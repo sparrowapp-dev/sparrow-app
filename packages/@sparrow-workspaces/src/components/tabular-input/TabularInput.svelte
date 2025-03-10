@@ -235,7 +235,7 @@
   });
 </script>
 
-<div class="outer-section" style="margin-top:12px;">
+<div>
   {#if !isBulkEditActive}
     <section
       class="mb-0 me-0 py-0 section-layout w-100"
@@ -438,7 +438,7 @@
     height: 28px;
   }
   .header-text {
-    color: var(--text-ds-neutral-200);
+    color: var(--text-ds-neutral-50);
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;

@@ -530,7 +530,7 @@
   }
 
   :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 11px !important;
+    width: 10px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -551,7 +551,7 @@
     .rest-splitter > .splitpanes__splitter:active,
     .rest-splitter > .splitpanes__splitter:hover
   ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .link {
     color: var(--text-primary-300);

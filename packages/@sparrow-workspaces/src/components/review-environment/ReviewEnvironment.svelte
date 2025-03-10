@@ -57,14 +57,18 @@
 
 <div
   id={`env-review-${id}`}
-  class="select-environment-popup bg-tertiary-400 d-flex p-3 rounded"
+  class="select-environment-popup d-flex rounded"
   style="
       top:{environmentAxisY}px;
       left:{environmentAxisX}px;
+      background-color: var(--bg-ds-surface-600);
+      padding: 12px;
       "
 >
   <div class="content-panel w-100">
-    <p
+    <div
+    style="margin-bottom: 12px;"
+
       class={reviewEnv?.type === "G"
         ? "global-base text-fs-10"
         : "local-base text-fs-10"}
@@ -74,7 +78,7 @@
         height={"6px"}
         width={"6px"}
       /> baseURL
-    </p>
+  </div>
     <div class="d-flex">
       <span class="text-secondary-200 text-fs-11" style="width:55px;"
         >SCOPE</span

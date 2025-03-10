@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, SvelteComponent } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon } from "@sparrow/library/assets";
@@ -30,6 +30,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    icon?: SvelteComponent;
   }>;
 
   export let iconColor = "grey";
@@ -143,6 +144,8 @@
   export let showDescription = true;
 
   export let isArrowIconRequired = true;
+
+  export let bodyAlignment: 'right' | 'left' = 'right';
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -383,19 +386,19 @@
     if (_color === "primary") {
       return "text-primaryColor";
     } else if (_color === "danger") {
-      return "var(--text-ds-danger-300)";
+      return "text-dangerColor";
     } else if (_color === "dark") {
       return "text-defaultColor";
     } else if (_color === "light") {
       return "text-whiteColor";
     } else if (_color === "success") {
-      return "var(--text-ds-success-300)";
+      return "text-getColor";
     } else if (_color === "warning") {
-      return "var(--text-ds-warning-300)";
+      return "text-postColor";
     } else if (_color === "secondary") {
-      return "var(--text-ds-secondary-300)";
+      return "text-putColor";
     } else if (_color === "patch") {
-      return "var(--text-ds-accent-300)";
+      return "text-patchColor";
     } else {
       return "text-whiteColor";
     }
@@ -464,7 +467,7 @@
               class="ellipsis {selectedRequest?.default
                 ? 'text-textColor'
                 : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {getTextColor(selectedRequest?.color)}"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
             >
               {selectedRequest?.description ?? ""}
             </span>
@@ -472,7 +475,7 @@
               class="ellipsis me-3 {selectedRequest?.default
                 ? 'text-textColor'
                 : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {getTextColor(selectedRequest?.color)}"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
             >
               /{selectedRequest?.name ?? ""}
             </span>
@@ -482,7 +485,7 @@
             class="ellipsis me-3 {selectedRequest?.default
               ? 'text-textColor'
               : getTextColor(selectedRequest?.color)}"
-            style="color: {getTextColor(selectedRequest?.color)};font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
+            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
             selectedRequest?.hide
               ? 'color:var(--bg-ds-nuetral-100) !important'
               : ''}"
@@ -507,19 +510,30 @@
       : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
-      {isOpen
-      ? 'opacity: 1; transform: scale(1);'
-      : 'opacity: 0; transform: scale(0.8);'}
-      min-width:{minBodyWidth}; left: {position === 'fixed'
+  {isOpen
+  ? 'opacity: 1; transform: scale(1);'
+  : 'opacity: 0; transform: scale(0.8);'}
+  min-width:{minBodyWidth}; 
+  left: {position === 'fixed'
+    ? (bodyAlignment === 'right'
       ? `${bodyLeftDistance}px;`
-      : `0px;`} top: {position === 'fixed'
-      ? `${bodyTopDistance}px;`
-      : `${
-          Number(headerHeight.replace(/\D/g, '')) + 5
-        }px;`}  right: {position === 'fixed'
+      : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`)
+    : (bodyAlignment === 'right'
+      ? '0px;'
+      : 'auto;')} 
+  top: {position === 'fixed'
+    ? `${bodyTopDistance}px;`
+    : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
+  right: {position === 'fixed'
+    ? (bodyAlignment === 'right'
       ? `${bodyRightDistance}px;`
-      : `0px;`} z-index:{zIndex}; padding: 8px 6px;
-      "
+      : 'auto;')
+    : (bodyAlignment === 'right'
+      ? '0px;'
+      : '0px;')} 
+  z-index:{zIndex}; 
+  padding: 8px 6px;
+  "
   >
     <div
       on:click={() => {

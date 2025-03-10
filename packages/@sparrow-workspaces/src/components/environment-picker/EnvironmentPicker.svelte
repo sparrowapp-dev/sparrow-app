@@ -69,35 +69,37 @@
 </script>
 
 <div
-  class="select-environment-popup bg-tertiary-700 d-flex p-3 rounded"
+  class="select-environment-popup d-flex"
   style="
     top:{environmentAxisY}px;
     left:{environmentAxisX}px;
     "
 >
   <div
-    class="left-panel pe-2 w-100"
+    class="left-panel w-100"
     id="left-panel-environment"
     bind:this={scrollPosition}
   >
     {#if filterData.filter((elem) => {
       return elem.type === "E";
     }).length > 0}
-      <p class="text-fs-12 mb-2">ENVIRONMENT VARIABLES</p>
+      <div class="variable-heading mb-2">ENVIRONMENT VARIABLES</div>
     {/if}
     {#each filterData as mock, index}
       {#if mock.type === "E"}
         <div
           role="button"
-          class="env-item border-radius-2"
+          class="env-item border-radius-1"
           on:click={() => {
             const preUrl = inputText?.substring(0, trackParanthesis[0]);
             const postUrl = inputText?.substring(trackCursor, inputText.length);
             updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
             handleInputValue();
           }}
+          
         >
-          <div class="d-flex mb-1 align-items-center border-radius-2">
+          <div class="d-flex align-items-center border-radius-2"
+          style="padding:4px 6px 4px 8px;">
             <div
               class="ms-1 d-flex align-items-center justify-content-center"
               style="height:22px; width:22px;"
@@ -135,12 +137,12 @@
     {#if filterData.filter((elem) => {
       return elem.type === "G";
     }).length > 0}
-      <p
-        class="text-fs-12 mt-2 mb-2"
-        style="font-size: 12px; font-weight:500; line-height:18px;"
+      <div
+        class="variable-heading mb-2"
+        style="margin-top:12px;"
       >
         GLOBAL VARIABLES
-      </p>
+  </div>
     {/if}
 
     {#each filterData.filter((elem) => {
@@ -155,14 +157,18 @@
           updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
           handleInputValue();
         }}
+        
+        
       >
-        <div class="d-flex mb-1 align-items-center border-radius-2">
+        <div class="d-flex align-items-center border-radius-2"
+        style="padding:4px 6px 4px 8px;">
           <div
             class="ms-1 d-flex align-items-center justify-content-center"
             style="height:22px; width:22px;"
           >
             <div
               class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center global-environment"
+              
             >
               <span class={"text-secondary-100 fw-bold text-fs-16"}
                 >{mock.type}</span
@@ -195,14 +201,19 @@
 
 <style>
   .select-environment-popup {
-    width: 394px;
-    height: 168px;
+    width: 252px;
+    height: fit-content;
+    max-height: 348px;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
+    background-color: var(--bg-ds-surface-600);
+    padding:12px;
+    border-radius: 4px;
   }
   .select-environment-popup .left-panel {
-    height: 138px;
+    height: 100%;
+    max-height: 324px;
     overflow-y: auto;
   }
   .global-environment {
@@ -240,5 +251,11 @@
 
   .word-break {
     word-break: break-all;
+  }
+  .variable-heading{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: var(--text-ds-neutral-50);
   }
 </style>

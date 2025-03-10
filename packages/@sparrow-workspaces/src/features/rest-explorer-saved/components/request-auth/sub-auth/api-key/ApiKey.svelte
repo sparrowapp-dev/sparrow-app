@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { Select } from "@sparrow/library/forms";
-  import { AuthSection } from "@sparrow/common/enums/authorization.enum";
-  import type { ApiKey } from "@sparrow/common/interfaces/request.interface";
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
   import { RadioButton } from "@sparrow/library/ui";
-  export let apiData: ApiKey;
+  import { CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  export let apiData;
   export let callback;
   export let environmentVariables;
   export let onUpdateEnvironment;
@@ -15,27 +13,22 @@
     callback({ apiKey: apiData });
   };
 
-  const handleOptionChange = (event) => {
+  const handleOptionChange = (event: any) => {
     apiData.addTo = event.target.value;
     callback({ apiKey: apiData });
   };
 </script>
 
-<div>
-  <p class="text-secondary-300 text-fs-12 fw-normal">
-    The authorization header will be automatically generated when you send the
-    request.
-  </p>
-</div>
+<p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
 <div class="pt-2 d-flex gap-3">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
       id="radio-1"
       name="radio"
-      value={AuthSection.HEADER}
+      value={CollectionRequestAddToBaseEnum.HEADER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Add to Header "
+      labelText=" Header "
       buttonSize="medium"
       disabled={true}
     />
@@ -44,10 +37,10 @@
     <RadioButton
       id="radio-2"
       name="radio"
-      value={AuthSection.QUERY_PARAMETER}
+      value={CollectionRequestAddToBaseEnum.QUERY_PARAMETER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Add to Parameter "
+      labelText=" Parameter "
       buttonSize="medium"
       disabled={true}
     />
@@ -55,7 +48,7 @@
 </div>
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class=" mb-2 text-secondary-100">Auth Key</p>
+    <p class=" mb-2 text-secondary-100">Key</p>
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
@@ -63,7 +56,7 @@
         onUpdateInput={() => {
           handleAuthChange();
         }}
-        placeholder={"Key"}
+        placeholder={"Enter auth key"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
@@ -72,14 +65,14 @@
     </div>
   </div>
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-secondary-100">Auth Value</p>
+    <p class="mb-2 text-secondary-100">Value</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:value={apiData.authValue}
         onUpdateInput={() => {
           handleAuthChange();
         }}
-        placeholder={"Value"}
+        placeholder={"Enter auth value"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}

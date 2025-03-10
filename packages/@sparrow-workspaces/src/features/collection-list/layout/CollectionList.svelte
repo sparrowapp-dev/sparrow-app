@@ -315,7 +315,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={col}
+                    collection={col?.toMutableJSON()}
                     {activeTabId}
                     {searchData}
                     {isWebApp}
@@ -357,7 +357,7 @@
                   {userRoleInWorkspace}
                   {activeTabPath}
                   {activeTabType}
-                  collection={col}
+                  collection={col?.toMutableJSON()}
                   {activeTabId}
                   {isWebApp}
                   bind:isFirstCollectionExpand

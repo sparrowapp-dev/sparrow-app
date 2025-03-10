@@ -103,7 +103,11 @@
       titleId={requestState.requestBodyNavigation}
       onclick={handleDropdown}
       zIndex={499}
-      disabled={true}
+      disabled={false}
+      headerTheme={"secondary"}
+      bodyTheme={"surface"}
+      minHeaderWidth={"500px"}
+      headerHeight={"28px"}
     />
     <span class="pe-3" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}

@@ -24,7 +24,12 @@
    * identifies Select disabled or not
    */
   export let disabled;
-  $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
+
+  export let minHeaderWidth;
+
+  export let minBodyWidth="150px";
+ 
+  export let headerHeight="24px";
 </script>
 
 <Select
@@ -38,12 +43,13 @@
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
-  headerHeight={"24px"}
-  minBodyWidth={"150px"}
+  minBodyWidth={minBodyWidth}
   borderRounded={"4px"}
-  headerTheme={"violet"}
-  bodyTheme={"violet"}
+  headerTheme={"secondary"}
+  bodyTheme={"surface"}
   menuItem={"v2"}
-  headerFontSize={"10px"}
+  headerFontSize={"12px"}
   isDropIconFilled={true}
+  minHeaderWidth={minHeaderWidth}
+  headerHeight={headerHeight}
 />
