@@ -219,7 +219,7 @@
   };
 
   // Methods for Tab Controls - start
-  const froceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
+  const forceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
     tabsToForceClose = tabList;
     tabIdWhoRecivedForceClose = currentTabId;
     noOfNotSavedTabsWhileForClose = 0;
@@ -636,7 +636,7 @@
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
             onDoubleClick={_viewModel.handleTabTypeChange}
             onClickCloseOtherTabs={closeTabExceptCurrentOne}
-            onClickForceCloseTabs={froceCloseExceptCurrentOne}
+            onClickForceCloseTabs={forceCloseExceptCurrentOne}
             onClickDuplicateTab={handleTabDuplication}
           />
           <div style="flex:1; overflow: hidden;">
@@ -817,7 +817,7 @@
       <div class="popup-desc" style="font-weight: 400; margin-top: 15px; ">
         <p style="margin: 0px; ">
           Do you want to save changes in this tab “<span style="color: white;">
-            {!removeTab ? "New API" : removeTab.name}</span
+            {!removeTab ? "Untitled" : removeTab.name}</span
           >”? Changes will be lost in case you choose not to save.
         </p>
       </div>
@@ -849,18 +849,6 @@
     </div>
   </div>
 </Modal>
-
-<!-- Save Changes for API Popup -- Old -->
-<!-- <WithModal
-  isOpen={isPopupClosed}
-  onModalStateChanged={handleClosePopupBackdrop}
-  onSave={handlePopupSave}
-  onCancel={handleClosePopupBackdrop}
-  onDiscard={handlePopupDiscard}
-  isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-  {loader}
-  {isGuestUser}
-/> -->
 
 <Modal
   title={""}
