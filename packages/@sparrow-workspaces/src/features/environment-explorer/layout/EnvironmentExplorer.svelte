@@ -48,7 +48,7 @@
   let quickHelp: boolean = false;
   let search = "";
   let environmentName = "";
-  export let isNewEnvironment = false;
+
   $: {
     if ($currentEnvironment) {
       environmentName = $currentEnvironment?.name;
@@ -142,7 +142,6 @@
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           placeholder=""
           height="36px"
-          autofocus={isNewEnvironment}
           isPencilIconRequired={false}
         />
         <div class={`d-flex env-btn-container`} style="gap: 6px;">
