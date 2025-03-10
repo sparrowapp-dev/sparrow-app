@@ -8,8 +8,6 @@
     disabled?: boolean;
     hidden?: boolean;
     icon?: any;
-    customIcon?: boolean;
-    iconSize?: number;
     iconColor?: string;
   }> = [];
   export let noOfColumns = 0;
