@@ -283,10 +283,8 @@
     _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
 
     for (let tab of unSavedTabs) {
-      if (tab.id !== currentTabId) {
-        // Wait for closeTab to finish before moving to the next tab
-        await closeTabSequentially(tab.id, tab);
-      }
+      // Wait for closeTab to finish before moving to the next tab
+      await closeTabSequentially(tab.id, tab);
     }
   };
   /**
