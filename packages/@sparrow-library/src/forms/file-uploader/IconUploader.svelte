@@ -19,9 +19,18 @@
   ) => void;
   export let width = "100%";
   export let height = "auto";
-  export let iconHeight = 12;
-  export let iconWidth = 12;
   export let disabled = false;
+  export let headerLabel: boolean = false;
+  export let inputLadelId: string = "";
+  export let headerLabelText: string = "Label";
+  export let inputValueRequired: boolean = false;
+  export let supportLabel: boolean = false;
+  export let helpLabel: boolean = false;
+  export let helpLabelValue: boolean = false;
+  export let helpIcon;
+  export let errorMessage: string = "ErrorMessage";
+  export let helpLabelText: string = "help";
+  export let supportLabelText: string = "supportText";
   export let fileTypes = ["JPG", "PNG", "JPEG"];
   export let fileName: string = "";
   let isDragOver = false;
@@ -44,6 +53,25 @@
   };
 </script>
 
+{#if headerLabel}
+  <div class="">
+    <div style="width: {width}; padding-bottom: 2px;">
+      <label for={inputLadelId} class="label-header-text"
+        >{headerLabelText}</label
+      >
+      {#if inputValueRequired}
+        <span style="color:var(--text-ds-danger-400)">*</span>
+      {/if}
+    </div>
+    {#if supportLabel}
+      <div class="pb-2">
+        <p style="margin: 0px;" class="support-label-text">
+          {supportLabelText}
+        </p>
+      </div>
+    {/if}
+  </div>
+{/if}
 <div class="sparrow-text-input-container mb-2">
   <div class="d-flex flex-column">
     {#if value.length == 0 || value.size === 0}
@@ -81,10 +109,14 @@
           }
         }}
         on:focus={() => {
-          if (!disabled) isFocused = true;
+          if (!disabled) {
+            isFocused = true;
+          }
         }}
         on:blur={() => {
-          if (!disabled) isFocused = false;
+          if (!disabled) {
+            isFocused = false;
+          }
         }}
       >
         <div
@@ -201,6 +233,34 @@
     />
   {/if}
 </div>
+<div>
+  {#if helpLabel}
+    <div
+      class="d-flex justify-content-normal align-items-center"
+      style={helpIcon !== ""
+        ? "margin-left: 2px;"
+        : "gap: 4px; margin-left: 2px;"}
+    >
+      <div>
+        <svelte:component
+          this={helpIcon}
+          size={"16px"}
+          useParentColor={true}
+          color={isError
+            ? "var(--icon-ds-danger-300)"
+            : "var(--icon-ds-neutral-400)"}
+        />
+      </div>
+      {#if isError}
+        <p style="margin:0px;" class="help-label-error">
+          {errorMessage}
+        </p>
+      {:else if helpLabelValue}
+        <p style="margin:0px;" class="help-label-text">{helpLabelText}</p>
+      {/if}
+    </div>
+  {/if}
+</div>
 
 <style lang="scss">
   .sparrow-choose-file-input-button {
@@ -312,5 +372,25 @@
     width: 28px;
     height: 28px;
     transition: background-color 0.3s ease;
+  }
+  .label-header-text.support-label-text.help-label-text.help-label-error {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+  }
+  .label-header-text {
+    font-size: 14px;
+    color: var(--text-ds-neutral-200);
+  }
+  .support-label-text {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+  }
+  .help-label-text {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+  }
+  .help-label-error {
+    font-size: 12px;
+    color: var(--text-ds-danger-300);
   }
 </style>
