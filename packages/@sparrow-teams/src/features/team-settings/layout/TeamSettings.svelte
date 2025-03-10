@@ -23,35 +23,6 @@
 
 <div>
   <section class="h-100 pb-2 pt-2">
-    <div
-      class="d-flex align-items-center justify-content-start w-100 position-relative mb-3"
-    >
-      <div
-        style="padding:2px 0px 6px 0px"
-        class="d-flex align-items-center justify-content-start position-relative w-50"
-      >
-        <div
-          class="position-absolute d-flex align-items-center"
-          style="height: 20px; width: 20px; left: 10px; pointer-events: none;"
-        >
-          <SearchFilled size={"18px"} color={"var(--bg-ds-neutral-300)"} />
-        </div>
-
-        <input
-          type="text"
-          class="custom-surface700"
-          style="width: 380px;   height: 36px; padding-left: 30px; padding-right: 30px; color: white; outline: none; border-radius: 6px; background-color:var(--bg-ds-surface-600)"
-          bind:value={searchQuery}
-          placeholder="    Search people in Sparrow’s Team"
-          on:input={() =>
-            handleSearch(new CustomEvent("search", { detail: searchQuery }))}
-          on:keydown={(e) =>
-            e.key === "Enter" &&
-            handleSearch(new CustomEvent("search", { detail: searchQuery }))}
-        />
-      </div>
-    </div>
-
     <div class="d-flex h-100">
       <div class="h-100 d-flex flex-column" style="width: 250px;">
         <div style="flex:1; overflow:auto;">

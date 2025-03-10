@@ -41,14 +41,24 @@
     />
   </div>
 </div>
-<div class="desc" tabindex="0" style="width:72px">
+
+<div tabindex="0">
   <button
-    style="background-color: var(--bg-ds-primary-400); border-width:0px;width:72px;height:28px;border-radius:4px;"
-    >Save</button
+    class="desc"
+    style="width:72px;border-width:0px;height:28px;border-radius:4px;"
+    >click</button
   >
 </div>
 
 <style>
+  .desc {
+    width: 72px;
+    height: 28px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--bg-ds-primary-400);
+    transition: background-color 0.3s ease;
+  }
   .settings-team-description {
     height: calc(150px) !important;
   }
@@ -58,6 +68,7 @@
   }
   .desc:hover {
     border-radius: 4px;
+    background-color: var(--bg-ds-primary-300);
   }
   .settings-team-description {
     background-color: transparent !important;
