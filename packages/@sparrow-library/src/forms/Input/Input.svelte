@@ -126,7 +126,8 @@
     {maxlength}
     class=" w-100 {componentClass}"
     {placeholder}
-    style=" {componentStyle} height: 100%; {type === 'search'
+    style="background-color: var(--bg-ds-surface-400); {componentStyle} height: 100%; {type ===
+    'search'
       ? `padding-left:${height} !important;`
       : ''} {type === 'text' && isEditIconRequired && isHovered
       ? 'padding-right:35px !important;'

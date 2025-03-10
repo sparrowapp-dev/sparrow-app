@@ -128,7 +128,10 @@
   <!-- 
     -- Title 
   -->
-  <span class="text-fs-14 text-secondary-1000">{ICON_CONFIG.TITLE}</span>
+  <span class="text-fs-14 text-secondary-1000"
+    ><span style="color:var(--text-ds-neutral-200);">{ICON_CONFIG.TITLE}</span
+    ></span
+  >
 
   <!-- 
     -- Description 

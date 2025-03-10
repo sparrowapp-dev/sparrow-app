@@ -30,7 +30,8 @@
     -- Title 
   -->
   <label for={inputId} class="text-fs-14 pb-1 text-secondary-1000"
-    >{NAME_CONFIG.TITLE}</label
+    ><span style="color:var(--text-ds-neutral-200)">{NAME_CONFIG.TITLE}</span
+    ></label
   >
   <span class="text-danger-200">*</span>
 
