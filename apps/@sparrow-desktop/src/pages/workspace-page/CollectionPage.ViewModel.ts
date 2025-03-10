@@ -4244,34 +4244,26 @@ export default class CollectionsViewModel {
           contentType,
         );
 
-      if (response.isSuccessful) {
-        const path = {
-          workspaceId: currentWorkspaceId,
-          collectionId: response.data.data._id,
-          folderId: "",
-        };
+      if (response?.isSuccessful) {
         this.collectionRepository.addCollection({
           ...response.data.data,
           id: response.data.data._id,
           workspaceId: currentWorkspaceId,
         });
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
-          currentWorkspaceId,
-        );
-        initCollectionTab.updatePath(path);
-        initCollectionTab.updateName(response.data.data.name);
-        initCollectionTab.updateDescription(response.data.data.description);
-        initCollectionTab.updateIsSave(true);
-
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        
+        const collectionTab = new CollectionTabAdapter().adapt(currentWorkspaceId, {
+          ...response.data.data,
+          id: response.data.data._id
+        });
+        
+        this.tabRepository.createTab(collectionTab);
         moveNavigation("right");
 
         this.workspaceRepository.updateCollectionInWorkspace(
           currentWorkspaceId,
           {
-            id: initCollectionTab.getValue().id,
-            name: initCollectionTab.getValue().name,
+            id: response.data.data._id,
+            name: response.data.data.name,
           },
         );
         MixpanelEvent(Events.IMPORT_COLLECTION, {
@@ -4309,12 +4301,7 @@ export default class CollectionsViewModel {
           file,
         );
       }
-      if (response.isSuccessful) {
-        const path = {
-          workspaceId: currentWorkspaceId,
-          collectionId: response.data.data._id,
-          folderId: "",
-        };
+      if (response?.isSuccessful) {
 
         this.collectionRepository.addCollection({
           ...response.data.data,
@@ -4322,24 +4309,19 @@ export default class CollectionsViewModel {
           workspaceId: currentWorkspaceId,
         });
 
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
-          currentWorkspaceId,
-        );
+        const collectionTab = new CollectionTabAdapter().adapt(currentWorkspaceId, {
+          ...response.data.data,
+          id: response.data.data._id
+        });
 
-        initCollectionTab.updatePath(path);
-        initCollectionTab.updateName(response.data.data.name);
-        initCollectionTab.updateDescription(response.data.data.description);
-        initCollectionTab.updateIsSave(true);
-
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        this.tabRepository.createTab(collectionTab);
         moveNavigation("right");
 
         this.workspaceRepository.updateCollectionInWorkspace(
           currentWorkspaceId,
           {
-            id: initCollectionTab.getValue().id,
-            name: initCollectionTab.getValue().name,
+            id: response.data.data._id,
+            name: response.data.data.name,
           },
         );
         notifications.success("Collection imported successfully.");
@@ -4371,25 +4353,13 @@ export default class CollectionsViewModel {
         activeSync,
       );
 
-      if (response.isSuccessful) {
-        const path = {
-          workspaceId: currentWorkspaceId,
-          collectionId: response.data.data.collection._id,
-          folderId: "",
-        };
+      if (response?.isSuccessful) {
 
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data.collection._id,
-          currentWorkspaceId,
-        );
-        initCollectionTab.updatePath(path);
-
-        initCollectionTab.updateName(response.data.data.collection.name);
-        initCollectionTab.updateDescription(
-          response.data.data.collection.description,
-        );
-
-        initCollectionTab.updateIsSave(true);
+        const collectionTab = new CollectionTabAdapter().adapt(currentWorkspaceId, {
+          ...response.data.data.collection,
+          id: response.data.data.collection._id
+        });
+    
         if (response.data.data.existingCollection) {
           this.collectionRepository.updateCollection(
             response.data.data.collection._id,
@@ -4410,14 +4380,14 @@ export default class CollectionsViewModel {
           this.workspaceRepository.updateCollectionInWorkspace(
             currentWorkspaceId,
             {
-              id: initCollectionTab.getValue().id,
-              name: initCollectionTab.getValue().name,
+              id: response.data.data.collection._id,
+              name: response.data.data.collection.name,
             },
           );
           notifications.success("Collection imported successfully.");
         }
 
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        this.tabRepository.createTab(collectionTab);
         moveNavigation("right");
 
         MixpanelEvent(Events.IMPORT_COLLECTION, {
