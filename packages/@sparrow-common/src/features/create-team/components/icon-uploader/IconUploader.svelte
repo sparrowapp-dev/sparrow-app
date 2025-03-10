@@ -72,8 +72,10 @@
           class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
         >
           <span style="color: var(--text-ds-neutral-200);">Drag & drop or</span>
-          <label for={inputId} class="sparrow-choose-file-label ps-2"
-            >Upload File</label
+          <label
+            for={inputId}
+            class="sparrow-choose-file-label ps-2"
+            style="color: var(--text-ds-primary-300);">Upload File</label
           ><span style="padding-left: 3px; color:var(--text-ds-neutral-200)"
             >here</span
           >
