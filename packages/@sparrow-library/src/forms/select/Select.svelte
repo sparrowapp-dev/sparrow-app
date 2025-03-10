@@ -383,19 +383,19 @@
     if (_color === "primary") {
       return "text-primaryColor";
     } else if (_color === "danger") {
-      return "text-dangerColor";
+      return "var(--text-ds-danger-300)";
     } else if (_color === "dark") {
       return "text-defaultColor";
     } else if (_color === "light") {
       return "text-whiteColor";
     } else if (_color === "success") {
-      return "text-getColor";
+      return "var(--text-ds-success-300)";
     } else if (_color === "warning") {
-      return "text-postColor";
+      return "var(--text-ds-warning-300)";
     } else if (_color === "secondary") {
-      return "text-putColor";
+      return "var(--text-ds-secondary-300)";
     } else if (_color === "patch") {
-      return "text-patchColor";
+      return "var(--text-ds-accent-300)";
     } else {
       return "text-whiteColor";
     }
@@ -464,7 +464,7 @@
               class="ellipsis {selectedRequest?.default
                 ? 'text-textColor'
                 : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {getTextColor(selectedRequest?.color)}"
             >
               {selectedRequest?.description ?? ""}
             </span>
@@ -472,7 +472,7 @@
               class="ellipsis me-3 {selectedRequest?.default
                 ? 'text-textColor'
                 : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {getTextColor(selectedRequest?.color)}"
             >
               /{selectedRequest?.name ?? ""}
             </span>
@@ -482,7 +482,7 @@
             class="ellipsis me-3 {selectedRequest?.default
               ? 'text-textColor'
               : getTextColor(selectedRequest?.color)}"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
+            style="color: {getTextColor(selectedRequest?.color)};font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
             selectedRequest?.hide
               ? 'color:var(--bg-ds-nuetral-100) !important'
               : ''}"

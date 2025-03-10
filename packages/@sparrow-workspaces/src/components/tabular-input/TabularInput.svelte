@@ -279,7 +279,7 @@
                   label="Bulk Edit"
                   fontSize="12px"
                   textColor="var(--text-ds-neutral-200)"
-                  fontWeight="400"
+                  fontWeight="500"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
                 />
@@ -332,11 +332,11 @@
         <!-- Bulk Edit Heading -->
         <div
           class="px-3 d-flex align-items-center"
-          style="justify-content: space-between; background-color: var(--bg-secondary-880)"
+          style="justify-content: space-between; background-color: var(--bg-ds-surface-400)"
         >
           <!-- Bulk Edit Text  -->
           <div class="d-flex align-items-center">
-            <p class="mb-0 text-fs-12 fw-bold text-secondary-200">Bulk Edit</p>
+            <p class="mb-0 text-fs-12" style="color: var(--text-ds-neutral-200); font-weight:500">Bulk Edit</p>
 
             <div>
               {#if isBulkEditHeaderInfoRequired}
@@ -401,8 +401,8 @@
                 <Toggle
                   bind:isActive={bulkToggle}
                   label="Bulk Edit"
-                  fontSize="10px"
-                  fontWeight="400"
+                  fontSize="12px"
+                  fontWeight="500"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
                 />
