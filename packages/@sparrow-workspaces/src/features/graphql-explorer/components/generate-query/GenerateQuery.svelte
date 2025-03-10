@@ -19,6 +19,8 @@
   export let onUpdateRequestState;
   export let operationSearch = "";
   export let updateOperationSearch;
+  export let isSchemaFetching = false;
+  export let onRefreshSchema: () => void = () => {};
 
   interface QuerySchema {
     name: string;
@@ -502,9 +504,6 @@
    */
   const handleQBuilderInputboxChange = (_e: Event, _id: string) =>
     updateAttributeInputData(_id, (_e.target as HTMLInputElement).value);
-
-  $: console.log(queryBuilder);
-  $: console.log(queryBuilder[0]);
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -513,7 +512,7 @@
     style="border-bottom:1px solid var(--border-secondary-500);"
   >
     <div
-      class="d-flex align-items-center py-3 pe-3"
+      class="d-flex justify-content-between align-items-center py-3 pe-3"
       style="min-width: 272px; max-width: 272px; border-right: 1px solid var(--border-secondary-500);"
     >
       <Select
@@ -545,6 +544,15 @@
           onUpdateRequestState({ operationNavigation: id });
         }}
         disabled={false}
+      />
+      <Button
+        size="small"
+        type="teritiary-regular"
+        title="Schema"
+        onclick={async () => {
+          onRefreshSchema();
+        }}
+        disabled={isSchemaFetching}
       />
     </div>
     <Breadcrumbs breadcrumbs={breadcrum} onNavigate={navigateToBreadcrumPath} />
