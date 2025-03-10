@@ -15,16 +15,17 @@
   import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
   import constants from "../../../../constants/constants";
   import type { RxDocument } from "rxdb";
+  import type { CollectionDocType } from "@app/models/collection.model";
   export let tab;
   export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
   const collectionObs = _viewModel.collectionSubscriber(tab.path.collectionId);
 
-  let collection;
+  let collection: CollectionDocType;
   const collectionSubscriber = collectionObs.subscribe(
     (data: RxDocument<CollectionDocument>) => {
-      collection = data.toMutableJSON();
+      collection = data?.toMutableJSON();
     },
   );
 

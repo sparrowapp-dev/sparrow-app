@@ -8,7 +8,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -318,7 +318,53 @@ export const tabSchemaLiteral = {
           type: "string",
         },
         collection: {
-          type: "string",
+          type: "object",
+          properties :{
+            auth: {
+              type: "object",
+              properties: {
+                bearerToken: {
+                  type: "string",
+                },
+                basicAuth: {
+                  type: "object",
+                  properties: {
+                    username: {
+                      type: "string",
+                    },
+                    password: {
+                      type: "string",
+                    },
+                  },
+                },
+                apiKey: {
+                  type: "object",
+                  properties: {
+                    authKey: {
+                      type: "string",
+                    },
+                    authValue: {
+                      type: "string",
+                    },
+                    addTo: {
+                      type: "string",
+                    },
+                  },
+                },
+              },
+            },
+            state: {
+              type: "object",
+              properties: {
+                collectionAuthNavigation: {
+                  type: "string",
+                },
+                collectionNavigation: {
+                  type: "string",
+                },
+              },
+            },  
+          }
         },
         workspace: {
           type: "string",

@@ -193,6 +193,7 @@
   {environmentVariables}
   onUpdateDescription={_viewModel.handleUpdateDescription}
   onCreateAPIRequest={_viewModel.handleCreateRequest}
+  onItemCreated={_viewModel.handleCreateItem}
   onCollectionSynced={_viewModel.handleSyncCollection}
   onSaveCollection={_viewModel.handleSaveCollection}
   onRename={_viewModel.handleRename}

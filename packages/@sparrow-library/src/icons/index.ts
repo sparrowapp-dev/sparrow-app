@@ -187,7 +187,7 @@ export { default as ClockRegular } from "./ClockRegular.svelte";
 export { default as CircleSmallFilled } from "./CircleSmallFilled.svelte";
 export { default as CopyRegular } from "./CopyRegular.svelte";
 
-export { default as ArrowDownloadRegular} from "./ArrowDownloadRegular.svelte";
+export { default as ArrowDownloadRegular } from "./ArrowDownloadRegular.svelte";
 export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";
 export { default as ArrowUpFilled } from "./ArrowUpFilled.svelte";
 export { default as ArrowDownRegular } from "./ArrowDownRegular.svelte";
@@ -205,4 +205,5 @@ export { default as SendRegular } from "./SendRegular.svelte";
 export { default as ThumbDislikeFilled } from "./ThumbDislikeFilled.svelte";
 export { default as GlobeRegular } from "./GlobeRegular.svelte";
 export { default as CircleFilled} from "./CircleFilled.svelte";
-export {default as OpenRegular} from "./OpenRegular.svelte"
+export { default as OpenRegular } from "./OpenRegular.svelte";
+export { default as CaretUpFilled } from "./CaretUpFilled.svelte";
