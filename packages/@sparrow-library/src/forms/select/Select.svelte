@@ -72,8 +72,6 @@
   export let borderType: "all" | "bottom" | "none" = "all"; // normal case
   export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
 
-  export let isStartIcon = false;
-
   /**
    * Determines the icon state for the Select header.
    */
@@ -592,7 +590,6 @@
               {getTextColor}
               {highlightTickedItem}
               {showDescription}
-              isStartIcon={isStartIcon}
             />
           {:else if menuItem === "v3"}
             <MenuItemsV3 {list} {selectedRequest} {getTextColor} />

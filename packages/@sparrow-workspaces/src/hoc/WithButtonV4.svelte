@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ButtonV2 } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   /**
    * icon to be embedded in button
    */
@@ -16,20 +16,18 @@
    * identifies the button is in loading state or not
    */
   export let loader;
+
+  export let size="medium";
+
+  export let type="primary";
   $: ({ onClick, icon, disable, loader } = $$props);
 </script>
 
-<ButtonV2
-  {icon}
+<Button
+  startIcon={icon}
   {onClick}
   {disable}
   {loader}
-  buttonSize={"20px"}
-  iconSize={"12px"}
-  defaultBackgroundColor={"transparent"}
-  hoveredBackgroundColor={"var(--bg-tertiary-500)"}
-  clickedBackgroundColor={"var(--bg-tertiary-500)"}
-  defaultIconColor={"var(--icon-secondary-200)"}
-  hoveredIconColor={"var(--icon-secondary-200)"}
-  clickedIconColor={"var(--icon-secondary-200)"}
+  type={type}
+  size={size}
 />

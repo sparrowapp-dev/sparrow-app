@@ -1,20 +1,22 @@
 <script lang="ts">
   import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
   import { Input, Search } from "@sparrow/library/forms";
-  import {  DotIcon,
+  import {
     BlankIcon,
     ArrowDownRegular,
     DeleteFilled,
     ListIcon,
     ArrowUpRightRegular,
-    ArrowDownLeft,
+    ArrowDownLeftFilled,
     CheckMarkIcon,
     CheckmarkCircle,
-    ErrorCircleFilled
+    ErrorCircleFilled,
+    CircleFilled
   } from "@sparrow/library/icons";
-  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
+  import { Dropdown, Tooltip } from "@sparrow/library/ui";
   import  {ArrowUpFilled } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
+  import {WithButtonV4} from "@sparrow/workspaces/hoc";
 
   export let webSocket;
   export let onSearchMessage;
@@ -23,8 +25,6 @@
   export let onUpdateContentType;
   export let onUpdateFilterType;
   let searchData = webSocket.search;
-  let messageTypeId="All Messages";
-
   let filteredWebsocketMessage = [];
   const filterWebsocketResponse = () => {
     filteredWebsocketMessage = webSocket.messages
@@ -101,8 +101,8 @@
     <div class="d-flex justify-content-between align-content-center pb-2">
       <span class="text-fs-12 text-secondary-300 my-auto" style="font-weight: 600;">Response</span>
       <div class="d-flex">
-        <span class="gap-1">
-          <DotIcon
+        <span class="gap-1 d-flex align-items-center">
+          <CircleFilled
             color={webSocket.status === "connected"
               ? "#69D696"
               : webSocket.status === "disconnected"
@@ -111,8 +111,8 @@
                     webSocket.status === "disconnecting"
                   ? "#FBA574"
                   : "#FBA574"}
-            height={"6px"}
-            width={"6px"}
+            size={"6px"}
+            
           />
           <span class="text-fs-12 px-2 connection-status"
           style={`color: ${webSocket.status === "connected"
@@ -137,10 +137,9 @@
         </span>
         <span class="d-flex gap-1">
           <Tooltip title={"Scroll to top"}>
-
-            <Button
-            type="teritiary-regular"
-            startIcon={ArrowUpFilled}
+            <WithButtonV4
+             type="teritiary-regular"
+            icon={ArrowUpFilled}
             size="small"
             onClick={() => {
               scroll("top");
@@ -148,23 +147,22 @@
             />
           </Tooltip>
           <Tooltip title={"Scroll to bottom"}>
-            <Button
-            type="teritiary-regular"
-            startIcon={ArrowDownRegular}
+            <WithButtonV4
+             type="teritiary-regular"
+            icon={ArrowDownRegular}
             size="small"
             onClick={() => {
               scroll("bottom");
             }}/>
           </Tooltip>
           <Tooltip title={"Delete"} placement="bottom-right">
-             <Button
+            <WithButtonV4
             type="teritiary-regular"
-            startIcon={DeleteFilled}
+            icon={DeleteFilled}
             size="small"
             onClick={() => {
               onDeleteMessage();
             }}/>
-            
           </Tooltip>
         </span>
       </div>
@@ -186,7 +184,7 @@
       <div>
         <Select
        id="filtermessage"
-       titleId={`${messageTypeId}`}
+       titleId={`${webSocket.filter}`}
         data={[
             { id:"All Messages",
               name: "All Messages",
@@ -202,12 +200,12 @@
             },
             { id:"Received",
               name: "Received",
-              icon: ArrowDownLeft,
+              icon: ArrowDownLeftFilled,
               iconProps:{size:"16px", color:"var(--text-ds-primary-400)"}
             },
           ]}
          onclick={(id)=>{
-          messageTypeId=id;
+          webSocket.filter=id;
           onUpdateFilterType(id);
          }}
         minHeaderWidth={"133px"}
@@ -225,7 +223,6 @@
         maxBodyHeight={"108px"}
         minBodyWidth={"186px"}
         headerHeight={"28px"}
-        isStartIcon={true}
         bodyAlignment={"left"}/>
       </div>
     </div>
@@ -266,7 +263,7 @@
             
                <CheckmarkCircle size={"14px"} color="var(--icon-ds-success-400)"/>
             {:else if message?.transmitter === "receiver"}
-            <ArrowDownLeft color="var(--icon-ds-primary-400)" size={"14px"}/>
+            <ArrowDownLeftFilled color="var(--icon-ds-primary-400)" size={"14px"}/>
             {/if}
           </span>
           <!-- <div class="d-flex align-items-center"> -->

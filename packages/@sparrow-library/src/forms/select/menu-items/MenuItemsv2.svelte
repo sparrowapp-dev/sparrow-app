@@ -44,7 +44,6 @@
    */
   export let bodyTheme: string;
 
-  export let isStartIcon: boolean = false;
 
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
@@ -113,7 +112,7 @@
   )}"
   tabindex="0"
 >
-  {#if isStartIcon && list.icon}
+  {#if list.icon}
   <div class="me-2">
 <svelte:component this={list.icon} {...list.iconProps} class="menu-icon" />
   </div>

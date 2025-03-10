@@ -17,6 +17,7 @@
   import type { WebSocketMessage } from "../../store/websocket";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
+  import { WithButtonV4 } from "@sparrow/workspaces/hoc"
 
   export let webSocket;
   export let onUpdateContentType;
@@ -186,21 +187,21 @@
     <div class="d-flex align-items-center gap-2">
       <!-- Copy button -->
       <Tooltip title={"Copy"}>
-        <Button
-        type="teritiary-regular"
-        startIcon={CopyRegular}
-        onClick={handleCopy}
-        size="small"/>
+        <WithButtonV4
+          type="teritiary-regular"
+          icon={CopyRegular}
+          onClick={handleCopy}
+          size="small"/>
       </Tooltip>
       <!-- Download button -->
 
       {#if !isWebApp}
         <Tooltip title={"Export"}>
-           <Button
-        type="teritiary-regular"
-        startIcon={ArrowDownloadRegular}
-        onClick={handleDownloaded}
-        size="small"/>
+          <WithButtonV4
+          type="teritiary-regular"
+          icon={ArrowDownloadRegular}
+          onClick={handleDownloaded}
+          size="small"/>
         </Tooltip>
       {/if}
     </div>
