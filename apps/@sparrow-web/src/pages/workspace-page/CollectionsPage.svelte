@@ -29,6 +29,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
@@ -79,6 +80,7 @@
     isDefaultTourGuideOpen,
     isDefaultTourGuideClose,
   } from "@sparrow/workspaces/stores";
+  import WorkspaceTeam from "../../../../../packages/@sparrow-teams/src/features/create-workspace/components/workspace-team/WorkspaceTeam.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -671,6 +673,7 @@
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"

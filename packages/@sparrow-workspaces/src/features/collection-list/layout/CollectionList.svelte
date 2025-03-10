@@ -33,8 +33,6 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
-  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
-  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -397,23 +395,6 @@
     {/if}
   </div>
 </div>
-
-{#if $isDefaultTourGuideOpen && $defaultCurrentStep === 1}
-  <DefaultTourGuide
-    targetId="collection-container"
-    TitleName="Manage Your API Requests"
-    DescriptionContent="Easily access, add and organize your API requests here. Use this panel to create, edit, or delete requests with just a few clicks."
-    CardNumber={1}
-    TotalsCards={7}
-    tipPosition="right-center"
-    onNext={() => {
-      defaultCurrentStep.set(2);
-    }}
-    onClose={() => {
-      isDefaultTourGuideOpen.set(false);
-    }}
-  />
-{/if}
 
 <style>
   .collection-container {

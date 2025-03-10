@@ -32,6 +32,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
@@ -655,6 +656,7 @@
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"

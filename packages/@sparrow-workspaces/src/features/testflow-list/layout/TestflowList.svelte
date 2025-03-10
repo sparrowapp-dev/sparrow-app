@@ -270,22 +270,6 @@
     </div>
   {/if}
 </div>
-{#if $isDefaultTourGuideOpen && $defaultCurrentStep == 3}
-  <DefaultTourGuide
-    targetId="testflow-container"
-    TitleName={"Test Flows"}
-    DescriptionContent={"Use Test Flow to automate testing for your API requests. Chain multiple requests, validate responses, and ensure your APIs work as expected."}
-    CardNumber={3}
-    TotalsCards={7}
-    onNext={() => {
-      defaultCurrentStep.set(4);
-      console.log($defaultCurrentStep);
-    }}
-    onClose={() => {
-      isDefaultTourGuideOpen.set(false);
-    }}
-  />
-{/if}
 
 <style lang="scss">
   .add-icon-container {

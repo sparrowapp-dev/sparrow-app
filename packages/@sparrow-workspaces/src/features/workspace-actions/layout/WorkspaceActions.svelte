@@ -48,8 +48,6 @@
     isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
-  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
-  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { LaunchDesktop } from "@sparrow/common/components";
@@ -574,22 +572,6 @@
           </Dropdown>
         {/if}
       </div>
-      {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 6}
-        <DefaultTourGuide
-          targetId="options-container"
-          TitleName="Add API Requests & More!"
-          DescriptionContent="Click here to create new requests (HTTP, GraphQL, WebSocket, Socket.IO) add & import collections, environments & test flows."
-          CardNumber={6}
-          TotalsCards={7}
-          tipPosition="right-center"
-          onNext={() => {
-            defaultCurrentStep.set(7);
-          }}
-          onClose={() => {
-            isDefaultTourGuideOpen.set(false);
-          }}
-        />
-      {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">

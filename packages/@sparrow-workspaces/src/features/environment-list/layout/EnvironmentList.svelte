@@ -18,8 +18,6 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
-  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
-  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
 
   /**
    * current workspace
@@ -315,22 +313,6 @@
     </div>
   {/if}
 </div>
-{#if $isDefaultTourGuideOpen && $defaultCurrentStep === 2}
-  <DefaultTourGuide
-    targetId="Environment-container"
-    TitleName="Your Environments"
-    DescriptionContent="Environments help you manage different API variables (e.g. development, staging, production)."
-    CardNumber={2}
-    TotalsCards={7}
-    tipPosition="right-center"
-    onNext={() => {
-      defaultCurrentStep.set(3);
-    }}
-    onClose={() => {
-      isDefaultTourGuideOpen.set(false);
-    }}
-  />
-{/if}
 
 <style lang="scss">
   .env-Global {

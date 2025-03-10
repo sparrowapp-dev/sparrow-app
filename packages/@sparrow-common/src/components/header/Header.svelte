@@ -23,12 +23,6 @@
   } from "./sub-component/UserProfileModal.svelte";
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
-  import {
-    defaultCurrentStep,
-    isDefaultTourGuideClose,
-    isDefaultTourGuideOpen,
-  } from "@sparrow/workspaces/stores";
-  import { DefaultTourGuide } from "@sparrow/workspaces/components";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -416,7 +410,7 @@
         </Select>
       {/if}
     </div>
-    {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 5}
+    <!-- {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 5}
       <DefaultTourGuide
         targetId="workspace-container"
         TitleName="Navigate Between Workspaces"
@@ -432,7 +426,7 @@
           isDefaultTourGuideOpen.set(false);
         }}
       />
-    {/if}
+    {/if} -->
   </div>
 
   <div
@@ -575,25 +569,6 @@
         headerHeight={"28px"}
       />
     </div>
-
-    {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 4}
-      <DefaultTourGuide
-        targetId="environment-select-container"
-        TitleName="Switch Environments"
-        DescriptionContent="Need to test in a different environment? Use this menu to switch environments instantly."
-        CardNumber={4}
-        TotalsCards={7}
-        additionLeftValue={-150}
-        tipPosition="bottom-center"
-        onNext={() => {
-          defaultCurrentStep.set(5);
-        }}
-        onClose={() => {
-          isDefaultTourGuideOpen.set(false);
-        }}
-      />
-    {/if}
-
     <!-- {/if} -->
     <div class="" id="question-container">
       <Tooltip placement="bottom-right" title={"Quick Help"} zIndex={600}>
@@ -634,37 +609,6 @@
           ]}
         />
       </div>
-    {/if}
-    {#if $isDefaultTourGuideClose}
-      <DefaultTourGuide
-        targetId="question-container"
-        TitleName="Quick Help!"
-        DescriptionContent="Access documentation and stay up to date with the latest features and improvements."
-        TotalsCards={7}
-        additionLeftValue={-210}
-        tipPosition="bottom-center"
-        rightButtonName="Close"
-        onNext={() => {
-          isDefaultTourGuideClose.set(false);
-          isDefaultTourGuideOpen.set(false);
-        }}
-      />
-    {/if}
-    {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 7}
-      <DefaultTourGuide
-        targetId="question-container"
-        TitleName="Quick Help!"
-        DescriptionContent="Access documentation and stay up to date with the latest features and improvements."
-        additionLeftValue={-210}
-        CardNumber={7}
-        TotalsCards={7}
-        tipPosition="bottom-center"
-        rightButtonName="Finish"
-        onNext={() => {
-          isDefaultTourGuideClose.set(false);
-          isDefaultTourGuideOpen.set(false);
-        }}
-      />
     {/if}
 
     {#if !isGuestUser}
