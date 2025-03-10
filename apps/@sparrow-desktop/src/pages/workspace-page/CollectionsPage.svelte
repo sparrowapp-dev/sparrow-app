@@ -219,19 +219,14 @@
   };
 
   // Methods for Tab Controls - start
-  const forceCloseExceptCurrentOne = (tabList: Tab[], currentTabId: string) => {
-    tabsToForceClose = tabList;
+  const forceCloseExceptCurrentOne = (currentTabId: string) => {
+    tabsToForceClose = $tabList;
     tabIdWhoRecivedForceClose = currentTabId;
+
     noOfNotSavedTabsWhileForClose = 0;
     tabList?.forEach((tab: Tab) => {
       if (tab.id !== currentTabId) {
-        if (
-          (tab?.type === TabTypeEnum.REQUEST ||
-            tab?.type === TabTypeEnum.WEB_SOCKET ||
-            tab?.type === TabTypeEnum.SOCKET_IO ||
-            tab?.type === TabTypeEnum.GRAPHQL) &&
-          !tab?.isSaved
-        ) {
+        if (!tab?.isSaved) {
           noOfNotSavedTabsWhileForClose += 1;
         }
       }
@@ -246,11 +241,21 @@
       isForceCloseTabPopupOpen = true;
     } else forceCloseTab(tabList, currentTabId);
   };
-  const forceCloseTab = async (tabList: Tab[], currentTabId: string) => {
-    for (const tab of tabList) {
+  const forceCloseTab = async (currentTabId: string) => {
+    const savedTabs = [];
+    const unSavedTabs = [];
+    for (const tab of $tabList) {
       if (tab.id !== currentTabId) {
-        await forceCloseTabsAsync(tab.id, tab);
+        if (tab.isSaved) savedTabs.push(tab.tabId);
+        else unSavedTabs.push(tab);
       }
+    }
+
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
+
+    for (const tab of unSavedTabs) {
+      await forceCloseTabsAsync(tab.id, tab);
     }
   };
   const forceCloseTabsAsync = async (id: string, tab: Tab) => {
@@ -263,23 +268,35 @@
       }, 300);
     });
   };
+  const closeTabExceptCurrentOne = async (currentTabId: string) => {
+    const savedTabs = [];
+    const unSavedTabs = [];
+    for (const tab of $tabList) {
+      if (tab.id !== currentTabId) {
+        if (tab.isSaved) savedTabs.push(tab.tabId);
+        else unSavedTabs.push(tab);
+      }
+    }
+
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
+
+    for (let tab of unSavedTabs) {
+      if (tab.id !== currentTabId) {
+        // Wait for closeTab to finish before moving to the next tab
+        await closeTabSequentially(tab.id, tab);
+      }
+    }
+  };
   /**
    * The closeTabSequentially() method works well incase we want to bulk close the tabs
    * one by one. This function can also replace the above closeTab() function (will do so).
    * So same function can be used for single tab close and multiple tab close.
    */
   const closeTabSequentially = async (id: string, tab: Tab) => {
-    if (
-      (tab?.type === TabTypeEnum.REQUEST ||
-        tab?.type === TabTypeEnum.WEB_SOCKET ||
-        tab?.type === TabTypeEnum.ENVIRONMENT ||
-        tab?.type === TabTypeEnum.TESTFLOW ||
-        tab?.type === TabTypeEnum.SOCKET_IO ||
-        tab?.type === TabTypeEnum.GRAPHQL) &&
-      !tab?.isSaved
-    ) {
+    if (!tab?.isSaved) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
-        console.log("save ssss*****");
+        // console.log("save ssss*****");
         removeTab = tab;
         isPopupClosed = true;
         // Wait for the save popup to be handled before continuing
@@ -303,17 +320,7 @@
       }, 300);
     });
   };
-  const closeTabExceptCurrentOne = async (
-    tabList: Tab[],
-    currentTabId: string,
-  ) => {
-    for (let tab of tabList) {
-      if (tab.id !== currentTabId) {
-        // Wait for closeTab to finish before moving to the next tab
-        await closeTabSequentially(tab.id, tab);
-      }
-    }
-  };
+
   const handleTabDuplication = (tabId: string) => {
     _viewModel.createDuplicateTabByTabId(tabId);
   };

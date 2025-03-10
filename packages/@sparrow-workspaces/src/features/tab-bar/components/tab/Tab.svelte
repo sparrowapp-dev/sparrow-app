@@ -25,7 +25,7 @@
     StackIcon,
     TreeIcon,
     DismissCircle,
-    CopyIcon,
+    CopyRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -35,12 +35,6 @@
   import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
-
-  // ------ Props ------
-  /**
-   * List of tabs
-   */
-  export let tabList;
 
   // ------ Props ------
   /**
@@ -83,8 +77,8 @@
   export let listLength;
   export let onDoubleClick: (tab: Tab) => void;
   export let onRightClick: (tab: Tab) => void;
-  export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
-  export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
+  export let onClickCloseOtherTabs: (tabId: string) => void;
+  export let onClickForceCloseTabs: (tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
   let noOfColumns = 180;
   let showTabControlMenu = false;
@@ -170,7 +164,7 @@
         },
         {
           onClick: () => {
-            onClickCloseOtherTabs(tabList, tab.id);
+            onClickCloseOtherTabs(tab.id);
           },
           displayText: "Close Other Tabs",
           disabled: false,
@@ -178,21 +172,21 @@
         },
         {
           onClick: () => {
-            onClickCloseOtherTabs(tabList, "");
+            onClickCloseOtherTabs("");
           },
           displayText: "Close All Tabs",
           hidden: false,
         },
         {
           onClick: () => {
-            onClickForceCloseTabs(tabList, tab.id);
+            onClickForceCloseTabs(tab.id);
           },
           displayText: "Force Close Other Tabs",
           hidden: false,
         },
         {
           onClick: () => {
-            onClickForceCloseTabs(tabList, "");
+            onClickForceCloseTabs("");
           },
           displayText: "Force Close All Tabs",
           hidden: false,
@@ -205,7 +199,7 @@
           hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
             tab.type,
           ),
-          icon: CopyIcon,
+          icon: CopyRegular,
         },
       ]}
       {noOfColumns}

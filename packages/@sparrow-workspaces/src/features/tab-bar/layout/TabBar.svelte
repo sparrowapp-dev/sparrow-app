@@ -147,7 +147,6 @@
         {#each tabList as tab, index (tab.tabId)}
           <Tab
             {tab}
-            {tabList}
             {onTabSelected}
             {onTabClosed}
             listLength={tabList.length}
