@@ -197,3 +197,4 @@ export { default as GlobeRegular } from "./GlobeRegular.svelte";
 export { default as ArchiveRegular } from "./ArchiveRegular.svelte";
 export { default as ArrowClockWiseRegular } from "./ArrowClockWiseRegular.svelte";
 export { default as OpenRegular } from "./OpenRegular.svelte";
+export { default as CaretUpFilled } from "./CaretUpFilled.svelte";
