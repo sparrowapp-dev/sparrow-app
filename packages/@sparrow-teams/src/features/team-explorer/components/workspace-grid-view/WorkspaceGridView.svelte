@@ -229,7 +229,7 @@
   }
   :global(.add-new-workspace:active) {
     border: 1px dashed var(--border-ds-primary-300);
-    background-color: var(--bg-ds-surface-500);
+    background: var(--bg-ds-surface-500);
   }
   :global(.add-new-workspace:focus-visible) {
     outline: none;
