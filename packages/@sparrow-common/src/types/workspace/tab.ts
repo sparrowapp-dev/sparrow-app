@@ -30,13 +30,13 @@ export interface WorkspaceIdWrapper {
   workspaceId: string;
 }
 export interface CollectionIdWrapper {
-  collectionId: string;
+  collectionId?: string;
 }
 export interface RequestIdWrapper {
-  requestId: string;
+  requestId?: string;
 }
 export interface FolderIdWrapper {
-  folderId: string;
+  folderId?: string;
 }
 export interface Path
   extends WorkspaceIdWrapper,

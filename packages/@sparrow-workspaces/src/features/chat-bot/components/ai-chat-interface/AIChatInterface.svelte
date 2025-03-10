@@ -2,6 +2,7 @@
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
   import { AISparkle, CrossIcon } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/common/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -88,11 +89,7 @@
               <div></div>
               <div class="d-flex flex-column align-items-center">
                 <span class="pb-3">
-                  <AISparkle
-                    height={"20px"}
-                    width={"20px"}
-                    color={"var(--icon-primary-300)"}
-                  />
+                  <SparkleFilled height={"28px"} width={"28px"} />
                 </span>
                 <p class="text-fs-16 mb-1 text-secondary-180">
                   Ask anything or write with AI

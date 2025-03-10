@@ -1,25 +1,127 @@
 import {
   createDeepCopy,
-  setAuthType,
-  setBodyType,
-  unsetAuthType,
-  unsetBodyType,
 } from "@sparrow/common/utils";
 import {
   RequestDatasetEnum,
+  RequestDataTypeEnum,
   type FormData,
-  type Path,
-  type RequestTab,
-  type Tab,
 } from "@sparrow/common/types/workspace";
 import { InitRequestTab } from "@sparrow/common/utils";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspace/tab";
+import { HttpRequestAuthTypeBaseEnum, HttpRequestContentTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base"
 
 /**
  * @class - this class makes request tab compatible with backend server
  */
 export class RequestTabAdapter {
   constructor() {}
+
+  private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : HttpRequestContentTypeBaseEnum => {
+    let contentType = HttpRequestContentTypeBaseEnum["text/plain"];
+    switch (bodyType) {
+      case RequestDataTypeEnum.JSON:
+        contentType = HttpRequestContentTypeBaseEnum["application/json"];
+        break;
+      case RequestDataTypeEnum.XML:
+        contentType = HttpRequestContentTypeBaseEnum["application/xml"];
+        break;
+      case RequestDataTypeEnum.HTML:
+        contentType = HttpRequestContentTypeBaseEnum["text/html"];
+        break;
+      case RequestDataTypeEnum.JAVASCRIPT:
+        contentType = HttpRequestContentTypeBaseEnum["application/javascript"];
+        break;
+      case RequestDataTypeEnum.TEXT:
+        contentType = HttpRequestContentTypeBaseEnum["text/plain"];
+        break;
+      case RequestDatasetEnum.URLENCODED:
+        contentType = HttpRequestContentTypeBaseEnum["application/x-www-form-urlencoded"];
+        break;
+      case RequestDatasetEnum.FORMDATA:
+        contentType = HttpRequestContentTypeBaseEnum["multipart/form-data"];
+        break;
+    }
+    return contentType;
+  };
+  
+  private setBodyType = (header: string) => {
+    let requestBodyNavigation = RequestDatasetEnum.RAW;
+    let requestBodyLanguage = RequestDataTypeEnum.TEXT;
+    switch (header) {
+      case HttpRequestContentTypeBaseEnum["application/json"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.JSON;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/xml"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.XML;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/javascript"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.JAVASCRIPT;
+        break;
+      case HttpRequestContentTypeBaseEnum["text/plain"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
+      case HttpRequestContentTypeBaseEnum["text/html"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.HTML;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/x-www-form-urlencoded"]:
+        requestBodyNavigation = RequestDatasetEnum.URLENCODED;
+        break;
+      case HttpRequestContentTypeBaseEnum["multipart/form-data"]:
+        requestBodyNavigation = RequestDatasetEnum.FORMDATA;
+        break;
+    }
+    return { requestBodyLanguage, requestBodyNavigation };
+  };
+  
+  private setAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
+    let requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+    switch (auth) {
+      case HttpRequestAuthTypeBaseEnum.NO_AUTH:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+        break;
+      case HttpRequestAuthTypeBaseEnum.API_KEY:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.API_KEY;
+        break;
+      case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
+        break;
+      case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+        break;
+      case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
+      break;
+    }
+    return requestAuthNavigation;
+  };
+  
+  private unsetAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
+    let authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+    switch (auth) {
+      case HttpRequestAuthTypeBaseEnum.NO_AUTH:
+        authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+        break;
+      case HttpRequestAuthTypeBaseEnum.API_KEY:
+        authType = HttpRequestAuthTypeBaseEnum.API_KEY;
+        break;
+      case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
+        authType = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
+        break;
+      case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
+        authType = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+        break;
+      case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
+        authType = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
+        break;
+          
+    }
+    return authType;
+  };
 
   /**
    * @description - parse backend data to frontend compatible
@@ -34,10 +136,10 @@ export class RequestTabAdapter {
     collectionId: string,
     folderId: string,
     request: any,
-  ): RequestTab {
+  ): Tab {
     request = createDeepCopy(request);
     const adaptedRequest = new InitRequestTab(request.id, workspaceId);
-    const path: Path = {
+    const path = {
       workspaceId: workspaceId,
       collectionId: collectionId,
       folderId: folderId,
@@ -55,7 +157,7 @@ export class RequestTabAdapter {
     // parsing body type
     const selectedRequestBodyType = request.request?.selectedRequestBodyType;
     if (selectedRequestBodyType) {
-      const bodyType = setBodyType(request.request?.selectedRequestBodyType);
+      const bodyType = this.setBodyType(request.request?.selectedRequestBodyType);
       adaptedRequest.updateState({
         requestBodyLanguage: bodyType.requestBodyLanguage,
         requestBodyNavigation: bodyType.requestBodyNavigation,
@@ -65,9 +167,9 @@ export class RequestTabAdapter {
     // parsing request auth
     const selectedRequestAuthType = request.request?.selectedRequestAuthType;
     if (selectedRequestAuthType) {
-      const AuthType = setAuthType(request.request?.selectedRequestAuthType);
+      const AuthType = this.setAuthType(request.request?.selectedRequestAuthType);
       adaptedRequest.updateState({
-        requestAuthNavigation: AuthType.requestAuthNavigation,
+        requestAuthNavigation: AuthType,
       });
     }
 
@@ -131,14 +233,24 @@ export class RequestTabAdapter {
   public unadapt(requestTab: Tab) {
     requestTab = createDeepCopy(requestTab);
     const bodyType =
-      requestTab.property.request.state.requestBodyNavigation ===
+      requestTab.property.request?.state.requestBodyNavigation ===
       RequestDatasetEnum.RAW
-        ? requestTab.property.request.state.requestBodyLanguage
-        : requestTab.property.request.state.requestBodyNavigation;
+        ? requestTab.property.request?.state.requestBodyLanguage
+        : requestTab.property.request?.state.requestBodyNavigation;
     // parsing form data
-    const textFormData = [];
-    const fileFormData = [];
-    requestTab.property.request.body.formdata.map((pair) => {
+    const textFormData : {
+      key: string;
+      value: string;
+      checked: boolean;
+    }[] = [];
+    const fileFormData : {
+      key: string;
+      value: string;
+      checked: boolean;
+      base: string;
+    }[] = [];
+    
+    requestTab.property.request?.body.formdata.map((pair) => {
       if (pair.type == "text") {
         textFormData.push({
           key: pair.key,
@@ -154,20 +266,23 @@ export class RequestTabAdapter {
         });
       }
     });
-    requestTab.property.request.body.formdata = {
-      text: textFormData,
-      file: fileFormData,
-    };
     return {
-      method: requestTab.property.request.method,
-      url: requestTab.property.request.url,
-      body: requestTab.property.request.body,
-      headers: requestTab.property.request.headers,
-      queryParams: requestTab.property.request.queryParams,
-      auth: requestTab.property.request.auth,
-      selectedRequestBodyType: unsetBodyType(bodyType),
-      selectedRequestAuthType: unsetAuthType(
-        requestTab.property.request.state?.requestAuthNavigation,
+      method: requestTab.property.request?.method,
+      url: requestTab.property.request?.url,
+      body: {
+        raw : requestTab.property.savedRequest?.body.raw,
+        urlencoded : requestTab.property.savedRequest?.body.urlencoded,
+        formdata : {
+          text: textFormData,
+          file: fileFormData,
+        }
+      },
+      headers: requestTab.property.request?.headers,
+      queryParams: requestTab.property.request?.queryParams,
+      auth: requestTab.property.request?.auth,
+      selectedRequestBodyType: this.unsetBodyType(bodyType as RequestDataTypeEnum | RequestDatasetEnum),
+      selectedRequestAuthType: this.unsetAuthType(
+        requestTab.property.request?.state?.requestAuthNavigation as HttpRequestAuthTypeBaseEnum,
       ),
     };
   }

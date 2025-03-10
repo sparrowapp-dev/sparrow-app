@@ -10,6 +10,7 @@
     MessageTypeEnum,
     type RequestTab,
   } from "@sparrow/common/types/workspace";
+  import { SparkleFilled } from "@sparrow/common/icons";
   import { SparrowSecondaryIcon } from "@sparrow/common/icons";
   import {
     CrossIcon,
@@ -193,9 +194,9 @@
 <style lang="scss">
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
-    height: 42px;
-    width: 42px;
-    border-radius: 8px;
+    height: 40px;
+    width: 40px;
+    border-radius: 6px;
     display: flex;
     justify-content: center;
     align-items: center;

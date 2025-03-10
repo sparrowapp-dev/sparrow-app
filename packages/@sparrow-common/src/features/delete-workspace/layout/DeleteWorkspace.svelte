@@ -52,11 +52,13 @@
   >
     <div class="d-flex ellipsis">
       {#if openTeam?.logo?.size}
-        <Avatar
-          type={"image"}
-          size={"large"}
-          image={base64ToURL(openTeam?.logo)}
-        />
+        <span class="me-2">
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+          />
+        </span>
       {:else}
         <span class="me-2">
           <Avatar
