@@ -303,11 +303,14 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 9,
+  version: 10,
   properties: {
     collectionId: {
       type: "string",
       maxLength: 100,
+    },
+    description:{
+      type:"string"
     },
     id: {
       type: "string",
@@ -349,6 +352,42 @@ export const collectionSchemaLiteral = {
           },
         },
       },
+    },
+    auth: {
+      type: "object",
+      properties: {
+        bearerToken: {
+          type: "string",
+        },
+        basicAuth: {
+          type: "object",
+          properties: {
+            username: {
+              type: "string",
+            },
+            password: {
+              type: "string",
+            },
+          },
+        },
+        apiKey: {
+          type: "object",
+          properties: {
+            authKey: {
+              type: "string",
+            },
+            authValue: {
+              type: "string",
+            },
+            addTo: {
+              type: "string",
+            },
+          },
+        },
+      },
+    },
+    selectedAuthType: {
+      type: "string",
     },
     primaryBranch: { type: "string" },
     currentBranch: { type: "string" },

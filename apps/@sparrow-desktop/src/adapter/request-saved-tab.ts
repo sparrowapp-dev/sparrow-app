@@ -3,7 +3,7 @@ import {
 } from "@sparrow/common/utils";
 import { InitTab } from "@sparrow/common/factory";
 import { HttpRequestSavedAuthModeBaseEnum, HttpRequestSavedBodyModeBaseEnum, HttpRequestSavedMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
-import { AuthTypeEnum, RequestDataTypeEnum, RequestDatasetEnum, type Auth, type KeyValueChecked, type Body } from "@sparrow/common/types/workspace/http-request-saved-tab";
+import {  RequestDataTypeEnum, RequestDatasetEnum, type Auth, type KeyValueChecked, type Body } from "@sparrow/common/types/workspace/http-request-saved-tab";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestSavedMetaDataDtoInterface } from "@sparrow/common/types/workspace/http-request-saved-dto";
@@ -15,19 +15,19 @@ export class RequestSavedTabAdapter {
   constructor() {}
 
   // parsing from frontend to backend
-  private unsetAuthType = (auth: AuthTypeEnum) => {
+  private unsetAuthType = (auth: HttpRequestSavedAuthModeBaseEnum): HttpRequestSavedAuthModeBaseEnum => {
     let authType = HttpRequestSavedAuthModeBaseEnum.NO_AUTH;
     switch (auth) {
-      case AuthTypeEnum.NO_AUTH:
+      case HttpRequestSavedAuthModeBaseEnum.NO_AUTH:
         authType = HttpRequestSavedAuthModeBaseEnum.NO_AUTH;
         break;
-      case AuthTypeEnum.API_KEY:
+      case HttpRequestSavedAuthModeBaseEnum.API_KEY:
         authType = HttpRequestSavedAuthModeBaseEnum.API_KEY;
         break;
-      case AuthTypeEnum.BASIC_AUTH:
+      case HttpRequestSavedAuthModeBaseEnum.BASIC_AUTH:
         authType = HttpRequestSavedAuthModeBaseEnum.BASIC_AUTH;
         break;
-      case AuthTypeEnum.BEARER_TOKEN:
+      case HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN:
         authType = HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN;
         break;
     }
@@ -64,23 +64,23 @@ export class RequestSavedTabAdapter {
   };
 
   // parsing from backend to frontend
-  private setAuthType = (auth: HttpRequestSavedAuthModeBaseEnum) => {
-    let requestAuthNavigation = AuthTypeEnum.NO_AUTH;
+  private setAuthType = (auth: HttpRequestSavedAuthModeBaseEnum): HttpRequestSavedAuthModeBaseEnum => {
+    let requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.NO_AUTH;
     switch (auth) {
       case HttpRequestSavedAuthModeBaseEnum.NO_AUTH:
-        requestAuthNavigation = AuthTypeEnum.NO_AUTH;
+        requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.NO_AUTH;
         break;
       case HttpRequestSavedAuthModeBaseEnum.API_KEY:
-        requestAuthNavigation = AuthTypeEnum.API_KEY;
+        requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.API_KEY;
         break;
       case HttpRequestSavedAuthModeBaseEnum.BASIC_AUTH:
-        requestAuthNavigation = AuthTypeEnum.BASIC_AUTH;
+        requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.BASIC_AUTH;
         break;
       case HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN:
-        requestAuthNavigation = AuthTypeEnum.BEARER_TOKEN;
+        requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN;
         break;
     }
-    return { requestAuthNavigation };
+    return requestAuthNavigation ;
   };
 
   // parsing from backend to frontend
@@ -169,7 +169,7 @@ export class RequestSavedTabAdapter {
     if (selectedRequestAuthType) {
       const AuthType = this.setAuthType(_savedRequest.requestResponse?.selectedRequestAuthType as HttpRequestSavedAuthModeBaseEnum);
       adaptedRequest.updateState({
-        requestAuthNavigation: AuthType.requestAuthNavigation,
+        requestAuthNavigation: AuthType,
       });
     }
 
@@ -292,7 +292,7 @@ export class RequestSavedTabAdapter {
       auth: _requestTab.property.savedRequest?.auth,
       selectedRequestBodyType: this.unsetBodyType(bodyType as RequestDatasetEnum | RequestDataTypeEnum),
       selectedRequestAuthType: this.unsetAuthType(
-        _requestTab.property.savedRequest?.state?.requestAuthNavigation as AuthTypeEnum,
+        _requestTab.property.savedRequest?.state?.requestAuthNavigation as HttpRequestSavedAuthModeBaseEnum,
       ),
     };
   }

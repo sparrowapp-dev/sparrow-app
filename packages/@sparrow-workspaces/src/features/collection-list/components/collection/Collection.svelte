@@ -332,7 +332,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -640,7 +640,7 @@
           {/each}
         </div>
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-4 ms-2 my-2 text-secondary-300">
+          <p class="text-fs-10 ps-5 ms-2 my-2 text-secondary-300">
             This collection is empty
           </p>
         {/if}

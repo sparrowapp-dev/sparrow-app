@@ -54,7 +54,7 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { requestSplitterDirection } from "../store";
+  import { tabsSplitterDirection } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
@@ -98,6 +98,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -114,6 +115,8 @@
   export let isWebApp = false;
   export let azureBlobCDN;
   export let onSaveResponse;
+  export let collectionAuth;
+  export let collection;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -244,9 +247,7 @@
           <Splitpanes
             class="rest-splitter w-100 h-100"
             id={"rest-splitter"}
-            horizontal={$requestSplitterDirection === "horizontal"
-              ? true
-              : false}
+            horizontal={$tabsSplitterDirection === "horizontal" ? true : false}
             dblClickSplitter={false}
             on:resize={(e) => {
               onUpdateRequestState({
@@ -265,7 +266,7 @@
             >
               <!-- Request Pane -->
               <div
-                class="h-100 d-flex flex-column position-relative {$requestSplitterDirection ===
+                class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pb-1'
                   : 'pe-2'}"
@@ -326,9 +327,12 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
+                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
@@ -353,7 +357,7 @@
             >
               <!-- Response Pane -->
               <div
-                class="d-flex flex-column h-100 {$requestSplitterDirection ===
+                class="d-flex flex-column h-100 {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"
