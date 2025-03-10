@@ -453,6 +453,19 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      visibility = !visibility;
+      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (visibility) {
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        }
+      }
+    }
+  }}
   style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
@@ -464,19 +477,6 @@
     class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        visibility = !visibility;
-        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-          if (visibility) {
-            onItemOpened("collection", {
-              workspaceId: collection.workspaceId,
-              collection,
-            });
-          }
-        }
-      }
-    }}
   >
     <Button
       size="extra-small"
@@ -484,7 +484,7 @@
       type="teritiary-regular"
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
       onClick={(e) => {
-        stopPropagation(e);
+        e.stopPropagation();
         visibility = !visibility;
       }}
     />
@@ -645,7 +645,7 @@
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ps-1 ms-2">
+        <div class="d-flex gap-2 ms-2" style="padding-left: 42px;">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip
               title={"Add Folder"}
