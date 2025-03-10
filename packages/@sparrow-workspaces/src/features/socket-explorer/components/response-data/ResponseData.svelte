@@ -138,9 +138,7 @@
         <span class="d-flex gap-1">
           <Tooltip title={"Scroll to top"}>
             <WithButtonV4
-             type="teritiary-regular"
             icon={ArrowUpFilled}
-            size="small"
             onClick={() => {
               scroll("top");
             }}
@@ -148,18 +146,14 @@
           </Tooltip>
           <Tooltip title={"Scroll to bottom"}>
             <WithButtonV4
-             type="teritiary-regular"
             icon={ArrowDownRegular}
-            size="small"
             onClick={() => {
               scroll("bottom");
             }}/>
           </Tooltip>
           <Tooltip title={"Delete"} placement="bottom-right">
             <WithButtonV4
-            type="teritiary-regular"
             icon={DeleteFilled}
-            size="small"
             onClick={() => {
               onDeleteMessage();
             }}/>

@@ -17,9 +17,6 @@
    */
   export let loader;
 
-  export let size="medium";
-
-  export let type="primary";
   $: ({ onClick, icon, disable, loader } = $$props);
 </script>
 
@@ -28,6 +25,6 @@
   {onClick}
   {disable}
   {loader}
-  type={type}
-  size={size}
+  type={"teritiary-regular"}
+  size={"small"}
 />

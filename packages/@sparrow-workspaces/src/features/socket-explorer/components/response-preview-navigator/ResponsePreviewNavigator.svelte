@@ -188,20 +188,16 @@
       <!-- Copy button -->
       <Tooltip title={"Copy"}>
         <WithButtonV4
-          type="teritiary-regular"
           icon={CopyRegular}
-          onClick={handleCopy}
-          size="small"/>
+          onClick={handleCopy}/>
       </Tooltip>
       <!-- Download button -->
 
       {#if !isWebApp}
         <Tooltip title={"Export"}>
           <WithButtonV4
-          type="teritiary-regular"
           icon={ArrowDownloadRegular}
-          onClick={handleDownloaded}
-          size="small"/>
+          onClick={handleDownloaded}/>
         </Tooltip>
       {/if}
     </div>

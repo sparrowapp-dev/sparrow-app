@@ -194,7 +194,7 @@ export { default as ArrowDownRegular } from "./ArrowDownRegular.svelte";
 export { default as DeleteFilled} from "./DeleteFilled.svelte";
 export { default as ListIcon } from "./List.svelte";
 export { default as ArrowDownLeftFilled } from "./ArrowDownLeftFilled.svelte";
-export { default as BroomIcon } from "./BroomIcon.svelte";
+export { default as BroomRegular } from "./BroomRegular.svelte";
 export { default as CheckmarkCircle } from "./CheckmarkCircle.svelte";
 export { default as ErrorCircleFilled } from "./ErrorCircleFilled.svelte";
 export { default as ArrowSyncRegular } from "./ArrowSyncRegular.svelte";

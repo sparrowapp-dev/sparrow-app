@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BroomIcon } from "@sparrow/library/icons";
+  import { BroomRegular } from "@sparrow/library/icons";
   import { Raw, SocketMessageNavigator } from "./sub-body";
   import { Button } from "@sparrow/library/ui";
 
@@ -43,7 +43,7 @@
         <div>
           <Button
           type="teritiary-regular"
-          startIcon={BroomIcon}
+          startIcon={BroomRegular}
           onClick={onClearInput}
           title="Clear Inputs"
           size="small"
