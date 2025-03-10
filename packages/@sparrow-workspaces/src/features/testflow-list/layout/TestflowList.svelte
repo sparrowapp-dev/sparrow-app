@@ -25,7 +25,6 @@
     currentStep,
   } from "../../../stores/guide.tour";
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
-  import DefaultTourGuide from "../../../components/default-tour-guide/DefaultTourGuide.svelte";
 
   /**
    * current workspace

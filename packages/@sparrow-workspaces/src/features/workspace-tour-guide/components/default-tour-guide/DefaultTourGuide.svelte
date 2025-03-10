@@ -40,14 +40,6 @@
         containerLeftX = rect.left + window.scrollX;
         containerHeight = rect.height;
         containerWidth = rect.width;
-
-        console.log("Updated Positions:", {
-          containerTopX,
-          containerLeftX,
-          containerHeight,
-          containerWidth,
-        });
-
         document.documentElement.style.setProperty(
           "--containerTopX",
           `${containerTopX}px`,

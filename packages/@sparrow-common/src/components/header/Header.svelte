@@ -67,6 +67,8 @@
   export let isCreateTeamModalOpen;
   export let searchQuery = "";
   export let onSearchClick;
+  export let docsLink = "";
+  export let featureUpdatesLink = "";
 
   let helpOptionsOpen = false;
 
@@ -246,13 +248,10 @@
   });
 
   const redirectDocumentation = () => {
-    window.open("https://docs.sparrowapp.dev/docs/intro", "_blank");
+    window.open(docsLink, "_blank");
   };
   const redirectNewFeatures = () => {
-    window.open(
-      "https://github.com/sparrowapp-dev/sparrow-app/releases",
-      "_blank",
-    );
+    window.open(featureUpdatesLink, "_blank");
   };
 </script>
 

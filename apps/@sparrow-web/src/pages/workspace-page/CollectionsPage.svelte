@@ -80,7 +80,6 @@
     isDefaultTourGuideOpen,
     isDefaultTourGuideClose,
   } from "@sparrow/workspaces/stores";
-  import WorkspaceTeam from "../../../../../packages/@sparrow-teams/src/features/create-workspace/components/workspace-team/WorkspaceTeam.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
