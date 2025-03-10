@@ -4,7 +4,7 @@
   export let label = "";
   export let textColor = "var(--text-ds-neutral-200)";
   export let fontSize = "12px";
-  export let fontWeight = "700";
+  export let fontWeight = "500";
   export let onChange: (event: Event) => void = () => {};
   export let onClick: (event: MouseEvent) => void = () => {};
 

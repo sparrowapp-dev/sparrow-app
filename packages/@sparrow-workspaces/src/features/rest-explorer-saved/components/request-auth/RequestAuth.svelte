@@ -52,9 +52,6 @@
     </div>
   </div>
   <div>
-    <p class="text-secondary-300 text-fs-12 fw-normal">
-      The auth header will be automatically generated when you send the request.
-    </p>
   </div>
   <section class="w-100" style="flex:1; overflow:auto;">
     {#if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.NO_AUTH}

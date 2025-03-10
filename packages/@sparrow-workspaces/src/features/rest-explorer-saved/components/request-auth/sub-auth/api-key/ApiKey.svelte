@@ -19,7 +19,6 @@
   };
 </script>
 
-<p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
 <div class="pt-2 d-flex gap-3">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
@@ -28,8 +27,8 @@
       value={CollectionRequestAddToBaseEnum.HEADER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Header "
-      buttonSize="medium"
+      labelText=" Add to Header "
+      buttonSize="small"
       disabled={true}
     />
   </div>
@@ -40,8 +39,8 @@
       value={CollectionRequestAddToBaseEnum.QUERY_PARAMETER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Parameter "
-      buttonSize="medium"
+      labelText=" Add to Parameter "
+      buttonSize="small"
       disabled={true}
     />
   </div>

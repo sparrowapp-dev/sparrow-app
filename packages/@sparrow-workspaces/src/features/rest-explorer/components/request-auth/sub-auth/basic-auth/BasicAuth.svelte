@@ -17,14 +17,14 @@
 
 <div class="w-100">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-secondary-100">Username</p>
+    <p class="mb-2" style="color:var(--bg-ds-neutral-200)">Username</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:value={basicAuth.username}
         onUpdateInput={() => {
           handleInput();
         }}
-        placeholder={"Username"}
+        placeholder={" Enter Username"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
@@ -34,7 +34,7 @@
   </div>
 
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-secondary-100">Password</p>
+    <p class="mb-2" style="color:var(--bg-ds-neutral-200)">Password</p>
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
@@ -42,7 +42,7 @@
         onUpdateInput={() => {
           handleInput();
         }}
-        placeholder={"Password"}
+        placeholder={" Enter Password"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}

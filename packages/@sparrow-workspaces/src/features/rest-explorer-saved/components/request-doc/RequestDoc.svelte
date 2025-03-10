@@ -24,7 +24,7 @@
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div> -->
   <div
-    style="height: 100%; min-height:160px; background-color: var(--bg-ds-surface-600);"
+    style="height: 100%; min-height:160px; background-color: var(--bg-ds-surface-600);border-radius:4px;padding:8px"
     class="area"
   >
     <div on:keydown|stopPropagation on:keyup|stopPropagation>

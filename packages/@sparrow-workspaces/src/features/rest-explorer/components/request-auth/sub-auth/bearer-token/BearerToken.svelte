@@ -16,14 +16,14 @@
 
 <div class="d-flex flex-column w-100">
   <div style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-secondary-100">Token</p>
+    <p class="mb-2" style="color:var(--bg-ds-neutral-200)">Token</p>
     <div class="position-relative auth-input-container mb-3">
       <CodeMirrorInput
         bind:value={bearerToken}
         onUpdateInput={() => {
           handleInput();
         }}
-        placeholder={"Token"}
+        placeholder={"Enter Token"}
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}

@@ -33,7 +33,7 @@
 </script>
 
 <section class="w-100" style="">
-  <TabularInput
+  <TabularrInput
     {isBulkEditRequired}
     bulkEditPlaceholder={bulkEditParamsPlaceholder}
     {isBulkEditActive}
