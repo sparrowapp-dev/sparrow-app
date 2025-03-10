@@ -225,7 +225,7 @@
     tabIdWhoRecivedForceClose = currentTabId;
 
     noOfNotSavedTabsWhileForClose = 0;
-    tabList?.forEach((tab: Tab) => {
+    $tabList?.forEach((tab: Tab) => {
       if (tab.id !== currentTabId) {
         if (!tab?.isSaved) {
           noOfNotSavedTabsWhileForClose += 1;
@@ -234,13 +234,13 @@
     });
     if (noOfNotSavedTabsWhileForClose > 0) {
       if (isUserDontWantForceClosePopup) {
-        forceCloseTab(tabList, currentTabId);
+        forceCloseTab($tabList, currentTabId);
         isForceCloseTabPopupOpen = false;
         noOfNotSavedTabsWhileForClose = 0;
         return;
       }
       isForceCloseTabPopupOpen = true;
-    } else forceCloseTab(tabList, currentTabId);
+    } else forceCloseTab($tabList, currentTabId);
   };
   const forceCloseTab = async (currentTabId: string) => {
     const savedTabs = [];
@@ -806,7 +806,7 @@
         type="danger"
         onClick={() => {
           "click dont save";
-          forceCloseTab(tabsToForceClose, tabIdWhoRecivedForceClose);
+          forceCloseTab(tabIdWhoRecivedForceClose);
           isForceCloseTabPopupOpen = false;
           noOfNotSavedTabsWhileForClose = 0;
         }}
