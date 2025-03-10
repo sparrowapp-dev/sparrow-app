@@ -8,6 +8,9 @@
     disabled?: boolean;
     hidden?: boolean;
     icon?: any;
+    customIcon?: boolean;
+    iconSize?: number;
+    iconColor?: string;
   }> = [];
   export let noOfColumns = 0;
   export let zIndex = 4;
@@ -85,7 +88,8 @@
                 this={item.icon}
                 height={"12px"}
                 width={"12px"}
-                color={"#A5B5CA"}
+                size={"14px"}
+                color={item?.iconColor || "#A5B5CA"}
               />
             </span>
             <span>
