@@ -5,11 +5,11 @@
     BlankIcon,
     ArrowDownRegular,
     DeleteFilled,
-    ListIcon,
+    ListFilled,
     ArrowUpRightRegular,
     ArrowDownLeftFilled,
     CheckMarkIcon,
-    CheckmarkCircle,
+    CheckmarkCircleFilled,
     ErrorCircleFilled,
     CircleFilled
   } from "@sparrow/library/icons";
@@ -182,7 +182,7 @@
         data={[
             { id:"All Messages",
               name: "All Messages",
-              icon: ListIcon,
+              icon: ListFilled,
               iconProps:{size:"16px"}
             },
             {
@@ -255,7 +255,7 @@
             {:else if message?.transmitter === "connecter"}
               <!-- ConnectIcon -->
             
-               <CheckmarkCircle size={"14px"} color="var(--icon-ds-success-400)"/>
+               <CheckmarkCircleFilled size={"14px"} color="var(--icon-ds-success-400)"/>
             {:else if message?.transmitter === "receiver"}
             <ArrowDownLeftFilled color="var(--icon-ds-primary-400)" size={"14px"}/>
             {/if}
