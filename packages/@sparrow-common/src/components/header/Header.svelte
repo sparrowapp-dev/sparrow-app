@@ -410,23 +410,6 @@
         </Select>
       {/if}
     </div>
-    <!-- {#if $isDefaultTourGuideOpen && $defaultCurrentStep === 5}
-      <DefaultTourGuide
-        targetId="workspace-container"
-        TitleName="Navigate Between Workspaces"
-        DescriptionContent="Work with multiple projects? Easily switch between workspaces to keep your API requests and collections organized."
-        CardNumber={5}
-        TotalsCards={7}
-        additionLeftValue={-30}
-        tipPosition="bottom-center"
-        onNext={() => {
-          defaultCurrentStep.set(6);
-        }}
-        onClose={() => {
-          isDefaultTourGuideOpen.set(false);
-        }}
-      />
-    {/if} -->
   </div>
 
   <div
