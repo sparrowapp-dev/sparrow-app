@@ -513,7 +513,7 @@
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
     docsLink={constants.DOCS_URL}
-    featureUpdatesLink={constants.RELEASE_NOTES_URL}
+    featureUpdatesLink={constants.SPARROW_DOWNLOAD_LINK}
   />
 
   <!-- 
