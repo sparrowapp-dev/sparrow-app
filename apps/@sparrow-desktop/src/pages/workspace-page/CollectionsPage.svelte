@@ -196,7 +196,8 @@
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = (id: string, tab: Tab) => {
+
+  const closeTab = async (id: string, tab: Tab, delay?: number) => {
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -211,9 +212,41 @@
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
+
+        if (delay) {
+          // Wait for the popup to close before proceeding (previous sequential logic)
+          await new Promise<void>((resolve) => {
+            const checkIfPopupClosed = setInterval(() => {
+              if (!isPopupClosed) {
+                clearInterval(checkIfPopupClosed);
+                resolve();
+              }
+            }, 300);
+          });
+
+          // Delay the tab removal if delay is provided
+          await new Promise<void>((resolve) => {
+            setTimeout(() => {
+              _viewModel.handleRemoveTab(id);
+              resolve();
+            }, delay);
+          });
+          return;
+        }
       } else {
         _viewModel.handleRemoveTab(id);
+        return;
       }
+    }
+
+    // Directly remove tab if delay is not provided
+    if (delay) {
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          _viewModel.handleRemoveTab(id);
+          resolve();
+        }, delay);
+      });
     } else {
       _viewModel.handleRemoveTab(id);
     }
@@ -234,15 +267,15 @@
     });
     if (noOfNotSavedTabsWhileForClose > 0) {
       if (isUserDontWantForceClosePopup) {
-        forceCloseTab($tabList, currentTabId);
+        forceCloseTabs($tabList, currentTabId);
         isForceCloseTabPopupOpen = false;
         noOfNotSavedTabsWhileForClose = 0;
         return;
       }
       isForceCloseTabPopupOpen = true;
-    } else forceCloseTab($tabList, currentTabId);
+    } else forceCloseTabs($tabList, currentTabId);
   };
-  const forceCloseTab = async (currentTabId: string) => {
+  const forceCloseTabs = async (currentTabId: string) => {
     const savedTabs = [];
     const unSavedTabs = [];
     for (const tab of $tabList) {
@@ -269,7 +302,7 @@
       }, 300);
     });
   };
-  const closeTabExceptCurrentOne = async (currentTabId: string) => {
+  const softCloseTabs = async (currentTabId: string) => {
     const savedTabs = [];
     const unSavedTabs = [];
     for (const tab of $tabList) {
@@ -284,40 +317,9 @@
 
     for (let tab of unSavedTabs) {
       // Wait for closeTab to finish before moving to the next tab
-      await closeTabSequentially(tab.id, tab);
+      // await closeTabSequentially(tab.id, tab);
+      await closeTab(tab.id, tab, 300);
     }
-  };
-  /**
-   * The closeTabSequentially() method works well incase we want to bulk close the tabs
-   * one by one. This function can also replace the above closeTab() function (will do so).
-   * So same function can be used for single tab close and multiple tab close.
-   */
-  const closeTabSequentially = async (id: string, tab: Tab) => {
-    if (!tab?.isSaved) {
-      if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
-        // console.log("save ssss*****");
-        removeTab = tab;
-        isPopupClosed = true;
-        // Wait for the save popup to be handled before continuing
-        await new Promise<void>((resolve) => {
-          const checkIfPopupClosed = setInterval(() => {
-            if (!isPopupClosed) {
-              clearInterval(checkIfPopupClosed);
-              resolve();
-            }
-          }, 300);
-        });
-        return;
-      }
-    }
-    // Common delayed tab removal logic
-    removeTab = tab;
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        _viewModel.handleRemoveTab(id);
-        resolve();
-      }, 300);
-    });
   };
 
   const handleTabDuplication = (tabId: string) => {
@@ -649,7 +651,7 @@
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
             onDoubleClick={_viewModel.handleTabTypeChange}
-            onClickCloseOtherTabs={closeTabExceptCurrentOne}
+            onClickCloseOtherTabs={softCloseTabs}
             onClickForceCloseTabs={forceCloseExceptCurrentOne}
             onClickDuplicateTab={handleTabDuplication}
           />
@@ -804,7 +806,7 @@
         type="danger"
         onClick={() => {
           "click dont save";
-          forceCloseTab(tabIdWhoRecivedForceClose);
+          forceCloseTabs(tabIdWhoRecivedForceClose);
           isForceCloseTabPopupOpen = false;
           noOfNotSavedTabsWhileForClose = 0;
         }}
