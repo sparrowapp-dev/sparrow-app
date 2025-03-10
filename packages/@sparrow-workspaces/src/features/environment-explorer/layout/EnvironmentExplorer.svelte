@@ -21,7 +21,7 @@
     SearchVariable,
   } from "@sparrow/workspaces/constants";
   import { WithButtonV3 } from "@sparrow/workspaces/hoc";
-  import { QuestionCircle, SaveRegular } from "@sparrow/library/icons";
+  import { QuestionCircleRegular, SaveRegular } from "@sparrow/library/icons";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -180,7 +180,7 @@
             <Tooltip title="Help" placement="bottom-center" distance={10}>
               <Button
               type="secondary"
-              startIcon={QuestionCircle}
+              startIcon={QuestionCircleRegular}
               size="small"
               customWidth="28px"
               onClick={() => {
@@ -227,7 +227,7 @@
       </section>
     </div>
     {#if quickHelp}
-      <div class="quick-help h-100" style="width:360px;">
+      <div class="quick-help h-100">
         <QuickHelp
           closeQuickHelp={() => {
             quickHelp = false;
@@ -341,7 +341,7 @@
     overflow-y: auto;
   }
   .quick-help {
-    width: 280px;
+    width: 360px;
   }
   .env-parent {
     padding: 0px 12px;
