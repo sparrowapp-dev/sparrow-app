@@ -125,6 +125,7 @@
     min-height: fit-content;
     transition: background-color 0.3s ease;
     display: block;
+    outline: 1px solid var(--bg-ds-surface-100);
   }
 
 .hasLabel input:focus-visible ~ .toggle-track {

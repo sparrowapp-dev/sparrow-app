@@ -8,6 +8,7 @@
     disabled?: boolean;
     hidden?: boolean;
     icon?: any;
+    iconColor?: string;
   }> = [];
   export let noOfColumns = 0;
   export let zIndex = 4;
@@ -24,7 +25,7 @@
    * @description - recalculates positions for element that overflows window
    */
   const calculateAdjustedAxis = () => {
-    const itemHeight = 38;
+    const itemHeight = 20;
     const containerPadding = 16;
     const dialogHeight =
       menuItems.filter((elem) => {
@@ -85,7 +86,8 @@
                 this={item.icon}
                 height={"12px"}
                 width={"12px"}
-                color={"#A5B5CA"}
+                size={"14px"}
+                color={item?.iconColor || "#A5B5CA"}
               />
             </span>
             <span>

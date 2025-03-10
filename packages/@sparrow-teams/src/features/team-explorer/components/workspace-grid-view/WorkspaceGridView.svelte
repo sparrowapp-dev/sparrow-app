@@ -61,23 +61,23 @@
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
     if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 5);
+      return filteredWorkspaces.slice(0, 8);
     } else {
-      const startIndex = 5 + (currPage - 2) * 6;
-      return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
+      const startIndex = 8 + (currPage - 2) * 9;
+      return filteredWorkspaces.slice(startIndex, startIndex + 9); //will check the start index based on current page
     }
   })();
 
   // This will calculate the total number of pages
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
-    if (total <= 5) return 1;
-    return Math.ceil((total - 5) / 6) + 1;
+    if (total <= 8) return 1;
+    return Math.ceil((total - 8) / 9) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
+  $: startIndex = currPage === 1 ? 1 : 8 + (currPage - 2) * 9 + 1;
   $: endIndex = Math.min(
-    currPage === 1 ? 5 : startIndex + 5,
+    currPage === 1 ? 8 : startIndex + 8,
     filteredWorkspaces.length,
   );
 
@@ -98,7 +98,7 @@
   <div class="d-flex flex-column h-100">
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
-        <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
+        <div class="d-flex flex-wrap" style="gap:16px">
           {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
             <p class="not-found-text mx-auto mt-3">
               You don't have access to any workspace in this team.
@@ -109,9 +109,10 @@
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
-              class="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
+              class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
               style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
               on:click={handleClick}
+              tabindex="0"
             >
               {#if isWorkspaceCreationInProgress}
                 <span>
@@ -206,15 +207,12 @@
   }
 
   :global(.add-new-workspace) {
-    border: 2px dashed var(--gradiant-2, var(--border-primary-300));
-    background: var(
-      --gradiant-2,
-      linear-gradient(270deg, var(--bg-primary-300) -1.72%, #1193f0 100%)
-    );
+    border: 1px dashed var(--border-ds-neutral-300);
+    background-color: var(--bg-ds-neutral-100);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    max-width: 47.5%;
+    max-width: 32.8%;
     max-height: 32%;
     border-radius: 8px;
   }
@@ -223,12 +221,20 @@
     max-width: 80%;
   }
   :global(.add-new-workspace:hover) {
-    border: 2px dashed var(--border-primary-300);
-    background: var(--bg-tertiary-600);
-    color: var(--text-primary-300);
+    border: 1px dashed var(--border-ds-primary-300);
+    background-color: var(--bg-ds-surface-500);
     background-clip: initial;
     -webkit-background-clip: initial;
     -webkit-text-fill-color: initial;
+  }
+  :global(.add-new-workspace:active) {
+    border: 1px dashed var(--border-ds-primary-300);
+    background: var(--bg-ds-surface-500);
+  }
+  :global(.add-new-workspace:focus-visible) {
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+    gap: 8px;
   }
   .not-found-text {
     color: var(--request-arc);

@@ -49,7 +49,7 @@ import { type Observable } from "rxjs";
 import { InitRequestTab, InitWebSocketTab } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+import { tabsSplitterDirection } from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -68,7 +68,10 @@ import {
   CollectionItemTypeBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestBaseInterface as RequestDto } from "@sparrow/common/types/workspace/http-request-base";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { SocketTabAdapter } from "../../adapter/socket-tab";
 import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";
@@ -76,7 +79,12 @@ import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
 
 import { createDeepCopy } from "@sparrow/common/utils";
-import { GraphqlTabAdapter, SocketIoTabAdapter } from "../../adapter";
+import {
+  CollectionTabAdapter,
+  GraphqlTabAdapter,
+  RequestSavedTabAdapter,
+  SocketIoTabAdapter,
+} from "../../adapter";
 import type {
   SocketIORequestDeletePayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
@@ -95,7 +103,6 @@ import {
   GraphqlRequestAuthModeBaseEnum,
 } from "@sparrow/common/types/workspace/graphql-request-base";
 import type { Path } from "@sparrow/common/interfaces/request.interface";
-
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -169,6 +176,7 @@ export default class CollectionsViewModel {
           const collection = createDeepCopy(_collection);
           collection["workspaceId"] = workspaceId;
           collection["id"] = _collection._id;
+          if(!collection?.description) collection.description = "";
           delete collection._id;
           return collection;
         }),
@@ -646,15 +654,15 @@ export default class CollectionsViewModel {
   };
   /**
    * Generate available name of new collection like New collection 2 if New collection is already taken
-   * @param list :any[] - list of collections
-   * @param name :string - name to be chacked
-   * @returns :string - new unique name
+   * @param list - list of collections
+   * @param name  - name to be chacked
+   * @returns - new unique name
    */
-  private getNextCollection = (list: CollectionDto[], name: string) => {
+  private getNextCollection = (list: CollectionDocType[], name: string) => {
     const isNameAvailable: (proposedName: string) => boolean = (
       proposedName,
     ) => {
-      return list.some((element) => {
+      return list.some((element: CollectionDocType) => {
         return element.name === proposedName;
       });
     };
@@ -678,22 +686,14 @@ export default class CollectionsViewModel {
    * @param workspaceId :string
    */
   public handleCreateCollection = async (workspaceId: string) => {
-    let collectionList: CollectionDto[] = [];
-
-    await this.collectionRepository
-      .getCollection()
-      .subscribe(
-        (collections) =>
-          (collectionList = collections as unknown as CollectionDto[]),
-      )
-      .unsubscribe();
-    const updatedCollectionList = collectionList.filter(
-      (collection) => collection.workspaceId === workspaceId,
+    const collectionsRx = await this.collectionRepository.getCollectionsByWorkspaceId(workspaceId);
+    const collectionsDoc = collectionsRx.map(
+      (collection) => collection.toMutableJSON(),
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
       name: this.getNextCollection(
-        updatedCollectionList,
+        collectionsDoc,
         "New Collection",
       ) as string,
       items: [],
@@ -708,37 +708,25 @@ export default class CollectionsViewModel {
       response = await this.collectionService.addCollection({
         name: newCollection.name,
         workspaceId: workspaceId,
+        description:""
       });
 
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
-        await this.addCollection({
+        await this.collectionRepository.addCollection({
           ...res,
           id: res._id,
           workspaceId: workspaceId,
+          description: ""
         });
-        const path = {
-          workspaceId: workspaceId,
-          collectionId: response.data.data._id,
-          folderId: "",
-        };
-
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
-          workspaceId,
-        );
-
-        initCollectionTab.updateId(response.data.data._id);
-        initCollectionTab.updatePath(path);
-        initCollectionTab.updateName(response.data.data.name);
-
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, {...response.data.data, id: response.data.data._id});
+        this.tabRepository.createTab(adaptCollection);
         moveNavigation("right");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
           {
-            id: initCollectionTab.getValue().id,
+            id: response.data.data._id,
             name: newCollection.name,
           },
         );
@@ -753,7 +741,7 @@ export default class CollectionsViewModel {
       }
     } else {
       const collectionId = uuidv4();
-      const dt: CollectionDto = {
+      const dt = {
         id: collectionId,
         name: newCollection.name,
         workspaceId: workspaceId,
@@ -765,25 +753,14 @@ export default class CollectionsViewModel {
         updatedAt: newCollection.createdAt,
         updatedBy: "guestUser",
       };
-      await this.addCollection(dt);
-      const path = {
-        workspaceId: workspaceId,
-        collectionId: "",
-        folderId: "",
-      };
-      const initCollectionTab = new InitCollectionTab(
-        collectionId,
-        workspaceId,
-      );
-      initCollectionTab.updateId(collectionId);
-      initCollectionTab.updatePath(path);
-      initCollectionTab.updateName(newCollection.name);
-      this.tabRepository.createTab(initCollectionTab.getValue());
+      await this.collectionRepository.addCollection(dt);
+      const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, dt);
+      this.tabRepository.createTab(adaptCollection);
       moveNavigation("right");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
-        id: initCollectionTab.getValue().id,
-        name: newCollection.name,
+        id: dt.id,
+        name: dt.name,
       });
       notifications.success("New Collection created successfully.");
     }
@@ -1875,7 +1852,7 @@ export default class CollectionsViewModel {
       });
     } else {
       // Show error notification and clean up by deleting the folder locally on failure.
-      notifications.error("Failed to create folder. Plaease try again.");
+      notifications.error("Failed to create folder. Please try again.");
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
         folder.id,
@@ -2039,6 +2016,32 @@ export default class CollectionsViewModel {
       folder?.id || "",
       request,
     );
+    adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
+    this.tabRepository.createTab(adaptedRequest);
+    moveNavigation("right");
+  };
+
+  /**
+   * Handles opening a request on a tab
+   * @param request : - The request going to be opened on tab
+   * @param path : - The path to the request
+   */
+  private handleOpenSavedRequest = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    _request: CollectionItemsDto,
+    _savedRequest: CollectionItemsDto,
+  ) => {
+    const requestSavedTabAdapter = new RequestSavedTabAdapter();
+    const adaptedRequest = requestSavedTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      _request?.id,
+      _savedRequest,
+    );
+    adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
@@ -2061,6 +2064,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       _graphql,
     );
+    adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     moveNavigation("right");
   };
@@ -2083,6 +2087,7 @@ export default class CollectionsViewModel {
       folder?.id || "",
       websocket,
     );
+    adaptedSocket.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocket);
     moveNavigation("right");
   };
@@ -2107,6 +2112,7 @@ export default class CollectionsViewModel {
       _folder?.id || "",
       _socketIo,
     );
+    adaptedSocketIo.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocketIo);
     moveNavigation("right");
   };
@@ -2130,6 +2136,7 @@ export default class CollectionsViewModel {
     sampleFolder.updateName(folder.name);
     sampleFolder.updatePath(path);
     sampleFolder.updateIsSave(true);
+    sampleFolder.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.handleCreateTab(sampleFolder.getValue());
     moveNavigation("right");
@@ -2139,35 +2146,8 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
   ) => {
-    let totalFolder: number = 0;
-    let totalRequest: number = 0;
-    if (collection.items) {
-      collection.items.map((item: CollectionItemsDto) => {
-        if (item.type === CollectionItemTypeBaseEnum.REQUEST) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += (item?.items as unknown as CollectionItemsDto[])
-            ?.length;
-        }
-      });
-    }
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: "",
-    };
-
-    const _collection = new InitCollectionTab(collection.id, workspaceId);
-    _collection.updateName(collection.name);
-    _collection.updateDescription(collection.description);
-    _collection.updatePath(path);
-    // _collection.updateActiveSync(collection.activeSync);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
-    _collection.updateIsSave(true);
-
-    this.tabRepository.createTab(_collection.getValue());
+    const collectionTabAdapter = new CollectionTabAdapter().adapt(workspaceId, collection);
+    this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
   };
   /**
@@ -2298,6 +2278,128 @@ export default class CollectionsViewModel {
             name: newRequestName,
           });
           MixpanelEvent(Events.RENAME_REQUEST, {
+            source: "Collection list",
+          });
+        }
+      }
+    }
+  };
+
+  /**
+   * Handles renaming a saved request
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which the request is saved
+   * @param folder : - the folder in which the request is saved(if request if saved inside a folder)
+   * @param request : - the request in which the response is saved
+   * @param requestResponse : - the requestResponse which is going to be renamed.
+   * @param newRequestName : - the new name of the saved request
+   */
+  private handleRenameSavedRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    request: CollectionItemsDto,
+    requestResponse: CollectionItemsDto,
+    newRequestName: string,
+  ) => {
+    let userSource = {};
+    if (request.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (collection.id && workspaceId && !folder.id) {
+        await this.collectionRepository.updateSavedRequestInCollection(
+          collection.id,
+          request.id,
+          requestResponse.id,
+          { name: newRequestName },
+        );
+        await this.updateTab(requestResponse.id, {
+          name: newRequestName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      } else if (collection.id && workspaceId && folder.id) {
+        await this.collectionRepository.updateSavedRequestInFolder(
+          collection.id,
+          folder.id,
+          request.id,
+          requestResponse.id,
+          { name: newRequestName },
+        );
+        await this.updateTab(requestResponse.id, {
+          name: newRequestName,
+        });
+        MixpanelEvent(Events.RENAME_REQUEST, {
+          source: "Collection list",
+        });
+      }
+      return;
+    }
+
+    if (newRequestName) {
+      if (collection.id && workspaceId && !folder.id) {
+        // const storage = request;
+        // storage.name = newRequestName;
+        const response =
+          await this.collectionService.updateSavedRequestInCollection(
+            requestResponse.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              requestId: request.id,
+              name: newRequestName,
+            },
+          );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateSavedRequestInCollection(
+            collection.id,
+            request.id,
+            requestResponse.id,
+            { name: newRequestName },
+          );
+          this.updateTab(requestResponse.id, {
+            name: newRequestName,
+          });
+          MixpanelEvent(Events.RENAME_RESPONSE, {
+            source: "Collection list",
+          });
+        }
+      } else if (collection.id && workspaceId && folder.id) {
+        const response =
+          await this.collectionService.updateSavedRequestInCollection(
+            requestResponse.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              folderId: folder.id,
+              requestId: request.id,
+              name: newRequestName,
+            } as CreateApiRequestPostBody,
+          );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateSavedRequestInFolder(
+            collection.id,
+            folder.id,
+            request.id,
+            requestResponse.id,
+            { name: newRequestName },
+          );
+          this.updateTab(requestResponse.id, {
+            name: newRequestName,
+          });
+          MixpanelEvent(Events.RENAME_RESPONSE, {
             source: "Collection list",
           });
         }
@@ -2984,7 +3086,105 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete API request. Plaease try again.");
+      notifications.error("Failed to delete API request. Please try again.");
+      return false;
+    }
+  };
+
+  /**
+   * Handle deleting request from repository as well as backend
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - The collection in which the request is saved
+   * @param request : - The request to be deleted
+   * @param folder : - The folder in which the request is saved(if is saved in a folder)
+   * @returns :void
+   */
+  private handleDeleteSavedRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    request: CollectionItemsDto,
+    folder: CollectionItemsDto,
+    requestResponse: CollectionItemsDto,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    let requestObject = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      requestId: request.id,
+      folderId: "",
+      ...userSource,
+    };
+
+    if (folder && collection.id && workspaceId) {
+      requestObject = {
+        ...requestObject,
+        folderId: folder.id,
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folder) {
+        await this.collectionRepository.deleteSavedRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
+          request.id,
+          requestResponse.id,
+        );
+        this.tabRepository.removeTab(requestResponse.id);
+      } else {
+        await this.collectionRepository.deleteSavedRequestInCollection(
+          requestObject.collectionId,
+          request.id,
+          requestResponse.id,
+        );
+        this.tabRepository.removeTab(requestResponse.id);
+      }
+      return true;
+    }
+    const response =
+      await this.collectionService.deleteSavedRequestInCollection(
+        requestResponse.id,
+        requestObject,
+      );
+
+    if (response.isSuccessful) {
+      if (
+        requestObject.folderId &&
+        requestObject.collectionId &&
+        requestObject.workspaceId
+      ) {
+        await this.collectionRepository.deleteSavedRequestInFolder(
+          requestObject.collectionId,
+          requestObject.folderId,
+          request.id,
+          requestResponse.id,
+        );
+      } else if (requestObject.workspaceId && requestObject.collectionId) {
+        await this.collectionRepository.deleteSavedRequestInCollection(
+          requestObject.collectionId,
+          request.id,
+          requestResponse.id,
+        );
+      }
+
+      notifications.success(`"${requestResponse.name}" Response deleted.`);
+      this.removeMultipleTabs([requestResponse.id]);
+      MixpanelEvent(Events.DELETE_RESPONSE, {
+        source: "Collection list",
+      });
+      return true;
+    } else {
+      notifications.error("Failed to delete saved response. Please try again.");
       return false;
     }
   };
@@ -3076,7 +3276,7 @@ export default class CollectionsViewModel {
       });
       return true;
     } else {
-      notifications.error("Failed to delete WebSocket. Plaease try again.");
+      notifications.error("Failed to delete WebSocket. Please try again.");
       return false;
     }
   };
@@ -3140,7 +3340,7 @@ export default class CollectionsViewModel {
 
     if (!response?.isSuccessful) {
       notifications.error(
-        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+        `Failed to delete ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
       );
       return false;
     }
@@ -3226,7 +3426,7 @@ export default class CollectionsViewModel {
 
     if (!response?.isSuccessful) {
       notifications.error(
-        `Failed to delete ${GraphqlRequestDefaultAliasBaseEnum.NAME}. Plaease try again.`,
+        `Failed to delete ${GraphqlRequestDefaultAliasBaseEnum.NAME}. Please try again.`,
       );
       return false;
     }
@@ -3857,6 +4057,15 @@ export default class CollectionsViewModel {
           args.folder as CollectionItemsDto,
         );
         break;
+      case "saved_request":
+        this.handleDeleteSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.request as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
+          args.requestResponse as CollectionItemsDto,
+        );
+        break;
     }
   };
 
@@ -3921,6 +4130,16 @@ export default class CollectionsViewModel {
           args.newName as string,
         );
         break;
+      case "saved_request":
+        this.handleRenameSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.request as CollectionItemsDto,
+          args.requestResponse as CollectionItemsDto,
+          args.newName as string,
+        );
+        break;
     }
   };
 
@@ -3945,10 +4164,7 @@ export default class CollectionsViewModel {
     return response;
   };
 
-  public handleOpenItem = async (
-    entitytype: string,
-    args: CollectionArgsDto,
-  ) => {
+  public handleOpenItem = async (entitytype: string, args: any) => {
     switch (entitytype) {
       case "collection":
         this.handleOpenCollection(
@@ -3969,6 +4185,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+        );
+        break;
+      case "saved_request":
+        this.handleOpenSavedRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.request as CollectionItemsDto,
+          args.savedRequest as CollectionItemsDto,
         );
         break;
       case "websocket":
@@ -3999,7 +4224,7 @@ export default class CollectionsViewModel {
   };
 
   public handleOnChangeViewInRequest = async (view: string) => {
-    requestSplitterDirection.set(view);
+    tabsSplitterDirection.set(view);
   };
 
   public importJSONObject = async (
@@ -4019,34 +4244,26 @@ export default class CollectionsViewModel {
           contentType,
         );
 
-      if (response.isSuccessful) {
-        const path = {
-          workspaceId: currentWorkspaceId,
-          collectionId: response.data.data._id,
-          folderId: "",
-        };
+      if (response?.isSuccessful) {
         this.collectionRepository.addCollection({
           ...response.data.data,
           id: response.data.data._id,
           workspaceId: currentWorkspaceId,
         });
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
-          currentWorkspaceId,
-        );
-        initCollectionTab.updatePath(path);
-        initCollectionTab.updateName(response.data.data.name);
-        initCollectionTab.updateDescription(response.data.data.description);
-        initCollectionTab.updateIsSave(true);
-
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        
+        const collectionTab = new CollectionTabAdapter().adapt(currentWorkspaceId, {
+          ...response.data.data,
+          id: response.data.data._id
+        });
+        
+        this.tabRepository.createTab(collectionTab);
         moveNavigation("right");
 
         this.workspaceRepository.updateCollectionInWorkspace(
           currentWorkspaceId,
           {
-            id: initCollectionTab.getValue().id,
-            name: initCollectionTab.getValue().name,
+            id: response.data.data._id,
+            name: response.data.data.name,
           },
         );
         MixpanelEvent(Events.IMPORT_COLLECTION, {
@@ -4084,12 +4301,7 @@ export default class CollectionsViewModel {
           file,
         );
       }
-      if (response.isSuccessful) {
-        const path = {
-          workspaceId: currentWorkspaceId,
-          collectionId: response.data.data._id,
-          folderId: "",
-        };
+      if (response?.isSuccessful) {
 
         this.collectionRepository.addCollection({
           ...response.data.data,
@@ -4097,24 +4309,19 @@ export default class CollectionsViewModel {
           workspaceId: currentWorkspaceId,
         });
 
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data._id,
-          currentWorkspaceId,
-        );
+        const collectionTab = new CollectionTabAdapter().adapt(currentWorkspaceId, {
+          ...response.data.data,
+          id: response.data.data._id
+        });
 
-        initCollectionTab.updatePath(path);
-        initCollectionTab.updateName(response.data.data.name);
-        initCollectionTab.updateDescription(response.data.data.description);
-        initCollectionTab.updateIsSave(true);
-
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        this.tabRepository.createTab(collectionTab);
         moveNavigation("right");
 
         this.workspaceRepository.updateCollectionInWorkspace(
           currentWorkspaceId,
           {
-            id: initCollectionTab.getValue().id,
-            name: initCollectionTab.getValue().name,
+            id: response.data.data._id,
+            name: response.data.data.name,
           },
         );
         notifications.success("Collection imported successfully.");
@@ -4146,25 +4353,13 @@ export default class CollectionsViewModel {
         activeSync,
       );
 
-      if (response.isSuccessful) {
-        const path = {
-          workspaceId: currentWorkspaceId,
-          collectionId: response.data.data.collection._id,
-          folderId: "",
-        };
+      if (response?.isSuccessful) {
 
-        const initCollectionTab = new InitCollectionTab(
-          response.data.data.collection._id,
-          currentWorkspaceId,
-        );
-        initCollectionTab.updatePath(path);
-
-        initCollectionTab.updateName(response.data.data.collection.name);
-        initCollectionTab.updateDescription(
-          response.data.data.collection.description,
-        );
-
-        initCollectionTab.updateIsSave(true);
+        const collectionTab = new CollectionTabAdapter().adapt(currentWorkspaceId, {
+          ...response.data.data.collection,
+          id: response.data.data.collection._id
+        });
+    
         if (response.data.data.existingCollection) {
           this.collectionRepository.updateCollection(
             response.data.data.collection._id,
@@ -4185,14 +4380,14 @@ export default class CollectionsViewModel {
           this.workspaceRepository.updateCollectionInWorkspace(
             currentWorkspaceId,
             {
-              id: initCollectionTab.getValue().id,
-              name: initCollectionTab.getValue().name,
+              id: response.data.data.collection._id,
+              name: response.data.data.collection.name,
             },
           );
           notifications.success("Collection imported successfully.");
         }
 
-        this.tabRepository.createTab(initCollectionTab.getValue());
+        this.tabRepository.createTab(collectionTab);
         moveNavigation("right");
 
         MixpanelEvent(Events.IMPORT_COLLECTION, {
@@ -5285,5 +5480,136 @@ export default class CollectionsViewModel {
       JSON.parse(data?.data?.response),
     );
     return response;
+  };
+
+  /**
+   * Saves saved http request
+   * @param componentData - refers overall saved request tab data.
+   * @returns status of the operation performed.
+   */
+  public saveSavedRequest = async (componentData: Tab): Promise<boolean> => {
+    const { folderId, collectionId, workspaceId, requestId } =
+      componentData.path;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    }
+    const res = await this.collectionService.updateSavedRequestInCollection(
+      componentData.id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        requestId: requestId,
+        folderId: folderId,
+        description: componentData.description,
+      },
+    );
+
+    if (res.isSuccessful) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    } else {
+      notifications.error("Failed to save response. Please try again.");
+      return false;
+    }
+  };
+
+  /**
+   * Handles saving a collection
+   */
+  public saveCollection = async (componentData : Tab ) => {
+    const progressiveTab = createDeepCopy(componentData);
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser == true) {
+      await this.collectionRepository.updateCollection(
+        progressiveTab.id,
+        {
+          description: progressiveTab.description,
+          name: progressiveTab.name,
+          auth: progressiveTab.property.collection.auth, 
+          selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
+        },
+      );
+      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      return true;
+    }
+    const response = await this.collectionService.updateCollectionData(
+      progressiveTab.id as string,
+      progressiveTab.path.workspaceId as string,
+      { description: progressiveTab.description, name: progressiveTab.name, auth: progressiveTab.property.collection.auth, 
+        selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
+       },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateCollection(
+        progressiveTab.id as string,
+        response.data.data,
+      );
+      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      return true;
+    } else {
+      notifications.error("Failed to update description. Please try again.");
+    }
+    return false;
+    }
+
+  /**
+   * Update the tab type to permanent on double click
+   * @param tab tab data to make it permanent
+   */
+  public handleTabTypeChange = async (tab: Tab) => {
+    if (tab.persistence === TabPersistenceTypeEnum.TEMPORARY) {
+      await this.tabRepository.updateTab(tab.tabId, {
+        persistence: TabPersistenceTypeEnum.PERMANENT,
+      });
+    }
   };
 }

@@ -16,6 +16,7 @@
     postIcon,
   } from "@sparrow/library/icons";
   import NoResults from "./sub-components/NoResults.svelte";
+  import { KeyboardShortcuts } from "@sparrow/library/ui";
   export let searchQuery = "";
   export let filteredCollection = [];
   export let filteredFolder = [];
@@ -31,6 +32,7 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
+  export let osKeyName="Ctrl";
   SocketIcon;
   import TitleBar from "./sub-components/TitleBar.svelte";
   import ItemBar from "./sub-components/ItemBar.svelte";
@@ -45,11 +47,10 @@
     WEBSOCKET: SocketIcon,
   };
   const methodIconsProps = {
-    SOCKETIO: "#3670f7",
-    WEBSOCKET: "#3670f7",
-    GRAPHQL: "#F15EB0",
+    SOCKETIO: "var(--icon-ds-success-300)",
+    WEBSOCKET: "var(--icon-ds-primary-400)",
+    GRAPHQL: "var(--icon-ds-accent-400)",
   };
- 
 
   const getRequestDetails = (request) => {
     switch (request.type) {
@@ -88,7 +89,7 @@
     workspaces: {
       items: filteredWorkspaces,
       title: searchQuery === "" ? "Recent Workspaces" : "Workspaces",
-      shortcutKeys: ["Shift", "W"],
+      shortcutKeys: [osKeyName,"Shift", "W"],
       icon: WorkspaceIcongs,
       nav: (item) => handleGlobalSearchWorkspaceNavigation(item),
       getName: (item) => item.name,
@@ -97,7 +98,7 @@
     folders: {
       items: filteredFolder,
       title: searchQuery === "" ? "Recent Folders" : "Folders",
-      shortcutKeys: ["Shift", "F"],
+      shortcutKeys: [osKeyName,"Shift", "F"],
       icon: FolderIcon,
       nav: (item) =>
         handleGlobalSearchFolderNavigation(
@@ -111,7 +112,7 @@
     collections: {
       items: filteredCollection,
       title: searchQuery === "" ? "Recent Collections" : "Collections",
-      shortcutKeys: ["Shift", "C"],
+      shortcutKeys: [osKeyName,"Shift", "C"],
       icon: CollectionIcongs,
       nav: (item) =>
         handleGlobalSearchCollectionNavigation(item.workspaceId, item.tree),
@@ -121,7 +122,7 @@
     requests: {
       items: filteredRequest,
       title: searchQuery === "" ? "Recent Requests" : "Requests",
-      shortcutKeys: ["Shift", "A"],
+      shortcutKeys: [osKeyName,"Shift", "A"],
       icon: RequestIcon,
       nav: (item) =>
         handleGlobalSearchRequestNavigation(
@@ -147,7 +148,7 @@
     environments: {
       items: filteredEnvironments,
       title: searchQuery === "" ? "Recent Environments" : "Environments",
-      shortcutKeys: ["Shift", "E"],
+      shortcutKeys: [osKeyName,"Shift", "E"],
       icon: StackIcon,
       nav: (item) => handleGlobalSearchEnvironmentNavigation(item),
       getName: (item) => item.title,
@@ -156,7 +157,7 @@
     flows: {
       items: filteredTestflows,
       title: searchQuery === "" ? "Recent Test Flows" : "Test Flows",
-      shortcutKeys: ["Shift", "T"],
+      shortcutKeys: [osKeyName,"Shift", "T"],
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
@@ -467,13 +468,23 @@
                 url: config.getUrl ? config.getUrl(item) : undefined,
               }}
               icon={config.getIcon ? config.getIcon(item) : config.icon}
-              iconProps={config.getIconProps ? config.getIconProps(item) : {color: "var(--text-ds-neutral-300)" , width: "16px" , height: "16px"}}
+              iconProps={config.getIconProps
+                ? config.getIconProps(item)
+                : {
+                    color: "var(--text-ds-neutral-300)",
+                    width: "16px",
+                    height: "16px",
+                  }}
               onClick={() => config.nav(item)}
             />
           {/if}
         {/each}
       {:else}
-        <NoResults {searchQuery} />
+        <NoResults
+          {searchQuery}
+          type={searchQuery ? "Basic" : "Custom"}
+          customText="No results found. Get started by creating one!"
+        />
       {/if}
     {:else}
       <NoResults {searchQuery} />

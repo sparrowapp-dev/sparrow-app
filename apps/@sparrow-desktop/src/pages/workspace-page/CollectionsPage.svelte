@@ -45,7 +45,6 @@
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
-  import { ItemType } from "@sparrow/common/enums";
 
   import type {
     CollectionDocument,
@@ -75,6 +74,8 @@
 
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
+  import { remove } from "@tauri-apps/plugin-fs";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -192,6 +193,8 @@
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -221,7 +224,8 @@
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
-      removeTab.type === TabTypeEnum.TESTFLOW
+      removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.COLLECTION
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -240,6 +244,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.COLLECTION) {
+          const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
         loader = false;
       }
@@ -247,6 +258,7 @@
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
@@ -260,6 +272,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -509,35 +528,36 @@
             onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+            onDoubleClick={_viewModel.handleTabTypeChange}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>
               {#if true}
-                {#if $activeTab?.type === ItemType.REQUEST}
+                {#if $activeTab?.type === TabTypeEnum.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.COLLECTION}
+                {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <CollectionExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.FOLDER}
+                {:else if $activeTab?.type === TabTypeEnum.FOLDER}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <EnvironmentExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WORKSPACE}
+                {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
@@ -546,28 +566,34 @@
                       />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.SOCKET_IO}
+                {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.GRAPHQL}
+                {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}

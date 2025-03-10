@@ -6,7 +6,11 @@
   import { Search } from "@sparrow/library/forms";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown, Button } from "@sparrow/library/ui";
-  import { AddRegular, PlusIcon2 } from "@sparrow/library/icons";
+  import {
+    AddRegular,
+    ChevronDoubleRightRegular,
+    PlusIcon2,
+  } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -25,7 +29,7 @@
     StackIcon,
     SocketIoIcon,
     GraphIcon,
-    ChevronDoubleRegular,
+    ChevronDoubleLeftRegular,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -445,11 +449,11 @@
 
 {#if leftPanelController.leftPanelCollapse}
   <div>
-    <button
+    <span
       class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:52px; bottom: 15px; width: 20px; height:20px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:57px; bottom: 15px; width: 20px; height:20px; background-color:transparent; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
@@ -458,17 +462,15 @@
         leftPanelController.handleCollapseCollectionList();
       }}
     >
-      <span
-        style="transform: rotate(180deg);"
-        class="position-relative d-flex align-items-center justify-content-center"
-      >
-        <DoubleArrowIcon
-          height={"10px"}
-          width={"10px"}
-          color={"var(--text-primary-200)"}
+      <Tooltip title={"Expand"} placement={"right-center"}>
+        <Button
+          type="teritiary-regular"
+          size="extra-small"
+          customWidth="24px"
+          startIcon={ChevronDoubleRightRegular}
         />
-      </span>
-    </button>
+      </Tooltip>
+    </span>
   </div>
 {/if}
 {#if !leftPanelController.leftPanelCollapse}
@@ -560,6 +562,7 @@
               type="primary"
               id="addButton"
               size={"small"}
+              customWidth={"28px"}
               startIcon={AddRegular}
               onClick={() => {
                 addButtonMenu = !addButtonMenu;
@@ -751,7 +754,7 @@
         <Button
           size="extra-small"
           type="teritiary-regular"
-          startIcon={ChevronDoubleRegular}
+          startIcon={ChevronDoubleLeftRegular}
           onClick={() => {
             leftPanelController.leftPanelCollapse =
               !leftPanelController.leftPanelCollapse;

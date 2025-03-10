@@ -6,6 +6,7 @@ export interface CreateDirectoryPostBody {
 export interface CreateCollectionPostBody {
   name: string;
   workspaceId: string;
+  description: string;
 }
 
 export interface UpdateCollectionName {

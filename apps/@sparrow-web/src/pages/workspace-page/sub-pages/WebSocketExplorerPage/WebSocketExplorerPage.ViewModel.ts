@@ -54,6 +54,7 @@ import type { CollectionDocType } from "../../../../models/collection.model";
 // import { WebSocketService } from "../../../../services/web-socket.service";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class RestExplorerViewModel {
   /**
@@ -85,6 +86,7 @@ class RestExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
       }, 0);
     }
