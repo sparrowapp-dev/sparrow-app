@@ -131,8 +131,7 @@
       style="top:55.4px;  margin-top: -1px;"
     >
       <div class="d-flex align-items-center gap-2" style=" height: 32px;">
-        <!-- Copy button -->
-        <Tooltip title={"Copy"}>
+        <!-- <Tooltip title={"Copy"}>
           <WithButtonV6
             icon={CopyIcon}
             onClick={handleCopy}
@@ -140,7 +139,6 @@
             loader={false}
           />
         </Tooltip>
-        <!-- Download button -->
         <Tooltip title={"Export"}>
           <WithButtonV6
             icon={DownloadIcon2}
@@ -148,7 +146,7 @@
             disable={false}
             loader={false}
           />
-        </Tooltip>
+        </Tooltip> -->
       </div>
       <div class="d-flex gap-3 align-items-center justify-content-center">
         {#if response && response?.status}

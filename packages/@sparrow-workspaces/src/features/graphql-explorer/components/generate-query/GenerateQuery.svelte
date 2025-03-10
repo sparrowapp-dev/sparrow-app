@@ -2,6 +2,7 @@
   import { WithSelect } from "../../../../hoc";
   import {
     AngleLeftIcon,
+    ArrowClockWiseRegular,
     ChevronRightRegular,
     ThreeDotIcon,
   } from "@sparrow/library/icons";
@@ -549,10 +550,11 @@
         size="small"
         type="teritiary-regular"
         title="Schema"
-        onclick={async () => {
+        startIcon={ArrowClockWiseRegular}
+        onClick={async () => {
           onRefreshSchema();
         }}
-        disabled={isSchemaFetching}
+        disable={isSchemaFetching}
       />
     </div>
     <Breadcrumbs breadcrumbs={breadcrum} onNavigate={navigateToBreadcrumPath} />
@@ -564,13 +566,10 @@
         style="min-width: 272px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
       >
         <div class="d-flex flex-column h-100">
-          <div
-            class="px-2 d-flex justify-content-end"
-            style="margin-bottom: 12px;"
-          >
+          <div class=" d-flex justify-content-end" style="margin-bottom: 12px;">
             <Search
               id="graphql-query-search"
-              customWidth="100%"
+              customWidth="260px"
               variant="primary"
               bind:value={operationSearch}
               on:input={() => updateOperationSearch(operationSearch)}
