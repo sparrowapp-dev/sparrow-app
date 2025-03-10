@@ -197,3 +197,5 @@ export { default as GlobeRegular } from "./GlobeRegular.svelte";
 export { default as QuestionCirlceReqular } from "./QuestionCircleReqular.svelte";
 export { default as DocumentRegular } from "./DocumentRegular.svelte";
 export { default as GiftReqular } from "./GiftRegular.svelte";
+export { default as OpenRegular } from "./OpenRegular.svelte";
+export { default as CaretUpFilled } from "./CaretUpFilled.svelte";

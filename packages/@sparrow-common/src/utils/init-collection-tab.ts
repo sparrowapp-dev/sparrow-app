@@ -5,6 +5,8 @@ import {
   type Path,
 } from "@sparrow/common/types/workspace/tab";
 import type { Tab } from "../types/workspace/tab";
+import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
+import { CollectionNavigationTabEnum, type State, type Auth } from "../types/workspace/collection-tab";
 
 class InitCollectionTab {
   private _tab: Tab;
@@ -14,9 +16,7 @@ class InitCollectionTab {
    * @param _workspaceId - Workspace Id to which Collection belongs to
    */
   constructor(_id: string, _workspaceId: string) {
-    if (!_id || !_workspaceId) {
-      console.error("invalid id or workspace id on create new tab request!");
-    } else {
+   
       this._tab = {
         id: _id,
         tabId: uuidv4(),
@@ -28,7 +28,22 @@ class InitCollectionTab {
         activeSync: false,
         property: {
           collection: {
-            id: "",
+            auth: {
+              bearerToken: "",
+              basicAuth: {
+                username: "",
+                password: "",
+              },
+              apiKey: {
+                authKey: "",
+                authValue: "",
+                addTo: CollectionRequestAddToBaseEnum.HEADER,
+              },
+            },
+            state : {
+              collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+              collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
+            }
           },
         },
         path: {
@@ -42,13 +57,13 @@ class InitCollectionTab {
         isDeleted: false,
         timestamp: new Date().toString(),
       };
-    }
+      if (!_id || !_workspaceId) {
+        console.error("invalid id or workspace id on create new tab request!");
+      } 
+    
   }
-  public getValue(): CollectionTab {
+  public getValue(): Tab {
     return this._tab;
-  }
-  public getSpacificValue(_value: string) {
-    return this._tab[_value];
   }
   public updateId(_id: string) {
     this._tab.id = _id;
@@ -68,11 +83,19 @@ class InitCollectionTab {
   public updateActiveSync(_activeSync: boolean) {
     this._tab.activeSync = _activeSync;
   }
-  public updateTotalRequests(_totalRequest: number) {
-    this._tab.property.totalRequests = _totalRequest;
+
+  public updateState(_state: Partial<State>) {
+    if (this._tab?.property?.collection) {
+      this._tab.property.collection.state = {
+        ...this._tab.property.collection.state,
+        ..._state,
+      };
+    }
   }
-  public updateTotalFolder(_totalFolder: number) {
-    this._tab.property.totalFolders = _totalFolder;
+  public updateAuth(_auth: Auth) {
+    if (_auth && this._tab.property.collection) {
+      this._tab.property.collection.auth = _auth;
+    }
   }
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
