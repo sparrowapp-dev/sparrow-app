@@ -15,7 +15,13 @@ import type {
 import { notifications } from "@sparrow/library/ui";
 
 // Utils
-import { createDeepCopy, Debounce, moveNavigation } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  Debounce,
+  InitFolderTab,
+  InitWebSocketTab,
+  moveNavigation,
+} from "@sparrow/common/utils";
 import {
   ItemType,
   ResponseStatusCode,
@@ -29,18 +35,27 @@ import { InitRequestTab } from "@sparrow/common/utils";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
 
-import type {
-  CollectionBaseInterface as CollectionDto,
-  CollectionItemBaseInterface as CollectionItemsDto,
+import {
+  CollectionItemTypeBaseEnum,
+  type CollectionArgsBaseInterface,
+  type CollectionBaseInterface as CollectionDto,
+  type CollectionItemBaseInterface as CollectionItemsDto,
 } from "@sparrow/common/types/workspace/collection-base";
 import { type Tab } from "@sparrow/common/types/workspace/tab";
-import type { Auth, State } from "@sparrow/common/types/workspace/collection-tab";
+import type {
+  Auth,
+  State,
+} from "@sparrow/common/types/workspace/collection-tab";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import type { EnvironmentLocalGlobalJoinBaseInterface } from "@sparrow/common/types/workspace/environment-base";
 import { EnvironmentService } from "@app/services/environment.service";
 import { GuestUserRepository } from "@app/repositories/guest-user.repository";
 import { CollectionTabAdapter } from "@app/adapter";
+import type { GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
+import { InitTab } from "@sparrow/common/factory";
+import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/http-request-base";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -64,15 +79,13 @@ class CollectionExplorerPage {
     this.tab = t;
   }
 
-  
-    public get tab(): Observable<Tab> {
-      return this._tab.asObservable();
-    }
-  
-    public set tab(value: Tab) {
-      this._tab.next(value);
-    }
+  public get tab(): Observable<Tab> {
+    return this._tab.asObservable();
+  }
 
+  public set tab(value: Tab) {
+    this._tab.next(value);
+  }
 
   /**
    *
@@ -101,11 +114,14 @@ class CollectionExplorerPage {
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
     const rxCollection = await this.collectionRepository.readCollection(
-        progressiveTab.id
-      );
-    
+      progressiveTab.id,
+    );
+
     const collection = rxCollection?.toMutableJSON();
-    const collectionTab = new CollectionTabAdapter().adapt(progressiveTab.id, collection);
+    const collectionTab = new CollectionTabAdapter().adapt(
+      progressiveTab.id,
+      collection,
+    );
     if (!collection) result = false;
     // description
     else if (collectionTab.description !== progressiveTab.description) {
@@ -116,7 +132,10 @@ class CollectionExplorerPage {
       result = false;
     }
     // auth navigation
-    else if (collectionTab.property.collection?.state.collectionAuthNavigation !== progressiveTab.property.collection?.state.collectionAuthNavigation) {
+    else if (
+      collectionTab.property.collection?.state.collectionAuthNavigation !==
+      progressiveTab.property.collection?.state.collectionAuthNavigation
+    ) {
       result = false;
     }
     // auth key
@@ -193,195 +212,195 @@ class CollectionExplorerPage {
     return this.environmentRepository.getEnvironment();
   }
 
-    /**
-     *
-     * @param isGlobalVariable - defines to save local or global
-     * @param environmentVariables - pre existing environment data
-     * @param newVariableObj - new entry to be extended
-     * @returns
-     */
-    public updateEnvironment = async (
-      isGlobalVariable: boolean,
-      environmentVariables: EnvironmentLocalGlobalJoinBaseInterface,
-      newVariableObj: { key: string; value: string },
-    ) => {
-      // const isGuestUser = await this.getGuestUserState();
-      const response = await this.guestUserRepository.findOne({
-        name: "guestUser",
-      });
-      const isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
-      if (isGlobalVariable) {
-        // api payload
-        const payload = {
-          name: environmentVariables.global.name,
-          variable: [
-            ...environmentVariables.global.variable,
-            {
-              key: newVariableObj.key,
-              value: newVariableObj.value,
-              checked: true,
-            },
-          ],
-        };
-        // removes blank key value pairs
-        payload.variable = [
-          ...payload.variable.filter((variable) => {
-            return variable.key.length > 0;
-          }),
+  /**
+   *
+   * @param isGlobalVariable - defines to save local or global
+   * @param environmentVariables - pre existing environment data
+   * @param newVariableObj - new entry to be extended
+   * @returns
+   */
+  public updateEnvironment = async (
+    isGlobalVariable: boolean,
+    environmentVariables: EnvironmentLocalGlobalJoinBaseInterface,
+    newVariableObj: { key: string; value: string },
+  ) => {
+    // const isGuestUser = await this.getGuestUserState();
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
+    if (isGlobalVariable) {
+      // api payload
+      const payload = {
+        name: environmentVariables.global.name,
+        variable: [
+          ...environmentVariables.global.variable,
           {
-            key: "",
-            value: "",
-            checked: false,
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
           },
-        ];
-  
-        if (isGuestUser === true) {
-          // updates environment list
-          this.environmentRepository.updateEnvironment(
-            environmentVariables.global.id,
-            payload,
-          );
-  
-          const currentTab = await this.tabRepository.getTabById(
-            environmentVariables.global.id,
-          );
-          if (currentTab) {
-            const currentTabId = currentTab.tabId;
-            const envTab = createDeepCopy(currentTab);
-            envTab.property.environment.variable = payload.variable;
-            envTab.isSaved = true;
-            await this.tabRepository.updateTab(currentTabId as string, {
-              property: envTab.property,
-              isSaved: envTab.isSaved,
-            });
-          }
-  
-          notifications.success("Environment variable added successfully.");
-          return {
-            isSuccessful: true,
-          };
-        }
-        const response = await this.environmentService.updateEnvironment(
-          this._tab.getValue().path?.workspaceId as string,
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+
+      if (isGuestUser === true) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
           environmentVariables.global.id,
           payload,
         );
-        if (response.isSuccessful) {
-          // updates environment list
-          this.environmentRepository.updateEnvironment(
-            response.data.data._id,
-            response.data.data,
-          );
-  
-          const currentTab = await this.tabRepository.getTabById(
-            response.data.data._id,
-          );
-  
-          if (currentTab) {
-            const currentTabId = currentTab.tabId;
-            const envTab = createDeepCopy(currentTab);
-            envTab.property.environment.variable = response.data.data.variable;
-            envTab.isSaved = true;
-            await this.tabRepository.updateTab(currentTabId as string, {
-              property: envTab.property,
-              isSaved: envTab.isSaved,
-            });
-          }
-  
-          notifications.success("Environment variable added successfully.");
-        } else {
-          notifications.error(
-            "Failed to add environment variable. Please try again.",
-          );
+
+        const currentTab = await this.tabRepository.getTabById(
+          environmentVariables.global.id,
+        );
+        if (currentTab) {
+          const currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
         }
-        return response;
-      } else {
-        // api payload
-        const payload = {
-          name: environmentVariables.local.name,
-          variable: [
-            ...environmentVariables.local.variable,
-            {
-              key: newVariableObj.key,
-              value: newVariableObj.value,
-              checked: true,
-            },
-          ],
+
+        notifications.success("Environment variable added successfully.");
+        return {
+          isSuccessful: true,
         };
-        // removes blank key value pairs
-        payload.variable = [
-          ...payload.variable.filter((variable) => {
-            return variable.key.length > 0;
-          }),
-          {
-            key: "",
-            value: "",
-            checked: false,
-          },
-        ];
-        if (isGuestUser) {
-          // updates environment list
-          this.environmentRepository.updateEnvironment(
-            environmentVariables.local.id,
-            payload,
-          );
-  
-          const currentTab = await this.tabRepository.getTabById(
-            environmentVariables.local.id,
-          );
-  
-          if (currentTab) {
-            const currentTabId = currentTab.tabId;
-            const envTab = createDeepCopy(currentTab);
-            envTab.property.environment.variable = payload.variable;
-            envTab.isSaved = true;
-            await this.tabRepository.updateTab(currentTabId as string, {
-              property: envTab.property,
-              isSaved: envTab.isSaved,
-            });
-          }
-  
-          notifications.success("Environment variable added successfully.");
-          return {
-            isSuccessful: true,
-          };
+      }
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path?.workspaceId as string,
+        environmentVariables.global.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+
+        const currentTab = await this.tabRepository.getTabById(
+          response.data.data._id,
+        );
+
+        if (currentTab) {
+          const currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
         }
-        // api response
-        const response = await this.environmentService.updateEnvironment(
-          this._tab.getValue().path?.workspaceId as string,
+
+        notifications.success("Environment variable added successfully.");
+      } else {
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
+      }
+      return response;
+    } else {
+      // api payload
+      const payload = {
+        name: environmentVariables.local.name,
+        variable: [
+          ...environmentVariables.local.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      if (isGuestUser) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
           environmentVariables.local.id,
           payload,
         );
-        if (response.isSuccessful) {
-          // updates environment list
-          this.environmentRepository.updateEnvironment(
-            response.data.data._id,
-            response.data.data,
-          );
-  
-          const currentTab = await this.tabRepository.getTabById(
-            response.data.data._id,
-          );
-          if (currentTab) {
-            const currentTabId = currentTab.tabId;
-            const envTab = createDeepCopy(currentTab);
-            envTab.property.environment.variable = response.data.data.variable;
-            envTab.isSaved = true;
-            await this.tabRepository.updateTab(currentTabId as string, {
-              property: envTab.property,
-              isSaved: envTab.isSaved,
-            });
-          }
-  
-          notifications.success("Environment variable added successfully.");
-        } else {
-          notifications.error(
-            "Failed to add environment variable. Please try again.",
-          );
+
+        const currentTab = await this.tabRepository.getTabById(
+          environmentVariables.local.id,
+        );
+
+        if (currentTab) {
+          const currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
         }
-        return response;
+
+        notifications.success("Environment variable added successfully.");
+        return {
+          isSuccessful: true,
+        };
       }
-    };
+      // api response
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path?.workspaceId as string,
+        environmentVariables.local.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+
+        const currentTab = await this.tabRepository.getTabById(
+          response.data.data._id,
+        );
+        if (currentTab) {
+          const currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+      } else {
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
+      }
+      return response;
+    }
+  };
   /**
    * Updates collection auth
    * @param _auth - collection auth
@@ -395,22 +414,22 @@ class CollectionExplorerPage {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareCollectionWithServer();
-  }
+  };
 
   /**
-     * Updates collection state
-     * @param _state - collection state
-     */
-    public updateCollectionState = async (_state: Partial<State>) => {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-      progressiveTab.property.collection.state = {
-        ...progressiveTab.property.collection.state,
-        ..._state,
-      };
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      this.compareCollectionWithServer();
+   * Updates collection state
+   * @param _state - collection state
+   */
+  public updateCollectionState = async (_state: Partial<State>) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.collection.state = {
+      ...progressiveTab.property.collection.state,
+      ..._state,
     };
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareCollectionWithServer();
+  };
 
   /**
    * Updates collection tab name
@@ -424,15 +443,12 @@ class CollectionExplorerPage {
     this.tab = progressiveTab;
   };
 
-
   /**
    * Handles renaming a collection
    * @param newCollectionName - the new name of the collection
    * @param event - blur or input
    */
-  public handleRename = async (
-    _collectionName: string, event = ""
-  ) => {
+  public handleRename = async (_collectionName: string, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
     // Trim the name to handle cases with only spaces
@@ -450,68 +466,72 @@ class CollectionExplorerPage {
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareCollectionWithServer();
-  }
+  };
 
   /**
    * Handles updating description of a collection.
    * @param _collectionDescription - the updated description of the collection.
    */
-  public handleUpdateDescription = async (
-    _collectionDescription: string,
-  ) => {
+  public handleUpdateDescription = async (_collectionDescription: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.description = _collectionDescription;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareCollectionWithServer();
-    }
+  };
 
   /**
    * Handles saving a collection
    */
-  public handleSaveCollection = async ( ) => {
+  public handleSaveCollection = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
     if (isGuestUser === true) {
-      await this.collectionRepository.updateCollection(
-        progressiveTab.id,
-        {
-          description: progressiveTab.description,
-          name: progressiveTab.name,
-          auth: progressiveTab.property.collection.auth, 
-          selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
-        },
+      await this.collectionRepository.updateCollection(progressiveTab.id, {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
+        auth: progressiveTab.property.collection.auth,
+        selectedAuthType:
+          progressiveTab.property.collection.state.collectionAuthNavigation,
+      });
+      notifications.success(
+        `The ‘${progressiveTab.name}’ collection saved successfully.`,
       );
-      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
       progressiveTab.isSaved = true;
-      this.tab = progressiveTab;    
+      this.tab = progressiveTab;
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       return;
     }
     const response = await this.collectionService.updateCollectionData(
       progressiveTab.id as string,
       progressiveTab.path.workspaceId as string,
-      { description: progressiveTab.description, name: progressiveTab.name, auth: progressiveTab.property.collection.auth, 
-        selectedAuthType : progressiveTab.property.collection.state.collectionAuthNavigation
-       },
+      {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
+        auth: progressiveTab.property.collection.auth,
+        selectedAuthType:
+          progressiveTab.property.collection.state.collectionAuthNavigation,
+      },
     );
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
         progressiveTab.id as string,
         response.data.data,
       );
-      notifications.success(`The ‘${progressiveTab.name}’ collection saved successfully.`);
+      notifications.success(
+        `The ‘${progressiveTab.name}’ collection saved successfully.`,
+      );
       progressiveTab.isSaved = true;
-      this.tab = progressiveTab;    
+      this.tab = progressiveTab;
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } else {
       notifications.error("Failed to save collection. Please try again.");
     }
-    }
-  
+  };
+
   /**
    *
    * @param collection - Collection in which branch is going to change
@@ -914,6 +934,583 @@ class CollectionExplorerPage {
         notifications.error(response.message);
       }
     }
+  };
+
+  /**
+   * Handles creating unique name for new collection, folder or request
+   * @param list :any[] - list of collection, folder or request
+   * @param type :string - type of element of list, i.e. collection, folder, request
+   * @param name :string - name of new element
+   * @returns :string - new proposed name of new collection, folder or request
+   */
+  private getNextName = (
+    list: { type: string; name: string }[],
+    type: string,
+    name: string,
+  ) => {
+    const isNameAvailable: (proposedName: string) => boolean = (
+      proposedName,
+    ) => {
+      return list.some((element) => {
+        return element.type === type && element.name === proposedName;
+      });
+    };
+
+    if (!isNameAvailable(name)) {
+      return name;
+    }
+
+    for (let i = 2; i < list.length + 10; i++) {
+      const proposedName: string = `${name} ${i}`;
+      if (!isNameAvailable(proposedName)) {
+        return proposedName;
+      }
+    }
+  };
+
+  /**
+   * Handle creating a new request in a collection
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateRequestInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const request = new InitRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: request.getValue().name,
+        type: request.getValue().type,
+        description: "",
+        request: {
+          method: request?.getValue().property?.request?.method,
+        } as HttpRequestBaseInterface,
+      },
+    };
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...requestObj.items,
+        id: request.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          requestObj.collectionId,
+          request.getValue().id,
+        );
+      if (res) {
+        res.id = uuidv4();
+      }
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+
+      request.updateId(res?.id as string);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      request.updateIsSave(true);
+      await this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      return;
+    }
+    const response =
+      await this.collectionService.addRequestInCollection(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+      request.updateId(res.id);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      request.updateIsSave(true);
+      this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
+   * Handles creating a new folder in a collection
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new folder is going to be created
+   * @returns :void
+   */
+  public handleCreateFolderInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ): Promise<void> => {
+    // Generate a new folder object with a unique ID, name, description, type, and an empty items array
+    const folder = {
+      id: UntrackedItems.UNTRACKED + uuidv4(),
+      name: this.getNextName(collection.items, ItemType.FOLDER, "New Folder"),
+      description: "",
+      type: ItemType.FOLDER,
+      items: [],
+    };
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    // Determine the user source based on collection's active synchronization
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    // Add the new folder to the collection locally
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      folder,
+    );
+
+    if (isGuestUser === true) {
+      const data = {
+        id: uuidv4(),
+        name: this.getNextName(
+          collection.items,
+          ItemType.FOLDER,
+          "New Folder",
+        ) as string,
+        description: "",
+        type: ItemType.FOLDER,
+        items: [],
+      };
+
+      const path = {
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: data.id,
+      };
+
+      const sampleFolder = new InitFolderTab(data.id, collection.workspaceId);
+
+      sampleFolder.updateName(data.name);
+      sampleFolder.updatePath(path);
+      sampleFolder.updateIsSave(true);
+
+      this.tabRepository.createTab(sampleFolder.getValue());
+      moveNavigation("right");
+
+      // Update the locally added folder with server response
+      const folderObj = data;
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        folder.id,
+        folderObj,
+      );
+      return;
+    }
+
+    // Add the folder in the collection on the Database
+    const response = await this.collectionService.addFolderInCollection(
+      workspaceId,
+      collection.id,
+      {
+        ...userSource,
+        name: folder.name,
+        description: folder.description,
+      },
+    );
+
+    // Update UI elements and handle navigation on success
+    if (response.isSuccessful) {
+      const path = {
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: response.data.data.id,
+        folderName: response.data.data.name,
+      };
+
+      const sampleFolder = new InitFolderTab(
+        response.data.data.id,
+        collection.workspaceId,
+      );
+
+      sampleFolder.updateName(response.data.data.name);
+      sampleFolder.updatePath(path);
+      sampleFolder.updateIsSave(true);
+
+      this.tabRepository.createTab(sampleFolder.getValue());
+      moveNavigation("right");
+
+      // Update the locally added folder with server response
+      const folderObj = response.data.data;
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        folder.id,
+        folderObj,
+      );
+    } else {
+      // Show error notification and clean up by deleting the folder locally on failure.
+      notifications.error("Failed to create folder. Please try again.");
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        folder.id,
+      );
+    }
+  };
+
+  /**
+   * Handle creating a new web socket in a collection
+   * @param workspaceId
+   * @param collection - the collection in which new web socket is going to be created
+   */
+  private handleCreateWebSocketInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const websocket = new InitWebSocketTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const websocketObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: websocket.getValue().name,
+        type: websocket.getValue().type,
+        description: "",
+        websocket: {},
+      },
+    };
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id as string,
+      {
+        ...websocketObj.items,
+        id: websocket.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          websocketObj.collectionId as string,
+          websocket.getValue().id,
+        );
+      if (res) {
+        res.id = uuidv4();
+      }
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id as string,
+        websocket.getValue().id,
+        res,
+      );
+
+      websocket.updateId(res?.id as string);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      websocket.updateIsSave(true);
+      await this.tabRepository.createTab(websocket.getValue());
+      moveNavigation("right");
+      return;
+    }
+    const response =
+      await this.collectionService.addSocketInCollection(websocketObj);
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id as string,
+        websocket.getValue().id,
+        res,
+      );
+
+      websocket.updateId(res.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      websocket.updateIsSave(true);
+
+      this.tabRepository.createTab(websocket.getValue());
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        websocket.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
+   * Handle creating a new socket io in a collection
+   * @param _workspaceId - workspace id
+   * @param _collection - the collection in which new socket io is going to be created
+   */
+  private handleCreateSocketIoInCollection = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+  ) => {
+    const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+    const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: socketIoTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.SOCKETIO,
+          description: "",
+          socketio: {},
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...socketIoOfCollectionPayload.items,
+          id: socketIoTab.getValue().id,
+        },
+      );
+      socketIoTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      socketIoTab.updateIsSave(true);
+      await this.tabRepository.createTab(socketIoTab.getValue());
+      moveNavigation("right");
+      return;
+    }
+
+    const response = await this.collectionService.addSocketIoInCollection(
+      socketIoOfCollectionPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...res,
+        },
+      );
+
+      socketIoTab.updateId(res.id as string);
+      socketIoTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      socketIoTab.updateIsSave(true);
+
+      this.tabRepository.createTab(socketIoTab.getValue());
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        socketIoTab.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
+   * Handle creating a new graphql in a collection
+   * @param _workspaceId - workspace id
+   * @param _collection - the collection in which new graphql is going to be created
+   */
+  private handleCreateGraphqlInCollection = async (
+    _workspaceId: string,
+    _collection: CollectionDto,
+  ) => {
+    const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+    const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: graphqlTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
+          description: "",
+          graphql: {},
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...graphqlOfCollectionPayload.items,
+          id: graphqlTab.getValue().id,
+        },
+      );
+      graphqlTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      graphqlTab.updateIsSave(true);
+      await this.tabRepository.createTab(graphqlTab.getValue());
+      moveNavigation("right");
+      return;
+    }
+
+    const response = await this.collectionService.addGraphqlInCollection(
+      graphqlOfCollectionPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...res,
+        },
+      );
+
+      graphqlTab.updateId(res.id as string);
+      graphqlTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      graphqlTab.updateIsSave(true);
+
+      this.tabRepository.createTab(graphqlTab.getValue());
+      moveNavigation("right");
+
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        graphqlTab.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
+   * Handle control of creating items
+   * @param entityType :string - type of entity, collection, folder or request
+   * @param args :object - arguments depending on entity type
+   */
+  public handleCreateItem = async (
+    entityType: string,
+    args: CollectionArgsBaseInterface,
+  ) => {
+    let response;
+    switch (entityType) {
+      case "folder":
+        await this.handleCreateFolderInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "requestCollection":
+        await this.handleCreateRequestInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "websocketCollection":
+        await this.handleCreateWebSocketInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "socketioCollection":
+        await this.handleCreateSocketIoInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "graphqlCollection":
+        await this.handleCreateGraphqlInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+    }
+    return response;
   };
 
   /**
