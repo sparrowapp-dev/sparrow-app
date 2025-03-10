@@ -19,7 +19,13 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import { MessageTypeEnum } from "@sparrow/common/types/workspace";
-
+  import { ArrowSyncRegular, ThumbLikeRegular } from "@sparrow/library/icons";
+  import {
+    ThumbLikeFilled,
+    ThumbDislikeFilled,
+    CopyRegular,
+    ThumbDislikeRegular,
+  } from "@sparrow/library/icons";
   export let message: string;
   export let messageId: string;
   export let type;
@@ -206,7 +212,24 @@
     -->
   {#if type === MessageTypeEnum.SENDER}
     <div class="send-item">
-      <p class="my-4 px-3 text-fs-12">{@html message}</p>
+      <p
+        class="my-4 px-3 text-fs-12"
+        style="background-color: var(--bg-ds-surface-500); 
+        height: auto; 
+        width:fit-content;
+        border-radius: 8px; 
+        padding: 8px; 
+        margin-left: auto; 
+        margin-right: 5px; 
+        max-width: 248px; 
+        text-align: left;
+        font-size:12px;
+        weight:400;
+        gap:10px;
+        "
+      >
+        {@html message}
+      </p>
     </div>
   {:else}
     <!--
@@ -216,7 +239,6 @@
     -->
     <div class="recieve-item p-3">
       <div class="d-flex justify-content-between">
-        <SparrowAIIcon height={"20px"} width={"20px"} />
         <div class="d-flex gap-1 pb-2">
           {#if status}
             <!--
@@ -224,38 +246,6 @@
             -- LIKE / DISLIKE
             -- 
             -->
-            <Tooltip placement="top-center" title="Like" distance={13}>
-              <span
-                role="button"
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                on:click={() => {
-                  onToggleLike(messageId, true);
-                  MixpanelEvent(Events.AI_Like_Response);
-                }}
-              >
-                <LikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isLiked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
-            <Tooltip placement="top-center" title="Dislike" distance={13}>
-              <span
-                class="action-button d-flex align-items-center justify-content-center border-radius-4"
-                role="button"
-                on:click={() => {
-                  onToggleLike(messageId, false);
-                  MixpanelEvent(Events.AI_Dislike_Response);
-                }}
-              >
-                <DislikeIcon
-                  height={"16px"}
-                  width={"16px"}
-                  color={isDisliked ? "white" : "transparent"}
-                />
-              </span>
-            </Tooltip>
           {/if}
         </div>
       </div>
@@ -275,32 +265,64 @@
         -- 
         -->
         {#if isLastRecieverMessage}
+          <Tooltip
+            placement="top-center"
+            title={showTickIcon ? "Copied" : "Copy"}
+            distance={13}
+          >
+            <button
+              disabled={showTickIcon}
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={handleCopyResponse}
+            >
+              {#if showTickIcon}
+                <TickIcon size={"14px"} color={"grey"} />
+              {:else}
+                <CopyRegular size={"16px"} />
+              {/if}
+            </button>
+          </Tooltip>
+          <Tooltip placement="top-center" title="Like" distance={13}>
+            <span
+              role="button"
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              on:click={() => {
+                onToggleLike(messageId, true);
+                MixpanelEvent(Events.AI_Like_Response);
+              }}
+            >
+              {#if isLiked}
+                <ThumbLikeFilled size={"16px"} />
+              {:else}
+                <ThumbLikeRegular size={"16px"} />
+              {/if}
+            </span>
+          </Tooltip>
+          <Tooltip placement="top-center" title="Dislike" distance={13}>
+            <span
+              class="action-button d-flex align-items-center justify-content-center border-radius-4"
+              role="button"
+              on:click={() => {
+                onToggleLike(messageId, false);
+                MixpanelEvent(Events.AI_Dislike_Response);
+              }}
+            >
+              {#if isDisliked}
+                <ThumbDislikeFilled size={"16px"} />
+              {:else}
+                <ThumbDislikeRegular size={"16px"} />
+              {/if}
+            </span>
+          </Tooltip>
           <Tooltip placement="top-center" title="Regenerate" distance={13}>
             <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
               on:click={regenerateAiResponse}
             >
-              <RefreshIcon height={"16px"} width={"16px"} />
+              <ArrowSyncRegular size={"16px"} />
             </button>
           </Tooltip>
         {/if}
-        <Tooltip
-          placement="top-center"
-          title={showTickIcon ? "Copied" : "Copy"}
-          distance={13}
-        >
-          <button
-            disabled={showTickIcon}
-            class="action-button d-flex align-items-center justify-content-center border-radius-4"
-            on:click={handleCopyResponse}
-          >
-            {#if showTickIcon}
-              <TickIcon height={"14px"} width={"14px"} color={"grey"} />
-            {:else}
-              <CopyIcon2 height={"14px"} width={"14px"} />
-            {/if}
-          </button>
-        </Tooltip>
       </div>
     </div>
   {/if}
@@ -309,7 +331,6 @@
 <style>
   .send-item,
   .recieve-item {
-    border-bottom: 1px solid var(--border-secondary-320);
   }
 
   :global(
@@ -332,6 +353,9 @@
   }
   :global(.message-wrapper .hljs) {
     background: #000 !important;
+    border: 2px solid var(--border-ds-surface-400);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
   :global(.action-button) {
     height: 30px;

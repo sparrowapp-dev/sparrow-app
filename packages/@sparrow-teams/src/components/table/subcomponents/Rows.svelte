@@ -25,11 +25,9 @@
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
 
-
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
-
 
   const rightClickContextMenu = (e: MouseEvent) => {
     e.preventDefault();
@@ -40,7 +38,6 @@
       showMenu = true;
     }, 100);
   };
-
 
   $: {
     if (isAdminOrOwner) {
@@ -84,23 +81,19 @@
     }
   }
 
-
   function closeRightClickContextMenu() {
     showMenu = false;
   }
 </script>
 
-
 {#if showMenu}
   <MenuView xAxis={pos.x} yAxis={pos.y} {noOfRows} {noOfColumns} {menuItems} />
 {/if}
-
 
 <svelte:window
   on:click={closeRightClickContextMenu}
   on:contextmenu|preventDefault={closeRightClickContextMenu}
 />
-
 
 <tr
   tabindex="0"
@@ -124,7 +117,6 @@
     {/if}
   </td>
 
-
   <td
     on:click={(e) => {
       e.stopPropagation();
@@ -135,14 +127,13 @@
     {list?.collections?.length ? list.collections.length : 0}
   </td>
 
-
   {#if activeTeam?.users?.length > 1}
     <td
       on:click={(e) => {
         e.stopPropagation();
         onOpenCollection(list._id);
       }}
-      class="tab-data py-2 "
+      class="tab-data py-2"
     >
       <div class="d-flex px-3">
         <UserProfileList
@@ -161,7 +152,6 @@
     </td>
   {/if}
 
-
   <td
     on:click={(e) => {
       e.stopPropagation();
@@ -171,7 +161,6 @@
   >
     {calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}
   </td>
-
 
   <td class="tab-data py-2 position-relative">
     {#if isWebEnvironment}
@@ -186,35 +175,32 @@
     {/if}
   </td>
 
-
-  <td class="tab-data rounded-end py-2"
-  >
-  <div bind:this={workspaceTabWrapper} class="threedot-icon-container" style="display: flex; justify-content: center; align-items: center;"> 
-    <Button
-    type="teritiary-regular"
-    onClick={(e) => {
-        rightClickContextMenu(e);
-      }}
-      startIcon={ThreeDotIcon}
-    />
-  </div>
-    
-     
+  <td class="tab-data rounded-end py-2">
+    <div
+      bind:this={workspaceTabWrapper}
+      class="threedot-icon-container"
+      style="display: flex; justify-content: center; align-items: center;"
+    >
+      <Button
+        type="teritiary-regular"
+        onClick={(e) => {
+          rightClickContextMenu(e);
+        }}
+        startIcon={ThreeDotIcon}
+      />
+    </div>
   </td>
 </tr>
 
-
 <style>
-
-
   tr:hover {
     background-color: var(--bg-ds-surface-600);
     cursor: pointer;
     border-bottom-color: transparent;
   }
-  tr{
+  tr {
     border-bottom-style: solid;
-    border-bottom-color:var(--bg-ds-surface-600);
+    border-bottom-color: var(--bg-ds-surface-600);
     border-bottom-width: 1px;
   }
   tr:active {
@@ -222,12 +208,11 @@
     cursor: pointer;
   }
   tr[tabindex="0"]:focus-visible {
-     outline: solid 2px var(--bg-ds-primary-300) !important;
-     outline-offset: -2px;
-     background-color: var(--bg-ds-surface-700);
+    outline: solid 2px var(--bg-ds-primary-300) !important;
+    outline-offset: -2px;
+    background-color: var(--bg-ds-surface-700);
     border-radius: 8px;
   }
-
 
   .workspace-list-item td {
     background-color: transparent;
@@ -242,7 +227,6 @@
   tr:hover .threedot-icon-container {
     visibility: visible;
   }
-
 
   .tab-data {
     font-size: 12px;
@@ -273,7 +257,7 @@
   .open-desktop-btn:hover {
     background-color: var(--color-primary-dark);
   }
-  tr{
+  tr {
     border-radius: 8px;
   }
 </style>
