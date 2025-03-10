@@ -42,14 +42,6 @@
   </div>
 </div>
 
-<div tabindex="0">
-  <button
-    class="desc"
-    style="width:72px;border-width:0px;height:28px;border-radius:4px;"
-    >save</button
-  >
-</div>
-
 <style>
   .desc {
     width: 72px;
