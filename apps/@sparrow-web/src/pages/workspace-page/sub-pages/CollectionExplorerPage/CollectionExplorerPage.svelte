@@ -187,11 +187,12 @@
 <CollectionExplorer
   {isCollectionEditable}
   onUpdateEnvironment={_viewModel.updateEnvironment}
-  isWebApp={false}
+  isWebApp={true}
   tab={_viewModel.tab}
   bind:collection
   {environmentVariables}
   onUpdateDescription={_viewModel.handleUpdateDescription}
+  onItemCreated={_viewModel.handleCreateItem}
   onCreateAPIRequest={_viewModel.handleCreateRequest}
   onCollectionSynced={_viewModel.handleSyncCollection}
   onSaveCollection={_viewModel.handleSaveCollection}
