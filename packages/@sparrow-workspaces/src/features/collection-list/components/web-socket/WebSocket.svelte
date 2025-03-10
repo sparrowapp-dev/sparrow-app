@@ -319,6 +319,7 @@ style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />

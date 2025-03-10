@@ -208,7 +208,6 @@
 </script>
 
 <button
-  {tabindex}
   {id}
   disabled={disable}
   style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: ${borderRadius}px;`}  `}
@@ -235,7 +234,10 @@
       <Spinner size={`${iconSize}px`} />
     </span>
   {:else if title}
-    <span style={` font-size:${fontSize}px; font-weight:500; `}>
+    <span
+      class="btn-title"
+      style={`font-size:${fontSize}px; font-weight:500; `}
+    >
       {title}
     </span>
   {/if}
@@ -365,21 +367,24 @@
     background-color: transparent;
     color: var(--text-ds-primary-300);
     border: 0px;
-    text-decoration: underline;
-    text-underline-offset: 5px;
+    .btn-title {
+      text-decoration: underline;
+      text-underline-offset: 5px;
+    }
   }
   .custom-btn-link-primary:focus-visible {
     background-color: transparent;
     color: var(--text-ds-primary-300);
-    outline: none;
-    border: 2px solid var(--border-ds-primary-300);
+    outline: 2px solid var(--border-ds-primary-300);
   }
   .custom-btn-link-primary:active {
     background-color: transparent;
     color: var(--bg-ds-primary-400);
     border: 0px;
-    text-decoration: underline;
-    text-underline-offset: 5px;
+    .btn-title {
+      text-decoration: underline;
+      text-underline-offset: 5px;
+    }
   }
 
   .custom-btn-link-primary-disable {

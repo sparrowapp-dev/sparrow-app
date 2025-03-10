@@ -205,3 +205,4 @@ export { default as SendRegular } from "./SendRegular.svelte";
 export { default as ThumbDislikeFilled } from "./ThumbDislikeFilled.svelte";
 export { default as GlobeRegular } from "./GlobeRegular.svelte";
 export { default as CircleFilled} from "./CircleFilled.svelte";
+export {default as OpenRegular} from "./OpenRegular.svelte"

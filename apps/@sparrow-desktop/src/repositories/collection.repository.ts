@@ -4,6 +4,7 @@ import { ItemType } from "@sparrow/common/enums/item-type.enum";
 import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
+import type { RxDocument } from "rxdb";
 export class CollectionRepository {
   constructor() {}
 
@@ -40,6 +41,8 @@ export class CollectionRepository {
       if (data.activeSync) value.activeSync = data.activeSync;
       if (data.createdBy) value.createdBy = data.createdBy;
       if (data.items) value.items = data.items;
+      if (data.selectedAuthType)  value.selectedAuthType = data.selectedAuthType;
+      if (data.auth) value.auth = data.auth;
       if (data.branches) value.branches = data.branches;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
       if (data.currentBranch) value.currentBranch = data.currentBranch;
@@ -51,14 +54,24 @@ export class CollectionRepository {
     return;
   };
 
-  public readCollection = async (uuid: string): Promise<CollectionDocument> => {
+  public readCollection = async (uuid: string): Promise<CollectionDocument | null | undefined> => {
     return await RxDB.getInstance()
-      .rxdb.collection.findOne({
+      .rxdb?.collection?.findOne({
         selector: {
           id: uuid,
         },
       })
       .exec();
+  };
+
+  public subscribeCollection = (uuid: string): Observable<RxDocument<CollectionDocument>> => {
+    return RxDB.getInstance()
+      .rxdb?.collection?.findOne({
+        selector: {
+          id: uuid,
+        },
+      })
+      .$;
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
@@ -68,6 +81,14 @@ export class CollectionRepository {
 
   public getCollectionDocs = (): CollectionDocument[] => {
     return RxDB.getInstance().rxdb?.collection.find().exec();
+  };
+
+  public getCollectionsByWorkspaceId = async (_workspaceId: string): Promise<CollectionDocument[]> => {
+    return await RxDB.getInstance().rxdb?.collection.find({
+      selector: {
+        workspaceId: _workspaceId,
+      },
+    }).exec() || [];
   };
 
   // public updateCollection = async (
