@@ -235,7 +235,7 @@
   });
 </script>
 
-<div class="outer-section" style="margin-top:12px;">
+<div>
   {#if !isBulkEditActive}
     <section
       class="mb-0 me-0 py-0 section-layout w-100"

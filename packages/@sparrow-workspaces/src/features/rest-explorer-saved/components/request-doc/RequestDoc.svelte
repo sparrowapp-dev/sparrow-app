@@ -23,7 +23,6 @@
   <!-- <div class="d-flex" style="justify-content: space-between; margin-top: 10px;">
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div> -->
-  <div class="pb-3"></div>
   <div
     style="height: 100%; min-height:160px; background-color: var(--bg-ds-surface-600);"
     class="area"
