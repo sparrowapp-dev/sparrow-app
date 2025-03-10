@@ -766,64 +766,57 @@
 <!-- {#if isForceCloseTabPopupOpen} -->
 <Modal
   title={"Force Close!"}
-  type={"dark"}
+  type={"danger"}
   zIndex={1000}
   isOpen={isForceCloseTabPopupOpen}
-  width={"40%"}
+  width={"35%"}
   handleModalState={handleForceClosePopupBackdrop}
 >
-  <div class="d-flex row gap-4" style="width: 552px;">
-    <div class="d-flex row">
-      <!-- <div class="force-close-popup-title">
-        <h4>Force Close!</h4>
-      </div> -->
-      <div class="popup-desc" style="margin-top: 15px;">
-        <p style="margin: 0">
-          <span style="color: white;"
-            >{noOfNotSavedTabsWhileForClose} Tabs
-          </span> have unsaved changes. Force closing will discard your edits, and
-          you won’t be able to recover them. Are you sure you want to proceed?
-        </p>
-      </div>
-    </div>
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p>
+      <span class="text-whiteColor fw-bold"
+        >{noOfNotSavedTabsWhileForClose} Tabs
+      </span>
+      have unsaved changes. Force closing will discard your edits, and you won’t
+      be able to recover them. Are you sure you want to proceed?
+    </p>
+  </div>
 
-    <div class="d-flex align-items-center gap-2 popup-desc">
-      <Checkbox
-        size={"large"}
-        bind:checked={isUserDontWantForceClosePopup}
-        on:input={() => {
-          isUserDontWantForceClosePopup = !isUserDontWantForceClosePopup;
-        }}
-        disabled={false}
-      />
-      <p style="margin: 0;">I understand, don't show this agian.</p>
-    </div>
-    <!-- <div class="d-flex justify-content-end gap-2"> -->
-    <div
-      class="d-flex gap-2"
-      style="display: flex; width: max-content; margin-left: auto; margin-right: 15px; margin-bottom: 0px;"
-    >
-      <Button
-        title="Don't Close"
-        size="medium"
-        type="secondary"
-        onClick={() => {
-          "click dont save";
-          handleForceClosePopupBackdrop(false);
-        }}
-      ></Button>
-      <Button
-        title="Force Close"
-        size="medium"
-        type="danger"
-        onClick={() => {
-          "click dont save";
-          forceCloseTabs(tabIdWhoRecivedForceClose);
-          isForceCloseTabPopupOpen = false;
-          noOfNotSavedTabsWhileForClose = 0;
-        }}
-      ></Button>
-    </div>
+  <div class="d-flex align-items-center gap-1 sparrow-fs-14 mb-3">
+    <Checkbox
+      size={"large"}
+      bind:checked={isUserDontWantForceClosePopup}
+      on:input={() => {
+        isUserDontWantForceClosePopup = !isUserDontWantForceClosePopup;
+      }}
+      disabled={false}
+    />
+    <p class="m-0">I understand, don't show this agian.</p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      title="Don't Close"
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      onClick={() => {
+        "click dont save";
+        handleForceClosePopupBackdrop(false);
+      }}
+    ></Button>
+    <Button
+      title="Force Close"
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"danger"}
+      onClick={() => {
+        "click dont save";
+        forceCloseTabs(tabIdWhoRecivedForceClose);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+      }}
+    ></Button>
   </div>
 </Modal>
 <!-- {/if} -->
@@ -834,47 +827,41 @@
   type={"dark"}
   zIndex={1000}
   isOpen={isPopupClosed}
-  width={"38.5%"}
+  width={"35%"}
   handleModalState={handleClosePopupBackdrop}
 >
-  <div class="d-flex row gap-2" style="width: 530px;">
-    <div class="d-flex row gap-2" style="width: 600px; height: 65px;">
-      <!-- <div class="force-close-popup-title">
-        <h4>Unsaved Changes!</h4>
-      </div> -->
-      <div class="popup-desc" style="font-weight: 400; margin-top: 15px; ">
-        <p style="margin: 0px; ">
-          Do you want to save changes in this tab “<span style="color: white;">
-            {!removeTab ? "Untitled" : removeTab.name}</span
-          >”? Changes will be lost in case you choose not to save.
-        </p>
-      </div>
-    </div>
+  <div class="mt-2 mb-4">
+    <p class="lightGray" style="color: lightGray;">
+      Do you want to save changes in this tab “<span
+        class="text-whiteColor fw-bold"
+      >
+        {!removeTab ? "Untitled" : removeTab.name}</span
+      >”? Changes will be lost in case you choose not to save.
+    </p>
+  </div>
 
-    <div
-      class="d-flex gap-2"
-      style="display: flex; width: max-content; margin-left: auto; margin-right: 30px; margin-bottom: 10px;"
-    >
-      <Button
-        title="Don't Save"
-        size="medium"
-        type="secondary"
-        customWidth="95px"
-        onClick={() => {
-          handlePopupDiscard();
-        }}
-      ></Button>
-      <Button
-        title="Save"
-        size="medium"
-        type="primary"
-        customWidth="95px"
-        disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-        onClick={() => {
-          handlePopupSave();
-        }}
-      ></Button>
-    </div>
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Don't Save"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        handlePopupDiscard();
+      }}
+    ></Button>
+    <Button
+      title={"Save"}
+      size={"medium"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"95px"}
+      disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+      onClick={() => {
+        handlePopupSave();
+      }}
+    ></Button>
   </div>
 </Modal>
 
