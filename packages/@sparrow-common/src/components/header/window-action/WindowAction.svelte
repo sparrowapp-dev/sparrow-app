@@ -10,7 +10,7 @@
   } from "@sparrow/library/icons";
   import { invoke } from "@tauri-apps/api/core";
   import { getCurrentWindow } from "@tauri-apps/api/window";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { WindowMultipleIcon } from "@sparrow/library/icons";
 
   export let isWindows = true;
@@ -61,12 +61,13 @@
     }
   };
 
-  let isMaximizeWindow = false;
+  let isMaximizeWindow = true;
 
   const checkSize = async () => {
     isMaximizeWindow = await appWindow.isMaximized();
   };
 
+  
   if (isWindows) {
     try {
       // Add event listener for window resize
@@ -77,7 +78,7 @@
         unlistenResize.then((f) => f());
       });
     } catch {
-      console.log("Insidie catch");
+      console.log("Inside catch");
     }
   }
 
@@ -90,6 +91,9 @@
       unlistenResize.then((f) => f());
     });
   }
+  onMount(() => {
+    checkSize();
+  });
 </script>
 
 {#if isWindows}

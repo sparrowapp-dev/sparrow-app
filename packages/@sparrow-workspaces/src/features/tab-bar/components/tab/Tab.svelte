@@ -102,6 +102,11 @@
   on:dblclick={() => handleDoubleClick(tab)}
 >
   <div
+    on:click={() => {
+      if (!tab.isActive) {
+        onTabSelected(tab.id);
+      }
+    }}
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="   background-color: {tab.isActive
@@ -114,11 +119,6 @@
   >
     <button
       tabindex="-1"
-      on:click={() => {
-        if (!tab.isActive) {
-          onTabSelected(tab.id);
-        }
-      }}
       class="position-relative p-0 border-0 ellipsis"
       style="width: 100%;
         text-align: left; font-weight:700; background-color:transparent;"
@@ -222,7 +222,7 @@
       </span>
     </button>
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
@@ -236,7 +236,8 @@
       <button
         class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
         !tab.isActive ? 'inactive-close-btn' : ''} btn"
-        on:click={() => {
+        on:click={(e) => {
+          e.stopPropagation();
           onTabClosed(tab.id, tab);
         }}
         style="overflow:hidden; height: 18px; width:18px;"

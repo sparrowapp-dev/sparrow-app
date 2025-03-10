@@ -4,94 +4,89 @@
   /**
    * Callback to update description
    */
-  export let onUpdateDescription: (
-    collection: CollectionDocument,
-    newDescription: string,
-  ) => void;
+  export let onUpdateDescription;
   /**
    * Callback to create api request
    */
-  export let onCreateAPIRequest: (collection: CollectionDocument) => void;
+  export let onCreateAPIRequest: (collection: any) => void;
   /**
    * Callback to sync collection from current branch
    */
-  export let onCollectionSynced: (
-    collection: CollectionDocument,
-  ) => Promise<boolean | undefined>;
+  // export let onCollectionSynced: (
+  //   collection: CollectionDocument,
+  // ) => Promise<boolean | undefined>;
   /**
    * Callback to get last updated and total number of folders and requests in collection
    */
-  export let getLastUpdatedAndCount: (collection: CollectionDto) => Promise<{
-    isSynced: boolean;
-    totalFolders: number;
-    totalRequests: number;
-    lastUpdated: string;
-    totalWebSocket: number;
-    totalSocketIo: number;
-    totalGraphQl: number;
-  }>;
+  export let getLastUpdatedAndCount: (collection: any) => Promise<any>;
   /**
    * Callback to refetch collection from local
    */
-  export let onCollectionRefetched: (collection: CollectionDocument) => void;
+  // export let onCollectionRefetched: (collection: CollectionDocument) => void;
   /**
    * Callback to change the branch
    */
-  export let onBranchChanged: (
-    collection: CollectionDocument,
-    newBranch: string,
-  ) => void;
+  // export let onBranchChanged: (
+  //   collection: CollectionDocument,
+  //   newBranch: string,
+  // ) => void;
   /**
    * Callback to rename collection
    */
-  export let onRename: (
-    collection: CollectionDocument,
-    newBranch: string,
-  ) => void;
+  export let isCollectionEditable;
+  export let onRename;
   /**
    * The tab of the collection explorer
    */
-  export let tab: TabDocument;
+  export let tab;
   /**
    * The collection
    */
-  export let collection: CollectionDocument;
+  export let collection;
+
+  export let onUpdateCollectionAuth;
+  export let onUpdateCollectionState;
+  export let onUpdateEnvironment;
 
   /**
    * Icons and images
    */
-  import { GitBranchIcon } from "@sparrow/library/assets";
-  import { refreshIcon } from "@sparrow/library/assets";
+  // import { GitBranchIcon } from "@sparrow/library/assets";
+  // import { refreshIcon } from "@sparrow/library/assets";
 
   /**
    * Components
    */
-  import { Modal } from "@sparrow/library/ui";
-  import { Button } from "@sparrow/library/ui";
-  import { Tooltip } from "@sparrow/library/ui";
-  import { Select } from "@sparrow/library/forms";
+  // import { Modal } from "@sparrow/library/ui";
+  // import { Button } from "@sparrow/library/ui";
+  // import { Tooltip } from "@sparrow/library/ui";
+  // import { Select } from "@sparrow/library/forms";
 
   /**
    * Enums
    */
-  import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
-  import type { CollectionDocument, TabDocument } from "@app/database/database";
-  import { WorkspaceRole } from "@sparrow/common/enums";
-  import type { CollectionDto } from "@sparrow/common/types/workspace";
+  // import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
+  // import type { CollectionDocument, TabDocument } from "@app/database/database";
+  // import { WorkspaceRole } from "@sparrow/common/enums";
+  import { CollectionAuth, CollectionNavigator } from "../components";
+  import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
+  import { Button } from "@sparrow/library/ui";
+  import { SaveRegular } from "@sparrow/library/icons";
 
   /**
    * Role of user in active workspace
    */
-  export let userRole;
   export let isWebApp = false;
+  export let environmentVariables;
+  export let onSaveCollection;
 
   /**
    * Local variables
    */
-  let isBranchSwitchPopupOpen: boolean = false;
-  let branchSwitchLoader: boolean = false;
-  let newBranch: string = "";
-  let refreshCollectionLoader: boolean = false;
+  // let isBranchSwitchPopupOpen: boolean = false;
+  // let branchSwitchLoader: boolean = false;
+  // let newBranch: string = "";
+  // let refreshCollectionLoader: boolean = false;
   let isSynced: boolean = false;
   let lastUpdated: string = "";
   let totalFolders: number = 0;
@@ -126,23 +121,23 @@
     }
   }
 
-  const onRenameInputKeyPress = () => {
-    const inputField = document.getElementById(
-      "renameInputFieldCollection",
-    ) as HTMLInputElement;
-    inputField.blur();
+  const handleInputDescription = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    onUpdateDescription(target.value);
   };
 
-  const resetInputField = () => {
-    const inputField = document.getElementById(
-      "renameInputFieldCollection",
-    ) as HTMLInputElement;
-    inputField.value = collection?.name;
+  const handleInputName = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    onRename(target.value, "");
+  };
+  const handleBlurName = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    onRename(target.value, "blur");
   };
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
-  <Modal
+  <!-- <Modal
     title={"Switch Branch?"}
     type={"danger"}
     width={"35%"}
@@ -180,7 +175,7 @@
         }}
       />
     </div>
-  </Modal>
+  </Modal> -->
   <div
     class="my-collection d-flex flex-column w-100 z-3"
     style=" min-width: 450px"
@@ -192,26 +187,13 @@
           required
           maxlength={100}
           id="renameInputFieldCollection"
-          value={collection?.name || ""}
+          value={$tab?.name || ""}
           class="bg-transparent input-outline text-fs-18 border-0 text-left w-100 ps-2 py-0"
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-            tab?.activeSync}
-          on:blur={(event) => {
-            const newValue = event?.target?.value?.trim();
-            const previousValue = tab.name;
-            if (newValue === "") {
-              resetInputField();
-            } else if (newValue !== previousValue) {
-              onRename(collection, newValue);
-            }
-          }}
-          on:keydown={(event) => {
-            if (event.key === "Enter") {
-              onRenameInputKeyPress();
-            }
-          }}
+          disabled={!isCollectionEditable}
+          on:input={handleInputName}
+          on:blur={handleBlurName}
         />
-        {#if tab?.activeSync}
+        <!-- {#if tab?.activeSync}
           <div class="d-flex">
             <Select
               isError={false}
@@ -291,7 +273,7 @@
             </button>
           </div>
           <div class="pt-2 ps-2 d-flex align-items-center">
-            <!-- {#if currentWorkspace?.users}
+            {#if currentWorkspace?.users}
                 <div class="d-flex">
                   <UserProfileList
                     width={25}
@@ -302,7 +284,7 @@
                     classProp="position-absolute"
                   />
                 </div>
-              {/if} -->
+              {/if}
             <div class="ps-2">
               <p class="sparrow-fs-12 mb-0">
                 <span class="text-textColor"> Last updated on: </span>
@@ -312,14 +294,13 @@
               </p>
             </div>
           </div>
-        {/if}
+        {/if} -->
       </div>
       <div class="d-flex flex-row">
-        {#if collection?.activeSync}
+        <!-- {#if collection?.activeSync}
           <div class="d-flex flex-column justify-content-center">
             <Button
-              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                refreshCollectionLoader}
+              disable={!isCollectionEditable || refreshCollectionLoader}
               title={`Sync Collection`}
               type={"secondary"}
               loader={refreshCollectionLoader}
@@ -335,22 +316,27 @@
               }}
             />
           </div>
-        {/if}
+        {/if} -->
 
-        <div class="d-flex flex-column justify-content-center">
-          {#if !collection?.activeSync || isSynced}
-            <button
-              disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-              class="btn add-button rounded mx-1 border-0 text-align-right py-1"
-              style="max-height:60px; width:200px; margin-top: -2px;"
-              on:click={() => onCreateAPIRequest(collection)}
-              >New Request</button
-            >
-          {/if}
+        <div class="d-flex me-2 flex-column justify-content-center">
+          <Button
+            disable={!isCollectionEditable}
+            title={"New Request"}
+            type={"primary"}
+            onClick={() => onCreateAPIRequest(collection)}
+          />
         </div>
+        <Button
+          disable={$tab?.isSaved || !isCollectionEditable ? true : false}
+          startIcon={SaveRegular}
+          type={"secondary"}
+          onClick={() => {
+            onSaveCollection();
+          }}
+        />
       </div>
     </div>
-    {#if collection?.activeSync && !isSynced}
+    <!-- {#if collection?.activeSync && !isSynced}
       <div
         class={`"d-flex"
           } flex-column align-items-center flex-grow-1 justify-content-center pt-5`}
@@ -377,8 +363,7 @@
             </li>
           </ol>
           <Button
-            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-              refreshCollectionLoader}
+            disable={!isCollectionEditable || refreshCollectionLoader}
             title={`Sync Collection`}
             type="primary"
             loader={refreshCollectionLoader}
@@ -391,58 +376,72 @@
           />
         </div>
       </div>
-    {/if}
-    <div
-      class={`${
-        !isSynced && collection?.activeSync ? "d-none" : "d-block"
-      } align-items-center`}
-    >
-      <div class="d-flex gap-4 mb-4 ps-2">
-        <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 highlighted-number">{totalFolders}</span>
-          <p style="font-size: 12px;" class="mb-0">Folders</p>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 highlighted-number">{totalRequests}</span>
-          <p style="font-size: 12px;" class="mb-0">
-            {HttpRequestDefaultNameBaseEnum.NAME}
-          </p>
-        </div>
-        {#if !isWebApp}
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <span class="fs-4 highlighted-number">{totalGraphQl}</span>
-              <p style="font-size: 12px;" class="mb-0">GraphQL</p>
-            </div>
-          </div>
-        {/if}
-        <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 highlighted-number">{totalWebSocket}</span>
-          <p style="font-size: 12px;" class="mb-0">WebSocket</p>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 highlighted-number">{totalSocketIo}</span>
-          <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
-        </div>
-      </div>
-      <div class="d-flex align-items-start ps-0 h-100 z-0">
-        <textarea
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-            collection?.activeSync}
-          id="updateCollectionDescField"
-          value={collection?.description || ""}
-          class="bg-transparent border-0 text-fs-12 collection-area input-outline w-100 p-2"
-          placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
-          on:blur={(event) => {
-            if (collection?.description !== event.target.value) {
-              onUpdateDescription(collection, event.target.value);
-            }
-          }}
-        />
-      </div>
+    {/if} -->
+    <div class="d-flex pb-3">
+      <CollectionNavigator
+        collectionNavigation={$tab?.property?.collection?.state
+          ?.collectionNavigation}
+        {onUpdateCollectionState}
+      />
     </div>
+    {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
+      <div
+        class={`${
+          !isSynced && collection?.activeSync ? "d-none" : "d-block"
+        } align-items-center`}
+      >
+        <div class="d-flex gap-4 mb-4 ps-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-4 highlighted-number">{totalFolders}</span>
+            <p style="font-size: 12px;" class="mb-0">Folders</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-4 highlighted-number">{totalRequests}</span>
+            <p style="font-size: 12px;" class="mb-0">
+              {HttpRequestDefaultNameBaseEnum.NAME}
+            </p>
+          </div>
+          {#if !isWebApp}
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fs-4 highlighted-number">{totalGraphQl}</span>
+                <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+              </div>
+            </div>
+          {/if}
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-4 highlighted-number">{totalWebSocket}</span>
+            <p style="font-size: 12px;" class="mb-0">WebSocket</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-4 highlighted-number">{totalSocketIo}</span>
+            <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
+          </div>
+        </div>
+        <div class="d-flex align-items-start ps-0 h-100 z-0">
+          <textarea
+            disabled={!isCollectionEditable}
+            id="updateCollectionDescField"
+            value={$tab?.description || ""}
+            class="bg-transparent border-0 text-fs-12 collection-area input-outline w-100 p-2"
+            placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+            on:input={handleInputDescription}
+          />
+        </div>
+      </div>
+    {:else}
+      <CollectionAuth
+        auth={$tab?.property?.collection?.auth}
+        requestStateAuth={$tab?.property?.collection?.state
+          ?.collectionAuthNavigation}
+        onUpdateRequestAuth={onUpdateCollectionAuth}
+        onUpdateRequestState={onUpdateCollectionState}
+        {onUpdateEnvironment}
+        {environmentVariables}
+      />
+    {/if}
   </div>
-  <div
+  <!-- <div
     class="d-flex flex-column align-items-left justify-content-start d-none"
     style="width: 280px;border-left:2px solid #313233"
   >
@@ -459,7 +458,7 @@
         grows.
       </p>
     </div>
-  </div>
+  </div> -->
 </div>
 
 <style>
