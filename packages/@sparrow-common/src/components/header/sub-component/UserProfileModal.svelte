@@ -77,7 +77,7 @@
     title="Profile"
     placement="bottom-right"
     distance={10}
-    zIndex={5}
+    zIndex={205}
     show={!showProfileModal}
   >
     <button

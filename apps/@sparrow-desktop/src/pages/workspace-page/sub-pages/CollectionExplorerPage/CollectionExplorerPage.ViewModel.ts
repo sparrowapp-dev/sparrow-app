@@ -508,7 +508,7 @@ class CollectionExplorerPage {
       this.tab = progressiveTab;    
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } else {
-      notifications.error("Failed to update description. Please try again.");
+      notifications.error("Failed to save collection. Please try again.");
     }
     }
   

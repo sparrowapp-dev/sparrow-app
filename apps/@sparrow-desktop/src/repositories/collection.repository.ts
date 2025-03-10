@@ -4,6 +4,7 @@ import { ItemType } from "@sparrow/common/enums/item-type.enum";
 import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
+import type { RxDocument } from "rxdb";
 export class CollectionRepository {
   constructor() {}
 
@@ -61,6 +62,16 @@ export class CollectionRepository {
         },
       })
       .exec();
+  };
+
+  public subscribeCollection = (uuid: string): Observable<RxDocument<CollectionDocument>> => {
+    return RxDB.getInstance()
+      .rxdb?.collection?.findOne({
+        selector: {
+          id: uuid,
+        },
+      })
+      .$;
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
