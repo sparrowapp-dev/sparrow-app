@@ -105,7 +105,7 @@
             style="font-size: 12px;"
           >
             <span class="d-flex" style="margin-right: 6px;">
-              <ArchiveRegular size="12px"/>
+              <ArchiveRegular size={"12px"} color="var(--icon-ds-neutral-50)"/>
             </span>
             {response.size?.toFixed(2)}
             <p class="mb-0 ms-1" style="font-size: 12px;">KB</p>
