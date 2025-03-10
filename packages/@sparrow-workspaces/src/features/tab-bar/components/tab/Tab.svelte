@@ -333,7 +333,7 @@
       </span>
     </button>
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
@@ -453,9 +453,7 @@
     /* border-radius: 2px; */
   }
   .ellipsis {
-    color: var(--text-secondary-100);
-  }
-  .ellipsis:hover {
-    color: var(--text-secondary-100);
+    color: var(--text-ds-neutral-300);
+    font-size: 12px;
   }
 </style>

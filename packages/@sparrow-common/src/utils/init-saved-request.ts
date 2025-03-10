@@ -158,6 +158,7 @@ export class InitSavedRequestTab {
         workspaceId: _workspaceId,
         collectionId: "",
         folderId: "",
+        requestId: "",
       },
       isSaved: true,
       index: 0,

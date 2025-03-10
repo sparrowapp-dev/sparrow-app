@@ -177,7 +177,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -238,7 +238,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px; gap:4px"
+  style="height:32px; padding-left:3px; gap:4px; margin-bottom:2px;"
 >
   <button
     tabindex="-1"

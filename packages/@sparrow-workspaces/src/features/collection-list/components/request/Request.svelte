@@ -202,7 +202,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -261,6 +261,16 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("request", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        request: api,
+      });
+    }
+  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -271,16 +281,6 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("request", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          request: api,
-        });
-      }
-    }}
     style={folder?.id
       ? "padding-left: 70.5px; gap:4px;"
       : "padding-left: 44.5px; gap:4px; "}
@@ -345,7 +345,9 @@
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
-        {api.name}
+        <p class="ellipsis m-0 p-0">
+          {api.name}
+        </p>
       </div>
     {/if}
   </button>
@@ -422,11 +424,12 @@
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
     color: var(--bg-ds-neutral-50);
     display: flex;
     align-items: center;
+
     padding: 4px 2px;
     caret-color: var(--bg-ds-primary-300);
   }
@@ -548,7 +551,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-ds-surface-500) !important;

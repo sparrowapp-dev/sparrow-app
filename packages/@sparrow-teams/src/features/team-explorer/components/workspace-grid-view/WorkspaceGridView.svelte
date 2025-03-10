@@ -98,7 +98,7 @@
   <div class="d-flex flex-column h-100">
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
-        <div class="d-flex flex-wrap gap-5 justify-content-between row-gap-0">
+        <div class="d-flex flex-wrap gap-3 justify-content-between row-gap-0">
           {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
             <p class="not-found-text mx-auto mt-3">
               You don't have access to any workspace in this team.
@@ -109,9 +109,10 @@
           {/if}
           {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
-              class="sparrow-fs-16 col-lg-5 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
+              class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 mb-4 add-new-workspace"
               style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
               on:click={handleClick}
+              tabindex="0"
             >
               {#if isWorkspaceCreationInProgress}
                 <span>
@@ -206,11 +207,8 @@
   }
 
   :global(.add-new-workspace) {
-    border: 2px dashed var(--gradiant-2, var(--border-primary-300));
-    background: var(
-      --gradiant-2,
-      linear-gradient(270deg, var(--bg-primary-300) -1.72%, #1193f0 100%)
-    );
+    border: 1px dashed var(--border-ds-neutral-300);
+    background-color: var(--bg-ds-neutral-100);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -223,12 +221,20 @@
     max-width: 80%;
   }
   :global(.add-new-workspace:hover) {
-    border: 2px dashed var(--border-primary-300);
-    background: var(--bg-tertiary-600);
-    color: var(--text-primary-300);
+    border: 1px dashed var(--border-ds-primary-300);
+    background-color: var(--bg-ds-surface-500);
     background-clip: initial;
     -webkit-background-clip: initial;
     -webkit-text-fill-color: initial;
+  }
+  :global(.add-new-workspace:active) {
+    border: 1px dashed var(--border-ds-primary-300);
+    background: var(--bg-ds-surface-500);
+  }
+  :global(.add-new-workspace:focus-visible) {
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+    gap: 8px;
   }
   .not-found-text {
     color: var(--request-arc);
