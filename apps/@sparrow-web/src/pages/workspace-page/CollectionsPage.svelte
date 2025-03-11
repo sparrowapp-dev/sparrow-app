@@ -29,6 +29,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
@@ -74,6 +75,11 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
+  import {
+    defaultCurrentStep,
+    isDefaultTourGuideOpen,
+    isDefaultTourGuideClose,
+  } from "@sparrow/workspaces/stores";
   import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
@@ -682,14 +688,17 @@
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;
+      isDefaultTourGuideClose.set(true);
     }}
     onClickTour={() => {
       isUserFirstSignUp.set(false);
-      isTourGuideOpen = true;
       isWelcomePopupOpen = false;
+      defaultCurrentStep.set(1);
+      isDefaultTourGuideOpen.set(true);
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"
