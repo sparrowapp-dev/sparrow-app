@@ -5,7 +5,7 @@ import {
   type Path,
 } from "@sparrow/common/types/workspace/tab";
 import type { Tab } from "../types/workspace/tab";
-import { CollectionAddToBaseEnum, CollectionAuthTypeBaseEnum } from "../types/workspace/collection-base";
+import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
 import { CollectionNavigationTabEnum, type State, type Auth } from "../types/workspace/collection-tab";
 
 class InitCollectionTab {
@@ -37,7 +37,7 @@ class InitCollectionTab {
               apiKey: {
                 authKey: "",
                 authValue: "",
-                addTo: CollectionAddToBaseEnum.HEADER,
+                addTo: CollectionRequestAddToBaseEnum.HEADER,
               },
             },
             state : {

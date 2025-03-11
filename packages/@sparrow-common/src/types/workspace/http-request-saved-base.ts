@@ -1,3 +1,5 @@
+import type { CollectionRequestAddToBaseEnum } from "./collection-base";
+
 interface HttpRequestSavedKeyValueCheckedWithBaseBaseInterface {
     key: string;
     value: string;
@@ -24,16 +26,11 @@ interface HttpRequestSavedKeyValueCheckedWithBaseBaseInterface {
     password?: string;
   }
   
-  export enum HttpRequestSavedAddToBaseEnum {
-    HEADER = "Header",
-    QUERY_PARAMETER = "Query Parameter",
-    COOKIES = "Cookies",
-  }
 
   interface HttpRequestSavedApiKeyBaseInterface {
     authKey: string;
     authValue: string;
-    addTo: HttpRequestSavedAddToBaseEnum;
+    addTo: CollectionRequestAddToBaseEnum
   }
   
   interface HttpRequestSavedAuthBaseInterface {
@@ -71,6 +68,7 @@ interface HttpRequestSavedKeyValueCheckedWithBaseBaseInterface {
       API_KEY = "API Key",
       BEARER_TOKEN = "Bearer Token",
       BASIC_AUTH = "Basic Auth",
+      INHERIT_AUTH = "Inherit Auth"
     }
   
   export interface HttpRequestSavedBaseInterface {

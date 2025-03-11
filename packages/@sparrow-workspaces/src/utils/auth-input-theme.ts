@@ -16,7 +16,7 @@ export class AuthInputTheme {
         height: "100%",
         paddingTop: "8px",
         borderRadius: "4px",
-        backgroundColor: "var(--bg-secondary-550)",
+        backgroundColor: "var(--bg-ds-surface-400)",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",
@@ -59,13 +59,16 @@ export class AuthInputTheme {
         backgroundColor: "transparent",
       },
       ".cm-placeholder": {
-        color: "var(--text-secondary-200)",
+        color: "var(--text-ds-neutral-400)",
         fontSize: "12px",
         fontWeight: 400,
       },
+      "&.cm-editor:hover": {
+        border: "1px solid var(--border-ds-neutral-300)",
+      },
       "&.cm-editor.cm-focused": {
-        border: "1px solid var(--border-primary-300)",
-        borderRadius: "4px",
+        border: "1px solid var(--border-ds-primary-300)",
+        "border-radius": "4px",
       },
       ".cm-scroller::-webkit-scrollbar": {
         display: "none",

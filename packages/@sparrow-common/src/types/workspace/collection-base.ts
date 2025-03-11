@@ -39,7 +39,7 @@ interface Branch {
   name: string;
 }
 
-export enum CollectionAddToBaseEnum {
+export enum CollectionRequestAddToBaseEnum {
   HEADER = "Header",
   QUERY_PARAMETER = "Query Parameter",
   COOKIES = "Cookies",
@@ -61,7 +61,7 @@ export interface CollectionAuthBaseInterface  {
   apiKey: {
     authKey: string;
     authValue: string;
-    addTo: CollectionAddToBaseEnum.HEADER;
+    addTo: CollectionRequestAddToBaseEnum;
   },
 }
 

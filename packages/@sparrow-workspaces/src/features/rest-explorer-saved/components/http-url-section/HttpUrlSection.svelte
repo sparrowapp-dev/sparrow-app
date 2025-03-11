@@ -1,6 +1,5 @@
 <script lang="ts">
   import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
-
   import { Select } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
@@ -11,8 +10,8 @@
   let componentClass = "";
   export { componentClass as class };
 
-  export let requestUrl: string;
-  export let httpMethod: string;
+  export let requestUrl;
+  export let httpMethod;
   export let onSendButtonClicked;
   export let onUpdateRequestUrl;
   export let onUpdateRequestMethod;
@@ -57,16 +56,6 @@
       onSendButtonClicked(environmentVariables);
     }
   };
-
-  let isHovered = false;
-
-  function handleMouseEnter() {
-    isHovered = true;
-  }
-
-  function handleMouseLeave() {
-    isHovered = false;
-  }
 </script>
 
 <div class={`d-flex ${componentClass}`}>
@@ -123,7 +112,7 @@
   <div class="ps-2"></div>
 
   <CodeMirrorInput
-    bind:value={requestUrl}
+    value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
     placeholder={"Enter a URL"}
     {theme}

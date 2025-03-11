@@ -31,6 +31,7 @@ import { FeatureSwitchRepository } from "../../repositories/feature-switch.repos
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import {
+  CollectionTabAdapter,
   GraphqlTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
@@ -42,6 +43,8 @@ import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import constants from "@app/constants/constants";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class DashboardViewModel {
   constructor() {}
@@ -114,6 +117,18 @@ export class DashboardViewModel {
       name: "guestUser",
     });
     return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
+  // redirects to Sparrow Docs.
+  public redirectDocs = async () => {
+    await open(constants.DOCS_URL);
+    return;
+  };
+
+  // redirects to Sparrow Feature Updates.
+  public redirectFeatureUpdates = async () => {
+    await open(constants.SPARROW_DOWNLOAD_LINK);
+    return;
   };
 
   /**
@@ -515,43 +530,9 @@ export class DashboardViewModel {
     workspaceId: string,
     collection: any,
   ) => {
-    // Calculate collection stats
-    let totalFolder = 0;
-    let totalRequest = 0;
-
-    if (collection.items) {
-      collection.items.forEach((item: any) => {
-        if (
-          item.type === "REQUEST" ||
-          item.type === "GRAPHQL" ||
-          item.type === "SOCKETIO" ||
-          item.type === "WEBSOCKET"
-        ) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item?.items?.length || 0;
-        }
-      });
-    }
-
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id || "",
-      folderId: "",
-    };
-
-    const _collection = new InitCollectionTab(collection.id, workspaceId);
-    _collection.updateName(collection.name);
-    _collection.updateDescription(collection.description);
-    _collection.updatePath(path);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
-    _collection.updateIsSave(true);
-
+    const collectionTab = new CollectionTabAdapter().adapt(workspaceId,collection);
     // Create the tab with the new collection
-    await this.tabRepository.createTab(_collection.getValue(), workspaceId);
-
+    await this.tabRepository.createTab(collectionTab, workspaceId);
     // Update UI
     moveNavigation("right");
   };

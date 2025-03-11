@@ -101,8 +101,8 @@
 
 <div class="workspace-card-outer w-100">
   <Card
-    cardClassProp={"flex-grow-1 col-lg-3 col-md-10 mb-4 position-relative"}
-    cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
+    cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
+    cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
     <button
       bind:this={workspaceTabWrapper}
@@ -192,7 +192,7 @@
   }
 
   .workspace-card-outer:hover .workspace-card {
-    background-color: var(--bg-ds-surface-400) !important;
+    background-color: var(--bg-ds-surface-400);
     cursor: pointer;
   }
   .workspace-card {
@@ -205,11 +205,12 @@
     transition: background-color 0.5s ease-in-out;
   }
   .workspace-card:active {
-    background-color: var(--bg-ds-surface-700);
+    background-color: var(--bg-ds-surface-600) !important;
   }
   .workspace-card:focus-visible {
-    border: 2px solid red;
+    border: 2px solid var(--border-ds-primary-300);
     background-color: var(--bg-ds-surface-600);
+    outline: none;
   }
   .workspace-card-outer:hover .workspace-card .teams-workspace__para,
   .workspace-card-outer:hover .workspace-card .teams-workspace__date {
