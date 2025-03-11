@@ -29,9 +29,10 @@
   <!-- 
     -- Title 
   -->
-  <label for={inputId} class="text-fs-14 pb-1 text-secondary-1000"
-    ><span style="color:var(--text-ds-neutral-200)">{NAME_CONFIG.TITLE}</span
-    ></label
+  <label
+    for={inputId}
+    class="text-fs-14 pb-1 text-secondary-1000"
+    style="color:var(--text-ds-neutral-200)">{NAME_CONFIG.TITLE}</label
   >
   <span class="text-danger-200" style="color:var(--bg-ds-danger-400)">*</span>
 
