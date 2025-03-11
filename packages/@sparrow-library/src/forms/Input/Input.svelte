@@ -18,13 +18,14 @@
    */
 
   let height = "28px";
+  export let size: "small" | "medium" | "large" = "medium";
 
-  switch (variant) {
-    case "normal":
-      height = "30px";
-      break;
-    case "strokeTextField":
+  switch (size) {
+    case "small":
       height = "28px";
+      break;
+    case "medium":
+      height = "36px";
       break;
     default:
       height = "28px";
@@ -33,7 +34,7 @@
   /**
    * width
    */
-  export let width = "auto";
+  let width = "100%";
 
   /**
    * identifies input is disabled or not
@@ -93,7 +94,7 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`input-field ${variant} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""} `}
+    class={`input-field ${variant} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100`}
     {placeholder}
     {disabled}
   />

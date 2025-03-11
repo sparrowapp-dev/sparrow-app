@@ -634,6 +634,7 @@
                     <Input
                       id={t.id}
                       type="text"
+                      size={"small"}
                       variant="strokeTextField"
                       placeholder="Enter value"
                       value={t.value || ""}
