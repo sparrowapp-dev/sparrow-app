@@ -5,7 +5,7 @@
 </script>
 
 <i
-  class="icon-ic_fluent_layer_20_regular"
+  class="icon-ic_image_20_regular"
   style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
 ></i>
 

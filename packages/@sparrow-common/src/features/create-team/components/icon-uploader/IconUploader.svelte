@@ -1,7 +1,7 @@
 <script lang="ts">
   import { DeleteIcon, EditIcon, UploadIcon } from "@sparrow/library/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
-  import { CloudArrowUpRegular } from "@sparrow/library/icons";
+  import { CloudArrowUpRegular, ImageRegular } from "@sparrow/library/icons";
   export let value: any = [];
   export let inputId: string;
   export let inputPlaceholder: string;
@@ -91,6 +91,10 @@
               onChange(e, maxFileSize, supportedFileTypes);
             }}
           />
+        </div>
+        <div>
+          <ImageRegular size={"16px"} color={"red"} />
+          <p style="color:  var(--text-ds-neutral-200);">PNG | JPG | JPEG</p>
         </div>
       </div>
     {/if}
