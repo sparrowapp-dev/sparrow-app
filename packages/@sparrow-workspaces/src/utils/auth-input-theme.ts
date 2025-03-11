@@ -16,7 +16,7 @@ export class AuthInputTheme {
         height: "100%",
         paddingTop: "8px",
         borderRadius: "4px",
-        backgroundColor: "var(--bg-ds-surface-400)",
+        backgroundColor: "var(--bg-ds-surface-600)",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",
@@ -61,7 +61,7 @@ export class AuthInputTheme {
       ".cm-placeholder": {
         color: "var(--text-ds-neutral-400)",
         fontSize: "12px",
-        fontWeight: 400,
+        fontWeight: 500,
       },
       "&.cm-editor:hover": {
         border: "1px solid var(--border-ds-neutral-300)",

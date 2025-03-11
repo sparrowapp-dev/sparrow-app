@@ -98,7 +98,6 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
-  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -115,8 +114,6 @@
   export let isWebApp = false;
   export let azureBlobCDN;
   export let onSaveResponse;
-  export let collectionAuth;
-  export let collection;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -158,7 +155,7 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
+    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-3">
       <!-- Request Name Header -->
       <!-- 
         --
@@ -327,12 +324,9 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
-                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
-                      {collection}
-                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
@@ -362,9 +356,10 @@
                   ? 'pt-1'
                   : 'ps-2'}"
                 style="overflow:auto;"
+                
               >
                 <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto;">
+                  <div style="flex:1; overflow:auto; ">
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div
@@ -377,14 +372,20 @@
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
                       <ResponseErrorScreen />
                     {:else if storeData?.response.status}
-                      <div class="h-100 d-flex flex-column">
-                        <ResponseStatus response={storeData.response} />
-                        <ResponseNavigator
-                          requestStateSection={storeData?.response.navigation}
-                          {onUpdateResponseState}
-                          responseHeadersLength={storeData?.response.headers
-                            ?.length || 0}
-                        />
+                      <div
+                        class="h-100 d-flex flex-column"
+                        style="gap:5px"
+                        
+                      >
+                        <div class="d-flex">
+                          <ResponseNavigator
+                            requestStateSection={storeData?.response.navigation}
+                            {onUpdateResponseState}
+                            responseHeadersLength={storeData?.response.headers
+                              ?.length || 0}
+                          />
+                          <ResponseStatus response={storeData.response} />
+                        </div>
                         {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
                           {#if storeData?.response.bodyLanguage !== "Image"}
                             <ResponseBodyNavigator
@@ -398,14 +399,14 @@
                               {isGuestUser}
                             />
                           {/if}
-                          <div style="flex:1; overflow:auto;">
+                          <div style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;">
                             <ResponseBody
                               response={storeData?.response}
                               apiState={storeData?.response}
                             />
                           </div>
                         {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                          <div style="flex:1; overflow:auto;">
+                          <div style="">
                             <ResponseHeaders
                               responseHeader={storeData.response?.headers}
                             />
@@ -529,7 +530,7 @@
   }
 
   :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 11px !important;
+    width: 10px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -538,9 +539,9 @@
     border-bottom: 0 !important;
   }
   :global(.rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 11px !important;
+    height: 10px !important;
     width: 100% !important;
-    background-color: var(--bg-secondary-500) !important;
+    background-color: var(--bg-ds-surface-100) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
     border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
@@ -550,7 +551,7 @@
     .rest-splitter > .splitpanes__splitter:active,
     .rest-splitter > .splitpanes__splitter:hover
   ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .link {
     color: var(--text-primary-300);

@@ -33,7 +33,7 @@
    * Ticked mark icon
    */
   export let tickIcon: any;
-  export let getTextColor: (color: any) => {};
+  export let getTextColor: (color: any) => string;
   /**
    * marks the tickmark is highlighted
    */
@@ -79,6 +79,8 @@
       return "";
     }
   };
+  $: console.log(list?.color);
+ $: console.log();
 
   /**
    * @description - add classes to ticked options
@@ -121,9 +123,8 @@
 
   <div class="content-wrapper">
     <p
-      class="m-0 p-0 option-name ellipsis {getTextColor(
-        list?.color,
-      )} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
+      class="m-0 p-0 option-name ellipsis {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
+      style="color:{getTextColor(list?.color)};"
     >
       {list.name}
     </p>

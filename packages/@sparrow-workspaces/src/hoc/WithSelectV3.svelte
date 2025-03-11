@@ -41,8 +41,8 @@
   headerHeight={"26px"}
   minBodyWidth={"150px"}
   borderRounded={"4px"}
-  headerTheme={"dark-violet2"}
-  bodyTheme={"violet"}
+  headerTheme={"transparent"}
+  bodyTheme={"surface"}
   menuItem={"v2"}
   headerFontSize={"10px"}
   isDropIconFilled={true}
