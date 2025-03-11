@@ -1,4 +1,6 @@
 <script>
+  import { Input } from "@sparrow/library/forms";
+
   export let onUpdateTestFlowName;
   export let testFlowName;
 </script>
@@ -18,13 +20,33 @@
       await onUpdateTestFlowName(testFlowName, "blur");
     }}
   />
+
+  <!-- style={"width: 40%; !important"} -->
+  <!-- style="border-color: transparent" -->
+
+  <!-- <Input
+    type={"text"}
+    size={"small"}
+    maxlength={500}
+    disabled={false}
+    id={"testFlowName-name"}
+    placeholder={"Untitled"}
+    bind:value={testFlowName}
+    variant={"inlineTextField"}
+    on:input={async (e) => {
+      await onUpdateTestFlowName(testFlowName, "");
+    }}
+    on:blur={async (e) => {
+      await onUpdateTestFlowName(testFlowName, "blur");
+    }}
+  /> -->
 </div>
 
 <style>
   .input-name-container {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary-400);
-   width: 81px;
+    width: 81px;
     position: relative;
     border: 1px solid transparent;
     gap: 2px;

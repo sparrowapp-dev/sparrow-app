@@ -92,7 +92,7 @@
         : ''}"
     >
       <header
-        class={`env-header justify-content-between d-flex`}
+        class={`env-header align-items-end justify-content-between d-flex gap-4 `}
         style="position: relative ;"
       >
         <!--Disabling the Quick Help feature, will be taken up in next release-->
@@ -123,7 +123,7 @@
           </button>
         {/if}
 
-        <Input
+        <!-- <Input
           id={"environment-name"}
           width={"calc(100% - 500px)"}
           type="text"
@@ -144,7 +144,27 @@
           placeholder=""
           height="36px"
           isPencilIconRequired={false}
+        /> -->
+
+        <Input
+          type={"text"}
+          size={"large"}
+          maxlength={500}
+          id={"environment-name"}
+          bind:value={environmentName}
+          variant={"inlineTextField"}
+          placeholder={"Untitled"}
+          style={"width: 40%; !important"}
+          disabled={$currentEnvironment?.property?.environment?.type ==
+            "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          on:input={(e) => {
+            handleCurrentEnvironmentNameChange(environmentName, "");
+          }}
+          on:blur={(e) => {
+            handleCurrentEnvironmentNameChange(environmentName, "blur");
+          }}
         />
+
         <div class={`d-flex env-btn-container`} style="gap: 6px;">
           <div class="position-relative">
             <Search

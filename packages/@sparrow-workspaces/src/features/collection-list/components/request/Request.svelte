@@ -27,6 +27,7 @@
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
+  import { Input } from "@sparrow/library/forms";
 
   let expand = false;
   /**
@@ -327,7 +328,7 @@
     </div>
 
     {#if isRenaming}
-      <input
+      <!-- <input
         class="py-0 renameInputFieldFile"
         style="font-size: 12px; width: calc(100% - 50px); "
         id="renameInputFieldFile"
@@ -335,6 +336,21 @@
         maxlength={100}
         value={api.name}
         on:click|stopPropagation={() => {}}
+        bind:this={inputField}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
+      /> -->
+
+      <Input
+        type={"text"}
+        size={"small"}
+        maxlength={100}
+        id={"renameInputFieldFile"}
+        value={api.name}
+        variant={"inlineTextField"}
+        placeholder={"Untitled"}
+        style={"width:calc(100% - 50px);"}
         bind:this={inputField}
         on:input={handleRenameInput}
         on:blur={onRenameBlur}

@@ -53,6 +53,7 @@
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
     <script>
+      console.warn = ()=>{}
       // Hide the loader after the window is fully loaded
       window.addEventListener("load", function () {
         setTimeout(() => {

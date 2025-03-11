@@ -86,6 +86,7 @@
   } from "@sparrow/library/icons";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { Input } from "@sparrow/library/forms";
 
   /**
    * Role of user in active workspace
@@ -151,12 +152,14 @@
   };
 
   const handleInputName = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    onRename(target.value, "");
+    // const target = event.target as HTMLInputElement;
+    // onRename(target.value, "");
+    onRename(event.detail, "");
   };
   const handleBlurName = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    onRename(target.value, "blur");
+    // const target = event.target as HTMLInputElement;
+    // onRename(target.value, "blur");
+    onRename(event.detail, "blur");
   };
   const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
@@ -292,7 +295,7 @@
   >
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
-        <input
+        <!-- <input
           type="text"
           required
           maxlength={100}
@@ -302,7 +305,21 @@
           disabled={!isCollectionEditable}
           on:input={handleInputName}
           on:blur={handleBlurName}
+        /> -->
+
+        <Input
+          type={"text"}
+          size={"large"}
+          maxlength={500}
+          id={"renameInputFieldCollection"}
+          value={$tab?.name || ""}
+          variant={"inlineTextField"}
+          placeholder={"Untitled"}
+          disabled={!isCollectionEditable}
+          on:input={handleInputName}
+          on:blur={handleBlurName}
         />
+
         <!-- {#if tab?.activeSync}
           <div class="d-flex">
             <Select
