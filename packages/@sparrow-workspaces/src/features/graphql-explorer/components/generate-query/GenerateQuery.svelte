@@ -1,7 +1,7 @@
 <script lang="ts">
   import { WithSelect } from "../../../../hoc";
   import { AngleLeftIcon, ThreeDotIcon } from "@sparrow/library/icons";
-  import { Search, Checkbox } from "@sparrow/library/forms";
+  import { Search, Checkbox, Input } from "@sparrow/library/forms";
 
   import { trashIcon } from "@sparrow/library/assets";
   import { Dropdown } from "@sparrow/library/ui";
@@ -631,22 +631,14 @@
                 </div>
                 {#if t.isLeafNode && t.isInputField && t.isSelected}
                   <div class="input-parent ps-4 pe-3 mb-2 position-relative">
-                    <input
+                    <Input
+                      id={t.id}
                       type="text"
-                      style="border:1px solid grey; outline:none;"
-                      class="arg-input w-100 bg-transparent border-radius-2 px-2 pe-3 py-1 text-fs-12"
+                      variant="strokeTextField"
                       placeholder="Enter value"
                       value={t.value || ""}
                       on:input={(e) => {
                         handleQBuilderInputboxChange(e, t?.id);
-                      }}
-                      on:focus={() => {
-                        isQueryInputFocused = true;
-                      }}
-                      on:blur={() => {
-                        setTimeout(() => {
-                          isQueryInputFocused = false;
-                        }, 400);
                       }}
                     />
                     {#if t?.value && isQueryInputFocused}
