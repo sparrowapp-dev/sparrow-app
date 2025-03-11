@@ -20,7 +20,7 @@
     RequestParameters,
     ResponseStatus,
   } from "../components";
-  import { Loader } from "@sparrow/library/ui";
+  import { Alert, Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
@@ -69,6 +69,10 @@
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import {
+    CheckmarkCircleFilled,
+    ErrorCircleFilled,
+  } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -140,6 +144,8 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isErrorMsgOpen = false;
+
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
@@ -153,6 +159,10 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+  const toggleErrorMsg = (flag: boolean): void => {
+    isErrorMsgOpen = flag;
+  };
+
   let isGuidePopup = false;
 </script>
 
@@ -364,7 +374,9 @@
                 style="overflow:auto;"
               >
                 <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto;">
+                  <div
+                    style="display:flex; justify-content:center; overflow:auto; "
+                  >
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div
