@@ -74,6 +74,7 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -257,6 +258,7 @@
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
@@ -270,6 +272,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -603,6 +612,12 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
                   <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
