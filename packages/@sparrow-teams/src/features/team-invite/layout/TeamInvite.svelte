@@ -197,7 +197,7 @@
   };
 </script>
 
-<div class="d-flex flex-column" style="padding-top: 1rem;">
+<div class="d-flex flex-column">
   <p class="invite-header text-secondary-1000 mb-0">
     <span style="size: 14px; color:var(--text-ds-neutral-200); "
       >Invite by email</span
@@ -374,10 +374,7 @@
   <div style="margin-top: 1.8rem; display: flex; justify-content: flex-end;">
     <div style="padding-right:5px;">
       <Button
-        disable={loader}
         title={"Cancel"}
-        loaderSize={19}
-        textStyleProp={"font-size: var(--base-text); min-width:80px;"}
         type={"secondary"}
         {loader}
         onClick={() => {
@@ -388,8 +385,6 @@
     <Button
       disable={loader}
       title={"Send Invite"}
-      loaderSize={19}
-      textStyleProp={"font-size: var(--base-text); min-width:80px;"}
       type={"primary"}
       {loader}
       onClick={() => {
