@@ -11,12 +11,12 @@
     CheckMarkIcon,
     CheckmarkCircleFilled,
     ErrorCircleFilled,
-    CircleFilled
+    CircleFilled,
   } from "@sparrow/library/icons";
   import { Dropdown, Tooltip } from "@sparrow/library/ui";
-  import  {ArrowUpFilled } from "@sparrow/library/icons";
+  import { ArrowUpFilled } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
-  import {WithButtonV4} from "@sparrow/workspaces/hoc";
+  import { WithButtonV4 } from "@sparrow/workspaces/hoc";
 
   export let webSocket;
   export let onSearchMessage;
@@ -99,7 +99,10 @@
 <div class="h-100 d-flex flex-column">
   <div>
     <div class="d-flex justify-content-between align-content-center pb-2">
-      <span class="text-fs-12 text-secondary-300 my-auto" style="font-weight: 600;">Response</span>
+      <span
+        class="text-fs-12 text-secondary-300 my-auto"
+        style="font-weight: 600;">Response</span
+      >
       <div class="d-flex">
         <span class="gap-1 d-flex align-items-center">
           <CircleFilled
@@ -112,17 +115,19 @@
                   ? "#FBA574"
                   : "#FBA574"}
             size={"6px"}
-            
           />
-          <span class="text-fs-12 px-2 connection-status"
-          style={`color: ${webSocket.status === "connected"
-            ? "var(--text-ds-success-300)"
-            : webSocket.status === "disconnected"
-              ? "var(--text-ds-danger-300)"
-              : webSocket.status === "connecting" ||
-                  webSocket.status === "disconnecting"
-                ? "var(--text-ds-warning-300)"
-                : "var(--text-ds-nuetral-300)"}`}
+          <span
+            class="text-fs-12 px-2 connection-status"
+            style={`color: ${
+              webSocket.status === "connected"
+                ? "var(--text-ds-success-300)"
+                : webSocket.status === "disconnected"
+                  ? "var(--text-ds-danger-300)"
+                  : webSocket.status === "connecting" ||
+                      webSocket.status === "disconnecting"
+                    ? "var(--text-ds-warning-300)"
+                    : "var(--text-ds-nuetral-300)"
+            }`}
           >
             {webSocket.status === "connected"
               ? "Connected"
@@ -138,30 +143,42 @@
         <span class="d-flex gap-1">
           <Tooltip title={"Scroll to top"}>
             <WithButtonV4
-            icon={ArrowUpFilled}
-            onClick={() => {
-              scroll("top");
-            }}
+              icon={ArrowUpFilled}
+              onClick={() => {
+                scroll("top");
+              }}
+              disable={false}
+              loader={false}
             />
           </Tooltip>
           <Tooltip title={"Scroll to bottom"}>
             <WithButtonV4
-            icon={ArrowDownRegular}
-            onClick={() => {
-              scroll("bottom");
-            }}/>
+              icon={ArrowDownRegular}
+              onClick={() => {
+                scroll("bottom");
+              }}
+              disable={false}
+              loader={false}
+            />
           </Tooltip>
           <Tooltip title={"Delete"} placement="bottom-right">
             <WithButtonV4
-            icon={DeleteFilled}
-            onClick={() => {
-              onDeleteMessage();
-            }}/>
+              icon={DeleteFilled}
+              onClick={() => {
+                onDeleteMessage();
+              }}
+              disable={false}
+              loader={false}
+            />
           </Tooltip>
         </span>
       </div>
     </div>
-    <div class="d-flex justify-content-between {webSocket?.messages?.length ? 'visible' : 'invisible'}">
+    <div
+      class="d-flex justify-content-between {webSocket?.messages?.length
+        ? 'visible'
+        : 'invisible'}"
+    >
       <div class="" style="max-width: 320px;">
         <Search
           id="websocket-list-search"
@@ -177,47 +194,49 @@
       </div>
       <div>
         <Select
-       id="filtermessage"
-       titleId={`${webSocket.filter}`}
-        data={[
-            { id:"All Messages",
+          id="filtermessage"
+          titleId={`${webSocket.filter}`}
+          data={[
+            {
+              id: "All Messages",
               name: "All Messages",
               icon: ListFilled,
-              iconProps:{size:"16px"}
+              iconProps: { size: "16px" },
             },
             {
-              id:"Sent",
+              id: "Sent",
               name: "Sent",
               icon: ArrowUpRightRegular,
-              iconProps:{size:"16px", color:"var(--text-ds-success-300)"}
-             
+              iconProps: { size: "16px", color: "var(--text-ds-success-300)" },
             },
-            { id:"Received",
+            {
+              id: "Received",
               name: "Received",
               icon: ArrowDownLeftFilled,
-              iconProps:{size:"16px", color:"var(--text-ds-primary-400)"}
+              iconProps: { size: "16px", color: "var(--text-ds-primary-400)" },
             },
           ]}
-         onclick={(id)=>{
-          webSocket.filter=id;
-          onUpdateFilterType(id);
-         }}
-        minHeaderWidth={"133px"}
-        borderType={"none"}
-        borderActiveType={"none"}
-        headerHighlight={"hover-active"}
-        headerTheme={"transparent"}
-        menuItem={"v2"}
-        headerFontSize={"12px"}
-        maxHeaderWidth={"12px"}
-        zIndex={200}
-        bodyTheme={"surface"}
-        borderRounded={"4px"}
-        position={"absolute"}
-        maxBodyHeight={"108px"}
-        minBodyWidth={"186px"}
-        headerHeight={"28px"}
-        bodyAlignment={"left"}/>
+          onclick={(id) => {
+            webSocket.filter = id;
+            onUpdateFilterType(id);
+          }}
+          minHeaderWidth={"133px"}
+          borderType={"none"}
+          borderActiveType={"none"}
+          headerHighlight={"hover-active"}
+          headerTheme={"transparent"}
+          menuItem={"v2"}
+          headerFontSize={"12px"}
+          maxHeaderWidth={"12px"}
+          zIndex={200}
+          bodyTheme={"surface"}
+          borderRounded={"4px"}
+          position={"absolute"}
+          maxBodyHeight={"108px"}
+          minBodyWidth={"186px"}
+          headerHeight={"28px"}
+          bodyAlignment={"left"}
+        />
       </div>
     </div>
   </div>
@@ -246,18 +265,29 @@
             style="padding-left:6px ;padding-right: 6px;"
           >
             {#if message?.transmitter === "sender"}
-            <ArrowUpRightRegular size={"14px"} color="var(--icon-ds-success-400)"/>
-                              <!-- senderIcon -->
+              <ArrowUpRightRegular
+                size={"14px"}
+                color="var(--icon-ds-success-400)"
+              />
+              <!-- senderIcon -->
             {:else if message?.transmitter === "disconnector"}
               <!-- DisconnectIcon -->
-               <ErrorCircleFilled size={"14px"} color="var(--icon-ds-danger-400)"/>
-              
+              <ErrorCircleFilled
+                size={"14px"}
+                color="var(--icon-ds-danger-400)"
+              />
             {:else if message?.transmitter === "connecter"}
               <!-- ConnectIcon -->
-            
-               <CheckmarkCircleFilled size={"14px"} color="var(--icon-ds-success-400)"/>
+
+              <CheckmarkCircleFilled
+                size={"14px"}
+                color="var(--icon-ds-success-400)"
+              />
             {:else if message?.transmitter === "receiver"}
-            <ArrowDownLeftFilled color="var(--icon-ds-primary-400)" size={"14px"}/>
+              <ArrowDownLeftFilled
+                color="var(--icon-ds-primary-400)"
+                size={"14px"}
+              />
             {/if}
           </span>
           <!-- <div class="d-flex align-items-center"> -->
@@ -267,10 +297,7 @@
           >
             {message?.timestamp}
           </span>
-          <p
-            class="ellipsis text-fs-12 mb-0"
-            style="line-height: 1;"
-          >
+          <p class="ellipsis text-fs-12 mb-0" style="line-height: 1;">
             {@html highlightSearchText(message?.data, searchData)}
           </p>
           <!-- </div> -->
@@ -298,12 +325,11 @@
   .response-message:hover {
     background-color: var(--bg-ds-surface-600);
   }
-  .response-message{
+  .response-message {
     background-color: var(--bg-ds-surface-900);
     border-radius: 4px;
   }
   .connection-status {
     font-weight: 500;
-    
   }
 </style>
