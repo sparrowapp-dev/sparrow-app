@@ -756,7 +756,6 @@ export default class CollectionsViewModel {
         updatedAt: newCollection.createdAt,
         updatedBy: "guestUser",
       };
-      await this.addCollection(dt);
       await this.collectionRepository.addCollection(dt);
 
       const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, dt);
