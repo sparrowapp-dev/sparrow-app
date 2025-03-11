@@ -74,6 +74,7 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -592,6 +593,12 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
                   <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
