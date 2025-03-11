@@ -54,7 +54,7 @@
             }}
             disabled={false}
             headerHeight={"28px"}
-            minHeaderWidth={"160px"}
+            minHeaderWidth={"10px"}
           />
         </p>
       </span>
@@ -108,7 +108,7 @@
           {onUpdateEnvironment}
           disabled={true}
         />
-      {:else if collectionAuth.collectionAuthNavigation === CollectionAuthTypeBaseEnum.BASIC_AUTH}
+      {:else if collectionAuth?.collectionAuthNavigation === CollectionAuthTypeBaseEnum.BASIC_AUTH}
         <p class="text-fs-16">Basic Auth</p>
         <BasicAuth
           basicAuth={collectionAuth.auth.basicAuth}

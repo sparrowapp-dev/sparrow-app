@@ -384,23 +384,23 @@
 
   const getTextColor = (_color: any) => {
     if (_color === "primary") {
-      return "text-primaryColor";
+      return "var(--text-ds-primary-300)";
     } else if (_color === "danger") {
-      return "text-dangerColor";
+      return "var(--text-ds-danger-300)";
     } else if (_color === "dark") {
-      return "text-defaultColor";
+      return "var(--text-ds-surface-500)";
     } else if (_color === "light") {
-      return "text-whiteColor";
+      return "var(--text-ds-neutral-50)";
     } else if (_color === "success") {
-      return "text-getColor";
+      return "var(--text-ds-success-300)";
     } else if (_color === "warning") {
-      return "text-postColor";
+      return "var(--text-ds-warning-300)";
     } else if (_color === "secondary") {
-      return "text-putColor";
+      return "var(--text-ds-secondary-300)";
     } else if (_color === "patch") {
-      return "text-patchColor";
+      return "var(--bg-ds-accent-300)";
     } else {
-      return "text-whiteColor";
+      return "var(--text-ds-neutral-50)";
     }
   };
 </script>
@@ -446,7 +446,7 @@
       style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight};"
     >
       <p
-        class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
+        class="mb-0 d-flex align-items-center ellipsis"
       >
         {#if iconRequired}
           <span class="me-2" style="margin-top: -2px;"
@@ -464,31 +464,31 @@
         {:else if isHeaderCombined}
           <div class="d-flex ellipsis">
             <span
-              class="ellipsis {selectedRequest?.default
-                ? 'text-textColor'
-                : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              class="ellipsis"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {selectedRequest?.default
+                ? 'var(--text-textColor)'
+                : getTextColor(selectedRequest?.color)};"
             >
               {selectedRequest?.description ?? ""}
             </span>
             <span
-              class="ellipsis me-3 {selectedRequest?.default
-                ? 'text-textColor'
-                : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              class="ellipsis me-3"
+              style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {selectedRequest?.default
+                ? 'var(--text-textColor)'
+                : getTextColor(selectedRequest?.color)};"
             >
               /{selectedRequest?.name ?? ""}
             </span>
           </div>
         {:else}
           <span
-            class="ellipsis me-3 {selectedRequest?.default
-              ? 'text-textColor'
-              : getTextColor(selectedRequest?.color)}"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
+            class="ellipsis me-3"
+            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color: {disabled ||
             selectedRequest?.hide
-              ? 'color:var(--bg-ds-nuetral-100) !important'
-              : ''}"
+              ? 'var(--bg-ds-nuetral-100) !important'
+              : selectedRequest?.default
+              ? 'var(--text-textColor)'
+              : getTextColor(selectedRequest?.color)};"
           >
             {selectedRequest?.name}
           </span>
