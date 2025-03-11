@@ -204,6 +204,8 @@ export { default as ThumbLikeFilled } from "./ThumbLikeFilled.svelte";
 export { default as SendRegular } from "./SendRegular.svelte";
 export { default as ThumbDislikeFilled } from "./ThumbDislikeFilled.svelte";
 export { default as GlobeRegular } from "./GlobeRegular.svelte";
+export { default as ArchiveRegular } from "./ArchiveRegular.svelte";
+export { default as ArrowClockWiseRegular } from "./ArrowClockWiseRegular.svelte";
 export { default as QuestionCirlceReqular } from "./QuestionCircleReqular.svelte";
 export { default as DocumentRegular } from "./DocumentRegular.svelte";
 export { default as GiftReqular } from "./GiftRegular.svelte";
