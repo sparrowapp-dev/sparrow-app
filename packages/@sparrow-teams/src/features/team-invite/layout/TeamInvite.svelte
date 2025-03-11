@@ -198,18 +198,18 @@
 </script>
 
 <div class="d-flex flex-column">
-  <p class="invite-header text-secondary-1000 mb-0">
-    <span style="size: 14px; color:var(--text-ds-neutral-200); "
-      >Invite by email</span
-    ><span class="asterik">*</span>
-  </p>
   <p
-    style="padding: 2px 0px 2px 0px;"
+    class="invite-header text-secondary-1000 mb-0"
+    style="color: var(--text-ds-neutral-200);"
+  >
+    Invite by email<span class="asterik">*</span>
+  </p>
+
+  <p
+    style="padding: 2px 0px; font-size: 12px; color: var(--text-ds-neutral-400);"
     class="invite-subheader text-secondary-200 mt-0 mb-1"
   >
-    <span style="font-size: 12px; color:var(--text-ds-neutral-400);"
-      >you can add multiple emails.</span
-    >
+    You can add multiple emails.
   </p>
   <div
     class="email-container rounded {(emailError && invalidEmails.length) ||
