@@ -376,7 +376,6 @@
       <Button
         title={"Cancel"}
         type={"secondary"}
-        {loader}
         onClick={() => {
           handleModalState(false);
         }}
