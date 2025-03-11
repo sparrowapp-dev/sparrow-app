@@ -116,33 +116,36 @@
           disabled={true}
         />
       {/if}
-      <p
-        class="text-fs-12 mb-1"
-        style="color:var(--text-ds-neutral-400); max-width:600px;"
-      >
-        The authorization setting is inherited from the collection '<span
-          style="color:var(--text-ds-neutral-100)">{collection.name}</span
-        >'. To make changes,
-      </p>
-      <p class="d-flex">
-        <span
-          class="pt-1 text-fs-12 me-1"
-          style="color:var(--text-ds-neutral-400)"
+      {#if collection}
+        <p
+          class="text-fs-12 mb-1"
+          style="color:var(--text-ds-neutral-400); max-width:600px;"
         >
-          navigate to
-        </span>
-        <Button
-          type={"link-primary"}
-          onClick={() => {
-            onOpenCollection();
-          }}
-          title={collection?.name?.length > 25
-            ? collection?.name?.slice(0, 25) + "..."
-            : collection?.name || "Collection Not Found"}
-          size={"small"}
-          endIcon={OpenRegular}
-        />
-      </p>
+          The authorization setting is inherited from the collection '<span
+            style="color:var(--text-ds-neutral-100)"
+            >{collection?.name || "Collection Not Found"}</span
+          >'. To make changes,
+        </p>
+        <p class="d-flex">
+          <span
+            class="pt-1 text-fs-12 me-1"
+            style="color:var(--text-ds-neutral-400)"
+          >
+            navigate to
+          </span>
+          <Button
+            type={"link-primary"}
+            onClick={() => {
+              onOpenCollection();
+            }}
+            title={collection?.name?.length > 25
+              ? collection?.name?.slice(0, 25) + "..."
+              : collection?.name || "Collection Not Found"}
+            size={"small"}
+            endIcon={OpenRegular}
+          />
+        </p>
+      {/if}
     {/if}
   </section>
 </div>

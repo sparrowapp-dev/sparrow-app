@@ -108,9 +108,7 @@
               <div
                 class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center local-environment"
               >
-                <span class={"icon-text"}
-                  >{mock.type}</span
-                >
+                <span class={"icon-text"}>{mock.type}</span>
               </div>
             </div>
             <div
@@ -124,9 +122,7 @@
                 {mock.key}
               </p>
               {#if mock.value}
-                <p
-                  class="mock-value m-0 p-0 env-value word-break"
-                >
+                <p class="mock-value m-0 p-0 env-value word-break">
                   {mock.value}
                 </p>
               {/if}
@@ -167,24 +163,18 @@
             <div
               class="d-flex align-items-center border-radius-2 justify-content-center global-environment"
             >
-              <span class={"icon-text"}
-                >{mock.type}</span
-              >
+              <span class={"icon-text"}>{mock.type}</span>
             </div>
           </div>
           <div
             style="height: 33px;"
             class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
           >
-            <p
-              class="mock-key m-0 p-0 env-value word-break"
-            >
+            <p class="mock-key m-0 p-0 env-value word-break">
               {mock.key}
             </p>
             {#if mock.value}
-              <p
-                class="mock-value m-0 p-0 env-value word-break"
-              >
+              <p class="mock-value m-0 p-0 env-value word-break">
                 {mock.value}
               </p>
             {/if}
@@ -263,17 +253,17 @@
     line-height: 18px;
     color: var(--text-ds-neutral-50);
   }
-  .icon-text{
+  .icon-text {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-ds-neutral-50);
   }
-  .mock-value{
+  .mock-value {
     font-size: 12px;
     font-weight: 400;
     color: var(--text-ds-neutral-300);
   }
-  .mock-key{
+  .mock-key {
     font-size: 12px;
     font-weight: 500;
     color: var(--text-ds-neutral-50);

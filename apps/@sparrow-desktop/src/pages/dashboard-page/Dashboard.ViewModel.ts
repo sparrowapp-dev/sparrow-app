@@ -43,6 +43,8 @@ import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import constants from "@app/constants/constants";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class DashboardViewModel {
   constructor() {}
@@ -115,6 +117,18 @@ export class DashboardViewModel {
       name: "guestUser",
     });
     return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
+  // redirects to Sparrow Docs.
+  public redirectDocs = async () => {
+    await open(constants.DOCS_URL);
+    return;
+  };
+
+  // redirects to Sparrow Feature Updates.
+  public redirectFeatureUpdates = async () => {
+    await open(constants.SPARROW_DOWNLOAD_LINK);
+    return;
   };
 
   /**

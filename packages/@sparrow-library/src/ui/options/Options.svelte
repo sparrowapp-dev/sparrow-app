@@ -8,6 +8,7 @@
     disabled?: boolean;
     hidden?: boolean;
     icon?: any;
+    iconColor?: string;
   }> = [];
   export let noOfColumns = 0;
   export let zIndex = 4;
@@ -63,7 +64,7 @@
   in:scale={{ start: 0.8, duration: 400 }}
   out:scale={{ start: 0.8, duration: 400 }}
 >
-  <div
+   <div
     style={`width: ${noOfColumns}px`}
     class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
   >
@@ -85,7 +86,8 @@
                 this={item.icon}
                 height={"12px"}
                 width={"12px"}
-                color={"#A5B5CA"}
+                size={"14px"}
+                color={item?.iconColor || "#A5B5CA"}
               />
             </span>
             <span>

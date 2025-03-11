@@ -43,6 +43,11 @@ import type {
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+import type {
+  HttpRequestSavedCreateUpdatePayloadDtoInterface,
+  HttpRequestSavedDeletePayloadDtoInterface,
+  HttpRequestSavedUpdatePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/http-request-saved-dto";
 
 export class CollectionService {
   constructor() {}
@@ -614,5 +619,57 @@ export class CollectionService {
     _eventName: string,
   ) => {
     return sendSocketIoMessage(_tabId, _message, _eventName);
+  };
+
+  public createSavedRequestInCollection = async (
+    _savedRequest: HttpRequestSavedCreateUpdatePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/response`,
+      {
+        body: _savedRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateSavedRequestInCollection = async (
+    _savedRequestId: string,
+    _savedRequest: HttpRequestSavedUpdatePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      {
+        body: _savedRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteSavedRequestInCollection = async (
+    _savedRequestId: string,
+    _savedRequest: HttpRequestSavedDeletePayloadDtoInterface,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      {
+        body: _savedRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
   };
 }

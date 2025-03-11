@@ -29,7 +29,9 @@
 
   export let minBodyWidth="150px";
  
+
   export let headerHeight="24px";
+  $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>
 
 <Select
@@ -52,6 +54,4 @@
   isDropIconFilled={true}
   minHeaderWidth={minHeaderWidth}
   headerHeight={headerHeight}
-  default={true}
-
 />
