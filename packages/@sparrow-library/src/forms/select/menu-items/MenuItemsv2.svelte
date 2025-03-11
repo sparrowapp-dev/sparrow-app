@@ -33,7 +33,7 @@
    * Ticked mark icon
    */
   export let tickIcon: any;
-  export let getTextColor: (color: any) => {};
+  export let getTextColor: (color: any) => string;
   /**
    * marks the tickmark is highlighted
    */
@@ -90,6 +90,9 @@
       return `select-ticked-highlight-text`;
     } else return "";
   };
+  
+  // Get the color class for this list item
+  $: colorClass = list?.color ? getTextColor(list.color) : '';
 </script>
 
 <div
@@ -121,9 +124,7 @@
 
   <div class="content-wrapper">
     <p
-      class="m-0 p-0 option-name ellipsis {getTextColor(
-        list?.color,
-      )} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
+      class="m-0 p-0 option-name ellipsis {colorClass} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     >
       {list.name}
     </p>
@@ -215,4 +216,36 @@
   .highlight {
     cursor: pointer;
   }
+
+   .color-primary {
+  color: var(--text-ds-primary-300);
+}
+
+.color-danger {
+  color: var(--text-ds-danger-300);
+}
+
+.color-default {
+  color: var(--text-ds-surface-500);
+}
+
+.color-white {
+  color: var(--text-ds-neutral-50);
+}
+
+.color-get {
+  color: var(--text-ds-success-300);
+}
+
+.color-post {
+  color: var(--text-ds-warning-300);
+}
+
+.color-put {
+  color: var(--text-ds-secondary-300);
+}
+
+.color-patch {
+  color: var(--bg-ds-accent-300);
+}
 </style>

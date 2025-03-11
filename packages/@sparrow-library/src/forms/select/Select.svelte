@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount, SvelteComponent } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon } from "@sparrow/library/assets";
@@ -30,7 +30,6 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
-    icon?: SvelteComponent;
   }>;
 
   export let iconColor = "grey";
@@ -116,7 +115,7 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3" = "v1";
+  export let menuItem: "v1" | "v2" | "v3"  = "v1";
   /**
    * Determines icons used in Select header.
    */
@@ -144,8 +143,6 @@
   export let showDescription = true;
 
   export let isArrowIconRequired = true;
-
-  export let bodyAlignment: "right" | "left" = "right";
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -382,27 +379,27 @@
     }
   };
 
-  const getTextColor = (_color: any) => {
-    if (_color === "primary") {
-      return "text-primaryColor";
-    } else if (_color === "danger") {
-      return "text-dangerColor";
-    } else if (_color === "dark") {
-      return "text-defaultColor";
-    } else if (_color === "light") {
-      return "text-whiteColor";
-    } else if (_color === "success") {
-      return "text-getColor";
-    } else if (_color === "warning") {
-      return "text-postColor";
-    } else if (_color === "secondary") {
-      return "text-putColor";
-    } else if (_color === "patch") {
-      return "text-patchColor";
-    } else {
-      return "text-whiteColor";
-    }
-  };
+ const getTextColor = (_color: any) => {
+  if (_color === "primary") {
+    return "color-primary";
+  } else if (_color === "danger") {
+    return "color-danger";
+  } else if (_color === "dark") {
+    return "color-default";
+  } else if (_color === "light") {
+    return "color-white";
+  } else if (_color === "success") {
+    return "color-get";
+  } else if (_color === "warning") {
+    return "color-post";
+  } else if (_color === "secondary") {
+    return "color-put";
+  } else if (_color === "patch") {
+    return "color-patch";
+  } else {
+    return "color-white";
+  }
+};
 </script>
 
 <div
@@ -498,7 +495,7 @@
         class="d-flex ps-2 {!isArrowIconRequired ? 'd-none' : ''}"
         class:select-logo-active={isOpen}
       >
-        <CaretDownFilled size={"16px"} />
+        <CaretDownFilled size={"16px"}/>
       </span>
     </div>
   </div>
@@ -510,30 +507,19 @@
       : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
-  {isOpen
+      {isOpen
       ? 'opacity: 1; transform: scale(1);'
       : 'opacity: 0; transform: scale(0.8);'}
-  min-width:{minBodyWidth}; 
-  left: {position === 'fixed'
-      ? bodyAlignment === 'right'
-        ? `${bodyLeftDistance}px;`
-        : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`
-      : bodyAlignment === 'right'
-        ? '0px;'
-        : 'auto;'} 
-  top: {position === 'fixed'
+      min-width:{minBodyWidth}; left: {position === 'fixed'
+      ? `${bodyLeftDistance}px;`
+      : `0px;`} top: {position === 'fixed'
       ? `${bodyTopDistance}px;`
-      : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
-  right: {position === 'fixed'
-      ? bodyAlignment === 'right'
-        ? `${bodyRightDistance}px;`
-        : 'auto;'
-      : bodyAlignment === 'right'
-        ? '0px;'
-        : '0px;'} 
-  z-index:{zIndex}; 
-  padding: 8px 6px;
-  "
+      : `${
+          Number(headerHeight.replace(/\D/g, '')) + 5
+        }px;`}  right: {position === 'fixed'
+      ? `${bodyRightDistance}px;`
+      : `0px;`} z-index:{zIndex}; padding: 8px 6px;
+      "
   >
     <div
       on:click={() => {
@@ -593,6 +579,7 @@
             />
           {:else if menuItem === "v3"}
             <MenuItemsV3 {list} {selectedRequest} {getTextColor} />
+          
           {/if}
         </div>
       {/each}
@@ -618,6 +605,7 @@
     </div>
   </div>
 </div>
+
 
 <style lang="scss">
   .select-btn {
@@ -810,4 +798,35 @@
   .select-btn:hover {
     background-color: var(--bg-ds-surface-400) !important;
   }
+  .color-primary {
+  color: var(--text-ds-primary-300);
+}
+
+.color-danger {
+  color: var(--text-ds-danger-300);
+}
+
+.color-default {
+  color: var(--text-ds-surface-500);
+}
+
+.color-white {
+  color: var(--text-ds-neutral-50);
+}
+
+.color-get {
+  color: var(--text-ds-success-300);
+}
+
+.color-post {
+  color: var(--text-ds-warning-300);
+}
+
+.color-put {
+  color: var(--text-ds-secondary-300);
+}
+
+.color-patch {
+  color: var(--bg-ds-accent-300);
+}
 </style>
