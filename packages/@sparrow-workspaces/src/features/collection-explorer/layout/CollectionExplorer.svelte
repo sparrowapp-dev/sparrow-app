@@ -70,8 +70,22 @@
   // import { WorkspaceRole } from "@sparrow/common/enums";
   import { CollectionAuth, CollectionNavigator } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
-  import { Button } from "@sparrow/library/ui";
-  import { SaveRegular } from "@sparrow/library/icons";
+  import { Button, Options } from "@sparrow/library/ui";
+  import {
+    AddRegular,
+    ArrowSwapRegular,
+    CaretDownFilled,
+    CaretUpFilled,
+    FolderAddRegular,
+    FolderIcon,
+    GraphIcon,
+    SaveRegular,
+    SocketIcon,
+    SocketIoIcon,
+    SyncIcon,
+  } from "@sparrow/library/icons";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   /**
    * Role of user in active workspace
@@ -79,6 +93,7 @@
   export let isWebApp = false;
   export let environmentVariables;
   export let onSaveCollection;
+  export let onItemCreated;
 
   /**
    * Local variables
@@ -94,6 +109,15 @@
   let totalWebSocket: number = 0;
   let totalSocketIo: number = 0;
   let totalGraphQl: number = 0;
+  let showAddItemMenu = false;
+  let collectionTabButtonWrapper: HTMLElement;
+  let noOfColumns = 180;
+
+  const rightClickContextMenu = () => {
+    setTimeout(() => {
+      showAddItemMenu = !showAddItemMenu;
+    }, 100);
+  };
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -134,8 +158,94 @@
     const target = event.target as HTMLInputElement;
     onRename(target.value, "blur");
   };
+  const handleSelectClick = (event: MouseEvent) => {
+    const selectElement = document.getElementById(
+      `add-item-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
+  };
 </script>
 
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
+{#if showAddItemMenu}
+  <Options
+    xAxis={collectionTabButtonWrapper.getBoundingClientRect().right}
+    yAxis={[
+      collectionTabButtonWrapper.getBoundingClientRect().top - 0,
+      collectionTabButtonWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    zIndex={700}
+    menuItems={[
+      {
+        onClick: () => {
+          onItemCreated("folder", {
+            collection: collection,
+          });
+        },
+        displayText: "Add Folder",
+        disabled: false,
+        hidden: false,
+        icon: FolderAddRegular,
+        iconColor: "var(--icon-ds-neutral-50)",
+      },
+      {
+        onClick: () => {
+          onItemCreated("requestCollection", {
+            collection: collection,
+          });
+        },
+        displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+        disabled: false,
+        hidden: false,
+        icon: ArrowSwapRegular,
+        iconColor: "var(--icon-ds-neutral-50)",
+      },
+      {
+        onClick: () => {
+          onItemCreated("socketioCollection", {
+            collection: collection,
+          });
+        },
+        displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+        disabled: false,
+        hidden: false,
+        icon: SocketIoIcon,
+        iconColor: "var(--icon-ds-neutral-50)",
+      },
+      {
+        onClick: () => {
+          onItemCreated("websocketCollection", {
+            collection: collection,
+          });
+        },
+        displayText: "Add WebSocket",
+        disabled: false,
+        hidden: false,
+        icon: SocketIcon,
+        iconColor: "var(--icon-ds-neutral-50)",
+      },
+
+      {
+        onClick: () => {
+          onItemCreated("graphqlCollection", {
+            collection: collection,
+          });
+        },
+        displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+        disabled: false,
+        hidden: isWebApp ? true : false,
+        icon: GraphIcon,
+        iconColor: "var(--icon-ds-neutral-50)",
+      },
+    ]}
+    {noOfColumns}
+  />
+{/if}
 <div class="main-container d-flex h-100" style="overflow:auto;">
   <!-- <Modal
     title={"Switch Branch?"}
@@ -318,12 +428,21 @@
           </div>
         {/if} -->
 
-        <div class="d-flex me-2 flex-column justify-content-center">
+        <div
+          class="d-flex me-2 flex-column justify-content-center"
+          bind:this={collectionTabButtonWrapper}
+        >
           <Button
+            id={`add-item-collection-${collection?.id}`}
             disable={!isCollectionEditable}
-            title={"New Request"}
+            title={"New"}
             type={"primary"}
-            onClick={() => onCreateAPIRequest(collection)}
+            onClick={() => {
+              rightClickContextMenu();
+            }}
+            size="medium"
+            startIcon={AddRegular}
+            endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
           />
         </div>
         <Button
