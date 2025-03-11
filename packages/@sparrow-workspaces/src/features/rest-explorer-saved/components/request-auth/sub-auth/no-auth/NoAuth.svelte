@@ -6,7 +6,7 @@
 
 <div class="w-100">
   <div>
-    <p class="text-fs-12 fw-normal" style="color: var(--text-ds-neutral-300)">
+    <p class="text-secondary-300 text-fs-12 fw-normal">
       This request does not use any authorization.
     </p>
   </div>
