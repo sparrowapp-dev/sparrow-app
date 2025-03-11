@@ -182,10 +182,6 @@
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
-
-  $: {
-    console.log(isCollectionEditable);
-  }
 </script>
 
 <CollectionExplorer
