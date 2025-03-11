@@ -41,6 +41,9 @@
       onclick={handleRawDropDown}
       zIndex={499}
       disabled={false}
+      minHeaderWidth={"70px"}
+      headerHeight={"28px"}
+      minBodyWidth={"104px"}
     />
   </div>
   <Button
@@ -53,5 +56,6 @@
       MixpanelEvent(Events.Send_WebSocket_Request);
     }}
     type={"primary"}
+    customWidth={"70px"}
   />
 </div>
