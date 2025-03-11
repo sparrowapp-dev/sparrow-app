@@ -24,6 +24,7 @@
     isTestFlowTourGuideOpen,
     currentStep,
   } from "../../../stores/guide.tour";
+  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
   /**
    * current workspace
@@ -121,11 +122,14 @@
       });
     }
   }
+  $: isExpandTestflow =
+    $isDefaultTourGuideOpen === true ? true : isExpandTestflow;
 </script>
 
 <div
   class={`d-flex flex-column  pt-0 px-1`}
   style="font-weight: 500;margin-bottom:2px; "
+  id="testflow-container"
 >
   <!-- 
   --  Testflow Header 

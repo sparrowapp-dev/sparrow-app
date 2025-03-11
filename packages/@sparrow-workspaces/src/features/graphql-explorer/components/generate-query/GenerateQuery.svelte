@@ -6,8 +6,6 @@
     ChevronRightRegular,
     ThreeDotIcon,
   } from "@sparrow/library/icons";
-  import { Search, Checkbox } from "@sparrow/library/forms";
-
   import { trashIcon } from "@sparrow/library/assets";
   import { Button } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";

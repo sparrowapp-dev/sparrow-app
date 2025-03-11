@@ -8,6 +8,9 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
+    defaultCurrentStep,
+    isDefaultTourGuideOpen,
+    isDefaultTourGuideClose,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -29,6 +32,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
@@ -651,14 +655,17 @@
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;
+      isDefaultTourGuideClose.set(true);
     }}
     onClickTour={() => {
       isUserFirstSignUp.set(false);
-      isTourGuideOpen = true;
       isWelcomePopupOpen = false;
+      defaultCurrentStep.set(1);
+      isDefaultTourGuideOpen.set(true);
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"

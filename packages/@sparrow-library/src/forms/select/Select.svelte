@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, SvelteComponent } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon } from "@sparrow/library/assets";
@@ -30,6 +30,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    icon?: SvelteComponent;
   }>;
 
   export let iconColor = "grey";
@@ -143,6 +144,8 @@
   export let showDescription = true;
 
   export let isArrowIconRequired = true;
+
+  export let bodyAlignment: 'right' | 'left' = 'right';
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -507,19 +510,30 @@
       : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
-      {isOpen
-      ? 'opacity: 1; transform: scale(1);'
-      : 'opacity: 0; transform: scale(0.8);'}
-      min-width:{minBodyWidth}; left: {position === 'fixed'
+  {isOpen
+  ? 'opacity: 1; transform: scale(1);'
+  : 'opacity: 0; transform: scale(0.8);'}
+  min-width:{minBodyWidth}; 
+  left: {position === 'fixed'
+    ? (bodyAlignment === 'right'
       ? `${bodyLeftDistance}px;`
-      : `0px;`} top: {position === 'fixed'
-      ? `${bodyTopDistance}px;`
-      : `${
-          Number(headerHeight.replace(/\D/g, '')) + 5
-        }px;`}  right: {position === 'fixed'
+      : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`)
+    : (bodyAlignment === 'right'
+      ? '0px;'
+      : 'auto;')} 
+  top: {position === 'fixed'
+    ? `${bodyTopDistance}px;`
+    : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
+  right: {position === 'fixed'
+    ? (bodyAlignment === 'right'
       ? `${bodyRightDistance}px;`
-      : `0px;`} z-index:{zIndex}; padding: 8px 6px;
-      "
+      : 'auto;')
+    : (bodyAlignment === 'right'
+      ? '0px;'
+      : '0px;')} 
+  z-index:{zIndex}; 
+  padding: 8px 6px;
+  "
   >
     <div
       on:click={() => {
