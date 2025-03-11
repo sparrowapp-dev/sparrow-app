@@ -208,3 +208,4 @@ export { default as CircleFilled} from "./CircleFilled.svelte";
 export { default as QuestionCircleRegular } from "./QuestionCircleRegular.svelte";
 export {default as OpenRegular} from "./OpenRegular.svelte"
 export { default as CaretUpFilled } from "./CaretUpFilled.svelte";
+export {default as ListRegular} from "./ListRegular.svelte";

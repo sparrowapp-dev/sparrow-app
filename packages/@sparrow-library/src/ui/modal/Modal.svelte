@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CrossIcon } from "@sparrow/library/icons";
+  import { CrossIcon, DismissRegular } from "@sparrow/library/icons";
 
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
@@ -85,7 +85,7 @@
             style="height: 30px; width:30px; "
             on:click={handleModalState(false)}
           >
-            <CrossIcon width="17px" height="17px" />
+            <DismissRegular size={"16px"} color="var(--bg-ds-neutral-100)" />
           </button>
         {/if}
       </div>
@@ -130,9 +130,10 @@
   }
 
   .sparrow-modal-container-data {
+    height: auto;
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
-    padding: 30px 30px 20px 30px;
+    padding: 30px 30px 40px 30px;
     position: relative;
   }
   .sparrow-modal-heading {
@@ -141,6 +142,7 @@
     color: var(--text-ds-neutral-50);
     font-weight: 600;
     line-height: 24px;
+    padding-bottom: 20px;
   }
 
   .sparrow-modal-close-icon-btn {
