@@ -2,6 +2,7 @@
   import { afterUpdate, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
+  import { Button } from "../button";
 
   export let isBackgroundClickable = true;
 
@@ -24,11 +25,15 @@
     iconSize?: string;
     onclick: () => void;
     isHoverConstant?: boolean;
+    subTitle?: String;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
 
   export let minWidth: number = 200;
+  export let startIcon;
+
+  export let endIcon;
 
   export let zIndex = 1;
   /**
@@ -102,18 +107,14 @@
     -->
       {#each options as item}
         <button
-          class="border-0 d-flex align-items-center p-2 rounded-1 w-100 option-button {item?.isHoverConstant
+          class="d-flex align-items-center p-2 rounded-1 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
             : ''} "
           style="color: {item.color};"
           on:click={() => item.onclick()}
+          tabindex={0}
         >
           {#if item.icon}
-            <!-- <img
-              src={item.icon}
-              alt=""
-              style="width: 15px; height: 15px; margin: auto 10px auto 5px;"
-            /> -->
             <span class="me-2 d-flex align-items-center">
               <svelte:component
                 this={item.icon}
@@ -123,7 +124,35 @@
               />
             </span>
           {/if}
-          <p style="margin-bottom: 0;max-width:{minWidth}; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">{item.name}</p>
+          {#if startIcon}
+            <Button
+              size="small"
+              type="teritiary-regular"
+              title="Schema"
+              {startIcon}
+            />
+          {/if}
+          <div>
+            <p
+              class="option-header-text"
+              style="margin-bottom: 0;max-width:{minWidth}; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;"
+            >
+              {item.name}
+            </p>
+            {#if item.subTitle}
+              <p class="option-subtitle" style="margin: 0px;">
+                {item.subTitle}
+              </p>
+            {/if}
+          </div>
+          {#if endIcon}
+            <Button
+              size="small"
+              type="teritiary-regular"
+              title="Schema"
+              {endIcon}
+            />
+          {/if}
         </button>
       {/each}
     </div>
@@ -132,21 +161,40 @@
 
 <style>
   .dropdown-container {
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    /* -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5); */
+    background-color: var(--bg-ds-surface-600);
   }
   .option-button {
-    background-color: transparent;
+    background-color: var(--bg-ds-surface-600);
+    border-radius: 4px;
     transition: 0.2s ease;
+    border: none;
   }
   .option-button:hover {
-    background-color: var(--dropdown-option-hover);
+    background-color: var(--bg-ds-surface-400);
   }
   .option-button:active {
-    background-color: var(--dropdown-option-active);
+    background-color: var(--bg-ds-surface-700);
+  }
+  .option-button:focus-visible {
+    background-color: var(--bg-ds-surface-600);
+    outline: 2px solid var(--bg-ds-primary-300);
   }
   .hover-effect {
-    background-color: var(--dropdown-option-hover);
+    background-color: var(--bg-ds-surface-400);
+  }
+  .option-header-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-50);
+  }
+  .option-subtitle {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
   }
 </style>
