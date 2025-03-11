@@ -2,7 +2,7 @@
   import { beautifyIcon } from "@sparrow/library/assets";
   import { Editor } from "@sparrow/library/forms";
   import { CleanerIcon } from "@sparrow/library/icons";
-  import { notifications } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Graphql";
   export let value = "";
@@ -11,6 +11,7 @@
   export let errorMessage = "";
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
+  export let onClearQuery;
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
     onUpdateRequestQuery(e.detail);
   };
@@ -55,5 +56,13 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="d-flex justify-content-end">
+    <Button
+      size="small"
+      type="teritiary-regular"
+      title="Clear Query"
+      onClick={onClearQuery}
+    />
   </div>
 </div>

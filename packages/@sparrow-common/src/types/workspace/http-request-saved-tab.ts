@@ -1,11 +1,5 @@
-import type { HttpRequestSavedAddToBaseEnum, HttpRequestSavedMethodBaseEnum } from "./http-request-saved-base";
-
-export enum AuthTypeEnum {
-    NO_AUTH = "No Auth",
-    API_KEY = "API Key",
-    BEARER_TOKEN = "Bearer Token",
-    BASIC_AUTH = "Basic Auth",
-  }
+import type { CollectionRequestAddToBaseEnum } from "./collection-base";
+import type {  HttpRequestSavedAuthModeBaseEnum, HttpRequestSavedMethodBaseEnum } from "./http-request-saved-base";
   
   export enum RequestMethodEnum {
     GET = "GET",
@@ -26,7 +20,6 @@ export enum AuthTypeEnum {
   }
   export enum RequestSectionEnum {
     PARAMETERS = "Parameters",
-    AUTHORIZATION = "Authorization",
     HEADERS = "Headers",
     REQUEST_BODY = "Request Body",
     DOCUMENTATION = "Description",
@@ -89,7 +82,7 @@ export enum AuthTypeEnum {
     requestBodyNavigation: RequestDatasetEnum;
   }
   export interface RequestAuthNavigationWrapper {
-    requestAuthNavigation: AuthTypeEnum;
+    requestAuthNavigation: HttpRequestSavedAuthModeBaseEnum;
   }
   export interface RequestNavigationWrapper {
     requestNavigation: RequestSectionEnum;
@@ -160,7 +153,7 @@ export enum AuthTypeEnum {
     authValue: string;
   }
   export interface AddtoWrapper {
-    addTo: HttpRequestSavedAddToBaseEnum;
+    addTo: CollectionRequestAddToBaseEnum;
   }
   export interface BearerTokenWrapper {
     bearerToken: string;

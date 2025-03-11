@@ -43,22 +43,14 @@
     bind:value={teamForm.name.value}
     on:blur={() => {
       teamForm.name.isTouched = true;
-      teamForm.name.value = teamForm.name.value.trim(); // Trim the value on blur
+      teamForm.name.value = teamForm.name.value.trim();
     }}
     height={"36px"}
     id={inputId}
     placeholder={NAME_CONFIG.PLACEHOLDER}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={!teamForm.name.value && teamForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    hoveredBorderColor={!teamForm.name.value && teamForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    focusedBorderColor={!teamForm.name.value && teamForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
+    isError={!teamForm.name.value && teamForm.name.isTouched}
     isEditIconRequired={false}
     type={"text"}
     maxlength={NAME_CONFIG.MAX_TEXT_SIZE}

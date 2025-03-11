@@ -225,7 +225,7 @@
             Clear
           </button>
         </div>
-        {#if path?.collectionId && !isWebApp}
+        {#if path?.collectionId}
           <!-- Save button -->
           <Button
             startIcon={SaveIcon}

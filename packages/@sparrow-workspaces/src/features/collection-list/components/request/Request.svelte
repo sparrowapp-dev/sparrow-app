@@ -307,7 +307,7 @@
       }}
       style="  display: flex; "
     >
-      {#if !isWebApp && api?.items && api?.items?.length > 0}
+      {#if api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
@@ -371,6 +371,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -378,32 +379,30 @@
     </Tooltip>
   {/if}
 </div>
-{#if !isWebApp}
-  <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-    <div class="sub-files position-relative">
-      <div
-        class="box-line"
-        style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
-      ></div>
-      <!-- {#if } -->
-      {#each api?.items || [] as exp}
-        <div>
-          <SavedRequest
-            {userRole}
-            api={exp}
-            request={api}
-            {onItemRenamed}
-            {onItemDeleted}
-            {onItemOpened}
-            {folder}
-            {collection}
-            {activeTabId}
-          />
-        </div>
-      {/each}
-    </div>
+<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
+  <div class="sub-files position-relative">
+    <div
+      class="box-line"
+      style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
+    ></div>
+    <!-- {#if } -->
+    {#each api?.items || [] as exp}
+      <div>
+        <SavedRequest
+          {userRole}
+          api={exp}
+          request={api}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {folder}
+          {collection}
+          {activeTabId}
+        />
+      </div>
+    {/each}
   </div>
-{/if}
+</div>
 
 <style lang="scss">
   .delete-ticker {

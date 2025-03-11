@@ -70,8 +70,22 @@
   // import { WorkspaceRole } from "@sparrow/common/enums";
   import { CollectionAuth, CollectionNavigator } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
-  import { Button } from "@sparrow/library/ui";
-  import { SaveRegular } from "@sparrow/library/icons";
+  import { Button, Dropdown, Options } from "@sparrow/library/ui";
+  import {
+    AddRegular,
+    ArrowSwapRegular,
+    CaretDownFilled,
+    CaretUpFilled,
+    FolderAddRegular,
+    FolderIcon,
+    GraphIcon,
+    SaveRegular,
+    SocketIcon,
+    SocketIoIcon,
+    SyncIcon,
+  } from "@sparrow/library/icons";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   /**
    * Role of user in active workspace
@@ -79,6 +93,7 @@
   export let isWebApp = false;
   export let environmentVariables;
   export let onSaveCollection;
+  export let onItemCreated;
 
   /**
    * Local variables
@@ -94,6 +109,9 @@
   let totalWebSocket: number = 0;
   let totalSocketIo: number = 0;
   let totalGraphQl: number = 0;
+  let showAddItemMenu = false;
+  let collectionTabButtonWrapper: HTMLElement;
+  let noOfColumns = 180;
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -134,6 +152,120 @@
     const target = event.target as HTMLInputElement;
     onRename(target.value, "blur");
   };
+  const handleSelectClick = (event: MouseEvent) => {
+    const selectElement = document.getElementById(
+      `add-item-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
+  };
+  const addButtonData = isWebApp
+    ? [
+        {
+          onclick: () => {
+            onItemCreated("folder", {
+              collection: collection,
+            });
+          },
+          name: "Add Folder",
+          icon: FolderAddRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("requestCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketCollection", {
+              collection: collection,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ]
+    : [
+        {
+          onclick: () => {
+            onItemCreated("folder", {
+              collection: collection,
+            });
+          },
+          name: "Add Folder",
+          icon: FolderAddRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("requestCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketCollection", {
+              collection: collection,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+
+        {
+          onclick: () => {
+            onItemCreated("graphqlCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ];
+  let isBackgroundClickable = true;
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -318,13 +450,31 @@
           </div>
         {/if} -->
 
-        <div class="d-flex me-2 flex-column justify-content-center">
-          <Button
-            disable={!isCollectionEditable}
-            title={"New Request"}
-            type={"primary"}
-            onClick={() => onCreateAPIRequest(collection)}
-          />
+        <div
+          class="d-flex me-2 flex-column justify-content-center"
+          bind:this={collectionTabButtonWrapper}
+        >
+          <Dropdown
+            zIndex={600}
+            buttonId={`add-item-collection`}
+            bind:isMenuOpen={showAddItemMenu}
+            bind:isBackgroundClickable
+            options={addButtonData}
+            horizontalPosition="left"
+          >
+            <Button
+              id={`add-item-collection`}
+              disable={!isCollectionEditable}
+              title={"New"}
+              type={"primary"}
+              onClick={() => {
+                showAddItemMenu = !showAddItemMenu;
+              }}
+              size="medium"
+              startIcon={AddRegular}
+              endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+            />
+          </Dropdown>
         </div>
         <Button
           disable={$tab?.isSaved || !isCollectionEditable ? true : false}

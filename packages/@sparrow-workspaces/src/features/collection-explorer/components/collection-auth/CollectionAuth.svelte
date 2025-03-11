@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AuthType } from "@sparrow/common/enums/authorization.enum";
+  import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
 
@@ -21,19 +21,19 @@
             data={[
               {
                 name: "No Auth",
-                id: AuthType.NO_AUTH,
+                id: CollectionAuthTypeBaseEnum.NO_AUTH,
               },
               {
                 name: "API Key",
-                id: AuthType.API_KEY,
+                id: CollectionAuthTypeBaseEnum.API_KEY,
               },
               {
                 name: "Bearer Token",
-                id: AuthType.BEARER_TOKEN,
+                id: CollectionAuthTypeBaseEnum.BEARER_TOKEN,
               },
               {
                 name: "Basic Auth",
-                id: AuthType.BASIC_AUTH,
+                id: CollectionAuthTypeBaseEnum.BASIC_AUTH,
               },
             ]}
             zIndex={499}
@@ -55,23 +55,23 @@
     modified within specified request.
   </p>
   <section class="w-100" style="flex:1; overflow:auto;">
-    {#if requestStateAuth === AuthType.NO_AUTH}
+    {#if requestStateAuth === CollectionAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
-    {:else if requestStateAuth === AuthType.API_KEY}
+    {:else if requestStateAuth === CollectionAuthTypeBaseEnum.API_KEY}
       <ApiKey
         apiData={auth.apiKey}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === AuthType.BEARER_TOKEN}
+    {:else if requestStateAuth === CollectionAuthTypeBaseEnum.BEARER_TOKEN}
       <BearerToken
         bearerToken={auth.bearerToken}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === AuthType.BASIC_AUTH}
+    {:else if requestStateAuth === CollectionAuthTypeBaseEnum.BASIC_AUTH}
       <BasicAuth
         basicAuth={auth.basicAuth}
         callback={onUpdateRequestAuth}
