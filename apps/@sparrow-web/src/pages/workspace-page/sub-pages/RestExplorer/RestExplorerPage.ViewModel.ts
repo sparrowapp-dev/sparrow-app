@@ -80,6 +80,7 @@ import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import {  CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum, type CollectionAuthBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
 class RestExplorerViewModel
 {
@@ -784,10 +785,13 @@ class RestExplorerViewModel
 
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
-      environmentVariables.filtered || [],
+      environmentVariables.filtered,
       this._collectionAuth.getValue()
     );
-    makeHttpRequestV2(...decodeData, signal)
+    const selectedAgent = localStorage.getItem(
+      "selectedAgent",
+    ) as WorkspaceUserAgentBaseEnum;
+    makeHttpRequestV2(...decodeData, selectedAgent, signal)
       .then((response) => {
         if (response.isSuccessful === false) {
           restExplorerDataStore.update((restApiDataMap) => {
