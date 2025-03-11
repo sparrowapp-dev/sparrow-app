@@ -198,16 +198,13 @@
 </script>
 
 <div class="d-flex flex-column">
-  <p
-    class="invite-header text-secondary-1000 mb-0"
-    style="color: var(--text-ds-neutral-200);"
-  >
+  <p class="invite-header mb-0" style="color: var(--text-ds-neutral-200);">
     Invite by email<span class="asterik">*</span>
   </p>
 
   <p
     style="padding: 2px 0px; font-size: 12px; color: var(--text-ds-neutral-400);"
-    class="invite-subheader text-secondary-200 mt-0 mb-1"
+    class="invite-subheader mt-0 mb-1"
   >
     You can add multiple emails.
   </p>
