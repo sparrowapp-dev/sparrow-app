@@ -270,8 +270,8 @@ export class RequestTabAdapter {
       method: requestTab.property.request?.method,
       url: requestTab.property.request?.url,
       body: {
-        raw : requestTab.property.savedRequest?.body.raw,
-        urlencoded : requestTab.property.savedRequest?.body.urlencoded,
+        raw : requestTab.property.request?.body.raw,
+        urlencoded : requestTab.property.request?.body.urlencoded,
         formdata : {
           text: textFormData,
           file: fileFormData,
