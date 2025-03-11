@@ -5,7 +5,7 @@
   import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
-  import { CaretDownFilled } from "@sparrow/library/icons";
+  import { CaretDownFilled, CaretDownRegular } from "@sparrow/library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -412,7 +412,6 @@
   id={`color-select-${id}`}
 >
   <div
-    style=""
     on:click={() => {
       if (!disabled) {
         toggleSelect();
@@ -444,7 +443,7 @@
       {extractBorderHighlight(borderHighlight, isHover, isOpen)} 
       {isError ? selectErrorBorderClass : ''}
         d-flex align-items-center justify-content-between"
-      style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight}; "
+      style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight};"
     >
       <p
         class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
@@ -626,7 +625,6 @@
     border: none;
     width: auto;
     padding: 0 10px;
-    // background-color: var(--bg-ds-surface-600);
   }
 
   // default states
@@ -637,7 +635,7 @@
     background-color: var(--blackColor);
   }
   .select-background-violet {
-    // background-color: var(--bg-tertiary-400);
+    background-color: var(--bg-tertiary-400);
   }
   .select-background-violet2 {
     background-color: var(--bg-tertiary-300);

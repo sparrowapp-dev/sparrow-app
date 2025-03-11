@@ -135,9 +135,14 @@
         />
       {/if}
     </div>
-    <div style="position:relative;right:2.8rem;padding-right:2px">
+    <!-- <div style="position:relative;right:2.8rem;padding-right:2px">
       <CaretDownFilled size={"16px"} color="var(--bg-ds-neutral-600)" />
-    </div>
+    </div> -->
+    {#if user.role !== TeamRole.TEAM_MEMBER}
+      <div style="position: relative; right: 2.8rem; padding-right: 2px;">
+        <CaretDownFilled size="16px" color="var(--bg-ds-neutral-600)" />
+      </div>
+    {/if}
   </div>
 </section>
 

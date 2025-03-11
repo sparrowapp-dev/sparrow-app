@@ -585,7 +585,7 @@
       type={"letter"}
       size={"large"}
       letter={user?.name?.charAt(0)}
-      bgColor={"var(--bg-secondary-600)"}
+      bgColor={""}
     />
     <div class="name px-2">
       <span style="font-size:12px;" class="text-whiteColor"
