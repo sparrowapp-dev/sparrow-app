@@ -53,6 +53,8 @@
               onUpdateRequestState({ requestAuthNavigation: id });
             }}
             disabled={false}
+            headerHeight={"28px"}
+            minHeaderWidth={"160px"}
           />
         </p>
       </span>
@@ -85,10 +87,10 @@
         {onUpdateEnvironment}
       />
     {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH}
-      {#if collectionAuth.collectionAuthNavigation === CollectionAuthTypeBaseEnum.NO_AUTH}
+      {#if collectionAuth?.collectionAuthNavigation === CollectionAuthTypeBaseEnum.NO_AUTH}
         <p class="text-fs-16">No Auth</p>
         <NoAuth />
-      {:else if collectionAuth.collectionAuthNavigation === CollectionAuthTypeBaseEnum.API_KEY}
+      {:else if collectionAuth?.collectionAuthNavigation === CollectionAuthTypeBaseEnum.API_KEY}
         <p class="text-fs-16">API Key</p>
         <ApiKey
           apiData={collectionAuth.auth.apiKey}
@@ -97,7 +99,7 @@
           {onUpdateEnvironment}
           disabled={true}
         />
-      {:else if collectionAuth.collectionAuthNavigation === CollectionAuthTypeBaseEnum.BEARER_TOKEN}
+      {:else if collectionAuth?.collectionAuthNavigation === CollectionAuthTypeBaseEnum.BEARER_TOKEN}
         <p class="text-fs-16">Bearer Token</p>
         <BearerToken
           bearerToken={collectionAuth.auth.bearerToken}
