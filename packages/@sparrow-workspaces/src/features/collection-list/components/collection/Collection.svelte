@@ -573,7 +573,10 @@
             customWidth={"24px"}
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
-            onClick={rightClickContextMenu}
+            onClick={(e) => {
+              e.stopPropagation();
+              rightClickContextMenu();
+            }}
           />
         </span>
       </Tooltip>
