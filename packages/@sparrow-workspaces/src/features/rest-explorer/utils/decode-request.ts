@@ -361,7 +361,7 @@ class DecodeRequest {
    * @param request - User Request
    * @param environmentVariables - Array of objects containing key-value pairs for environment variables.
    */
-  public init(request: Request, environmentVariables, _collectionAuth : Partial<HttpRequestCollectionLevelAuthTabInterface>): string[] {    
+  public init(request: Request, environmentVariables = [], _collectionAuth : Partial<HttpRequestCollectionLevelAuthTabInterface>): string[] {    
     return [
       this.extractURL(
         this.setEnvironmentVariables(request.url, environmentVariables),

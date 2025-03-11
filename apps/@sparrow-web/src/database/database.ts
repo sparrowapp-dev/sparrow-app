@@ -140,7 +140,7 @@ export class RxDB {
             return oldDoc;
           },
           3: function (oldDoc: TabDocument) {
-            if(oldDoc?.property?.collection){
+            if (oldDoc?.property?.collection) {
               oldDoc.property.collection.auth = {
                 bearerToken: "",
                 basicAuth: {
@@ -152,12 +152,15 @@ export class RxDB {
                   authValue: "",
                   addTo: "Header",
                 },
-              }
+              };
               oldDoc.property.collection.state = {
                 collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
                 collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
-              }
+              };
             }
+            return oldDoc;
+          },
+          4: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },

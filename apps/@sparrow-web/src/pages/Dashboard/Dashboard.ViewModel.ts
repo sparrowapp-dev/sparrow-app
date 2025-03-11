@@ -364,6 +364,18 @@ export class DashboardViewModel {
     }
   };
 
+  // redirects to Sparrow Docs.
+  public redirectDocs = async () => {
+    window.open(constants.DOCS_URL, "_blank");
+    return;
+  };
+
+  // redirects to Sparrow Feature Updates.
+  public redirectFeatureUpdates = async () => {
+    window.open(constants.DOCS_URL, "_blank");
+    return;
+  };
+
   /**
    * add guest user in local db
    */
@@ -564,8 +576,10 @@ export class DashboardViewModel {
     workspaceId: string,
     collection: any,
   ) => {
-    
-    const collectionTab = new CollectionTabAdapter().adapt(workspaceId,collection);
+    const collectionTab = new CollectionTabAdapter().adapt(
+      workspaceId,
+      collection,
+    );
     // Create the tab with the new collection
     await this.tabRepository.createTab(collectionTab, workspaceId);
 

@@ -207,6 +207,7 @@
   onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
   azureBlobCDN={constants.AZURE_CDN_URL}
+  onSaveResponse={_viewModel.saveResponse}
 />
 {#if !isGuestUser}
   <ChatBot

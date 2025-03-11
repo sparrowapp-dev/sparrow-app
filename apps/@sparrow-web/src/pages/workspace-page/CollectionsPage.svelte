@@ -29,6 +29,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
@@ -73,6 +74,12 @@
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
+  import {
+    defaultCurrentStep,
+    isDefaultTourGuideOpen,
+    isDefaultTourGuideClose,
+  } from "@sparrow/workspaces/stores";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
 
   import { Checkbox } from "@sparrow/library/forms";
   const _viewModel = new CollectionsViewModel();
@@ -303,7 +310,8 @@
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
-      removeTab.type === TabTypeEnum.TESTFLOW
+      removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.COLLECTION
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -322,13 +330,22 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.COLLECTION) {
+          const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
+
         loader = false;
       }
     } else if (
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       // console.log("Saving popup is of request type :>> ", removeTab);
@@ -343,6 +360,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -683,6 +707,12 @@
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                   <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -837,14 +867,17 @@
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;
+      isDefaultTourGuideClose.set(true);
     }}
     onClickTour={() => {
       isUserFirstSignUp.set(false);
-      isTourGuideOpen = true;
       isWelcomePopupOpen = false;
+      defaultCurrentStep.set(1);
+      isDefaultTourGuideOpen.set(true);
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"

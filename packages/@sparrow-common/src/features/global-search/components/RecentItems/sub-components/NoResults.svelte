@@ -8,7 +8,7 @@
 
 <div class="container">
   <div style="display:flex; align-items:center; justify-content:center;">
-    <img src={SearchIcon} alt="" class="width:24px, height:24px" />
+    <SearchIcon width="24px" height="24px" />
   </div>
   <div class="text-container">
     {#if type === "Basic"}

@@ -192,7 +192,7 @@
   }
 
   .workspace-card-outer:hover .workspace-card {
-    background-color: var(--bg-ds-surface-400) !important;
+    background-color: var(--bg-ds-surface-400);
     cursor: pointer;
   }
   .workspace-card {
@@ -205,7 +205,7 @@
     transition: background-color 0.5s ease-in-out;
   }
   .workspace-card:active {
-    background-color: var(--bg-ds-surface-700);
+    background-color: var(--bg-ds-surface-600) !important;
   }
   .workspace-card:focus-visible {
     border: 2px solid var(--border-ds-primary-300);

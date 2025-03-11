@@ -578,6 +578,8 @@
     onLogout={_viewModel.handleLogout}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    handleDocsRedirect={_viewModel.redirectDocs}
+    handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
 
   <!--
