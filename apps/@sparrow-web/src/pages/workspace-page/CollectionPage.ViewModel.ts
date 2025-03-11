@@ -5543,6 +5543,83 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Saves saved http request
+   * @param componentData - refers overall saved request tab data.
+   * @returns status of the operation performed.
+   */
+  public saveSavedRequest = async (componentData: Tab): Promise<boolean> => {
+    const { folderId, collectionId, workspaceId, requestId } =
+      componentData.path;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    }
+    const res = await this.collectionService.updateSavedRequestInCollection(
+      componentData.id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        requestId: requestId,
+        folderId: folderId,
+        description: componentData.description,
+      },
+    );
+
+    if (res.isSuccessful) {
+      if (folderId) {
+        this.collectionRepository.updateSavedRequestInFolder(
+          collectionId,
+          folderId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      } else {
+        this.collectionRepository.updateSavedRequestInCollection(
+          collectionId,
+          requestId,
+          componentData.id,
+          {
+            description: componentData.description,
+          },
+        );
+      }
+      notifications.success("Response saved successfully.");
+      return true;
+    } else {
+      notifications.error("Failed to save response. Please try again.");
+      return false;
+    }
+  };
+
+  /**
    * Handles saving a collection
    */
   public saveCollection = async (componentData: Tab) => {
