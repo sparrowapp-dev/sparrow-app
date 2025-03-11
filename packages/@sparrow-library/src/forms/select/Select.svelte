@@ -116,7 +116,7 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3"  = "v1";
+  export let menuItem: "v1" | "v2" | "v3" = "v1";
   /**
    * Determines icons used in Select header.
    */
@@ -145,7 +145,7 @@
 
   export let isArrowIconRequired = true;
 
-  export let bodyAlignment: 'right' | 'left' = 'right';
+  export let bodyAlignment: "right" | "left" = "right";
 
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
@@ -498,7 +498,7 @@
         class="d-flex ps-2 {!isArrowIconRequired ? 'd-none' : ''}"
         class:select-logo-active={isOpen}
       >
-        <CaretDownFilled size={"16px"}/>
+        <CaretDownFilled size={"16px"} />
       </span>
     </div>
   </div>
@@ -511,26 +511,26 @@
     {isOpen ? 'visible' : 'invisible'}"
     style="
   {isOpen
-  ? 'opacity: 1; transform: scale(1);'
-  : 'opacity: 0; transform: scale(0.8);'}
+      ? 'opacity: 1; transform: scale(1);'
+      : 'opacity: 0; transform: scale(0.8);'}
   min-width:{minBodyWidth}; 
   left: {position === 'fixed'
-    ? (bodyAlignment === 'right'
-      ? `${bodyLeftDistance}px;`
-      : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`)
-    : (bodyAlignment === 'right'
-      ? '0px;'
-      : 'auto;')} 
+      ? bodyAlignment === 'right'
+        ? `${bodyLeftDistance}px;`
+        : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`
+      : bodyAlignment === 'right'
+        ? '0px;'
+        : 'auto;'} 
   top: {position === 'fixed'
-    ? `${bodyTopDistance}px;`
-    : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
+      ? `${bodyTopDistance}px;`
+      : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
   right: {position === 'fixed'
-    ? (bodyAlignment === 'right'
-      ? `${bodyRightDistance}px;`
-      : 'auto;')
-    : (bodyAlignment === 'right'
-      ? '0px;'
-      : '0px;')} 
+      ? bodyAlignment === 'right'
+        ? `${bodyRightDistance}px;`
+        : 'auto;'
+      : bodyAlignment === 'right'
+        ? '0px;'
+        : '0px;'} 
   z-index:{zIndex}; 
   padding: 8px 6px;
   "
@@ -593,7 +593,6 @@
             />
           {:else if menuItem === "v3"}
             <MenuItemsV3 {list} {selectedRequest} {getTextColor} />
-          
           {/if}
         </div>
       {/each}
@@ -627,7 +626,7 @@
     width: auto;
     padding: 0 10px;
   }
-  
+
   // default states
   .select-background-transparent {
     background-color: transparent;
@@ -741,7 +740,7 @@
     font-size: 12px;
     font-weight: 400;
   }
-  .select-data{
+  .select-data {
     background-color: var(--bg-ds-surface-600);
   }
   .select-active {
@@ -808,7 +807,7 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-  .select-btn:hover{
+  .select-btn:hover {
     background-color: var(--bg-ds-surface-400) !important;
   }
 </style>
