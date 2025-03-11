@@ -52,4 +52,6 @@
   isDropIconFilled={true}
   minHeaderWidth={minHeaderWidth}
   headerHeight={headerHeight}
+  default={true}
+
 />

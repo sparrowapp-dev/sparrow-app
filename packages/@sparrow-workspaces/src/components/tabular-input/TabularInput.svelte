@@ -438,7 +438,7 @@
     height: 28px;
   }
   .header-text {
-    color: var(--text-ds-neutral-50);
+    color: var(--text-ds-neutral-200);
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;

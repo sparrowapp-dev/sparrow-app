@@ -139,6 +139,9 @@
         onclick={handleRawDropDown}
         zIndex={499}
         disabled={true}
+        minHeaderWidth={"160px"}
+        headerHeight={"28px"}
+        
       />
     {/if}
   </div>
