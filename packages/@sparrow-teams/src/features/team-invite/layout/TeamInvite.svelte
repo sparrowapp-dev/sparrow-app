@@ -273,9 +273,7 @@
 
 <div class="mt-4">
   <p class="role-title text-fs-14 text-secondary-1000 mb-1">
-    <span style="color: var(--text-ds-neutral-200);"> Role</span><span
-      class="asterik">*</span
-    >
+    Role<span class="asterik">*</span>
   </p>
   <Select
     id="invite-team"
@@ -374,19 +372,18 @@
     </p>
   </div>
   <div style="margin-top: 1.8rem; display: flex; justify-content: flex-end;">
-    <div style="margin-right:12px;">
-      <button
-        style="background-color:var(--bg-ds-surface-300);
-    width: 96px;
-    white-space: nowrap;
-    height: 37px;
-    border-width:0px;
-    border-radius: 6px;"
-        on:click={handleModalState(false)}
-        onmouseover="this.style.backgroundColor='var(--bg-ds-neutral-600)'"
-        onmouseout="this.style.backgroundColor='var(--bg-ds-surface-300)'"
-        >Cancel</button
-      >
+    <div style="padding-right:5px;">
+      <Button
+        disable={loader}
+        title={"Cancel"}
+        loaderSize={19}
+        textStyleProp={"font-size: var(--base-text); min-width:80px;"}
+        type={"secondary"}
+        {loader}
+        onClick={() => {
+          handleModalState(false);
+        }}
+      />
     </div>
     <Button
       disable={loader}
