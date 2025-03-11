@@ -512,6 +512,8 @@
     }}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    handleDocsRedirect={_viewModel.redirectDocs}
+    handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
 
   <!-- 

@@ -38,7 +38,7 @@
       </div>
       <div class="d-flex flex-column align-items-center">
         <p class="text-secondary-200 fw-bold text-fs-14 mb-5">
-          Run a query to get response
+          Enter a URL to load and explore your schema.
         </p>
       </div>
     </div>
@@ -48,11 +48,7 @@
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}
@@ -61,11 +57,7 @@
       {#if key === "Edit link" || key === "Add Query" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}

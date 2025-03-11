@@ -63,6 +63,10 @@
 
   export let onDoubleClick: (tab) => void;
 
+  export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
+  export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
+
   let isTabSaved: boolean;
 
   let activeTabType: string;
@@ -149,6 +153,9 @@
             {onDragStart}
             {onDropOver}
             {onDoubleClick}
+            {onClickCloseOtherTabs}
+            {onClickForceCloseTabs}
+            {onClickDuplicateTab}
           />
         {/each}
       {/if}
