@@ -192,6 +192,8 @@
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -221,7 +223,8 @@
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
-      removeTab.type === TabTypeEnum.TESTFLOW
+      removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.COLLECTION
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -240,7 +243,15 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.COLLECTION) {
+          const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
+
         loader = false;
       }
     } else if (
