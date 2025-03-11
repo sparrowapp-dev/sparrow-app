@@ -546,7 +546,7 @@
         }}
         disabled={false}
       />
-      <Button
+      <!-- <Button
         size="small"
         type="teritiary-regular"
         title="Schema"
@@ -555,7 +555,7 @@
           onRefreshSchema();
         }}
         disable={isSchemaFetching}
-      />
+      /> -->
     </div>
     <Breadcrumbs breadcrumbs={breadcrum} onNavigate={navigateToBreadcrumPath} />
   </div>
