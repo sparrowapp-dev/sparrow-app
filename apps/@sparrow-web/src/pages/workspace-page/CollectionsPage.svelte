@@ -80,6 +80,7 @@
     isDefaultTourGuideOpen,
     isDefaultTourGuideClose,
   } from "@sparrow/workspaces/stores";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -197,6 +198,8 @@
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -226,7 +229,8 @@
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
-      removeTab.type === TabTypeEnum.TESTFLOW
+      removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.COLLECTION
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -245,13 +249,22 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.COLLECTION) {
+          const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
+
         loader = false;
       }
     } else if (
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
@@ -265,6 +278,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -598,6 +618,12 @@
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
                   <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
