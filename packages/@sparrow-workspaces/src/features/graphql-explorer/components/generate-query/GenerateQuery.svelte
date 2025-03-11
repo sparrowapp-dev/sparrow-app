@@ -7,6 +7,8 @@
     ThreeDotIcon,
   } from "@sparrow/library/icons";
   import { trashIcon } from "@sparrow/library/assets";
+  import { Search } from "@sparrow/library/forms";
+  import { Checkbox } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
   import { Breadcrumbs } from "@sparrow/library/ui";
