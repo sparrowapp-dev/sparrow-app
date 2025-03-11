@@ -196,4 +196,4 @@ export { default as ThumbDislikeFilled } from "./ThumbDislikeFilled.svelte";
 export {default as  GlobeRegular} from "./GlobeRegular.svelte";
 export {default as ListRegular} from "./ListRegular.svelte";
 export {default as CloudArrowUpRegular} from "./CloudArrowUpRegular.svelte";
-export {default as ImageRegular} from "./ImageRegular.svelte"
+export {default as ImageRegular} from "./ImageRegular.svelte";

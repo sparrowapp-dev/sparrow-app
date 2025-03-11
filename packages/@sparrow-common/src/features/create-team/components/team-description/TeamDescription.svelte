@@ -56,7 +56,7 @@
     -- Description 
   -->
   {#if !teamForm?.description?.value?.length}
-    <p class="mb-2 text-fs-12 text-secondary-200">
+    <p style="padding-top:4px" class="mb-2 text-fs-12 text-secondary-200">
       {DESCRIPTION_CONFIG.DESCRIPTION}
     </p>
   {:else}

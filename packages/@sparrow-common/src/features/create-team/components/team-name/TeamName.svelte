@@ -33,7 +33,7 @@
     ><span style="color:var(--text-ds-neutral-200)">{NAME_CONFIG.TITLE}</span
     ></label
   >
-  <span class="text-danger-200">*</span>
+  <span class="text-danger-200" style="color:var(--bg-ds-danger-400)">*</span>
 
   <!-- 
     -- Input 

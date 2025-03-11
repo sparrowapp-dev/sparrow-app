@@ -195,7 +195,7 @@
         <p
           style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
         >
-          Sign up or log in to unlock powerful tools and stay organized !
+          Sign up or log in to unlock powerful tools and stay organized!
         </p>
       </div>
     {/if}

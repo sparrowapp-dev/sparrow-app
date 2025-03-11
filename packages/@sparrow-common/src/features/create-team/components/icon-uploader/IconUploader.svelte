@@ -92,9 +92,45 @@
             }}
           />
         </div>
-        <div>
-          <ImageRegular size={"16px"} color={"red"} />
-          <p style="color:  var(--text-ds-neutral-200);">PNG | JPG | JPEG</p>
+        <div
+          style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 12px;"
+        >
+          <div style="display: flex; align-items: center;">
+            <ImageRegular size="16px" color={"var(--bg-ds-neutral-400)"} />
+            <p
+              style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
+            >
+              PNG
+            </p>
+          </div>
+
+          <!-- Vertical Line -->
+          <div
+            style="width: 1px; height: 16px; background-color: var(--text-ds-neutral-400);"
+          ></div>
+
+          <div style="display: flex; align-items: center;">
+            <ImageRegular size="16px" color={"var(--bg-ds-neutral-400"} />
+            <p
+              style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
+            >
+              JPG
+            </p>
+          </div>
+
+          <!-- Vertical Line -->
+          <div
+            style="width: 1px; height: 16px; background-color: var(--text-ds-neutral-400);"
+          ></div>
+
+          <div style="display: flex; align-items: center;">
+            <ImageRegular size="16px" color={"var(--bg-ds-neutral-400"} />
+            <p
+              style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
+            >
+              JPEG
+            </p>
+          </div>
         </div>
       </div>
     {/if}
@@ -157,6 +193,7 @@
     border-radius: 4px;
     font-size: var(--base-text);
     background-color: var(--bg-ds-surface-400);
+    padding-bottom: 20px;
   }
   .sparrow-file-input:hover {
     cursor: pointer;

@@ -18,6 +18,7 @@
   export let modifyTeam;
   export let activeIndex;
   export let threeDotIconDisable = false;
+  const isEdge = /Edg\/\d+/.test(navigator.userAgent);
 </script>
 
 <!--Teams list-->
@@ -80,7 +81,6 @@
                 />
               </div>
             {:else}
-              <!-- <img src={base64ToURL(team.logo)} alt="" /> -->
               <Avatar
                 type={"image"}
                 size={"small"}
