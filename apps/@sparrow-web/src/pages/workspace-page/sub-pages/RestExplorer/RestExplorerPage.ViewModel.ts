@@ -1037,6 +1037,7 @@ class RestExplorerViewModel {
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
+
             return restApiDataMap;
           });
         }
