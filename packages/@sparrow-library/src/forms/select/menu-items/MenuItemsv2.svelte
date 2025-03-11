@@ -18,6 +18,8 @@
     description?: string;
     default?: boolean;
     hide?: boolean;
+    icon?: string;
+    iconProps?: Record<string, any>;
   };
   /**
    * selected option
@@ -41,6 +43,7 @@
    * body theme - background
    */
   export let bodyTheme: string;
+
 
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
@@ -109,6 +112,13 @@
   )}"
   tabindex="0"
 >
+  {#if list.icon}
+  <div class="me-2">
+<svelte:component this={list.icon} {...list.iconProps} class="menu-icon" />
+  </div>
+      
+  {/if}
+
   <div class="content-wrapper">
     <p
       class="m-0 p-0 option-name ellipsis {getTextColor(

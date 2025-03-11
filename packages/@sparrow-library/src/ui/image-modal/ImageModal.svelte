@@ -126,7 +126,7 @@
   }
 
   .sparrow-modal-container-data {
-    // background-color: var(--bg-tertiary-400);
+    // background-color: red;
     border-radius: 6px;
     position: relative;
   }

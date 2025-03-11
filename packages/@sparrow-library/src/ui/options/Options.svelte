@@ -64,7 +64,7 @@
   in:scale={{ start: 0.8, duration: 400 }}
   out:scale={{ start: 0.8, duration: 400 }}
 >
-  <div
+   <div
     style={`width: ${noOfColumns}px`}
     class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
   >
