@@ -301,23 +301,23 @@
           >
             {#if message?.transmitter === "sender"}
               <ArrowUpRightRegular
-                size={"14px"}
+                size={"16px"}
                 color="var(--icon-ds-success-400)"
               />
             {:else if message?.transmitter === "disconnector"}
               <ErrorCircleFilled
-                size={"14px"}
+                size={"16px"}
                 color="var(--icon-ds-danger-400)"
               />
             {:else if message?.transmitter === "connecter"}
               <CheckmarkCircleFilled
-                size={"14px"}
+                size={"16px"}
                 color="var(--icon-ds-success-400)"
               />
             {:else if message?.transmitter === "receiver"}
               <ArrowDownLeftFilled
                 color="var(--icon-ds-primary-400)"
-                size={"14px"}
+                size={"16px"}
               />
             {/if}
           </span>

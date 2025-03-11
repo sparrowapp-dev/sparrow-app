@@ -17,8 +17,8 @@
   };
 </script>
 
-<div class="mb-2 gap-2 d-flex align-items-center justify-content-between">
-  <div class="d-flex mt-1" style="font-size: 12px;">
+<div class="mb-2 d-flex align-items-center justify-content-between" style="gap:6px;">
+  <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash9872"}
       data={[
@@ -43,6 +43,9 @@
       onclick={handleRawDropDown}
       zIndex={499}
       disabled={false}
+      minHeaderWidth={"70px"}
+      headerHeight={"28px"}
+      minBodyWidth={"104px"}
     />
   </div>
   <Input
@@ -50,16 +53,16 @@
     id="collection-list-search"
     width={"100%"}
     height={"24px"}
-    type="teritiary"
+    size="small"
     on:input={() => {
       onUpdateRequestEventName(requestEventName);
     }}
     defaultBorderColor="transparent"
     hoveredBorderColor="var(--border-primary-300)"
     focusedBorderColor={"var(--border-primary-300)"}
-    class="text-fs-12 bg-tertiary-400 border-radius-2 ellipsis fw-normal px-2"
-    style="outline:none;"
-    placeholder="Event name"
+    class="text-fs-12 border-radius-2 ellipsis fw-normal px-2 inputField"
+    style="outline:none; background-color: red;"
+    placeholder="Event Name"
   />
   <Button
     title="Send"
@@ -75,3 +78,8 @@
     type={"primary"}
   />
 </div>
+<style>
+  .inputField{
+    background-color: blueviolet;
+  }
+</style>

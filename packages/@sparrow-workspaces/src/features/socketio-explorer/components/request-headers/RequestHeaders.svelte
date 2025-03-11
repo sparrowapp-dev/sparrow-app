@@ -61,6 +61,8 @@
           <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"
+          fontWeight="500"
+          
          /> 
 
         </div>
