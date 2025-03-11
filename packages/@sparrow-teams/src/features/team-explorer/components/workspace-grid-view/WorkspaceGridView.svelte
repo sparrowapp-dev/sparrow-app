@@ -9,8 +9,7 @@
   import { Button, Spinner } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
-  import SparrowLogo from "../../../../../../@sparrow-workspaces/src/features/rest-explorer/assets/images/sparrow-logo.svelte";
-
+  import { SparrowLogo } from "@sparrow/common/icons";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
