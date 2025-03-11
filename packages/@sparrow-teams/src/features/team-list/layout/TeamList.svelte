@@ -18,7 +18,6 @@
   export let modifyTeam;
   export let activeIndex;
   export let threeDotIconDisable = false;
-  const isEdge = /Edg\/\d+/.test(navigator.userAgent);
 </script>
 
 <!--Teams list-->
