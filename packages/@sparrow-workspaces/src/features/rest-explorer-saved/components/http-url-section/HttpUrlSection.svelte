@@ -63,6 +63,7 @@
   <div class="" style="">
     <Select
       id={"api-request"}
+      size={"medium"}
       data={[
         {
           name: "GET",

@@ -28,7 +28,7 @@
     id: string;
   };
 
-  export let showDescription= true;
+  export let showDescription = true;
   /**
    * Ticked mark icon
    */
@@ -44,9 +44,10 @@
    */
   export let bodyTheme: string;
 
-
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
+
+  export let fontSize;
 
   /**
    * @description - adds CSS class to menu item when hovered or clicked according to the theme
@@ -71,11 +72,9 @@
       return `select-hover-highlight-violet-btn`;
     } else if (_bodyTheme === "dark" && _isMenuItemHover) {
       return `select-hover-highlight-dark-btn`;
-    } 
-    else if (_bodyTheme === "surface" && _isMenuItemHover) {
+    } else if (_bodyTheme === "surface" && _isMenuItemHover) {
       return `select-hover-highlight-surface-btn`;
-    } 
-    else {
+    } else {
       return "";
     }
   };
@@ -113,15 +112,19 @@
   tabindex="0"
 >
   {#if list.icon}
-  <div class="me-2">
-<svelte:component this={list.icon} {...list.iconProps} class="menu-icon" />
-  </div>
-      
+    <div class="me-2">
+      <svelte:component
+        this={list.icon}
+        {...list.iconProps}
+        class="menu-icon"
+      />
+    </div>
   {/if}
 
   <div class="content-wrapper">
     <p
-      class="m-0 p-0 option-name ellipsis {getTextColor(
+      style="font-size: {fontSize}"
+      class="m-0 p-0 ellipsis option-name {getTextColor(
         list?.color,
       )} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     >
@@ -129,12 +132,14 @@
     </p>
     {#if list.description && showDescription}
       <div class="description-wrapper">
-        <small class="text-textColor description">{list.description}</small>
+        <small class="text-textColor description" style="font-size: {fontSize}"
+          >{list.description}</small
+        >
       </div>
     {/if}
   </div>
   {#if selectedRequest?.id === list.id}
-     <span class="d-flex align-items-center justify-content-center tick-icon">
+    <span class="d-flex align-items-center justify-content-center tick-icon">
       <CheckMarkIcon color="var(--text-primary-300)" size="medium" />
     </span>
   {/if}
@@ -143,15 +148,14 @@
 <style>
   .select-option-container {
     width: 100%;
-   
   }
   .select-option-container:focus-visible {
-     outline: 2px solid var(--bg-ds-primary-300);
-     outline-offset: -2px;
-     border-radius:4px;
+    outline: 2px solid var(--bg-ds-primary-300);
+    outline-offset: -2px;
+    border-radius: 4px;
   }
 
-  .select-option-container:active{
+  .select-option-container:active {
     background-color: var(--bg-ds-surface-500);
   }
 
@@ -161,7 +165,6 @@
   }
 
   .option-name {
-    font-size: 12px;
     margin-bottom: 4px;
   }
 
@@ -176,7 +179,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
-    font-size: 11px;
     line-height: 1.3;
     word-break: break-word;
   }
@@ -195,7 +197,7 @@
   .select-hover-highlight-violet-btn {
     background-color: var(--bg-tertiary-600);
   }
-  .select-hover-highlight-surface-btn{
+  .select-hover-highlight-surface-btn {
     background-color: var(--bg-ds-surface-400);
   }
 
