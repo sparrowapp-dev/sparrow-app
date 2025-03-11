@@ -67,8 +67,8 @@
   export let isCreateTeamModalOpen;
   export let searchQuery = "";
   export let onSearchClick;
-  export let docsLink = "";
-  export let featureUpdatesLink = "";
+  export let handleDocsRedirect;
+  export let handleFeaturesRedirect;
 
   let helpOptionsOpen = false;
 
@@ -248,10 +248,12 @@
   });
 
   const redirectDocumentation = () => {
-    window.open(docsLink, "_blank");
+    // window.open(docsLink, "_blank");
+    handleDocsRedirect();
   };
   const redirectNewFeatures = () => {
-    window.open(featureUpdatesLink, "_blank");
+    // window.open(featureUpdatesLink, "_blank");
+    handleFeaturesRedirect();
   };
 </script>
 

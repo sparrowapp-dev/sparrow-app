@@ -578,8 +578,8 @@
     onLogout={_viewModel.handleLogout}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
-    docsLink={constants.DOCS_URL}
-    featureUpdatesLink={constants.SPARROW_DOWNLOAD_LINK}
+    handleDocsRedirect={_viewModel.redirectDocs}
+    handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
 
   <!--
