@@ -24,7 +24,7 @@
     SocketIoIcon,
     StackIcon,
     TreeIcon,
-    DismissCircle,
+    DismissCircleRegular,
     CopyRegular,
   } from "@sparrow/library/icons";
   import {
@@ -105,27 +105,13 @@
     if (tabbarElement) {
       const navbarElement = tabbarElement.querySelector(".navbar");
       if (navbarElement) {
-        // console.log("Navbar is present inside Tabbar.");
         navbarElement.remove();
         // showTabControlMenu = true;
       } else {
-        // console.log("Navbar is NOT present inside Tabbar.");
         showTabControlMenu = true;
       }
     }
-
-    // showTabControlMenu = !showTabControlMenu;
-
-    // Add event listener to close menu when clicking outside
-    // setTimeout(() => {
-    //   window.addEventListener("click", handleOutsideClick);
-    // }, 0);
   };
-
-  // const handleOutsideClick = (event: MouseEvent) => {
-  //   showTabControlMenu = false;
-  //   window.removeEventListener("click", handleOutsideClick); // Remove event listener
-  // };
 </script>
 
 <button
@@ -160,7 +146,7 @@
           displayText: "Close Tab",
           disabled: false,
           hidden: false,
-          icon: DismissCircle,
+          icon: DismissCircleRegular,
         },
         {
           onClick: () => {
@@ -364,7 +350,6 @@
 >
 <svelte:window
   on:click={() => {
-    // console.log("tab :>> ", tab);
     showTabControlMenu = false;
   }}
 />

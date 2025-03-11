@@ -1098,18 +1098,6 @@
     -webkit-text-fill-color: transparent;
   }
 
-  .force-close-popup-title {
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    color: #ffffff;
-  }
-  .popup-desc {
-    font-family: "Inter", sans-serif;
-    font-weight: 400;
-    font-size: 15px;
-    color: #cccccc;
-  }
   .save-popup {
     font-weight: 400;
   }

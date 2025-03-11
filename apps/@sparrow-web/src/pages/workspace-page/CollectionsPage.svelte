@@ -348,7 +348,6 @@
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
-      // console.log("Saving popup is of request type :>> ", removeTab);
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
         loader = true;
@@ -538,7 +537,6 @@
   let isLaunchAppModalOpen = false;
 
   const launchSparrowWebApp = () => {
-    // console.log("in launchSparrowWebApp() collectionPage.svelte :>> ");
     let appDetected = false;
 
     // Handle when window loses focus (app opens)
@@ -559,7 +557,6 @@
 
       // Only show popup if app wasn't detected
       if (!appDetected) {
-        console.log("App isn't detected !!!!");
         isLaunchAppModalOpen = true;
       }
     }, 500);
@@ -1168,20 +1165,6 @@
     background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-  }
-
-  .force-close-popup-title {
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    color: #ffffff;
-  }
-
-  .popup-desc {
-    font-family: "Inter", sans-serif;
-    font-weight: 400;
-    font-size: 15px;
-    color: #cccccc;
   }
 
   .save-popup {

@@ -99,8 +99,6 @@
   let scrollerWidth: number;
   let moreOption: boolean = false;
   let viewChange: boolean = false;
-
-  // $: console.log("tabList ;>> ", tabList);
 </script>
 
 <button
