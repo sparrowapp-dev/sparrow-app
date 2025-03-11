@@ -3,18 +3,20 @@
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
   import { Input, Search } from "@sparrow/library/forms";
   import {
-    ArrowInsertIcon,
-    ArrowOutwardIcon,
-    ErrorInfoIcon,
-    SuccessInfoIcon,
-    DotIcon,
-    DustbinIcon,
-    ArrowUpward,
-    ArrowDownward,
-    DownArrowIcon,
     BlankIcon,
+    ArrowDownRegular,
+    DeleteFilled,
+    ListFilled,
+    ArrowUpRightRegular,
+    ArrowDownLeftFilled,
+    CheckMarkIcon,
+    CheckmarkCircleFilled,
+    ErrorCircleFilled,
+    CircleFilled,
+    ArrowUpFilled
   } from "@sparrow/library/icons";
   import { Dropdown, Tooltip } from "@sparrow/library/ui";
+  import { Select } from "@sparrow/library/forms";
   import { WithButtonV4 } from "@sparrow/workspaces/hoc";
 
   export let webSocket;
@@ -142,11 +144,14 @@
 
 <div class="h-100 d-flex flex-column">
   <div>
-    <div class="d-flex justify-content-between py-2">
-      <span class="text-fs-12 text-secondary-300">Response</span>
+    <div class="d-flex justify-content-between align-content-center pb-2">
+      <span
+        class="text-fs-12 text-secondary-300 my-auto"
+        style="font-weight: 600;">Response</span
+      >
       <div class="d-flex">
-        <span class="">
-          <DotIcon
+        <span class="gap-1 d-flex align-items-center">
+          <CircleFilled
             color={webSocket.status === "connected"
               ? "#69D696"
               : webSocket.status === "disconnected"
@@ -155,10 +160,21 @@
                     webSocket.status === "disconnecting"
                   ? "#FBA574"
                   : "#FBA574"}
-            height={"8px"}
-            width={"8px"}
+            size={"6px"}
           />
-          <span class="text-fs-12 px-2">
+          <span
+            class="text-fs-12 px-2 connection-status"
+            style={`color: ${
+              webSocket.status === "connected"
+                ? "var(--text-ds-success-300)"
+                : webSocket.status === "disconnected"
+                  ? "var(--text-ds-danger-300)"
+                  : webSocket.status === "connecting" ||
+                      webSocket.status === "disconnecting"
+                    ? "var(--text-ds-warning-300)"
+                    : "var(--text-ds-nuetral-300)"
+            }`}
+          >
             {webSocket.status === "connected"
               ? "Connected"
               : webSocket.status === "disconnected"
@@ -170,10 +186,10 @@
                     : ""}
           </span>
         </span>
-        <span class="d-flex">
+        <span class="d-flex gap-1">
           <Tooltip title={"Scroll to top"}>
             <WithButtonV4
-              icon={ArrowUpward}
+              icon={ArrowUpFilled}
               onClick={() => {
                 scroll("top");
               }}
@@ -183,7 +199,7 @@
           </Tooltip>
           <Tooltip title={"Scroll to bottom"}>
             <WithButtonV4
-              icon={ArrowDownward}
+              icon={ArrowDownRegular}
               onClick={() => {
                 scroll("bottom");
               }}
@@ -191,9 +207,9 @@
               loader={false}
             />
           </Tooltip>
-          <Tooltip title={"Delete"}>
+          <Tooltip title={"Delete"} placement="bottom-right">
             <WithButtonV4
-              icon={DustbinIcon}
+              icon={DeleteFilled}
               onClick={() => {
                 onDeleteMessage();
               }}
@@ -204,14 +220,17 @@
         </span>
       </div>
     </div>
-    <div class="d-flex {webSocket?.messages?.length ? 'visible' : 'invisible'}">
-      <div class="w-100" style="margin-right:60px;">
+    <div
+      class="d-flex justify-content-between {webSocket?.messages?.length
+        ? 'visible'
+        : 'invisible'}"
+    >
+      <div class="" style="max-width: 320px;">
         <Search
           id="websocket-list-search"
-
           customWidth={"100%"}
-          size="large"
           variant="primary"
+          size="small"
           bind:value={searchData}
           on:input={() => {
             onSearchMessage(searchData);
@@ -220,127 +239,100 @@
         />
       </div>
       <div>
-        <Dropdown
-          buttonId="filtermessage"
-          bind:isMenuOpen={isFilterDropdownActive}
-          horizontalPosition="left"
-          minWidth={175}
-          options={[
+        <Select
+          id="filtermessage"
+          titleId={`${webSocket.filter}`}
+          data={[
             {
+              id: "All Messages",
               name: "All Messages",
-              icon: BlankIcon,
-              iconColor: "",
-              iconSize: "13px",
-              color: "var(--text-secondary-100)",
-              onclick: () => {
-                onUpdateFilterType("All Messages");
-              },
+              icon: ListFilled,
+              iconProps: { size: "16px" },
             },
             {
+              id: "Sent",
               name: "Sent",
-              icon: ArrowOutwardIcon,
-              iconColor: "#69D696",
-              iconSize: "13px",
-              color: "var(--text-secondary-100)",
-              onclick: () => {
-                onUpdateFilterType("Sent");
-              },
+              icon: ArrowUpRightRegular,
+              iconProps: { size: "16px", color: "var(--text-ds-success-300)" },
             },
             {
+              id: "Received",
               name: "Received",
-              icon: ArrowInsertIcon,
-              iconColor: "#0B5ED7",
-              iconSize: "13px",
-              color: "var(--text-secondary-100)",
-              onclick: () => {
-                onUpdateFilterType("Received");
-              },
+              icon: ArrowDownLeftFilled,
+              iconProps: { size: "16px", color: "var(--text-ds-primary-400)" },
             },
           ]}
-        >
-          <button
-            id="filtermessage"
-            class="h-100 border-0 bg-transparent py-2 rounded d-flex justify-content-end align-items-center"
-            style="width:130px;"
-            on:click={() => {
-              isFilterDropdownActive = !isFilterDropdownActive;
-            }}
-          >
-            {#if webSocket.filter === "All Messages"}
-              <span class="text-fs-12 pe-2 text-tertiary-100"
-                >{webSocket.filter}</span
-              >
-            {:else}
-              <span class="text-fs-12 pe-2 text-secondary-100"
-                >{webSocket.filter}</span
-              >
-            {/if}
-            <DownArrowIcon
-              height={"16px"}
-              width={"16px"}
-              color={"var(--text-tertiary-100)"}
-            />
-          </button>
-          <!-- </Tooltip> -->
-        </Dropdown>
+          onclick={(id) => {
+            webSocket.filter = id;
+            onUpdateFilterType(id);
+          }}
+          minHeaderWidth={"133px"}
+          borderType={"none"}
+          borderActiveType={"none"}
+          headerHighlight={"hover-active"}
+          headerTheme={"transparent"}
+          menuItem={"v2"}
+          headerFontSize={"12px"}
+          maxHeaderWidth={"12px"}
+          zIndex={200}
+          bodyTheme={"surface"}
+          borderRounded={"4px"}
+          position={"absolute"}
+          maxBodyHeight={"108px"}
+          minBodyWidth={"186px"}
+          headerHeight={"28px"}
+          bodyAlignment={"left"}
+        />
       </div>
     </div>
   </div>
-  <div class="pt-2"></div>
+  <div class="pt-1"></div>
   <div style="flex:1; overflow:auto;" bind:this={listContainer}>
     <div>
       {#each filteredWebsocketMessage as message}
         <div
-          class="response-message d-flex align-items-center"
+          class="response-message d-flex align-items-center gap-2"
           style="cursor: pointer;"
           on:click={() => handleMessageClick(message)}
         >
           <span
-            class="p-2 d-flex align-items-center"
-            style="width: 35px !important;"
+            class="py-2 d-flex align-items-center"
+            style="padding-left:6px ;padding-right: 6px;"
           >
             {#if message?.transmitter === "sender"}
-              <ArrowOutwardIcon
-                height={"10px"}
-                width={"10px"}
-                color={"#69D696"}
+              <ArrowUpRightRegular
+                size={"14px"}
+                color="var(--icon-ds-success-400)"
               />
-              <!-- senderIcon -->
             {:else if message?.transmitter === "disconnector"}
-              <!-- DisconnectIcon -->
-              <ErrorInfoIcon height={"12px"} width={"12px"} color={"#FE8C98"} />
+              <ErrorCircleFilled
+                size={"14px"}
+                color="var(--icon-ds-danger-400)"
+              />
             {:else if message?.transmitter === "connecter"}
-              <!-- ConnectIcon -->
-              <SuccessInfoIcon
-                height={"14px"}
-                width={"14px"}
-                color={"#69D696"}
+              <CheckmarkCircleFilled
+                size={"14px"}
+                color="var(--icon-ds-success-400)"
               />
             {:else if message?.transmitter === "receiver"}
-              <ArrowInsertIcon
-                height={"10px"}
-                width={"10px"}
-                color={"#0B5ED7"}
+              <ArrowDownLeftFilled
+                color="var(--icon-ds-primary-400)"
+                size={"14px"}
               />
             {/if}
           </span>
-          <!-- <div class="d-flex align-items-center"> -->
           <span
-            class="text-fs-12 py-2 px-3 timestamp"
+            class="text-fs-12 py-2 timestamp"
             style="white-space: nowrap; line-height: 1;"
           >
             {message?.timestamp}
           </span>
-          <p
-            class="ellipsis text-fs-12 mb-0"
-            style="margin-left: 8px; line-height: 1; width: calc(100% - 145px);"
-          >
+          <p class="ellipsis text-fs-12 mb-0" style="line-height: 1;">
             {@html highlightSearchText(
               parseMessageData(message?.data),
               searchData,
             )}
           </p>
-          <!-- </div> -->
         </div>
       {/each}
 
@@ -357,12 +349,19 @@
 <style>
   .timestamp {
     color: var(--text-secondary-550);
-    width: 110px;
+    width: fit-content;
   }
   :global(.highlight-websocket-message-search) {
     background-color: #1e354d;
   }
   .response-message:hover {
-    background-color: #2e2f3d;
+    background-color: var(--bg-ds-surface-600);
+  }
+  .response-message {
+    background-color: var(--bg-ds-surface-900);
+    border-radius: 4px;
+  }
+  .connection-status {
+    font-weight: 500;
   }
 </style>

@@ -6,9 +6,10 @@
 <div
   class="{isMainScreen
     ? 'pt-5 pb-3'
-    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center"
+    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center position-relative"
 >
   <div class="">
+    <span class="text-fs-12 text-secondary-300 my-auto mt-1" style="font-weight: 500;position:absolute;left:0px">Response</span>
     <div
       class="d-flex align-items-center flex-column justify-content-center pt-5"
     >
