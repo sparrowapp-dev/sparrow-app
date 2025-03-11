@@ -193,7 +193,7 @@
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = async (id: string, tab: Tab, delay?: number) => {
+  const closeTab = async (id: string, tab: Tab) => {
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -209,47 +209,45 @@
         removeTab = tab;
         isPopupClosed = true;
 
-        if (delay) {
-          // Wait for the popup to close before proceeding (previous sequential logic)
-          await new Promise<void>((resolve) => {
-            const checkIfPopupClosed = setInterval(() => {
-              if (!isPopupClosed) {
-                clearInterval(checkIfPopupClosed);
-                resolve();
-              }
-            }, 300);
-          });
-
-          // Delay the tab removal if delay is provided
-          await new Promise<void>((resolve) => {
-            setTimeout(() => {
-              _viewModel.handleRemoveTab(id);
+        // Wait for the popup to close before proceeding (check for user input)
+        await new Promise<void>((resolve) => {
+          const checkIfPopupClosed = setInterval(() => {
+            if (!isPopupClosed) {
+              clearInterval(checkIfPopupClosed);
               resolve();
-            }, delay);
-          });
-          return;
-        }
+            }
+          }, 300);
+        });
+
+        return;
       } else {
         _viewModel.handleRemoveTab(id);
         return;
       }
-    }
-
-    // Directly remove tab if delay is not provided
-    if (delay) {
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          _viewModel.handleRemoveTab(id);
-          resolve();
-        }, delay);
-      });
     } else {
       _viewModel.handleRemoveTab(id);
     }
   };
+  const softCloseTabs = async (currentTabId: string) => {
+    const savedTabs = [];
+    const unSavedTabs = [];
+    for (const tab of $tabList) {
+      if (tab.id !== currentTabId) {
+        if (tab.isSaved) savedTabs.push(tab.tabId);
+        else unSavedTabs.push(tab);
+      }
+    }
 
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
+
+    for (let tab of unSavedTabs) {
+      // Wait for user confirmation before moving to the next tab
+      await closeTab(tab.id, tab);
+    }
+  };
   // Methods for Tab Controls - start
-  const forceCloseExceptCurrentOne = (currentTabId: string) => {
+  const tabsForceCloseInitiator = (currentTabId: string) => {
     tabsToForceClose = $tabList;
     tabIdWhoRecivedForceClose = currentTabId;
 
@@ -273,53 +271,12 @@
     } else forceCloseTabs(currentTabId);
   };
   const forceCloseTabs = async (currentTabId: string) => {
-    console.log("curr :>> ", currentTabId);
-
-    const savedTabs = [];
-    const unSavedTabs = [];
+    const tabsToClose = [];
     for (const tab of $tabList) {
-      if (tab.id !== currentTabId) {
-        if (tab.isSaved) savedTabs.push(tab.tabId);
-        else unSavedTabs.push(tab);
-      }
+      if (tab.id !== currentTabId) tabsToClose.push(tab.tabId);
     }
-
-    console.log("sav :> ", savedTabs);
-    console.log("unSav :> ", unSavedTabs);
     const wsId = currentWOrkspaceValue._id;
-    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
-
-    for (const tab of unSavedTabs) {
-      await forceCloseTabsAsync(tab.id, tab);
-    }
-  };
-  const forceCloseTabsAsync = async (id: string, tab: Tab) => {
-    return new Promise((resolve) => {
-      removeTab = tab;
-      setTimeout(() => {
-        // Simulating a delay similar to waiting for a save action
-        _viewModel.handleRemoveTab(id);
-        resolve(0);
-      }, 300);
-    });
-  };
-  const softCloseTabs = async (currentTabId: string) => {
-    const savedTabs = [];
-    const unSavedTabs = [];
-    for (const tab of $tabList) {
-      if (tab.id !== currentTabId) {
-        if (tab.isSaved) savedTabs.push(tab.tabId);
-        else unSavedTabs.push(tab);
-      }
-    }
-
-    const wsId = currentWOrkspaceValue._id;
-    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
-
-    for (let tab of unSavedTabs) {
-      // Wait for closeTab to finish before moving to the next tab
-      await closeTab(tab.id, tab, 300);
-    }
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, tabsToClose);
   };
 
   const handleTabDuplication = (tabId: string) => {
@@ -669,7 +626,7 @@
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
             onDoubleClick={_viewModel.handleTabTypeChange}
             onClickCloseOtherTabs={softCloseTabs}
-            onClickForceCloseTabs={forceCloseExceptCurrentOne}
+            onClickForceCloseTabs={tabsForceCloseInitiator}
             onClickDuplicateTab={handleTabDuplication}
           />
           <div style="flex:1; overflow: hidden;">
@@ -828,7 +785,7 @@
   zIndex={1000}
   isOpen={isPopupClosed}
   width={"35%"}
-  handleModalState={handleClosePopupBackdrop}
+  handleModalState={() => handleClosePopupBackdrop(false)}
 >
   <div class="mt-2 mb-4">
     <p class="lightGray" style="color: lightGray;">
