@@ -53,7 +53,7 @@
   /**
    * Determines the dimensions of a Select.
    */
-  export let headerHeight = "34px";
+  let headerHeight = "28px";
   export let maxBodyHeight = "200px";
   export let minHeaderWidth = "50px";
   export let maxHeaderWidth = "500px";
@@ -69,13 +69,8 @@
   /**
    * Determines the border positioning state for the Select header.
    */
-  export let borderType: "all" | "bottom" | "none" = "all"; // normal case
-  export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
-
-  /**
-   * Determines the icon state for the Select header.
-   */
-  export let isDropIconFilled: boolean = false; // normal case
+  let borderType: "all" | "bottom" | "none" = "none"; // normal case
+  let borderActiveType: "all" | "bottom" | "none" = "none"; // active case
 
   /**
    * Determines the background state for the Select header.
@@ -108,7 +103,7 @@
   /**
    * Determines the border radius of Select header.
    */
-  export let borderRounded = "2px";
+  let borderRounded = "2px";
   /**
    * Determines the z-index of Select.
    */
@@ -126,8 +121,8 @@
   /**
    * typography
    */
-  export let headerFontSize: string = "14px";
-  export let headerFontWeight: number = 500;
+  let headerFontSize: string = "12px";
+  let headerFontWeight: number = 500;
 
   /**
    * ticked state
@@ -147,6 +142,23 @@
 
   export let bodyAlignment: "right" | "left" = "right";
 
+  export let size: "small" | "medium" | "large" | "extra-small" = "small";
+
+  $: {
+    if (size === "small") {
+      headerFontSize = "12px";
+      headerHeight = "28px";
+    } else if (size === "medium") {
+      headerFontSize = "12px";
+      headerHeight = "36px";
+    } else if (size === "large") {
+      headerFontSize = "12px";
+      headerHeight = "36px";
+    } else {
+      headerFontSize = "12px";
+      headerHeight = "36px";
+    }
+  }
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
 
@@ -581,10 +593,16 @@
           on:keydown={() => {}}
         >
           {#if menuItem === "v1"}
-            <MenuItemsV1 {list} {selectedRequest} {getTextColor} />
+            <MenuItemsV1
+              {list}
+              fontSize={headerFontSize}
+              {selectedRequest}
+              {getTextColor}
+            />
           {:else if menuItem === "v2"}
             <MenuItemsv2
               {list}
+              fontSize={headerFontSize}
               {selectedRequest}
               {bodyTheme}
               {getTextColor}
@@ -592,7 +610,12 @@
               {showDescription}
             />
           {:else if menuItem === "v3"}
-            <MenuItemsV3 {list} {selectedRequest} {getTextColor} />
+            <MenuItemsV3
+              {list}
+              fontSize={headerFontSize}
+              {selectedRequest}
+              {getTextColor}
+            />
           {/if}
         </div>
       {/each}
