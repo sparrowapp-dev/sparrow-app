@@ -609,9 +609,8 @@
       <Pane
         size={$leftPanelCollapse ? 100 : $rightPanelWidth}
         minSize={60}
-        class="bg-secondary-800-important"
       >
-        <section class="d-flex flex-column h-100">
+        <section class="d-flex flex-column h-100" style="background-color:var(--bg-ds-surface-900)">
           <TabBar
             tabList={$tabList}
             {isGuestUser}

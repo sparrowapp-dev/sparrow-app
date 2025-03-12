@@ -4,7 +4,7 @@
   /**
    * input type
    */
-  export let variant: "primary" | "stroke" = "primary";
+  export let variant: "primary" | "stroke" | "inline" = "primary";
   export let type: "text" | "password" = "text";
 
   export let isError = false;
@@ -20,21 +20,10 @@
   let height = "28px";
   export let size: "small" | "medium" | "large" = "medium";
 
-  switch (size) {
-    case "small":
-      height = "28px";
-      break;
-    case "medium":
-      height = "36px";
-      break;
-    default:
-      height = "28px";
-      break;
-  }
   /**
    * width
    */
-  let width = "100%";
+  export let width = "100%";
 
   /**
    * identifies input is disabled or not
@@ -78,23 +67,31 @@
   onMount(() => {
     window.addEventListener("click", handleClick);
   });
+
+  const handleInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value = target?.value;
+    dispatch("input", target?.value);
+  };
+
+  const handleBlur = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value = target?.value;
+    dispatch("blur", target?.value);
+  };
 </script>
 
-<div
-  class="position-relative"
-  style="height:{height}; width: {width}; !important"
->
+<div class="position-relative">
   <input
     {id}
     {value}
-    on:input={(event) => {
-      value = event?.target?.value;
-      dispatch("input", event?.target?.value);
-    }}
+    on:input={handleInput}
+    on:blur={handleBlur}
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`${variant} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100`}
+    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
+    style="width: {width};"
     {placeholder}
     {disabled}
   />
@@ -106,12 +103,12 @@
     background-color: transparent;
     border: 1px solid var(--border-ds-neutral-600);
     border-radius: 4px;
-    padding: 2px 8px;
     gap: 8px;
     caret-color: var(--border-ds-primary-300);
-    font-size: 12px !important;
-    font-weight: 500;
     line-height: 150%;
+    // padding: 2px 8px;
+    // font-size: 12px !important;
+    // font-weight: 500;
   }
   .stroke.isError {
     border: 2px solid var(--border-ds-danger-300) !important;
@@ -152,12 +149,12 @@
     background-color: var(--bg-ds-surface-400);
     border: 1px solid transparent;
     border-radius: 4px;
-    padding: 2px 8px;
     gap: 8px;
     caret-color: var(--border-ds-primary-300);
-    font-size: 12px !important;
-    font-weight: 500;
     line-height: 150%;
+    // padding: 2px 8px;
+    // font-size: 12px !important;
+    // font-weight: 500;
   }
   .primary.isError {
     border: 2px solid var(--border-ds-danger-300) !important;
@@ -191,5 +188,77 @@
   .primary:not(:focus):hover {
     border: 1px solid var(--border-ds-neutral-300);
     border-radius: 4px;
+  }
+
+  /** inline */
+
+  .inline {
+    color: var(--text-ds-neutral-50);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 2px 8px;
+    gap: 8px;
+    caret-color: var(--border-ds-primary-300);
+    // font-size: 12px !important;
+    // font-weight: 500;
+    line-height: 150%;
+  }
+  .inline.isError {
+    border: 2px solid var(--border-ds-danger-300) !important;
+    border-radius: 4px;
+  }
+  .inline::placeholder {
+    color: var(--text-ds-neutral-400) !important;
+  }
+  .inline:focus {
+    outline: none;
+    // background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // during typing
+  .inline.has-text {
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text but not foucsed
+  .inline.has-text:not(:focus) {
+    border: 1px solid var(--border-ds-neutral-600);
+    border-radius: 4px;
+  }
+  // when it have text  and focused
+  .inline.entered:focus {
+    // background-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text and not focused
+  .inline:not(:focus):hover {
+    border: 1px solid var(--border-ds-neutral-300);
+    border-radius: 4px;
+  }
+
+  // Default State
+  .inline.has-text:not(:focus):not(:hover) {
+    border-color: transparent;
+  }
+
+  .small {
+    height: 28px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 4px;
+  }
+  .medium {
+    height: 36px;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px;
+  }
+  .large {
+    height: 40px;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 8px;
   }
 </style>

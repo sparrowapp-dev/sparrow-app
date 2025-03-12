@@ -78,7 +78,6 @@
       return "";
     }
   };
-
   /**
    * @description - add classes to ticked options
    * @param _id - item id (rows iteration)

@@ -9,13 +9,9 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import js_beautify, { html_beautify } from "js-beautify";
-  import {
-    WithButtonV4,
-    WithSelect,
-    WithSelectV2,
-  } from "@sparrow/workspaces/hoc";
+  import { WithButtonV4, WithSelectV2 } from "@sparrow/workspaces/hoc";
   import { Tooltip } from "@sparrow/library/ui";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import { ArrowDownloadRegular, CopyRegular } from "@sparrow/library/icons";
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
@@ -150,14 +146,17 @@
 </script>
 
 <div
-  class="d-flex flex-column align-items-start justify-content-between w-100 bg-tertiary-300 px-3 pt-1"
+  class="d-flex flex-column align-items-start justify-content-between w-100 px-3 pt-1"
 >
   <div
     class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-3 align-items-center justify-content-center">
-      <span class="text-fs-12" style="color: var(--text-secondary-100);">
+      <span
+        class="text-fs-12"
+        style="color: var(--text-ds-nuetral-50);font-weight:600;line-height:18px"
+      >
         {MessageTransmitter}
       </span>
       <span class="">
@@ -193,7 +192,7 @@
       <!-- Copy button -->
       <Tooltip title={"Copy"}>
         <WithButtonV4
-          icon={CopyIcon}
+          icon={CopyRegular}
           onClick={handleCopy}
           disable={false}
           loader={false}
@@ -203,7 +202,7 @@
       {#if !isWebApp}
         <Tooltip title={"Export"}>
           <WithButtonV4
-            icon={DownloadIcon2}
+            icon={ArrowDownloadRegular}
             onClick={handleDownloaded}
             disable={false}
             loader={false}
