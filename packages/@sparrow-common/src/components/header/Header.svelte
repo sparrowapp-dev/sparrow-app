@@ -577,6 +577,7 @@
               color: "var(--text-ds-neutral-50)",
               startIcon: DocumentRegular,
               iconSize: "16px",
+              iconColor: "var(--icon-ds-neutral-50)",
               onclick: () => {
                 redirectDocumentation();
               },
@@ -586,6 +587,7 @@
               color: "var(--text-ds-neutral-50)",
               startIcon: GiftReqular,
               iconSize: "16px",
+              iconColor: "var(--icon-ds-neutral-50)",
               onclick: () => {
                 redirectNewFeatures();
               },
