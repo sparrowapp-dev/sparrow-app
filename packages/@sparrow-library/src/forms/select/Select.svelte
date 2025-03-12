@@ -397,7 +397,7 @@
   } else if (_color === "patch") {
     return "color-patch";
   } else {
-    return "color-white";
+    return "color-grey";
   }
 };
 </script>
@@ -811,7 +811,7 @@
 }
  
 .color-white {
-  color: var(--text-ds-neutral-50);
+  color: var(--text-ds-neutral-200);
 }
  
 .color-get {

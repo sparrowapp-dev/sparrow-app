@@ -91,7 +91,6 @@
     } else return "";
   };
  
-  // Get the color class for this list item
   $: colorClass = list?.color ? getTextColor(list.color) : '';
 </script>
  
@@ -217,7 +216,7 @@
     cursor: pointer;
   }
  
-   .color-primary {
+.color-primary {
   color: var(--text-ds-primary-300);
 }
  

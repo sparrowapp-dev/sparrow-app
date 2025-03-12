@@ -98,6 +98,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -114,6 +115,8 @@
   export let isWebApp = false;
   export let azureBlobCDN;
   export let onSaveResponse;
+  export let collectionAuth;
+  export let collection;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -324,9 +327,12 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
+                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
@@ -530,7 +536,7 @@
   }
 
   :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10px !important;
+    width: 101px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -539,7 +545,7 @@
     border-bottom: 0 !important;
   }
   :global(.rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-ds-surface-100) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
