@@ -47,7 +47,7 @@
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
-  import { map, type Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { onMount } from "svelte";
 
   import type {
@@ -606,11 +606,11 @@
           appVersion={version}
         />
       </Pane>
-      <Pane
-        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-        minSize={60}
-      >
-        <section class="d-flex flex-column h-100" style="background-color:var(--bg-ds-surface-900)">
+      <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
+        <section
+          class="d-flex flex-column h-100"
+          style="background-color:var(--bg-ds-surface-900)"
+        >
           <TabBar
             tabList={$tabList}
             {isGuestUser}
