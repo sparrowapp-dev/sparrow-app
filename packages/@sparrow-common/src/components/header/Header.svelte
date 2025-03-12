@@ -575,8 +575,8 @@
             {
               name: "Documentation",
               color: "var(--text-ds-neutral-50)",
-              icon: DocumentRegular,
-              iconSize: "12px",
+              startIcon: DocumentRegular,
+              iconSize: "16px",
               onclick: () => {
                 redirectDocumentation();
               },
@@ -584,8 +584,8 @@
             {
               name: "What’s New?",
               color: "var(--text-ds-neutral-50)",
-              icon: GiftReqular,
-              iconSize: "12px",
+              startIcon: GiftReqular,
+              iconSize: "16px",
               onclick: () => {
                 redirectNewFeatures();
               },

@@ -2,7 +2,6 @@
   import { afterUpdate, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import { quintOut, backInOut } from "svelte/easing";
-  import { Button } from "../button";
 
   export let isBackgroundClickable = true;
 
@@ -26,14 +25,13 @@
     onclick: () => void;
     isHoverConstant?: boolean;
     subTitle?: String;
+    startIcon?: any;
+    endIcon?: any;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
 
   export let minWidth: number = 200;
-  export let startIcon;
-
-  export let endIcon;
 
   export let zIndex = 1;
   /**
@@ -98,7 +96,7 @@
     <div
       in:scale={{ start: 0.8, duration: 400 }}
       out:scale={{ start: 0.8, duration: 400 }}
-      class="bg-dropdownContainer dropdown-container p-1 rounded-1 position-fixed
+      class="dropdown-container p-1 rounded-1 position-fixed
       "
       style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 9999;"
     >
@@ -107,9 +105,9 @@
     -->
       {#each options as item}
         <button
-          class="d-flex align-items-center p-2 rounded-1 w-100 option-button {item?.isHoverConstant
+          class="d-flex align-items-center p-2 rounded-1 gap-1 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
-            : ''} "
+            : ''} {disable ? 'option-button' : ''} "
           style="color: {item.color};"
           on:click={() => item.onclick()}
           tabindex={0}
@@ -124,12 +122,11 @@
               />
             </span>
           {/if}
-          {#if startIcon}
-            <Button
-              size="small"
-              type="teritiary-regular"
-              title="Schema"
-              {startIcon}
+          {#if item.startIcon}
+            <svelte:component
+              this={item.startIcon}
+              size={item.iconSize}
+              color={item.iconColor}
             />
           {/if}
           <div>
@@ -145,12 +142,11 @@
               </p>
             {/if}
           </div>
-          {#if endIcon}
-            <Button
-              size="small"
-              type="teritiary-regular"
-              title="Schema"
-              {endIcon}
+          {#if item.endIcon}
+            <svelte:component
+              this={item.startIcon}
+              size={item.iconSize}
+              color={item.iconColor}
             />
           {/if}
         </button>
@@ -171,6 +167,7 @@
     border-radius: 4px;
     transition: 0.2s ease;
     border: none;
+    min-height: 28px;
   }
   .option-button:hover {
     background-color: var(--bg-ds-surface-400);
