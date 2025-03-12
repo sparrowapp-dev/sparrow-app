@@ -80,6 +80,7 @@
     isDefaultTourGuideClose,
   } from "@sparrow/workspaces/stores";
   import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
+  import { writable } from "svelte/store";
 
   import { Checkbox } from "@sparrow/library/forms";
   const _viewModel = new CollectionsViewModel();
@@ -122,6 +123,7 @@
   let globalEnvironment;
 
   let environments = _viewModel2.environments;
+  let totalCollectionCount = writable(0);
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -561,6 +563,14 @@
       }
     }, 500);
   };
+  collectionList.subscribe((collections) => {
+    let count = 0;
+    collections.forEach((collection) => {
+      const collectionData = collection.toMutableJSON();
+      count += collectionData.items.length || 0;
+    });
+    totalCollectionCount.set(count);
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -861,6 +871,7 @@
   }}
 >
   <WelcomePopup
+    loader={$totalCollectionCount > 0 ? false : true}
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;
