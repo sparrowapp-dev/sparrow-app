@@ -80,7 +80,7 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100`}
+    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 `}
     {placeholder}
     {disabled}
   />
@@ -239,11 +239,13 @@
     padding: 8px 4px;
   }
   .medium {
+    height: 36px;
     font-size: 16px;
     font-weight: 500;
     padding: 8px;
   }
   .large {
+    height: 40px;
     font-size: 20px;
     font-weight: 600;
     padding: 8px;

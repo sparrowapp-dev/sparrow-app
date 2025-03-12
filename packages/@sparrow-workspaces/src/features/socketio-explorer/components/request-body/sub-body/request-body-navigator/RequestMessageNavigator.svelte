@@ -52,8 +52,7 @@
     bind:value={requestEventName}
     id="collection-list-search"
     width={"100%"}
-    height={"24px"}
-    type="teritiary"
+    variant="primary"
     size="small"
     on:input={() => {
       onUpdateRequestEventName(requestEventName);

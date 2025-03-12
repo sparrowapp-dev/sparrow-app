@@ -92,14 +92,14 @@
         : ''}"
     >
       <header
-        class={`env-header align-items-end justify-content-between d-flex gap-4 `}
+        class={`env-header align-items-start justify-content-between d-flex gap-4 `}
         style="position: relative ;"
       >
         <!--Disabling the Quick Help feature, will be taken up in next release-->
         {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
-            style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
+            style="position: absolute; left:133px;  top:5px; border:none; z-index:5; curser:pointer;"
             on:click={() => {
               isPopoverContainer = !isPopoverContainer;
               if (isPopoverContainer === true) {
@@ -154,7 +154,7 @@
           bind:value={environmentName}
           variant={"inline"}
           placeholder={"Untitled"}
-          style={"width: 40%; !important"}
+          width={"398px"}
           disabled={$currentEnvironment?.property?.environment?.type ==
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           on:input={(e) => {
