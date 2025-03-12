@@ -42,7 +42,7 @@
   };
 </script>
 
-<section class="w-100" style="">
+<section class="w-100" style="color:var(--text-ds-neutral-50)">
   <TabularInput
     {isBulkEditRequired}
     bulkEditPlaceholder={placeholderHeader}
@@ -61,6 +61,8 @@
           <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"
+          fontWeight="500"
+          
          /> 
 
         </div>
