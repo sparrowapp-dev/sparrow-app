@@ -111,6 +111,7 @@ import { makeHttpRequestV2, makeRequest } from "src/containers/api/api.common";
 import { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 import { RequestSavedTabAdapter } from "src/adapter/request-saved-tab";
 import { type Body, type KeyValueChecked, RequestMethodEnum, type Auth, type StatePartial, type State } from "@sparrow/common/types/workspace";
+import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -2312,10 +2313,12 @@ export default class CollectionsViewModel {
   public handleOpenCollection = (
     workspaceId: string,
     collection: CollectionDto,
+    navigation: CollectionNavigationTabEnum
   ) => {
     const collectionTabAdapter = new CollectionTabAdapter().adapt(
       workspaceId,
       collection,
+      navigation
     );
     this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
@@ -4340,6 +4343,7 @@ export default class CollectionsViewModel {
         this.handleOpenCollection(
           args.workspaceId,
           args.collection as CollectionDto,
+          args?.navigation
         );
         break;
       case "folder":
