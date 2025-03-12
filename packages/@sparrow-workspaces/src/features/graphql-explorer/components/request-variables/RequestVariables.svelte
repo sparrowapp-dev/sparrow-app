@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Editor } from "@sparrow/library/forms";
+  import { Button } from "@sparrow/library/ui";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "JSON";
   export let value = "";
@@ -8,6 +9,7 @@
     onUpdateRequestVariable(e.detail);
   };
   let isBodyBeautified = false;
+  export let onClearQuery;
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -27,5 +29,13 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="d-flex justify-content-end">
+    <Button
+      size="small"
+      type="teritiary-regular"
+      title="Clear Query"
+      onClick={onClearQuery}
+    />
   </div>
 </div>

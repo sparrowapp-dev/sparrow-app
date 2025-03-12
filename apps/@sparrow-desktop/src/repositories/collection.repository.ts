@@ -285,7 +285,10 @@ export class CollectionRepository {
       .exec();
     const updatedItems = collection.toJSON().items.map((element) => {
       if (element.id.toString() === uuid) {
-        element = items;
+        element = {
+          ...element,
+          ...items
+        };
       }
       return element;
     });
@@ -623,7 +626,9 @@ export class CollectionRepository {
       if (element.id === folderId) {
         for (let i = 0; i < element.items.length; i++) {
           if (element.items[i].id === uuid) {
-            element.items[i] = request;
+            element.items[i] = {
+              ...element.items[i],
+              ...request};
             break;
           }
         }

@@ -7,7 +7,6 @@
     ChevronDownRegular,
     AddRegular,
     LayerRegular,
-    GlobeRegular,
   } from "@sparrow/library/icons";
   import { Button, List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -149,6 +148,7 @@
 <div
   class={`d-flex flex-column  h-100     pt-0 px-1`}
   style="font-weight: 500;"
+  id="Environment-container"
 >
   <div
     tabindex="0"
@@ -225,15 +225,25 @@
             class={`fw-normal   env-item text-fs-12 border-radius-2  ${
               globalEnvironment[0]?.id === activeTabId && "active"
             }`}
-            style="height: 32px; display:flex; align-items:center; padding-left:32px; margin-bottom:2px; position:relative;"
+            style="height: 32px; display:flex; align-items:center; padding-left:35px; margin-bottom:2px; position:relative;"
             on:click={() => {
               onOpenGlobalEnvironment(globalEnvironment[0]);
             }}
           >
             <span class="icon-default">
-              <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
+              <StackIcon
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-130)"}
+              />
             </span>
-
+            <span class="icon-hover">
+              <StackFilled
+                height={"12px"}
+                width={"12px"}
+                color={"var(--icon-secondary-130)"}
+              />
+            </span>
             <span class="box-line1"></span>
             <span class="">{globalEnvironment[0]?.name}</span>
           </p>
@@ -381,8 +391,16 @@
     justify-content: center;
   }
 
+  .env-item:hover .icon-default {
+    display: none;
+  }
+
   .env-item:hover .icon-hover {
     display: flex;
+  }
+
+  .env-item.active .icon-default {
+    display: none;
   }
 
   .env-item.active .icon-hover {

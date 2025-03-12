@@ -21,7 +21,8 @@
     SearchVariable,
   } from "@sparrow/workspaces/constants";
   import { WithButtonV3 } from "@sparrow/workspaces/hoc";
-  import { QuestionCircleRegular, SaveRegular } from "@sparrow/library/icons";
+  import { SaveRegular } from "@sparrow/library/icons";
+  import { QuestionCirlceReqular } from "@sparrow/library/icons";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -159,34 +160,34 @@
           <div class="position-relative">
             <Tooltip title="Save" placement="bottom-center" distance={10}>
               <Button
-              type="primary"
-              startIcon={SaveRegular}
-              title="Save"
-              onClick={onSaveEnvironment}
-              customWidth="72px"
-              size="small"
-              disable={$currentEnvironment?.property?.environment?.state
+                type="primary"
+                startIcon={SaveRegular}
+                title="Save"
+                onClick={onSaveEnvironment}
+                customWidth="72px"
+                size="small"
+                disable={$currentEnvironment?.property?.environment?.state
                   ?.isSaveInProgress ||
                   $currentEnvironment?.isSaved ||
                   userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                  loader={
-                      $currentEnvironment?.property?.environment?.state
-                  ?.isSaveInProgress
-                  }/>
+                loader={$currentEnvironment?.property?.environment?.state
+                  ?.isSaveInProgress}
+              />
             </Tooltip>
           </div>
           <span>
             <Tooltip title="Help" placement="bottom-center" distance={10}>
               <Button
-              type="secondary"
-              startIcon={QuestionCircleRegular}
-              size="small"
-              customWidth="28px"
-              onClick={() => {
+                type="secondary"
+                startIcon={QuestionCirlceReqular}
+                size="small"
+                customWidth="28px"
+                onClick={() => {
                   quickHelp = true;
                 }}
                 disable={false}
-                loader={false}/>
+                loader={false}
+              />
             </Tooltip>
           </span>
         </div>

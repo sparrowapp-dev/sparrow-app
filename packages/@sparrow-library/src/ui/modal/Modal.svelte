@@ -85,7 +85,7 @@
             style="height: 30px; width:30px; "
             on:click={handleModalState(false)}
           >
-            <DismissRegular size={"16px"} color="var(--bg-ds-neutral-100)" />
+            <DismissRegular size={"20px"} color="var(--bg-ds-neutral-100)" />
           </button>
         {/if}
       </div>
