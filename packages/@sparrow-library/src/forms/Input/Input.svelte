@@ -4,7 +4,7 @@
   /**
    * input type
    */
-  let variant: "primary" | "stroke" = "primary";
+  export let variant: "primary" | "stroke" = "primary";
   export let type: "text" | "password" = "text";
 
   export let isError = false;
