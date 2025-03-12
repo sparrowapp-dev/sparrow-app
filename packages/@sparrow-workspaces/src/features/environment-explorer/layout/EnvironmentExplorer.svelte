@@ -96,7 +96,7 @@
         style="position: relative ;"
       >
         <!--Disabling the Quick Help feature, will be taken up in next release-->
-        {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
+        <!-- {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
           <button
             class="btn p-0"
             style="position: absolute; left:150px;  top:22.5px; border:none; z-index:5; curser:pointer;"
@@ -121,7 +121,7 @@
           >
             <HelpIcon height={"12.67px"} width={"12.67px"} />
           </button>
-        {/if}
+        {/if} -->
 
         <!-- <Input
           id={"environment-name"}
@@ -146,24 +146,25 @@
           isPencilIconRequired={false}
         /> -->
 
-        <Input
-          type={"text"}
-          size={"medium"}
-          maxlength={500}
-          id={"environment-name"}
-          bind:value={environmentName}
-          variant={"inline"}
-          placeholder={"Untitled"}
-          style={"width: 40%; !important"}
-          disabled={$currentEnvironment?.property?.environment?.type ==
-            "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          on:input={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName, "");
-          }}
-          on:blur={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName, "blur");
-          }}
-        />
+        <div class="w-100">
+          <Input
+            type={"text"}
+            size={"medium"}
+            maxlength={500}
+            id={"environment-name"}
+            bind:value={environmentName}
+            variant={"inline"}
+            placeholder={""}
+            disabled={$currentEnvironment?.property?.environment?.type ==
+              "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+            on:input={(e) => {
+              handleCurrentEnvironmentNameChange(environmentName, "");
+            }}
+            on:blur={(e) => {
+              handleCurrentEnvironmentNameChange(environmentName, "blur");
+            }}
+          />
+        </div>
 
         <div class={`d-flex env-btn-container`} style="gap: 6px;">
           <div class="position-relative">
