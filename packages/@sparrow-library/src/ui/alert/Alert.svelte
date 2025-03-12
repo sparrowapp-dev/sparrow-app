@@ -175,7 +175,7 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(
       50% 50% at 50% 50%,
-      rgba(51, 204, 122, 0.25) 0%,
+      rgba(77, 123, 255, 0.25) 0%,
       rgba(29, 33, 43, 0) 100%
     );
   }
