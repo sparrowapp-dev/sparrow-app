@@ -246,7 +246,7 @@
     height: 38px;
     width: auto;
     padding: 0 10px;
-    background-color: var(--header-background-color, black);
+    background-color: var(--bg-ds-surface-400);
   }
   .dropdown-data {
     background-color: var(--body-background-color, black);

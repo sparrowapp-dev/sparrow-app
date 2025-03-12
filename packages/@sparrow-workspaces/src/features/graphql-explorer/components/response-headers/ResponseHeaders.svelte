@@ -14,7 +14,7 @@
         <input
           type="text"
           placeholder={header.key}
-          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
+          class="px-2 py-1 border-0 w-100 border-radius-2"
           style="font-size: 13px;"
           readonly
           disabled
@@ -24,7 +24,7 @@
         <input
           type="text"
           placeholder={header.value}
-          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
+          class="px-2 py-1 border-0 w-100 border-radius-2"
           style="font-size: 13px;"
           readonly
           disabled
@@ -37,5 +37,8 @@
 <style>
   input::placeholder {
     color: var(--white-color);
+  }
+  input {
+    background-color: var(--bg-ds-surface-800);
   }
 </style>
