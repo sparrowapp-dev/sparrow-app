@@ -6,7 +6,7 @@
   import { SparrowLogo } from "@sparrow/common/images";
 
   export let description = "Could not Send Request";
-  export let heading = "Error";
+  export let heading = "";
   export let icon;
   export let ctaTitle = "Try Again";
   export let ctaShow = false;
@@ -64,12 +64,14 @@
         </div>
       </div>
       <div style="display: flex; flex-direction: column; min-width: 322px; ">
-        <p
-          class="text-secondary-200 text-fs-14 fw-bold"
-          style="text-align: left; margin:0; font-size:12px; font-weight:500; color:var(--text-ds-neutral-50);"
-        >
-          {heading}
-        </p>
+        {#if heading}
+          <p
+            class="text-secondary-200 text-fs-14 fw-bold"
+            style="text-align: left; margin:0; font-size:12px; font-weight:500; color:var(--text-ds-neutral-50);"
+          >
+            {heading}
+          </p>
+        {/if}
 
         <div class="d-flex flex-column">
           <p

@@ -20,6 +20,8 @@
         varient="error"
         description="Cloud Agent error: Please check the URL .Try again. Make sure that the domain is publicly accessible"
         heading={"Error"}
+        ctaShow={true}
+        onClick={onSendButtonClicked}
       />
     </div>
   </div>

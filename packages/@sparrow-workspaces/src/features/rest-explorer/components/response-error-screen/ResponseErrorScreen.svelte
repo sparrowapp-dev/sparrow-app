@@ -18,8 +18,8 @@
       </div>
       <Alert
         varient="error"
-        description="Cloud Agent error: Please check the URL .Try again. Make sure that the domain is publicly accessible"
-        heading={"Error"}
+        description="Unable to reach the API endpoint. Please verify the request URL and try again.
+"
         ctaShow={true}
         onClick={onSendButtonClicked}
       />
