@@ -135,9 +135,6 @@
         />
       {/if}
     </div>
-    <!-- <div style="position:relative;right:2.8rem;padding-right:2px">
-      <CaretDownFilled size={"16px"} color="var(--bg-ds-neutral-600)" />
-    </div> -->
     {#if user.role !== TeamRole.TEAM_MEMBER}
       <div style="position: relative; right: 2.8rem; padding-right: 2px;">
         <CaretDownFilled size="16px" color="var(--bg-ds-neutral-600)" />
@@ -149,6 +146,5 @@
 <style>
   .dropdown-workspace-access {
     width: 100px;
-    /* background-color: var(--bg-ds-surface-600); */
   }
 </style>
