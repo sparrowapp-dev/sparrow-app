@@ -90,12 +90,8 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-<<<<<<< HEAD
-    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 `}
-=======
     class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
     style="width: {width};"
->>>>>>> ab24c06fe252467267bb1b20db7bc82466a94ded
     {placeholder}
     {disabled}
   />
