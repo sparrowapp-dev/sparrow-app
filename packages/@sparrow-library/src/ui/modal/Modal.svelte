@@ -133,7 +133,7 @@
     height: auto;
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
-    padding: 30px 30px 40px 30px;
+    padding: 30px 30px 20px 30px;
     position: relative;
   }
   .sparrow-modal-heading {
@@ -142,7 +142,6 @@
     color: var(--text-ds-neutral-50);
     font-weight: 600;
     line-height: 24px;
-    padding-bottom: 20px;
   }
 
   .sparrow-modal-close-icon-btn {
