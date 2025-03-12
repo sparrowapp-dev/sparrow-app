@@ -127,7 +127,7 @@ export class DashboardViewModel {
 
   // redirects to Sparrow Feature Updates.
   public redirectFeatureUpdates = async () => {
-    await open(constants.SPARROW_DOWNLOAD_LINK);
+    await open(constants.SPARROW_GITHUB + '/sparrow-app/releases');
     return;
   };
 
