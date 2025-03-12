@@ -406,10 +406,9 @@ export default class CollectionsViewModel {
       
         const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
         newRequestTab.updatePath(filteredPath as TabPath);
+        newRequestTab.updateIsSave(false);
 
-        // newRequestTab.updateIsSave(false);
-
-        console.log("new req :>> ", newRequestTab)
+        // console.log("new req :>> ", newRequestTab)
         this.tabRepository.createTab(newRequestTab.getValue());
         moveNavigation("right");
     } 
@@ -438,7 +437,7 @@ export default class CollectionsViewModel {
       
       const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
       newWebSocketTab.updatePath(filteredPath as TabPath);
-      // newWebSocketTab.updateIsSave(false);
+      newWebSocketTab.updateIsSave(false);
 
       this.tabRepository.createTab(newWebSocketTab.getValue());
       moveNavigation("right");
@@ -470,7 +469,7 @@ export default class CollectionsViewModel {
       
       const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
       newSocketIOTab.updatePath(filteredPath as TabPath);
-      // newSocketIOTab.updateIsSave(false);
+      newSocketIOTab.updateIsSave(false);
 
       this.tabRepository.createTab(newSocketIOTab.getValue());
       moveNavigation("right");
@@ -502,7 +501,7 @@ export default class CollectionsViewModel {
       
       const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
       newGraphQLTab.updatePath(filteredPath as TabPath);
-      // newGraphQLTab.updateIsSave(false);
+      newGraphQLTab.updateIsSave(false);
 
       this.tabRepository.createTab(newGraphQLTab.getValue());
       moveNavigation("right");
