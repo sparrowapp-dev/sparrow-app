@@ -62,7 +62,7 @@
     hoveredBorderColor="var(--border-primary-300)"
     focusedBorderColor={"var(--border-primary-300)"}
     class="text-fs-12 border-radius-2 ellipsis fw-normal px-2 inputField"
-    style="outline:none; background-color: red;"
+    style="outline:none;"
     placeholder="Event Name"
   />
   <Button

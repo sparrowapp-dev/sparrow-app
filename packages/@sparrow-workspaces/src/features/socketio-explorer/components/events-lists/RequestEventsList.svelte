@@ -58,7 +58,6 @@
         {#if index !== pairs.length - 1}
           <Tooltip title={"Delete"} placement={"bottom-right"} distance={10}>
             <Button
-              buttonClassProp=""
               size="extra-small"
               type="teritiary-regular"
               startIcon={DeleteRegular}
