@@ -29,6 +29,7 @@
           on:input={() => updateParam(index)}
           width={"100%"}
           size="small"
+          variant="inline"
           class="text-fs-12 fw-medium me-5"
           style="outline:none; background-color:transparent;"
           placeholder="Name"

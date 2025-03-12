@@ -406,10 +406,9 @@ export default class CollectionsViewModel {
       
         const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
         newRequestTab.updatePath(filteredPath as TabPath);
-
         newRequestTab.updateIsSave(false);
 
-        console.log("new req :>> ", newRequestTab)
+        // console.log("new req :>> ", newRequestTab)
         this.tabRepository.createTab(newRequestTab.getValue());
         moveNavigation("right");
     } 
