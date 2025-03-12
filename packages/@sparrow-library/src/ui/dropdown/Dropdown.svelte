@@ -120,6 +120,7 @@
                 this={item.icon}
                 height={item.iconSize}
                 width={item.iconSize}
+                size={item.iconSize}
                 color={item.iconColor}
               />
             </span>
