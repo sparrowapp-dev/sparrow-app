@@ -48,10 +48,10 @@
       minBodyWidth={"104px"}
     />
   </div>
-  <Input
+ <div class="w-100">
+   <Input
     bind:value={requestEventName}
     id="collection-list-search"
-    width={"100%"}
     variant="primary"
     size="small"
     on:input={() => {
@@ -63,7 +63,9 @@
     class="text-fs-12 border-radius-2 ellipsis fw-normal px-2 inputField"
     style="outline:none;"
     placeholder="Event Name"
+    width="100%"
   />
+  </div>
   <Button
     title="Send"
     size="small"
