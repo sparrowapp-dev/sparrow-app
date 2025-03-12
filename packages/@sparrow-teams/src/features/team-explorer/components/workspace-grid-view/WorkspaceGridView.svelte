@@ -9,7 +9,7 @@
   import { Button, Spinner } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
-
+  import { SparrowLogo } from "@sparrow/common/icons";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -182,18 +182,33 @@
         </div>
       {/if}
     {:else}
-      <img
-        src={TeamSkeleton}
-        alt="Team-Skelton"
-        width="100%"
-        height="100%"
-        style="padding-bottom:100px;"
-      />
+      <div class="container">
+        <div class="sparrow-logo">
+          <SparrowLogo />
+        </div>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+        >
+          Welcome to Sparrow – where teamwork flows effortlessly.
+        </p>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+        >
+          Sign up or log in to unlock powerful tools and stay organized!
+        </p>
+      </div>
     {/if}
   </div>
 </div>
 
 <style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 150px 35px 24px;
+  }
   .tab-head {
     padding: 8px;
     font-size: 12px;

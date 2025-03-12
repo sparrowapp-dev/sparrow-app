@@ -80,7 +80,6 @@
                 />
               </div>
             {:else}
-              <!-- <img src={base64ToURL(team.logo)} alt="" /> -->
               <Avatar
                 type={"image"}
                 size={"small"}

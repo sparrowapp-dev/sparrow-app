@@ -11,12 +11,12 @@
   export let headerContentClassProp = "";
   export let onSortToggle = (field: string) => {};
 
-import {ArrowSortRegular} from "@sparrow/library/icons";
-import { Button } from "@sparrow/library/ui";
+  import { ArrowSortRegular } from "@sparrow/library/icons";
+  import { Button } from "@sparrow/library/ui";
 
-  const handleSortClick=(field: string)=> {
+  const handleSortClick = (field: string) => {
     onSortToggle(field);
-  }
+  };
 </script>
 
 <table
@@ -32,7 +32,9 @@ import { Button } from "@sparrow/library/ui";
             data-sortable={headingDataSortable}
             class="{headerContentClassProp} tab-head"
           >
-            <div style="display: flex; gap: 4px; align-items: center; padding:8px;max-height:30px">
+            <div
+              style="display: flex; gap: 4px; align-items: center; padding:8px;max-height:30px"
+            >
               {heading}
               {#if heading.toLowerCase() === "last updated"}
                 <Button
@@ -52,8 +54,8 @@ import { Button } from "@sparrow/library/ui";
 </table>
 
 <style>
-   .tab-head {
-    padding: 8px;
+  .tab-head {
+    padding: 8px 8px 8px 0px;
     font-size: 12px;
     font-weight: 600;
     line-height: 18px;
@@ -63,6 +65,6 @@ import { Button } from "@sparrow/library/ui";
     text-align: center;
   }
   thead {
-   border-bottom: 0px solid var(--bg-ds-surface-900);
+    border-bottom: 0px solid var(--bg-ds-surface-900);
   }
 </style>

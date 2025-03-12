@@ -11,6 +11,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
+  import { ListRegular } from "@sparrow/library/icons";
 
   import {
     TeamTabsEnum,
@@ -318,7 +319,7 @@
             style="padding-bottom: 4px;"
           >
             <Navigator
-              tabs={teamTabs.filter((tab) => tab.visible !== false)}
+              tabs={teamTabs}
               currentTabId={"Workspaces"}
               onTabClick={onUpdateActiveTab}
               {activeTeamTab}
@@ -336,15 +337,16 @@
                   alt=""
                 />
               </span>
-              <span style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set(TeamViewEnum.LIST);
-                  }}
-                  class:view-active={selectedView === TeamViewEnum.LIST}
-                  src={hamburger}
-                  alt=""
-                />
+              <span
+                style="cursor:pointer;display:flex;justify-content:center;align-items:center"
+                on:click={() => {
+                  workspaceView.set(TeamViewEnum.LIST);
+                }}
+                class:view-active={selectedView === TeamViewEnum.LIST}
+                src={hamburger}
+                alt=""
+              >
+                <ListRegular size={"16px"} />
               </span>
             {/if}
           </div>
@@ -527,5 +529,8 @@
   }
   .moreOption-icon:hover {
     background-color: var(--bg-tertiary-190);
+  }
+  .teams-menu__right {
+    display: flex;
   }
 </style>
