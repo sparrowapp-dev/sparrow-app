@@ -81,6 +81,7 @@
   <Select
     headerTheme={"secondary"}
     id={"api-request"}
+    size={"medium"}
     data={[
       {
         name: "GET",
