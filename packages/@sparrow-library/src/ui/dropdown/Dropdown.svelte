@@ -26,7 +26,7 @@
     iconSize?: string;
     onclick: () => void;
     isHoverConstant?: boolean;
-    subTitle?: String;
+    subTitle?: string;
     startIcon?: any;
     endIcon?: any;
   }[];
