@@ -17,6 +17,7 @@
       </div>
 
       <Alert
+        heading="Error"
         varient="error"
         description="Unable to reach the API endpoint. Please verify the request URL and try again."
       />
