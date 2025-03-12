@@ -42,7 +42,7 @@
   };
 </script>
 
-<section class="w-100" style="">
+<section class="w-100" style="color:var(--text-ds-neutral-50)">
   <TabularInput
     {isBulkEditRequired}
     bulkEditPlaceholder={placeholderHeader}
