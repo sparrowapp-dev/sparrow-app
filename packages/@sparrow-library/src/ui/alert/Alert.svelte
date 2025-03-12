@@ -8,6 +8,9 @@
   export let description = "Could not Send Request";
   export let heading = "Error";
   export let icon;
+  export let ctaTitle = "Try Again";
+  export let ctaShow = false;
+  export let onClick = () => {};
   export let varient: "error" | "success" | "warning" | "info" = "error";
 
   let componentClass;
@@ -77,6 +80,18 @@
           </p>
         </div>
       </div>
+      {#if ctaShow}
+        <div>
+          <Button
+            type="outline-secondary"
+            size="small"
+            title={ctaTitle}
+            onClick={() => {
+              onClick();
+            }}
+          />
+        </div>
+      {/if}
     </div>
   </div>
 </div>

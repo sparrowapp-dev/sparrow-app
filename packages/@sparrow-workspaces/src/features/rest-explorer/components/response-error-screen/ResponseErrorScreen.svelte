@@ -2,6 +2,7 @@
   import { DangerIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
   import { Alert } from "@sparrow/library/ui";
+  export let onSendButtonClicked;
 </script>
 
 <div class="response-default">
@@ -16,9 +17,11 @@
         </p>
       </div>
       <Alert
-        varient="info"
+        varient="error"
         description="Cloud Agent error: Please check the URL .Try again. Make sure that the domain is publicly accessible"
         heading={"Error"}
+        ctaShow={true}
+        onClick={onSendButtonClicked}
       />
     </div>
   </div>

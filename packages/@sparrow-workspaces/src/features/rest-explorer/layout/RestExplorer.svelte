@@ -20,7 +20,7 @@
     RequestParameters,
     ResponseStatus,
   } from "../components";
-  import { Alert, Loader } from "@sparrow/library/ui";
+  import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
@@ -158,9 +158,6 @@
   }
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
-  };
-  const toggleErrorMsg = (flag: boolean): void => {
-    isErrorMsgOpen = flag;
   };
 
   let isGuidePopup = false;
@@ -385,7 +382,9 @@
                     {:else if !storeData?.response.status}
                       <ResponseDefaultScreen />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen
+                        onSendButtonClicked={onSendRequest}
+                      />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column">
                         <ResponseStatus response={storeData.response} />
