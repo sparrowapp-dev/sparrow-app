@@ -34,7 +34,7 @@
   /**
    * width
    */
-  let width = "100%";
+  export let width = "100%";
 
   /**
    * identifies input is disabled or not
