@@ -331,11 +331,11 @@
 
         <Input
           type={"text"}
-          size={"large"}
+          size={"medium"}
           maxlength={500}
           id={"renameInputFieldCollection"}
           value={$tab?.name || ""}
-          variant={"inlineTextField"}
+          variant={"inline"}
           placeholder={"Untitled"}
           disabled={!isCollectionEditable}
           on:input={handleInputName}

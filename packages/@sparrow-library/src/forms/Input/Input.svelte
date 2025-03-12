@@ -2,15 +2,23 @@
   import { createEventDispatcher, onMount } from "svelte";
 
   /**
-   * variant type
-   */
-  export let variant: "normal" | "strokeTextField" | "inlineTextField" =
-    "strokeTextField";
-
-  /**
    * input type
    */
+  export let variant: "primary" | "stroke" | "inline" = "primary";
   export let type: "text" | "password" = "text";
+
+  export let isError = false;
+  /**
+   * placeholder - dummy text
+   */
+  export let placeholder = "placeholder";
+
+  /**
+   * height
+   */
+
+  let height = "28px";
+  export let size: "small" | "medium" | "large" = "medium";
 
   /**
    * width
@@ -18,96 +26,15 @@
   let width = "100%";
 
   /**
-   * height
-   */
-  let height = "28px";
-
-  /**
-   * id for the input tag and its parent
-   */
-  export let id = "";
-
-  /**
-   * placeholder - dummy text
-   */
-  export let placeholder = "placeholder";
-
-  /**
-   * size of the input
-   */
-  export let size: "small" | "medium" | "large" = "medium";
-
-  /**
-   * Props for custom style and class
-   */
-  let componentClass = "";
-  let componentStyle = "";
-  export { componentClass as class };
-  export { componentStyle as style };
-  // $: console.log(componentStyle);
-
-  /**
    * identifies input is disabled or not
    */
   export let disabled = false;
-
-  /**
-   * input text value
-   */
   export let value = "";
-
-  /**
-   * max length allowed
-   */
   export let maxlength = 500;
-
-  export let isError = false;
+  export let id = "";
   let enterPressed = false;
 
-  // Reactive statement to update height based on variant and size
-  $: {
-    if (variant === "normal") {
-      // height = size === "small" ? "24px" : size === "medium" ? "32px" : "40px";
-    } else if (variant === "strokeTextField") {
-      height = size === "small" ? "28px" : size === "medium" ? "36px" : "44px";
-    } else if (variant === "inlineTextField") {
-      height = size === "small" ? "24px" : size === "medium" ? "40px" : "40px";
-    }
-  }
-
   const dispatch = createEventDispatcher();
-
-  $: {
-    if (value === "") {
-      enterPressed = false;
-    }
-  }
-  const handleClick = () => {
-    if (value.length > 0) {
-      enterPressed = true;
-    }
-  };
-
-  onMount(() => {
-    window.addEventListener("click", handleClick);
-  });
-
-  const onMouseEnter = () => {};
-
-  const onMouseLeave = () => {};
-
-  const onFocus = (event) => {
-    dispatch("focused", event?.target?.value);
-  };
-
-  const onBlur = (event) => {
-    dispatch("blur", event?.target?.value);
-  };
-
-  const onInput = (event) => {
-    value = event?.target?.value;
-    dispatch("input", event?.target?.value);
-  };
 
   /**
    * blur input on Enter key press
@@ -125,130 +52,200 @@
       enterPressed = false;
     }
   };
+
+  $: {
+    if (value === "") {
+      enterPressed = false;
+    }
+  }
+  const handleClick = () => {
+    if (value.length > 0) {
+      enterPressed = true;
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("click", handleClick);
+  });
 </script>
 
-<div
-  class="position-relative"
-  style="height:{height}; width: {width}; !important"
->
+<div class="position-relative" style="width: {width}; !important">
   <input
     {id}
-    {type}
     {value}
-    {disabled}
-    {maxlength}
-    {placeholder}
-    on:mouseenter={onMouseEnter}
-    on:mouseleave={onMouseLeave}
-    on:focus={onFocus}
-    on:blur={onBlur}
-    on:input={onInput}
+    on:input={(event) => {
+      value = event?.target?.value;
+      dispatch("input", event?.target?.value);
+    }}
     on:keydown={onKeyPress}
-    class={`input-field ${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100 ${componentClass}`}
-    style="{componentStyle};"
+    {type}
+    {maxlength}
+    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100`}
+    {placeholder}
+    {disabled}
   />
 </div>
 
 <style lang="scss">
-  .SearchIconClass {
-    display: flex;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////
-  ///                        Base Style for Input Tag
-  ///////////////////////////////////////////////////////////////////////////////
-  input {
-    caret-color: var(--border-primary-300);
-    border: 1px solid transparent;
-  }
-
-  input::placeholder {
-    color: var(--placeholder-color);
-  }
-
-  .input-field {
+  .stroke {
     color: var(--text-ds-neutral-50);
     background-color: transparent;
+    border: 1px solid var(--border-ds-neutral-600);
     border-radius: 4px;
     gap: 8px;
     caret-color: var(--border-ds-primary-300);
     line-height: 150%;
+    // padding: 2px 8px;
+    // font-size: 12px !important;
+    // font-weight: 500;
   }
-
-  .input-field.isError {
+  .stroke.isError {
     border: 2px solid var(--border-ds-danger-300) !important;
     border-radius: 4px;
   }
-  .input-field::placeholder {
+  .stroke::placeholder {
     color: var(--text-ds-neutral-400) !important;
   }
-  .input-field:focus {
+  .stroke:focus {
     outline: none;
     background-color: var(--bg-ds-surface-400);
     border: 2px solid var(--border-ds-primary-300);
   }
-
   // during typing
-  .input-field.has-text {
+  .stroke.has-text {
     border: 1px solid var(--border-ds-primary-300);
     border-radius: 4px;
   }
-
   // when it have text but not foucsed
-  .input-field.has-text:not(:focus) {
+  .stroke.has-text:not(:focus) {
     border: 1px solid var(--border-ds-neutral-600);
     border-radius: 4px;
   }
-
   // when it have text  and focused
-  .input-field.entered:focus {
+  .stroke.entered:focus {
     background-color: var(--bg-ds-surface-400);
     border: 2px solid var(--border-ds-primary-300);
     border-radius: 4px;
   }
-
   // when it have text and not focused
-  .input-field:not(:focus):hover {
+  .stroke:not(:focus):hover {
     border: 1px solid var(--border-ds-neutral-300);
     border-radius: 4px;
   }
 
-  ///////////////////////////////////////////////////////////////////////////////
-  ///                        StrokeTextField Variants Specific Style
-  ///////////////////////////////////////////////////////////////////////////////
-  .strokeTextField {
+  .primary {
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-surface-400);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    gap: 8px;
+    caret-color: var(--border-ds-primary-300);
+    line-height: 150%;
+    // padding: 2px 8px;
+    // font-size: 12px !important;
+    // font-weight: 500;
+  }
+  .primary.isError {
+    border: 2px solid var(--border-ds-danger-300) !important;
+    border-radius: 4px;
+  }
+  .primary::placeholder {
+    color: var(--text-ds-neutral-400) !important;
+  }
+  .primary:focus {
+    outline: none;
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // during typing
+  .primary.has-text {
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text but not foucsed
+  .primary.has-text:not(:focus) {
     border: 1px solid var(--border-ds-neutral-600);
-    font-size: 12px !important;
-    font-weight: 500;
-    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  // when it have text  and focused
+  .primary.entered:focus {
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text and not focused
+  .primary:not(:focus):hover {
+    border: 1px solid var(--border-ds-neutral-300);
+    border-radius: 4px;
   }
 
-  ///////////////////////////////////////////////////////////////////////////////
-  ///                        InlineTextField Variants Specific Style
-  ///////////////////////////////////////////////////////////////////////////////
-  .inlineTextField {
-    background-color: transparent !important; // Always bg will be transparent
-    font-family: "Inter", sans-serif;
-    outline: none;
+  /** inline */
+
+  .inline {
+    color: var(--text-ds-neutral-50);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 2px 8px;
+    gap: 8px;
+    caret-color: var(--border-ds-primary-300);
+    // font-size: 12px !important;
+    // font-weight: 500;
+    line-height: 150%;
   }
-  .inlineTextField.small {
+  .inline.isError {
+    border: 2px solid var(--border-ds-danger-300) !important;
+    border-radius: 4px;
+  }
+  .inline::placeholder {
+    color: var(--text-ds-neutral-400) !important;
+  }
+  .inline:focus {
+    outline: none;
+    // background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // during typing
+  .inline.has-text {
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text but not foucsed
+  .inline.has-text:not(:focus) {
+    border: 1px solid var(--border-ds-neutral-600);
+    border-radius: 4px;
+  }
+  // when it have text  and focused
+  .inline.entered:focus {
+    // background-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text and not focused
+  .inline:not(:focus):hover {
+    border: 1px solid var(--border-ds-neutral-300);
+    border-radius: 4px;
+  }
+
+  // Default State
+  .inline.has-text:not(:focus):not(:hover) {
+    border-color: transparent;
+  }
+
+  .small {
+    height: 28px;
     font-size: 12px;
     font-weight: 500;
     padding: 8px 4px;
   }
-  .inlineTextField.medium {
+  .medium {
     font-size: 16px;
     font-weight: 500;
     padding: 8px;
   }
-  .inlineTextField.large {
+  .large {
     font-size: 20px;
     font-weight: 600;
     padding: 8px;
-  }
-
-  // Default State
-  .input-field.inlineTextField.has-text:not(:focus):not(:hover) {
-    border-color: transparent;
   }
 </style>

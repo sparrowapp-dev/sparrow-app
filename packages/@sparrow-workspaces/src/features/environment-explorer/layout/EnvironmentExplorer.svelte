@@ -148,11 +148,11 @@
 
         <Input
           type={"text"}
-          size={"large"}
+          size={"medium"}
           maxlength={500}
           id={"environment-name"}
           bind:value={environmentName}
-          variant={"inlineTextField"}
+          variant={"inline"}
           placeholder={"Untitled"}
           style={"width: 40%; !important"}
           disabled={$currentEnvironment?.property?.environment?.type ==
