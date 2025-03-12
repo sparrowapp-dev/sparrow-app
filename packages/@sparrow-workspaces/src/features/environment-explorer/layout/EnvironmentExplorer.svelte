@@ -303,7 +303,7 @@
 
 <style lang="scss">
   .env-panel {
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-900);
   }
   .env-heading {
     font-size: 18px;
