@@ -4,7 +4,7 @@
   /**
    * input type
    */
-  export let variant: "normal" | "strokeTextField" = "strokeTextField";
+  export let variant: "primary" | "stroke" = "primary";
   export let type: "text" | "password" = "text";
 
   export let isError = false;
@@ -94,26 +94,14 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`input-field ${variant} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100`}
+    class={`${variant} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 h-100`}
     {placeholder}
     {disabled}
   />
 </div>
 
 <style lang="scss">
-  .SearchIconClass {
-    display: flex;
-  }
-  input {
-    caret-color: var(--border-primary-300);
-    border: 1px solid transparent;
-  }
-  input::placeholder {
-    color: var(--placeholder-color);
-  }
-  /* Base style */
-
-  .input-field {
+  .stroke {
     color: var(--text-ds-neutral-50);
     background-color: transparent;
     border: 1px solid var(--border-ds-neutral-600);
@@ -125,36 +113,82 @@
     font-weight: 500;
     line-height: 150%;
   }
-  .input-field.isError {
+  .stroke.isError {
     border: 2px solid var(--border-ds-danger-300) !important;
     border-radius: 4px;
   }
-  .input-field::placeholder {
+  .stroke::placeholder {
     color: var(--text-ds-neutral-400) !important;
   }
-  .input-field:focus {
+  .stroke:focus {
     outline: none;
     background-color: var(--bg-ds-surface-400);
     border: 2px solid var(--border-ds-primary-300);
   }
   // during typing
-  .input-field.has-text {
+  .stroke.has-text {
     border: 1px solid var(--border-ds-primary-300);
     border-radius: 4px;
   }
   // when it have text but not foucsed
-  .input-field.has-text:not(:focus) {
+  .stroke.has-text:not(:focus) {
     border: 1px solid var(--border-ds-neutral-600);
     border-radius: 4px;
   }
   // when it have text  and focused
-  .input-field.entered:focus {
+  .stroke.entered:focus {
     background-color: var(--bg-ds-surface-400);
     border: 2px solid var(--border-ds-primary-300);
     border-radius: 4px;
   }
   // when it have text and not focused
-  .input-field:not(:focus):hover {
+  .stroke:not(:focus):hover {
+    border: 1px solid var(--border-ds-neutral-300);
+    border-radius: 4px;
+  }
+
+  .primary {
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-surface-400);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 2px 8px;
+    gap: 8px;
+    caret-color: var(--border-ds-primary-300);
+    font-size: 12px !important;
+    font-weight: 500;
+    line-height: 150%;
+  }
+  .primary.isError {
+    border: 2px solid var(--border-ds-danger-300) !important;
+    border-radius: 4px;
+  }
+  .primary::placeholder {
+    color: var(--text-ds-neutral-400) !important;
+  }
+  .primary:focus {
+    outline: none;
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // during typing
+  .primary.has-text {
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text but not foucsed
+  .primary.has-text:not(:focus) {
+    border: 1px solid var(--border-ds-neutral-600);
+    border-radius: 4px;
+  }
+  // when it have text  and focused
+  .primary.entered:focus {
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text and not focused
+  .primary:not(:focus):hover {
     border: 1px solid var(--border-ds-neutral-300);
     border-radius: 4px;
   }
