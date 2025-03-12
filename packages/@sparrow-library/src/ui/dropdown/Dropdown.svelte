@@ -13,6 +13,8 @@
    * If the menu is open
    */
   export let isMenuOpen: boolean = false;
+
+  export let disable: Boolean = false;
   /**
    * Options of the menu
    */
@@ -105,9 +107,9 @@
     -->
       {#each options as item}
         <button
-          class="d-flex align-items-center p-2 rounded-1 gap-1 w-100 option-button {item?.isHoverConstant
+          class="d-flex align-items-center p-2 rounded-1 gap-2 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
-            : ''} {disable ? 'option-button' : ''} "
+            : ''} {disable ? 'option-button-disable' : ''} "
           style="color: {item.color};"
           on:click={() => item.onclick()}
           tabindex={0}
@@ -193,5 +195,9 @@
     font-weight: 400;
     font-size: 12px;
     color: var(--text-ds-neutral-300);
+  }
+  .option-button-disable {
+    background-color: var(--bg-ds-surface-600);
+    opacity: 0.6;
   }
 </style>
