@@ -203,7 +203,11 @@ export { default as ThumbDislikeRegular } from "./ThumbDislikeRegular.svelte";
 export { default as ThumbLikeFilled } from "./ThumbLikeFilled.svelte";
 export { default as SendRegular } from "./SendRegular.svelte";
 export { default as ThumbDislikeFilled } from "./ThumbDislikeFilled.svelte";
-export { default as GlobeRegular } from "./GlobeRegular.svelte";
+export {default as  GlobeRegular} from "./GlobeRegular.svelte";
+export {default as ArrowUploadFilled} from "./ArrowUploadFilled.svelte"
+export {default as EditRegular} from "./EditRegular.svelte";
+export {default as LockClosedRegular} from "./LockClosedRegular.svelte";
+export {default as SearchFilled} from "./SearchFilled.svelte";
 export { default as ArchiveRegular } from "./ArchiveRegular.svelte";
 export { default as ArrowClockWiseRegular } from "./ArrowClockWiseRegular.svelte";
 export { default as QuestionCirlceReqular } from "./QuestionCircleReqular.svelte";
