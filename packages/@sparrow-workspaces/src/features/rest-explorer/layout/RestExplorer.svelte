@@ -374,9 +374,7 @@
                 style="overflow:auto;"
               >
                 <div class="h-100 d-flex flex-column">
-                  <div
-                    style="display:flex; justify-content:center; overflow:auto; "
-                  >
+                  <div style="flex:1; overflow:auto; ">
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div

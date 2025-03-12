@@ -16,7 +16,7 @@
         </p>
       </div>
       <Alert
-        varient="error"
+        varient="info"
         description="Cloud Agent error: Please check the URL .Try again. Make sure that the domain is publicly accessible"
         heading={"Error"}
       />
