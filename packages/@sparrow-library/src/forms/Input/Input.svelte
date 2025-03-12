@@ -67,20 +67,35 @@
   onMount(() => {
     window.addEventListener("click", handleClick);
   });
+
+  const handleInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value = target?.value;
+    dispatch("input", target?.value);
+  };
+
+  const handleBlur = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    value = target?.value;
+    dispatch("blur", target?.value);
+  };
 </script>
 
-<div class="position-relative" style="width: {width}; !important">
+<div class="position-relative">
   <input
     {id}
     {value}
-    on:input={(event) => {
-      value = event?.target?.value;
-      dispatch("input", event?.target?.value);
-    }}
+    on:input={handleInput}
+    on:blur={handleBlur}
     on:keydown={onKeyPress}
     {type}
     {maxlength}
+<<<<<<< HEAD
     class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}  w-100 `}
+=======
+    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
+    style="width: {width};"
+>>>>>>> ab24c06fe252467267bb1b20db7bc82466a94ded
     {placeholder}
     {disabled}
   />

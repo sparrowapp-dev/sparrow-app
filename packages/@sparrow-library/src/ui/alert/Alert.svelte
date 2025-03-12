@@ -35,7 +35,7 @@
 <div>
   <div
     class={componentClass}
-    style="width: 543px; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px;"
+    style="width: 543px; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
   >
     <div
       class="d-flex align-items-start flex-row"
@@ -135,8 +135,8 @@
 
   .icon-backdrop-error {
     position: absolute;
-    width: 90px;
-    height: 90px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     z-index: 1;
     top: 50%;
@@ -151,8 +151,8 @@
   }
   .icon-backdrop-success {
     position: absolute;
-    width: 90px;
-    height: 90px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     z-index: 1;
     top: 50%;
@@ -166,8 +166,8 @@
   }
   .icon-backdrop-info {
     position: absolute;
-    width: 90px;
-    height: 90px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     z-index: 1;
     top: 50%;
@@ -181,8 +181,8 @@
   }
   .icon-backdrop-warning {
     position: absolute;
-    width: 90px;
-    height: 90px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     z-index: 1;
     top: 50%;

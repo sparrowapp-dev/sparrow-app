@@ -336,7 +336,7 @@
           id={"renameInputFieldCollection"}
           value={$tab?.name || ""}
           variant={"inline"}
-          placeholder={"Untitled"}
+          placeholder={""}
           disabled={!isCollectionEditable}
           on:input={handleInputName}
           on:blur={handleBlurName}
