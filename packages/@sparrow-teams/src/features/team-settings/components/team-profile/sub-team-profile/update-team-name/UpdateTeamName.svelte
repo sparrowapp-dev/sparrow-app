@@ -1,9 +1,9 @@
 <script lang="ts">
   import { TeamPropertyEnum } from "../../../../types";
   import { NAME_CONFIG } from "../../../../constants";
+  import { Input } from "@sparrow/library/forms";
   export let teamName: string;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
-
   const inputId = "input-team-name";
   const blurInputField = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -19,20 +19,14 @@
       {NAME_CONFIG.TITLE}
     </p>
   </div>
-  <div
-    class="container-width"
-    style="background-color: var(--bg-ds-surface-600); margin-top:8px;border-radius:4px"
-  >
-    <input
-      required
+  <div class="container-width">
+    <Input
+      size={"small"}
+      width={"398px"}
       type="text"
+      variant={"primary"}
       id={inputId}
       placeholder={NAME_CONFIG.PLACEHOLDER}
-      class="settings-team-name w-100 fs-12 border-0 p-2 rounded"
-      autocomplete="off"
-      spellcheck="false"
-      autocorrect="off"
-      autocapitalize="off"
       maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
       bind:value={teamName}
       on:keydown={(e) => {
@@ -41,6 +35,7 @@
       on:blur={() => {
         onUpdateTeam(TeamPropertyEnum.NAME);
       }}
+      disabled={true}
     />
   </div>
 </div>
@@ -62,6 +57,6 @@
     width: 98px;
   }
   .container-width {
-    width: 398px;
+    width: calc(100%-98px);
   }
 </style>

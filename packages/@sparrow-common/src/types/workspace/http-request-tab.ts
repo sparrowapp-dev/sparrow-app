@@ -1,15 +1,6 @@
-export enum AuthTypeEnum {
-  NO_AUTH = "No Auth",
-  API_KEY = "API Key",
-  BEARER_TOKEN = "Bearer Token",
-  BASIC_AUTH = "Basic Auth",
-}
+import type { CollectionAuthBaseInterface, CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "./collection-base";
+import type { HttpRequestAuthTypeBaseEnum } from "./http-request-base";
 
-export enum AuthSectionEnum {
-  HEADER = "Header",
-  QUERY_PARAMETER = "Query Parameter",
-  COOKIES = "Cookies",
-}
 export enum RequestMethodEnum {
   GET = "GET",
   POST = "POST",
@@ -92,7 +83,7 @@ export interface RequestBodyNavigationWrapper {
   requestBodyNavigation: RequestDatasetEnum;
 }
 export interface RequestAuthNavigationWrapper {
-  requestAuthNavigation: AuthTypeEnum;
+  requestAuthNavigation: HttpRequestAuthTypeBaseEnum;
 }
 export interface RequestNavigationWrapper {
   requestNavigation: RequestSectionEnum;
@@ -163,7 +154,7 @@ export interface AuthValueWrapper {
   authValue: string;
 }
 export interface AddtoWrapper {
-  addTo: AuthSectionEnum;
+  addTo: CollectionRequestAddToBaseEnum;
 }
 export interface BearerTokenWrapper {
   bearerToken: string;
@@ -237,6 +228,17 @@ export interface Body extends RawWrapper, UrlEncodedWrapper, FormDataWrapper {}
 export interface BodyWrapper {
   body: Body;
 }
+
+export interface HttpRequestCollectionAuthTabInterface  {
+  auth: CollectionAuthBaseInterface
+}
+
+export interface HttpRequestCollectionAuthNavigationTabInterface {
+  collectionAuthNavigation : CollectionAuthTypeBaseEnum
+}
+
+export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface,  HttpRequestCollectionAuthNavigationTabInterface {}
+
 
 export interface State
   extends RequestBodyLanguageWrapper,

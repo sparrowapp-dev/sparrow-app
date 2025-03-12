@@ -195,14 +195,15 @@
                         />
                       </div>
                       <div style="overflow:auto; height:50%;">
-                        <div class="h-100 d-flex flex-column">
+                        <div class="h-100 d-flex flex-column" 
+                        style="border-top: 1px solid var(--border-ds-surface-100);padding-top: 8px;">
                           <ResponsePreviewNavigator
                             {webSocket}
                             {isWebApp}
                             {onUpdateContentType}
                           />
                           <div class="pt-2"></div>
-                          <div style="flex:1; overflow:auto;">
+                          <div style="flex:1; overflow:auto;border: 1px solid var(--border-ds-surface-100);border-radius:2px;">
                             <ResponsePreview {webSocket} />
                           </div>
                         </div>
@@ -258,7 +259,7 @@
   :global(.web-socket-splitter.splitpanes--vertical > .splitpanes__splitter) {
     width: 11px !important;
     height: 100% !important;
-    background-color: var(--bg-secondary-500) !important;
+    background-color: var(--bg-ds-surface-100) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
     border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
