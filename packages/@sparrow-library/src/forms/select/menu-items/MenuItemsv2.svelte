@@ -33,7 +33,7 @@
    * Ticked mark icon
    */
   export let tickIcon: any;
-  export let getTextColor: (color: any) => string;
+  export let getTextColor: (color: any) => {};
   /**
    * marks the tickmark is highlighted
    */
@@ -78,9 +78,6 @@
       return "";
     }
   };
-  $: console.log(list?.color);
- $: console.log();
-
   /**
    * @description - add classes to ticked options
    * @param _id - item id (rows iteration)

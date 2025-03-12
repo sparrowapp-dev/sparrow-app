@@ -53,6 +53,7 @@
     id="collection-list-search"
     width={"100%"}
     height={"24px"}
+    type="teritiary"
     size="small"
     on:input={() => {
       onUpdateRequestEventName(requestEventName);
@@ -78,8 +79,3 @@
     type={"primary"}
   />
 </div>
-<style>
-  .inputField{
-    background-color: blueviolet;
-  }
-</style>
