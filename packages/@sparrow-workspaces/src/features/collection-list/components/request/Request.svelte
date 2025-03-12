@@ -27,7 +27,6 @@
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
-  import { Input } from "@sparrow/library/forms";
 
   let expand = false;
   /**
