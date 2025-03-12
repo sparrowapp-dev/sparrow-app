@@ -8,17 +8,6 @@
   export let onUpdateTeam;
 
   let activeTeamSettingsTabId = TeamSettingsTabsEnum.TEAM_PROFILE;
-
-  let searchQuery: string = "";
-
-  const handleSearch = (event: CustomEvent) => {
-    searchQuery = event.detail;
-    console.log("Searching for:", searchQuery);
-  };
-  const handleClear = () => {
-    console.log("Search cleared");
-    searchQuery = "";
-  };
 </script>
 
 <div>
