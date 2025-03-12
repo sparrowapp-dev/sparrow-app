@@ -61,6 +61,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import type { CollectionBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+  import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
   let deletedIds: string[] = [];
   let requestCount = 0;
@@ -362,6 +363,17 @@
           !(collection?.activeSync && !isBranchSynced)
             ? false
             : true,
+      },
+      {
+        onClick: () =>
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+            navigation: CollectionNavigationTabEnum.AUTH,
+          }),
+        displayText: "Set Auth",
+        disabled: false,
+        hidden: false,
       },
       {
         onClick: () => {
