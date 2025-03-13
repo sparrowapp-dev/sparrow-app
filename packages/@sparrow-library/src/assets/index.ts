@@ -32,6 +32,7 @@ export { default as StatusSuccessIcon } from "./status-success.svelte";
 export { default as TickMarkRoundedIcon } from "./tick-mark-rounded.svelte";
 export { default as QuestionIcon } from "./question.svelte";
 export { default as FilterIcon } from "./filter.svelte";
+export { default as FileType } from "./filetype.svelte";
 
 // Export all SVG files (camelCase) with "Icon" appended
 export { default as aboutIcon } from "./about.svg";

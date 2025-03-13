@@ -13,6 +13,7 @@ export * from "./carousel";
 export * from "./toast";
 export * from "./image-modal";
 export * from "./skeleton";
+export * from "./upload-area";
 export * from "./radio-button";
 export * from "./toggle";
 export * from "./tags";
