@@ -3,11 +3,13 @@ description: Create a bug report to help us improve Sparrow
 title: "[bug]: "
 labels: [bug]
 assignees: [LordNayan]
+type: [Bug]
+projects: [Sparrow]
 body:
 - type: markdown
   attributes:
     value: |
-      Thank you for taking the time to fill out this bug report.
+      Thank you for taking your time out to fill this bug report.
 - type: checkboxes
   attributes:
     label: Is there an existing issue for this?
@@ -45,6 +47,7 @@ body:
       - Windows 11
       - Mac - Intel
       - Mac - M1
+      - Other
       - Others
   validations:
     required: true
