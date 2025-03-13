@@ -549,7 +549,9 @@
    */
   const countNextDeletedNode = (id: string) => {
     nodes.subscribe((_nodes) => {
-      deleteCount = _nodes.filter((node) => node.id > id).length;
+      deleteCount = _nodes.filter(
+        (node) => Number(node.id) > Number(id),
+      ).length;
     });
   };
 
