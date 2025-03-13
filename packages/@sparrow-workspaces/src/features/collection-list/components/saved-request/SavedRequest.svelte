@@ -304,7 +304,9 @@
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
-        {api.name}
+        <p class="ellipsis m-0 p-0">
+          {api.name}
+        </p>
       </div>
     {/if}
   </button>

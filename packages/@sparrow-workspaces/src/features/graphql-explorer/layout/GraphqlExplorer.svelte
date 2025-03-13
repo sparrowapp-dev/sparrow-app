@@ -295,11 +295,13 @@
                             errorMessage={queryErrorMessage}
                             {errorStartIndex}
                             {errorEndIndex}
+                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
                           <RequestVariables
                             value={$tab.property.graphql.variables}
                             onUpdateRequestVariable={onUpdateVariables}
+                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                           <RequestHeaders
@@ -392,7 +394,7 @@
               class="position-relative bg-transparent"
             >
               <div class="h-100 d-flex flex-column">
-                <div class="mb-2 pt-1">
+                <!-- <div class="mb-2 pt-1">
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
@@ -401,7 +403,7 @@
                       ? $tab.property.graphql.mutation
                       : $tab.property.graphql.query}
                   />
-                </div>
+                </div> -->
                 <div style="flex:1; overflow: auto;">
                   {#if $tab.property.graphql.state.isRequestSchemaFetched}
                     <GenerateQuery
@@ -412,6 +414,8 @@
                       onUpdateRequestState={handleUpdateRequestState}
                       operationSearch={$tab.property.graphql?.operationSearch}
                       {updateOperationSearch}
+                      onRefreshSchema={handleFetchSchema}
+                      {isSchemaFetching}
                     />
                   {:else}
                     <div style="flex: 1;">

@@ -1,12 +1,14 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
   import {
-    CloudOffIcon,
     SparrowEdgeIcon,
     StackIcon,
     CheckCircle,
     ArrowRightRegular,
     AddRegular,
+    QuestionCirlceReqular,
+    DocumentRegular,
+    GiftReqular,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
@@ -19,7 +21,7 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
-  import { Button, Tooltip } from "@sparrow/library/ui";
+  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
@@ -65,6 +67,10 @@
   export let isCreateTeamModalOpen;
   export let searchQuery = "";
   export let onSearchClick;
+  export let handleDocsRedirect;
+  export let handleFeaturesRedirect;
+
+  let helpOptionsOpen = false;
 
   /**
    * callback for Select component
@@ -240,6 +246,15 @@
       isWindows = false;
     }
   });
+
+  const redirectDocumentation = () => {
+    // window.open(docsLink, "_blank");
+    handleDocsRedirect();
+  };
+  const redirectNewFeatures = () => {
+    // window.open(featureUpdatesLink, "_blank");
+    handleFeaturesRedirect();
+  };
 </script>
 
 <header
@@ -279,7 +294,7 @@
     <!-- <div >
       <WorkspaceRegular />
     </div> -->
-    <div class="no-drag" style="margin-left: 8px;">
+    <div class="no-drag" style="margin-left: 8px;" id="workspace-container">
       {#if isGuestUser}
         <div style="display: flex;">
           <Select
@@ -497,49 +512,93 @@
     {/if}
     <!-- {#if !isWebApp} -->
 
-    <Select
-      id={"environment-selector"}
-      data={[
-        {
-          name: "Select Environment",
-          id: "none",
-          type: environmentType.LOCAL,
-          hide: true,
-        },
-        {
-          name: "None",
-          id: "none",
-          display: "none",
-          type: environmentType.LOCAL,
-        },
-        ...environments,
-      ].filter((elem) => {
-        return elem.type === environmentType.LOCAL;
-      })}
-      titleId={currentEnvironment?.id}
-      onclick={handleDropdown}
-      minHeaderWidth={"205px"}
-      iconRequired={true}
-      icon={StackIcon}
-      iconColor={"var(--icon-primary-300)"}
-      isDropIconFilled={true}
-      borderType={"none"}
-      borderActiveType={"none"}
-      headerHighlight={"hover-active"}
-      headerTheme={"transparent"}
-      menuItem={"v2"}
-      headerFontSize={"12px"}
-      maxHeaderWidth={"185px"}
-      zIndex={200}
-      bodyTheme={"surface"}
-      borderRounded={"2px"}
-      position={"absolute"}
-      headerHeight={"28px"}
-    />
+    <div id="environment-select-container">
+      <Select
+        id={"environment-selector"}
+        data={[
+          {
+            name: "Select Environment",
+            id: "none",
+            type: environmentType.LOCAL,
+            hide: true,
+          },
+          {
+            name: "None",
+            id: "none",
+            display: "none",
+            type: environmentType.LOCAL,
+          },
+          ...environments,
+        ].filter((elem) => {
+          return elem.type === environmentType.LOCAL;
+        })}
+        titleId={currentEnvironment?.id}
+        onclick={handleDropdown}
+        minHeaderWidth={"205px"}
+        iconRequired={true}
+        icon={StackIcon}
+        iconColor={"var(--icon-primary-300)"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        headerTheme={"transparent"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"185px"}
+        zIndex={200}
+        bodyTheme={"surface"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        headerHeight={"28px"}
+      />
+    </div>
     <!-- {/if} -->
+    <div class="" id="question-container">
+      <Tooltip placement="bottom-right" title={"Quick Help"} zIndex={600}>
+        <Button
+          startIcon={QuestionCirlceReqular}
+          type="teritiary-regular"
+          size="medium"
+          iconSize={20}
+          onClick={() => (helpOptionsOpen = !helpOptionsOpen)}
+        />
+      </Tooltip>
+    </div>
+    {#if helpOptionsOpen}
+      <div class="question-option">
+        <Dropdown
+          buttonId="question-container"
+          horizontalPosition="left"
+          isMenuOpen={true}
+          options={[
+            {
+              name: "Documentation",
+              color: "var(--text-ds-neutral-50)",
+              startIcon: DocumentRegular,
+              iconSize: "16px",
+              iconColor: "var(--icon-ds-neutral-50)",
+              onclick: () => {
+                redirectDocumentation();
+              },
+            },
+            {
+              name: "What’s New?",
+              color: "var(--text-ds-neutral-50)",
+              startIcon: GiftReqular,
+              iconSize: "16px",
+              iconColor: "var(--icon-ds-neutral-50)",
+              onclick: () => {
+                redirectNewFeatures();
+              },
+            },
+          ]}
+        />
+      </div>
+    {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-2"}>
+      <div class={"pe-1"}>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
@@ -560,6 +619,10 @@
 </header>
 
 <style>
+  .main-container {
+    min-height: 28px;
+    min-width: 96px;
+  }
   header {
     height: 44px;
     background-color: var(--bg-ds-surface-700);
@@ -690,5 +753,8 @@
     opacity: 0.2;
     pointer-events: none;
     z-index: 1;
+  }
+  .question-option {
+    position: absolute;
   }
 </style>

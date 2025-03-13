@@ -39,15 +39,7 @@
     placeholder={"Workspace name"}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    hoveredBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
-    focusedBorderColor={inputNameError
-      ? "var(--border-danger-200)"
-      : "var(--border-secondary-400)"}
+    isError={inputNameError ? true : false}
     isEditIconRequired={false}
     type={"text"}
     placeholderColor={"var(--text-secondary-200)"}
@@ -63,20 +55,21 @@
   >
     <div class="d-flex ellipsis">
       {#if openTeam?.logo?.size}
-      <span class="me-2">
-        <Avatar
-          type={"image"}
-          size={"large"}
-          image={base64ToURL(openTeam?.logo)}/>
-      </span>
-         
+        <span class="me-2">
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+          />
+        </span>
       {:else}
         <span class="me-2">
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={workspace?.team?.teamName[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         </span>
       {/if}
       <div class="d-flex align-items-center ellipsis">

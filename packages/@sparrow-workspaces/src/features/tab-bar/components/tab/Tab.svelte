@@ -24,13 +24,15 @@
     SocketIoIcon,
     StackIcon,
     TreeIcon,
+    DismissCircleRegular,
+    CopyRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
     TabTypeEnum,
   } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge, Spinner } from "@sparrow/library/ui";
+  import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
 
@@ -74,6 +76,13 @@
 
   export let listLength;
   export let onDoubleClick: (tab: Tab) => void;
+  export let onRightClick: (tab: Tab) => void;
+  export let onClickCloseOtherTabs: (tabId: string) => void;
+  export let onClickForceCloseTabs: (tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
+  let noOfColumns = 200;
+  let showTabControlMenu = false;
+
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
       // Check if the middle button is pressed (button code 1)
@@ -82,6 +91,26 @@
   }
   const handleDoubleClick = (tab: Tab) => {
     onDoubleClick(tab);
+  };
+
+  let mouseX = 0;
+  let mouseY = 0;
+  const handleRightClick = (event: MouseEvent, tab: Tab) => {
+    showTabControlMenu = !showTabControlMenu;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+    const tabbarElement = document.querySelector(".tabbar") as HTMLElement;
+
+    if (tabbarElement) {
+      const navbarElement = tabbarElement.querySelector(".navbar");
+      if (navbarElement) {
+        navbarElement.remove();
+        // showTabControlMenu = true;
+      } else {
+        showTabControlMenu = true;
+      }
+    }
   };
 </script>
 
@@ -100,7 +129,70 @@
     : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
+  on:contextmenu|preventDefault={(event) => handleRightClick(event, tab)}
 >
+  <!-- <Dropdown>
+  </Dropdown> -->
+  {#if showTabControlMenu}
+    <Options
+      isTabMenu={true}
+      xAxis={mouseX}
+      yAxis={[mouseY, mouseY + 20]}
+      zIndex={500}
+      menuItems={[
+        {
+          onClick: () => {
+            onTabClosed(tab.id, tab);
+          },
+          displayText: "Close Tab",
+          disabled: false,
+          hidden: false,
+          icon: DismissCircleRegular,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs(tab.id);
+          },
+          displayText: "Close Other Tabs",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs("");
+          },
+          displayText: "Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickForceCloseTabs(tab.id);
+          },
+          displayText: "Force Close Other Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickForceCloseTabs("");
+          },
+          displayText: "Force Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickDuplicateTab(tab.id);
+          },
+          displayText: "Duplicate Tab",
+          hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
+            tab.type,
+          ),
+          icon: CopyRegular,
+        },
+      ]}
+      {noOfColumns}
+    />
+  {/if}
+
   <div
     on:click={() => {
       if (!tab.isActive) {
@@ -257,6 +349,11 @@
     {/if}
   </div></button
 >
+<svelte:window
+  on:click={() => {
+    showTabControlMenu = false;
+  }}
+/>
 
 <style>
   * {

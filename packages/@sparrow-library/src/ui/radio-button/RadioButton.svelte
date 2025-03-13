@@ -92,7 +92,7 @@
     {disabled}
     class="hidden"
   />
-  <label for={id}>
+  <label for={id} class={disabled ? "pe-none" : ""}>
     <div
       id={id + "-div"}
       class="focus-visible-button"

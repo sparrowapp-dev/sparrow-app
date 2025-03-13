@@ -81,6 +81,7 @@
   <Select
     headerTheme={"secondary"}
     id={"api-request"}
+    size={"medium"}
     data={[
       {
         name: "GET",
@@ -118,7 +119,7 @@
     zIndex={500}
     borderType={"none"}
     menuItem={"v2"}
-    bodyTheme={"violet"}
+    bodyTheme={"surface"}
     isDropIconFilled={true}
     highlightTickedItem={false}
     headerFontSize={"12px"}
