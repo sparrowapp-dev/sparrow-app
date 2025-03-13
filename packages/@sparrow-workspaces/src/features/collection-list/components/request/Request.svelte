@@ -160,6 +160,12 @@
       return newMap;
     });
   };
+
+  $: {
+    if ($opendComponent.has(api.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -282,15 +288,18 @@
   }}
   on:click|preventDefault={() => {
     if (!isRenaming) {
-      addComponent(api);
-      onItemOpened("request", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        request: api,
-      });
-    } else {
-      removeComponent(api.id);
+      expand = !expand;
+      if (expand) {
+        addComponent(api);
+        onItemOpened("request", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          request: api,
+        });
+      } else {
+        removeComponent(api.id);
+      }
     }
   }}
   bind:this={requestTabWrapper}

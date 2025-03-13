@@ -209,6 +209,11 @@
       return newMap;
     });
   };
+  $: {
+    if ($opendComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
