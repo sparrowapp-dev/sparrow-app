@@ -28,7 +28,7 @@
       onClick={onClickExplore}
     />
     <Button
-      title="Take a Tour"
+      title="Take A Walkthrough"
       size="small"
       type="primary"
       {loader}
