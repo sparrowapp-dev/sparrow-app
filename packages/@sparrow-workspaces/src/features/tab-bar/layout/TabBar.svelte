@@ -14,7 +14,7 @@
 
   // ---- Helper
   import { tabBarScroller } from "@sparrow/common/utils/navigation";
-  import { requestSplitterDirection } from "@sparrow/workspaces/features/rest-explorer/store";
+  import { tabsSplitterDirection } from "../../../stores";
   import { HelpIcon } from "@sparrow/library/assets";
   import {
     HorizontalGridIcon,
@@ -60,6 +60,12 @@
   export let onTabSelected: (id: string) => void;
 
   export let onChangeViewInRequest: (view: string) => void;
+
+  export let onDoubleClick: (tab) => void;
+
+  export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
+  export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
 
   let isTabSaved: boolean;
 
@@ -146,6 +152,10 @@
             {tabWidth}
             {onDragStart}
             {onDropOver}
+            {onDoubleClick}
+            {onClickCloseOtherTabs}
+            {onClickForceCloseTabs}
+            {onClickDuplicateTab}
           />
         {/each}
       {/if}
@@ -250,7 +260,8 @@
             </button>
           </Tooltip>
         </div>
-
+      {/if}
+      {#if activeTabType === TabTypeEnum.REQUEST || activeTabType === TabTypeEnum.SAVED_REQUEST}
         <!-- Split button -->
         <div
           class="d-flex align-items-center ms-auto ps-1"
@@ -295,7 +306,7 @@
                   viewChange = !viewChange;
                 }}
               >
-                {#if $requestSplitterDirection === "horizontal"}
+                {#if $tabsSplitterDirection === "horizontal"}
                   <HorizontalGridIcon
                     color={"var(--icon-secondary-200)"}
                     height={12}

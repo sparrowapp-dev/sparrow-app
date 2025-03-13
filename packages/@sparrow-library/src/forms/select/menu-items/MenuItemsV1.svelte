@@ -20,6 +20,7 @@
   };
   export let tickIcon: string;
   export let getTextColor: (color: string) => {};
+  export let fontSize;
 
   let isMenuItemHover = false;
 </script>
@@ -38,7 +39,7 @@
     !list?.color
       ? 'highlight-menu-item'
       : ''}"
-    style="font-size: 12px;"
+    style="font-size: {fontSize}"
   >
     {list.name}<br />
     {#if list.description}

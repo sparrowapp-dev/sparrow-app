@@ -6,13 +6,17 @@
   import { Search } from "@sparrow/library/forms";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown, Button } from "@sparrow/library/ui";
-  import { AddRegular, PlusIcon2 } from "@sparrow/library/icons";
   import {
     isExpandCollection,
     isExpandEnvironment,
     isExpandTestflow,
     isFirstCollectionExpand,
   } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+  import {
+    AddRegular,
+    ChevronDoubleRightRegular,
+    PlusIcon2,
+  } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -31,7 +35,7 @@
     StackIcon,
     SocketIoIcon,
     GraphIcon,
-    ChevronDoubleRegular,
+    ChevronDoubleLeftRegular,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -451,11 +455,11 @@
 
 {#if leftPanelController.leftPanelCollapse}
   <div>
-    <button
+    <span
       class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:52px; bottom: 15px; width: 20px; height:20px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:57px; bottom: 15px; width: 20px; height:20px; background-color:transparent; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
@@ -464,17 +468,15 @@
         leftPanelController.handleCollapseCollectionList();
       }}
     >
-      <span
-        style="transform: rotate(180deg);"
-        class="position-relative d-flex align-items-center justify-content-center"
-      >
-        <DoubleArrowIcon
-          height={"10px"}
-          width={"10px"}
-          color={"var(--text-primary-200)"}
+      <Tooltip title={"Expand"} placement={"right-center"}>
+        <Button
+          type="teritiary-regular"
+          size="extra-small"
+          customWidth="24px"
+          startIcon={ChevronDoubleRightRegular}
         />
-      </span>
-    </button>
+      </Tooltip>
+    </span>
   </div>
 {/if}
 {#if !leftPanelController.leftPanelCollapse}
@@ -537,43 +539,45 @@
       <!--  
         New dropdown button for adding new api, collection and import Curl
       -->
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <Dropdown
-          zIndex={600}
-          buttonId="addButton"
-          bind:isBackgroundClickable
-          bind:isMenuOpen={addButtonMenu}
-          options={addButtonData}
-        >
-          <Tooltip
-            title={"Add Options"}
-            placement={"bottom-center"}
-            distance={12}
-            show={!addButtonMenu}
-            zIndex={10}
+      <div id="options-container">
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+          <Dropdown
+            zIndex={600}
+            buttonId="addButton"
+            bind:isBackgroundClickable
+            bind:isMenuOpen={addButtonMenu}
+            options={addButtonData}
           >
-            <!-- <button
+            <Tooltip
+              title={"Add Options"}
+              placement={"bottom-center"}
+              distance={12}
+              show={!addButtonMenu}
+              zIndex={10}
+            >
+              <!-- <button
               id="addButton"
               class="border-0 p-1 border-radius-2 add-button"
               on:click={() => {
                 addButtonMenu = !addButtonMenu;
               }}
             > -->
-            <!--               
+              <!--               
               <img src={plusIcon} alt="" />
             </button> -->
-            <Button
-              type="primary"
-              id="addButton"
-              size={"small"}
-              startIcon={AddRegular}
-              onClick={() => {
-                addButtonMenu = !addButtonMenu;
-              }}
-            />
-          </Tooltip>
-        </Dropdown>
-      {/if}
+              <Button
+                type="primary"
+                id="addButton"
+                size={"small"}
+                startIcon={AddRegular}
+                onClick={() => {
+                  addButtonMenu = !addButtonMenu;
+                }}
+              />
+            </Tooltip>
+          </Dropdown>
+        {/if}
+      </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
@@ -753,7 +757,7 @@
         <Button
           size="extra-small"
           type="teritiary-regular"
-          startIcon={ChevronDoubleRegular}
+          startIcon={ChevronDoubleLeftRegular}
           onClick={() => {
             leftPanelController.leftPanelCollapse =
               !leftPanelController.leftPanelCollapse;

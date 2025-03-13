@@ -149,6 +149,7 @@
 <div
   class={`d-flex flex-column  h-100     pt-0 px-1`}
   style="font-weight: 500;"
+  id="Environment-container"
 >
   <div
     tabindex="0"
@@ -201,6 +202,7 @@
             customWidth={"24px"}
             type="teritiary-regular"
             onClick={(e) => {
+              e.stopPropagation();
               handleCreateEnvironment(e);
             }}
             startIcon={AddRegular}
@@ -258,26 +260,20 @@
             Add Environments in your Workspace for precise API testing with
             relevant resources and constraints.
           </p>
-          <button
+          <Button
+            title="Add Environment"
+            startIcon={AddRegular}
+            type="outline-secondary"
+            size="small"
+            customWidth="100%"
             disabled={loggedUserRoleInWorkspace ===
               WorkspaceRole.WORKSPACE_VIEWER}
-            class="bg-transparent w-100 add-environment d-flex justify-content-center align-items-center border-radius-2"
-            style="color: var(--text-secondary-100);"
-            role="button"
-            on:click={() => {
+            onClick={() => {
               onCreateEnvironment(localEnvironment);
             }}
           >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--text-secondary-200)"}
-            />
-            <span
-              style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add Environment</span
-            >
-          </button>
+            startIcon = {AddRegular}
+          </Button>
         </div>
       {/if}
 

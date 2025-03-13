@@ -18,8 +18,11 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
-import { RequestDataTypeEnum } from "@sparrow/common/types/workspace";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import { RequestDataTypeEnum, type HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import type {
   ENVDocumentType,
   ENVExtractVariableType,
@@ -40,6 +43,7 @@ import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils"
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -222,8 +226,10 @@ export class TestflowExplorerPageViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -329,6 +335,35 @@ export class TestflowExplorerPageViewModel {
     return nodes;
   };
 
+  private fetchCollectionAuth = async(_collectionId: string)=>{
+    let collectionAuth;
+    const collectionRx = await this.collectionRepository.readCollection(_collectionId);
+    const collectionDoc = collectionRx?.toMutableJSON();
+    if(collectionDoc?.auth){
+      collectionAuth = {
+        auth : collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType
+      } as HttpRequestCollectionLevelAuthTabInterface
+    }
+    else{
+      collectionAuth = {
+        auth: {
+          bearerToken: "",
+          basicAuth: {
+            username: "",
+            password: "",
+          },
+          apiKey: {
+            authKey: "",
+            authValue: "",
+            addTo: CollectionRequestAddToBaseEnum.HEADER,
+          },
+        },
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
+      }
+    }
+    return collectionAuth;
+  }
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -402,9 +437,11 @@ export class TestflowExplorerPageViewModel {
             element.data.folderId,
             request,
           );
+          const collectionAuth = await this.fetchCollectionAuth(element.data.collectionId);
           const decodeData = this._decodeRequest.init(
             adaptedRequest.property.request,
-            environments?.filtered || [],
+            environments?.filtered,
+            collectionAuth
           );
           const start = Date.now();
 

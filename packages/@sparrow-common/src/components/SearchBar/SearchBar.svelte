@@ -48,17 +48,15 @@
   }
   .container {
     width: 208px;
-    height: 30px;
+    height: 28px;
     border: 1px solid var(--border-ds-surface-100);
-    min-height: 30px;
-    padding: 8px;
+    min-height: 28px;
+    padding: 2px 4px;
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
-
     align-items: center;
     gap: 8px;
-    margin-right: 6px;
   }
   .container:hover {
     border: 1px solid var(--border-ds-neutral-200);

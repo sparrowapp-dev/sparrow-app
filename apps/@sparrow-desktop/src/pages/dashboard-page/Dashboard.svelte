@@ -155,6 +155,11 @@
   };
 
   const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
+    if (isGlobalSearchOpen && event.key === "Escape") {
+      event.preventDefault();
+      setGlobalSearch(false);
+      return;
+    }
     if (
       decidingKey(event) &&
       event.key.toLowerCase() === "f" &&
@@ -551,8 +556,7 @@
 <div
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
-> 
-
+>
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
@@ -574,6 +578,8 @@
     onLogout={_viewModel.handleLogout}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    handleDocsRedirect={_viewModel.redirectDocs}
+    handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
 
   <!--

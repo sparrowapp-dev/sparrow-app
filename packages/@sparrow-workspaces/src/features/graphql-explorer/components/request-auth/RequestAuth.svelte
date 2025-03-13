@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { AuthType } from "@sparrow/common/enums/authorization.enum";
+  import { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
 
   export let auth;
-  export let environmentVariables = [];
+  export let environmentVariables;
   export let requestStateAuth;
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
@@ -21,19 +21,19 @@
             data={[
               {
                 name: "No Auth",
-                id: AuthType.NO_AUTH,
+                id: GraphqlRequestAuthModeBaseEnum.NO_AUTH,
               },
               {
                 name: "API Key",
-                id: AuthType.API_KEY,
+                id: GraphqlRequestAuthModeBaseEnum.API_KEY,
               },
               {
                 name: "Bearer Token",
-                id: AuthType.BEARER_TOKEN,
+                id: GraphqlRequestAuthModeBaseEnum.BEARER_TOKEN,
               },
               {
                 name: "Basic Auth",
-                id: AuthType.BASIC_AUTH,
+                id: GraphqlRequestAuthModeBaseEnum.BASIC_AUTH,
               },
             ]}
             zIndex={499}
@@ -47,24 +47,29 @@
       </span>
     </div>
   </div>
+  <div>
+    <p class="text-secondary-300 text-fs-12 fw-normal">
+      The auth header will be automatically generated when you send the request.
+    </p>
+  </div>
   <section class="w-100" style="flex:1; overflow:auto;">
-    {#if requestStateAuth === AuthType.NO_AUTH}
+    {#if requestStateAuth === GraphqlRequestAuthModeBaseEnum.NO_AUTH}
       <NoAuth />
-    {:else if requestStateAuth === AuthType.API_KEY}
+    {:else if requestStateAuth === GraphqlRequestAuthModeBaseEnum.API_KEY}
       <ApiKey
         apiData={auth.apiKey}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === AuthType.BEARER_TOKEN}
+    {:else if requestStateAuth === GraphqlRequestAuthModeBaseEnum.BEARER_TOKEN}
       <BearerToken
         bearerToken={auth.bearerToken}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === AuthType.BASIC_AUTH}
+    {:else if requestStateAuth === GraphqlRequestAuthModeBaseEnum.BASIC_AUTH}
       <BasicAuth
         basicAuth={auth.basicAuth}
         callback={onUpdateRequestAuth}

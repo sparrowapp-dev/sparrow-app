@@ -288,7 +288,7 @@
     </div></Modal
   >
 
-  {#if showMenu}
+  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
@@ -411,7 +411,24 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left:23px; margin-bottom:2px; "
+        on:click|preventDefault={() => {
+          if (!isRenaming) {
+            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+              expand = !expand;
+              if (expand) {
+                addComponent(explorer);
+                onItemOpened("folder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              }
+            }
+          } else {
+            removeComponent(explorer.id);
+          }
+        }}
+        style="height:32px; padding-left:48px; margin-bottom:2px; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -422,23 +439,6 @@
           style=" gap:4px; height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
-          on:click|preventDefault={() => {
-            if (!isRenaming) {
-              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-                expand = !expand;
-                if (expand) {
-                  addComponent(explorer);
-                  onItemOpened("folder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                  });
-                } else {
-                  removeComponent(explorer.id);
-                }
-              }
-            }
-          }}
         >
           <span
             on:click|stopPropagation={() => {
@@ -457,13 +457,16 @@
           {#if expand}
             <div
               style="height:24px; width:30px;"
-              class="d-flex align-items-center justify-content-center me-2"
+              class="d-flex align-items-center justify-content-center"
             >
-              <FolderOpenRegular />
+              <FolderOpenRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {:else}
-            <div class="d-flex me-2" style="height:24px; width:30px;">
-              <FolderRegular />
+            <div
+              class="d-flex align-items-center justify-content-center"
+              style="height:24px; width:30px;"
+            >
+              <FolderRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}
           {#if isRenaming}
@@ -549,7 +552,9 @@
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files position-relative">
-          <div class="box-line"></div>
+          {#if explorer?.items?.length > 0}
+            <div class="box-line"></div>
+          {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
@@ -568,7 +573,10 @@
             />
           {/each}
           {#if !explorer?.items?.length}
-            <p class="text-fs-10 ps-5 my-2 text-secondary-300">
+            <p
+              class="text-fs-10 my-2 text-secondary-300"
+              style="padding-left: 90px;"
+            >
               This folder is empty
             </p>
           {/if}
@@ -614,6 +622,7 @@
           {folder}
           {collection}
           {activeTabId}
+          {isWebApp}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
@@ -786,14 +795,14 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 34px;
+    left: 58.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
-    /* height: 100px; */
+    z-index: 200;
   }
 
   .main-folder {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;
@@ -802,7 +811,7 @@
     border-radius: 2px;
   }
   .folder-title {
-    width: calc(100% - 40px);
+    width: calc(100% - 58px);
   }
   .folder-icon {
     width: 16px;

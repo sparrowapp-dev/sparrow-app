@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { tickIcon } from "./svgs";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, SvelteComponent } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
   import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
-  import { GitBranchIcon, DownArrowIcon } from "@sparrow/library/assets";
+  import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
-  import { ArrowIcon } from "@sparrow/library/icons";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
+  import { CaretDownFilled } from "@sparrow/library/icons";
   /**
    * Determines id of the menu item.
    */
@@ -31,6 +30,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    icon?: SvelteComponent;
   }>;
 
   export let iconColor = "grey";
@@ -53,7 +53,7 @@
   /**
    * Determines the dimensions of a Select.
    */
-  export let headerHeight = "34px";
+  let headerHeight = "28px";
   export let maxBodyHeight = "200px";
   export let minHeaderWidth = "50px";
   export let maxHeaderWidth = "500px";
@@ -69,13 +69,8 @@
   /**
    * Determines the border positioning state for the Select header.
    */
-  export let borderType: "all" | "bottom" | "none" = "all"; // normal case
-  export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
-
-  /**
-   * Determines the icon state for the Select header.
-   */
-  export let isDropIconFilled: boolean = false; // normal case
+  let borderType: "all" | "bottom" | "none" = "none"; // normal case
+  let borderActiveType: "all" | "bottom" | "none" = "none"; // active case
 
   /**
    * Determines the background state for the Select header.
@@ -93,7 +88,7 @@
   /**
    * Determines the background state for the Select body.
    */
-  export let bodyTheme: "dark" | "blur" | "violet" = "dark";
+  export let bodyTheme: "dark" | "blur" | "violet" | "surface" = "dark";
 
   /**
    * Determines the background highlighting state for the Select header.
@@ -108,7 +103,7 @@
   /**
    * Determines the border radius of Select header.
    */
-  export let borderRounded = "2px";
+  let borderRounded = "2px";
   /**
    * Determines the z-index of Select.
    */
@@ -116,7 +111,7 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3" = "v1";
+  export let menuItem: "v1" | "v2" | "v3"  = "v1";
   /**
    * Determines icons used in Select header.
    */
@@ -126,8 +121,8 @@
   /**
    * typography
    */
-  export let headerFontSize: string = "14px";
-  export let headerFontWeight: number = 500;
+  let headerFontSize: string = "12px";
+  let headerFontWeight: number = 500;
 
   /**
    * ticked state
@@ -141,9 +136,29 @@
   export let position: "absolute" | "fixed" = "fixed";
   export let placeholderText = "";
   export let isHeaderCombined = false;
+  export let showDescription = true;
 
   export let isArrowIconRequired = true;
 
+  export let bodyAlignment: 'right' | 'left' = 'right';
+
+  export let size: "small" | "medium" | "large" | "extra-small" = "small";
+
+  $: {
+    if (size === "small") {
+      headerFontSize = "12px";
+      headerHeight = "28px";
+    } else if (size === "medium") {
+      headerFontSize = "12px";
+      headerHeight = "36px";
+    } else if (size === "large") {
+      headerFontSize = "12px";
+      headerHeight = "36px";
+    } else {
+      headerFontSize = "12px";
+      headerHeight = "36px";
+    }
+  }
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
 
@@ -240,6 +255,10 @@
       break;
     case "violet":
       selectBodyBackgroundClass = "select-body-background-violet";
+      break;
+    case "surface":
+      selectBodyBackgroundClass = "select-body-background-surface";
+      break;
   }
 
   let bodyLeftDistance: number;
@@ -411,7 +430,6 @@
       }
     }}
     role="button"
-    tabindex="0"
     on:keydown={() => {}}
   >
     <div
@@ -481,7 +499,7 @@
               : getTextColor(selectedRequest?.color)}"
             style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
             selectedRequest?.hide
-              ? 'color:var(--text-secondary-200) !important'
+              ? 'color:var(--bg-ds-nuetral-100) !important'
               : ''}"
           >
             {selectedRequest?.name}
@@ -492,23 +510,7 @@
         class="d-flex ps-2 {!isArrowIconRequired ? 'd-none' : ''}"
         class:select-logo-active={isOpen}
       >
-        {#if isDropIconFilled}
-          <ArrowIcon
-            width={"12"}
-            height={"12"}
-            color={disabled || selectedRequest?.hide
-              ? "var( --icon-secondary-220)"
-              : "var(--sparrow-text-color)"}
-          />
-        {:else}
-          <DownArrowIcon
-            width={"12"}
-            height={"12"}
-            color={disabled || selectedRequest?.hide
-              ? "var( --icon-secondary-220)"
-              : "var(--sparrow-text-color)"}
-          />
-        {/if}
+        <CaretDownFilled size={"16px"}/>
       </span>
     </div>
   </div>
@@ -517,21 +519,33 @@
     bind:this={selectBodyWrapper}
     class="select-data {position === 'fixed'
       ? 'position-fixed'
-      : 'position-absolute'}  {selectBodyBackgroundClass} p-1 border-radius-2
+      : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
-      {isOpen
-      ? 'opacity: 1; transform: scale(1);'
-      : 'opacity: 0; transform: scale(0.8);'}
-      min-width:{minBodyWidth}; left: {position === 'fixed'
+  {isOpen
+  ? 'opacity: 1; transform: scale(1);'
+  : 'opacity: 0; transform: scale(0.8);'}
+  min-width:{minBodyWidth}; 
+  left: {position === 'fixed'
+    ? (bodyAlignment === 'right'
       ? `${bodyLeftDistance}px;`
-      : `0px;`} top: {position === 'fixed'
-      ? `${bodyTopDistance}px;`
-      : `${
-          Number(headerHeight.replace(/\D/g, '')) + 5
-        }px;`}  right: {position === 'fixed'
+      : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`)
+    : (bodyAlignment === 'right'
+      ? '0px;'
+      : 'auto;')} 
+  top: {position === 'fixed'
+    ? `${bodyTopDistance}px;`
+    : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
+  right: {position === 'fixed'
+    ? (bodyAlignment === 'right'
       ? `${bodyRightDistance}px;`
-      : `0px;`} z-index:{zIndex};"
+      : 'auto;')
+    : (bodyAlignment === 'right'
+      ? '0px;'
+      : '0px;')} 
+  z-index:{zIndex}; 
+  padding: 8px 6px;
+  "
   >
     <div
       on:click={() => {
@@ -539,6 +553,7 @@
       }}
       role="button"
       tabindex="0"
+      class="main-container"
       on:keydown={() => {}}
     >
       <slot name="pre-select" />
@@ -567,7 +582,7 @@
         return element.name.toLowerCase().includes(searchData.toLowerCase());
       }) as list}
         <div
-          class=" {list.hide ? 'd-none' : ''} {list?.disabled
+          class="{list.hide ? 'd-none' : ''} {list?.disabled
             ? 'disabled-option'
             : ''}"
           on:click={() => {
@@ -575,22 +590,32 @@
             onclick(list.id);
           }}
           role="button"
-          tabindex="0"
           on:keydown={() => {}}
         >
           {#if menuItem === "v1"}
-            <MenuItemsV1 {list} {selectedRequest} {tickIcon} {getTextColor} />
+            <MenuItemsV1
+              {list}
+              fontSize={headerFontSize}
+              {selectedRequest}
+              {getTextColor}
+            />
           {:else if menuItem === "v2"}
             <MenuItemsv2
               {list}
+              fontSize={headerFontSize}
               {selectedRequest}
-              {tickIcon}
               {bodyTheme}
               {getTextColor}
               {highlightTickedItem}
+              {showDescription}
             />
           {:else if menuItem === "v3"}
-            <MenuItemsV3 {list} {selectedRequest} {tickIcon} {getTextColor} />
+            <MenuItemsV3
+              {list}
+              fontSize={headerFontSize}
+              {selectedRequest}
+              {getTextColor}
+            />
           {/if}
         </div>
       {/each}
@@ -624,6 +649,7 @@
     width: auto;
     padding: 0 10px;
   }
+  
   // default states
   .select-background-transparent {
     background-color: transparent;
@@ -652,7 +678,7 @@
 
   // hover or open-body states
   .select-btn-state-active-transparent {
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-600);
   }
   .select-btn-state-active-dark {
     background-color: var(--bg-secondary-600);
@@ -673,12 +699,12 @@
     background-color: var(--bg-ds-surface-400);
   }
   .select-btn-state-active-secondary {
-    background-color: var(--bg-ds-surface-400);
+    background-color: var(--bg-ds-surface-600);
   }
 
   // clicked states
   .select-btn-state-clicked-transparent {
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-500);
   }
   .select-btn-state-clicked-dark {
     background-color: var(--bg-secondary-400);
@@ -692,7 +718,6 @@
   .select-btn-state-clicked-dark-violet {
     background-color: var(--bg-tertiary-700);
   }
-
   .select-btn-state-clicked-dark-violet2 {
     background-color: var(--bg-tertiary-700);
   }
@@ -704,39 +729,42 @@
   }
 
   // focused
+  .select-background-transparent:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none !important;
+    background-color: transparent;
+  }
   .select-background-primary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
-    outline: none;
+    outline: none !important;
     background-color: transparent;
   }
   .select-background-secondary:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
-    outline: none;
-    background-color: var(--bg-ds-surface-600);
+    outline: none !important;
+    border-radius: 4px !important;
   }
-  //////////////////////////
-  .select-data {
-    color: white;
-    border: 1px solid rgb(44, 44, 44);
-    transition: 0.3s ease;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-  }
+
   .select-body-background-dark {
-    background-color: var(--background-dropdown);
+    background-color: var(--background-dropdown) !important;
   }
   .select-body-background-violet {
-    background-color: var(--bg-tertiary-400);
+    background-color: var(--bg-tertiary-400) !important;
+  }
+  .select-body-background-surface {
+    background-color: var(--bg-ds-surface-600) !important;
   }
   .select-body-background-blur {
-    background: var(--background-hover);
+    background: var(--background-hover) !important;
     backdrop-filter: blur(2px);
   }
   .select-btn p,
   .select-data p {
     font-size: 12px;
     font-weight: 400;
+  }
+  .select-data{
+    background-color: var(--bg-ds-surface-600);
   }
   .select-active {
   }
@@ -801,5 +829,8 @@
     opacity: 0.6; /* Reduce opacity to visually indicate disabled state */
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
+  }
+  .select-btn:hover{
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>

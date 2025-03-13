@@ -1,14 +1,14 @@
 <script lang="ts">
   import { inview } from "svelte-inview";
-  import { trashIcon as trashIcon } from "@sparrow/library/assets";
   import { CodeMirrorInput } from "../";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import type {
     ObserverEventDetails,
     ScrollDirection,
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
+  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
 
   export let element;
   export let index;
@@ -39,10 +39,18 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="w-100 pair-data-row px-3 d-flex align-items-center"
+  class="pair-data-row d-flex align-items-center w-100"
+  style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}
-    <div style=" width: 24px;" class="me-3">
+    <!-- <div class="button-container">
+      <Button
+        size="extra-small"
+        type="teritiary-regular"
+        startIcon={ReOrderDotsRegular}
+      />
+    </div> -->
+    <div style=" width: 24px;" class="me-2">
       {#if pairs.length - 1 != index || !isInputBoxEditable}
         <Checkbox
           size={"small"}
@@ -56,7 +64,8 @@
     </div>
 
     <div class="d-flex" style="width: calc(100% - 64px);">
-      <div class="w-50 position-relative">
+      <div class="w-50 position-relative"
+      style="font-weight: 500;">
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => {
@@ -67,9 +76,11 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
+
         />
       </div>
-      <div class="w-50 position-relative">
+      <div class="w-50 position-relative"
+      style="font-weight: 500;">
         <CodeMirrorInput
           bind:value={element.value}
           onUpdateInput={() => {
@@ -97,15 +108,15 @@
                 placement={"bottom-center"}
                 distance={10}
               >
-                <button
-                  class="trash-icon bg-secondary-700 border-radius-2 d-flex justify-content-center align-items-center p-0 border-0"
-                  style="width: 16px; height:16px; "
-                  on:click={() => {
-                    deleteParam(index);
-                  }}
-                >
-                  <img src={trashIcon} style="height: 100%; width: 100%;" />
-                </button>
+                <div class="button-container">
+                  <Button
+                    buttonClassProp=""
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={DeleteRegular}
+                    onClick={() => deleteParam(index)}
+                  />
+                </div>
               </Tooltip>
             {/if}
           {/if}
@@ -121,20 +132,45 @@
 <style>
   .pair-data-row:first-child {
     border-top: none !important;
-    height: 24px !important;
+    height: 28px !important;
+  }
+  .pair-data-row:last-child {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
   }
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(24px);
-    background-color: var(--bg-secondary-700);
+    height: calc(28px);
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--bg-ds-surface-400);
+    transition: background-color 1ms ease;
   }
-
+  .pair-data-row:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .pair-data-row:hover .button-container {
+    opacity: 1;
+    visibility: visible;
+  }
   .skelton-parent {
     display: flex;
     height: 24px;
     padding: 2px 20px 2px 0px;
     margin: 0px;
     gap: 10%;
+  }
+  .trash-icon {
+    background: transparent;
+  }
+  .trash-icon:hover {
+    background-color: var(--bg-ds-surface-300);
+  }
+  .button-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>

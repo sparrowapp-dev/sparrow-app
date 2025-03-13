@@ -1,6 +1,7 @@
 import type { FolderBaseInterface } from "./folder-base";
 import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
+import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
 
@@ -10,6 +11,7 @@ export enum CollectionItemTypeBaseEnum {
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
+  SAVED_REQUEST = "REQUEST_RESPONSE",
 }
 
 export interface CollectionItemBaseInterface {
@@ -23,6 +25,7 @@ export interface CollectionItemBaseInterface {
   websocket?: WebsocketRequestBaseInterface;
   socketio?: SocketIORequestBaseInterface;
   graphql?: GraphqlRequestBaseInterface;
+  requestResponse?: HttpRequestSavedBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +37,32 @@ export interface CollectionItemBaseInterface {
 interface Branch {
   id: string;
   name: string;
+}
+
+export enum CollectionRequestAddToBaseEnum {
+  HEADER = "Header",
+  QUERY_PARAMETER = "Query Parameter",
+  COOKIES = "Cookies",
+}
+
+export enum CollectionAuthTypeBaseEnum {
+  NO_AUTH = "No Auth",
+  API_KEY = "API Key",
+  BEARER_TOKEN = "Bearer Token",
+  BASIC_AUTH = "Basic Auth",
+}
+
+export interface CollectionAuthBaseInterface  {
+  bearerToken: string;
+  basicAuth: {
+    username: string;
+    password: string;
+  },
+  apiKey: {
+    authKey: string;
+    authValue: string;
+    addTo: CollectionRequestAddToBaseEnum;
+  },
 }
 
 export interface CollectionBaseInterface {
@@ -48,6 +77,8 @@ export interface CollectionBaseInterface {
   activeSyncUrl?: string;
   localRepositoryPath?: string;
   workspaceId: string;
+  auth?: CollectionAuthBaseInterface,
+  selectedAuthType?: CollectionAuthTypeBaseEnum;
   branches?: Branch[];
   primaryBranch?: string;
   currentBranch?: string;
@@ -65,6 +96,7 @@ export interface CollectionArgsBaseInterface {
   websocket?: CollectionItemBaseInterface;
   socketio?: CollectionItemBaseInterface;
   graphql?: CollectionItemBaseInterface;
+  requestResponse?: CollectionItemBaseInterface;
   newName?: string;
   importCurl?: string;
   deletedIds?: string[];

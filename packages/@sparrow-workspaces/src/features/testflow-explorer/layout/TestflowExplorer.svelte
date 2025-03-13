@@ -520,11 +520,19 @@
    */
   const handleDeleteNode = (id: string) => {
     nodes.update((_nodes) => {
-      return _nodes.filter((node) => node.id < id);
+      const remainingNodes = _nodes.filter(
+        (node) => Number(node.id) < Number(id),
+      );
+      return remainingNodes;
     });
 
     edges.update((_edges) => {
-      return _edges.filter((edge) => edge.source !== id && edge.target < id);
+      const remainingEdges = _edges.filter(
+        (edge) =>
+          Number(edge.source) !== Number(id) &&
+          Number(edge.target) < Number(id),
+      );
+      return remainingEdges;
     });
 
     deleteNodeResponse($tab.tabId, selectedNodeId);
@@ -793,12 +801,12 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:240px; left:620px; z-index:1000;">
+      <div style="position:absolute; top:232px; left:638px; z-index:1000;">
         <TestFlowTourGuide
           title="Block Added! 👏 "
           description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
           tipPosition="left-top"
-          pulsePosition={{ top: "8px", left: "-140px" }}
+          pulsePosition={{ top: "8px", left: "-150px" }}
           onNext={() => {
             currentStep.set(5);
           }}
@@ -810,12 +818,12 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <div style="position:absolute; top:280px; left:620px; z-index:1000;">
+      <div style="position:absolute; top:265px; left:632px; z-index:1000;">
         <TestFlowTourGuide
           title="Sample API waiting...⏱️"
           description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
           tipPosition="left-top"
-          pulsePosition={{ top: "10px", left: "-140px" }}
+          pulsePosition={{ top: "10px", left: "-145px" }}
           onNext={() => {
             currentStep.set(6);
           }}

@@ -55,6 +55,8 @@ import {
   TestflowSchema,
   type TFRxContainerType,
 } from "../models/testflow.model";
+import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 // import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 // addRxPlugin(RxDBDevModePlugin);
 
@@ -131,10 +133,45 @@ export class RxDB {
           1: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          2: function (oldDoc: TabDocument) {
+            if (oldDoc) {
+              oldDoc.persistence = "permanent";
+            }
+            return oldDoc;
+          },
+          3: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.collection) {
+              oldDoc.property.collection.auth = {
+                bearerToken: "",
+                basicAuth: {
+                  username: "",
+                  password: "",
+                },
+                apiKey: {
+                  authKey: "",
+                  authValue: "",
+                  addTo: "Header",
+                },
+              };
+              oldDoc.property.collection.state = {
+                collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+                collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
+              };
+            }
+            return oldDoc;
+          },
+          4: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
         schema: collectionSchema,
+        migrationStrategies: {
+          1: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+        },
       },
       activesidebartab: {
         schema: activeSideBarTabSchema,

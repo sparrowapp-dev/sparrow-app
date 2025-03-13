@@ -47,7 +47,7 @@
 
 <div tabindex={allDisableState ? -1 : 0}>
   <!-- Tabs -->
-  <div class="d-flex">
+  <div class="d-flex position-relative">
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { WorkspaceDocument } from "@app/database/database";
+  import type {
+    CollectionDocument,
+    WorkspaceDocument,
+  } from "@app/database/database";
   import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
@@ -7,14 +10,25 @@
   import { RestExplorer, ChatBot } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
   import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
   import constants from "../../../../constants/constants";
+  import type { RxDocument } from "rxdb";
+  import type { CollectionDocType } from "src/models/collection.model";
   export let tab;
   export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
   const _viewModel = new RestExplorerViewModel(tab);
+  const collectionObs = _viewModel.collectionSubscriber(tab.path.collectionId);
+
+  let collection: CollectionDocType;
+  const collectionSubscriber = collectionObs.subscribe(
+    (data: RxDocument<CollectionDocument>) => {
+      collection = data?.toMutableJSON();
+    },
+  );
+
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
   let isGuestUser = false;
@@ -32,11 +46,11 @@
   });
 
   const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList,
+    _viewModel.updateNameWithCollectionList as any,
     1000,
   );
   const debouncedAPIUpdater = new Debounce().debounce(
-    _viewModel?.refreshTabData,
+    _viewModel?.refreshTabData as any,
     1000,
   );
   let prevTabName = "";
@@ -64,12 +78,12 @@
     }
   }
 
-  let environmentVariables = [];
+  let environmentVariables;
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
       if (activeWorkspaceRxDoc) {
@@ -141,19 +155,27 @@
   restExplorerDataStore.subscribe((webSocketMap) => {
     restExplorerData = webSocketMap.get(tab.tabId);
   });
+
+  onDestroy(() => {
+    collectionSubscriber.unsubscribe();
+    activeWorkspaceSubscriber.unsubscribe();
+  });
 </script>
 
 <RestExplorer
   bind:collections={_viewModel.collection}
   bind:tab={_viewModel.tab}
+  bind:collectionAuth={_viewModel.collectionAuth}
   bind:requestAuthHeader={_viewModel.authHeader}
   bind:requestAuthParameter={_viewModel.authParameter}
   bind:userRole
   bind:isTourGuideOpen
+  {collection}
   storeData={restExplorerData}
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
+  onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
@@ -185,6 +207,7 @@
   onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
   azureBlobCDN={constants.AZURE_CDN_URL}
+  onSaveResponse={_viewModel.saveResponse}
 />
 {#if !isGuestUser}
   <ChatBot

@@ -74,16 +74,20 @@
     : ""}
   class="start-block position-relative"
   on:click={() => {
+    if (isAddBlockVisible) return;
     MixpanelEvent(Events.Start_TestFlows);
     data.onClick("0");
   }}
 >
-  <span
-    ><PlayArrow
-      height={"14px"}
-      width={"12px"}
-      color={"var(--icon-primary-300)"}
-    /><span class="ms-3 text-fs-12">Start</span>
+  <span>
+    <span style="opacity:{isAddBlockVisible ? '0.4' : '1'}">
+      <PlayArrow
+        height={"14px"}
+        width={"12px"}
+        color={"var(--bg-ds-neutral-50)"}
+      /><span class="ms-2 text-fs-12">Start</span>
+    </span>
+
     <Handle type="source" position={Position.Right} />
     {#if isAddBlockVisible}
       <div
@@ -114,8 +118,7 @@
             data.onClick(id);
           }}
         >
-          <span
-            class="btnc py-1 px-3 d-flex align-items-center" >
+          <span class="btnc py-1 px-3 d-flex align-items-center">
             <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
           </span>
         </span>
@@ -128,9 +131,9 @@
   .start-block {
     padding: 8px 15px;
     background: #eee;
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-300);
     height: auto;
-    border-radius: 0.125rem;
+    border-radius: 4px;
     font-size: 0.7rem;
   }
   .add-block-btn {
@@ -148,6 +151,7 @@
   .arrow {
     padding: 8px 4px;
     display: inline-block;
+    align-content: center;
   }
   :global(.svelte-flow__handle) {
     pointer-events: none !important;

@@ -29,6 +29,7 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
@@ -42,7 +43,6 @@
   import { EnvironmentViewModel } from "@app/pages/workspace-page/EnvironmentPage.ViewModel";
 
   // ---- helpers
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { onMount } from "svelte";
@@ -80,7 +80,15 @@
     isExpandTestflow,
     isFirstCollectionExpand,
   } from "@app/store/ws.store";
+  import {
+    defaultCurrentStep,
+    isDefaultTourGuideOpen,
+    isDefaultTourGuideClose,
+  } from "@sparrow/workspaces/stores";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
+  import { writable } from "svelte/store";
 
+  import { Checkbox } from "@sparrow/library/forms";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -93,6 +101,15 @@
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
+
+  // Tab Controls Properties - st
+  let isForceCloseTabPopupOpen: boolean = false;
+  let tabsToForceClose: Tab[] = [];
+  let tabIdWhoRecivedForceClose: string;
+  let noOfNotSavedTabsWhileForClose = 0;
+  let isUserDontWantForceClosePopup: boolean = false;
+  // Tab Controls Properties - st
+
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
@@ -111,6 +128,7 @@
   let globalEnvironment;
 
   let environments = _viewModel2.environments;
+  let totalCollectionCount = writable(0);
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -189,26 +207,96 @@
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = (id: string, tab: Tab) => {
+  const closeTab = async (id: string, tab: Tab) => {
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
+
+        // Wait for the popup to close before proceeding (check for user input)
+        await new Promise<void>((resolve) => {
+          const checkIfPopupClosed = setInterval(() => {
+            if (!isPopupClosed) {
+              clearInterval(checkIfPopupClosed);
+              resolve();
+            }
+          }, 300);
+        });
+
+        return;
       } else {
         _viewModel.handleRemoveTab(id);
+        return;
       }
     } else {
       _viewModel.handleRemoveTab(id);
     }
   };
+  const softCloseTabs = async (currentTabId: string) => {
+    const savedTabs = [];
+    const unSavedTabs = [];
+    for (const tab of $tabList) {
+      if (tab.id !== currentTabId) {
+        if (tab.isSaved) savedTabs.push(tab.tabId);
+        else unSavedTabs.push(tab);
+      }
+    }
+
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
+
+    for (let tab of unSavedTabs) {
+      // Wait for user confirmation before moving to the next tab
+      await closeTab(tab.id, tab);
+    }
+  };
+  // Methods for Tab Controls - start
+  const tabsForceCloseInitiator = (currentTabId: string) => {
+    tabsToForceClose = $tabList;
+    tabIdWhoRecivedForceClose = currentTabId;
+
+    noOfNotSavedTabsWhileForClose = 0;
+    $tabList?.forEach((tab: Tab) => {
+      if (tab.id !== currentTabId) {
+        if (!tab?.isSaved) {
+          noOfNotSavedTabsWhileForClose += 1;
+        }
+      }
+    });
+
+    if (noOfNotSavedTabsWhileForClose > 0) {
+      if (isUserDontWantForceClosePopup) {
+        forceCloseTabs(currentTabId);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+        return;
+      }
+      isForceCloseTabPopupOpen = true;
+    } else forceCloseTabs(currentTabId);
+  };
+  const forceCloseTabs = async (currentTabId: string) => {
+    const tabsToClose = [];
+    for (const tab of $tabList) {
+      if (tab.id !== currentTabId) tabsToClose.push(tab.tabId);
+    }
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, tabsToClose);
+  };
+
+  const handleTabDuplication = (tabId: string) => {
+    _viewModel.createDuplicateTabByTabId(tabId);
+  };
+  // Methods for Tab Controls - End
 
   const handleClosePopupBackdrop = (flag: boolean) => {
     isPopupClosed = flag;
@@ -219,13 +307,18 @@
     isPopupClosed = false;
   };
 
+  const handleForceClosePopupBackdrop = (flag: boolean) => {
+    isForceCloseTabPopupOpen = flag;
+  };
+
   /**
    * Handle save functionality on close confirmation popup
    */
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
-      removeTab.type === TabTypeEnum.TESTFLOW
+      removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.COLLECTION
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -244,13 +337,22 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.COLLECTION) {
+          const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
+
         loader = false;
       }
     } else if (
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
@@ -264,6 +366,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -459,6 +568,14 @@
       }
     }, 500);
   };
+  collectionList.subscribe((collections) => {
+    let count = 0;
+    collections.forEach((collection) => {
+      const collectionData = collection.toMutableJSON();
+      count += collectionData.items.length || 0;
+    });
+    totalCollectionCount.set(count);
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -539,6 +656,10 @@
             onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+            onDoubleClick={_viewModel.handleTabTypeChange}
+            onClickCloseOtherTabs={softCloseTabs}
+            onClickForceCloseTabs={tabsForceCloseInitiator}
+            onClickDuplicateTab={handleTabDuplication}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>
@@ -594,6 +715,12 @@
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
+                    </div>
+                  </Motion>
                   <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -629,16 +756,108 @@
   </div>
 </Motion>
 
-<WithModal
+<!-- Force Close Popup -->
+<!-- {#if isForceCloseTabPopupOpen} -->
+<Modal
+  title={"Force Close!"}
+  type={"danger"}
+  zIndex={1000}
+  isOpen={isForceCloseTabPopupOpen}
+  width={"35%"}
+  handleModalState={handleForceClosePopupBackdrop}
+>
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p>
+      <span class="text-whiteColor fw-bold"
+        >{noOfNotSavedTabsWhileForClose} Tabs
+      </span>
+      have unsaved changes. Force closing will discard your edits, and you won’t
+      be able to recover them. Are you sure you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex align-items-center gap-1 sparrow-fs-14 mb-3">
+    <Checkbox
+      size={"large"}
+      bind:checked={isUserDontWantForceClosePopup}
+      on:input={() => {
+        isUserDontWantForceClosePopup = !isUserDontWantForceClosePopup;
+      }}
+      disabled={false}
+    />
+    <p class="m-0">I understand, don't show this agian.</p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      title="Don't Close"
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      onClick={() => {
+        "click dont save";
+        handleForceClosePopupBackdrop(false);
+      }}
+    ></Button>
+    <Button
+      title="Force Close"
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"danger"}
+      onClick={() => {
+        "click dont save";
+        forceCloseTabs(tabIdWhoRecivedForceClose);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+      }}
+    ></Button>
+  </div>
+</Modal>
+<!-- {/if} -->
+
+<!-- Save Changes for API Popup -- New -->
+<Modal
+  title={"Unsaved Changes!"}
+  type={"dark"}
+  zIndex={1000}
   isOpen={isPopupClosed}
-  onModalStateChanged={handleClosePopupBackdrop}
-  onSave={handlePopupSave}
-  onCancel={handleClosePopupBackdrop}
-  onDiscard={handlePopupDiscard}
-  isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-  {loader}
-  {isGuestUser}
-/>
+  width={"35%"}
+  handleModalState={() => handleClosePopupBackdrop(false)}
+>
+  <div class="mt-2 mb-4">
+    <p class="lightGray" style="color: lightGray;">
+      Do you want to save changes in this tab “<span
+        class="text-whiteColor fw-bold"
+      >
+        {!removeTab ? "Untitled" : removeTab.name}</span
+      >”? Changes will be lost in case you choose not to save.
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Don't Save"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        handlePopupDiscard();
+      }}
+    ></Button>
+    <Button
+      title={"Save"}
+      size={"medium"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"95px"}
+      disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+      onClick={() => {
+        handlePopupSave();
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <Modal
   title={""}
@@ -652,17 +871,21 @@
   }}
 >
   <WelcomePopup
+    loader={$totalCollectionCount > 0 ? false : true}
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;
+      isDefaultTourGuideClose.set(true);
     }}
     onClickTour={() => {
       isUserFirstSignUp.set(false);
-      isTourGuideOpen = true;
       isWelcomePopupOpen = false;
+      defaultCurrentStep.set(1);
+      isDefaultTourGuideOpen.set(true);
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"
@@ -953,5 +1176,9 @@
     background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .save-popup {
+    font-weight: 400;
   }
 </style>

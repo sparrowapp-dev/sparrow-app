@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/common",
-  "version": "2.18.0",
+  "version": "2.19.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -30,8 +30,12 @@
     "./types/sidebar/sidebar-base": "./src/types/sidebar/sidebar-base.ts",
     "./types/workspace": "./src/types/workspace/http-request-tab.ts",
     "./types/workspace/collection-base": "./src/types/workspace/collection-base.ts",
+    "./types/workspace/collection-tab": "./src/types/workspace/collection-tab.ts",
     "./types/workspace/http-request-base": "./src/types/workspace/http-request-base.ts",
+    "./types/workspace/http-request-saved-tab": "./src/types/workspace/http-request-saved-tab.ts",
+    "./types/workspace/http-request-saved-base": "./src/types/workspace/http-request-saved-base.ts",
     "./types/workspace/http-request-dto": "./src/types/workspace/http-request-dto.ts",
+    "./types/workspace/http-request-saved-dto": "./src/types/workspace/http-request-saved-dto.ts",
     "./types/workspace/graphql-request-base": "./src/types/workspace/graphql-request-base.ts",
     "./types/workspace/graphql-request-dto": "./src/types/workspace/graphql-request-dto.ts",
     "./types/workspace/graphql-request-tab": "./src/types/workspace/graphql-request-tab.ts",

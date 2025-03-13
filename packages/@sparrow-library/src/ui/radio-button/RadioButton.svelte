@@ -92,7 +92,7 @@
     {disabled}
     class="hidden"
   />
-  <label for={id}>
+  <label for={id} class={disabled ? "pe-none" : ""}>
     <div
       id={id + "-div"}
       class="focus-visible-button"
@@ -115,8 +115,7 @@
         >
           <SelectIcon
             {selected}
-            height={buttonSize === "medium" ? 16 : 12}
-            width={buttonSize === "medium" ? 16 : 12}
+            size={buttonSize === "medium" ? "20px" : "16px"}
             {unSelectedColor}
             {selectedColor}
           />
@@ -149,6 +148,10 @@
 
   .focus-visible-button:focus-visible {
     outline: 2px solid var(--border-ds-primary-300);
+  }
+
+  .focus-visible-button:focus-visible .circle-internal {
+    background-color: var(--bg-ds-surface-300) !important;
   }
   .focus-visible-button:focus-visible .label-text-medium,
   .focus-visible-button:focus-visible .label-text-small {
