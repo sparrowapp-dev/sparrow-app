@@ -327,7 +327,7 @@
               }}
             >
               <div
-                style="margin-left: 5px;"
+                style="margin-left: 5px;min-width: 28px;"
                 class="d-flex align-items-center justify-content-center"
               >
                 {#if data?.type === "REQUEST"}
@@ -335,7 +335,7 @@
                     <span
                       class={"request-icon"}
                       style="font-size: 9px; font-weight: 600;"
-                      >{data?.request?.method || ""}</span
+                      >{data?.request?.method === "DELETE" ? "DEL" : data?.request?.method || ""}</span
                     >
                   </span>
                 {:else if data?.type === "FOLDER"}
