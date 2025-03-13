@@ -144,8 +144,6 @@
   }
 
   const addComponent = (collection) => {
-    console.log($opendComponent);
-
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.set(collection.id, `REST API`);
@@ -153,7 +151,6 @@
     });
   };
   const removeComponent = (id) => {
-    console.log($opendComponent);
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.delete(id); // Remove the entry by ID

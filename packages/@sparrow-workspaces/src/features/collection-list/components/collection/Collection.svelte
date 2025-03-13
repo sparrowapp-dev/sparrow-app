@@ -205,7 +205,6 @@
   });
 
   $: {
-    console.log($opendComponent, collection.id);
     if ($opendComponent.has(collection.id)) {
       visibility = true;
     }
@@ -268,7 +267,6 @@
       newMap.set(collection.id, `Collection`);
       return newMap;
     });
-    console.log($opendComponent);
   };
   const removeComponent = (id) => {
     // opendComponent.update((components) =>
@@ -280,7 +278,6 @@
       newMap.delete(id); // Remove the entry by ID
       return newMap;
     });
-    console.log($opendComponent);
   };
 </script>
 
