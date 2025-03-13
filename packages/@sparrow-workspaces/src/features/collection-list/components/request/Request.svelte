@@ -21,6 +21,7 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import { opendComponent } from "../../../../stores/recent-left-panel";
   import {
     ChevronDownRegular,
     ChevronRightRegular,
@@ -140,6 +141,27 @@
     httpMethodUIStyle = getMethodStyle(
       api?.request?.method as HttpRequestMethodBaseEnum,
     );
+  }
+
+  const addComponent = (collection) => {
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.set(collection.id, `REST API`);
+      return newMap;
+    });
+  };
+  const removeComponent = (id) => {
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.delete(id); // Remove the entry by ID
+      return newMap;
+    });
+  };
+
+  $: {
+    if ($opendComponent.has(api.id)) {
+      expand = true;
+    }
   }
 </script>
 
@@ -263,12 +285,18 @@
   }}
   on:click|preventDefault={() => {
     if (!isRenaming) {
-      onItemOpened("request", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        request: api,
-      });
+      expand = !expand;
+      if (expand) {
+        addComponent(api);
+        onItemOpened("request", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          request: api,
+        });
+      } else {
+        removeComponent(api.id);
+      }
     }
   }}
   bind:this={requestTabWrapper}

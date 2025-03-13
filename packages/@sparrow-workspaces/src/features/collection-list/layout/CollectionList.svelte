@@ -19,7 +19,7 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     AddRegular,
     AngleLeftIcon,
@@ -33,6 +33,10 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import {
+    isExpandCollection,
+    isFirstCollectionExpand,
+  } from "../../../stores/recent-left-panel";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -83,13 +87,11 @@
 
   export let searchData: string = "";
 
-  export let isExpandCollection: boolean;
-
   export let toggleExpandCollection;
 
   export let isWebApp = false;
   export let activeTabType;
-  export let isFirstCollectionExpand = false;
+  // export let isFirstCollectionExpand = false;
 
   let collectionListDocument: CollectionDocument[];
 
@@ -234,7 +236,7 @@
             size="extra-small"
             type="teritiary-regular"
             customWidth="24px"
-            startIcon={!isExpandCollection
+            startIcon={!$isExpandCollection
               ? ChevronRightRegular
               : ChevronDownRegular}
           />
@@ -274,7 +276,7 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
-                isExpandCollection = true;
+                isExpandCollection.set(true);
                 isGuestUser
                   ? onItemCreated("collection", {
                       workspaceId: currentWorkspaceId,
@@ -288,7 +290,7 @@
       {/if}
     </div>
 
-    {#if isExpandCollection}
+    {#if $isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column ms-2 me-0 pt-1 mb-2"
       >
@@ -361,7 +363,6 @@
                   collection={col?.toMutableJSON()}
                   {activeTabId}
                   {isWebApp}
-                  bind:isFirstCollectionExpand
                 />
               {/each}
             </List>

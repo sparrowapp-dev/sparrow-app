@@ -1,8 +1,5 @@
 import { writable } from "svelte/store";
 
-export const tabsSplitterDirection = writable("horizontal");
-
-
 export const isExpandCollection = writable<boolean>(false);
 export const isExpandEnvironment = writable<boolean>(false);
 export const isExpandTestflow = writable<boolean>(false);
