@@ -18,7 +18,7 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
-  import { isExpandEnvironment } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+  import { isExpandEnvironment } from "../../../stores/recent-left-panel";
 
   /**
    * current workspace

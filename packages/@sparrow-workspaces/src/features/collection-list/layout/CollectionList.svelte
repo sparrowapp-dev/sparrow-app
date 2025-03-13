@@ -19,7 +19,7 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     AddRegular,
     AngleLeftIcon,
@@ -36,7 +36,7 @@
   import {
     isExpandCollection,
     isFirstCollectionExpand,
-  } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+  } from "../../../stores/recent-left-panel";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -86,9 +86,6 @@
   export let scrollList;
 
   export let searchData: string = "";
-
-  // export let isExpandCollection: boolean;
-  // let isExpandCollection = true;
 
   export let toggleExpandCollection;
 

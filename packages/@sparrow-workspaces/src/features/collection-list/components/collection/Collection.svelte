@@ -27,7 +27,7 @@
   import {
     isFirstCollectionExpand,
     opendComponent,
-  } from "../../../../../../../apps/@sparrow-web/src/store/ws.store";
+  } from "../../../../stores/recent-left-panel";
 
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";

@@ -11,7 +11,7 @@
     isExpandEnvironment,
     isExpandTestflow,
     isFirstCollectionExpand,
-  } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+  } from "../../../stores/recent-left-panel";
   import {
     AddRegular,
     ChevronDoubleRightRegular,

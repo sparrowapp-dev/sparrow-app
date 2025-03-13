@@ -34,6 +34,12 @@
     SaveAsCollectionItem,
     WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
+  import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+    isFirstCollectionExpand,
+  } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
 
@@ -114,11 +120,6 @@
   let userId = "";
   let userRole = "";
 
-  let isExpandCollection = false;
-  let isExpandEnvironment = false;
-  let isExpandTestflow = false;
-  let isFirstCollectionExpand = false;
-
   let localEnvironment;
   let globalEnvironment;
 
@@ -173,8 +174,8 @@
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
   async function handleCreateEnvironment() {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
 
     await onCreateEnvironment(localEnvironment);
@@ -525,9 +526,9 @@
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
-      isExpandCollection = value;
-      isExpandEnvironment = value;
-      isFirstCollectionExpand = value;
+      isExpandCollection.set(value);
+      isExpandEnvironment.set(value);
+      isFirstCollectionExpand.set(value);
     }
   });
   onDestroy(() => {
@@ -599,10 +600,6 @@
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
           onOpenTestflow={_viewModel3.handleOpenTestflow}
-          bind:isExpandCollection
-          bind:isExpandEnvironment
-          bind:isExpandTestflow
-          bind:isFirstCollectionExpand
           appVersion={version}
         />
       </Pane>
@@ -702,9 +699,8 @@
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
                           _viewModel3.handleCreateTestflow();
-                          isExpandTestflow = true;
+                          isExpandTestflow.set(true);
                         }}
-                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -912,7 +908,7 @@
       if (response.isSuccessful) {
         setTimeout(() => {
           scrollList("bottom");
-          isExpandCollection = true;
+          isExpandCollection.set(true);
         }, 1000);
       }
     }}

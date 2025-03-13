@@ -42,7 +42,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
-  import { opendComponent } from "../../../../../../../apps/@sparrow-web/src/store/ws.store";
+  import { opendComponent } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder

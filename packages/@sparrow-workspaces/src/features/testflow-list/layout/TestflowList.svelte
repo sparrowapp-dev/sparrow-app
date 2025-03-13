@@ -26,7 +26,7 @@
   } from "../../../stores/guide.tour";
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
-  import { isExpandTestflow } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+  import { isExpandTestflow } from "../../../stores/recent-left-panel";
 
   /**
    * current workspace

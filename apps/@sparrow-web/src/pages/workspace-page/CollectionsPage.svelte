@@ -79,7 +79,7 @@
     isExpandEnvironment,
     isExpandTestflow,
     isFirstCollectionExpand,
-  } from "@app/store/ws.store";
+  } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
   import {
     defaultCurrentStep,
     isDefaultTourGuideOpen,

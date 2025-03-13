@@ -21,7 +21,7 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { opendComponent } from "../../../../../../../apps/@sparrow-web/src/store/ws.store";
+  import { opendComponent } from "../../../../stores/recent-left-panel";
   import {
     ChevronDownRegular,
     ChevronRightRegular,
