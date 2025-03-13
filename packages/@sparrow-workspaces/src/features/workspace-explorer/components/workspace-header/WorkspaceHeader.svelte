@@ -2,7 +2,7 @@
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-
+  import { PeopleRegular, SaveRegular } from "@sparrow/library/icons";
   /**
    * The name of the workspace.
    */
@@ -90,25 +90,16 @@
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
         <div class="d-flex gap-2 ms-3">
           <Button
-            type={"secondary"}
-            title={"Delete Workspace"}
-            textClassProp={"fs-12 "}
-            textStyleProp={"font-weight:400; font-size:12px;"}
-            onClick={() => {
-              onDeleteWorkspace();
-            }}
-            disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          />
-          <Button
+            startIcon={PeopleRegular}
+            size={"medium"}
             type={"primary"}
             title={"Invite"}
-            textClassProp={"fs-12"}
-            textStyleProp={"font-weight:400; font-size:12px;"}
             onClick={() => {
               isWorkspaceInviteModalOpen = true;
             }}
             disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          ></Button>
+          />
+          <Button type={"secondary"} startIcon={SaveRegular} size={"medium"} />
         </div>
       {/if}
     </div>

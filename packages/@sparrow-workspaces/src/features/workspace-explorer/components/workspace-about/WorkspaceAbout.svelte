@@ -35,9 +35,9 @@
     <textarea
       disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
       id="updateWorkspaceDescField"
-      class="bg-transparent border-0 text-fs-12 input-outline shadow-none w-100 p-2"
+      class=" border-0 text-fs-12 input-outline shadow-none w-100 p-2"
       value={workspaceDescription || ""}
-      placeholder="This is your personal workspace. Describe the objectives of the workspace and how it is meant to be used. Or create a comprehensive API documentation by including links to your collections and requests. Start typing."
+      placeholder="Describe this workspace's objectives or add links to generate API documentation. Start typing."
       on:blur={(event) => {
         if (workspaceDescription !== event.target.value) {
           onUpdateWorkspaceDescription(workspaceID, event.target.value);
@@ -53,7 +53,7 @@
     height: 300px;
     border: 1px solid transparent !important;
     border-radius: 4px !important;
-    
+    background-color: var(--bg-ds-surface-600);
   }
   textarea:focus,
   textarea:hover {
