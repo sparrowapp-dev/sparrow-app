@@ -124,8 +124,8 @@
       });
     }
   }
-  $: isExpandTestflow =
-    $isDefaultTourGuideOpen === true ? true : isExpandTestflow;
+  $: $isExpandTestflow =
+    $isDefaultTourGuideOpen === true ? true : $isExpandTestflow;
 </script>
 
 <div

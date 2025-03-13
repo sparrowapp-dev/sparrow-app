@@ -259,7 +259,6 @@
   };
 
   const addComponent = (collection) => {
-    // console.log($opendComponent);
     // opendComponent.update((components) => {
     //   components.push({ id: collection.id, type: "collection" });
     //   return components; // Always return updated state
@@ -269,17 +268,19 @@
       newMap.set(collection.id, `Collection`);
       return newMap;
     });
+    console.log($opendComponent);
   };
   const removeComponent = (id) => {
     // opendComponent.update((components) =>
     //   components.filter((c) => c.id !== id),
     // );
-    // console.log($opendComponent);
+
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.delete(id); // Remove the entry by ID
       return newMap;
     });
+    console.log($opendComponent);
   };
 </script>
 
@@ -505,10 +506,10 @@
             workspaceId: collection.workspaceId,
             collection,
           });
+        } else {
+          removeComponent(collection.id);
         }
       }
-    } else {
-      removeComponent(collection.id);
     }
   }}
   style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "

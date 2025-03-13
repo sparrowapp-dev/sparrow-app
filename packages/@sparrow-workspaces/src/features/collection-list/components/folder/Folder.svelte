@@ -422,10 +422,10 @@
                   collection,
                   folder: explorer,
                 });
+              } else {
+                removeComponent(explorer.id);
               }
             }
-          } else {
-            removeComponent(explorer.id);
           }
         }}
         style="height:32px; padding-left:48px; margin-bottom:2px; "
