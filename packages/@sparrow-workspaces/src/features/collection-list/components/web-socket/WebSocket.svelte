@@ -136,11 +136,12 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="mb-1 mt-2"
-style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;">
+  <div
+    class="mb-1 mt-2"
+    style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;"
+  >
     <p>
-      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span
-      >
+      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
@@ -260,7 +261,7 @@ style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
+      ? "padding-left: 74.5px; gap:4px;"
       : "padding-left: 48.5px; gap:4px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
