@@ -33,7 +33,10 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
-  import { isExpandCollection } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
+  import {
+    isExpandCollection,
+    isFirstCollectionExpand,
+  } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -91,7 +94,7 @@
 
   export let isWebApp = false;
   export let activeTabType;
-  export let isFirstCollectionExpand = false;
+  // export let isFirstCollectionExpand = false;
 
   let collectionListDocument: CollectionDocument[];
 
@@ -360,7 +363,6 @@
                   collection={col}
                   {activeTabId}
                   {isWebApp}
-                  bind:isFirstCollectionExpand
                 />
               {/each}
             </List>

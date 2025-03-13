@@ -11,6 +11,7 @@
     isExpandCollection,
     isExpandEnvironment,
     isExpandTestflow,
+    isFirstCollectionExpand,
   } from "../../../../../../apps/@sparrow-web/src/store/ws.store";
   import type { Observable } from "rxjs";
   import type {
@@ -126,7 +127,7 @@
   export let onUpdateTestflow;
   export let onOpenTestflow;
   export let isWebApp = false;
-  export let isFirstCollectionExpand = false;
+  // export let isFirstCollectionExpand = false;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -646,7 +647,6 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
-          bind:isFirstCollectionExpand
           {isWebApp}
         />
       </div>

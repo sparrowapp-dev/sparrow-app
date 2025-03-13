@@ -22,6 +22,7 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { MoreHorizontalRegular } from "@sparrow/library/icons";
+  import { opendComponent } from "../../../../../../../apps/@sparrow-web/src/store/ws.store";
 
   /**
    * Callback for Item Deleted
@@ -134,6 +135,24 @@
       api?.request?.method as HttpRequestMethodBaseEnum,
     );
   }
+
+  const addComponent = (collection) => {
+    console.log($opendComponent);
+
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.set(collection.id, `REST API`);
+      return newMap;
+    });
+  };
+  const removeComponent = (id) => {
+    console.log($opendComponent);
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.delete(id); // Remove the entry by ID
+      return newMap;
+    });
+  };
 </script>
 
 <svelte:window
@@ -266,12 +285,15 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
+        addComponent(api);
         onItemOpened("request", {
           workspaceId: collection.workspaceId,
           collection,
           folder,
           request: api,
         });
+      } else {
+        removeComponent(api.id);
       }
     }}
     style={folder?.id

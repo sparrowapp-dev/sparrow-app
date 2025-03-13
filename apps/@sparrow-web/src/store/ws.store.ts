@@ -5,3 +5,6 @@ export const socketStore = writable<Socket | null>(null);
 export const isExpandCollection = writable<boolean>(false);
 export const isExpandEnvironment = writable<boolean>(false);
 export const isExpandTestflow = writable<boolean>(false);
+export const isFirstCollectionExpand = writable<boolean>(false);
+
+export const opendComponent = writable(new Map());
