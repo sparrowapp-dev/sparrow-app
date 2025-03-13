@@ -272,7 +272,7 @@
     </div></Modal
   >
 
-  {#if showMenu}
+  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
@@ -395,6 +395,20 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
+        on:click|preventDefault={() => {
+          if (!isRenaming) {
+            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+              expand = !expand;
+              if (expand) {
+                onItemOpened("folder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              }
+            }
+          }
+        }}
         style="height:32px; padding-left:48px; margin-bottom:2px; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
@@ -406,20 +420,6 @@
           style=" gap:4px; height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
-          on:click|preventDefault={() => {
-            if (!isRenaming) {
-              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-                expand = !expand;
-                if (expand) {
-                  onItemOpened("folder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                  });
-                }
-              }
-            }
-          }}
         >
           <span
             on:click|stopPropagation={() => {
@@ -438,13 +438,16 @@
           {#if expand}
             <div
               style="height:24px; width:30px;"
-              class="d-flex align-items-center justify-content-center me-2"
+              class="d-flex align-items-center justify-content-center"
             >
-              <FolderOpenRegular />
+              <FolderOpenRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {:else}
-            <div class="d-flex me-2" style="height:24px; width:30px;">
-              <FolderRegular />
+            <div
+              class="d-flex align-items-center justify-content-center"
+              style="height:24px; width:30px;"
+            >
+              <FolderRegular color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}
           {#if isRenaming}
@@ -530,7 +533,9 @@
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files position-relative">
-          <div class="box-line"></div>
+          {#if explorer?.items?.length > 0}
+            <div class="box-line"></div>
+          {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
@@ -778,7 +783,7 @@
   }
 
   .main-folder {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;
@@ -787,7 +792,7 @@
     border-radius: 2px;
   }
   .folder-title {
-    width: calc(100% - 40px);
+    width: calc(100% - 58px);
   }
   .folder-icon {
     width: 16px;

@@ -223,6 +223,14 @@
   style="margin-bottom:2px;"
   class="environment-tab"
   bind:this={environmentTabWrapper}
+  on:click|preventDefault={() => {
+    handleSelectEnvironment();
+    if (!isRenaming) {
+      if (!env.id.includes(UntrackedItems.UNTRACKED)) {
+        openEnvironment();
+      }
+    }
+  }}
 >
   <button
     tabindex="0"
@@ -238,13 +246,6 @@
       class="d-flex main-collection align-items-center"
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
-      }}
-      on:click|preventDefault={() => {
-        if (!isRenaming) {
-          if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-            openEnvironment();
-          }
-        }
       }}
     >
       <button
@@ -311,6 +312,7 @@
               WorkspaceRole.WORKSPACE_VIEWER}
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
+              e.stopPropagation();
               rightClickContextMenu(e);
             }}
           />
@@ -387,7 +389,7 @@
       border-left: 1px solid var(--border-color);
     }
     .main-collection {
-      width: calc(100% - 24px);
+      width: calc(100% - 38px);
       gap: 4px;
     }
     .active-collection-tab {

@@ -520,11 +520,19 @@
    */
   const handleDeleteNode = (id: string) => {
     nodes.update((_nodes) => {
-      return _nodes.filter((node) => node.id < id);
+      const remainingNodes = _nodes.filter(
+        (node) => Number(node.id) < Number(id),
+      );
+      return remainingNodes;
     });
 
     edges.update((_edges) => {
-      return _edges.filter((edge) => edge.source !== id && edge.target < id);
+      const remainingEdges = _edges.filter(
+        (edge) =>
+          Number(edge.source) !== Number(id) &&
+          Number(edge.target) < Number(id),
+      );
+      return remainingEdges;
     });
 
     deleteNodeResponse($tab.tabId, selectedNodeId);

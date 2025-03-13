@@ -6,6 +6,7 @@
   export let callback;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let disabled = false;
 
   const theme = new AuthInputTheme().build();
   const handleInput = () => {
@@ -13,16 +14,10 @@
   };
 </script>
 
-<div>
-  <p class="text-secondary-300 text-fs-12 fw-normal">
-    The authorization header will be automatically generated when you send the
-    request.
-  </p>
-</div>
-<div class="d-flex flex-column w-100 pt-2 pe-1">
+<div class="d-flex flex-column w-100">
   <div style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Token</p>
-    <div class="position-relative auth-input-container">
+    <div class="position-relative auth-input-container mb-3">
       <CodeMirrorInput
         bind:value={bearerToken}
         onUpdateInput={() => {
@@ -32,6 +27,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
+        {disabled}
       />
     </div>
   </div>

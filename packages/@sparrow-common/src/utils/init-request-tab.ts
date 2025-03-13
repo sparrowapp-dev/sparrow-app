@@ -1,7 +1,5 @@
 import { RequestDefault } from "@sparrow/common/enums";
 import {
-  AuthSectionEnum,
-  AuthTypeEnum,
   RequestDataTypeEnum,
   RequestDatasetEnum,
   RequestMethodEnum,
@@ -21,6 +19,8 @@ import {
   TabPersistenceTypeEnum,
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
+import { HttpRequestAuthTypeBaseEnum } from "../types/workspace/http-request-base";
+import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
 
 class InitRequestTab {
   private _tab: Tab;
@@ -103,7 +103,7 @@ class InitRequestTab {
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
             requestBodyNavigation: RequestDatasetEnum.NONE,
-            requestAuthNavigation: AuthTypeEnum.NO_AUTH,
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
             requestNavigation: RequestSectionEnum.PARAMETERS,
             responseNavigation: ResponseSectionEnum.RESPONSE,
             responseBodyLanguage: RequestDataTypeEnum.TEXT,
@@ -132,7 +132,7 @@ class InitRequestTab {
             apiKey: {
               authKey: "",
               authValue: "",
-              addTo: AuthSectionEnum.HEADER,
+              addTo: CollectionRequestAddToBaseEnum.HEADER,
             },
           },
           ai: {

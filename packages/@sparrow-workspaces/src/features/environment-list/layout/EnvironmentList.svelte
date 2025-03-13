@@ -148,6 +148,7 @@
 <div
   class={`d-flex flex-column  h-100     pt-0 px-1`}
   style="font-weight: 500;"
+  id="Environment-container"
 >
   <div
     tabindex="0"

@@ -101,8 +101,8 @@
 
 <div class="workspace-card-outer w-100">
   <Card
-    cardClassProp={"flex-grow-1 col-lg-5 col-md-10 mb-4 position-relative"}
-    cardStyleProp={"max-width: 47.5%; max-height: 32%;"}
+    cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
+    cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
     <button
       bind:this={workspaceTabWrapper}
@@ -117,6 +117,7 @@
 
     <div
       class="bg-tertiary-750 workspace-card p-4"
+      tabindex="0"
       on:click={() => {
         handleOpenWorkspace();
       }}
@@ -129,7 +130,11 @@
         class="d-flex overflow-hidden justify-content-between"
         style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
       >
-        <h4 class="ellipsis overflow-hidden me-4">{workspace.name}</h4>
+        <h4 class="ellipsis overflow-hidden me-4">
+          <span style="font-size: 16px; color:var(--text-ds-neutral-50)"
+            >{workspace.name}</span
+          >
+        </h4>
       </div>
       <p
         class="teams-workspace__para mb-1"
@@ -137,7 +142,10 @@
           showMenu ? "color: var(--sparrow-text-color) !important;" : null
         }`}
       >
-        <span>{workspace?.collections?.length ?? 0}</span> COLLECTIONS
+        <span>{workspace?.collections?.length ?? 0}</span>
+        <span style="font-size: 12px; color:var(--text-secondary-200)">
+          Collections
+        </span>
       </p>
       <p
         class="teams-workspace__date mb-0"
@@ -145,7 +153,11 @@
           showMenu ? "color: var(--sparrow-text-color) !important;" : null
         }`}
       >
-        Last updated on <span>{formatDateInString(workspace?.updatedAt)}</span>
+        <span style="size: 12px; color:var(--text-secondary-200)"
+          >Last updated on
+        </span><span style="font-size: 12px; color:var(--text-ds-neutral-50)"
+          >{formatDateInString(workspace?.updatedAt)}</span
+        >
       </p>
 
       {#if isWebEnvironment}
@@ -180,11 +192,25 @@
   }
 
   .workspace-card-outer:hover .workspace-card {
-    background-color: var(--bg-tertiary-600) !important;
+    background-color: var(--bg-ds-surface-400);
+    cursor: pointer;
   }
   .workspace-card {
+    background-color: var(--bg-ds-surface-600);
     z-index: 0 !important;
     border-radius: 8px;
+    cursor: pointer;
+  }
+  .workspace-card:hover {
+    transition: background-color 0.5s ease-in-out;
+  }
+  .workspace-card:active {
+    background-color: var(--bg-ds-surface-600) !important;
+  }
+  .workspace-card:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    background-color: var(--bg-ds-surface-600);
+    outline: none;
   }
   .workspace-card-outer:hover .workspace-card .teams-workspace__para,
   .workspace-card-outer:hover .workspace-card .teams-workspace__date {

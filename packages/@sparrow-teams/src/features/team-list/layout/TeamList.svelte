@@ -36,6 +36,7 @@
         <Button
           type="primary"
           size="small"
+          customWidth={"28px"}
           startIcon={AddRegular}
           disable={isGuestUser}
           onClick={() => {
