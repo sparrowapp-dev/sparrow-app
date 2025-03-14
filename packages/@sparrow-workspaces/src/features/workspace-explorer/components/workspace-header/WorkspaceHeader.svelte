@@ -22,6 +22,8 @@
    * Function to handle deletion of the workspace.
    */
   export let onDeleteWorkspace;
+  export let data: string = "";
+  export let onUpdateWorkspaceDescription;
 
   /**
    * Function to update the workspace name.
@@ -99,7 +101,14 @@
             }}
             disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
           />
-          <Button type={"secondary"} startIcon={SaveRegular} size={"medium"} />
+          <Button
+            type={"secondary"}
+            startIcon={SaveRegular}
+            size={"medium"}
+            onClick={(e) => {
+              onUpdateWorkspaceDescription(workspaceID, data);
+            }}
+          />
         </div>
       {/if}
     </div>

@@ -68,6 +68,10 @@
   let workspaceID = tab._data.path.workspaceId;
 
   let workspaceNavigatorId: string = "about";
+  let desc: string = "";
+  const handleUpdateDescription = (s: string) => {
+    desc = s;
+  };
 </script>
 
 <div class="d-flex h-100" style="width: 100%;">
@@ -79,6 +83,8 @@
       bind:userRole
       bind:isWorkspaceInviteModalOpen
       {onDeleteWorkspace}
+      {onUpdateWorkspaceDescription}
+      data={desc}
       {onUpdateWorkspaceName}
       workspaceName={currentWorkspace.name}
       {workspaceID}
@@ -87,7 +93,7 @@
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
           bind:userRole
-          {onUpdateWorkspaceDescription}
+          {handleUpdateDescription}
           workspaceDescription={currentWorkspace.description}
           {workspaceID}
         />
