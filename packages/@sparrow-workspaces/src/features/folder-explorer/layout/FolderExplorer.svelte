@@ -4,6 +4,8 @@
    * The tab of the folder
    */
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import { AddRegular, SaveRegular } from "@sparrow/library/icons";
+  import { Button } from "@sparrow/library/ui";
   export let tab: TabDocument;
   /**
    * The folder data from repository
@@ -155,6 +157,9 @@
             onCreateAPIRequest(collection, folder);
           }}>New Request</button
         >
+        <div style="padding-left:4px">
+          <Button type={"secondary"} startIcon={SaveRegular} />
+        </div>
       </div>
     </div>
 
@@ -186,9 +191,9 @@
           tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="margin-top: -2px;"
-        class="bg-transparent border-0 text-fs-12 h-50 input-outline shadow-none w-100 p-2"
+        class="border-0 text-fs-12 h-50 input-outline shadow-none w-100 p-2"
         value={folder?.description || ""}
-        placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
+        placeholder="Describe this folder and share code examples or usage tips for the APIs."
         on:blur={(event) => {
           if (folder?.description !== event.target.value) {
             onUpdateDescription(tab, event.target.value);
@@ -224,6 +229,7 @@
 
   .input-outline {
     border-radius: 0%;
+    background-color: var(--bg-ds-surface-600);
   }
   textarea {
     border-radius: 4px !important;
