@@ -1,11 +1,15 @@
 <script lang="ts">
-  import {FolderIcon} from "@sparrow/library/icons";
+  import { FolderIcon } from "@sparrow/library/icons";
 
   export let onClick = () => {};
   export let icon = FolderIcon;
-  export let iconProps = { color: "var(--text-ds-neutral-200)" , width: "16px" , height: "16px" };
+  export let iconProps = {
+    color: "var(--text-ds-neutral-200)",
+    width: "16px",
+    height: "16px",
+  };
   export let data = {};
-
+  console.log("data :>> ", data);
 </script>
 
 <div class="request-item" on:click={() => onClick(data)}>
@@ -14,7 +18,15 @@
   </div>
   <div class="request-details">
     <div class="request-header">
-      <span class="request-title">{data?.name}</span>
+      <span class="request-title">
+        {#if data?.highLightChars && typeof data.highLightChars === "number" && data?.name}
+          <span class="highlight"
+            >{data.name.substring(0, data.highLightChars)}</span
+          >{data.name.substring(data.highLightChars)}
+        {:else}
+          {data?.name}
+        {/if}
+      </span>
       <span class="request-path">{data?.path}</span>
     </div>
     <span class="request-url">{data.url || ""}</span>
@@ -68,6 +80,11 @@
       sans-serif;
     flex: 1 1 0;
     max-width: fit-content;
+  }
+  .request-title .highlight {
+    color: var(
+      --text-ds-neutral-50
+    ); /* White color for highlighted characters */
   }
 
   .request-path {
