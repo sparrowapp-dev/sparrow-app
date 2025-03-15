@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { AuthType } from "@sparrow/common/enums/authorization.enum";
+  import { HttpRequestSavedAuthModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
 
   export let auth;
-  export let environmentVariables = [];
+  export let environmentVariables;
   export let requestStateAuth;
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
@@ -21,19 +21,23 @@
             data={[
               {
                 name: "No Auth",
-                id: AuthType.NO_AUTH,
+                id: HttpRequestSavedAuthModeBaseEnum.NO_AUTH,
+              },
+              {
+                name: "Inherit Auth",
+                id: HttpRequestSavedAuthModeBaseEnum.INHERIT_AUTH,
               },
               {
                 name: "API Key",
-                id: AuthType.API_KEY,
+                id: HttpRequestSavedAuthModeBaseEnum.API_KEY,
               },
               {
                 name: "Bearer Token",
-                id: AuthType.BEARER_TOKEN,
+                id: HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN,
               },
               {
                 name: "Basic Auth",
-                id: AuthType.BASIC_AUTH,
+                id: HttpRequestSavedAuthModeBaseEnum.BASIC_AUTH,
               },
             ]}
             zIndex={499}
@@ -41,36 +45,46 @@
             onclick={(id = "") => {
               onUpdateRequestState({ requestAuthNavigation: id });
             }}
-            disabled={false}
+            disabled={true}
           />
         </p>
       </span>
     </div>
   </div>
+  <div>
+    <p class="text-secondary-300 text-fs-12 fw-normal">
+      The auth header will be automatically generated when you send the request.
+    </p>
+  </div>
   <section class="w-100" style="flex:1; overflow:auto;">
-    {#if requestStateAuth === AuthType.NO_AUTH}
+    {#if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.NO_AUTH}
       <NoAuth />
-    {:else if requestStateAuth === AuthType.API_KEY}
+    {:else if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.API_KEY}
       <ApiKey
         apiData={auth.apiKey}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === AuthType.BEARER_TOKEN}
+    {:else if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN}
       <BearerToken
         bearerToken={auth.bearerToken}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === AuthType.BASIC_AUTH}
+    {:else if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.BASIC_AUTH}
       <BasicAuth
         basicAuth={auth.basicAuth}
         callback={onUpdateRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
+    {:else if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.INHERIT_AUTH}
+      <p class="text-fs-12">
+        Inherit Auth can't be shown on saved response, click "try" button to see
+        the Inherit Auth.
+      </p>
     {/if}
   </section>
 </div>

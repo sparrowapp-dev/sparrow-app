@@ -17,5 +17,7 @@
     callback={handleUrlEncodeChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
   />
 </section>

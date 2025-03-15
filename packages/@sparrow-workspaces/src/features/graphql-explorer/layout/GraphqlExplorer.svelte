@@ -295,11 +295,13 @@
                             errorMessage={queryErrorMessage}
                             {errorStartIndex}
                             {errorEndIndex}
+                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
                           <RequestVariables
                             value={$tab.property.graphql.variables}
                             onUpdateRequestVariable={onUpdateVariables}
+                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                           <RequestHeaders
@@ -392,7 +394,7 @@
               class="position-relative bg-transparent"
             >
               <div class="h-100 d-flex flex-column">
-                <div class="mb-2 pt-1">
+                <!-- <div class="mb-2 pt-1">
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
@@ -401,7 +403,7 @@
                       ? $tab.property.graphql.mutation
                       : $tab.property.graphql.query}
                   />
-                </div>
+                </div> -->
                 <div style="flex:1; overflow: auto;">
                   {#if $tab.property.graphql.state.isRequestSchemaFetched}
                     <GenerateQuery
@@ -412,6 +414,8 @@
                       onUpdateRequestState={handleUpdateRequestState}
                       operationSearch={$tab.property.graphql?.operationSearch}
                       {updateOperationSearch}
+                      onRefreshSchema={handleFetchSchema}
+                      {isSchemaFetching}
                     />
                   {:else}
                     <div style="flex: 1;">
@@ -477,7 +481,7 @@
   }
 
   :global(.graph-rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -486,7 +490,7 @@
     border-bottom: 0 !important;
   }
   :global(.graph-rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10.5px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
@@ -501,7 +505,7 @@
     background-color: var(--bg-primary-200) !important;
   }
   :global(.graph-ql-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -510,7 +514,7 @@
     border-bottom: 0 !important;
   }
   :global(.graph-ql-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10.5px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;

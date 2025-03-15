@@ -10,7 +10,7 @@
   export let authParameter;
   export let onUpdateEnvironment;
 
-  let isBulkEditRequired = true;
+  let isBulkEditRequired = false;
   export let onUpdateRequestState;
 
   export let isBulkEditActive;
@@ -43,5 +43,7 @@
     callback={handleParamsChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
   />
 </section>

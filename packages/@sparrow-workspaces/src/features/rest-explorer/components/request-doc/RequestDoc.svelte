@@ -20,7 +20,7 @@
 </script>
 
 <div class=" text-fs-14">
-  <div class="d-flex" style="justify-content: space-between; margin-top: 10px;">
+  <div class="d-flex" style="justify-content: space-between;">
     <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
   </div>
   <div style="height: 100%; min-height:160px; " class="area">

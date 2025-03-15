@@ -98,8 +98,8 @@
       <div style="flex:1; overflow:auto;">
         <!-- {#if !isLoading} -->
         <Splitpanes
-          class="rest-splitter w-100 h-100"
-          id={"rest-splitter"}
+          class="web-socket-splitter w-100 h-100"
+          id={"web-socket-splitter"}
           horizontal={false}
           dblClickSplitter={false}
           on:resize={(e) => {
@@ -195,14 +195,15 @@
                         />
                       </div>
                       <div style="overflow:auto; height:50%;">
-                        <div class="h-100 d-flex flex-column">
+                        <div class="h-100 d-flex flex-column" 
+                        style="border-top: 1px solid var(--border-ds-surface-100);padding-top: 8px;">
                           <ResponsePreviewNavigator
                             {webSocket}
                             {isWebApp}
                             {onUpdateContentType}
                           />
                           <div class="pt-2"></div>
-                          <div style="flex:1; overflow:auto;">
+                          <div style="flex:1; overflow:auto;border: 1px solid var(--border-ds-surface-100);border-radius:2px;">
                             <ResponsePreview {webSocket} />
                           </div>
                         </div>
@@ -255,17 +256,17 @@
     background-color: var(--bg-ds-surface-900);
   }
 
-  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
-    width: 10.5px !important;
+  :global(.web-socket-splitter.splitpanes--vertical > .splitpanes__splitter) {
+    width: 11px !important;
     height: 100% !important;
-    background-color: var(--bg-secondary-500) !important;
+    background-color: var(--bg-ds-surface-100) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
     border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
-  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
-    height: 10.5px !important;
+  :global(.web-socket-splitter.splitpanes--horizontal > .splitpanes__splitter) {
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
@@ -274,8 +275,8 @@
     border-right: 0 !important;
   }
   :global(
-    .rest-splitter .splitpanes__splitter:active,
-    .rest-splitter .splitpanes__splitter:hover
+    .web-socket-splitter > .splitpanes__splitter:active,
+    .web-socket-splitter > .splitpanes__splitter:hover
   ) {
     background-color: var(--bg-primary-200) !important;
   }

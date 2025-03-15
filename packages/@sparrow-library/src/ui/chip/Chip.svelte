@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BoxIcon, CrossIcon2 } from "../../icons";
-
+  import { DismissRegular } from "@sparrow/library/icons";
   export let startIcon = null;
   export let endIcon = null;
   export let label = "";
@@ -34,11 +34,7 @@
         onClose(id);
       }}
     >
-      <CrossIcon2
-        height={"16px"}
-        width={"16px"}
-        color={"var(--icon-ds-neutral-50)"}
-      />
+      <DismissRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
     </span>
   {:else if type === "filter"}
     {#if startIcon}

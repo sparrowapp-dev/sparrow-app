@@ -54,7 +54,7 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { requestSplitterDirection } from "../store";
+  import { tabsSplitterDirection } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
@@ -69,6 +69,10 @@
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import {
+    CheckmarkCircleFilled,
+    ErrorCircleFilled,
+  } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -98,6 +102,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -114,6 +119,8 @@
   export let isWebApp = false;
   export let azureBlobCDN;
   export let onSaveResponse;
+  export let collectionAuth;
+  export let collection;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -137,6 +144,8 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isErrorMsgOpen = false;
+
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
@@ -150,6 +159,7 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+
   let isGuidePopup = false;
 </script>
 
@@ -244,9 +254,7 @@
           <Splitpanes
             class="rest-splitter w-100 h-100"
             id={"rest-splitter"}
-            horizontal={$requestSplitterDirection === "horizontal"
-              ? true
-              : false}
+            horizontal={$tabsSplitterDirection === "horizontal" ? true : false}
             dblClickSplitter={false}
             on:resize={(e) => {
               onUpdateRequestState({
@@ -265,7 +273,7 @@
             >
               <!-- Request Pane -->
               <div
-                class="h-100 d-flex flex-column position-relative {$requestSplitterDirection ===
+                class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pb-1'
                   : 'pe-2'}"
@@ -326,9 +334,12 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
+                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
@@ -353,14 +364,14 @@
             >
               <!-- Response Pane -->
               <div
-                class="d-flex flex-column h-100 {$requestSplitterDirection ===
+                class="d-flex flex-column h-100 {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"
                 style="overflow:auto;"
               >
                 <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto;">
+                  <div style="flex:1; overflow:auto; ">
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div
@@ -371,7 +382,9 @@
                     {:else if !storeData?.response.status}
                       <ResponseDefaultScreen />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen
+                        onSendButtonClicked={onSendRequest}
+                      />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column">
                         <ResponseStatus response={storeData.response} />
@@ -391,6 +404,7 @@
                               {onClearResponse}
                               {onSaveResponse}
                               {isWebApp}
+                              {isGuestUser}
                             />
                           {/if}
                           <div style="flex:1; overflow:auto;">
@@ -523,8 +537,8 @@
     background-color: var(--bg-ds-surface-900);
   }
 
-  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
-    width: 10.5px !important;
+  :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;
@@ -532,8 +546,8 @@
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
-  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
-    height: 10.5px !important;
+  :global(.rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
@@ -542,8 +556,8 @@
     border-right: 0 !important;
   }
   :global(
-    .rest-splitter .splitpanes__splitter:active,
-    .rest-splitter .splitpanes__splitter:hover
+    .rest-splitter > .splitpanes__splitter:active,
+    .rest-splitter > .splitpanes__splitter:hover
   ) {
     background-color: var(--bg-primary-200) !important;
   }

@@ -69,6 +69,7 @@
    */
   export let userRole;
   export let activeTabType;
+  export let isWebApp;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -201,7 +202,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -260,6 +261,16 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("request", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        request: api,
+      });
+    }
+  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -270,16 +281,6 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("request", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          request: api,
-        });
-      }
-    }}
     style={folder?.id
       ? "padding-left: 70.5px; gap:4px;"
       : "padding-left: 44.5px; gap:4px; "}
@@ -306,17 +307,19 @@
       }}
       style="  display: flex; "
     >
-      <Button
-        startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-      />
+      {#if api?.items && api?.items?.length > 0}
+        <Button
+          startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+        />
+      {/if}
     </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
-      style="font-size: 12px;"
+      style="font-size: 9px;"
     >
       {api.request?.method?.toUpperCase() === "DELETE"
         ? "DEL"
@@ -342,7 +345,9 @@
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
-        {api.name}
+        <p class="ellipsis m-0 p-0">
+          {api.name}
+        </p>
       </div>
     {/if}
   </button>
@@ -366,6 +371,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -404,8 +410,8 @@
     font-weight: 500;
   }
   .api-method {
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 9px;
+    font-weight: 600;
     width: 30px !important;
     height: 24px;
     border-radius: 4px;
@@ -417,11 +423,12 @@
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
     color: var(--bg-ds-neutral-50);
     display: flex;
     align-items: center;
+
     padding: 4px 2px;
     caret-color: var(--bg-ds-primary-300);
   }
@@ -543,7 +550,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-ds-surface-500) !important;
@@ -568,6 +575,6 @@
     bottom: 0;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
-    z-index: 200;
+    z-index: 150;
   }
 </style>

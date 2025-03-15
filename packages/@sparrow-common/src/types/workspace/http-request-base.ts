@@ -1,3 +1,5 @@
+import type { CollectionRequestAddToBaseEnum } from "./collection-base";
+
 interface HttpRequestKeyValueCheckedWithBaseBaseInterface {
   key: string;
   value: string;
@@ -8,6 +10,14 @@ interface HttpRequestKeyValueCheckedBaseInterface {
   key: string;
   value: string;
   checked: boolean;
+}
+
+export enum HttpRequestAuthTypeBaseEnum {
+  NO_AUTH = "No Auth",
+  API_KEY = "API Key",
+  BEARER_TOKEN = "Bearer Token",
+  BASIC_AUTH = "Basic Auth",
+  INHERIT_AUTH = "Inherit Auth"
 }
 
 interface HttpRequestBodyBaseInterface {
@@ -27,7 +37,7 @@ interface HttpRequestBasicAuthBaseInterface {
 interface HttpRequestApiKeyBaseInterface {
   authKey: string;
   authValue: string;
-  addTo: string;
+  addTo: CollectionRequestAddToBaseEnum;
 }
 
 interface HttpRequestAuthBaseInterface {
@@ -50,13 +60,23 @@ export enum HttpRequestDefaultNameBaseEnum {
   NAME = "REST API",
 }
 
+export enum HttpRequestContentTypeBaseEnum {
+  "application/json" = "application/json",
+  "application/xml" = "application/xml",
+  "application/x-www-form-urlencoded" = "application/x-www-form-urlencoded",
+  "multipart/form-data" = "multipart/form-data",
+  "application/javascript" = "application/javascript",
+  "text/plain" = "text/plain",
+  "text/html" = "text/html",
+}
+
 export interface HttpRequestBaseInterface {
   method: string;
   operationId: string;
   url: string;
   body: HttpRequestBodyBaseInterface[];
-  selectedRequestBodyType: string;
-  selectedRequestAuthType: string;
+  selectedRequestBodyType: HttpRequestContentTypeBaseEnum;
+  selectedRequestAuthType: HttpRequestAuthTypeBaseEnum;
   queryParams: HttpRequestKeyValueCheckedBaseInterface[];
   auth: HttpRequestAuthBaseInterface;
   headers: HttpRequestKeyValueCheckedBaseInterface[];

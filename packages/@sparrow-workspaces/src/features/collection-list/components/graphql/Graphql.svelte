@@ -177,7 +177,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -233,25 +233,25 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("graphql", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        graphql: graphql,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px; padding-left:3px;"
+  style="height:32px; padding-left:3px; margin-bottom: 2px;"
 >
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("graphql", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          graphql: graphql,
-        });
-      }
-    }}
     style={folder?.id
       ? "padding-left: 62.5px; gap:4px;"
       : "padding-left: 48.5px; gap:4px;"}
@@ -288,7 +288,7 @@
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px; "
       >
-        {graphql.name}
+        <p class=" ellipsis m-0 p-0">{graphql.name}</p>
       </div>
     {/if}
   </button>
@@ -312,6 +312,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -338,7 +339,7 @@
   }
   .api-name {
     font-weight: 500;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
     font-size: 12px;
     line-height: 18px;
@@ -463,7 +464,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-ds-surface-500) !important;
