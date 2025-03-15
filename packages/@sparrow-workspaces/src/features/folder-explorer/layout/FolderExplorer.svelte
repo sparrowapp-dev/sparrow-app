@@ -4,7 +4,11 @@
    * The tab of the folder
    */
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { AddRegular, SaveRegular } from "@sparrow/library/icons";
+  import {
+    AddRegular,
+    CaretDownFilled,
+    SaveRegular,
+  } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   export let tab: TabDocument;
   /**
@@ -147,8 +151,8 @@
           }}
         />
       </div>
-      <div class="d-flex flex-row">
-        <button
+      <div class="d-flex flex-row" style="gap:8px">
+        <!-- <button
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
             tab?.source === "SPEC"}
           class="btn add-button rounded mx-1 border-0 text-align-right py-1"
@@ -156,10 +160,19 @@
           on:click={() => {
             onCreateAPIRequest(collection, folder);
           }}>New Request</button
-        >
-        <div style="padding-left:4px">
-          <Button type={"secondary"} startIcon={SaveRegular} />
-        </div>
+        > -->
+        <Button
+          startIcon={AddRegular}
+          endIcon={CaretDownFilled}
+          title={"New"}
+          type={"primary"}
+          onClick={() => {
+            onCreateAPIRequest(collection, folder);
+          }}
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+            tab?.source === "SPEC"}
+        />
+        <Button type={"secondary"} startIcon={SaveRegular} />
       </div>
     </div>
 
