@@ -20,7 +20,9 @@
 </script>
 
 <div>
-  <p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
+  <p style="color:var(  --text-ds-neutral-200)" class="text-fs-12 fw-bold mb-2">
+    Add API Key to
+  </p>
 </div>
 <div class="d-flex gap-3">
   <div class="radio text-fs-12 d-flex align-items-center">
@@ -48,7 +50,7 @@
 </div>
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class=" mb-2 text-secondary-100">Key</p>
+    <p style="color: var(--text-ds-neutral-200);" class=" mb-2">Key</p>
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
@@ -64,7 +66,7 @@
     </div>
   </div>
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-secondary-100">Value</p>
+    <p style="color: var(--text-ds-neutral-200);" class="mb-2">Value</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:value={apiData.authValue}
