@@ -1,0 +1,37 @@
+name: Sync GITHUB issues to JIRA and vice versa
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create_jira_issue:
+    if: contains(github.event.issue.labels.*.name, 'bug') || contains(github.event.issue.labels.*.name, 'feature')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Map GitHub Label bug and feature to Jira Issue Type Bug and Story
+        id: map_type
+        run: |
+          if [[ "${{ github.event.issue.labels.*.name }}" == *"bug"* ]]; then
+            echo "JIRA_ISSUE_TYPE=Bug" >> $GITHUB_ENV
+          elif [[ "${{ github.event.issue.labels.*.name }}" == *"feature"* ]]; then
+            echo "JIRA_ISSUE_TYPE=Story" >> $GITHUB_ENV
+          fi
+
+      - name: Create Jira Issue
+        id: create_jira
+        uses: atlassian/gajira-create@v3
+        with:
+          project: ${{ secrets.JIRA_PROJECT_KEY }}
+          issuetype: ${{ env.JIRA_ISSUE_TYPE }}
+          summary: "GitHub Issue: ${{ github.event.issue.title }}"
+          description: |
+            **GitHub Issue:** [View Issue](${{ github.event.issue.html_url }})
+            **Description:**  
+            ${{ github.event.issue.body }}
+            **GitHub Labels:** ${{ join(github.event.issue.labels.*.name, ', ') }}
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
