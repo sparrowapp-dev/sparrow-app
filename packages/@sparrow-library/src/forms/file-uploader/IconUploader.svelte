@@ -1,8 +1,7 @@
 <script lang="ts">
   import { DeleteIcon, EditIcon2 } from "@sparrow/library/icons";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
-  import { FileTypeIcon } from "@sparrow/library/icons";
-  import { UploadIcon2 } from "@sparrow/library/icons";
+  import { Button, Spinner } from "../../ui";
 
   export let value: any = [];
   export let inputId: string;
@@ -31,8 +30,9 @@
   export let errorMessage: string = "ErrorMessage";
   export let helpLabelText: string = "help";
   export let supportLabelText: string = "supportText";
-  export let fileTypes = ["JPG", "PNG", "JPEG"];
   export let fileName: string = "";
+  export let loading: boolean = false;
+  export let handleCancel: () => void;
   let isDragOver = false;
   let isFocused = false;
 
@@ -122,46 +122,38 @@
         <div
           class="sparrow-choose-file-input-button d-flex justify-content-center"
         >
-          <div class="d-flex text-center row justify-content-center">
-            <label for={inputId} class="d-flex justify-content-center">
-              <UploadIcon2 />
-            </label>
-            <label for={inputId} class="sparrow-choose-file-label my-2 ps-2"
-              >Drag & Drop or <span class="sparrow-upload-text text-fs-14"
-                >Upload File</span
-              > here</label
-            >
-            <div for={inputId} class="d-flex justify-content-center text-fs-12">
-              <div class="file-type-container-one pe-2 pt-1 pb-1">
-                <FileTypeIcon />
-                <span class="file-type-text">{fileTypes[0]}</span>
+          {#if loading}
+            <div class="d-flex row text-center justify-content-center">
+              <div class="d-flex justify-content-center">
+                <Spinner size={"48px"} />
               </div>
-              {#each fileTypes.slice(1, -1) as fileType, index}
-                <div class="file-type-container-two px-2 pt-1 pb-1" key={index}>
-                  <FileTypeIcon />
-                  <span class="file-type-text">{fileType}</span>
-                </div>
-              {/each}
-              <div class="ps-2 pt-1 pb-1">
-                <FileTypeIcon />
-                <span class="file-type-text"
-                  >{fileTypes[fileTypes.length - 1]}</span
-                >
-              </div>
+              <p class="upload-file-text" style="margin: 0px;">
+                Uploading file...
+              </p>
+              <Button
+                title="Cancel"
+                type={"secondary"}
+                size={"small"}
+                onClick={handleCancel}
+              />
             </div>
-            <input
-              class="sparrow-choose-file-input visually-hidden"
-              type="file"
-              {value}
-              id={inputId}
-              placeholder={inputPlaceholder}
-              accept={generateAcceptString()}
-              {disabled}
-              on:change={(e) => {
-                onChange(e, maxFileSize, supportedFileTypes);
-              }}
-            />
-          </div>
+          {:else}
+            <div class="d-flex text-center row justify-content-center">
+              <slot />
+              <input
+                class="sparrow-choose-file-input visually-hidden"
+                type="file"
+                {value}
+                id={inputId}
+                placeholder={inputPlaceholder}
+                accept={generateAcceptString()}
+                {disabled}
+                on:change={(e) => {
+                  onChange(e, maxFileSize, supportedFileTypes);
+                }}
+              />
+            </div>
+          {/if}
         </div>
       </div>
     {/if}
@@ -272,6 +264,7 @@
     min-width: 240px;
     max-width: 540px;
     border-radius: 4px;
+    outline: none;
     transition:
       border 0.2s ease-in-out,
       background-color 0.2s ease-in-out;
@@ -284,6 +277,11 @@
     &:focus {
       border: 1px dashed var(--border-ds-primary-300) !important;
       background-color: var(--bg-ds-surface-500);
+      cursor: pointer;
+    }
+
+    &:focus-visible {
+      border: 2px dashed var(--border-ds-primary-300) !important;
     }
   }
 
@@ -295,31 +293,10 @@
     border: 1px solid var(--border-ds-neutral-300);
     cursor: pointer;
   }
-  .sparrow-upload-text {
-    color: var(--text-ds-primary-300);
-    font-family: "Inter", sans-serif;
-    text-align: center;
-    cursor: pointer;
-  }
-  .file-type-text {
-    color: var(--text-ds-neutral-400);
-    font-family: "Inter", sans-serif;
-    text-align: left;
-  }
-  .file-type-container-one {
-    border-right: 1px solid var(--border-ds-surface-100);
-  }
-  .file-type-container-two {
-    border-right: 1px solid var(--border-ds-surface-100);
-  }
   .sparrow-choose-file-input::file-selector-button {
     background-color: transparent;
     color: var(--bg-ds-neutral-400);
     border: 0;
-  }
-
-  .sparrow-choose-file-label {
-    color: var(--text-ds-neutral-400);
   }
 
   .sparrow-input-image-preview > img {
@@ -336,6 +313,7 @@
     border-radius: 4px;
     border: 1px dashed var(--border-ds-surface-100);
     background-color: var(--bg-ds-surface-400);
+    outline: none;
     transition:
       border 0.2s ease-in-out,
       background-color 0.2s ease-in-out;
@@ -346,6 +324,10 @@
     &:focus {
       border: 1px dashed var(--border-ds-primary-300) !important;
       background-color: var(--bg-ds-surface-500);
+      cursor: pointer;
+    }
+    &:focus-visible {
+      border: 2px dashed var(--border-ds-primary-300) !important;
     }
   }
   .sparrow-input-box {
@@ -364,6 +346,12 @@
   .file-name-text {
     font-family: "Inter", sans-serif;
     font-weight: 400px;
+  }
+  .upload-file-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 400px;
+    font-size: 14px;
+    color: var(--text-ds-neutral-400);
   }
 
   .edit-btn,
