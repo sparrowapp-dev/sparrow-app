@@ -31,6 +31,7 @@ jobs:
             **Description:**  
             ${{ github.event.issue.body }}
             **GitHub Labels:** ${{ join(github.event.issue.labels.*.name, ', ') }}
+             labels: "GitHub-Issue"
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_EMAIL }}
