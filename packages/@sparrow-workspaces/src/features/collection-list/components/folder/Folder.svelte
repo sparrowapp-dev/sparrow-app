@@ -623,6 +623,8 @@
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}

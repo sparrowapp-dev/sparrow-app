@@ -65,6 +65,9 @@
    */
   export let activeTabId: string;
 
+  export let searchData: string;
+  export let activeTabPath;
+
   /**
    * Role of user in workspace
    */
@@ -161,6 +164,14 @@
   $: {
     if ($opendComponent.has(api.id)) {
       expand = true;
+    }
+    if (searchData) {
+      expand = true;
+    }
+    if (activeTabPath) {
+      if (activeTabPath.requestId === api.id) {
+        expand = true;
+      }
     }
   }
 </script>

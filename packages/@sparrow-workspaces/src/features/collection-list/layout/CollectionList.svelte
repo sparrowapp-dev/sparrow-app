@@ -318,7 +318,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={col?.toMutableJSON()}
+                    collection={col}
                     {activeTabId}
                     {searchData}
                     {isWebApp}
