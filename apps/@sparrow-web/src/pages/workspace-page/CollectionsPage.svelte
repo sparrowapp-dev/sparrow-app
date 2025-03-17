@@ -121,7 +121,7 @@
 
   // let isExpandEnvironment = false;
   // let isExpandTestflow = false;
-  // let isFirstCollectionExpand = false;
+  let isFirstCollectionExpand = false;
 
   let localEnvironment;
   let globalEnvironment;
@@ -532,6 +532,7 @@
       isWelcomePopupOpen = value;
       isExpandCollection.set(value);
       isExpandEnvironment.set(value);
+      isFirstCollectionExpand = value;
     }
   });
 
@@ -632,6 +633,7 @@
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
           onOpenTestflow={_viewModel3.handleOpenTestflow}
+          bind:isFirstCollectionExpand
           appVersion={"version"}
           isWebApp={true}
         />

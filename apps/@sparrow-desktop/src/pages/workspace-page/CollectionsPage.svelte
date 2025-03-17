@@ -121,6 +121,7 @@
 
   let localEnvironment;
   let globalEnvironment;
+  let isFirstCollectionExpand;
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
@@ -527,7 +528,7 @@
       isWelcomePopupOpen = value;
       isExpandCollection.set(value);
       isExpandEnvironment.set(value);
-      isFirstCollectionExpand.set(value);
+      isFirstCollectionExpand = value;
     }
   });
   onDestroy(() => {
@@ -600,6 +601,7 @@
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
           onOpenTestflow={_viewModel3.handleOpenTestflow}
           appVersion={version}
+          bind:isFirstCollectionExpand
         />
       </Pane>
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>

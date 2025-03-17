@@ -23,6 +23,7 @@
    */
   export let userRole;
   export let isWebApp = false;
+  export let isFirstCollectionExpand = false;
 
   import { opendComponent } from "../../../../stores/recent-left-panel";
 
@@ -202,7 +203,7 @@
   });
 
   $: {
-    if ($opendComponent.has(collection.id)) {
+    if ($opendComponent.has(collection.id) || isFirstCollectionExpand) {
       visibility = true;
     }
   }

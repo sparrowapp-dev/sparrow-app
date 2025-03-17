@@ -130,7 +130,7 @@
   export let onUpdateTestflow;
   export let onOpenTestflow;
   export let isWebApp = false;
-  // export let isFirstCollectionExpand = false;
+  export let isFirstCollectionExpand = false;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -633,6 +633,7 @@
         <CollectionList
           bind:scrollList
           bind:userRole
+          bind:isFirstCollectionExpand
           {onRefetchCollection}
           {showImportCurlPopup}
           {collectionList}
