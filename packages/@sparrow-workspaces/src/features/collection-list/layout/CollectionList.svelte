@@ -304,24 +304,26 @@
                 overflowY={"auto"}
                 classProps={"pe-0"}
               >
-                {#each collectionFilter as col}
-                  <Collection
-                    bind:userRole
-                    {onItemCreated}
-                    {onItemDeleted}
-                    {onItemRenamed}
-                    {onItemOpened}
-                    {onBranchSwitched}
-                    {onRefetchCollection}
-                    {userRoleInWorkspace}
-                    {activeTabPath}
-                    {activeTabType}
-                    collection={col?.toMutableJSON()}
-                    {activeTabId}
-                    {searchData}
-                    {isWebApp}
-                  />
-                {/each}
+                {#if collectionFilter.length >= 0}
+                  {#each collectionFilter as col}
+                    <Collection
+                      bind:userRole
+                      {onItemCreated}
+                      {onItemDeleted}
+                      {onItemRenamed}
+                      {onItemOpened}
+                      {onBranchSwitched}
+                      {onRefetchCollection}
+                      {userRoleInWorkspace}
+                      {activeTabPath}
+                      {activeTabType}
+                      collection={col?.toMutableJSON()}
+                      {activeTabId}
+                      {searchData}
+                      {isWebApp}
+                    />
+                  {/each}
+                {/if}
               </List>
             {:else}
               <List
@@ -346,24 +348,26 @@
               overflowY={"auto"}
               classProps={"pe-0"}
             >
-              {#each collectionListDocument as col}
-                <Collection
-                  bind:userRole
-                  {onItemCreated}
-                  {onItemDeleted}
-                  {onItemRenamed}
-                  {onItemOpened}
-                  {onBranchSwitched}
-                  {onRefetchCollection}
-                  {userRoleInWorkspace}
-                  {activeTabPath}
-                  {activeTabType}
-                  collection={col?.toMutableJSON()}
-                  {activeTabId}
-                  {isWebApp}
-                  bind:isFirstCollectionExpand
-                />
-              {/each}
+              {#if collectionFilter.length >= 0}
+                {#each collectionListDocument as col}
+                  <Collection
+                    bind:userRole
+                    {onItemCreated}
+                    {onItemDeleted}
+                    {onItemRenamed}
+                    {onItemOpened}
+                    {onBranchSwitched}
+                    {onRefetchCollection}
+                    {userRoleInWorkspace}
+                    {activeTabPath}
+                    {activeTabType}
+                    collection={col?.toMutableJSON()}
+                    {activeTabId}
+                    {isWebApp}
+                    bind:isFirstCollectionExpand
+                  />
+                {/each}
+              {/if}
             </List>
           {/if}
         {:else}
