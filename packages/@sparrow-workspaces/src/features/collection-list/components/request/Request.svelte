@@ -417,7 +417,7 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
   }
   .api-name {
     height: 24px;

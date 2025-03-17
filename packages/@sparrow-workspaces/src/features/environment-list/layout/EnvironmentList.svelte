@@ -7,6 +7,7 @@
     ChevronDownRegular,
     AddRegular,
     LayerRegular,
+    GlobeRegular,
   } from "@sparrow/library/icons";
   import { Button, List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -231,24 +232,13 @@
             }}
           >
             <span class="icon-default">
-              <StackIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
-            </span>
-            <span class="icon-hover">
-              <StackFilled
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
+              <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
             </span>
             <span class="box-line1"></span>
             <span class="">{globalEnvironment[0]?.name}</span>
           </p>
         </div>
-        <hr class="m-0 ms-4 me-1 mt-1 mb-1" />
+        <hr class="m-0 ms-2 me-1 mt-1 mb-1" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>
@@ -389,22 +379,6 @@
     width: 30px;
     align-items: center;
     justify-content: center;
-  }
-
-  .env-item:hover .icon-default {
-    display: none;
-  }
-
-  .env-item:hover .icon-hover {
-    display: flex;
-  }
-
-  .env-item.active .icon-default {
-    display: none;
-  }
-
-  .env-item.active .icon-hover {
-    display: flex;
   }
 
   .environment-inactive {

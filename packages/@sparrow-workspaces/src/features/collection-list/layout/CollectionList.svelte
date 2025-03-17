@@ -241,7 +241,7 @@
         </span>
 
         <span
-          style="display: flex; align-items:center; justify-content:center; height:24px; "
+          style="display: flex; align-items:center; justify-content:end; height:24px; width:30px; "
         >
           <StackRegular size="16px" color="var(--bg-ds-neutral-300)" />
         </span>
