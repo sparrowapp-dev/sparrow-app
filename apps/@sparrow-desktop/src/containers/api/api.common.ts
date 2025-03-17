@@ -344,7 +344,29 @@ const sendSocketIoMessage = async (
  * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
  *
  */
-const disconnectWebSocket = async (tab_id: string) => {
+const disconnectWebSocket = async (tab_id: string, signal: AbortSignal) => {
+  // Handle the response and update UI accordingly
+  if (signal?.aborted) {
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(tab_id);
+      if (wsData) {
+        const listener = wsData.listener;
+        wsData.messages.unshift({
+          data: `Disconnected from ${url}`,
+          transmitter: "disconnector",
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+        wsData.status = "disconnected";
+        webSocketDataMap.set(tab_id, wsData);
+        if (listener) {
+          listener();
+        }
+      }
+      return webSocketDataMap;
+    });
+    return notifications.success("WebSocket disconnected successfully.");
+  }
   let url = "";
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
@@ -601,7 +623,16 @@ const connectWebSocket = async (
   url: string,
   tabId: string,
   requestHeaders: string,
+  signal: AbortSignal,
 ) => {
+  // Handle the response and update UI accordingly
+  if (signal?.aborted) {
+    webSocketDataStore.update((webSocketDataMap) => {
+      webSocketDataMap.delete(tabId);
+      return webSocketDataMap;
+    });
+    return;
+  }
   const { httpUrl, wsUrl } = convertWebSocketUrl(url);
   console.table({ wsUrl, httpUrl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
@@ -626,6 +657,11 @@ const connectWebSocket = async (
   })
     .then(async (data: string) => {
       try {
+        debugger;
+        // Handle the response and update UI accordingly
+        if (signal?.aborted) {
+          throw new Error(); // Ignore response if request was cancelled
+        }
         // Logic to handle response
         if (data) {
           const dt = JSON.parse(data);
@@ -703,6 +739,7 @@ const connectWebSocket = async (
       }
     })
     .catch((e) => {
+      debugger;
       console.error(e);
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
@@ -843,7 +880,6 @@ const makeHttpRequestV2 = async (
     if (signal?.aborted) {
       throw new Error(); // Ignore response if request was cancelled
     }
-    debugger;
     const endTime = performance.now();
     const duration = endTime - startTime;
 

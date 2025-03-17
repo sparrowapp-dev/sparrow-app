@@ -1449,7 +1449,10 @@ class RestExplorerViewModel {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 
-  public connectWebsocket = async (environmentVariables) => {
+  public connectWebsocket = async (
+    environmentVariables,
+    signal: AbortSignal,
+  ) => {
     const websocketData = this._tab.getValue();
 
     const decodeData = new DecodeWebsocket().init(
@@ -1461,14 +1464,18 @@ class RestExplorerViewModel {
       decodeData[0] as string,
       websocketData.tabId,
       decodeData[1],
+      signal,
     );
   };
-  public disconnectWebsocket = async () => {
+
+  public disconnectWebsocket = async (signal: AbortSignal) => {
     const websocketData = this._tab.getValue();
     return await this.webSocketService.disconnectWebsocket(
       websocketData?.tabId,
+      signal,
     );
   };
+
   public sendMessageWebsocket = async () => {
     const websocketData = this._tab.getValue();
     return await this.webSocketService.sendMessageWebsocket(

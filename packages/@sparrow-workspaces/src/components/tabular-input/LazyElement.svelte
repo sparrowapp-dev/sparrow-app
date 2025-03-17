@@ -63,8 +63,8 @@
       {/if}
     </div>
 
-    <div class="d-flex" style="width: calc(100% - 64px);">
-      <div class="w-50 position-relative">
+    <div class="d-flex" style="overflow-y: auto; width: calc(100% - 64px);">
+      <div class="w-50 position-relative" style="overflow-y: auto;">
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => {
@@ -77,7 +77,7 @@
           {onUpdateEnvironment}
         />
       </div>
-      <div class="w-50 position-relative">
+      <div class="w-50 position-relative" style="overflow-y: auto;">
         <CodeMirrorInput
           bind:value={element.value}
           onUpdateInput={() => {
@@ -138,7 +138,7 @@
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: calc(28px);
+    height: auto; /* Ensure height is auto to handle content overflow */
     background-color: var(--bg-ds-surface-600);
     border-top: 1px solid var(--bg-ds-surface-400);
     transition: background-color 1ms ease;

@@ -2,6 +2,8 @@ import { EditorView } from "@codemirror/view";
 
 export class TabularInputTheme {
   private theme;
+  private focusOverride;
+
   constructor() {
     this.theme = EditorView.theme({
       "&": {
@@ -16,6 +18,14 @@ export class TabularInputTheme {
         caretColor: "var(--white-color)",
         height: "100%",
         padding: "4px",
+        whiteSpace: "nowrap", // Single-line truncation
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      },
+      ".cm-line": {
+        whiteSpace: "nowrap", // Single-line truncation
+        overflow: "hidden",
+        textOverflow: "ellipsis",
       },
       ".cm-panels": {
         backgroundColor: "var(--bg-ds-surface-400)",
@@ -71,13 +81,105 @@ export class TabularInputTheme {
           backgroundColor: "var(--bg-ds-surface-400)",
           borderRadius: "4px",
         },
-
         "&:hover": {
           border: "1px solid var(--border-ds-neutral-300)",
           backgroundColor: "var(--bg-ds-surface-400)",
           borderRadius: "4px",
         },
+        "&.cm-focus-invisible": {
+          border: "2px solid var(--border-ds-primary-300) !important",
+          borderRadius: "4px",
+          backgroundColor: "var(--bg-ds-surface-400)",
+        },
+      },
+      ".cm-scroller::-webkit-scrollbar": {
+        display: "none",
+      },
+    });
 
+    // Focus override: when the editor is focused, we want auto height and pre-wrapped text
+    // (This override will be applied on top of the base theme.)
+    this.focusOverride = EditorView.theme({
+      "&": {
+        height: "auto",
+        width: "100%",
+        flex: "1",
+        border: "1px solid transparent",
+        borderRadius: "0",
+        fontSize: "12px",
+        overflowY: "auto", // Ensure overflow is handled
+        position: "relative", // Change from absolute to relative
+        top: "0", // Fix the top position
+      },
+      ".cm-content": {
+        caretColor: "var(--white-color)",
+        height: "100%",
+        padding: "4px",
+        whiteSpace: "pre-wrap",
+      },
+      ".cm-line": {
+        whiteSpace: "pre-wrap",
+      },
+      ".cm-panels": {
+        backgroundColor: "var(--bg-ds-surface-400)",
+        color: "var(--white-color)",
+        zIndex: "1",
+      },
+      ".cm-panels.cm-panels-top": {
+        borderBottom: "none",
+      },
+      ".cm-search label": {
+        display: "inline-flex",
+        alignItems: "center",
+      },
+      ".cm-textfield": {
+        backgroundColor: "var(--background-color)",
+      },
+      ".cm-button": {
+        backgroundColor: "var(--background-color)",
+        color: "var(--white-color)",
+        backgroundImage: "none",
+        textTransform: "capitalize",
+        border: "none",
+      },
+      ".cm-completionLabel": {
+        color: "var(--white-color)",
+      },
+      ".cm-tooltip": {
+        backgroundColor: "var(--background-color)",
+        border: "none",
+      },
+      ".cm-activeLine": { backgroundColor: "transparent" },
+      ".cm-gutters": {
+        backgroundColor: "var(--background-color)",
+      },
+      ".cm-activeLineGutter": {
+        backgroundColor: "transparent",
+      },
+      ".cm-foldPlaceholder": {
+        color: "var(--text-primary-100)",
+        fontSize: "12px",
+        fontWeight: "400",
+      },
+      ".cm-placeholder": {
+        color: "var(--text-ds-neutral-400)",
+        fontSize: "12px",
+        fontWeight: "400",
+      },
+      "&.cm-editor": {
+        border: "1px solid transparent",
+        borderRadius: "4px",
+        "&.cm-focused": {
+          border: "1px solid var(--border-ds-primary-300) !important",
+          backgroundColor: "var(--bg-ds-surface-400)",
+          borderRadius: "4px",
+          zIndex: "2",
+        },
+        "&:hover": {
+          border: "1px solid var(--border-ds-neutral-300)",
+          backgroundColor: "var(--bg-ds-surface-400)",
+          borderRadius: "4px",
+        },
         "&.cm-focus-invisible": {
           border: "2px solid var(--border-ds-primary-300) !important",
           borderRadius: "4px",
@@ -89,7 +191,12 @@ export class TabularInputTheme {
       },
     });
   }
+
   public build() {
     return this.theme;
+  }
+
+  public getFocusOverride() {
+    return this.focusOverride;
   }
 }

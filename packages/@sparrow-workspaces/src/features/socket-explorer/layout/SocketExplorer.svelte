@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Loader } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
 
@@ -34,6 +33,7 @@
   } from "../components";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -72,6 +72,22 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsSocket = flag;
   };
+
+  let isConnecting = false;
+  let abortController: AbortController;
+
+  const handleConnect = async () => {
+    isConnecting = true;
+    abortController = new AbortController();
+    await onConnect(environmentVariables, abortController.signal);
+  };
+
+  const handleCancelConnect = async () => {
+    isConnecting = false;
+    abortController.abort();
+    await invoke("abort_websocket_connection", { tabid: $tab.tabId });
+    onDisconnect();
+  };
 </script>
 
 {#if $tab.tabId}
@@ -89,9 +105,11 @@
         {toggleSaveRequest}
         {onSaveSocket}
         {isGuestUser}
-        {onConnect}
+        {handleConnect}
         {webSocket}
         {onDisconnect}
+        {isConnecting}
+        {handleCancelConnect}
       />
 
       <div class="pt-2"></div>

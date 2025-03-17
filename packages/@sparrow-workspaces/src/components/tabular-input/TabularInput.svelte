@@ -235,7 +235,10 @@
   });
 </script>
 
-<div class="outer-section" style="margin-top:12px;">
+<div
+  class="outer-section"
+  style="margin-top:12px; overflow-y: auto; max-height: 100vh;"
+>
   {#if !isBulkEditActive}
     <section
       class="mb-0 me-0 py-0 section-layout w-100"
@@ -442,5 +445,9 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
+  }
+  .outer-section {
+    overflow-y: auto; /* Ensure outer section handles overflow */
+    max-height: 100vh; /* Limit the height to viewport */
   }
 </style>

@@ -76,8 +76,8 @@ use hyper::{Client as OtherClient, Request};
 use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
+use tokio::sync::oneshot::{self, Sender};
 use tokio::sync::Mutex;
-use tokio::time::timeout;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 
@@ -89,9 +89,6 @@ use rust_socketio::{
 };
 use tauri_plugin_os::platform;
 use tokio::sync::Mutex as SocketMutex;
-
-// 5 seconds timeout for websocket connection
-const SOCKET_TIMEOUT: Duration = Duration::from_secs(5);
 
 // MacOs Window Titlebar Config Imports
 #[cfg(target_os = "macos")]
@@ -603,13 +600,14 @@ struct SingleInstancePayload {
 }
 
 #[derive(Clone)]
-struct TabConnection {
-    sender: UnboundedSender<String>,
-    disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<()>>>>,
+pub struct TabConnection {
+    pub sender: mpsc::UnboundedSender<String>,
+    pub disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<Result<(), String>>>>>,
 }
 
 struct AppState {
     connections: Mutex<std::collections::HashMap<String, TabConnection>>,
+    abort_senders: Mutex<std::collections::HashMap<String, Sender<()>>>,
 }
 struct SocketIoAppState {
     connections: SocketMutex<HashMap<String, SocketClient>>,
@@ -641,7 +639,7 @@ async fn connect_websocket(
     // Create a HashMap to store key-value pairs
     let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
 
-    // Iterate over key_values and add key-value pairs to the map
+    // Add each key-value pair to the map
     for kv in headers_key_values {
         headers_key_value_map.insert(kv.key, kv.value);
     }
@@ -664,31 +662,26 @@ async fn connect_websocket(
         );
     }
 
-    // Unwrap the body
     let req = req_builder
         .body(hyper::Body::empty())
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
-    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
-    let response_result = timeout(SOCKET_TIMEOUT, client.request(req)).await;
+    // Send the HTTP request and await response to check if upgrade is possible.
+    let response = client
+        .request(req)
+        .await
+        .map_err(|e| format!("Failed to request: {}", e))?;
 
-    let response = match response_result {
-        Ok(Ok(response)) => response, // Successfully got a response
-        Ok(Err(e)) => return Err(format!("Request failed: {}", e)), // Request error
-        Err(_) => return Err("Request timed out".to_string()), // Timeout error
-    };
-
-    // Check if the upgrade to WebSocket was successful
     if response.status() != 101 {
         return Err(format!("Failed to upgrade: {:?}", response.status()));
     }
 
-    // Establish the WebSocket connection and convert the response into a WebSocket stream
+    // Establish the WebSocket connection
     let (ws_stream, response) = connect_async(url)
         .await
         .map_err(|e| format!("Failed to connect: {}", e))?;
 
-    // Extract headers from the response
+    // Extract headers from the WebSocket response
     let mut response_headers = HashMap::new();
     for (key, value) in response.headers() {
         if let Ok(header_value) = value.to_str() {
@@ -696,14 +689,18 @@ async fn connect_websocket(
         }
     }
 
-    // Split the WebSocket stream into read and write halves
+    // Split the WebSocket stream into write and read halves.
     let (mut write, mut read) = ws_stream.split();
 
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
 
-    let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel();
+    // Create a disconnect channel that will be used to signal when the connection ends.
+    // Its type is oneshot::Sender<Result<(), String>> where an Err indicates a manual abort.
+    let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel::<Result<(), String>>();
+    // Wrap the disconnect sender in an Option so we can take() it exactly once.
     let disconnect_handle = Arc::new(Mutex::new(Some(disconnect_tx)));
 
+    // Insert the connection into shared state.
     state.connections.lock().await.insert(
         tabid.clone(),
         TabConnection {
@@ -712,14 +709,36 @@ async fn connect_websocket(
         },
     );
 
+    // Create an abort channel. When the user manually aborts the connection,
+    // the sender (stored in state.abort_senders) will be used to trigger the abort branch.
+    let (abort_tx, abort_rx) = oneshot::channel();
+    state
+        .abort_senders
+        .lock()
+        .await
+        .insert(tabid.clone(), abort_tx);
+
     let svelte_tabid = tabid.clone();
     let app_handle_clone = app_handle.clone();
+    // Spawn a task to handle incoming messages and listen for an abort signal.
     tokio::spawn(async move {
         tokio::select! {
-            _ = disconnect_rx => {
-                // Handle manual disconnection
-                println!("WebSocket connection manually closed for tab: {}", svelte_tabid);
-            }
+            // If an abort signal is received…
+            _ = abort_rx => {
+                println!("WebSocket connection manually aborted for tab: {}", svelte_tabid);
+                let event = format!("ws_message_{}", svelte_tabid);
+                let error_message = format!("WebSocket connection manually aborted for tab: {}", svelte_tabid);
+                let payload = json!({
+                    "type": "disconnect",
+                    "data": error_message,
+                });
+                let _ = app_handle_clone.emit(event.as_str(), payload);
+                // Send an error through the disconnect channel.
+                if let Some(tx) = disconnect_handle.lock().await.take() {
+                    let _ = tx.send(Err(error_message));
+                }
+            },
+            // Otherwise, process messages from the WebSocket.
             _ = async {
                 while let Some(message) = read.next().await {
                     match message {
@@ -731,75 +750,83 @@ async fn connect_websocket(
                                         "type": "message",
                                         "data": text,
                                     });
-                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
-                                }
+                                    let _ = app_handle_clone.emit(event.as_str(), payload);
+                                },
                                 Message::Close(close_frame) => {
-                                    // Handle server disconnection
                                     let event = format!("ws_message_{}", svelte_tabid);
                                     let close_reason = close_frame
                                         .as_ref()
                                         .map(|frame| frame.reason.to_string())
-                                        .unwrap_or("No reason provided".to_string());
-
-                                    println!(
-                                        "Server closed WebSocket connection for tab: {}, reason: {}",
-                                        svelte_tabid,
-                                        close_reason
-                                    );
-
+                                        .unwrap_or_else(|| "No reason provided".to_string());
+                                    println!("Server closed WebSocket connection for tab: {}, reason: {}", svelte_tabid, close_reason);
                                     let payload = json!({
                                         "type": "disconnect",
                                         "data": close_reason,
                                     });
-                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
+                                    let _ = app_handle_clone.emit(event.as_str(), payload);
                                     break;
-                                }
+                                },
                                 _ => {}
                             }
-                        }
+                        },
                         Err(err) => {
-                            // Handle errors (like connection reset, etc.)
                             let event = format!("ws_message_{}", svelte_tabid);
                             let error_message = format!("WebSocket error: {}", err);
                             println!("Error for tab {}: {}", svelte_tabid, error_message);
-
                             let payload = json!({
                                 "type": "disconnect",
                                 "data": error_message,
                             });
-                            app_handle_clone.emit(event.as_str(), payload).unwrap();
+                            let _ = app_handle_clone.emit(event.as_str(), payload);
                             break;
                         }
                     }
                 }
-            } => {}
+            } => {
+                // Connection ended “normally” (or due to a server-side close/error);
+                // send a success (Ok) through the disconnect channel.
+                if let Some(tx) = disconnect_handle.lock().await.take() {
+                    let _ = tx.send(Ok(()));
+                }
+            }
         }
     });
 
+    // Spawn a separate task to handle outgoing messages.
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
-            write
-                .send(Message::Text(msg))
-                .await
-                .map_err(|e| format!("Failed to send message: {}", e))
-                .unwrap();
+            if let Err(e) = write.send(Message::Text(msg)).await {
+                eprintln!("Failed to send message: {}", e);
+                break;
+            }
         }
     });
 
-    // Create a success response
-    let response = WebSocketResponse {
-        is_successful: true,
-        status_code: 200,
-        message: "Connected Successfully".to_string(),
-        headers: Some(response_headers),
-        // initial_data: Some(initial_data),
-    };
+    // Now wait for the disconnect signal.
+    // If the connection was manually aborted, this will return an Err.
+    let disconnect_result = disconnect_rx
+        .await
+        .map_err(|_| "Disconnect channel dropped unexpectedly".to_string())?;
 
-    // Serialize the response to a JSON string and return it
-    let response_json = serde_json::to_string(&response)
-        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+    // Clear the connection state regardless of how the connection ended.
+    state.connections.lock().await.remove(&tabid);
+    state.abort_senders.lock().await.remove(&tabid);
 
-    Ok(response_json)
+    match disconnect_result {
+        Err(err_msg) => Err(err_msg),
+        Ok(_) => {
+            // If the connection ended normally, return a success response.
+            let response = WebSocketResponse {
+                is_successful: true,
+                status_code: 200,
+                message: "Connected Successfully".to_string(),
+                headers: Some(response_headers),
+            };
+            let response_json = serde_json::to_string(&response)
+                .map_err(|e| format!("Failed to serialize response: {}", e))?;
+            Ok(response_json)
+        }
+    }
 }
 
 #[tauri::command]
@@ -845,6 +872,7 @@ async fn disconnect_websocket(
     state: tauri::State<'_, Arc<AppState>>,
 ) -> Result<String, String> {
     let mut connections = state.connections.lock().await;
+    let mut abort_senders = state.abort_senders.lock().await;
 
     if let Some(connection) = connections.remove(&tabid) {
         // Access the disconnect handle
@@ -853,35 +881,24 @@ async fn disconnect_websocket(
         // Check if there is a Sender inside the Option
         if let Some(sender) = std::mem::take(&mut *handle_lock) {
             // Send the signal to close the WebSocket connection
-            let _ = sender.send(());
+            let _ = sender.send(Ok(()));
         }
 
-        // Create a success response
-        let response = DisconnectResponse {
-            is_successful: true,
-            status_code: 200,
-            message: "WebSocket connection disconnected successfully".to_string(),
-        };
-
-        // Serialize the response to a JSON string and return it
-        let response_json = serde_json::to_string(&response)
-            .map_err(|e| format!("Failed to serialize response: {}", e))?;
-
-        return Ok(response_json);
-    } else {
-        // Return an error if the connection was not found
-        let response = DisconnectResponse {
-            is_successful: false,
-            status_code: 404,
-            message: "WebSocket connection not found".to_string(),
-        };
-
-        // Serialize the error response to a JSON string and return it
-        let response_json = serde_json::to_string(&response)
-            .map_err(|e| format!("Failed to serialize response: {}", e))?;
-
-        return Err(response_json);
+        // Remove the abort sender
+        abort_senders.remove(&tabid);
     }
+    // Create a success response
+    let response = DisconnectResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "WebSocket connection disconnected successfully".to_string(),
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    return Ok(response_json);
 }
 
 #[derive(Serialize)]
@@ -1239,6 +1256,21 @@ async fn send_graphql_request(
     };
 }
 
+#[tauri::command]
+async fn abort_websocket_connection(
+    tabid: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<String, String> {
+    let mut abort_senders = state.abort_senders.lock().await;
+
+    if let Some(abort_sender) = abort_senders.remove(&tabid) {
+        let _ = abort_sender.send(());
+        Ok("WebSocket connection aborted successfully".to_string())
+    } else {
+        Err("WebSocket connection not found".to_string())
+    }
+}
+
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -1277,6 +1309,7 @@ fn main() {
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
             app.manage(Arc::new(AppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
+                abort_senders: Mutex::new(std::collections::HashMap::new()),
             }));
             app.manage(Arc::new(SocketIoAppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
@@ -1319,7 +1352,8 @@ fn main() {
             send_socket_io_message,
             send_graphql_request,
             show_toolbar,
-            hide_toolbar
+            hide_toolbar,
+            abort_websocket_connection
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {

@@ -10,6 +10,7 @@
     Decoration,
     placeholder as CreatePlaceHolder,
   } from "@codemirror/view";
+  import { TabularInputTheme } from "../../../../utils";
   /**
    * input value
    */
@@ -47,7 +48,7 @@
    * input states
    */
   export let placeholder: string;
-  export let theme: object;
+  export let theme;
   export let disabled: boolean = false;
   /**
    * environment dialog box positions
@@ -61,12 +62,19 @@
   export let componentClass;
   export let isFocusedOnMount = false;
 
+  /**
+   * Code Id of Component
+   */
+  export let codeId: string;
+
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
   let codeMirrorEditorDiv: HTMLDivElement;
 
   const ENVIRONMENT_REGEX =
     /({{[a-zA-Z0-9-_!@#$%^&*()+=\[\]|\\;:'",.<>?/`\s]+}})/g;
+
+  const themeCompartment = new Compartment();
 
   type AggregateEnvironment = {
     key: string;
@@ -219,19 +227,29 @@
    */
   const handleEventsRegister = EditorView.domEventHandlers({
     blur: (event, view: EditorView) => {
+      if (codeId != "url") {
+        view.dispatch({
+          effects: themeCompartment.reconfigure(theme),
+        });
+      }
       handleBlurChange();
     },
     focus: (event, view: EditorView) => {
+      if (codeId != "url") {
+        view.dispatch({
+          effects: themeCompartment.reconfigure(
+            new TabularInputTheme().getFocusOverride(),
+          ),
+        });
+      }
       handleFocusChange();
     },
     keyup: (event, view: EditorView) => {
       handleKeyUpChange(codeMirrorView.state.selection);
     },
-
     keydown: (event, view: EditorView) => {
       handleKeyDownChange(event);
     },
-
     paste: handlePaste, // triggers paste event
   });
 
@@ -343,10 +361,11 @@
     let state = EditorState.create({
       doc: value,
       extensions: [
-        theme,
+        themeCompartment.of(theme),
         updateExtensionView,
         keyBinding,
         languageConf.of(javascriptLanguage),
+        EditorView.lineWrapping,
         EditorState.readOnly.of(disabled ? true : false),
         handleEventsRegister,
         CreatePlaceHolder(placeholder),
@@ -405,7 +424,11 @@
   });
 </script>
 
-<div class="w-100 basic-code-mirror-input" bind:this={inputWrapper}>
+<div
+  class="w-100 basic-code-mirror-input"
+  bind:this={inputWrapper}
+  style="position: relative;"
+>
   <div class={componentClass} bind:this={codeMirrorEditorDiv} />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
