@@ -78,8 +78,7 @@
     isExpandCollection,
     isExpandEnvironment,
     isExpandTestflow,
-    isFirstCollectionExpand,
-  } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
+  } from "@sparrow/workspaces/stores";
   import {
     defaultCurrentStep,
     isDefaultTourGuideOpen,
@@ -533,7 +532,6 @@
       isWelcomePopupOpen = value;
       isExpandCollection.set(value);
       isExpandEnvironment.set(value);
-      isFirstCollectionExpand.set(value);
     }
   });
 

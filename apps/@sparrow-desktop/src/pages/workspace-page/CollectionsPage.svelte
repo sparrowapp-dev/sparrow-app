@@ -38,8 +38,7 @@
     isExpandCollection,
     isExpandEnvironment,
     isExpandTestflow,
-    isFirstCollectionExpand,
-  } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
+  } from "@sparrow/workspaces/stores";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
 

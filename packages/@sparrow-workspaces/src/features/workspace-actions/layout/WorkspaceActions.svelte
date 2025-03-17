@@ -10,7 +10,6 @@
     isExpandCollection,
     isExpandEnvironment,
     isExpandTestflow,
-    isFirstCollectionExpand,
   } from "../../../stores/recent-left-panel";
   import {
     AddRegular,
