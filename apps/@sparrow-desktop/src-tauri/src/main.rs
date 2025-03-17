@@ -729,14 +729,10 @@ async fn connect_websocket(
                 let event = format!("ws_message_{}", svelte_tabid);
                 let error_message = format!("WebSocket connection manually aborted for tab: {}", svelte_tabid);
                 let payload = json!({
-                    "type": "disconnect",
-                    "data": error_message,
+                    "type": "cancel"
                 });
+                println!("event: {}", event);
                 let _ = app_handle_clone.emit(event.as_str(), payload);
-                // Send an error through the disconnect channel.
-                if let Some(tx) = disconnect_handle.lock().await.take() {
-                    let _ = tx.send(Err(error_message));
-                }
             },
             // Otherwise, process messages from the WebSocket.
             _ = async {
@@ -802,31 +798,16 @@ async fn connect_websocket(
         }
     });
 
-    // Now wait for the disconnect signal.
-    // If the connection was manually aborted, this will return an Err.
-    let disconnect_result = disconnect_rx
-        .await
-        .map_err(|_| "Disconnect channel dropped unexpectedly".to_string())?;
-
-    // Clear the connection state regardless of how the connection ended.
-    state.connections.lock().await.remove(&tabid);
-    state.abort_senders.lock().await.remove(&tabid);
-
-    match disconnect_result {
-        Err(err_msg) => Err(err_msg),
-        Ok(_) => {
-            // If the connection ended normally, return a success response.
-            let response = WebSocketResponse {
-                is_successful: true,
-                status_code: 200,
-                message: "Connected Successfully".to_string(),
-                headers: Some(response_headers),
-            };
-            let response_json = serde_json::to_string(&response)
-                .map_err(|e| format!("Failed to serialize response: {}", e))?;
-            Ok(response_json)
-        }
-    }
+    // Return a success response immediately after the WebSocket connects.
+    let response = WebSocketResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "Connected Successfully".to_string(),
+        headers: Some(response_headers),
+    };
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+    Ok(response_json)
 }
 
 #[tauri::command]
@@ -1267,7 +1248,7 @@ async fn abort_websocket_connection(
         let _ = abort_sender.send(());
         Ok("WebSocket connection aborted successfully".to_string())
     } else {
-        Err("WebSocket connection not found".to_string())
+        Ok("WebSocket connection not found".to_string())
     }
 }
 
