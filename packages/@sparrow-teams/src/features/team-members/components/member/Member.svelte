@@ -293,7 +293,7 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span style="font-size:12px;display: inline-block;" class="text-textColor"
             >{user.email}</span
           >
         </div>
@@ -372,7 +372,7 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span style="font-size:12px;display: inline-block;" class="text-textColor "
             >{user.email}</span
           >
         </div>
@@ -445,7 +445,7 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span style="font-size:12px;display: inline-block;" class="text-textColor"
             >{user.email}</span
           >
         </div>
