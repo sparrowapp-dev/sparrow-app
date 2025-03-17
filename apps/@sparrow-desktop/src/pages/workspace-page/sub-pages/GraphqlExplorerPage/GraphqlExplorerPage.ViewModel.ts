@@ -2883,7 +2883,7 @@ class GraphqlExplorerViewModel {
     }
     await this.updateRequestQuery(query);
 
-    notifications.success("Cleared Query successfully.");
+    notifications.success("Cleared query successfully.");
   };
 }
 

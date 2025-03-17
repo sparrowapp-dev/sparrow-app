@@ -1904,7 +1904,7 @@ class GraphqlExplorerViewModel {
    */
   public clearQuery = async () => {
     await this.updateRequestQuery("");
-    notifications.success("Cleared Query successfully.");
+    notifications.success("Cleared query successfully.");
   };
 }
 
