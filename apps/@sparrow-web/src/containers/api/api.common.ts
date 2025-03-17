@@ -486,7 +486,6 @@ const connectWebSocket = async (
         };
       });
     } catch (error) {
-      console.log("error");
       console.error("WebSocket connection error:", error);
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
