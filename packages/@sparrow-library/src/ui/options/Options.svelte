@@ -1,5 +1,6 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
+  export let isTabMenu = false;
   export let xAxis = 0;
   export let yAxis = [0, 0];
   export let menuItems: Array<{
@@ -8,6 +9,7 @@
     disabled?: boolean;
     hidden?: boolean;
     icon?: any;
+    iconColor?: string;
   }> = [];
   export let noOfColumns = 0;
   export let zIndex = 4;
@@ -64,8 +66,8 @@
   out:scale={{ start: 0.8, duration: 400 }}
 >
   <div
-    style={`width: ${noOfColumns}px`}
-    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-2 align-items-start justify-content-start text-whiteColor bg-tertiary-400"
+    style={`width: ${noOfColumns}px; background-color: var(--bg-ds-surface-600);`}
+    class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-4 align-items-start justify-content-start text-whiteColor"
   >
     <ul class="p-1 w-100 mb-0">
       {#each menuItems as item}
@@ -79,16 +81,24 @@
             style={item.displayText === "Delete"
               ? "color: var(--request-delete)"
               : ""}
+            tabindex={0}
           >
             <span class="me-2">
               <svelte:component
                 this={item.icon}
                 height={"12px"}
                 width={"12px"}
-                color={"#A5B5CA"}
+                size={"14px"}
+                color={item?.iconColor || "#A5B5CA"}
               />
             </span>
-            <span>
+            <span
+              style="padding-left: {isTabMenu
+                ? item.icon
+                  ? ''
+                  : '14px'
+                : ''};"
+            >
               {item.displayText}
             </span>
           </button>
@@ -107,14 +117,18 @@
   }
 
   ul li button {
-    background-color: var(--bg-tertiary-400);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-600);
     transition: 0.2s ease;
+    border: none;
   }
 
   ul li button:hover {
     color: var(--white-color);
     border-radius: 4px;
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-400);
+  }
+  ul li button:focus-visible {
+    background-color: var(--bg-ds-surface-600);
+    outline: 2px solid var(--border-ds-primary-300) !important;
   }
 </style>

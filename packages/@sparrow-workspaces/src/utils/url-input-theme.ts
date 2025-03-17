@@ -67,12 +67,12 @@ export class UrlInputTheme {
         fontWeight: "400",
       },
       "&.cm-editor:hover": {
-        border: "1px solid var(--border-ds-neutral-300)",
+        outline: "1px solid var(--border-ds-neutral-300)",
         "border-radius": "4px",
       },
       "&.cm-editor.cm-focused": {
-        border: "1px solid var(--border-ds-primary-300)",
         "border-radius": "4px",
+        outline: "1px solid var(--border-ds-primary-300)",
       },
       ".cm-scroller::-webkit-scrollbar": {
         display: "none",

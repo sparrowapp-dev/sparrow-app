@@ -69,6 +69,10 @@
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import {
+    CheckmarkCircleFilled,
+    ErrorCircleFilled,
+  } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -98,6 +102,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -114,6 +119,8 @@
   export let isWebApp = false;
   export let azureBlobCDN;
   export let onSaveResponse;
+  export let collectionAuth;
+  export let collection;
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -137,6 +144,8 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isErrorMsgOpen = false;
+
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
@@ -150,6 +159,7 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+
   let isGuidePopup = false;
 </script>
 
@@ -324,9 +334,12 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
+                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
@@ -358,7 +371,7 @@
                 style="overflow:auto;"
               >
                 <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto;">
+                  <div style="flex:1; overflow:auto; ">
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div
@@ -369,7 +382,9 @@
                     {:else if !storeData?.response.status}
                       <ResponseDefaultScreen />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen
+                        onSendButtonClicked={onSendRequest}
+                      />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column">
                         <ResponseStatus response={storeData.response} />

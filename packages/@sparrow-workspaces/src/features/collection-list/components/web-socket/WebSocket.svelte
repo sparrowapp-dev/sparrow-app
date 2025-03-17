@@ -136,18 +136,19 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-12">
+  <div
+    class="mb-1 mt-2"
+    style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;"
+  >
     <p>
-      Are you sure you want to delete this WebSocket? <span
-        class="text-whiteColor fw-bold">"{api.name}"</span
-      >
+      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end mt-1 mb-0 rounded w-100"
+    style="font-size: 16px;gap:12px"
   >
     <Button
       disable={deleteLoader}
@@ -158,6 +159,7 @@
       onClick={() => {
         isDeletePopup = false;
       }}
+      customWidth={"96px"}
     />
 
     <Button
@@ -178,6 +180,7 @@
         deleteLoader = false;
         isDeletePopup = false;
       }}
+      customWidth={"96px"}
     />
   </div></Modal
 >
@@ -258,7 +261,7 @@
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
+      ? "padding-left: 74.5px; gap:4px;"
       : "padding-left: 48.5px; gap:4px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
@@ -317,6 +320,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />

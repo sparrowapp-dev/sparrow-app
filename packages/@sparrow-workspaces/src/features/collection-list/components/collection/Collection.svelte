@@ -61,6 +61,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import type { CollectionBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+  import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
   let deletedIds: string[] = [];
   let requestCount = 0;
@@ -364,6 +365,17 @@
             : true,
       },
       {
+        onClick: () =>
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+            navigation: CollectionNavigationTabEnum.AUTH,
+          }),
+        displayText: "Set Auth",
+        disabled: false,
+        hidden: false,
+      },
+      {
         onClick: () => {
           isCollectionPopup = true;
         },
@@ -453,6 +465,19 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      visibility = !visibility;
+      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+        if (visibility) {
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        }
+      }
+    }
+  }}
   style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
@@ -464,19 +489,6 @@
     class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        visibility = !visibility;
-        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-          if (visibility) {
-            onItemOpened("collection", {
-              workspaceId: collection.workspaceId,
-              collection,
-            });
-          }
-        }
-      }
-    }}
   >
     <Button
       size="extra-small"
@@ -484,7 +496,7 @@
       type="teritiary-regular"
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
       onClick={(e) => {
-        stopPropagation(e);
+        e.stopPropagation();
         visibility = !visibility;
       }}
     />
@@ -573,7 +585,10 @@
             customWidth={"24px"}
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
-            onClick={rightClickContextMenu}
+            onClick={(e) => {
+              e.stopPropagation();
+              rightClickContextMenu();
+            }}
           />
         </span>
       </Tooltip>
@@ -645,7 +660,7 @@
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ps-1 ms-2">
+        <div class="d-flex gap-2 ms-2" style="padding-left: 42px;">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip
               title={"Add Folder"}

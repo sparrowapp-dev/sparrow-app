@@ -249,7 +249,7 @@
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
+      ? "padding-left: 74.5px; gap:4px;"
       : "padding-left: 48.5px; gap:4px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
@@ -308,6 +308,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />

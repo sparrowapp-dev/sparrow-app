@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { CleanerIcon } from "@sparrow/library/icons";
+  import { BroomRegular } from "@sparrow/library/icons";
   import { Raw, RequestMessageNavigator } from "./sub-body";
+  import { Button } from "@sparrow/library/ui";
 
   export let body;
   export let requestState;
@@ -44,22 +45,13 @@
       >
         <div></div>
         <div>
-          <span
-            class="input-cleaner px-2 border-radius-2 py-1 text-fs-12 text-secondary-200"
-            role="button"
-            on:click={() => {
-              onClearInput();
-            }}
-          >
-            <span class="me-2"
-              ><CleanerIcon
-                height={"14px"}
-                width={"12px"}
-                color={"var(--text-secondary-200)"}
-              /></span
-            >
-            Clear Inputs</span
-          >
+           <Button
+          type="teritiary-regular"
+          startIcon={BroomRegular}
+          onClick={onClearInput}
+          title="Clear Inputs"
+          size="small"
+          />
         </div>
       </div>
     </div>

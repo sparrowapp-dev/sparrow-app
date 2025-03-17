@@ -192,6 +192,7 @@
 <div
   style="height:100%; overflow:hidden"
   class={`sidebar d-flex flex-column  scroll px-1`}
+  id="collection-container"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"

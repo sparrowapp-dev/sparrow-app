@@ -533,44 +533,45 @@
       <!--  
         New dropdown button for adding new api, collection and import Curl
       -->
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <Dropdown
-          zIndex={600}
-          buttonId="addButton"
-          bind:isBackgroundClickable
-          bind:isMenuOpen={addButtonMenu}
-          options={addButtonData}
-        >
-          <Tooltip
-            title={"Add Options"}
-            placement={"bottom-center"}
-            distance={12}
-            show={!addButtonMenu}
-            zIndex={10}
+      <div id="options-container">
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+          <Dropdown
+            zIndex={600}
+            buttonId="addButton"
+            bind:isBackgroundClickable
+            bind:isMenuOpen={addButtonMenu}
+            options={addButtonData}
           >
-            <!-- <button
+            <Tooltip
+              title={"Add Options"}
+              placement={"bottom-center"}
+              distance={12}
+              show={!addButtonMenu}
+              zIndex={10}
+            >
+              <!-- <button
               id="addButton"
               class="border-0 p-1 border-radius-2 add-button"
               on:click={() => {
                 addButtonMenu = !addButtonMenu;
               }}
             > -->
-            <!--               
+              <!--               
               <img src={plusIcon} alt="" />
             </button> -->
-            <Button
-              type="primary"
-              id="addButton"
-              size={"small"}
-              customWidth={"28px"}
-              startIcon={AddRegular}
-              onClick={() => {
-                addButtonMenu = !addButtonMenu;
-              }}
-            />
-          </Tooltip>
-        </Dropdown>
-      {/if}
+              <Button
+                type="primary"
+                id="addButton"
+                size={"small"}
+                startIcon={AddRegular}
+                onClick={() => {
+                  addButtonMenu = !addButtonMenu;
+                }}
+              />
+            </Tooltip>
+          </Dropdown>
+        {/if}
+      </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
@@ -593,7 +594,11 @@
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div style="position:fixed; top:234px; left:220px; z-index:9999;">
+        <div
+          style="position:fixed; top:{isWebApp
+            ? '234px'
+            : '266px'}; left:220px; z-index:9999;"
+        >
           <TestFlowTourGuide
             targetId="addButton"
             title="Add Your Flow 🌊"
