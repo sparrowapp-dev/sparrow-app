@@ -33,10 +33,7 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
-  import {
-    isExpandCollection,
-    isFirstCollectionExpand,
-  } from "../../../stores/recent-left-panel";
+  import { isExpandCollection } from "../../../stores/recent-left-panel";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;

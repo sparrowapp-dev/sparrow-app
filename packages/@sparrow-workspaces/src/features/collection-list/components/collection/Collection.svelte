@@ -24,10 +24,7 @@
   export let userRole;
   export let isWebApp = false;
 
-  import {
-    isFirstCollectionExpand,
-    opendComponent,
-  } from "../../../../stores/recent-left-panel";
+  import { opendComponent } from "../../../../stores/recent-left-panel";
 
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
