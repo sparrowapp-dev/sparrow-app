@@ -47,7 +47,7 @@ export class AuthViewModel {
     const workspaceId = uuidv4();
     const dummyTeam = {
       teamId: teamId,
-      name: "Teams",
+      name: "Team",
       workspaces: [{ name: "My Workspace", workspaceId: workspaceId }],
       users: [{ id: user.id, name: user.name, email: "", role: "owner" }],
       owner: user.id,
@@ -66,7 +66,7 @@ export class AuthViewModel {
       name: "My Workspace",
       team: {
         teamId: teamId,
-        teamName: "Teams",
+        teamName: "Team",
       },
       admins: [{ id: user.id, name: user.name }],
       users: [{ id: user.id, name: user.name, email: "", role: "admin" }],
