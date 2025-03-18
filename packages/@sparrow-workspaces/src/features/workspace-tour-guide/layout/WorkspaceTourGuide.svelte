@@ -37,7 +37,7 @@
       CardNumber={$defaultCurrentStep}
       TotalsCards={totalSteps}
       tipPosition={currentStepData.tipPosition}
-      rightButtonName={$defaultCurrentStep === totalSteps ? "Finish" : "Next"}
+      rightButtonName={$defaultCurrentStep === totalSteps ? "Finish" : ""}
       onNext={() => {
         defaultCurrentStep.set($defaultCurrentStep + 1);
       }}

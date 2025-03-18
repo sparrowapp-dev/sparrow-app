@@ -136,11 +136,12 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="mb-1 mt-2"
-style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;">
+  <div
+    class="mb-1 mt-2"
+    style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;"
+  >
     <p>
-      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span
-      >
+      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
@@ -259,15 +260,17 @@ style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="width: 24px!important; height:24px; margin-right:4px;"
+    ></div>
     <span class="api-method"
       ><SocketIcon
         height={"12px"}
@@ -341,7 +344,8 @@ style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     font-weight: 500;
@@ -350,9 +354,8 @@ style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font
     line-height: 18px;
     width: calc(100% - 58px);
     text-align: left;
-    // display: flex;
     align-items: center;
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

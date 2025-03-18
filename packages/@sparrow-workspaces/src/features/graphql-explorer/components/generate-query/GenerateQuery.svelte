@@ -7,7 +7,7 @@
     ThreeDotIcon,
   } from "@sparrow/library/icons";
   import { trashIcon } from "@sparrow/library/assets";
-  import { Search } from "@sparrow/library/forms";
+  import { Input, Search } from "@sparrow/library/forms";
   import { Checkbox } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
@@ -684,6 +684,23 @@
                 </div>
               {/each}
             {/if}
+            {#if operationSearch && !queryBuilder?.length}
+              <div
+                class="fields-column h-100 ellipsis"
+                style="min-width: 260px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
+              >
+                <div
+                  class="h-100 d-flex align-items-center justify-content-center"
+                >
+                  <p
+                    class="text-fs-12 text-secondary-200"
+                    style="text-align: center;"
+                  >
+                    No result found.
+                  </p>
+                </div>
+              </div>
+            {/if}
           </div>
         </div>
       </div>
@@ -774,7 +791,10 @@
                       class="input-parent pe-2 mb-2 position-relative"
                       style="padding-left: 35px;"
                     >
-                      <input
+                      <Input
+                        id={t.id}
+                        variant="stroke"
+                        size="small"
                         type="text"
                         style="border:1px solid grey; outline:none;"
                         class="arg-input w-100 bg-transparent border-radius-2 px-2 pe-3 py-1 text-fs-12"
@@ -816,21 +836,6 @@
           </div>
         {/if}
       {/each}
-      {#if operationSearch && !queryBuilder?.length}
-        <div
-          class="fields-column h-100 ellipsis"
-          style="min-width: 260px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
-        >
-          <div class="h-100 d-flex align-items-center justify-content-center">
-            <p
-              class="text-fs-12 text-secondary-200"
-              style="text-align: center;"
-            >
-              No result found.
-            </p>
-          </div>
-        </div>
-      {/if}
     </div>
   </div>
 </div>

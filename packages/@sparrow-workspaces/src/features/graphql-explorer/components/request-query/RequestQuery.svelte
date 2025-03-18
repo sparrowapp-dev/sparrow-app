@@ -1,7 +1,7 @@
 <script lang="ts">
   import { beautifyIcon } from "@sparrow/library/assets";
   import { Editor } from "@sparrow/library/forms";
-  import { CleanerIcon } from "@sparrow/library/icons";
+  import { BroomRegular, CleanerIcon } from "@sparrow/library/icons";
   import { Button, notifications } from "@sparrow/library/ui";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Graphql";
@@ -61,6 +61,7 @@
     <Button
       size="small"
       type="teritiary-regular"
+      startIcon={BroomRegular}
       title="Clear Query"
       onClick={onClearQuery}
     />

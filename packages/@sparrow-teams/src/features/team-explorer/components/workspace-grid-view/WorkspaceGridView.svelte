@@ -223,10 +223,10 @@
 
   :global(.add-new-workspace) {
     border: 1px dashed var(--border-ds-neutral-300);
-    background-color: var(--bg-ds-neutral-100);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    /* background-color: var(--bg-ds-neutral-100); */
+    /* background-clip: text; */
+    /* -webkit-background-clip: text; */
+    /* -webkit-text-fill-color: transparent; */
     max-width: 32.8%;
     max-height: 32%;
     border-radius: 8px;
@@ -244,7 +244,7 @@
   }
   :global(.add-new-workspace:active) {
     border: 1px dashed var(--border-ds-primary-300);
-    background: var(--bg-ds-surface-500);
+    background: var(--bg-ds-surface-600);
   }
   :global(.add-new-workspace:focus-visible) {
     outline: none;
