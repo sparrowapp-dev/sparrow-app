@@ -1020,12 +1020,18 @@ export class DashboardViewModel {
       }
 
       let environment = await this.getRecentEnvironment();
-      environment = environment.map((_environment) => ({
-        title: _environment.name,
-        workspace: _environment.workspaceId,
-        id: _environment.id,
-        variable: _environment.variable,
-      }));
+
+      environment = environment.map((_environment) => {
+        const workspaceInfo = workspaceMap[_environment.workspaceId];
+        const envPath = `${workspaceInfo.teamName} / ${workspaceInfo.workspaceName}`
+        return ({
+          title: _environment.name,
+          workspace: _environment.workspaceId,
+          id: _environment.id,
+          variable: _environment.variable,
+          path: envPath
+        })
+      });
 
       let workspace = await this.getRecentWorkspace();
       workspace = workspace.map((_value) => _value._data);

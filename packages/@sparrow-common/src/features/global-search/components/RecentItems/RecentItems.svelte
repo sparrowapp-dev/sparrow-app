@@ -251,7 +251,8 @@
                     name: details.name,
                     path: item.path,
                     url: details.url,
-                    highLightChars: searchQuery.length - 1,
+                    isTitleHighLightEnable: true,
+                    charsToBeHightlighted: searchQuery,
                   }}
                   icon={methodIcons[details.method] || GraphIcon}
                   iconProps={{
@@ -275,7 +276,8 @@
                 data={{
                   name: item.tree.name,
                   path: item.path,
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={CollectionIcongs}
                 iconProps={{
@@ -292,25 +294,33 @@
               />
             {:else if section.key === "environments"}
               <ItemBar
-                data={{ name: item.title, path: "" }}
+                data={{
+                  name: item.title,
+                  path: item.path,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={StackIcon}
                 iconProps={{
                   width: "16px",
                   height: "16px",
                   color: "var(--icon-ds-neutral-200)",
-                  highLightChars: searchQuery.length - 1,
                 }}
                 onClick={() => handleGlobalSearchEnvironmentNavigation(item)}
               />
             {:else if section.key === "folders"}
               <ItemBar
-                data={{ name: item.tree.name, path: item.path }}
+                data={{
+                  name: item.tree.name,
+                  path: item.path,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={FolderIcon}
                 iconProps={{
                   width: "16px",
                   height: "16px",
                   color: "var(--icon-ds-neutral-200)",
-                  highLightChars: searchQuery.length - 1,
                 }}
                 onClick={() =>
                   handleGlobalSearchFolderNavigation(
@@ -324,7 +334,8 @@
                 data={{
                   name: item.name,
                   path: item.team.teamName,
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={WorkspaceIcongs}
                 iconProps={{
@@ -339,7 +350,8 @@
                 data={{
                   name: item.name,
                   path: item.description || "",
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={FlowIcon}
                 iconProps={{
@@ -360,7 +372,6 @@
             data={{
               title: selectedTypeMapping[section.key].title,
               shortcutKeys: selectedTypeMapping[section.key].shortcutKeys,
-              highLightChars: searchQuery.length - 1,
             }}
           />
           {#each section.items as item}
@@ -372,7 +383,8 @@
                     name: details.name,
                     path: item.path,
                     url: details.url,
-                    highLightChars: searchQuery.length - 1,
+                    isTitleHighLightEnable: true,
+                    charsToBeHightlighted: searchQuery,
                   }}
                   icon={methodIcons[details.method] || GraphIcon}
                   iconProps={{
@@ -395,7 +407,8 @@
                 data={{
                   name: item.tree.name,
                   path: item.path,
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={CollectionIcongs}
                 iconProps={{
@@ -414,7 +427,8 @@
                 data={{
                   name: item.tree.name,
                   path: item.path,
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={FolderIcon}
                 iconProps={{
@@ -434,7 +448,8 @@
                 data={{
                   name: item.title,
                   path: "",
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={StackIcon}
                 iconProps={{
@@ -449,7 +464,8 @@
                 data={{
                   name: item.name,
                   path: item.description || "",
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={FlowIcon}
                 iconProps={{
@@ -464,7 +480,8 @@
                 data={{
                   name: item.name,
                   path: item.team.teamName,
-                  highLightChars: searchQuery.length - 1,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={WorkspaceIcongs}
                 iconProps={{
@@ -487,7 +504,6 @@
         data={{
           title: config.title,
           shortcutKeys: config.shortcutKeys,
-          highLightChars: searchQuery.length - 1,
         }}
       />
 
@@ -499,7 +515,8 @@
                 name: config.getName(item),
                 path: config.getPath(item),
                 url: config.getUrl ? config.getUrl(item) : undefined,
-                highLightChars: searchQuery.length - 1,
+                isTitleHighLightEnable: true,
+                charsToBeHightlighted: searchQuery,
               }}
               icon={config.getIcon ? config.getIcon(item) : config.icon}
               iconProps={config.getIconProps
