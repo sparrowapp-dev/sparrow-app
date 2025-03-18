@@ -71,4 +71,5 @@
   onCreateAPIRequest={_viewModel.handleCreateAPIRequest}
   onUpdateDescription={_viewModel.handleUpdateDescription}
   getTotalRequests={_viewModel.getTotalRequests}
+  onItemCreated={_viewModel.handleCreateItem}
 />

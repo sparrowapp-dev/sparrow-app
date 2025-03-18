@@ -7,14 +7,26 @@
   import {
     AddRegular,
     CaretDownFilled,
+    CaretUpFilled,
     SaveRegular,
+    FolderAddRegular,
+    ArrowSwapRegular,
+    SocketIoIcon,
+    SocketIcon,
+    GraphIcon,
   } from "@sparrow/library/icons";
-  import { Button } from "@sparrow/library/ui";
+  import { Dropdown, Button } from "@sparrow/library/ui";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+
+  import { Input } from "@sparrow/library/forms";
   export let tab: TabDocument;
   /**
    * The folder data from repository
    */
   export let folder: Folder;
+  export let onItemCreated;
+  export let isCollectionEditable;
+
   /**
    * The collection of the folder
    */
@@ -64,6 +76,7 @@
    * Components
    */
   import { Tooltip } from "@sparrow/library/ui";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   /**
    * Types
@@ -84,10 +97,108 @@
   let totalGraphQl: number = 0;
   let totalSocketIo: number = 0;
   let totalWebSocket: number = 0;
-
+  let showAddItemMenu = false;
+  let currentDescription = folder?.description || "";
   /**
    * Funciton to update total requests
    */
+  $: {
+    if (folder) {
+      currentDescription = folder?.description || "";
+    }
+  }
+  const addButtonData = isWebApp
+    ? [
+        {
+          onclick: () => {
+            onItemCreated("requestCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketCollection", {
+              collection: collection,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ]
+    : [
+        {
+          onclick: () => {
+            onItemCreated("requestCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketCollection", {
+              collection: collection,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+
+        {
+          onclick: () => {
+            onItemCreated("graphqlCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ];
+  const handleSelectClick = (event: MouseEvent) => {
+    const selectElement = document.getElementById(
+      `add-item-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
+  };
+  let isBackgroundClickable = true;
   const updateTotalRequests = async () => {
     let res = await getTotalRequests(collection, tab);
     if (res) {
@@ -126,15 +237,17 @@
   <div class="my-collection d-flex flex-column w-100 z-3">
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
-        <input
-          type="text"
-          required
-          id="renameInputFieldFolder"
+        <Input
+          placeholder={"Enter name"}
+          type={"text"}
+          size={"medium"}
+          maxlength={100}
           value={folder?.name || ""}
+          id={"renameInputFieldFolder"}
+          variant={"inline"}
+          width={"398px"}
           disabled={tab?.source === "SPEC" ||
             userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 text-fs-18"
-          maxlength={100}
           on:blur={(event) => {
             const newValue = event.target.value.trim();
             const previousValue = folder.name;
@@ -152,27 +265,35 @@
         />
       </div>
       <div class="d-flex flex-row" style="gap:8px">
-        <!-- <button
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-            tab?.source === "SPEC"}
-          class="btn add-button rounded mx-1 border-0 text-align-right py-1"
-          style="max-height:60px; width:200px; margin-top: -2px;"
-          on:click={() => {
-            onCreateAPIRequest(collection, folder);
-          }}>New Request</button
-        > -->
+        <Dropdown
+          zIndex={600}
+          buttonId={`add-item-collection`}
+          bind:isMenuOpen={showAddItemMenu}
+          bind:isBackgroundClickable
+          options={addButtonData}
+          horizontalPosition="left"
+        >
+          <Button
+            id={`add-item-collection`}
+            title={"New Request"}
+            type={"primary"}
+            onClick={() => {
+              showAddItemMenu = !showAddItemMenu;
+            }}
+            size="medium"
+            startIcon={AddRegular}
+            endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+          />
+        </Dropdown>
         <Button
-          startIcon={AddRegular}
-          endIcon={CaretDownFilled}
-          title={"New"}
-          type={"primary"}
+          type={"secondary"}
+          startIcon={SaveRegular}
           onClick={() => {
-            onCreateAPIRequest(collection, folder);
+            if (folder?.description !== currentDescription) {
+              onUpdateDescription(tab, currentDescription);
+            }
           }}
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-            tab?.source === "SPEC"}
         />
-        <Button type={"secondary"} startIcon={SaveRegular} />
       </div>
     </div>
 
@@ -207,10 +328,8 @@
         class="border-0 text-fs-12 h-50 input-outline shadow-none w-100 p-2"
         value={folder?.description || ""}
         placeholder="Describe this folder and share code examples or usage tips for the APIs."
-        on:blur={(event) => {
-          if (folder?.description !== event.target.value) {
-            onUpdateDescription(tab, event.target.value);
-          }
+        on:input={(event) => {
+          currentDescription = event.target.value;
         }}
       />
     </div>
@@ -239,7 +358,6 @@
   .my-collection {
     padding: 24px;
   }
-
   .input-outline {
     border-radius: 0%;
     background-color: var(--bg-ds-surface-600);

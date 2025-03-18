@@ -590,8 +590,8 @@
             disabled={!isCollectionEditable}
             id="updateCollectionDescField"
             value={$tab?.description || ""}
-            class="bg-transparent border-0 text-fs-12 collection-area input-outline w-100 p-2"
-            placeholder="Describe the collection. Add code examples and tips for your team to effectively use the APIs."
+            class=" border-0 text-fs-12 collection-area input-outline w-100 p-2"
+            placeholder="Describe this folder and share code examples or usage tips for the APIs."
             on:input={handleInputDescription}
           />
         </div>
@@ -640,6 +640,7 @@
     outline-color: var(--text-primary-600);
     border: none;
     border-radius: 4px !important;
+    background: var(--bg-ds-surface-600);
     color: var(--text-secondary-1000);
   }
   textarea::placeholder {
