@@ -32,7 +32,8 @@
   export let filteredTestflows;
   export let filteredEnvironments;
   export let isWebApp = false;
-  export let osKeyName="Ctrl";
+  export let osKeyName = "Ctrl";
+  export let isGuestUser = false;
   SocketIcon;
   import TitleBar from "./sub-components/TitleBar.svelte";
   import ItemBar from "./sub-components/ItemBar.svelte";
@@ -89,7 +90,7 @@
     workspaces: {
       items: filteredWorkspaces,
       title: searchQuery === "" ? "Recent Workspaces" : "Workspaces",
-      shortcutKeys: [osKeyName,"Shift", "W"],
+      shortcutKeys: [osKeyName, "Shift", "W"],
       icon: WorkspaceIcongs,
       nav: (item) => handleGlobalSearchWorkspaceNavigation(item),
       getName: (item) => item.name,
@@ -98,7 +99,7 @@
     folders: {
       items: filteredFolder,
       title: searchQuery === "" ? "Recent Folders" : "Folders",
-      shortcutKeys: [osKeyName,"Shift", "F"],
+      shortcutKeys: [osKeyName, "Shift", "F"],
       icon: FolderIcon,
       nav: (item) =>
         handleGlobalSearchFolderNavigation(
@@ -112,7 +113,7 @@
     collections: {
       items: filteredCollection,
       title: searchQuery === "" ? "Recent Collections" : "Collections",
-      shortcutKeys: [osKeyName,"Shift", "C"],
+      shortcutKeys: [osKeyName, "Shift", "C"],
       icon: CollectionIcongs,
       nav: (item) =>
         handleGlobalSearchCollectionNavigation(item.workspaceId, item.tree),
@@ -122,7 +123,7 @@
     requests: {
       items: filteredRequest,
       title: searchQuery === "" ? "Recent Requests" : "Requests",
-      shortcutKeys: [osKeyName,"Shift", "A"],
+      shortcutKeys: [osKeyName, "Shift", "A"],
       icon: RequestIcon,
       nav: (item) =>
         handleGlobalSearchRequestNavigation(
@@ -148,7 +149,7 @@
     environments: {
       items: filteredEnvironments,
       title: searchQuery === "" ? "Recent Environments" : "Environments",
-      shortcutKeys: [osKeyName,"Shift", "E"],
+      shortcutKeys: [osKeyName, "Shift", "E"],
       icon: StackIcon,
       nav: (item) => handleGlobalSearchEnvironmentNavigation(item),
       getName: (item) => item.title,
@@ -157,7 +158,7 @@
     flows: {
       items: filteredTestflows,
       title: searchQuery === "" ? "Recent Test Flows" : "Test Flows",
-      shortcutKeys: [osKeyName,"Shift", "T"],
+      shortcutKeys: [osKeyName, "Shift", "T"],
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
@@ -318,7 +319,7 @@
                     item.tree,
                   )}
               />
-            {:else if section.key === "workspaces"}
+            {:else if section.key === "workspaces" && !isGuestUser}
               <ItemBar
                 data={{
                   name: item.name,
@@ -458,7 +459,7 @@
                 }}
                 onClick={() => handleGlobalSearchTestflowNavgation(item)}
               />
-            {:else if section.key === "workspaces"}
+            {:else if section.key === "workspaces" && !isGuestUser}
               <ItemBar
                 data={{
                   name: item.name,
