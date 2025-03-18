@@ -24,6 +24,7 @@
    * The folder data from repository
    */
   export let folder: Folder;
+
   export let onItemCreated;
   export let isCollectionEditable;
 
@@ -34,11 +35,12 @@
   /**
    * Callback to rename folder
    */
-  export let onRename: (
-    collection: CollectionDocument,
-    folder: Folder,
-    newName: string,
-  ) => Promise<void>;
+  // export let onRename: (
+  //   collection: CollectionDocument,
+  //   folder: Folder,
+  //   newName: string,
+  // ) => Promise<void>;
+  export let onRename;
   /**
    * Callback to create new api request
    */
@@ -111,7 +113,7 @@
     ? [
         {
           onclick: () => {
-            onItemCreated("requestCollection", {
+            onItemCreated("requestFolder", {
               collection: collection,
             });
           },
@@ -238,7 +240,7 @@
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
         <Input
-          placeholder={"Enter name"}
+          placeholder={""}
           type={"text"}
           size={"medium"}
           maxlength={100}
@@ -249,11 +251,13 @@
           disabled={tab?.source === "SPEC" ||
             userRole === WorkspaceRole.WORKSPACE_VIEWER}
           on:blur={(event) => {
-            const newValue = event.target.value.trim();
+            console.log(folder);
+            const newValue = event.detail;
             const previousValue = folder.name;
             if (newValue === "") {
               resetInputField();
             } else if (newValue !== previousValue) {
+              console.log(newValue, previousValue);
               onRename(collection, folder, newValue, tab);
             }
           }}
@@ -266,6 +270,7 @@
       </div>
       <div class="d-flex flex-row" style="gap:8px">
         <Dropdown
+          minWidth={171}
           zIndex={600}
           buttonId={`add-item-collection`}
           bind:isMenuOpen={showAddItemMenu}

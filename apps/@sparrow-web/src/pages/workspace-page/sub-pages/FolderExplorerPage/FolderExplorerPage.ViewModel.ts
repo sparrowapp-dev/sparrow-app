@@ -314,140 +314,22 @@ class FolderExplorerPage {
       notifications.error("Failed to create API request. Please try again.");
     }
   };
-  public handleCreateFolderInCollection = async (
-        workspaceId: string,
-        collection: CollectionDto,
-      ): Promise<void> => {
-        // Generate a new folder object with a unique ID, name, description, type, and an empty items array
-        const folder = {
-          id: UntrackedItems.UNTRACKED + uuidv4(),
-          name: this.getNextName(collection.items, ItemType.FOLDER, "New Folder"),
-          description: "",
-          type: ItemType.FOLDER,
-          items: [],
-        };
-        let isGuestUser;
-        isGuestUserActive.subscribe((value) => {
-          isGuestUser = value;
-        });
-    
-        // Determine the user source based on collection's active synchronization
-        let userSource = {};
-        if (collection?.activeSync) {
-          userSource = {
-            currentBranch: collection?.currentBranch
-              ? collection?.currentBranch
-              : collection?.primaryBranch,
-            source: "USER",
-          };
-        }
-        // Add the new folder to the collection locally
-        await this.collectionRepository.addRequestOrFolderInCollection(
-          collection.id,
-          folder,
-        );
-    
-        if (isGuestUser === true) {
-          const data = {
-            id: uuidv4(),
-            name: this.getNextName(
-              collection.items,
-              ItemType.FOLDER,
-              "New Folder",
-            ) as string,
-            description: "",
-            type: ItemType.FOLDER,
-            items: [],
-          };
-    
-          const path = {
-            workspaceId: workspaceId,
-            collectionId: collection.id,
-            folderId: data.id,
-          };
-    
-          const sampleFolder = new InitFolderTab(data.id, collection.workspaceId);
-    
-          sampleFolder.updateName(data.name);
-          sampleFolder.updatePath(path);
-          sampleFolder.updateIsSave(true);
-    
-          this.tabRepository.createTab(sampleFolder.getValue());
-          moveNavigation("right");
-    
-          // Update the locally added folder with server response
-          const folderObj = data;
-          await this.collectionRepository.updateRequestOrFolderInCollection(
-            collection.id,
-            folder.id,
-            folderObj,
-          );
-          return;
-        }
-    
-        // Add the folder in the collection on the Database
-        const response = await this.collectionService.addFolderInCollection(
-          workspaceId,
-          collection.id,
-          {
-            ...userSource,
-            name: folder.name,
-            description: folder.description,
-          },
-        );
-    
-        // Update UI elements and handle navigation on success
-        if (response.isSuccessful) {
-          const path = {
-            workspaceId: workspaceId,
-            collectionId: collection.id,
-            folderId: response.data.data.id,
-            folderName: response.data.data.name,
-          };
-    
-          const sampleFolder = new InitFolderTab(
-            response.data.data.id,
-            collection.workspaceId,
-          );
-    
-          sampleFolder.updateName(response.data.data.name);
-          sampleFolder.updatePath(path);
-          sampleFolder.updateIsSave(true);
-    
-          this.tabRepository.createTab(sampleFolder.getValue());
-          moveNavigation("right");
-    
-          // Update the locally added folder with server response
-          const folderObj = response.data.data;
-          await this.collectionRepository.updateRequestOrFolderInCollection(
-            collection.id,
-            folder.id,
-            folderObj,
-          );
-        } else {
-          // Show error notification and clean up by deleting the folder locally on failure.
-          notifications.error("Failed to create folder. Please try again.");
-          this.collectionRepository.deleteRequestOrFolderInCollection(
-            collection.id,
-            folder.id,
-          );
-        }
-      };
-      private handleCreateRequestInCollection = async (
+      private handleCreateRequestInFolder = async (
           workspaceId: string,
           collection: CollectionDto,
+          explorer: CollectionItemsDto,
         ) => {
-          const request = new InitRequestTab(
+          const sampleRequest = new InitRequestTab(
             UntrackedItems.UNTRACKED + uuidv4(),
             workspaceId,
           );
       
           let userSource = {};
-          if (collection?.activeSync) {
+          if (collection.activeSync && explorer?.source === "USER") {
             userSource = {
-              currentBranch: collection?.currentBranch
-                ? collection?.currentBranch
-                : collection?.primaryBranch,
+              currentBranch: collection.currentBranch
+                ? collection.currentBranch
+                : collection.primaryBranch,
               source: "USER",
             };
           }
@@ -455,20 +337,28 @@ class FolderExplorerPage {
             collectionId: collection.id,
             workspaceId: workspaceId,
             ...userSource,
+            folderId: explorer.id,
             items: {
-              name: request.getValue().name,
-              type: request.getValue().type,
-              description: "",
-              request: {
-                method: request?.getValue().property?.request?.method,
-              } as HttpRequestBaseInterface,
+              name: explorer.name,
+              type: ItemType.FOLDER,
+              id: explorer.id,
+              items: {
+                name: sampleRequest.getValue().name,
+                type: sampleRequest.getValue().type,
+                description: "",
+                request: {
+                  method: sampleRequest.getValue().property.request?.method,
+                } as RequestDto,
+              },
             },
           };
-          await this.collectionRepository.addRequestOrFolderInCollection(
-            collection.id,
+      
+          await this.collectionRepository.addRequestInFolder(
+            requestObj.collectionId,
+            requestObj.folderId,
             {
-              ...requestObj.items,
-              id: request.getValue().id,
+              ...requestObj.items.items,
+              id: sampleRequest.getValue().id,
             },
           );
           let isGuestUser;
@@ -477,62 +367,72 @@ class FolderExplorerPage {
           });
       
           if (isGuestUser === true) {
-            const res =
-              await this.collectionRepository.readRequestOrFolderInCollection(
-                requestObj.collectionId,
-                request.getValue().id,
-              );
-            if (res) {
-              res.id = uuidv4();
-            }
-            await this.collectionRepository.updateRequestOrFolderInCollection(
-              collection.id,
-              request.getValue().id,
+            const res = (await this.collectionRepository.readRequestInFolder(
+              requestObj.collectionId,
+              requestObj.folderId,
+              sampleRequest.getValue().id,
+            )) as CollectionItemsDto;
+            res.id = uuidv4();
+            this.collectionRepository.updateRequestInFolder(
+              requestObj.collectionId,
+              requestObj.folderId,
+              sampleRequest.getValue().id,
               res,
             );
       
-            request.updateId(res?.id as string);
-            request.updatePath({
+            sampleRequest.updateId(res.id);
+            sampleRequest.updatePath({
               workspaceId: workspaceId,
               collectionId: collection.id,
-              folderId: "",
+              folderId: explorer.id,
             });
-            request.updateIsSave(true);
-            await this.tabRepository.createTab(request.getValue());
+            sampleRequest.updateIsSave(true);
+            this.tabRepository.createTab(sampleRequest.getValue());
+      
             moveNavigation("right");
+            MixpanelEvent(Events.CREATE_REQUEST, {
+              source: "Collection list",
+            });
             return;
           }
           const response =
             await this.collectionService.addRequestInCollection(requestObj);
           if (response.isSuccessful && response.data.data) {
-            const res = response.data.data;
+            const request = response.data.data;
       
-            this.collectionRepository.updateRequestOrFolderInCollection(
-              collection.id,
-              request.getValue().id,
-              res,
+            this.collectionRepository.updateRequestInFolder(
+              requestObj.collectionId,
+              requestObj.folderId,
+              sampleRequest.getValue().id,
+              request,
             );
-            request.updateId(res.id);
-            request.updatePath({
+      
+            sampleRequest.updateId(request.id);
+            sampleRequest.updatePath({
               workspaceId: workspaceId,
               collectionId: collection.id,
-              folderId: "",
+              folderId: explorer.id,
             });
-            request.updateIsSave(true);
-            this.tabRepository.createTab(request.getValue());
+            sampleRequest.updateIsSave(true);
+            this.tabRepository.createTab(sampleRequest.getValue());
+      
             moveNavigation("right");
+            MixpanelEvent(Events.CREATE_REQUEST, {
+              source: "Collection list",
+            });
             return;
           } else {
-            this.collectionRepository.deleteRequestOrFolderInCollection(
-              collection.id,
-              request.getValue().id,
+            this.collectionRepository.deleteRequestInFolder(
+              requestObj.collectionId,
+              requestObj.folderId,
+              sampleRequest.getValue().id,
             );
-            notifications.error(response.message);
           }
         };
-        private handleCreateWebSocketInCollection = async (
+        private handleCreateWebSocketInFolder = async (
             workspaceId: string,
             collection: CollectionDto,
+            explorer: CollectionItemsDto,
           ) => {
             const websocket = new InitWebSocketTab(
               UntrackedItems.UNTRACKED + uuidv4(),
@@ -540,29 +440,37 @@ class FolderExplorerPage {
             );
         
             let userSource = {};
-            if (collection?.activeSync) {
+            if (collection.activeSync && explorer?.source === "USER") {
               userSource = {
-                currentBranch: collection?.currentBranch
-                  ? collection?.currentBranch
-                  : collection?.primaryBranch,
+                currentBranch: collection.currentBranch
+                  ? collection.currentBranch
+                  : collection.primaryBranch,
                 source: "USER",
               };
             }
-            const websocketObj = {
+            const requestObj = {
               collectionId: collection.id,
               workspaceId: workspaceId,
               ...userSource,
+              folderId: explorer.id,
               items: {
-                name: websocket.getValue().name,
-                type: websocket.getValue().type,
-                description: "",
-                websocket: {},
+                name: explorer.name,
+                type: ItemType.FOLDER,
+                id: explorer.id,
+                items: {
+                  name: websocket.getValue().name,
+                  type: websocket.getValue().type,
+                  description: "",
+                  websocket: {},
+                },
               },
             };
-            await this.collectionRepository.addRequestOrFolderInCollection(
-              collection.id as string,
+        
+            await this.collectionRepository.addRequestInFolder(
+              requestObj.collectionId,
+              requestObj.folderId,
               {
-                ...websocketObj.items,
+                ...requestObj.items.items,
                 id: websocket.getValue().id,
               },
             );
@@ -572,38 +480,15 @@ class FolderExplorerPage {
             });
         
             if (isGuestUser === true) {
-              const res =
-                await this.collectionRepository.readRequestOrFolderInCollection(
-                  websocketObj.collectionId as string,
-                  websocket.getValue().id,
-                );
-              if (res) {
-                res.id = uuidv4();
-              }
-              await this.collectionRepository.updateRequestOrFolderInCollection(
-                collection.id as string,
+              const res = (await this.collectionRepository.readRequestInFolder(
+                requestObj.collectionId,
+                requestObj.folderId,
                 websocket.getValue().id,
-                res,
-              );
-        
-              websocket.updateId(res?.id as string);
-              websocket.updatePath({
-                workspaceId: workspaceId,
-                collectionId: collection.id,
-                folderId: "",
-              });
-              websocket.updateIsSave(true);
-              await this.tabRepository.createTab(websocket.getValue());
-              moveNavigation("right");
-              return;
-            }
-            const response =
-              await this.collectionService.addSocketInCollection(websocketObj);
-            if (response.isSuccessful && response.data.data) {
-              const res = response.data.data;
-        
-              this.collectionRepository.updateRequestOrFolderInCollection(
-                collection.id as string,
+              )) as CollectionItemsDto;
+              res.id = uuidv4();
+              this.collectionRepository.updateRequestInFolder(
+                requestObj.collectionId,
+                requestObj.folderId,
                 websocket.getValue().id,
                 res,
               );
@@ -612,116 +497,181 @@ class FolderExplorerPage {
               websocket.updatePath({
                 workspaceId: workspaceId,
                 collectionId: collection.id,
-                folderId: "",
+                folderId: explorer.id,
               });
               websocket.updateIsSave(true);
-        
               this.tabRepository.createTab(websocket.getValue());
+        
               moveNavigation("right");
+              MixpanelEvent(Events.CREATE_REQUEST, {
+                source: "Collection list",
+              });
+              return;
+            }
+            const response =
+              await this.collectionService.addSocketInCollection(requestObj);
+            if (response.isSuccessful && response.data.data) {
+              const request = response.data.data;
+        
+              this.collectionRepository.updateRequestInFolder(
+                requestObj.collectionId,
+                requestObj.folderId,
+                websocket.getValue().id,
+                request,
+              );
+        
+              websocket.updateId(request.id);
+              websocket.updatePath({
+                workspaceId: workspaceId,
+                collectionId: collection.id,
+                folderId: explorer.id,
+              });
+              websocket.updateIsSave(true);
+              this.tabRepository.createTab(websocket.getValue());
+        
+              moveNavigation("right");
+              MixpanelEvent(Events.CREATE_REQUEST, {
+                source: "Collection list",
+              });
               return;
             } else {
-              this.collectionRepository.deleteRequestOrFolderInCollection(
-                collection.id,
+              this.collectionRepository.deleteRequestInFolder(
+                requestObj.collectionId,
+                requestObj.folderId,
                 websocket.getValue().id,
               );
-              notifications.error(response.message);
             }
           };
-          private handleCreateSocketIoInCollection = async (
-            _workspaceId: string,
-            _collection: CollectionDto,
-          ) => {
-            const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
-            const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
-              {
-                collectionId: _collection.id,
-                workspaceId: _workspaceId,
-                currentBranch: _collection.activeSync
-                  ? _collection.currentBranch
-                  : undefined,
-                source: _collection.activeSync ? "USER" : undefined,
-                items: {
-                  name: socketIoTab.getValue().name,
-                  type: CollectionItemTypeBaseEnum.SOCKETIO,
-                  description: "",
-                  socketio: {},
-                },
-              };
-        
-            let isGuestUser;
-            isGuestUserActive.subscribe((value) => {
-              isGuestUser = value;
-            });
-        
-            if (isGuestUser === true) {
-              await this.collectionRepository.addRequestOrFolderInCollection(
-                _collection.id as string,
+           private handleCreateSocketIoInFolder = async (
+              _workspaceId: string,
+              _collection: CollectionDto,
+              _folder: CollectionItemsDto,
+            ) => {
+              const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+          
+              const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
                 {
-                  ...socketIoOfCollectionPayload.items,
-                  id: socketIoTab.getValue().id,
-                },
-              );
-              socketIoTab.updatePath({
-                workspaceId: _workspaceId,
-                collectionId: _collection.id,
-                folderId: "",
+                  collectionId: _collection.id,
+                  workspaceId: _workspaceId,
+                  currentBranch:
+                    _collection.activeSync && _folder.source === "USER"
+                      ? _collection.currentBranch
+                      : undefined,
+                  source:
+                    _collection.activeSync && _folder.source === "USER"
+                      ? _folder.source
+                      : undefined,
+                  folderId: _folder.id,
+                  items: {
+                    name: _folder.name,
+                    type: CollectionItemTypeBaseEnum.FOLDER,
+                    id: _folder.id,
+                    items: {
+                      name: socketIoTab.getValue().name,
+                      type: CollectionItemTypeBaseEnum.SOCKETIO,
+                      description: "",
+                      socketio: {},
+                    },
+                  },
+                };
+          
+              let isGuestUser;
+              isGuestUserActive.subscribe((value) => {
+                isGuestUser = value;
               });
-              socketIoTab.updateIsSave(true);
-              await this.tabRepository.createTab(socketIoTab.getValue());
-              moveNavigation("right");
-              return;
-            }
-        
-            const response = await this.collectionService.addSocketIoInCollection(
-              socketIoOfCollectionPayload,
-            );
-            if (response.isSuccessful && response.data.data) {
-              const res = response.data.data;
-        
-              await this.collectionRepository.addRequestOrFolderInCollection(
-                _collection.id as string,
-                {
-                  ...res,
-                },
+          
+              if (isGuestUser === true) {
+                await this.collectionRepository.addRequestInFolder(
+                  socketIoInFolderPayload.collectionId,
+                  socketIoInFolderPayload.folderId as string,
+                  {
+                    ...socketIoInFolderPayload?.items?.items,
+                    id: socketIoTab.getValue().id,
+                  },
+                );
+          
+                socketIoTab
+                  .updatePath({
+                    workspaceId: _workspaceId,
+                    collectionId: _collection.id,
+                    folderId: _folder.id,
+                  })
+                  .updateIsSave(true);
+                this.tabRepository.createTab(socketIoTab.getValue());
+          
+                moveNavigation("right");
+                MixpanelEvent(Events.CREATE_REQUEST, {
+                  source: "Collection list",
+                });
+                return;
+              }
+              const response = await this.collectionService.addSocketIoInCollection(
+                socketIoInFolderPayload,
               );
-        
-              socketIoTab.updateId(res.id as string);
-              socketIoTab.updatePath({
-                workspaceId: _workspaceId,
-                collectionId: _collection.id,
-                folderId: "",
-              });
-              socketIoTab.updateIsSave(true);
-        
-              this.tabRepository.createTab(socketIoTab.getValue());
-              moveNavigation("right");
-              return;
-            } else {
-              this.collectionRepository.deleteRequestOrFolderInCollection(
-                _collection.id,
-                socketIoTab.getValue().id,
-              );
-              notifications.error(response.message);
-            }
-          };
-            private handleCreateGraphqlInCollection = async (
+              if (response.isSuccessful && response.data.data) {
+                const request = response.data.data;
+          
+                await this.collectionRepository.addRequestInFolder(
+                  socketIoInFolderPayload.collectionId,
+                  socketIoInFolderPayload.folderId as string,
+                  {
+                    ...request,
+                  },
+                );
+          
+                socketIoTab
+                  .updateId(request?.id as string)
+                  .updatePath({
+                    workspaceId: _workspaceId,
+                    collectionId: _collection.id,
+                    folderId: _folder.id,
+                  })
+                  .updateIsSave(true);
+                this.tabRepository.createTab(socketIoTab.getValue());
+          
+                moveNavigation("right");
+                MixpanelEvent(Events.CREATE_REQUEST, {
+                  source: "Collection list",
+                });
+                return;
+              } else {
+                this.collectionRepository.deleteRequestInFolder(
+                  socketIoInFolderPayload.collectionId,
+                  socketIoInFolderPayload.folderId as string,
+                  socketIoTab.getValue().id,
+                );
+              }
+            };
+            private handleCreateGraphqlInFolder = async (
                 _workspaceId: string,
                 _collection: CollectionDto,
+                _folder: CollectionItemsDto,
               ) => {
                 const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
-                const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
+            
+                const graphqlInFolderPayload: GraphqlRequestCreateUpdateInFolderPayloadDtoInterface =
                   {
                     collectionId: _collection.id,
                     workspaceId: _workspaceId,
-                    currentBranch: _collection.activeSync
-                      ? _collection.currentBranch
-                      : undefined,
-                    source: _collection.activeSync ? "USER" : undefined,
+                    currentBranch:
+                      _collection.activeSync && _folder.source === "USER"
+                        ? _collection.currentBranch
+                        : undefined,
+                    source:
+                      _collection.activeSync && _folder.source === "USER"
+                        ? _folder.source
+                        : undefined,
+                    folderId: _folder.id,
                     items: {
-                      name: graphqlTab.getValue().name,
-                      type: CollectionItemTypeBaseEnum.GRAPHQL,
-                      description: "",
-                      graphql: {},
+                      name: _folder.name,
+                      type: CollectionItemTypeBaseEnum.FOLDER,
+                      id: _folder.id,
+                      items: {
+                        name: graphqlTab.getValue().name,
+                        type: CollectionItemTypeBaseEnum.GRAPHQL,
+                        description: "",
+                        graphql: {},
+                      },
                     },
                   };
             
@@ -731,55 +681,60 @@ class FolderExplorerPage {
                 });
             
                 if (isGuestUser === true) {
-                  await this.collectionRepository.addRequestOrFolderInCollection(
-                    _collection.id as string,
+                  await this.collectionRepository.addRequestInFolder(
+                    graphqlInFolderPayload.collectionId,
+                    graphqlInFolderPayload.folderId as string,
                     {
-                      ...graphqlOfCollectionPayload.items,
+                      ...graphqlInFolderPayload?.items?.items,
                       id: graphqlTab.getValue().id,
                     },
                   );
-                  graphqlTab.updatePath({
-                    workspaceId: _workspaceId,
-                    collectionId: _collection.id,
-                    folderId: "",
-                  });
-                  graphqlTab.updateIsSave(true);
-                  await this.tabRepository.createTab(graphqlTab.getValue());
+            
+                  graphqlTab
+                    .updatePath({
+                      workspaceId: _workspaceId,
+                      collectionId: _collection.id,
+                      folderId: _folder.id,
+                    })
+                    .updateIsSave(true);
+                  this.tabRepository.createTab(graphqlTab.getValue());
+            
                   moveNavigation("right");
+            
                   return;
                 }
-            
                 const response = await this.collectionService.addGraphqlInCollection(
-                  graphqlOfCollectionPayload,
+                  graphqlInFolderPayload,
                 );
                 if (response.isSuccessful && response.data.data) {
-                  const res = response.data.data;
+                  const request = response.data.data;
             
-                  await this.collectionRepository.addRequestOrFolderInCollection(
-                    _collection.id as string,
+                  await this.collectionRepository.addRequestInFolder(
+                    graphqlInFolderPayload.collectionId,
+                    graphqlInFolderPayload.folderId as string,
                     {
-                      ...res,
+                      ...request,
                     },
                   );
             
-                  graphqlTab.updateId(res.id as string);
-                  graphqlTab.updatePath({
-                    workspaceId: _workspaceId,
-                    collectionId: _collection.id,
-                    folderId: "",
-                  });
-                  graphqlTab.updateIsSave(true);
-            
+                  graphqlTab
+                    .updateId(request?.id as string)
+                    .updatePath({
+                      workspaceId: _workspaceId,
+                      collectionId: _collection.id,
+                      folderId: _folder.id,
+                    })
+                    .updateIsSave(true);
                   this.tabRepository.createTab(graphqlTab.getValue());
-                  moveNavigation("right");
             
+                  moveNavigation("right");
                   return;
                 } else {
-                  this.collectionRepository.deleteRequestOrFolderInCollection(
-                    _collection.id,
+                  this.collectionRepository.deleteRequestInFolder(
+                    graphqlInFolderPayload.collectionId,
+                    graphqlInFolderPayload.folderId as string,
                     graphqlTab.getValue().id,
                   );
-                  notifications.error(response.message);
                 }
               };
      public handleCreateItem = async (
