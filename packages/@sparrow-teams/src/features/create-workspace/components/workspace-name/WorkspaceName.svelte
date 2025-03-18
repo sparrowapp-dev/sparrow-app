@@ -47,18 +47,7 @@
     placeholder={NAME_CONFIG.PLACEHOLDER}
     class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
     style="outline:none;"
-    defaultBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    hoveredBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    focusedBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
+    isError={!workspaceForm.name.value.trim() && workspaceForm.name.isTouched}
     isEditIconRequired={false}
     type={"text"}
     placeholderColor={"var(--text-secondary-200)"}

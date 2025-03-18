@@ -63,8 +63,9 @@
       {/if}
     </div>
 
-    <div class="d-flex" style="overflow-y: auto; width: calc(100% - 64px);">
-      <div class="w-50 position-relative" style="overflow-y: auto;">
+    <div class="d-flex" style="width: calc(100% - 64px);">
+      <div class="w-50 position-relative"
+      style="font-weight: 500;">
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => {
@@ -75,9 +76,11 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
+
         />
       </div>
-      <div class="w-50 position-relative" style="overflow-y: auto;">
+      <div class="w-50 position-relative"
+      style="font-weight: 500;">
         <CodeMirrorInput
           bind:value={element.value}
           onUpdateInput={() => {

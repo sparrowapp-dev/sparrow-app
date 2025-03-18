@@ -272,7 +272,7 @@
     </div></Modal
   >
 
-  {#if showMenu}
+  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
@@ -395,7 +395,21 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px; padding-left:48px; margin-bottom:2px; "
+        on:click|preventDefault={() => {
+          if (!isRenaming) {
+            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+              expand = !expand;
+              if (expand) {
+                onItemOpened("folder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              }
+            }
+          }
+        }}
+        style="height:32px; padding-left:33px; margin-bottom:2px; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -403,29 +417,15 @@
       >
         <button
           tabindex="-1"
-          style=" gap:4px; height:32px; "
+          style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
-          on:click|preventDefault={() => {
-            if (!isRenaming) {
-              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-                expand = !expand;
-                if (expand) {
-                  onItemOpened("folder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                  });
-                }
-              }
-            }
-          }}
         >
           <span
             on:click|stopPropagation={() => {
               expand = !expand;
             }}
-            style="  display: flex; "
+            style="  display: flex; margin-right:4px; "
           >
             <Button
               startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
@@ -437,14 +437,20 @@
 
           {#if expand}
             <div
-              style="height:24px; width:30px;"
-              class="d-flex align-items-center justify-content-center me-2"
+              style="height:24px; width:30px; padding:4px;"
+              class="d-flex align-items-center justify-content-end"
             >
-              <FolderOpenRegular />
+              <FolderOpenRegular
+                size={"16px"}
+                color="var(--icon-ds-neutral-300)"
+              />
             </div>
           {:else}
-            <div class="d-flex me-2" style="height:24px; width:30px;">
-              <FolderRegular />
+            <div
+              class="d-flex align-items-center justify-content-end"
+              style="height:24px; width:30px; padding:4px;"
+            >
+              <FolderRegular size={"16px"} color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}
           {#if isRenaming}
@@ -471,6 +477,7 @@
                       font-size:12px;
                       color:var(--text-ds-neutral-50);
                       line-height:18px;
+                      padding:2px 4px;
                       "
             >
               <p class="ellipsis mb-0" style="font-size: 12px;">
@@ -530,7 +537,9 @@
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
         <div class="sub-files position-relative">
-          <div class="box-line"></div>
+          {#if explorer?.items?.length > 0}
+            <div class="box-line"></div>
+          {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
@@ -771,14 +780,14 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 58.5px;
+    left: 44.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 200;
   }
 
   .main-folder {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;
@@ -787,7 +796,7 @@
     border-radius: 2px;
   }
   .folder-title {
-    width: calc(100% - 40px);
+    width: calc(100% - 58px);
   }
   .folder-icon {
     width: 16px;

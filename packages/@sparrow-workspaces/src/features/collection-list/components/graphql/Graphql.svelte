@@ -177,7 +177,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -233,34 +233,36 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("graphql", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        graphql: graphql,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px; padding-left:3px;"
+  style="height:32px; padding-left:3px; margin-bottom: 2px;"
 >
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("graphql", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          graphql: graphql,
-        });
-      }
-    }}
-    style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {graphql.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="height: 24px; width:24px !important; margin-right:4px;"
+    ></div>
     <span class="api-method">
       <GraphIcon
         height={"12px"}
@@ -288,7 +290,7 @@
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px; "
       >
-        {graphql.name}
+        <p class=" ellipsis m-0 p-0">{graphql.name}</p>
       </div>
     {/if}
   </button>
@@ -312,6 +314,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -334,15 +337,16 @@
     border-radius: 8px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     font-weight: 500;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
     font-size: 12px;
     line-height: 18px;
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -463,7 +467,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-ds-surface-500) !important;

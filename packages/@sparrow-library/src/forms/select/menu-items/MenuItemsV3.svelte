@@ -26,6 +26,8 @@
 
   let isMenuItemHover = false;
 
+  export let fontSize;
+
   /**
    * @description - add classes to ticked options
    * @param _id - item id (rows iteration)
@@ -64,7 +66,7 @@
       !list?.color
         ? 'highlight-menu-item'
         : ''}  {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
-      style="font-size: 12px;"
+      style="font-size: {fontSize}"
     >
       {list.name}<br />
       {#if list.description}

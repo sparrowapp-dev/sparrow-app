@@ -192,6 +192,7 @@
 <div
   style="height:100%; overflow:hidden"
   class={`sidebar d-flex flex-column  scroll px-1`}
+  id="collection-container"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
@@ -226,9 +227,9 @@
     >
       <div
         class=" d-flex align-items-center"
-        style="width: calc(100% - 30px); gap:4px; padding:2px 4px; height:32px; "
+        style="width: calc(100% - 30px);  padding: 4px 2px; height:32px; "
       >
-        <span style=" display: flex; ">
+        <span style=" display: flex; margin-right:4px;">
           <Button
             size="extra-small"
             type="teritiary-regular"
@@ -240,7 +241,7 @@
         </span>
 
         <span
-          style="display: flex; align-items:center; justify-content:center; height:24px; "
+          style="display: flex; align-items:center; justify-content:end; height:24px; width:30px; padding:4px; "
         >
           <StackRegular size="16px" color="var(--bg-ds-neutral-300)" />
         </span>
@@ -289,9 +290,9 @@
 
     {#if isExpandCollection}
       <div
-        class="overflow-auto position-relative d-flex flex-column ms-2 me-0 pt-1 mb-2"
+        class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
       >
-        {#if collectionListDocument?.length > 0}
+        {#if collectionListDocument?.length > 0 && searchData.length === 0}
           <div class="box-line"></div>
         {/if}
         {#if collectionListDocument?.length > 0}
@@ -315,7 +316,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={col}
+                    collection={col?.toMutableJSON()}
                     {activeTabId}
                     {searchData}
                     {isWebApp}
@@ -357,7 +358,7 @@
                   {userRoleInWorkspace}
                   {activeTabPath}
                   {activeTabType}
-                  collection={col}
+                  collection={col?.toMutableJSON()}
                   {activeTabId}
                   {isWebApp}
                   bind:isFirstCollectionExpand
@@ -533,7 +534,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 6.5px;
+    left: 13.6px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 10;

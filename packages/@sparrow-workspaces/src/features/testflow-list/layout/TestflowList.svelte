@@ -24,6 +24,7 @@
     isTestFlowTourGuideOpen,
     currentStep,
   } from "../../../stores/guide.tour";
+  import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
   /**
    * current workspace
@@ -121,11 +122,14 @@
       });
     }
   }
+  $: isExpandTestflow =
+    $isDefaultTourGuideOpen === true ? true : isExpandTestflow;
 </script>
 
 <div
   class={`d-flex flex-column  pt-0 px-1`}
   style="font-weight: 500;margin-bottom:2px; "
+  id="testflow-container"
 >
   <!-- 
   --  Testflow Header 
@@ -133,16 +137,16 @@
   <div
     tabindex="0"
     class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2 env-sidebar"
-    style="cursor:pointer; justify-content: space-between; height:32px; gap:4px"
+    style="cursor:pointer; justify-content: space-between; height:32px; "
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={toggleExpandTestflow}
   >
     <div
       class="d-flex align-items-center"
-      style="width: calc(100% - 30px); gap:4px; padding-left:3px;"
+      style="width: calc(100% - 30px);  padding-left:3px;"
     >
-      <span style=" display: flex; ">
+      <span style=" display: flex; margin-right:4px; ">
         <Button
           size="extra-small"
           customWidth={"24px"}
@@ -154,7 +158,7 @@
       </span>
 
       <span
-        style=" display: flex;  align-items:center; justify-content:center;"
+        style=" display: flex;  align-items:center; justify-content:end; width:30px; height:24px; padding:4px;"
       >
         <FlowChartRegular size="16px" color="var(--bg-ds-neutral-300)" />
       </span>
@@ -195,7 +199,7 @@
   </div>
 
   {#if isExpandTestflow}
-    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
+    <div style="flex:1;" class="overflow-auto h-100" bind:this={scrollDiv}>
       <!-- 
   --  Testflow Empty screen 
   -->
@@ -237,7 +241,7 @@
             bind:scrollList
             height={"auto"}
             overflowY={"auto"}
-            classProps={"pe-0"}
+            classProps={"pe-0 ps-0"}
             style={"flex:1;"}
           >
             {#each filteredflows as flow}
@@ -403,7 +407,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 6.5px;
+    left: 14.6px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 10;

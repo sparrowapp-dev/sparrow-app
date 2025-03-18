@@ -40,7 +40,7 @@ export class TabularInputTheme {
         alignItems: "center",
       },
       ".cm-textfield": {
-        backgroundColor: "var(--background-color)",
+        backgroundColor: "var(--background-color)"
       },
       ".cm-button": {
         backgroundColor: "var(--background-color)",

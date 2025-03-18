@@ -23,3 +23,4 @@ export * from "./breadcrumbs";
 export * from "./avatar";
 export * from "./chip";
 export * from "./accordion";
+export * from "./alert";

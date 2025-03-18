@@ -26,6 +26,8 @@
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
       event.preventDefault();
+    } else if (event.key === "Escape" && canClose) {
+      handleModalState(false);
     }
   };
 
@@ -126,7 +128,7 @@
   }
 
   .sparrow-modal-container-data {
-    // background-color: var(--bg-tertiary-400);
+    // background-color: red;
     border-radius: 6px;
     position: relative;
   }

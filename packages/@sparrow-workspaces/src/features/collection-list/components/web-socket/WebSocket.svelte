@@ -136,18 +136,19 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-12">
+  <div
+    class="mb-1 mt-2"
+    style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;"
+  >
     <p>
-      Are you sure you want to delete this WebSocket? <span
-        class="text-whiteColor fw-bold">"{api.name}"</span
-      >
+      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end mt-1 mb-0 rounded w-100"
+    style="font-size: 16px;gap:12px"
   >
     <Button
       disable={deleteLoader}
@@ -158,6 +159,7 @@
       onClick={() => {
         isDeletePopup = false;
       }}
+      customWidth={"96px"}
     />
 
     <Button
@@ -178,11 +180,12 @@
         deleteLoader = false;
         isDeletePopup = false;
       }}
+      customWidth={"96px"}
     />
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -238,6 +241,16 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("websocket", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        websocket: api,
+      });
+    }
+  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
@@ -247,25 +260,17 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("websocket", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          websocket: api,
-        });
-      }
-    }}
-    style={folder?.id
-      ? "padding-left: 62.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="width: 24px!important; height:24px; margin-right:4px;"
+    ></div>
     <span class="api-method"
       ><SocketIcon
         height={"12px"}
@@ -293,7 +298,7 @@
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px; font-weight:500; line-height:18px;"
       >
-        {api.name}
+        <p class="ellipsis m-0 p-0">{api.name}</p>
       </div>
     {/if}
   </button>
@@ -317,6 +322,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -338,18 +344,18 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     font-weight: 500;
     font-size: 12px;
     height: 24px;
     line-height: 18px;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
-    // display: flex;
     align-items: center;
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -469,7 +475,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-tertiary-400) !important;

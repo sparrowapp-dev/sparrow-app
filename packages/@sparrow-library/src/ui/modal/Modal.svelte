@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CrossIcon } from "@sparrow/library/icons";
+  import { CrossIcon, DismissRegular } from "@sparrow/library/icons";
 
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
@@ -23,6 +23,8 @@
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
       event.preventDefault();
+    } else if (event.key === "Escape" && canClose) {
+      handleModalState(false);
     }
   };
 
@@ -85,7 +87,7 @@
             style="height: 30px; width:30px; "
             on:click={handleModalState(false)}
           >
-            <CrossIcon width="17px" height="17px" />
+            <DismissRegular size={"20px"} color="var(--bg-ds-neutral-100)" />
           </button>
         {/if}
       </div>
@@ -130,6 +132,7 @@
   }
 
   .sparrow-modal-container-data {
+    height: auto;
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
     padding: 30px 30px 20px 30px;

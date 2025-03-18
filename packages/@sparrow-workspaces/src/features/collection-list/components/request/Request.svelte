@@ -202,7 +202,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -261,6 +261,16 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      onItemOpened("request", {
+        workspaceId: collection.workspaceId,
+        collection,
+        folder,
+        request: api,
+      });
+    }
+  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -271,19 +281,7 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (!isRenaming) {
-        onItemOpened("request", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          request: api,
-        });
-      }
-    }}
-    style={folder?.id
-      ? "padding-left: 70.5px; gap:4px;"
-      : "padding-left: 44.5px; gap:4px; "}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -305,15 +303,20 @@
       on:click|stopPropagation={() => {
         expand = !expand;
       }}
-      style="  display: flex; "
+      style="  display: flex; margin-right:4px; "
     >
-      {#if !isWebApp && api?.items && api?.items?.length > 0}
+      {#if api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
         />
+      {:else}
+        <div
+          class="api-method"
+          style="width: 24px !important; height:24px !important; padding:0;"
+        ></div>
       {/if}
     </span>
     <div
@@ -345,7 +348,9 @@
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style="font-size: 12px;"
       >
-        {api.name}
+        <p class="ellipsis m-0 p-0">
+          {api.name}
+        </p>
       </div>
     {/if}
   </button>
@@ -369,6 +374,7 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
+            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -376,32 +382,30 @@
     </Tooltip>
   {/if}
 </div>
-{#if !isWebApp}
-  <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-    <div class="sub-files position-relative">
-      <div
-        class="box-line"
-        style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
-      ></div>
-      <!-- {#if } -->
-      {#each api?.items || [] as exp}
-        <div>
-          <SavedRequest
-            {userRole}
-            api={exp}
-            request={api}
-            {onItemRenamed}
-            {onItemDeleted}
-            {onItemOpened}
-            {folder}
-            {collection}
-            {activeTabId}
-          />
-        </div>
-      {/each}
-    </div>
+<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
+  <div class="sub-files position-relative">
+    <div
+      class="box-line"
+      style={folder?.id ? "left: 57.6px;" : "left: 45.1px;"}
+    ></div>
+    <!-- {#if } -->
+    {#each api?.items || [] as exp}
+      <div>
+        <SavedRequest
+          {userRole}
+          api={exp}
+          request={api}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {folder}
+          {collection}
+          {activeTabId}
+        />
+      </div>
+    {/each}
   </div>
-{/if}
+</div>
 
 <style lang="scss">
   .delete-ticker {
@@ -416,18 +420,19 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
   }
   .api-name {
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
+    color: var(--bg-ds-neutral-200);
     display: flex;
     align-items: center;
-    padding: 4px 2px;
+
+    padding: 2px 4px;
     caret-color: var(--bg-ds-primary-300);
   }
   .api-name:focus {
@@ -548,7 +553,7 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-ds-surface-500) !important;
