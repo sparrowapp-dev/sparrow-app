@@ -53,14 +53,15 @@
               onUpdateRequestState({ requestAuthNavigation: id });
             }}
             disabled={false}
-            headerHeight={"28px"}
-            minHeaderWidth={"10px"}
           />
         </p>
       </span>
     </div>
   </div>
   <div>
+    <p class="text-fs-12 fw-normal" style="color:var(--text-ds-neutral-400)">
+      The auth header will be automatically generated when you send the request.
+    </p>
   </div>
   <section class="w-100" style="flex:1; overflow:auto;">
     {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}

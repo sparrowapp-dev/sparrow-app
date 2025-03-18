@@ -218,7 +218,7 @@
         {isGuestUser}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 10px;">
+      <div class="" style="margin-top: 8px;">
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
