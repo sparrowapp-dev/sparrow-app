@@ -1,9 +1,6 @@
 <script lang="ts">
   import { SettingsNavigator, TeamProfile } from "../components";
   import { TeamSettingsTabsEnum } from "../types";
-  import { createEventDispatcher } from "svelte";
-  import { SearchIcon2, SearchFilled } from "@sparrow/library/icons";
-  import { CrossIcon2, CrossIcon } from "@sparrow/library/icons";
   export let openTeam;
   export let onUpdateTeam;
 
