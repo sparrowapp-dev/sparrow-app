@@ -110,8 +110,6 @@
     : variants[variant].normal;
   let bgColors = variants[variant].bgColors;
 
-  $: console.log("error color", variants[variant].error.defaultBorderColor);
-
   $: borderColor = isError
     ? isFocused
       ? variants[variant].error.focusedBorderColor
@@ -131,7 +129,6 @@
   $: backgroundColor = disabled
     ? bgColors.disabledBgColor
     : bgColors.defaultBgColor;
-  $: console.log("error color", borderColor);
 
   /**
    * Event Dispatcher
