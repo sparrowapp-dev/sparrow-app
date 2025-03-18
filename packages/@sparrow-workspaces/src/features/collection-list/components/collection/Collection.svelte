@@ -255,7 +255,7 @@
     }
   };
 
-  const addComponent = (collection) => {
+  const addCollectionItem = (collection) => {
     // opendComponent.update((components) => {
     //   components.push({ id: collection.id, type: "collection" });
     //   return components; // Always return updated state
@@ -266,11 +266,7 @@
       return newMap;
     });
   };
-  const removeComponent = (id) => {
-    // opendComponent.update((components) =>
-    //   components.filter((c) => c.id !== id),
-    // );
-
+  const removeCollectionItem = (id) => {
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.delete(id); // Remove the entry by ID
@@ -496,13 +492,13 @@
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         if (visibility) {
-          addComponent(collection);
+          addCollectionItem(collection);
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
           });
         } else {
-          removeComponent(collection.id);
+          removeCollectionItem(collection.id);
         }
       }
     }

@@ -195,14 +195,14 @@
     }
   };
 
-  const addComponent = (collection) => {
+  const addFolderItem = (collection) => {
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.set(collection.id, `folder`);
       return newMap;
     });
   };
-  const removeComponent = (id) => {
+  const removeFolderItem = (id) => {
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.delete(id); // Remove the entry by ID
@@ -421,14 +421,14 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
-                addComponent(explorer);
+                addFolderItem(explorer);
                 onItemOpened("folder", {
                   workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                 });
               } else {
-                removeComponent(explorer.id);
+                removeFolderItem(explorer.id);
               }
             }
           }

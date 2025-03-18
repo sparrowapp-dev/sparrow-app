@@ -146,14 +146,14 @@
     );
   }
 
-  const addComponent = (collection) => {
+  const addRequestItem = (collection) => {
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.set(collection.id, `REST API`);
       return newMap;
     });
   };
-  const removeComponent = (id) => {
+  const removeRequestItem = (id) => {
     opendComponent.update((map) => {
       const newMap = new Map(map);
       newMap.delete(id); // Remove the entry by ID
@@ -298,7 +298,7 @@
     if (!isRenaming) {
       expand = !expand;
       if (expand) {
-        addComponent(api);
+        addRequestItem(api);
         onItemOpened("request", {
           workspaceId: collection.workspaceId,
           collection,
@@ -306,7 +306,7 @@
           request: api,
         });
       } else {
-        removeComponent(api.id);
+        removeRequestItem(api.id);
       }
     }
   }}
