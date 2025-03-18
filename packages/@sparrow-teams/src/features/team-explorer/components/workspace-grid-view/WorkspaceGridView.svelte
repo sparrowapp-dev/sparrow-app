@@ -10,6 +10,12 @@
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
   import { SparrowLogo } from "@sparrow/common/icons";
+  import {
+    ChevronDoubleLeftRegular,
+    ChevronDoubleRightRegular,
+    ChevronLeftRegular,
+    ChevronRightRegular,
+  } from "@sparrow/library/icons";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -146,37 +152,25 @@
               on:click={() => setPageWithinBounds(1)}
               class="bg-transparent border-0"
             >
-              <DoubleLeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              />
+              <ChevronDoubleLeftRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage - 1)}
               class="bg-transparent border-0"
             >
-              <LeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              />
+              <ChevronLeftRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage + 1)}
               class="bg-transparent border-0"
             >
-              <RightIcon
-                color={currPage === totalPages
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              />
+              <ChevronRightRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(totalPages)}
               class="bg-transparent border-0"
             >
-              <DoubleRightIcon
-                color={currPage === totalPages
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              />
+              <ChevronDoubleRightRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
           </div>
         </div>
