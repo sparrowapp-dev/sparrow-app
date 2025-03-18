@@ -5624,7 +5624,7 @@ export default class CollectionsViewModel {
   public validateOapiDataSyntax = async (data: any) => {
     const response = await this.collectionService.validateImportCollectionInput(
       "",
-      JSON.parse(data?.data?.body),
+      data?.data?.body,
     );
     return response;
   };
