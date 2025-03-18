@@ -444,8 +444,4 @@
     font-weight: 500;
     font-size: 12px;
   }
-  .outer-section {
-    overflow-y: auto; /* Ensure outer section handles overflow */
-    max-height: 100vh; /* Limit the height to viewport */
-  }
 </style>

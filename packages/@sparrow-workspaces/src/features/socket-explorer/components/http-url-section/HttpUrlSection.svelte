@@ -23,7 +23,6 @@
   export let onUpdateEnvironment;
   export let isSave;
   export let isGuestUser = false;
-  export let onConnect;
   export let webSocket;
   export let onDisconnect;
   /**

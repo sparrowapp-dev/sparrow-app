@@ -114,7 +114,6 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
-  {codeId}
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}

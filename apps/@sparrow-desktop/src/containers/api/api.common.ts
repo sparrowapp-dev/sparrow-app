@@ -341,29 +341,29 @@ const sendSocketIoMessage = async (
 /**
  * Disconnects a WebSocket connection for a specific tab and handles the response.
  *
- * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
+ * @param tabId - The ID of the tab for which the WebSocket connection should be disconnected.
  *
  */
-const disconnectWebSocket = async (tab_id: string, isCancelled = false) => {
+const disconnectWebSocket = async (tabId: string, isCancelled = false) => {
   let url = "";
   webSocketDataStore.update((webSocketDataMap) => {
-    const wsData = webSocketDataMap.get(tab_id);
+    const wsData = webSocketDataMap.get(tabId);
     if (wsData) {
       url = wsData.url;
       wsData.status = isCancelled ? "disconnected": "disconnecting";
       wsData.url = "";
-      webSocketDataMap.set(tab_id, wsData);
+      webSocketDataMap.set(tabId, wsData);
     }
     return webSocketDataMap;
   });
   if(!isCancelled){
-  await invoke("disconnect_websocket", { tabid: tab_id })
-    .then(async (data: string) => {
+  await invoke("disconnect_websocket", { tabid: tabId })
+    .then(async () => {
       try {
         // Logic to handle response
         let listener;
         webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tab_id);
+          const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
             listener = wsData.listener;
             wsData.messages.unshift({
@@ -373,7 +373,7 @@ const disconnectWebSocket = async (tab_id: string, isCancelled = false) => {
               uuid: uuidv4(),
             });
             wsData.status = "disconnected";
-            webSocketDataMap.set(tab_id, wsData);
+            webSocketDataMap.set(tabId, wsData);
             if (listener) {
               listener();
             }

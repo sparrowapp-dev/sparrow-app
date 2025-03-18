@@ -141,7 +141,7 @@
   .pair-data-row {
     padding-top: 3px;
     padding-bottom: 3px;
-    height: auto; /* Ensure height is auto to handle content overflow */
+    height: calc(28px);
     background-color: var(--bg-ds-surface-600);
     border-top: 1px solid var(--bg-ds-surface-400);
     transition: background-color 1ms ease;
