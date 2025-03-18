@@ -32,7 +32,8 @@
   export let userRole;
   export let handleConnect;
   export let handleCancelConnect;
-  export let isConnecting;
+
+  let isConnecting = false;
 
   const theme = new UrlInputTheme().build();
   /**
@@ -75,9 +76,10 @@
     customWidth={"96px"}
     loader={webSocket?.status === "disconnecting"}
     disable={webSocket?.status === "disconnecting"}
-    onClick={() => {
+    onClick={async () => {
       if (isConnecting) {
-        handleCancelConnect();
+        isConnecting = false;
+        await handleCancelConnect();
       } else if (requestUrl === "") {
         const codeMirrorElement = document.querySelector(
           ".input-url .cm-editor",
@@ -87,11 +89,16 @@
         }
       } else {
         if (webSocket?.status === "connected") {
+          isConnecting = false;
           onDisconnect();
           MixpanelEvent(Events.WebSocket_Disconnected);
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
-          handleConnect();
-          MixpanelEvent(Events.WebSocket_Connected);
+          isConnecting = true;
+          const connectResult = await handleConnect();
+          if (connectResult === true) {
+            isConnecting = false;
+            MixpanelEvent(Events.WebSocket_Connected);
+          }
         }
       }
     }}

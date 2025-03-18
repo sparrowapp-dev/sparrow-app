@@ -1450,8 +1450,7 @@ class RestExplorerViewModel {
   };
 
   public connectWebsocket = async (
-    environmentVariables,
-    signal: AbortSignal,
+    environmentVariables
   ) => {
     const websocketData = this._tab.getValue();
 
@@ -1464,15 +1463,14 @@ class RestExplorerViewModel {
       decodeData[0] as string,
       websocketData.tabId,
       decodeData[1],
-      signal,
     );
   };
 
-  public disconnectWebsocket = async (signal: AbortSignal) => {
+  public disconnectWebsocket = async (isCancelled: boolean = false) => {
     const websocketData = this._tab.getValue();
     return await this.webSocketService.disconnectWebsocket(
       websocketData?.tabId,
-      signal,
+      isCancelled
     );
   };
 

@@ -73,20 +73,13 @@
     isExposeSaveAsSocket = flag;
   };
 
-  let isConnecting = false;
-  let abortController: AbortController;
-
-  const handleConnect = async () => {
-    isConnecting = true;
-    abortController = new AbortController();
-    await onConnect(environmentVariables, abortController.signal);
+  const handleConnect = async (signal: AbortSignal) => {
+    return await onConnect(environmentVariables, signal);
   };
 
   const handleCancelConnect = async () => {
-    isConnecting = false;
-    abortController.abort();
     await invoke("abort_websocket_connection", { tabid: $tab.tabId });
-    onDisconnect();
+    await onDisconnect(true);
   };
 </script>
 
@@ -108,7 +101,6 @@
         {handleConnect}
         {webSocket}
         {onDisconnect}
-        {isConnecting}
         {handleCancelConnect}
       />
 
