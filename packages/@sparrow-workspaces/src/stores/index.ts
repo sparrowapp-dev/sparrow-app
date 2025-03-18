@@ -15,5 +15,10 @@ export {
   defaultCurrentStep,
   isDefaultTourGuideClose,
 } from "./defaultGuide.tour";
+export {
+  isExpandCollection,
+  isExpandEnvironment,
+  isExpandTestflow,
+} from "./recent-left-panel";
 
 export { tabsSplitterDirection } from "./tabs-view";

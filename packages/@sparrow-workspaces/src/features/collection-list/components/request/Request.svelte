@@ -21,6 +21,7 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import { opendComponent } from "../../../../stores/recent-left-panel";
   import {
     ChevronDownRegular,
     ChevronRightRegular,
@@ -63,6 +64,9 @@
    * Current Tab Path
    */
   export let activeTabId: string;
+
+  export let searchData: string;
+  export let activeTabPath;
 
   /**
    * Role of user in workspace
@@ -140,6 +144,35 @@
     httpMethodUIStyle = getMethodStyle(
       api?.request?.method as HttpRequestMethodBaseEnum,
     );
+  }
+
+  const addRequestItem = (collection) => {
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.set(collection.id, `REST API`);
+      return newMap;
+    });
+  };
+  const removeRequestItem = (id) => {
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.delete(id); // Remove the entry by ID
+      return newMap;
+    });
+  };
+
+  $: {
+    if ($opendComponent.has(api.id)) {
+      expand = true;
+    }
+    if (searchData) {
+      expand = true;
+    }
+    if (activeTabPath) {
+      if (activeTabPath.requestId === api.id) {
+        expand = true;
+      }
+    }
   }
 </script>
 
@@ -263,12 +296,18 @@
   }}
   on:click|preventDefault={() => {
     if (!isRenaming) {
-      onItemOpened("request", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        request: api,
-      });
+      expand = !expand;
+      if (expand) {
+        addRequestItem(api);
+        onItemOpened("request", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          request: api,
+        });
+      } else {
+        removeRequestItem(api.id);
+      }
     }
   }}
   bind:this={requestTabWrapper}

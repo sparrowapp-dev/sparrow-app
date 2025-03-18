@@ -42,6 +42,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
+  import { opendComponent } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -193,6 +194,26 @@
       inputField.blur();
     }
   };
+
+  const addFolderItem = (collection) => {
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.set(collection.id, `folder`);
+      return newMap;
+    });
+  };
+  const removeFolderItem = (id) => {
+    opendComponent.update((map) => {
+      const newMap = new Map(map);
+      newMap.delete(id); // Remove the entry by ID
+      return newMap;
+    });
+  };
+  $: {
+    if ($opendComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -400,11 +421,14 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
+                addFolderItem(explorer);
                 onItemOpened("folder", {
                   workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                 });
+              } else {
+                removeFolderItem(explorer.id);
               }
             }
           }
@@ -599,6 +623,8 @@
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}
