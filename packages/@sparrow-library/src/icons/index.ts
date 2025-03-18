@@ -215,4 +215,5 @@ export { default as QuestionCircleRegular } from "./QuestionCircleRegular.svelte
 export { default as CaretUpFilled } from "./CaretUpFilled.svelte";
 export {default as ListRegular} from "./ListRegular.svelte";
 export {default as CaretDownRegular} from "./CaretDownRegular.svelte";
+export {default as WarningFilled} from "./WarningFilled.svelte"
 export { default as DismissCircleRegular } from "./DismissCircleRegular.svelte"

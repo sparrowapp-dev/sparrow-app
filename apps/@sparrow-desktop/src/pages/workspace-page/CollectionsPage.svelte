@@ -47,7 +47,7 @@
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
-  import type { Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { onMount } from "svelte";
 
   import type {
@@ -81,6 +81,7 @@
   import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
   import { remove } from "@tauri-apps/plugin-fs";
   import { Checkbox } from "@sparrow/library/forms";
+  import { writable } from "svelte/store";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -122,6 +123,7 @@
   let globalEnvironment;
 
   let environments = _viewModel2.environments;
+  let totalCollectionCount = writable(0);
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -528,9 +530,17 @@
       isFirstCollectionExpand = value;
     }
   });
-
   onDestroy(() => {
     cw.unsubscribe();
+  });
+
+  collectionList.subscribe((collections) => {
+    let count = 0;
+    collections.forEach((collection) => {
+      const collectionData = collection.toMutableJSON();
+      count += collectionData.items.length || 0;
+    });
+    totalCollectionCount.set(count);
   });
 </script>
 
@@ -596,12 +606,11 @@
           appVersion={version}
         />
       </Pane>
-      <Pane
-        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-        minSize={60}
-        class="bg-secondary-800-important"
-      >
-        <section class="d-flex flex-column h-100">
+      <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
+        <section
+          class="d-flex flex-column h-100"
+          style="background-color:var(--bg-ds-surface-900)"
+        >
           <TabBar
             tabList={$tabList}
             {isGuestUser}
@@ -829,6 +838,7 @@
   }}
 >
   <WelcomePopup
+    loader={$totalCollectionCount > 0 ? false : true}
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;

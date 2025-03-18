@@ -80,7 +80,7 @@
   export let onClickCloseOtherTabs: (tabId: string) => void;
   export let onClickForceCloseTabs: (tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
-  let noOfColumns = 180;
+  let noOfColumns = 200;
   let showTabControlMenu = false;
 
   function handleMouseDown(event: MouseEvent) {
@@ -135,6 +135,7 @@
   </Dropdown> -->
   {#if showTabControlMenu}
     <Options
+      isTabMenu={true}
       xAxis={mouseX}
       yAxis={[mouseY, mouseY + 20]}
       zIndex={500}
