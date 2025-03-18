@@ -738,44 +738,87 @@ class FolderExplorerPage {
                 }
               };
      public handleCreateItem = async (
-        entityType: string,
-        args: CollectionArgsBaseInterface,
-      ) => {
-        let response;
-        switch (entityType) {
-          case "folder":
-            await this.handleCreateFolderInCollection(
-              args.collection.workspaceId,
-              args.collection as CollectionDto,
-            );
-            break;
-          case "requestCollection":
-            await this.handleCreateRequestInCollection(
-              args.collection.workspaceId,
-              args.collection as CollectionDto,
-            );
-            break;
-          case "websocketCollection":
-            await this.handleCreateWebSocketInCollection(
-              args.collection.workspaceId,
-              args.collection as CollectionDto,
-            );
-            break;
-          case "socketioCollection":
-            await this.handleCreateSocketIoInCollection(
-              args.collection.workspaceId,
-              args.collection as CollectionDto,
-            );
-            break;
-          case "graphqlCollection":
-            await this.handleCreateGraphqlInCollection(
-              args.collection.workspaceId,
-              args.collection as CollectionDto,
-            );
-            break;
-        }
-        return response;
-      };
+       entityType: string,
+       args: CollectionArgsDto,
+     ) => {
+       let response;
+       switch (entityType) {
+         case "collection":
+           response = await this.handleCreateCollection(args.workspaceId);
+           break;
+         case "folder":
+           await this.handleCreateFolderInCollection(
+             args.workspaceId,
+             args.collection as CollectionDto,
+           );
+           break;
+         case "request":
+           await this.createNewTab();
+           break;
+         case "requestCollection":
+           await this.handleCreateRequestInCollection(
+             args.workspaceId,
+             args.collection as CollectionDto,
+           );
+           break;
+         case "requestFolder":
+           await this.handleCreateRequestInFolder(
+             args.workspaceId,
+             args.collection as CollectionDto,
+             args.folder as CollectionItemsDto,
+           );
+           break;
+         case "web-socket":
+           await this.createWebSocketNewTab();
+           break;
+         case "websocketCollection":
+           await this.handleCreateWebSocketInCollection(
+             args.workspaceId,
+             args.collection as CollectionDto,
+           );
+           break;
+         case "websocketFolder":
+           await this.handleCreateWebSocketInFolder(
+             args.workspaceId,
+             args.collection as CollectionDto,
+             args.folder as CollectionItemsDto,
+           );
+           break;
+         case "socket-io":
+           await this.createSocketIoNewTab();
+           break;
+         case "socketioCollection":
+           await this.handleCreateSocketIoInCollection(
+             args.workspaceId,
+             args.collection as CollectionDto,
+           );
+           break;
+         case "socketioFolder":
+           await this.handleCreateSocketIoInFolder(
+             args.workspaceId,
+             args.collection as CollectionDto,
+             args.folder as CollectionItemsDto,
+           );
+           break;
+         case "graphql":
+           await this.createGraphqlNewTab();
+           break;
+         case "graphqlCollection":
+           await this.handleCreateGraphqlInCollection(
+             args.workspaceId,
+             args.collection as CollectionDto,
+           );
+           break;
+         case "graphqlFolder":
+           await this.handleCreateGraphqlInFolder(
+             args.workspaceId,
+             args.collection as CollectionDto,
+             args.folder as CollectionItemsDto,
+           );
+           break;
+       }
+       return response;
+     };
   /**
    *
    * @param tab - Tab in which description will be updated

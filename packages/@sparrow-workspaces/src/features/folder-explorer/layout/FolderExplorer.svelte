@@ -124,7 +124,7 @@
         },
         {
           onclick: () => {
-            onItemCreated("socketioCollection", {
+            onItemCreated("socketioFolder", {
               collection: collection,
             });
           },
@@ -135,7 +135,7 @@
         },
         {
           onclick: () => {
-            onItemCreated("websocketCollection", {
+            onItemCreated("websocketFolder", {
               collection: collection,
             });
           },
@@ -148,7 +148,7 @@
     : [
         {
           onclick: () => {
-            onItemCreated("requestCollection", {
+            onItemCreated("requestFolder", {
               collection: collection,
             });
           },
@@ -159,7 +159,7 @@
         },
         {
           onclick: () => {
-            onItemCreated("socketioCollection", {
+            onItemCreated("socketioFolder", {
               collection: collection,
             });
           },
@@ -170,24 +170,12 @@
         },
         {
           onclick: () => {
-            onItemCreated("websocketCollection", {
+            onItemCreated("websocketFolder", {
               collection: collection,
             });
           },
           name: "Add WebSocket",
           icon: SocketIcon,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-
-        {
-          onclick: () => {
-            onItemCreated("graphqlCollection", {
-              collection: collection,
-            });
-          },
-          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
-          icon: GraphIcon,
           iconColor: "var(--icon-ds-neutral-50)",
           iconSize: "14px",
         },
