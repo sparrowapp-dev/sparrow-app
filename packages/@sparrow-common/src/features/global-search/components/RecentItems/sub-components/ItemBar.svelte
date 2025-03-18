@@ -62,7 +62,7 @@
   }
 </script>
 
-<div class="request-item" on:click={() => onClick()}>
+<div class="request-item" on:click={() => onClick(data)}>
   <div class="request-method">
     <svelte:component this={icon} {...iconProps} />
   </div>
