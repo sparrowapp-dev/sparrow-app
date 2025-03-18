@@ -126,11 +126,13 @@
   .checkmark.small {
     width: 12px;
     height: 12px;
+    padding: 0;
   }
 
   .checkmark.large {
     width: 14px;
     height: 14px;
+    padding: 0px;
   }
 
   /* Normal checked state */
