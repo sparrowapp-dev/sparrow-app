@@ -258,12 +258,9 @@
        * Handle imports using deployed URL
        */
       const response = await onGetOapiTextFromURL(importData);
-
+      const contentType = validateJSON(importData);
       if (response?.data?.status === ResponseStatusCode.OK) {
-        handleImportJsonObject(
-          ContentTypeEnum["application/json"],
-          response?.data?.body,
-        );
+        handleImportJsonObject(contentType, response?.data?.body);
       }
     } else if (
       importType === "text" &&
@@ -276,10 +273,8 @@
        */
       const response = await onGetOapiTextFromURL(importData);
       if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
-        handleImportJsonObject(
-          ContentTypeEnum["application/json"],
-          response?.data?.body,
-        );
+        const contentType = validateJSON(response?.data?.body);
+        handleImportJsonObject(contentType, response?.data?.body);
       }
 
       // else if (
