@@ -347,7 +347,7 @@
     // display: flex;
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
