@@ -79,7 +79,6 @@
   .delay-class {
     transition: top 250ms ease-in-out 150ms;
   }
-
   .sidebar-item-parent:focus {
     outline: none;
     border-radius: 4px;
@@ -87,8 +86,8 @@
     background-color: var(--bg-ds-surface-500) !important;
   }
   .sidebar-item img {
-    height: 24px;
-    width: 24px;
+    height: 19px;
+    width: 18px;
   }
 
   .sidebar-item {
