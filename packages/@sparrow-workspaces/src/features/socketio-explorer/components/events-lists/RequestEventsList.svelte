@@ -13,7 +13,10 @@
   export let deleteParam;
 </script>
 
-<div style="background-color: var(--bg-ds-surface-600);" class="rounded-bottom-1">
+<div
+  style="background-color: var(--bg-ds-surface-600);"
+  class="rounded-bottom-1"
+>
   <div
     class="d-flex justify-content-between align-items-center bg-secondary-700 w-100 rounded-bottom-1"
     style="font-size: 12px; font-weight: 500;background-color: var(--bg-ds-surface-600);padding:0px 4px 0px 24px;border-top: var(--border-ds-surface-400) 1px solid;"
@@ -29,6 +32,7 @@
           on:input={() => updateParam(index)}
           width={"100%"}
           size="small"
+          variant="inline"
           class="text-fs-12 fw-medium me-5"
           style="outline:none; background-color:transparent;"
           placeholder="Name"
