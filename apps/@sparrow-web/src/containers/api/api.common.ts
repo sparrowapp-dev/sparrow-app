@@ -322,7 +322,9 @@ const disconnectWebSocket = async (tab_id: string) => {
         !isEnableWebSocketCloud
       ) {
         socketInsta.close();
-        notifications.success("WebSocket disconnected successfully");
+
+        // ToDo -> Messages and Constants strings/values should be stored in a single script (named Constants) 
+        notifications.success("WebSocket disconnected successfully.");
       } else {
         socketInsta?.emit(
           "sparrow_internal_disconnect",
@@ -422,7 +424,7 @@ const connectWebSocket = async (
             }
             return webSocketDataMap;
           });
-          notifications.success("WebSocket connected successfully");
+          notifications.success("WebSocket connected successfully.");
           resolve("");
         };
 
@@ -540,7 +542,7 @@ const connectWebSocket = async (
           }
           return webSocketDataMap;
         });
-        notifications.success("WebSocket connected successfully");
+        notifications.success("WebSocket connected successfully.");
       } else if (event === "sparrow_internal_disconnect") {
         // Disconnect listener from the target Socket.IO.
         console.error(

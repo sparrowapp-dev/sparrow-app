@@ -20,6 +20,7 @@
   };
 </script>
 
+<p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
 <div class="d-flex ps-1 gap-3 mb-2">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
@@ -28,8 +29,8 @@
       value={CollectionRequestAddToBaseEnum.HEADER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Add to Header "
-      buttonSize="small"
+      labelText=" Header "
+      buttonSize="medium"
       {disabled}
     />
   </div>
@@ -40,15 +41,15 @@
       value={CollectionRequestAddToBaseEnum.QUERY_PARAMETER}
       group={apiData.addTo}
       handleChange={handleOptionChange}
-      labelText=" Add to Parameter "
-      buttonSize="small"
+      labelText=" Parameter "
+      buttonSize="medium"
       {disabled}
     />
   </div>
 </div>
 <div class="d-flex flex-column w-100">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class=" mb-2 title">Auth Key</p>
+    <p class=" mb-2 text-secondary-100">Key</p>
 
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
@@ -65,7 +66,7 @@
     </div>
   </div>
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 title">Auth Value</p>
+    <p class="mb-2 text-secondary-100">Value</p>
     <div class="position-relative auth-input-container">
       <CodeMirrorInput
         bind:value={apiData.authValue}
@@ -133,10 +134,5 @@
   }
   .radio input[type="radio"] + .radio-label:empty:before {
     margin-right: 0;
-  }
-  .title{
-    color:var(--text-ds-neutral-200);
-    font-size: 12px;
-    font-weight: 500;
   }
 </style>

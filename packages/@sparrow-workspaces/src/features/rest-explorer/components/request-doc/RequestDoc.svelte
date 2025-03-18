@@ -20,10 +20,7 @@
 </script>
 
 <div class=" text-fs-14">
-  <div class="d-flex" style="justify-content: space-between;">
-    <div style="font-weight: 600; margin-bottom:8px;">Documentation</div>
-  </div>
-  <div style="height: 100%; min-height:160px;background-color: var(--bg-ds-surface-600);border-radius:4px;padding:8px" class="area">
+  <div style="height: 100%; min-height:160px;background-color: var(--bg-ds-surface-600);border-radius:4px;padding:8px;display:flex;flex-direction:column;gap:4px;" class="area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div
         id="editor2"
@@ -41,7 +38,7 @@
     {#if !isGuestUser}
       <div
         class=""
-        style="height: 42px; width: 100%; padding-bottom:8px; padding-left:16px; "
+        style=" width: 100%;"
       >
         <div style="width:fit-content;] ">
           {#if isDocGenerating == true}
@@ -78,7 +75,7 @@
         </div>
       </div>
     {/if}
-    <div></div>
+    
   </div>
 </div>
 

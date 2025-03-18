@@ -59,28 +59,29 @@
 
  <div class="outer-section">
   <div
-    class="mb-0 me-0 w-100 bg-secondary-700 py-0 border-radius-2 section-layout"
+    class="mb-0 me-0 w-100 bg-secondary-700 py-0 section-layout rounded-3"
+    
   >
     <div
-      class="d-flex gap-3 py-1 mb-1 align-items-center w-100 {!isTopHeaderRequired
+      class="d-flex gap-3 py-1 align-items-center w-100 {!isTopHeaderRequired
         ? 'd-none'
         : ''}"
       style="height:26px; "
     >
       <div
-        class="ps-5 d-flex bg-secondary-700 align-items-center w-100"
-        style="font-size: 12px; font-weight: 500; background-color:var(--bg-secondary-880);"
+        class="d-flex align-items-center w-100 rounded-top-1"
+        style="font-size: 12px; font-weight: 500; background-color:var(--bg-ds-surface-400);padding:0px 24px"
       >
         <p
-          class="mb-0 w-50 text-secondary-200 text-fs-12 "
-          style="font-weight: 500;"
+          class="mb-0 w-50 text-fs-12 "
+          style="font-weight: 500;padding:2px 8px;color:var(--text-ds-neutral-200)"
         >
           Event
         </p>
 
         <p
-          class="mb-0 w-50 text-secondary-200 text-fs-12 p-1"
-          style="font-weight: 500;"
+          class="mb-0 w-50 text-fs-12 p-1"
+          style="font-weight: 500;padding:2px 8px;color:var(--text-ds-neutral-200)"
         >
           Listen
         </p>

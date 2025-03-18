@@ -73,7 +73,7 @@
     </div>
   {/if}
 </div>
-<div class="mb-2 d-flex align-items-center justify-content-between">
+<div class="d-flex align-items-center justify-content-between" style="margin-bottom:12px;">
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash124"}

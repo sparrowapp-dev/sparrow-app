@@ -224,7 +224,6 @@
   class="environment-tab"
   bind:this={environmentTabWrapper}
   on:click|preventDefault={() => {
-    handleSelectEnvironment();
     if (!isRenaming) {
       if (!env.id.includes(UntrackedItems.UNTRACKED)) {
         openEnvironment();

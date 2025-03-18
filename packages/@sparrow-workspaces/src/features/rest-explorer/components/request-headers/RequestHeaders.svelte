@@ -57,7 +57,7 @@
   />
   <div>
     {#if !isBulkEditActive}
-      <div class="d-flex align-items-center py-3">
+      <div class="d-flex align-items-center" style="padding:12px 0px">
        <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"

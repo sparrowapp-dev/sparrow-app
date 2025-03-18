@@ -70,7 +70,7 @@
   // import { WorkspaceRole } from "@sparrow/common/enums";
   import { CollectionAuth, CollectionNavigator } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
-  import { Button, Options } from "@sparrow/library/ui";
+  import { Button, Dropdown, Options } from "@sparrow/library/ui";
   import {
     AddRegular,
     ArrowSwapRegular,
@@ -86,6 +86,7 @@
   } from "@sparrow/library/icons";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { Input } from "@sparrow/library/forms";
 
   /**
    * Role of user in active workspace
@@ -112,12 +113,6 @@
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
-
-  const rightClickContextMenu = () => {
-    setTimeout(() => {
-      showAddItemMenu = !showAddItemMenu;
-    }, 100);
-  };
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -151,12 +146,14 @@
   };
 
   const handleInputName = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    onRename(target.value, "");
+    // const target = event.target as HTMLInputElement;
+    // onRename(target.value, "");
+    onRename(event.detail, "");
   };
   const handleBlurName = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    onRename(target.value, "blur");
+    // const target = event.target as HTMLInputElement;
+    // onRename(target.value, "blur");
+    onRename(event.detail, "blur");
   };
   const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
@@ -166,86 +163,114 @@
       showAddItemMenu = false;
     }
   };
+  const addButtonData = isWebApp
+    ? [
+        {
+          onclick: () => {
+            onItemCreated("folder", {
+              collection: collection,
+            });
+          },
+          name: "Add Folder",
+          icon: FolderAddRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("requestCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketCollection", {
+              collection: collection,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ]
+    : [
+        {
+          onclick: () => {
+            onItemCreated("folder", {
+              collection: collection,
+            });
+          },
+          name: "Add Folder",
+          icon: FolderAddRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("requestCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketCollection", {
+              collection: collection,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+
+        {
+          onclick: () => {
+            onItemCreated("graphqlCollection", {
+              collection: collection,
+            });
+          },
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ];
+  let isBackgroundClickable = true;
 </script>
 
-<svelte:window
-  on:click={handleSelectClick}
-  on:contextmenu|preventDefault={handleSelectClick}
-/>
-{#if showAddItemMenu}
-  <Options
-    xAxis={collectionTabButtonWrapper.getBoundingClientRect().right}
-    yAxis={[
-      collectionTabButtonWrapper.getBoundingClientRect().top - 0,
-      collectionTabButtonWrapper.getBoundingClientRect().bottom + 5,
-    ]}
-    zIndex={700}
-    menuItems={[
-      {
-        onClick: () => {
-          onItemCreated("folder", {
-            collection: collection,
-          });
-        },
-        displayText: "Add Folder",
-        disabled: false,
-        hidden: false,
-        icon: FolderAddRegular,
-        iconColor: "var(--icon-ds-neutral-50)",
-      },
-      {
-        onClick: () => {
-          onItemCreated("requestCollection", {
-            collection: collection,
-          });
-        },
-        displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-        disabled: false,
-        hidden: false,
-        icon: ArrowSwapRegular,
-        iconColor: "var(--icon-ds-neutral-50)",
-      },
-      {
-        onClick: () => {
-          onItemCreated("socketioCollection", {
-            collection: collection,
-          });
-        },
-        displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-        disabled: false,
-        hidden: false,
-        icon: SocketIoIcon,
-        iconColor: "var(--icon-ds-neutral-50)",
-      },
-      {
-        onClick: () => {
-          onItemCreated("websocketCollection", {
-            collection: collection,
-          });
-        },
-        displayText: "Add WebSocket",
-        disabled: false,
-        hidden: false,
-        icon: SocketIcon,
-        iconColor: "var(--icon-ds-neutral-50)",
-      },
-
-      {
-        onClick: () => {
-          onItemCreated("graphqlCollection", {
-            collection: collection,
-          });
-        },
-        displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
-        disabled: false,
-        hidden: isWebApp ? true : false,
-        icon: GraphIcon,
-        iconColor: "var(--icon-ds-neutral-50)",
-      },
-    ]}
-    {noOfColumns}
-  />
-{/if}
 <div class="main-container d-flex h-100" style="overflow:auto;">
   <!-- <Modal
     title={"Switch Branch?"}
@@ -292,7 +317,7 @@
   >
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
-        <input
+        <!-- <input
           type="text"
           required
           maxlength={100}
@@ -302,7 +327,21 @@
           disabled={!isCollectionEditable}
           on:input={handleInputName}
           on:blur={handleBlurName}
+        /> -->
+
+        <Input
+          type={"text"}
+          size={"medium"}
+          maxlength={500}
+          id={"renameInputFieldCollection"}
+          value={$tab?.name || ""}
+          variant={"inline"}
+          placeholder={""}
+          disabled={!isCollectionEditable}
+          on:input={handleInputName}
+          on:blur={handleBlurName}
         />
+
         <!-- {#if tab?.activeSync}
           <div class="d-flex">
             <Select
@@ -432,18 +471,27 @@
           class="d-flex me-2 flex-column justify-content-center"
           bind:this={collectionTabButtonWrapper}
         >
-          <Button
-            id={`add-item-collection-${collection?.id}`}
-            disable={!isCollectionEditable}
-            title={"New"}
-            type={"primary"}
-            onClick={() => {
-              rightClickContextMenu();
-            }}
-            size="medium"
-            startIcon={AddRegular}
-            endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
-          />
+          <Dropdown
+            zIndex={600}
+            buttonId={`add-item-collection`}
+            bind:isMenuOpen={showAddItemMenu}
+            bind:isBackgroundClickable
+            options={addButtonData}
+            horizontalPosition="left"
+          >
+            <Button
+              id={`add-item-collection`}
+              disable={!isCollectionEditable}
+              title={"New"}
+              type={"primary"}
+              onClick={() => {
+                showAddItemMenu = !showAddItemMenu;
+              }}
+              size="medium"
+              startIcon={AddRegular}
+              endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+            />
+          </Dropdown>
         </div>
         <Button
           disable={$tab?.isSaved || !isCollectionEditable ? true : false}

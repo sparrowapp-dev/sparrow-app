@@ -69,6 +69,10 @@
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import {
+    CheckmarkCircleFilled,
+    ErrorCircleFilled,
+  } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -140,6 +144,8 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isErrorMsgOpen = false;
+
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
@@ -153,12 +159,13 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+
   let isGuidePopup = false;
 </script>
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-3">
+    <div class="w-100 d-flex flex-column h-100 pt-3 pb-3" style="padding:0px 12px">
       <!-- Request Name Header -->
       <!-- 
         --
@@ -376,7 +383,9 @@
                     {:else if !storeData?.response.status}
                       <ResponseDefaultScreen />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen
+                        onSendButtonClicked={onSendRequest}
+                      />
                     {:else if storeData?.response.status}
                       <div
                         class="h-100 d-flex flex-column"
@@ -536,7 +545,7 @@
   }
 
   :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 101px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
     border-left: 5px solid var(--border-ds-surface-900) !important;

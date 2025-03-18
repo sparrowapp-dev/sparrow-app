@@ -80,50 +80,51 @@
   <!-- Http Method Dropdown -->
   <Select
     headerTheme={"secondary"}
-      id={"api-request"}
-      data={[
-        {
-          name: "GET",
-          id: RequestMethod.GET,
-          color: "success",
-        },
-        {
-          name: "POST",
-          id: RequestMethod.POST,
-          color: "warning",
-        },
-        {
-          name: "PUT",
-          id: RequestMethod.PUT,
-          color: "secondary",
-        },
-        {
-          name: "DELETE",
-          id: RequestMethod.DELETE,
-          color: "danger",
-        },
-        {
-          name: "PATCH",
-          id: RequestMethod.PATCH,
-          color: "patch",
-        },
-      ]}
-      borderRounded={"4px"}
-      titleId={httpMethod}
-      onclick={handleDropdown}
-      borderHighlight={"active"}
-      headerHighlight={"hover"}
-      minHeaderWidth={"100px"}
-      borderActiveType={"none"}
-      zIndex={500}
-      borderType={"none"}
-      menuItem={"v2"}
-      bodyTheme={"surface"}
-      isDropIconFilled={true}
-      highlightTickedItem={false}
-      headerFontSize={"12px"}
-      headerHeight={"36px"}
-    />
+    id={"api-request"}
+    size={"medium"}
+    data={[
+      {
+        name: "GET",
+        id: RequestMethod.GET,
+        color: "success",
+      },
+      {
+        name: "POST",
+        id: RequestMethod.POST,
+        color: "warning",
+      },
+      {
+        name: "PUT",
+        id: RequestMethod.PUT,
+        color: "secondary",
+      },
+      {
+        name: "DELETE",
+        id: RequestMethod.DELETE,
+        color: "danger",
+      },
+      {
+        name: "PATCH",
+        id: RequestMethod.PATCH,
+        color: "patch",
+      },
+    ]}
+    borderRounded={"4px"}
+    titleId={httpMethod}
+    onclick={handleDropdown}
+    borderHighlight={"active"}
+    headerHighlight={"hover"}
+    minHeaderWidth={"100px"}
+    borderActiveType={"none"}
+    zIndex={500}
+    borderType={"none"}
+    menuItem={"v2"}
+    bodyTheme={"surface"}
+    isDropIconFilled={true}
+    highlightTickedItem={false}
+    headerFontSize={"12px"}
+    headerHeight={"36px"}
+  />
 
   <CodeMirrorInput
     value={requestUrl}
