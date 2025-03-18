@@ -114,7 +114,7 @@
     title={"Add Feedback"}
     type={"dark"}
     width={"50%"}
-    zIndex={10000}
+    zIndex={1}
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
       isExposeFeedbackForm = flag;
