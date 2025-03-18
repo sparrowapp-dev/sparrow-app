@@ -7,4 +7,4 @@ export { default as MultiSelect } from "./multi-select/MultiSelect.svelte";
 export { default as TextEditor } from "./text-editor/TextEditor.svelte";
 export { default as Checkbox } from "./checkbox/Checkbox.svelte";
 export { default as Search } from "./search/Search.svelte";
-export { default as InputField } from "./Input-field/InputField.svelte";
+export { default as LabelField } from "./label-field/LabelField.svelte";
