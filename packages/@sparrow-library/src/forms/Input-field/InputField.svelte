@@ -12,14 +12,17 @@
   export let errorMessage: string = "";
   export let helpLabelText: string = "";
   export let helpLabelValue: boolean = false;
+  export let currentTextLength: number = 0;
+  export let maxTextLength: number = 300;
+  export let type: "input" | "textarea" = "input";
 
   let fontSize = size === "small" ? "12px" : "14px";
 </script>
 
-<div class="input-container">
+<div class="input-container d-flex flex-column">
   <!-- Label & Support Text -->
-  <div class="label-section">
-    <div class="label-wrapper" style="width: {width};">
+  <div class="label-section d-flex flex-column">
+    <div class="label-wrapper d-flex gap-1" style="width: {width};">
       <label
         for={inputLabelId}
         class="label-header-text-{variant}"
@@ -46,29 +49,44 @@
   <!-- Help Label -->
   {#if helpLabel}
     <div
-      class="help-wrapper"
+      class="help-wrapper d-flex justify-content-between"
       style={helpIcon !== ""
         ? "margin-left: 2px;"
         : "gap: 4px; margin-left: 2px;"}
     >
-      {#if helpIcon}
-        <svelte:component
-          this={helpIcon}
-          size="16px"
-          useParentColor={true}
-          color={isError
-            ? "var(--icon-ds-danger-300)"
-            : "var(--icon-ds-neutral-400)"}
-        />
-      {/if}
-      {#if isError}
-        <p class="help-label-error" style="font-size: 12px;">
-          {errorMessage}
-        </p>
-      {:else if helpLabelValue}
-        <p class="help-label-text-{variant}" style="font-size: 12px;">
-          {helpLabelText}
-        </p>
+      <div>
+        {#if helpIcon}
+          <svelte:component
+            this={helpIcon}
+            size="16px"
+            useParentColor={true}
+            color={isError
+              ? "var(--icon-ds-danger-300)"
+              : "var(--icon-ds-neutral-400)"}
+          />
+        {/if}
+        {#if isError}
+          <p class="help-label-error" style="font-size: 12px;">
+            {errorMessage}
+          </p>
+        {:else if helpLabelValue}
+          <p class="help-label-text-{variant}" style="font-size: 12px;">
+            {helpLabelText}
+          </p>
+        {/if}
+      </div>
+      {#if type === "textarea"}
+        <div>
+          <p
+            style="margin: 0; font-size: 12px; font-family: 'Inter', sans-serif; color:{isError
+              ? 'var(--icon-ds-danger-300)'
+              : 'var(--icon-ds-neutral-400)'}"
+          >
+            {maxTextLength - currentTextLength < 0
+              ? 0
+              : currentTextLength}/{maxTextLength}
+          </p>
+        </div>
       {/if}
     </div>
   {/if}
@@ -77,11 +95,13 @@
 <style>
   .required-mark-primary {
     color: var(--text-ds-danger-400);
+    font-family: "Inter", sans-serif;
   }
 
   .support-label-text-primary {
     margin: 0;
     color: var(--text-ds-neutral-400);
+    font-family: "Inter", sans-serif;
   }
   .label-header-text-primary {
     font-family: "Inter", sans-serif;
@@ -92,35 +112,25 @@
   .help-label-text-primary {
     margin: 0;
     color: var(--text-ds-neutral-400);
+    font-family: "Inter", sans-serif;
   }
 
   .help-label-error {
     margin: 0;
     color: var(--text-ds-danger-300);
+    font-family: "Inter", sans-serif;
   }
   .input-container {
-    display: flex;
-    flex-direction: column;
     max-width: 540px;
     min-width: 240px;
-    gap: 8px;
-  }
-
-  .label-section {
-    display: flex;
-    flex-direction: column;
+    gap: 2px;
   }
 
   .label-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
     padding-bottom: 2px;
   }
 
   .help-wrapper {
-    display: flex;
-    align-items: center;
     gap: 4px;
   }
 </style>
