@@ -75,7 +75,7 @@ use hyper::header::{CONNECTION, UPGRADE};
 use hyper::{Client as OtherClient, Request};
 use hyper_tls::HttpsConnector;
 use std::sync::Arc;
-use tokio::sync::mpsc::{self};
+use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::watch;
 use tokio::sync::Mutex;
 use tokio_tungstenite::connect_async;
@@ -599,9 +599,9 @@ struct SingleInstancePayload {
 }
 
 #[derive(Clone)]
-pub struct TabConnection {
-    pub sender: mpsc::UnboundedSender<String>,
-    pub disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<Result<(), String>>>>>,
+struct TabConnection {
+    sender: UnboundedSender<String>,
+    disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<Result<(), String>>>>>,
 }
 
 struct AppState {
@@ -634,13 +634,16 @@ async fn abort_websocket_connection(
         return Ok("WebSocket connection cancellation triggered".to_string());
     }
     // If no pending connection attempt exists, try disconnecting an already established connection.
-    let mut connections = state.connections.lock().await;
-    if let Some(conn) = connections.remove(&tabid) {
-        // In a real implementation, you might send a "close" frame or similar.
-        let _ = conn.sender.send("CANCEL".to_string());
-        return Ok("WebSocket connection disconnected".to_string());
-    }
-    Ok("WebSocket connection not found".to_string())
+    let _ = disconnect_websocket(tabid.clone(), state.clone()).await;
+    let cancel_response = WebSocketResponse {
+        is_successful: false,
+        is_cancelled: true,
+        status_code: 499, // Custom status for cancellation.
+        message: "WebSocket connection manually aborted".to_string(),
+        headers: None,
+    };
+    return Err(serde_json::to_string(&cancel_response)
+    .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
 }
 
 #[tauri::command]
