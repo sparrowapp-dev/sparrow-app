@@ -17,7 +17,10 @@
   };
 </script>
 
-<div class="mb-2 d-flex align-items-center justify-content-between" style="gap:6px;">
+<div
+  class="mb-2 d-flex align-items-center justify-content-between"
+  style="gap:6px;"
+>
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash9872"}
@@ -48,23 +51,23 @@
       minBodyWidth={"104px"}
     />
   </div>
- <div class="w-100">
-   <Input
-    bind:value={requestEventName}
-    id="collection-list-search"
-    variant="primary"
-    size="small"
-    on:input={() => {
-      onUpdateRequestEventName(requestEventName);
-    }}
-    defaultBorderColor="transparent"
-    hoveredBorderColor="var(--border-primary-300)"
-    focusedBorderColor={"var(--border-primary-300)"}
-    class="text-fs-12 border-radius-2 ellipsis fw-normal px-2 inputField"
-    style="outline:none;"
-    placeholder="Event Name"
-    width="100%"
-  />
+  <div class="w-100">
+    <Input
+      bind:value={requestEventName}
+      id="collection-list-search"
+      variant="primary"
+      size="small"
+      on:input={() => {
+        onUpdateRequestEventName(requestEventName);
+      }}
+      defaultBorderColor="transparent"
+      hoveredBorderColor="var(--border-primary-300)"
+      focusedBorderColor={"var(--border-primary-300)"}
+      class="text-fs-12 border-radius-2 ellipsis fw-normal px-2 inputField"
+      style="outline:none;"
+      placeholder="Event Name"
+      width="100%"
+    />
   </div>
   <Button
     title="Send"
