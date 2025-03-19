@@ -26,6 +26,7 @@
   export let onConnect;
   export let webSocket;
   export let onDisconnect;
+  export let isSaveLoad = false;
   /**
    * Role of user in active workspace
    */
@@ -46,7 +47,6 @@
       notifications.success("WebSocket request saved successfully.");
     }
   };
-
 </script>
 
 <div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
@@ -64,7 +64,7 @@
 
   <!-- Send button -->
   <Button
-  title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
+    title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
     type="primary"
     customWidth={"96px"}
     loader={webSocket?.status === "connecting" ||
@@ -91,16 +91,16 @@
     }}
   />
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-
-     <Button
-    type="secondary"
-    size="medium"
-    startIcon={SaveRegular}
-    onClick={handleSaveRequest}
-    disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+    <Button
+      type="secondary"
+      size="medium"
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
+      onClick={handleSaveRequest}
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-        />
+    />
   </Tooltip>
 </div>
 

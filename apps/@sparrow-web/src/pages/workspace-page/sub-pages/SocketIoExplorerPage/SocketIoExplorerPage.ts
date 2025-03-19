@@ -60,6 +60,7 @@ import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import { saveTabs } from "../../../../../../../packages/@sparrow-workspaces/src/stores/save-tabs";
 
 class SocketIoExplorerPageViewModel {
   /**
@@ -695,6 +696,11 @@ class SocketIoExplorerPageViewModel {
   public saveSocket = async () => {
     const componentData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path as Path;
+    const tabId = componentData?.tabId;
+    saveTabs.update((tabs) => ({
+      ...tabs,
+      [tabId]: true,
+    }));
 
     if (!workspaceId || !collectionId) {
       return {
@@ -777,6 +783,10 @@ class SocketIoExplorerPageViewModel {
           data,
         );
       }
+      saveTabs.update((tabs) => ({
+        ...tabs,
+        [tabId]: false,
+      }));
       return {
         status: "success",
         message: "",
@@ -811,11 +821,19 @@ class SocketIoExplorerPageViewModel {
           res.data.data,
         );
       }
+      saveTabs.update((tabs) => ({
+        ...tabs,
+        [tabId]: false,
+      }));
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      saveTabs.update((tabs) => ({
+        ...tabs,
+        [tabId]: false,
+      }));
       return {
         status: "error",
         message: res.message,

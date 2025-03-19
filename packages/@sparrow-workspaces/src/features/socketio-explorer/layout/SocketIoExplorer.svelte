@@ -33,6 +33,7 @@
     RequestEvents,
   } from "../components";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/socket-io-request-tab";
+  import { saveTabs } from "../../../stores";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<any[]>;
@@ -81,6 +82,7 @@
     <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
       <!-- HTTP URL Section -->
       <HttpUrlSection
+        isSaveLoad={$saveTabs[$tab.tabId]}
         class=""
         isSave={$tab.isSaved}
         bind:userRole
@@ -186,8 +188,7 @@
           >
             <!-- Response Pane -->
             <div class="d-flex flex-column h-100 ps-2" style="overflow:auto;">
-               <div class="h-100 d-flex flex-column" 
-                       >
+              <div class="h-100 d-flex flex-column">
                 <div style="flex:1; overflow:auto;">
                   {#if !socketIoStoreData}
                     <ResponseDefaultScreen />
@@ -204,15 +205,19 @@
                         />
                       </div>
                       <div style="overflow:auto; height:50%;">
-                        <div class="h-100 d-flex flex-column"
-                        style="border-top: 1px solid var(--border-ds-surface-100);padding-top: 8px;">
+                        <div
+                          class="h-100 d-flex flex-column"
+                          style="border-top: 1px solid var(--border-ds-surface-100);padding-top: 8px;"
+                        >
                           <ResponsePreviewNavigator
                             webSocket={socketIoStoreData}
                             {onUpdateContentType}
                             {isWebApp}
                           />
                           <div class="pt-2"></div>
-                          <div style="flex:1; overflow:auto;border: 1px solid var(--border-ds-surface-100);border-radius:2px;">
+                          <div
+                            style="flex:1; overflow:auto;border: 1px solid var(--border-ds-surface-100);border-radius:2px;"
+                          >
                             <ResponsePreview webSocket={socketIoStoreData} />
                           </div>
                         </div>

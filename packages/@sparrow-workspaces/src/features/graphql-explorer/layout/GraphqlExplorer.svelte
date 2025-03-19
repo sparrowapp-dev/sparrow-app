@@ -43,6 +43,7 @@
   import { WarningIcon } from "@sparrow/library/icons";
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
   import { onMount } from "svelte";
+  import { saveTabs } from "../../../stores";
 
   export let tab;
   export let collections;
@@ -208,6 +209,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$saveTabs[$tab.tabId]}
         isSave={$tab.isSaved}
         {isGraphqlEditable}
         requestUrl={$tab.property.graphql.url}

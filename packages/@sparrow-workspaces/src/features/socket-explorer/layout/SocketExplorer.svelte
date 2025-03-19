@@ -34,6 +34,7 @@
   } from "../components";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
+  import { saveTabs } from "../../../stores";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -79,6 +80,7 @@
     <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
       <!-- HTTP URL Section -->
       <HttpUrlSection
+        isSaveLoad={$saveTabs[$tab.tabId]}
         class=""
         isSave={$tab.isSaved}
         bind:userRole
@@ -195,15 +197,19 @@
                         />
                       </div>
                       <div style="overflow:auto; height:50%;">
-                        <div class="h-100 d-flex flex-column" 
-                        style="border-top: 1px solid var(--border-ds-surface-100);padding-top: 8px;">
+                        <div
+                          class="h-100 d-flex flex-column"
+                          style="border-top: 1px solid var(--border-ds-surface-100);padding-top: 8px;"
+                        >
                           <ResponsePreviewNavigator
                             {webSocket}
                             {isWebApp}
                             {onUpdateContentType}
                           />
                           <div class="pt-2"></div>
-                          <div style="flex:1; overflow:auto;border: 1px solid var(--border-ds-surface-100);border-radius:2px;">
+                          <div
+                            style="flex:1; overflow:auto;border: 1px solid var(--border-ds-surface-100);border-radius:2px;"
+                          >
                             <ResponsePreview {webSocket} />
                           </div>
                         </div>

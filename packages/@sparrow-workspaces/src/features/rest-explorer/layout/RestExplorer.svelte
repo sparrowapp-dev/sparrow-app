@@ -73,6 +73,7 @@
     CheckmarkCircleFilled,
     ErrorCircleFilled,
   } from "@sparrow/library/icons";
+  import { saveTabs } from "../../../stores";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -194,9 +195,7 @@
                 notifications.success("API request saved successfully.");
               }
             }}
-          />
-
-          <span class="position-relative" style="width:35px;"> </span>
+          /> <span class="position-relative" style="width:35px;"> </span>
           <Button
             title="Share"
             type={"secondary"}
@@ -209,6 +208,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$saveTabs[$tab.tabId]}
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={$tab.property.request?.url}

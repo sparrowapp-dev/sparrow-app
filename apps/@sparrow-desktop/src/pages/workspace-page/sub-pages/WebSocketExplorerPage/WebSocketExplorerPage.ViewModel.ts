@@ -55,6 +55,7 @@ import { WebSocketService } from "../../../../services/web-socket.service";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { saveTabs } from "@sparrow/workspaces/stores";
 
 class RestExplorerViewModel {
   /**
@@ -631,8 +632,10 @@ class RestExplorerViewModel {
   public saveSocket = async () => {
     const componentData: Tab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
-
+    const tabId = componentData?.tabId;
+    saveTabs.update(tabs => ({...tabs, [tabId]:true}))
     if (!workspaceId || !collectionId) {
+      saveTabs.update(tabs => ({...tabs, [tabId]:false}))
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -713,6 +716,10 @@ class RestExplorerViewModel {
           data,
         );
       }
+      saveTabs.update(tabs => ({
+        ...tabs,
+        [tabId]:false
+      }))
       return {
         status: "success",
         message: "",
@@ -745,11 +752,19 @@ class RestExplorerViewModel {
           res.data.data,
         );
       }
+      saveTabs.update(tabs => ({
+        ...tabs,
+        [tabId]:false
+      }))
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      saveTabs.update(tabs => ({
+        ...tabs,
+        [tabId]:false
+      }))
       return {
         status: "error",
         message: res.message,
