@@ -1,7 +1,11 @@
 <script lang="ts">
   import { DeleteIcon, EditIcon, UploadIcon } from "@sparrow/library/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
-
+  import {
+    ArrowUploadFilled,
+    EditRegular,
+    DeleteRegular,
+  } from "@sparrow/library/icons";
   /**
    * The current value of the file input.
    */
@@ -136,10 +140,9 @@
           class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
         >
           <label for={inputId} role="button">
-            <UploadIcon
+            <ArrowUploadFilled
               classProp="my-auto"
-              width={iconWidth}
-              height={iconHeight}
+              size={"24px"}
               color={"var(--icon-primary-300)"}
             />
           </label>
@@ -175,19 +178,22 @@
         <img class="rounded p-2" src={imageDataToURL(value)} alt="" />
       {/if}
       <div class="align-items-end justify-content-end d-flex gap-1">
-        <button
-          on:click={editValue}
-          style=""
-          class="edit-btn border-0  rounded p-1"
+        <div
+          style="border: 1px solid var(--border-ds-surface-50); border-radius:4px"
         >
-          <EditIcon height={12} width={12} />
-        </button>
-        <button
-          on:click={resetValue}
-          class="del-btn border-0 p-1 rounded"
-        >
-          <DeleteIcon height={12} width={12} />
-        </button>
+          <button
+            on:click={editValue}
+            style=""
+            class="edit-btn border-0 rounded p-1"
+          >
+            <EditRegular size={"16px"} />
+          </button>
+        </div>
+        <div style="border: 1px solid var(--border-ds-surface-50)">
+          <button on:click={resetValue} class="del-btn border-0 p-1 rounded">
+            <DeleteRegular size={"16px"} />
+          </button>
+        </div>
       </div>
     </div>
     <!-- Enables opiton to reupload the file preview-->
@@ -214,6 +220,11 @@
     outline: none;
     border-radius: 4px;
     font-size: var(--base-text);
+  }
+  .sparrow-file-input:hover {
+    cursor: pointer;
+    border: 2px dashed var(--border-ds-primary-300) !important;
+    border-radius: 6px !important;
   }
   .sparrow-input-label-desc {
     color: var(--text-secondary-350);
