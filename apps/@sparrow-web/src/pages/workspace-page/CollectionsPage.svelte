@@ -170,6 +170,37 @@
     }
   }
 
+  // Auto select environment for the first time - st
+  // If we want the same behaviour while workspace switch then use local vars instead of store
+  let hasSetInitialEnvironment = writable(false);
+  $: {
+    // Set the first environment by default from the list if no env. already set.
+    if (!$hasSetInitialEnvironment && localEnvironment?.length > 0) {
+      // console.log("Setting default env : if");
+      setInitialEnvironment();
+    }
+    // else console.log("Setting default env : else");
+  }
+
+  // Function to handle default environment selection
+  async function setInitialEnvironment() {
+    // console.log("i m here 1 !!");
+    if ($hasSetInitialEnvironment) return;
+    // console.log("i m here 2 !!");
+
+    const currActiveEnv = currentWOrkspaceValue.environmentId;
+
+    if (!currActiveEnv) {
+      await _viewModel2.onSelectEnvironment(localEnvironment[0]);
+      // console.log("No active environment, ");
+      // console.log("Environment set to:", localEnvironment[0]?.name);
+    }
+    // else console.log("Active environment already set:", currActiveEnv);
+
+    hasSetInitialEnvironment.set(true);
+  }
+  // Auto select environment for the first time - End
+
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
   async function handleCreateEnvironment() {
