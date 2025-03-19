@@ -363,10 +363,7 @@
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
           <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
-          <Tag
-            type={getColor(post?.status)}
-            text={post?.status || ""}
-            />
+          <Tag type={getColor(post?.status)} text={post?.status || ""} />
         </div>
 
         <div class="d-flex flex-row">
@@ -378,7 +375,8 @@
                 type={"letter"}
                 size={"large"}
                 letter={post?.author?.name?.charAt(0)}
-                bgColor={"var(--text-secondary-600)"}/>
+                bgColor={"var(--text-secondary-600)"}
+              />
               <div style="font-size: 14px; font-weight: 500;">
                 {post?.author?.name}
               </div>
@@ -667,9 +665,7 @@
           id="feedback-description"
           height={"90px"}
           bind:value={feedbackDescription}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
+          blankTextarea={true}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
        "

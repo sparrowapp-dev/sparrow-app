@@ -211,9 +211,7 @@
           type="text"
           isEditIconRequired={false}
           bind:value={feedbackSubject}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
+          blankTextarea={true}
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
           disabled={false}

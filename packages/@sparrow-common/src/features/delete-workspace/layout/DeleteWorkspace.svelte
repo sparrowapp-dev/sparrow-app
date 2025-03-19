@@ -4,7 +4,7 @@
   // ---- document models
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   // ---- library
-  import { Input } from "@sparrow/library/forms";
+  import { Input, LabelField } from "@sparrow/library/forms";
   import { Button, Avatar } from "@sparrow/library/ui";
   export let isDeleteWorkspaceModalOpen = false;
   export let workspace: WorkspaceDocument;
@@ -17,7 +17,7 @@
 </script>
 
 <div class="workspace-delete-confirmation">
-  <div class="text-lightGray mb-2 mt-2 sparrow-fs-14">
+  <!-- <div class="text-lightGray mb-2 mt-2 sparrow-fs-14">
     <p class="text-secondary-1000 sparrow-fs-14">
       Everything in <span class="text-secondary-100" style="font-weight: 500;"
         >"{workspace.name}"</span
@@ -28,25 +28,32 @@
 
   <p class="confirm-header mb-1 sparrow-fs-14 text-secondary-1000">
     Enter workspace name to confirm<span class="asterik">*</span>
-  </p>
+  </p> -->
   <!-- 
-      -- Input 
+      -- Input with Label Text
     -->
-  <Input
-    bind:value={inputName}
-    height={"36px"}
-    id={inputId}
-    placeholder={"Workspace name"}
-    class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
-    style="outline:none;"
+  <LabelField
+    inputValueRequired={true}
+    headerLabelText={"Enter workspace name to confirm"}
+    supportLabelText={`Everything in ${workspace.name} will be permanently removed, and all contributors will lose access. This
+  action cannot be undone.`}
+    helpLabel={true}
     isError={inputNameError ? true : false}
-    isEditIconRequired={false}
-    type={"text"}
-    placeholderColor={"var(--text-secondary-200)"}
-  />
-  {#if inputNameError}
-    <p class="error-text sparrow-fs-12">{inputNameError}</p>
-  {/if}
+    errorMessage={inputNameError}
+  >
+    <Input
+      bind:value={inputName}
+      height={"36px"}
+      id={inputId}
+      placeholder={"Workspace name"}
+      class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
+      style="outline:none;"
+      isError={inputNameError ? true : false}
+      isEditIconRequired={false}
+      type={"text"}
+      placeholderColor={"var(--text-secondary-200)"}
+    />
+  </LabelField>
   <br />
 
   <div
