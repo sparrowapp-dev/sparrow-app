@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { IconUploader, FileType } from "..";
+  import { IconUploader } from "@sparrow/library/forms";
   import { OSDetector } from "@sparrow/common/utils";
 
   /**
@@ -16,11 +16,17 @@
   import type { TeamForm } from "../../types";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
+  import type { SvelteComponent } from "svelte";
+  import { UploadArea } from "@sparrow/library/ui";
+  import { ImageRegular } from "@sparrow/library/icons";
+  import { CloudArrowUpRegular } from "@sparrow/library/icons";
 
   /**
    * Exports
    */
   export let teamForm: TeamForm;
+  export let maxFileSizeText: number = 2;
+  export let iconComponent: typeof SvelteComponent;
 
   /**
    * Data
@@ -122,60 +128,140 @@
     ) as HTMLInputElement;
     fileInput?.click();
   };
+
+  // This will be remove the File type starting Dot and it Capital Word.
+  const handleExtraDot = (value: string) => {
+    if (value.length > 0) {
+      value = value.charAt(0) === "." ? value.slice(1) : value;
+      return value.toUpperCase();
+    }
+    return value.toUpperCase();
+  };
 </script>
 
 <div class="pb-1">
-  <!-- 
-    -- Title 
-  -->
-  <span class="text-fs-14 text-secondary-1000">{ICON_CONFIG.TITLE}</span>
-
-  <!-- 
-    -- Description 
-  -->
-  {#if !(!Array.isArray(teamForm.file.value) && teamForm.file.value.size > 0)}
-    <p class="mb-2 text-fs-12 text-secondary-200">
-      {ICON_CONFIG.DESCRIPTION}
-    </p>
-  {/if}
-
-  <!-- 
-    -- Icon Uploader 
-  -->
-  <IconUploader
-    value={teamForm.file.value}
-    maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
-    onChange={handleLogoInputChange}
-    resetValue={handleLogoReset}
-    editValue={handleLogoEdit}
-    inputId={iconUploaderId}
-    inputPlaceholder={ICON_CONFIG.PLACEHOLDER}
-    supportedFileTypes={ICON_CONFIG.FILE_TYPES}
-    isError={teamForm.file.invalid}
-  />
-
-  <!-- 
-    -- Error Messages 
-  -->
-  <div>
-    {#if teamForm.file.showFileSizeError}
-      <p class="mb-2 mt-1 text-fs-12 text-danger-200">
-        {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
-      </p>
-    {:else if teamForm.file.showFileTypeError}
-      <p class="mb-2 mt-1 text-fs-12 text-danger-200">
-        {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
-      </p>
-      <!-- 
-        -- Supportes File Types Button 
-      -->
-      <div class="d-flex">
-        {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
-          <span class="me-4">
-            <FileType {fileType} />
-          </span>
-        {/each}
+  <UploadArea
+    titleName={ICON_CONFIG.TITLE}
+    descriptionName={ICON_CONFIG.DESCRIPTION}
+    fileValue={teamForm.file.value}
+    fileSize={teamForm.file.value.size}
+    fileSizeError={teamForm.file.showFileSizeError}
+    fileSizeErrorMessage={ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
+    fileTypeError={teamForm.file.showFileTypeError}
+    fileTypeErrorMessage={ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+    fileTypes={ICON_CONFIG.FILE_TYPES}
+    {maxFileSizeText}
+    {iconComponent}
+  >
+    <IconUploader
+      value={teamForm.file.value}
+      maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
+      onChange={handleLogoInputChange}
+      resetValue={handleLogoReset}
+      editValue={handleLogoEdit}
+      inputId={iconUploaderId}
+      inputPlaceholder={ICON_CONFIG.PLACEHOLDER}
+      supportedFileTypes={ICON_CONFIG.FILE_TYPES}
+      isError={teamForm.file.invalid}
+      fileName={teamForm.file.value?.name}
+    >
+      <div>
+        <label for={iconUploaderId} class="d-flex justify-content-center">
+          <CloudArrowUpRegular
+            size={"28px"}
+            color={"var(--icon-ds-neutral-400)"}
+          />
+        </label>
+        <label for={iconUploaderId} class="sparrow-choose-file-label my-2 ps-2"
+          >Drag & Drop or <span class="sparrow-upload-text text-fs-14"
+            >Upload File</span
+          > here</label
+        >
+        <div
+          for={iconUploaderId}
+          class="d-flex justify-content-center text-fs-12"
+        >
+          <div
+            class="file-type-container-one d-flex align-items-center pe-2 pt-1 pb-1"
+          >
+            <ImageRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
+            <span class="file-type-text ms-1">
+              {handleExtraDot(ICON_CONFIG.FILE_TYPES[0])}
+            </span>
+          </div>
+          {#each ICON_CONFIG.FILE_TYPES.slice(1, -1) as fileType, index}
+            <div
+              class="file-type-container-two d-flex align-items-center px-2 pt-1 pb-1"
+              key={index}
+            >
+              <ImageRegular
+                size={"16px"}
+                color={"var(--icon-ds-neutral-400)"}
+              />
+              <span class="file-type-text ms-1">{handleExtraDot(fileType)}</span
+              >
+            </div>
+          {/each}
+          <div class="d-flex align-items-center ps-2 pt-1 pb-1">
+            <ImageRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
+            <span class="file-type-text ms-1">
+              {handleExtraDot(
+                ICON_CONFIG.FILE_TYPES[ICON_CONFIG.FILE_TYPES.length - 1],
+              )}
+            </span>
+          </div>
+        </div>
       </div>
-    {/if}
-  </div>
+    </IconUploader>
+  </UploadArea>
 </div>
+
+<style lang="scss">
+  .upload-file-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    line-height: 20.02px;
+    text-align: left;
+    color: var(--text-ds-neutral-200);
+  }
+  .upload-file-description {
+    color: var(--text-ds-neutral-400);
+    font-weight: 400;
+    line-height: 18px;
+  }
+  .message-error-text {
+    color: var(--text-ds-danger-300);
+    word-break: break-word;
+  }
+  .upload-max-file-content {
+    font-family: "Inter", sans-serif;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+  .upload-max-file-text {
+    color: var(--text-ds-neutral-400);
+  }
+  .upload-max-file-text-error {
+    color: var(--text-ds-danger-300);
+  }
+  .sparrow-upload-text {
+    color: var(--text-ds-primary-300);
+    font-family: "Inter", sans-serif;
+    text-align: center;
+    cursor: pointer;
+  }
+  .file-type-text {
+    color: var(--text-ds-neutral-400);
+    font-family: "Inter", sans-serif;
+    text-align: left;
+  }
+  .file-type-container-one {
+    border-right: 1px solid var(--border-ds-surface-100);
+  }
+  .file-type-container-two {
+    border-right: 1px solid var(--border-ds-surface-100);
+  }
+  .sparrow-choose-file-label {
+    color: var(--text-ds-neutral-400);
+  }
+</style>
