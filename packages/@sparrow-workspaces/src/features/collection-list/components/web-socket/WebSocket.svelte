@@ -260,15 +260,17 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id
-      ? "padding-left: 74.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="width: 24px!important; height:24px; margin-right:4px;"
+    ></div>
     <span class="api-method"
       ><SocketIcon
         height={"12px"}
@@ -342,7 +344,8 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     font-weight: 500;
@@ -351,9 +354,8 @@
     line-height: 18px;
     width: calc(100% - 58px);
     text-align: left;
-    // display: flex;
     align-items: center;
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
