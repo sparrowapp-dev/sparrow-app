@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DeleteIcon, EditIcon2 } from "@sparrow/library/icons";
+  import { DismissRegular, EditRegular } from "@sparrow/library/icons";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
   import { Button, Spinner } from "../../ui";
 
@@ -196,19 +196,19 @@
             : 'var(--text-ds-neutral-50)'};"
           >{truncateFileName(fileName, 6)}</span
         >
-        <div class="ms-auto d-flex">
-          <button
-            on:click={editValue}
-            class="edit-btn border-0 p-1 d-flex align-items-center justify-content-center"
-          >
-            <EditIcon2 height={16} width={16} />
-          </button>
-          <button
-            on:click={resetValue}
-            class="del-btn border-0 p-1 d-flex align-items-center justify-content-center"
-          >
-            <DeleteIcon height={14} width={14} />
-          </button>
+        <div class="ms-auto d-flex justify-content-center pe-1">
+          <Button
+            type="teritiary-regular"
+            startIcon={EditRegular}
+            size="extra-small"
+            onClick={editValue}
+          />
+          <Button
+            type="teritiary-regular"
+            startIcon={DismissRegular}
+            size="extra-small"
+            onClick={resetValue}
+          />
         </div>
       </div>
     </div>

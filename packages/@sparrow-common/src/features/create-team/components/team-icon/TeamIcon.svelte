@@ -16,11 +16,10 @@
   import type { TeamForm } from "../../types";
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import { MessageTextIcon } from "@sparrow/library/icons";
   import type { SvelteComponent } from "svelte";
   import { UploadArea } from "@sparrow/library/ui";
-  import { FileTypeIcon } from "@sparrow/library/icons";
-  import { UploadIcon2 } from "@sparrow/library/icons";
+  import { ImageRegular } from "@sparrow/library/icons";
+  import { CloudArrowUpRegular } from "@sparrow/library/icons";
 
   /**
    * Exports
@@ -168,7 +167,10 @@
     >
       <div>
         <label for={iconUploaderId} class="d-flex justify-content-center">
-          <UploadIcon2 />
+          <CloudArrowUpRegular
+            size={"28px"}
+            color={"var(--icon-ds-neutral-400)"}
+          />
         </label>
         <label for={iconUploaderId} class="sparrow-choose-file-label my-2 ps-2"
           >Drag & Drop or <span class="sparrow-upload-text text-fs-14"
@@ -179,25 +181,34 @@
           for={iconUploaderId}
           class="d-flex justify-content-center text-fs-12"
         >
-          <div class="file-type-container-one pe-2 pt-1 pb-1">
-            <FileTypeIcon />
-            <span class="file-type-text"
-              >{handleExtraDot(ICON_CONFIG.FILE_TYPES[0])}</span
-            >
+          <div
+            class="file-type-container-one d-flex align-items-center pe-2 pt-1 pb-1"
+          >
+            <ImageRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
+            <span class="file-type-text ms-1">
+              {handleExtraDot(ICON_CONFIG.FILE_TYPES[0])}
+            </span>
           </div>
           {#each ICON_CONFIG.FILE_TYPES.slice(1, -1) as fileType, index}
-            <div class="file-type-container-two px-2 pt-1 pb-1" key={index}>
-              <FileTypeIcon />
-              <span class="file-type-text">{handleExtraDot(fileType)}</span>
+            <div
+              class="file-type-container-two d-flex align-items-center px-2 pt-1 pb-1"
+              key={index}
+            >
+              <ImageRegular
+                size={"16px"}
+                color={"var(--icon-ds-neutral-400)"}
+              />
+              <span class="file-type-text ms-1">{handleExtraDot(fileType)}</span
+              >
             </div>
           {/each}
-          <div class="ps-2 pt-1 pb-1">
-            <FileTypeIcon />
-            <span class="file-type-text"
-              >{handleExtraDot(
+          <div class="d-flex align-items-center ps-2 pt-1 pb-1">
+            <ImageRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
+            <span class="file-type-text ms-1">
+              {handleExtraDot(
                 ICON_CONFIG.FILE_TYPES[ICON_CONFIG.FILE_TYPES.length - 1],
-              )}</span
-            >
+              )}
+            </span>
           </div>
         </div>
       </div>

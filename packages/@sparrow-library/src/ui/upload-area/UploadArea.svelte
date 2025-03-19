@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { MessageTextIcon } from "@sparrow/library/icons";
   import { FileType } from "@sparrow/library/assets";
   import { SvelteComponent } from "svelte";
+  import { Button } from "../button";
 
   export let titleName: string = "";
   export let descriptionName: string = "";
@@ -36,9 +36,11 @@
         {#if fileSizeError}
           <div class="d-flex col gap-1">
             {#if iconComponent}
-              {iconComponent}
-            {:else}
-              <MessageTextIcon visible={false} />
+              <Button
+                type="teritiary-regular"
+                startIcon={iconComponent}
+                size="extra-small"
+              />
             {/if}
             <p class="mb-2 text-fs-12 message-error-text">
               {fileSizeErrorMessage}
@@ -47,9 +49,11 @@
         {:else if fileTypeError}
           <div class="d-flex col gap-1">
             {#if iconComponent}
-              {iconComponent}
-            {:else}
-              <MessageTextIcon visible={false} />
+              <Button
+                type="teritiary-regular"
+                startIcon={iconComponent}
+                size="extra-small"
+              />
             {/if}
             <p class="mb-2 text-fs-12 message-error-text">
               {fileTypeErrorMessage}
