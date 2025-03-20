@@ -165,7 +165,7 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
+    <div class="w-100 d-flex flex-column h-100 pt-3 pb-3" style="padding:0px 12px">
       <!-- Request Name Header -->
       <!-- 
         --
@@ -225,7 +225,7 @@
         {isGuestUser}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 10px;">
+      <div class="" style="margin-top: 8px;">
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
@@ -369,6 +369,7 @@
                   ? 'pt-1'
                   : 'ps-2'}"
                 style="overflow:auto;"
+                
               >
                 <div class="h-100 d-flex flex-column">
                   <div style="flex:1; overflow:auto; ">
@@ -386,14 +387,20 @@
                         onSendButtonClicked={onSendRequest}
                       />
                     {:else if storeData?.response.status}
-                      <div class="h-100 d-flex flex-column">
-                        <ResponseStatus response={storeData.response} />
-                        <ResponseNavigator
-                          requestStateSection={storeData?.response.navigation}
-                          {onUpdateResponseState}
-                          responseHeadersLength={storeData?.response.headers
-                            ?.length || 0}
-                        />
+                      <div
+                        class="h-100 d-flex flex-column"
+                        style="gap:5px"
+                        
+                      >
+                        <div class="d-flex">
+                          <ResponseNavigator
+                            requestStateSection={storeData?.response.navigation}
+                            {onUpdateResponseState}
+                            responseHeadersLength={storeData?.response.headers
+                              ?.length || 0}
+                          />
+                          <ResponseStatus response={storeData.response} />
+                        </div>
                         {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
                           {#if storeData?.response.bodyLanguage !== "Image"}
                             <ResponseBodyNavigator
@@ -407,14 +414,14 @@
                               {isGuestUser}
                             />
                           {/if}
-                          <div style="flex:1; overflow:auto;">
+                          <div style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;">
                             <ResponseBody
                               response={storeData?.response}
                               apiState={storeData?.response}
                             />
                           </div>
                         {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                          <div style="flex:1; overflow:auto;">
+                          <div style="">
                             <ResponseHeaders
                               responseHeader={storeData.response?.headers}
                             />
@@ -549,7 +556,7 @@
   :global(.rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
     height: 11px !important;
     width: 100% !important;
-    background-color: var(--bg-secondary-500) !important;
+    background-color: var(--bg-ds-surface-100) !important;
     border-top: 5px solid var(--border-ds-surface-900) !important;
     border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
@@ -559,7 +566,7 @@
     .rest-splitter > .splitpanes__splitter:active,
     .rest-splitter > .splitpanes__splitter:hover
   ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .link {
     color: var(--text-primary-300);

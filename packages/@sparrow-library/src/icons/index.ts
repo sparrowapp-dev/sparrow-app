@@ -217,6 +217,7 @@ export { default as GiftReqular } from "./GiftRegular.svelte";
 export { default as CircleFilled } from "./CircleFilled.svelte";
 export { default as QuestionCircleRegular } from "./QuestionCircleRegular.svelte";
 export { default as CaretUpFilled } from "./CaretUpFilled.svelte";
+export { default as InfoFilled } from "./InfoFilled.svelte";
 export {default as ListRegular} from "./ListRegular.svelte";
 export {default as CaretDownRegular} from "./CaretDownRegular.svelte";
 export {default as WarningFilled} from "./WarningFilled.svelte"

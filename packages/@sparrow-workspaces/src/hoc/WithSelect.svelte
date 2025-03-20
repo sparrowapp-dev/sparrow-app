@@ -50,7 +50,7 @@
   headerTheme={"secondary"}
   bodyTheme={"surface"}
   menuItem={"v2"}
-  headerFontSize={"10px"}
+  headerFontSize={"12px"}
   isDropIconFilled={true}
   minHeaderWidth={minHeaderWidth}
   headerHeight={headerHeight}

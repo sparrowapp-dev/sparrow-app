@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { notifications } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { copyToClipBoard } from "@sparrow/common/utils";
-  import { CopyIcon, DotIcon } from "@sparrow/library/icons";
+  import { CopyIcon, CopyRegular, DotIcon } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
 
   /**
@@ -57,14 +57,17 @@
 
 <div
   id={`env-review-${id}`}
-  class="select-environment-popup bg-tertiary-400 d-flex p-3 rounded"
+  class="select-environment-popup d-flex rounded"
   style="
       top:{environmentAxisY}px;
       left:{environmentAxisX}px;
+      background-color: var(--bg-ds-surface-600);
+      padding: 12px;
       "
 >
   <div class="content-panel w-100">
-    <p
+    <div
+      style="margin-bottom: 12px;"
       class={reviewEnv?.type === "G"
         ? "global-base text-fs-10"
         : "local-base text-fs-10"}
@@ -74,35 +77,52 @@
         height={"6px"}
         width={"6px"}
       /> baseURL
-    </p>
-    <div class="d-flex">
-      <span class="text-secondary-200 text-fs-11" style="width:55px;"
-        >SCOPE</span
-      >
-      <span class="text-fs-9"
-        >{reviewEnv?.type === "G" ? "Global" : "Environment"}</span
-      >
     </div>
-    <div class="d-flex">
-      <span class="text-secondary-200 text-fs-11" style="width:55px;"
-        >VALUE</span
-      >
-      <div class="d-flex" style="width: calc(100% - 55px);">
-        <div class="text-fs-9 env-value" style="width: calc(100% - 20px);">
-          {reviewEnv?.value}
-        </div>
-        <div style="width: 30px;" class="ps-2 d-flex align-items-end">
-          <div
-            role="button"
-            class="copyIcon prevent-default"
-            on:click={async (e) => {
-              e.preventDefault();
-              await copyToClipBoard(reviewEnv?.value);
-              notifications.success("Copied to Clipboard");
-            }}
+
+    <div class="d-flex justify-content-between">
+      <div>
+        <div class="d-flex">
+          <span
+            class="text-secondary-200 text-fs-11"
+            style="width:55px; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-300);"
+            >SCOPE</span
           >
-            <CopyIcon height={"12px"} width={"12px"} color={"#8A9299"} />
+          <span
+            style="font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50);"
+            >{reviewEnv?.type === "G" ? "Global" : "Environment"}</span
+          >
+        </div>
+        <div class="d-flex">
+          <span
+            class="text-secondary-200 text-fs-11"
+            style="width:55px;font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-300);"
+            >VALUE</span
+          >
+          <div class="d-flex" style="width: calc(100% - 55px);">
+            <div
+              style="width: calc(100% - 20px); font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50);"
+            >
+              {reviewEnv?.value}
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center">
+        <div
+          role="button"
+          class="copyIcon prevent-default"
+          on:click={async (e) => {
+            e.preventDefault();
+            await copyToClipBoard(reviewEnv?.value);
+            notifications.success("Copied to Clipboard");
+          }}
+        >
+          <Button
+            startIcon={CopyRegular}
+            type="teritiary-regular"
+            size="small"
+          />
         </div>
       </div>
     </div>
@@ -134,8 +154,6 @@
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
   }
   .copyIcon {
-    width: 24px;
-    height: 24px;
     display: flex;
     justify-content: center;
     align-items: center;

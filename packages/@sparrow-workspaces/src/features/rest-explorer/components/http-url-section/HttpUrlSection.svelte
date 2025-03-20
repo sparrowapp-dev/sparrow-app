@@ -129,7 +129,7 @@
   <CodeMirrorInput
     value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter URL here"}
+    placeholder={"Enter a URL"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
