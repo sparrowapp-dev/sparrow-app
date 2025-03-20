@@ -1,4 +1,5 @@
 <script lang="ts">
+  // Fluent Icon
   export let size = "";
   export let color = "";
   $: finalColor = color === "" ? "inherit" : color;
