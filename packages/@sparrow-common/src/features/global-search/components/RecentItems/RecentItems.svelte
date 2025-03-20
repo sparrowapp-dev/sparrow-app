@@ -175,17 +175,17 @@
     {
       key: "collections",
       condition: filteredCollection && filteredCollection[0],
-      items: filteredCollection ? filteredCollection.slice(0, 3) : [],
+      items: filteredCollection ? [filteredCollection[0]] : [],
     },
     {
       key: "environments",
       condition: filteredEnvironments && filteredEnvironments[0],
-      items: filteredEnvironments ? filteredEnvironments.slice(0, 3) : [],
+      items: filteredEnvironments ? [filteredEnvironments[0]] : [],
     },
     {
       key: "folders",
       condition: filteredFolder && filteredFolder[0],
-      items: filteredFolder ? filteredFolder.slice(0, 3) : [],
+      items: filteredFolder ? [filteredFolder[0]] : [],
     },
     {
       key: "workspaces",
@@ -195,7 +195,7 @@
     {
       key: "flows",
       condition: filteredTestflows && filteredTestflows.length,
-      items: filteredTestflows ? filteredTestflows.slice(0, 3) : [],
+      items: filteredTestflows ? filteredTestflows.slice(0, 1) : [],
     },
   ];
 
@@ -296,7 +296,7 @@
               <ItemBar
                 data={{
                   name: item.title,
-                  path: item.path,
+                  path: item.path || "",
                   isTitleHighLightEnable: true,
                   charsToBeHightlighted: searchQuery,
                 }}
@@ -447,7 +447,7 @@
               <ItemBar
                 data={{
                   name: item.title,
-                  path: "",
+                  path: item.path || "",
                   isTitleHighLightEnable: true,
                   charsToBeHightlighted: searchQuery,
                 }}
