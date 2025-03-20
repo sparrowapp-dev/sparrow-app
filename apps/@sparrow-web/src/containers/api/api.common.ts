@@ -461,6 +461,7 @@ const connectWebSocket = async (
 
         ws.onerror = (error) => {
           console.error("WebSocket error:", error);
+          notifications.error("Failed to connect WebSocket. Please try again.");
           webSocketDataStore.update((webSocketDataMap) => {
             webSocketDataMap.delete(tabId);
             return webSocketDataMap;
