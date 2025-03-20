@@ -3,6 +3,11 @@
   import { SparrowLogo } from "@sparrow/common/images";
   import { Alert } from "@sparrow/library/ui";
   export let onSendButtonClicked;
+  export let environmentVariables;
+
+  const handleClickSendButton = () => {
+    onSendButtonClicked(environmentVariables);
+  };
 </script>
 
 <div class="response-default">
@@ -18,10 +23,9 @@
       </div>
       <Alert
         varient="error"
-        description="Unable to reach the API endpoint. Please verify the request URL and try again.
-"
+        description="Unable to reach the API endpoint. Please verify the request URL and try again."
         ctaShow={true}
-        onClick={onSendButtonClicked}
+        onClick={handleClickSendButton}
       />
     </div>
   </div>
