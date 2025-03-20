@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { DangerIcon, InfoFilled } from "@sparrow/library/icons";
+  import {  InfoFilled } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
-  import InfoRegular from "../../../../@sparrow-library/src/icons/InfoRegular.svelte";
-  import { Button, Toggle } from "@sparrow/library/ui";
-  import e from "cors";
+  import { Toggle } from "@sparrow/library/ui";
 
   /**
    * environment dialog box position
@@ -49,11 +47,6 @@
   let checkedToggle = false;
   let isGlobalVariable = false;
 
-  const handleOpenAddVariable = (e) => {
-    console.log(e);
-    e.preventDefault();
-    addVariable = true;
-  };
 
   $: {
     if (environmentVariables) {
