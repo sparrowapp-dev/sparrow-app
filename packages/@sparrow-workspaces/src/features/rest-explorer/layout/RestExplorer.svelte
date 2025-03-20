@@ -385,6 +385,7 @@
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
                       <ResponseErrorScreen
                         onSendButtonClicked={onSendRequest}
+                        {environmentVariables}
                       />
                     {:else if storeData?.response.status}
                       <div
