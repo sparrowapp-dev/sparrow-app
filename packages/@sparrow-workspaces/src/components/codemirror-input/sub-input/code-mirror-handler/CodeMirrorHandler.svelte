@@ -133,6 +133,18 @@
       run: redo,
     },
     {
+      key: "Cmd-z",
+      run: undo,
+    },
+    {
+      key: "Cmd-Shift-z",
+      run: redo,
+    },
+    {
+      key: "Cmd-y",
+      run: redo,
+    },
+    {
       key: "Enter",
       run: (view) => {
         return true;
