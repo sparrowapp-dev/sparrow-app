@@ -14,7 +14,7 @@
   };
 </script>
 
-<div class="d-flex pb-3">
+<div class="d-flex flex-column pb-3">
   <div class="title-width">
     <p class="team-title mt-2 fs-12 text-textColor">
       {DESCRIPTION_CONFIG.TITLE}
@@ -43,10 +43,25 @@
 </div>
 
 <style>
+  .desc {
+    width: 72px;
+    height: 28px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--bg-ds-primary-400);
+    transition: background-color 0.3s ease;
+  }
   .settings-team-description {
     height: calc(150px) !important;
   }
 
+  .desc:focus-visible {
+    border: 1px solid red;
+  }
+  .desc:hover {
+    border-radius: 4px;
+    background-color: var(--bg-ds-primary-300);
+  }
   .settings-team-description {
     background-color: transparent !important;
   }
@@ -63,6 +78,8 @@
     width: 98px;
   }
   .container-width {
-    width: calc(100% - 98px);
+    background-color: var(--bg-ds-surface-600);
+    width: 398px;
+    border-radius: 4px;
   }
 </style>

@@ -5,7 +5,7 @@
   import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
-  import { CaretDownFilled } from "@sparrow/library/icons";
+  import { CaretDownFilled, CaretDownRegular } from "@sparrow/library/icons";
   /**
    * Determines id of the menu item.
    */
