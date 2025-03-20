@@ -872,26 +872,7 @@
 {/if}
 
 <svelte:window on:keydown={handleKeyPress} />
-<!-- <ImportCollection
-    {collectionList}
-    workspaceId={$currentWorkspace._id}
-    closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
-    onItemCreated={async (entityType, args) => {
-      const response = await _viewModel.handleCreateItem(entityType, args);
-      if (response.isSuccessful) {
-        setTimeout(() => {
-          scrollList("bottom");
-        }, 1000);
-      }
-    }}
-    onItemImported={async (entityType, args) => {
-      await _viewModel.handleImportItem(entityType, args);
-      scrollList("bottom");
-    }}
-    onImportDataChange={_viewModel.handleImportDataChange}
-    onUploadFile={_viewModel.uploadFormFile}
-    onExtractGitBranch={_viewModel.extractGitBranch}
-  /> -->
+
 <Modal
   title={"New Collection"}
   type={"dark"}
@@ -903,7 +884,7 @@
   }}
 >
   <ImportCollection
-    onClick={() => {
+    onCloseModal={() => {
       isImportCollectionPopup = false;
     }}
     {collectionList}
@@ -917,7 +898,7 @@
       }
     }}
     currentWorkspaceId={$currentWorkspace?._id}
-    onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
+    onImportOapiText={async (currentWorkspaceId, importJSON, contentType) => {
       const response = await _viewModel.importJSONObject(
         currentWorkspaceId,
         importJSON,
@@ -930,7 +911,7 @@
       }
       return response;
     }}
-    onCollectionFileUpload={async (currentWorkspaceId, file, type) => {
+    onImportOapiFile={async (currentWorkspaceId, file, type) => {
       const response = await _viewModel.collectionFileUpload(
         currentWorkspaceId,
         file,
@@ -960,10 +941,9 @@
       }
       return response;
     }}
-    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
-    onValidateDeployedURL={_viewModel.validateDeployedURL}
-    onValidateDeployedURLInput={_viewModel.validateURLInput}
-    onValidateLocalHostURLInput={_viewModel.validateURLInput}
+    onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
+    onValidateOapiText={_viewModel.validateOapiDataSyntax}
+    onValidateOapiFile={_viewModel.validateOapiFileSyntax}
   />
 </Modal>
 

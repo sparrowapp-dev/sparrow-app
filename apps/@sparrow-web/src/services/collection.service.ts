@@ -19,13 +19,11 @@ import type {
   UpdateCollectionName,
 } from "@sparrow/common/dto";
 import { ContentTypeEnum } from "@sparrow/common/enums/request.enum";
-import { createApiRequest } from "./rest-api.service";
 import type {
   HttpClientBackendResponseInterface,
   HttpClientResponseInterface,
 } from "@app/types/http-client";
 import {
-  CollectionItemTypeDtoEnum,
   type CollectionDtoInterface,
   type CollectionItemDtoInterface,
 } from "@sparrow/common/types/workspace/collection-dto";
@@ -42,7 +40,7 @@ import type {
   GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
-import type { HttpRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 import type {
   HttpRequestSavedCreateUpdatePayloadDtoInterface,
   HttpRequestSavedDeletePayloadDtoInterface,
@@ -273,19 +271,6 @@ export class CollectionService {
     return response;
   };
 
-  public validateImportCollectionURL = async (url = "") => {
-    return createApiRequest(
-      [
-        url,
-        `GET`,
-        `Accept[SPARROW_EQUALS]*/*[SPARROW_AMPERSAND]Connection[SPARROW_EQUALS]keep-alive`,
-        ``,
-        `TEXT`,
-      ],
-      ``,
-    );
-  };
-
   public importCollection = async (
     workspaceId: string,
     url: ImportBodyUrl,
@@ -503,7 +488,7 @@ export class CollectionService {
       schema?: string;
       headers?: GraphqlRequestKeyValueDtoInterface[];
       auth?: GraphqlRequestAuthDtoInterface;
-      selectedGraphqlAuthType: HttpRequestAuthModeBaseEnum;
+      selectedGraphqlAuthType: GraphqlRequestAuthModeBaseEnum;
     },
     _folderId?: string,
   ): Promise<

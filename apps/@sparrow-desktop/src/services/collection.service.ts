@@ -2,6 +2,7 @@ import {
   connectSocketIo,
   disconnectSocketIo,
   getAuthHeaders,
+  makeHttpRequestV2,
   makeRequest,
   sendSocketIoMessage,
 } from "@app/containers/api/api.common";
@@ -16,7 +17,7 @@ import type {
   UpdateCollectionName,
 } from "@sparrow/common/dto";
 import { ContentTypeEnum } from "@sparrow/common/enums/request.enum";
-import { createApiRequest } from "./rest-api.service";
+
 import type {
   HttpClientBackendResponseInterface,
   HttpClientResponseInterface,
@@ -272,16 +273,7 @@ export class CollectionService {
   };
 
   public validateImportCollectionURL = async (url = "") => {
-    return createApiRequest(
-      [
-        url,
-        `GET`,
-        `Accept[SPARROW_EQUALS]*/*[SPARROW_AMPERSAND]Connection[SPARROW_EQUALS]keep-alive`,
-        ``,
-        `TEXT`,
-      ],
-      ``,
-    );
+    return makeHttpRequestV2(url, 'GET', '[{"key":"Accept-Encoding","value":"gzip, br","checked":true},{"key":"User-Agent","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","checked":true},{"key":"Connection","value":"keep-alive","checked":true},{"key":"Accept","value":"*/*","checked":true}]', '', 'text/plain');
   };
 
   public importCollection = async (

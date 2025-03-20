@@ -183,50 +183,6 @@ const makeRequest = async (
   }
 };
 
-function timeout(timeout: number) {
-  return new Promise((res, rej) => {
-    setTimeout(() => {
-      rej("Timeout");
-    }, timeout);
-  });
-}
-
-const makeHttpRequest = async (
-  url: string,
-  method: string,
-  headers: string,
-  body: string,
-  request: string,
-) => {
-  console.table({ url, method, headers, body, request });
-  let response;
-  MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-  url = url.trim().replace(/ /g, "%20");
-  body = body.replace(/\[SPARROW_AMPERSAND$/, "");
-  return Promise.race([
-    timeout(apiTimeOut),
-    invoke("make_http_request", {
-      url,
-      method,
-      headers,
-      body,
-      request,
-    }),
-  ])
-    .then(async (data: string) => {
-      try {
-        response = JSON.parse(data);
-        response = JSON.parse(response.body);
-        return success(response);
-      } catch (e) {
-        return error("error");
-      }
-    })
-    .catch(() => {
-      return error("error");
-    });
-};
-
 function formatTime(date) {
   let hours = date.getHours();
   const minutes = date.getMinutes();
