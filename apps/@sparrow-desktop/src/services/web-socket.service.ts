@@ -10,10 +10,10 @@ export class WebSocketService {
     _tabId: string,
     _headers: string,
   ) => {
-    return connectWebSocket(_url, _tabId, _headers);
+    return await connectWebSocket(_url, _tabId, _headers);
   };
-  public disconnectWebsocket = async (_tabId: string) => {
-    return disconnectWebSocket(_tabId);
+  public disconnectWebsocket = async (_tabId: string, isCancelled: boolean = false) => {
+    return disconnectWebSocket(_tabId, isCancelled);
   };
   public sendMessageWebsocket = async (_tabId: string, _message: string) => {
     return sendMessage(_tabId, _message);

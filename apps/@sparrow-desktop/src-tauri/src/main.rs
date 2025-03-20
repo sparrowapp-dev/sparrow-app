@@ -76,19 +76,18 @@ use hyper::{Client as OtherClient, Request};
 use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
+use tokio::sync::watch;
 use tokio::sync::Mutex;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
-
 // Socket.IO imports
 use futures_util::FutureExt;
 use rust_socketio::{
     asynchronous::{Client as SocketClient, ClientBuilder},
     Event as SocketIoEvent, Payload as SocketIoPayload, TransportType,
 };
-use tokio::sync::Mutex as SocketMutex;
 use tauri_plugin_os::platform;
-
+use tokio::sync::Mutex as SocketMutex;
 
 // MacOs Window Titlebar Config Imports
 #[cfg(target_os = "macos")]
@@ -101,7 +100,6 @@ extern crate cocoa;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
 use tauri::{Runtime, WebviewWindow};
-
 
 pub trait WindowExt {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
@@ -603,11 +601,12 @@ struct SingleInstancePayload {
 #[derive(Clone)]
 struct TabConnection {
     sender: UnboundedSender<String>,
-    disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<()>>>>,
+    disconnect_handle: Arc<Mutex<Option<tokio::sync::oneshot::Sender<Result<(), String>>>>>,
 }
 
 struct AppState {
     connections: Mutex<std::collections::HashMap<String, TabConnection>>,
+    cancel_handles: Mutex<HashMap<String, watch::Sender<bool>>>,
 }
 struct SocketIoAppState {
     connections: SocketMutex<HashMap<String, SocketClient>>,
@@ -616,9 +615,35 @@ struct SocketIoAppState {
 #[derive(Serialize)]
 struct WebSocketResponse {
     is_successful: bool,
+    is_cancelled: bool,
     status_code: u16,
     message: String,
     headers: Option<HashMap<String, String>>,
+}
+
+#[tauri::command]
+async fn abort_websocket_connection(
+    tabid: String,
+    state: tauri::State<'_, Arc<AppState>>,
+) -> Result<String, String> {
+    // First, try to cancel an in-flight connection attempt.
+    let cancel_handles = state.cancel_handles.lock().await;
+    if let Some(cancel_sender) = cancel_handles.get(&tabid) {
+        // Signal cancellation.
+        let _ = cancel_sender.send(true);
+        return Ok("WebSocket connection cancellation triggered".to_string());
+    }
+    // If no pending connection attempt exists, try disconnecting an already established connection.
+    let _ = disconnect_websocket(tabid.clone(), state.clone()).await;
+    let cancel_response = WebSocketResponse {
+        is_successful: false,
+        is_cancelled: true,
+        status_code: 499, // Custom status for cancellation.
+        message: "WebSocket connection manually aborted".to_string(),
+        headers: None,
+    };
+    return Err(serde_json::to_string(&cancel_response)
+    .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
 }
 
 #[tauri::command]
@@ -630,171 +655,197 @@ async fn connect_websocket(
     state: tauri::State<'_, Arc<AppState>>,
     app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
-    println!("inside the websocket");
 
-    // Deserialize the JSON string into a Vec<KeyValue>
-    let headers_key_values: Vec<KeyValue> =
-        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
-
-    // Create a HashMap to store key-value pairs
-    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
-
-    // Iterate over key_values and add key-value pairs to the map
-    for kv in headers_key_values {
-        headers_key_value_map.insert(kv.key, kv.value);
+    // Create a cancellation watch channel.
+    // The sender is stored in state so that an abort can trigger a cancellation.
+    let (cancel_sender, mut cancel_receiver) = tokio::sync::watch::channel(false);
+    {
+        let mut cancel_handles = state.cancel_handles.lock().await;
+        cancel_handles.insert(tabid.clone(), cancel_sender);
     }
 
-    // Create an HTTPS connector and client
+    // Parse the JSON headers.
+    let headers_key_values: Vec<KeyValue> =
+        serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
+    let mut headers_map = std::collections::HashMap::new();
+    for kv in headers_key_values {
+        headers_map.insert(kv.key, kv.value);
+    }
+
+    // Build the HTTP request for the WebSocket upgrade.
     let https = HttpsConnector::new();
     let client: OtherClient<_, hyper::Body> = OtherClient::builder().build::<_, hyper::Body>(https);
-
-    // Build the HTTP request to upgrade to WebSocket
     let mut req_builder = Request::builder()
         .uri(&httpurl)
         .header(UPGRADE, "websocket")
         .header(CONNECTION, "Upgrade");
-
-    // Add custom headers to the request
-    for (key, value) in headers_key_value_map.iter() {
+    for (key, value) in headers_map.iter() {
         req_builder = req_builder.header(
             key,
             HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
         );
     }
-
-    // Unwrap the body
     let req = req_builder
         .body(hyper::Body::empty())
         .map_err(|e| format!("Failed to build request: {}", e))?;
 
-    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
+    // Send the HTTP request.
     let response = client
         .request(req)
         .await
         .map_err(|e| format!("Failed to request: {}", e))?;
-
-    // Check if the upgrade to WebSocket was successful
     if response.status() != 101 {
         return Err(format!("Failed to upgrade: {:?}", response.status()));
     }
 
-    // Establish the WebSocket connection and convert the response into a WebSocket stream
-    let (ws_stream, response) = connect_async(url)
-        .await
-        .map_err(|e| format!("Failed to connect: {}", e))?;
+    // Await the WebSocket connection using tokio::select! to also listen for cancellation.
+    let ws_future = connect_async(url.clone());
+    let (ws_stream, ws_response) = tokio::select! {
+        res = ws_future => {
+            match res {
+                Ok((stream, response)) => (stream, response),
+                Err(e) => return Err(format!("Failed to connect: {}", e)),
+            }
+        },
+        _ = cancel_receiver.changed() => {
+            if *cancel_receiver.borrow() {
+                let cancel_response = WebSocketResponse {
+                    is_successful: false,
+                    is_cancelled: true,
+                    status_code: 499, // Custom status for cancellation.
+                    message: "WebSocket connection manually aborted".to_string(),
+                    headers: None,
+                };
+                return Err(serde_json::to_string(&cancel_response)
+                .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
+            } else {
+                return Err("Cancellation channel closed unexpectedly".to_string());
+            }
+        }
+    };
 
-    // Extract headers from the response
-    let mut response_headers = HashMap::new();
-    for (key, value) in response.headers() {
-        if let Ok(header_value) = value.to_str() {
-            response_headers.insert(key.as_str().to_string(), header_value.to_string());
+    // Connection established—remove the cancellation sender.
+    {
+        let mut cancel_handles = state.cancel_handles.lock().await;
+        cancel_handles.remove(&tabid);
+    }
+
+    // Capture handshake response headers.
+    let mut response_headers = std::collections::HashMap::new();
+    for (key, value) in ws_response.headers() {
+        if let Ok(val_str) = value.to_str() {
+            response_headers.insert(key.to_string(), val_str.to_string());
         }
     }
 
-    // Split the WebSocket stream into read and write halves
+    // Split the WebSocket stream.
     let (mut write, mut read) = ws_stream.split();
 
-    let (tx, mut rx) = mpsc::unbounded_channel::<String>();
+    // Create channels for sending messages and for a disconnect handle.
+    let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<String>();
+    let (disconnect_tx, _disconnect_rx) = tokio::sync::oneshot::channel::<Result<(), String>>();
+    let disconnect_handle = Arc::new(tokio::sync::Mutex::new(Some(disconnect_tx)));
 
-    let (disconnect_tx, disconnect_rx) = tokio::sync::oneshot::channel();
-    let disconnect_handle = Arc::new(Mutex::new(Some(disconnect_tx)));
+    // **Insert the connection into state immediately.**
+    {
+        let mut connections = state.connections.lock().await;
+        connections.insert(
+            tabid.clone(),
+            TabConnection {
+                sender: tx,
+                disconnect_handle: disconnect_handle.clone(),
+            },
+        );
+    }
 
-    state.connections.lock().await.insert(
-        tabid.clone(),
-        TabConnection {
-            sender: tx,
-            disconnect_handle: disconnect_handle.clone(),
-        },
-    );
+    // Now check if cancellation was triggered after connection establishment.
+    if *cancel_receiver.borrow() {
+        // Reuse the existing disconnect_websocket command to tear down the connection.
+        let _ = disconnect_websocket(tabid.clone(), state.clone()).await;
+        let cancel_response = WebSocketResponse {
+            is_successful: false,
+            is_cancelled: true,
+            status_code: 499, // Custom status for cancellation.
+            message: "WebSocket connection manually aborted".to_string(),
+            headers: None,
+        };
+        return Err(serde_json::to_string(&cancel_response)
+        .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
+    }
 
+    // Spawn a task to handle incoming messages.
     let svelte_tabid = tabid.clone();
     let app_handle_clone = app_handle.clone();
     tokio::spawn(async move {
-        tokio::select! {
-            _ = disconnect_rx => {
-                // Handle manual disconnection
-                println!("WebSocket connection manually closed for tab: {}", svelte_tabid);
-            }
-            _ = async {
-                while let Some(message) = read.next().await {
-                    match message {
-                        Ok(msg) => {
-                            match msg {
-                                Message::Text(text) => {
-                                    let event = format!("ws_message_{}", svelte_tabid);
-                                    let payload = json!({
-                                        "type": "message",
-                                        "data": text,
-                                    });
-                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
-                                }
-                                Message::Close(close_frame) => {
-                                    // Handle server disconnection
-                                    let event = format!("ws_message_{}", svelte_tabid);
-                                    let close_reason = close_frame
-                                        .as_ref()
-                                        .map(|frame| frame.reason.to_string())
-                                        .unwrap_or("No reason provided".to_string());
-
-                                    println!(
-                                        "Server closed WebSocket connection for tab: {}, reason: {}",
-                                        svelte_tabid,
-                                        close_reason
-                                    );
-
-                                    let payload = json!({
-                                        "type": "disconnect",
-                                        "data": close_reason,
-                                    });
-                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
-                                    break;
-                                }
-                                _ => {}
-                            }
-                        }
-                        Err(err) => {
-                            // Handle errors (like connection reset, etc.)
-                            let event = format!("ws_message_{}", svelte_tabid);
-                            let error_message = format!("WebSocket error: {}", err);
-                            println!("Error for tab {}: {}", svelte_tabid, error_message);
-
-                            let payload = json!({
-                                "type": "disconnect",
-                                "data": error_message,
-                            });
-                            app_handle_clone.emit(event.as_str(), payload).unwrap();
-                            break;
-                        }
+        while let Some(message) = read.next().await {
+            match message {
+                Ok(msg) => match msg {
+                    Message::Text(text) => {
+                        let event = format!("ws_message_{}", svelte_tabid);
+                        let payload = json!({
+                            "type": "message",
+                            "data": text,
+                        });
+                        let _ = app_handle_clone.emit(event.as_str(), payload);
                     }
+                    Message::Close(close_frame) => {
+                        let event = format!("ws_message_{}", svelte_tabid);
+                        let reason = close_frame
+                            .as_ref()
+                            .map(|frame| frame.reason.to_string())
+                            .unwrap_or_else(|| "No reason provided".to_string());
+                        println!(
+                            "Server closed WebSocket connection for tab: {}, reason: {}",
+                            svelte_tabid, reason
+                        );
+                        let payload = json!({
+                            "type": "disconnect",
+                            "data": reason,
+                        });
+                        let _ = app_handle_clone.emit(event.as_str(), payload);
+                        break;
+                    }
+                    _ => {}
+                },
+                Err(err) => {
+                    let event = format!("ws_message_{}", svelte_tabid);
+                    let error_message = format!("WebSocket error: {}", err);
+                    println!("Error for tab {}: {}", svelte_tabid, error_message);
+                    let payload = json!({
+                        "type": "disconnect",
+                        "data": error_message,
+                    });
+                    let _ = app_handle_clone.emit(event.as_str(), payload);
+                    break;
                 }
-            } => {}
+            }
+        }
+        // Signal normal connection closure.
+        if let Some(tx) = disconnect_handle.lock().await.take() {
+            let _ = tx.send(Ok(()));
         }
     });
 
+    // Spawn a task to handle outgoing messages.
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
-            write
-                .send(Message::Text(msg))
-                .await
-                .map_err(|e| format!("Failed to send message: {}", e))
-                .unwrap();
+            if let Err(e) = write.send(Message::Text(msg)).await {
+                eprintln!("Failed to send message: {}", e);
+                break;
+            }
         }
     });
 
-    // Create a success response
-    let response = WebSocketResponse {
+    // Build and return the success response.
+    let ws_response_obj = WebSocketResponse {
         is_successful: true,
+        is_cancelled: false,
         status_code: 200,
         message: "Connected Successfully".to_string(),
         headers: Some(response_headers),
-        // initial_data: Some(initial_data),
     };
-
-    // Serialize the response to a JSON string and return it
-    let response_json = serde_json::to_string(&response)
-        .map_err(|e| format!("Failed to serialize response: {}", e))?;
-
-    Ok(response_json)
+    serde_json::to_string(&ws_response_obj)
+        .map_err(|e| format!("Failed to serialize response: {}", e))
 }
 
 #[tauri::command]
@@ -815,6 +866,7 @@ async fn send_websocket_message(
     // Create a success response
     let response = WebSocketResponse {
         is_successful: true,
+        is_cancelled: false,
         status_code: 200,
         message: "Message sent successfully".to_string(),
         headers: None, // Set headers to None or provide actual headers if needed
@@ -848,35 +900,21 @@ async fn disconnect_websocket(
         // Check if there is a Sender inside the Option
         if let Some(sender) = std::mem::take(&mut *handle_lock) {
             // Send the signal to close the WebSocket connection
-            let _ = sender.send(());
+            let _ = sender.send(Ok(()));
         }
-
-        // Create a success response
-        let response = DisconnectResponse {
-            is_successful: true,
-            status_code: 200,
-            message: "WebSocket connection disconnected successfully".to_string(),
-        };
-
-        // Serialize the response to a JSON string and return it
-        let response_json = serde_json::to_string(&response)
-            .map_err(|e| format!("Failed to serialize response: {}", e))?;
-
-        return Ok(response_json);
-    } else {
-        // Return an error if the connection was not found
-        let response = DisconnectResponse {
-            is_successful: false,
-            status_code: 404,
-            message: "WebSocket connection not found".to_string(),
-        };
-
-        // Serialize the error response to a JSON string and return it
-        let response_json = serde_json::to_string(&response)
-            .map_err(|e| format!("Failed to serialize response: {}", e))?;
-
-        return Err(response_json);
     }
+    // Create a success response
+    let response = DisconnectResponse {
+        is_successful: true,
+        status_code: 200,
+        message: "WebSocket connection disconnected successfully".to_string(),
+    };
+
+    // Serialize the response to a JSON string and return it
+    let response_json = serde_json::to_string(&response)
+        .map_err(|e| format!("Failed to serialize response: {}", e))?;
+
+    return Ok(response_json);
 }
 
 #[derive(Serialize)]
@@ -1272,6 +1310,7 @@ fn main() {
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
             app.manage(Arc::new(AppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
+                cancel_handles: Mutex::new(std::collections::HashMap::new()),
             }));
             app.manage(Arc::new(SocketIoAppState {
                 connections: Mutex::new(std::collections::HashMap::new()),
@@ -1314,7 +1353,8 @@ fn main() {
             send_socket_io_message,
             send_graphql_request,
             show_toolbar,
-            hide_toolbar
+            hide_toolbar,
+            abort_websocket_connection
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {
