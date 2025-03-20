@@ -22,7 +22,7 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import {
-    opendComponent,
+    openedComponent,
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
@@ -151,7 +151,7 @@
   }
 
   $: {
-    if ($opendComponent.has(api.id)) {
+    if ($openedComponent.has(api.id)) {
       expand = true;
     }
     if (searchData) {

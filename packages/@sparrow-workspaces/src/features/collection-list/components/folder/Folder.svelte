@@ -43,7 +43,7 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   import {
-    opendComponent,
+    openedComponent,
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
@@ -200,7 +200,7 @@
   };
 
   $: {
-    if ($opendComponent.has(explorer.id)) {
+    if ($openedComponent.has(explorer.id)) {
       expand = true;
     }
   }

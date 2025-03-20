@@ -26,7 +26,7 @@
   export let isFirstCollectionExpand = false;
 
   import {
-    opendComponent,
+    openedComponent,
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
@@ -207,7 +207,7 @@
   });
 
   $: {
-    if ($opendComponent.has(collection.id) || isFirstCollectionExpand) {
+    if ($openedComponent.has(collection.id) || isFirstCollectionExpand) {
       visibility = true;
     }
   }
