@@ -19,6 +19,11 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   import { Input } from "@sparrow/library/forms";
+  import {
+    CollectionItemTypeBaseEnum,
+    type CollectionBaseInterface,
+    type CollectionItemBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
   export let tab: TabDocument;
   /**
    * The folder data from repository
@@ -58,6 +63,7 @@
   /**
    * Callback to get total number of requests in folder
    */
+  export let explorer: CollectionItemBaseInterface;
 
   export let getTotalRequests: (
     collection: CollectionDocument,
@@ -113,9 +119,7 @@
     ? [
         {
           onclick: () => {
-            onItemCreated("requestFolder", {
-              collection: collection,
-            });
+            onCreateAPIRequest(collection, folder);
           },
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: ArrowSwapRegular,

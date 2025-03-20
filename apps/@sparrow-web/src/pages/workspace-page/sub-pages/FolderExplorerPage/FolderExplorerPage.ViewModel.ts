@@ -315,16 +315,24 @@ class FolderExplorerPage {
       notifications.error("Failed to create API request. Please try again.");
     }
   };
+   /**
+     * Handles creating a new request in a folder
+     * @param workspaceId :string
+     * @param collection :CollectionDocument - the collection in which new request is going to be created
+     * @param explorer : - the folder in which new request is going to be created
+     * @returns :void
+     */
    private handleCreateRequestInFolder = async (
        workspaceId: string,
        collection: CollectionDto,
-       explorer: CollectionItemsDto,
+       explorer: CollectionItemsDto,  
      ) => {
        const sampleRequest = new InitRequestTab(
          UntrackedItems.UNTRACKED + uuidv4(),
          workspaceId,
        );
-   
+      //  console.log("THe ans ======= " , collection)
+
        let userSource = {};
        if (collection.activeSync && explorer?.source === "USER") {
          userSource = {
