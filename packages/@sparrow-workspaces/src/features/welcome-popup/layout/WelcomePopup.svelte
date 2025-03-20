@@ -3,6 +3,7 @@
   import SparrowLogo from "../icons/SparrowIconLogo.svelte";
   export let onClickExplore;
   export let onClickTour;
+  export let loader = false;
 </script>
 
 <div class="d-flex row align-items-center" style="padding: 0; gap:2px;">
@@ -27,9 +28,10 @@
       onClick={onClickExplore}
     />
     <Button
-      title="Take a Tour"
+      title="Take A Walkthrough"
       size="small"
       type="primary"
+      {loader}
       onClick={onClickTour}
     />
   </div>

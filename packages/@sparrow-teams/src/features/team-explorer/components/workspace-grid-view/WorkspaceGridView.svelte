@@ -9,7 +9,13 @@
   import { Button, Spinner } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
-
+  import { SparrowLogo } from "@sparrow/common/icons";
+  import {
+    ChevronDoubleLeftRegular,
+    ChevronDoubleRightRegular,
+    ChevronLeftRegular,
+    ChevronRightRegular,
+  } from "@sparrow/library/icons";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -146,54 +152,57 @@
               on:click={() => setPageWithinBounds(1)}
               class="bg-transparent border-0"
             >
-              <DoubleLeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              />
+              <ChevronDoubleLeftRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage - 1)}
               class="bg-transparent border-0"
             >
-              <LeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              />
+              <ChevronLeftRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage + 1)}
               class="bg-transparent border-0"
             >
-              <RightIcon
-                color={currPage === totalPages
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              />
+              <ChevronRightRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(totalPages)}
               class="bg-transparent border-0"
             >
-              <DoubleRightIcon
-                color={currPage === totalPages
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              />
+              <ChevronDoubleRightRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
           </div>
         </div>
       {/if}
     {:else}
-      <img
-        src={TeamSkeleton}
-        alt="Team-Skelton"
-        width="100%"
-        height="100%"
-        style="padding-bottom:100px;"
-      />
+      <div class="container">
+        <div class="sparrow-logo">
+          <SparrowLogo />
+        </div>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+        >
+          Welcome to Sparrow – where teamwork flows effortlessly.
+        </p>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+        >
+          Sign up or log in to unlock powerful tools and stay organized!
+        </p>
+      </div>
     {/if}
   </div>
 </div>
 
 <style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 150px 35px 24px;
+  }
   .tab-head {
     padding: 8px;
     font-size: 12px;
@@ -208,10 +217,10 @@
 
   :global(.add-new-workspace) {
     border: 1px dashed var(--border-ds-neutral-300);
-    background-color: var(--bg-ds-neutral-100);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    /* background-color: var(--bg-ds-neutral-100); */
+    /* background-clip: text; */
+    /* -webkit-background-clip: text; */
+    /* -webkit-text-fill-color: transparent; */
     max-width: 32.8%;
     max-height: 32%;
     border-radius: 8px;
@@ -229,7 +238,7 @@
   }
   :global(.add-new-workspace:active) {
     border: 1px dashed var(--border-ds-primary-300);
-    background: var(--bg-ds-surface-500);
+    background: var(--bg-ds-surface-600);
   }
   :global(.add-new-workspace:focus-visible) {
     outline: none;

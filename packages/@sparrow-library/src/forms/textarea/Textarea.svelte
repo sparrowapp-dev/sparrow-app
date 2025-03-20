@@ -113,6 +113,7 @@
     scrollbar-width: none;
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+    background-color: var(--bg-ds-surface-400);
   }
   textarea::placeholder {
     color: var(--placeholder-color);
