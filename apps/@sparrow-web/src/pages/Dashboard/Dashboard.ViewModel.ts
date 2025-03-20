@@ -1022,14 +1022,19 @@ export class DashboardViewModel {
       let environment = await this.getRecentEnvironment();
 
       environment = environment.map((_environment) => {
-        const workspaceInfo = workspaceMap[_environment.workspaceId];
-        const envPath = `${workspaceInfo.teamName} / ${workspaceInfo.workspaceName}`
+        const workspaceDetails = workspaceMap[_environment.workspaceId];
+        const path:string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+
         return ({
           title: _environment.name,
           workspace: _environment.workspaceId,
           id: _environment.id,
           variable: _environment.variable,
-          path: envPath
+          path: this.createPath(path)
         })
       });
 
@@ -1037,7 +1042,19 @@ export class DashboardViewModel {
       workspace = workspace.map((_value) => _value._data);
 
       let testflow = await this.getRecentTestflow();
-      testflow = testflow.map((_value) => _value._data);
+      testflow = testflow.map((_value) => {
+        const workspaceDetails = workspaceMap[_value._data.workspaceId];
+        const path:string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+
+        return {
+          ..._value._data,
+          path: this.createPath(path)
+        };
+      });
 
       return { collection, folder, file, workspace, testflow, environment };
     }

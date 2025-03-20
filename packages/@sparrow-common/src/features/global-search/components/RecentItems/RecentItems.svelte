@@ -349,7 +349,7 @@
               <ItemBar
                 data={{
                   name: item.name,
-                  path: item.description || "",
+                  path: item.path || "",
                   isTitleHighLightEnable: true,
                   charsToBeHightlighted: searchQuery,
                 }}
@@ -463,7 +463,7 @@
               <ItemBar
                 data={{
                   name: item.name,
-                  path: item.description || "",
+                  path: item.path || "",
                   isTitleHighLightEnable: true,
                   charsToBeHightlighted: searchQuery,
                 }}
