@@ -21,7 +21,11 @@
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { opendComponent } from "../../../../stores/recent-left-panel";
+  import {
+    opendComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
   import {
     ChevronDownRegular,
     ChevronRightRegular,
@@ -145,21 +149,6 @@
       api?.request?.method as HttpRequestMethodBaseEnum,
     );
   }
-
-  const addRequestItem = (collection) => {
-    opendComponent.update((map) => {
-      const newMap = new Map(map);
-      newMap.set(collection.id, `REST API`);
-      return newMap;
-    });
-  };
-  const removeRequestItem = (id) => {
-    opendComponent.update((map) => {
-      const newMap = new Map(map);
-      newMap.delete(id); // Remove the entry by ID
-      return newMap;
-    });
-  };
 
   $: {
     if ($opendComponent.has(api.id)) {
@@ -298,7 +287,7 @@
     if (!isRenaming) {
       expand = !expand;
       if (expand) {
-        addRequestItem(api);
+        addCollectionItem(api, "Request");
         onItemOpened("request", {
           workspaceId: collection.workspaceId,
           collection,
@@ -306,7 +295,7 @@
           request: api,
         });
       } else {
-        removeRequestItem(api.id);
+        removeCollectionItem(api.id);
       }
     }
   }}

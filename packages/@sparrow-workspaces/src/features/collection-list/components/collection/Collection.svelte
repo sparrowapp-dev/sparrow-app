@@ -25,7 +25,11 @@
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
 
-  import { opendComponent } from "../../../../stores/recent-left-panel";
+  import {
+    opendComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
 
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
@@ -254,25 +258,6 @@
       inputField.blur();
     }
   };
-
-  const addCollectionItem = (collection) => {
-    // opendComponent.update((components) => {
-    //   components.push({ id: collection.id, type: "collection" });
-    //   return components; // Always return updated state
-    // });
-    opendComponent.update((map) => {
-      const newMap = new Map(map);
-      newMap.set(collection.id, `Collection`);
-      return newMap;
-    });
-  };
-  const removeCollectionItem = (id) => {
-    opendComponent.update((map) => {
-      const newMap = new Map(map);
-      newMap.delete(id); // Remove the entry by ID
-      return newMap;
-    });
-  };
 </script>
 
 <svelte:window
@@ -492,7 +477,7 @@
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         if (visibility) {
-          addCollectionItem(collection);
+          addCollectionItem(collection, "collection");
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
