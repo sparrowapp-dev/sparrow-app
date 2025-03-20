@@ -606,20 +606,12 @@
           appVersion={version}
         />
       </Pane>
-<<<<<<< HEAD
-      <Pane
-        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-        minSize={60}
-        class="bg-secondary-800-important"
-      >
-        <section class="d-flex flex-column h-100">
-=======
+
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
         <section
           class="d-flex flex-column h-100"
           style="background-color:var(--bg-ds-surface-900)"
         >
->>>>>>> 64b357de6ed9da95de74a7b028871e387cc78fc5
           <TabBar
             tabList={$tabList}
             {isGuestUser}
