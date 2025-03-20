@@ -346,16 +346,38 @@ const sendSocketIoMessage = async (
  */
 const disconnectWebSocket = async (tab_id: string) => {
   let url = "";
+  let abortController;
+  let isRequestCancelled = false;
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
       url = wsData.url;
-      wsData.status = "disconnecting";
+      if(wsData?.status === "connecting"){
+        wsData.status = "disconnected";
+        abortController = wsData?.abortController;
+        isRequestCancelled = true;
+        wsData.messages.unshift({
+          data: `Connection aborted`,
+          transmitter: "disconnector",
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+      }
+      else{
+        wsData.status = "disconnecting";
+        isRequestCancelled = false;
+      }
       wsData.url = "";
       webSocketDataMap.set(tab_id, wsData);
     }
     return webSocketDataMap;
   });
+  if(isRequestCancelled){
+    if (abortController) {
+        abortController.abort(); // Abort the request using the stored controller
+    }
+   return;
+  }
   await invoke("disconnect_websocket", { tabid: tab_id })
     .then(async (data: string) => {
       try {
@@ -598,9 +620,11 @@ const connectWebSocket = async (
   requestHeaders: string,
 ) => {
   const httpurl = convertWebSocketUrl(url);
+  const abortController = new AbortController();
   console.table({ url, httpurl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
+      abortController: abortController,
       messages: [],
       status: "connecting",
       search: "",
@@ -613,6 +637,9 @@ const connectWebSocket = async (
 
     return webSocketDataMap;
   });
+
+  const { signal } = abortController; // Extract the signal for the request
+
   await invoke("connect_websocket", {
     url: url,
     httpurl: httpurl,
@@ -625,6 +652,10 @@ const connectWebSocket = async (
         if (data) {
           const dt = JSON.parse(data);
           console.log(dt);
+        }
+        if (signal?.aborted) {
+          return;
+          // throw new Error(); // Ignore response if request was cancelled
         }
         // Store the WebSocket and initialize data
         webSocketDataStore.update((webSocketDataMap) => {
