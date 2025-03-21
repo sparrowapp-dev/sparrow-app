@@ -73,8 +73,8 @@
     isExposeSaveAsSocket = flag;
   };
 
-  const handleConnect = async (signal: AbortSignal) => {
-    return await onConnect(environmentVariables, signal);
+  const handleConnect = async () => {
+    return await onConnect(environmentVariables);
   };
 
   const handleCancelConnect = async () => {

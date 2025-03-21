@@ -714,17 +714,26 @@ const connectWebSocket = async (
           return webSocketDataMap;
         });
         notifications.success("WebSocket connected successfully.");
-        return true;
+        return {
+          connected: true,
+          cancelled: false
+        };
       } catch (e) {
         notifications.error("Failed to fetch WebSocket response. Please try again.");
-        return error("error");
+        return {
+          connected: false,
+          cancelled: false
+        };
       }
     })
     .catch((e) => {
       try {
         const dt = JSON.parse(e);
         if (dt.is_cancelled) {
-          return false;
+          return {
+            connected: false,
+            cancelled: true
+          };
         }
       } catch (e) {
         webSocketDataStore.update((webSocketDataMap) => {
@@ -736,7 +745,10 @@ const connectWebSocket = async (
           return webSocketDataMap;
         });
         notifications.error("Failed to connect WebSocket. Please try again.");
-        return error("error");
+        return {
+          connected: false,
+          cancelled: false
+        };
       }
     });
 };

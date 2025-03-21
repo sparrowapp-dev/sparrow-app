@@ -94,7 +94,7 @@
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
           isConnecting = true;
           const connectResult = await handleConnect();
-          if (connectResult === true) {
+          if (!connectResult.cancelled) {
             isConnecting = false;
             MixpanelEvent(Events.WebSocket_Connected);
           }
