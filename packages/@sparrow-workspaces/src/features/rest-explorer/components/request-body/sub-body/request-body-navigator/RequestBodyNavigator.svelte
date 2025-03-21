@@ -107,7 +107,7 @@
       minHeaderWidth={"160px"}
       headerHeight={"28px"}
     />
-    <span class="pe-3" />
+    <span style="padding-right:12px" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <WithSelect
         id={"hash987"}

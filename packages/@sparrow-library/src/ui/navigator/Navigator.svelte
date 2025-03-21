@@ -43,16 +43,17 @@
       handleClick(currentTabId);
     }
   }
+
 </script>
 
-<div tabindex={allDisableState ? -1 : 0}>
+<div>
   <!-- Tabs -->
-  <div class="d-flex position-relative">
+  <div class="d-flex position-relative gap-1">
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
         tabindex={allDisableState ? -1 : 0}
-        class={tab.disabled ? "tab-container-disabled" : "tab-container "}
+        class={`${tab.disabled ? "tab-container-disabled" : "tab-container"} ${tab.id === currentTabId ? "selected" : ""}`}
         role="tab"
         on:click={() => {
           if (!tab.disabled) {
@@ -61,16 +62,17 @@
           }
         }}
       >
-        <span class="d-flex align-items-center ps-1 pe-1">
+        <span class="d-flex align-items-center">
           {#if tab?.icon}
-            <span class="d-flex align-items-center w-20px h-20px p-2px">
+            <span class="d-flex align-items-center w-16px h-16px me-1">
               <svelte:component this={tab.icon} class="icon" />
             </span>
           {/if}
           <span class="text">{tab.name} </span>
           {#if tab?.count}
-            <span class="ms-1"></span>
+            <span class="ms-1" style="margin-right: -4px;">
             <Badge count={tab.count} variant={"neutral"} size={"medium"} />
+            </span>
           {/if}
         </span>
       </button>
@@ -90,26 +92,36 @@
     justify-content: center;
     align-items: center;
 
-    min-width: 96px;
+    min-width: fit-content;
+    max-width: 182px;
     text-align: center;
     border-radius: 4px;
-    padding: 4px, 8px;
+    padding: 0px 6px;
     gap: 4px;
     background-color: transparent;
     color: var(--text-ds-neutral-100);
     font-size: 12px;
-    line-height: 18px;
+    line-height: 16px;
     min-height: 28px;
     border: 0px;
   }
   .tab-container:hover {
-    background-color: var(--bg-ds-surface-600);
+    background-color: var(--bg-ds-surface-400);
     color: var(--bg-ds-neutral-50);
   }
   .tab-container:focus-visible {
     background-color: var(--bg-ds-surface-900);
-    outline: none;
-    border: 2px solid var(--border-ds-primary-300);
+    outline: 2px solid var(--border-ds-primary-300);
+    outline-offset: -2px;
+  
+  }
+  .tab-container.selected{
+    background-color: var(--bg-ds-surface-600);
+    color: var(--bg-ds-neutral-50);
+  }
+  .tab-container.selected:hover{
+    background-color: var(--bg-ds-surface-400);
+    color: var(--bg-ds-neutral-50);
   }
   /* .tab-container:focus-visible .slider {
     left: calc(var(--left-distance) + 1px) !important;
@@ -149,11 +161,11 @@
     height: 2px;
     border-radius: 2px;
     background-color: var(--bg-ds-primary-400);
-    transition: 250ms ease-out;
+    transition: all 250ms ease-out;
     position: relative;
     bottom: 0;
     left: 0px;
-    top: -3px;
+    top: 0px;
     z-index: 100;
   }
 </style>
