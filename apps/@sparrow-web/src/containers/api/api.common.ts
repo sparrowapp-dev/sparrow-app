@@ -408,6 +408,7 @@ const connectWebSocket = async (
       });
 
       return new Promise((resolve, reject) => {
+        let hasErrorOccurred = false;
         ws.onopen = () => {
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
@@ -461,11 +462,7 @@ const connectWebSocket = async (
 
         ws.onerror = (error) => {
           console.error("WebSocket error:", error);
-          notifications.error("Failed to connect WebSocket. Please try again.");
-          webSocketDataStore.update((webSocketDataMap) => {
-            webSocketDataMap.delete(tabId);
-            return webSocketDataMap;
-          });
+          hasErrorOccurred = true;
         };
 
         ws.onclose = () => {
@@ -473,7 +470,9 @@ const connectWebSocket = async (
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: `Disconnected from ${url}`,
+                data: hasErrorOccurred
+                  ? "Error: Failed to connect Websocket"
+                  : `Disconnected from ${url}`,
                 transmitter: "disconnector",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
