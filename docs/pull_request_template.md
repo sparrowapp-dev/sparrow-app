@@ -1,32 +1,20 @@
-## Description
+### Description
+Add your description here.
 
-Please do not leave this blank 
+### Add Issue Number
+Fixes #<your_issue_number>
 
-## What type of PR is this? (check all applicable)
+### Add Screenshots/GIFs
+If applicable, add relavent screenshot/gif here.
 
-- [ ] 🍕 Feature
-- [ ] 🐛 Bug Fix
-- [ ] 📝 Documentation Update
-- [ ] 🎨 Style
-- [ ] 🧑‍💻 Code Refactor
-- [ ] 🔥 Performance Improvements
-- [ ] ✅ Test
-- [ ] 🤖 Build
+### Add Known Issue
+If applicable, add any known issues.
 
-## Have you tested locally?
+### Contribution Checklist:
+- [ ] **The pull request only addresses one issue or adds one feature.**
+- [ ] **I have linked an issue to the pull request.**
+- [ ] **The pull request does not introduce any breaking changes**
+- [ ] **I have added screenshots or gifs to help explain the change if applicable.**
+- [ ] **I have read the [contribution guidelines](../../docs/CONTRIBUTING.md).**
 
-- [ ] 👍 yes
-- [ ] 🙅 no, because I am lazy
-
-## Added tests?
-
-- [ ] 👍 yes
-- [ ] 🙅 no, because they aren't needed
-- [ ] 🙋 no, because I need help
-
-## Added to documentation?
-
-- [ ] 📜 README.md
-
-## Any Known issue?
-## Related Story, task & Documents?
+Note: Keeping the PR small and focused helps make it easier to review and merge. If you have multiple changes you want to make, please consider submitting them as separate pull requests.
