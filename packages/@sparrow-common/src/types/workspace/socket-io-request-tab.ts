@@ -207,4 +207,5 @@ export type SocketIORequestOutputTabInterface = {
   connectListener?: any;
   disconnectListener?: any;
   messageListener?: any;
+  abortController: AbortController;
 };

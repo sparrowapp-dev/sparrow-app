@@ -67,13 +67,15 @@
 
   <!-- Send button -->
   <Button
-    title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
-    type={"primary"}
+    title={webSocket?.status === "connected"
+      ? "Disconnect"
+      : webSocket?.status === "connecting"
+        ? "Cancel"
+        : "Connect"}
+    type={webSocket?.status === "connecting" ? "secondary" : "primary"}
     customWidth={"96px"}
-    loader={webSocket?.status === "connecting" ||
-      webSocket?.status === "disconnecting"}
-    disable={webSocket?.status === "connecting" ||
-      webSocket?.status === "disconnecting"}
+    loader={webSocket?.status === "disconnecting"}
+    disable={webSocket?.status === "disconnecting"}
     onClick={() => {
       if (requestUrl === "") {
         const codeMirrorElement = document.querySelector(
@@ -83,7 +85,10 @@
           codeMirrorElement.classList.add("url-red-border");
         }
       } else {
-        if (webSocket?.status === "connected") {
+        if (
+          webSocket?.status === "connected" ||
+          webSocket?.status === "connecting"
+        ) {
           onDisconnect();
           MixpanelEvent(Events.SocketIO_Disconnected);
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {

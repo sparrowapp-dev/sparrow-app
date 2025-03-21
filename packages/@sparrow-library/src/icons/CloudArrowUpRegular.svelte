@@ -1,10 +1,13 @@
 <script lang="ts">
-  export let size = "20px";
+  export let size = "";
   export let color = "";
   $: finalColor = color === "" ? "inherit" : color;
 </script>
 
 <i
-  class="icon-ic_fluent_archive_20_regular"
+  class="icon-ic_fluent_cloud_arrow_up_20_regular"
   style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
 ></i>
+
+<style>
+</style>

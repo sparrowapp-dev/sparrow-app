@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
   import { OSDetector } from "@sparrow/common/utils";
+  import { Button } from "@sparrow/library/ui";
 
   export let isMainScreen = false;
   let platformName = "";
@@ -46,12 +47,13 @@ altCommands = {
         <SparrowLogo />
       </div>
       <div class="d-flex flex-column align-items-center">
-        <p class="text-secondary-200 fw-bold text-fs-14 mb-5">
-          Click Send to get a Response
+        <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
+          Click Send To Get A Response
         </p>
       </div>
     </div>
   </div>
+<div>
   <div class={"d-flex flex-wrap justify-content-center mt-auto"}>
     {#each Object.entries(ctrlCommands) as [key, value]}
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
@@ -81,27 +83,30 @@ altCommands = {
   </div>
   {#if !isExpandShortcuts}
     <div class="d-flex justify-content-center">
-      <p
-        class="text-primary-200 text-fs-12 cursor-pointer"
-        on:click={() => {
-          isExpandShortcuts = true;
-        }}
-      >
-        See All Shortcuts
-      </p>
+      <Button
+      type="outline-secondary"
+      title="See All Shortcuts"
+      onClick={() => {
+        isExpandShortcuts = true;
+      }}
+      size="small"
+      fontSize={14}
+      />
     </div>
   {:else}
     <div class="d-flex justify-content-center">
-      <p
-        class="text-primary-200 text-fs-12 cursor-pointer"
-        on:click={() => {
-          isExpandShortcuts = false;
-        }}
-      >
-        Hide All Shortcuts
-      </p>
+       <Button
+      type="outline-secondary"
+      title="Hide All Shortcuts"
+      onClick={() => {
+        isExpandShortcuts = false;
+      }}
+      size="small"
+      fontSize={14}
+      />
     </div>
   {/if}
+  </div>
 </div>
 
 <style>

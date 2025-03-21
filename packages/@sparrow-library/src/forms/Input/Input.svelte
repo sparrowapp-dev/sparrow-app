@@ -251,7 +251,7 @@
   }
   .medium {
     height: 36px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
     padding: 8px;
   }

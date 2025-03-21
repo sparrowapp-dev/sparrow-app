@@ -18,6 +18,7 @@ export type WebSocketData = {
   url: string;
   filter: "All Messages" | "Sent" | "Received";
   listener?: any;
+  abortController: AbortController;
 };
 
 export const webSocketDataStore = writable<Map<string, WebSocketData>>(

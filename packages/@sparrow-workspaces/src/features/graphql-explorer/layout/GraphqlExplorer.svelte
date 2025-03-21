@@ -367,7 +367,9 @@
                           {:else if !storeData?.response.status}
                             <ResponseDefaultScreen />
                           {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                            <ResponseErrorScreen />
+                            <ResponseErrorScreen
+                              response={storeData.response}
+                            />
                           {:else if storeData?.response.status}
                             <div class="h-100 d-flex flex-column">
                               <ResponseNavigator

@@ -1004,7 +1004,7 @@ class RestExplorerViewModel {
           restExplorerDataStore.update((restApiDataMap) => {
             const data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
-              data.response.body = "";
+              data.response.body = response?.message ?? "";
               data.response.headers = [];
               data.response.status = ResponseStatusCode.ERROR;
               data.response.time = 0;
