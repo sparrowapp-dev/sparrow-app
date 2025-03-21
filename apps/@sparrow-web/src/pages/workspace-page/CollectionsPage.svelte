@@ -171,7 +171,9 @@
     }
   }
 
+  ///////////////////////////////////////////////////////
   // Auto select environment for the first time - st
+  //////////////////////////////////////////////////////
   $: {
     // Set the first environment by default from the list if no env. already set.
     if (!hasSetInitialEnvironment && localEnvironment?.length > 0) {
@@ -182,16 +184,9 @@
   // Function to handle default environment selection
   async function setInitialEnvironment() {
     if (hasSetInitialEnvironment) return;
-
     const currActiveEnv = currentWOrkspaceValue.environmentId;
-
-    if (!currActiveEnv) {
+    if (!currActiveEnv)
       await _viewModel2.onSelectEnvironment(localEnvironment[0]);
-      // console.log("No active environment, ");
-      // console.log("Environment set to:", localEnvironment[0]?.name);
-    }
-    // else console.log("Active environment already set:", currActiveEnv);
-
     hasSetInitialEnvironment = true;
   }
   // Auto select environment for the first time - End
