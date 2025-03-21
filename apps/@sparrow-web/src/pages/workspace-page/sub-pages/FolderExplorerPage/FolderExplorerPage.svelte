@@ -29,7 +29,7 @@
   // Local variables
   let collection: CollectionDocument;
   let folder: Folder;
-
+  let isSaved = true;
   // Initialization of collection, folder and userRoleInWorkspace
   onMount(async () => {
     (await _viewModel.getCollectionList()).subscribe(async (collectionList) => {

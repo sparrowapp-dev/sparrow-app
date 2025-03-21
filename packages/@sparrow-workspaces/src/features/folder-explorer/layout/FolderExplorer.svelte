@@ -25,6 +25,7 @@
     type CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   export let tab: TabDocument;
+  // ViewModel initialization
   /**
    * The folder data from repository
    */
@@ -40,12 +41,13 @@
   /**
    * Callback to rename folder
    */
-  // export let onRename: (
-  //   collection: CollectionDocument,
-  //   folder: Folder,
-  //   newName: string,
-  // ) => Promise<void>;
-  export let onRename;
+  export let onRename: (
+    collection: CollectionDocument,
+    folder: Folder,
+    newName: string,
+  ) => Promise<void>;
+  // export let onRename;
+
   /**
    * Callback to create new api request
    */
@@ -130,6 +132,7 @@
           onclick: () => {
             onItemCreated("socketioFolder", {
               collection: collection,
+              folder: folder,
             });
           },
           name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
@@ -141,6 +144,7 @@
           onclick: () => {
             onItemCreated("websocketFolder", {
               collection: collection,
+              folder: folder,
             });
           },
           name: "Add WebSocket",
@@ -152,9 +156,7 @@
     : [
         {
           onclick: () => {
-            onItemCreated("requestFolder", {
-              collection: collection,
-            });
+            onCreateAPIRequest(collection, folder);
           },
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: ArrowSwapRegular,
@@ -165,6 +167,7 @@
           onclick: () => {
             onItemCreated("socketioFolder", {
               collection: collection,
+              folder: folder,
             });
           },
           name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
@@ -176,10 +179,23 @@
           onclick: () => {
             onItemCreated("websocketFolder", {
               collection: collection,
+              folder: folder,
             });
           },
           name: "Add WebSocket",
           icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("graphqlFolder", {
+              collection: collection,
+              folder: folder,
+            });
+          },
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
           iconColor: "var(--icon-ds-neutral-50)",
           iconSize: "14px",
         },

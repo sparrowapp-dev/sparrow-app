@@ -43,6 +43,7 @@ import {
   type CollectionBaseInterface as CollectionDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
 } from "@sparrow/common/types/workspace/collection-base";
+import type { SocketIORequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
@@ -331,7 +332,6 @@ class FolderExplorerPage {
          UntrackedItems.UNTRACKED + uuidv4(),
          workspaceId,
        );
-      //  console.log("THe ans ======= " , collection)
 
        let userSource = {};
        if (collection.activeSync && explorer?.source === "USER") {
@@ -713,7 +713,7 @@ class FolderExplorerPage {
             break;
           case "websocketFolder":
             await this.handleCreateWebSocketInFolder(
-              args.workspaceId,
+              args.collection.workspaceId,
               args.collection as CollectionDto,
               args.folder as CollectionItemsDto,
             );
@@ -729,7 +729,7 @@ class FolderExplorerPage {
             break;
           case "socketioFolder":
             await this.handleCreateSocketIoInFolder(
-              args.workspaceId,
+              args.collection.workspaceId,
               args.collection as CollectionDto,
               args.folder as CollectionItemsDto,
             );
