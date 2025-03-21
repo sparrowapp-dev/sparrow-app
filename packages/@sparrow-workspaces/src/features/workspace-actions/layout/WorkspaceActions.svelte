@@ -521,7 +521,7 @@
         <Tooltip title={"Refresh"} placement={"bottom-center"}>
           <Button
             type="secondary"
-            startIcon={ArrowClockWiseRegular}
+            startIcon={refreshLoad ? "" : ArrowClockWiseRegular}
             size="small"
             loader={refreshLoad}
             onClick={refreshWorkspace}

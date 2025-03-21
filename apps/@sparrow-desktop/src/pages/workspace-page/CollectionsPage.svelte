@@ -93,6 +93,8 @@
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
 
+  let totalTeamCount = writable(0);
+
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
 
@@ -436,7 +438,8 @@
   let activeTab: Observable<TabDocument | null> | undefined;
   let prevWorkspaceId = "";
   let count = 0;
-
+  let autoRefreshEnable = writable(true);
+  let refreshLoad = writable(false);
   let isAccessDeniedModalOpen = false;
 
   // Add userValidation state
@@ -542,6 +545,60 @@
     });
     totalCollectionCount.set(count);
   });
+
+  // This function will set the value of Users in the Workspace.
+  currentWorkspace.subscribe((workspace) => {
+    let userCount = workspace?._data?.users.length;
+    totalTeamCount.set(userCount);
+  });
+
+  let refreshInterval: NodeJS.Timeout | null = null;
+
+  //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
+  const handleRefreshWorkspace = async (): Promise<void> => {
+    if (!currentWorkspace) return;
+    refreshLoad.set(true);
+    currentWorkspace.subscribe(async (workspace) => {
+      if (workspace && workspace._data.users?.length) {
+        try {
+          // Fetch data in parallel
+          await Promise.all([
+            _viewModel.fetchCollections(workspace._id),
+            _viewModel2.refreshEnvironment(workspace._id),
+            _viewModel3.refreshTestflow(workspace._id),
+          ]);
+        } catch (error) {
+          return;
+        }
+      }
+      refreshLoad.set(false);
+    });
+  };
+
+  // It will autorefresh the handle function of refresh in 2 minutes interval Time.
+  const startAutoRefresh = (): void => {
+    if (!$autoRefreshEnable) {
+      return;
+    }
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+    refreshInterval = setInterval(
+      () => {
+        handleRefreshWorkspace();
+      },
+      2 * 60 * 1000,
+    );
+  };
+
+  const refreshWorkspace = (): void => {
+    handleRefreshWorkspace();
+    startAutoRefresh();
+  };
+
+  onMount(() => {
+    startAutoRefresh();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -562,6 +619,9 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          userCount={$totalTeamCount}
+          {refreshWorkspace}
+          refreshLoad={false}
           {collectionList}
           {navigateToGithub}
           {currentWorkspace}
