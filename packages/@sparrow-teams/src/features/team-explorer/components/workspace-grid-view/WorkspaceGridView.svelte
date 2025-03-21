@@ -152,25 +152,41 @@
               on:click={() => setPageWithinBounds(1)}
               class="bg-transparent border-0"
             >
-              <ChevronDoubleLeftRegular color={"var(--bg-ds-neutral-100)"} />
+              <ChevronDoubleLeftRegular
+                color={currPage === 1
+                  ? "var(--border-secondary-200)"
+                  : "var(--bg-ds-neutral-100"}
+              />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage - 1)}
               class="bg-transparent border-0"
             >
-              <ChevronLeftRegular color={"var(--bg-ds-neutral-100)"} />
+              <ChevronLeftRegular
+                color={currPage === 1
+                  ? "var(--border-secondary-200)"
+                  : "var(--bg-ds-neutral-100"}
+              />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage + 1)}
               class="bg-transparent border-0"
             >
-              <ChevronRightRegular color={"var(--bg-ds-neutral-100)"} />
+              <ChevronRightRegular
+                color={currPage === totalPages
+                  ? "var(--border-secondary-200)"
+                  : "var(--bg-ds-neutral-100"}
+              />
             </button>
             <button
               on:click={() => setPageWithinBounds(totalPages)}
               class="bg-transparent border-0"
             >
-              <ChevronDoubleRightRegular color={"var(--bg-ds-neutral-100)"} />
+              <ChevronDoubleRightRegular
+                color={currPage === totalPages
+                  ? "var(--border-secondary-200)"
+                  : "var(--bg-ds-neutral-100"}
+              />
             </button>
           </div>
         </div>
