@@ -5,6 +5,11 @@
   import type { Response } from "@sparrow/common/types/workspace";
   export let onSendButtonClicked;
   export let response: Response;
+  export let environmentVariables;
+
+  const handleClickSendButton = () => {
+    onSendButtonClicked(environmentVariables);
+  };
 </script>
 
 <div class="response-default">
@@ -25,7 +30,7 @@
           ? response.body
           : "Unable to reach the API endpoint. Please verify the request URL and try again."}
         ctaShow={true}
-        onClick={onSendButtonClicked}
+        onClick={handleClickSendButton}
       />
     </div>
   </div>
