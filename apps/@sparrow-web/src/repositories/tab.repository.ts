@@ -991,4 +991,25 @@ export class TabRepository {
     await RxDB?.getInstance()?.rxdb?.tab?.bulkRemove(_deletabletabIds);
     return;
   };
+
+  
+  /**
+   * Removes multiple tabs from the RxDB database in a single operation.
+   *
+   * This function takes an array of tab IDs and removes all corresponding tab documents
+   * from the RxDB database using a bulk operation.
+   *
+   * @param {string[]} ids - An array of tab IDs to be removed.
+   *
+   * @returns {Promise<void>} - A promise that resolves when the tabs have been successfully removed.
+   */
+  public bulkRemoveTabs = async (ids: string[]): Promise<void> => {
+    if (ids.length === 0) return;
+    await this.rxdb?.find({
+      selector: {
+        id: { $in: ids },
+      },
+    }).remove();
+  };
+
 }

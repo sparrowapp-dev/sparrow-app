@@ -814,9 +814,8 @@ export default class CollectionsViewModel {
    * @param ids :string[] - the ids of tab to be removed
    */
   private removeMultipleTabs = async (ids: string[]) => {
-    ids.forEach((id) => {
-      this.tabRepository.removeTab(id);
-    });
+    if (ids.length === 0) return;
+    await this.tabRepository.bulkRemoveTabs(ids);
   };
 
   /**
