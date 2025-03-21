@@ -17,7 +17,7 @@ export const NAME_CONFIG = {
 export const DESCRIPTION_CONFIG = {
   TITLE: `About`,
   MAX_TEXT_SIZE: 500,
-  PLACEHOLDER: `Add teams's description`,
+  PLACEHOLDER: `Tell us something about your team`,
 };
 
 export const OWNER_CONFIG = {
