@@ -8,6 +8,7 @@
   import { Dropdown, Button } from "@sparrow/library/ui";
   import {
     AddRegular,
+    ArrowClockWiseRegular,
     ChevronDoubleRightRegular,
     PlusIcon2,
   } from "@sparrow/library/icons";
@@ -126,6 +127,9 @@
   export let onOpenTestflow;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+  export let refreshLoad = false;
+  export let refreshWorkspace: () => void;
+  export let userCount = 0;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -498,7 +502,7 @@
     </div>
 
     <div
-      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-1"
+      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-2"
     >
       <Search
         id="collection-list-search"
@@ -513,6 +517,17 @@
         }}
         placeholder={"Search"}
       />
+      {#if userCount > 1}
+        <Tooltip title={"Refresh"} placement={"bottom-center"}>
+          <Button
+            type="secondary"
+            startIcon={ArrowClockWiseRegular}
+            size="small"
+            loader={refreshLoad}
+            onClick={refreshWorkspace}
+          />
+        </Tooltip>
+      {/if}
       <div class="d-flex align-items-center justify-content-center d-none">
         <button
           id="filter-btn"

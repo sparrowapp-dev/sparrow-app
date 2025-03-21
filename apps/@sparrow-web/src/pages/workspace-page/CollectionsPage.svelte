@@ -124,6 +124,7 @@
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
+  let totalTeamCount = writable(0);
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -490,6 +491,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
+        totalTeamCount.set(value._data?.users?.length);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -571,6 +573,33 @@
     });
     totalCollectionCount.set(count);
   });
+
+  currentWorkspace.subscribe((workspace) => {
+    let userCount = workspace?._data?.users.length;
+    totalTeamCount.set(userCount);
+  });
+
+  const handleRefreshWorkspace = async () => {
+    if (!currentWorkspace) return;
+    const subscription = currentWorkspace.subscribe(async (workspace) => {
+      if (workspace && workspace._data.users?.length) {
+        try {
+          // Await Promise.all for parallel asynchronous tasks
+          await Promise.all([
+            _viewModel.fetchCollections(workspace._id),
+            _viewModel2.refreshEnvironment(workspace._id),
+            _viewModel3.refreshTestflow(workspace._id),
+          ]);
+          console.log("Workspace refresh completed", workspace);
+        } catch (error) {
+          return;
+        }
+      }
+    });
+
+    // Unsubscribe after the process if required
+    return () => subscription.unsubscribe();
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -591,6 +620,9 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          userCount={$totalTeamCount}
+          refreshWorkspace={handleRefreshWorkspace}
+          refreshLoad={false}
           {collectionList}
           {currentWorkspace}
           {navigateToGithub}
