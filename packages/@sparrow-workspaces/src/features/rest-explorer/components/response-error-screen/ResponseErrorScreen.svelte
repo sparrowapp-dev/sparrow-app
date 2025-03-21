@@ -1,6 +1,15 @@
-<script>
+<script lang="ts">
   import { DangerIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
+  import { Alert } from "@sparrow/library/ui";
+  import type { Response } from "@sparrow/common/types/workspace";
+  export let onSendButtonClicked;
+  export let response: Response;
+  export let environmentVariables;
+
+  const handleClickSendButton = () => {
+    onSendButtonClicked(environmentVariables);
+  };
 </script>
 
 <div class="response-default">
@@ -14,19 +23,15 @@
           Could not Send Request
         </p>
       </div>
-      <div
-        class="d-flex align-items-center error-message bg-danger-1000 border-radius-2"
-      >
-        <div class="error-icon p-3">
-          <DangerIcon />
-        </div>
-        <div class="error-content">
-          <p class="mb-0 text-fs-12 pe-3">
-            Cloud Agent error: Please check the URL .Try again. Make sure that
-            the domain is publicly accessible
-          </p>
-        </div>
-      </div>
+      <Alert
+        varient="error"
+        heading="Error"
+        description={response?.body.length > 0
+          ? response.body
+          : "Unable to reach the API endpoint. Please verify the request URL and try again."}
+        ctaShow={true}
+        onClick={handleClickSendButton}
+      />
     </div>
   </div>
 </div>

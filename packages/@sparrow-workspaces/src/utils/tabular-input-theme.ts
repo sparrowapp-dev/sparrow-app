@@ -16,6 +16,7 @@ export class TabularInputTheme {
         caretColor: "var(--white-color)",
         height: "100%",
         padding: "4px",
+        color: "var(--text-ds-neutral-50)",
       },
       ".cm-panels": {
         backgroundColor: "var(--bg-ds-surface-400)",
@@ -30,7 +31,7 @@ export class TabularInputTheme {
         alignItems: "center",
       },
       ".cm-textfield": {
-        backgroundColor: "var(--background-color)",
+        backgroundColor: "var(--background-color)"
       },
       ".cm-button": {
         backgroundColor: "var(--background-color)",
@@ -87,6 +88,7 @@ export class TabularInputTheme {
       ".cm-scroller::-webkit-scrollbar": {
         display: "none",
       },
+      
     });
   }
   public build() {

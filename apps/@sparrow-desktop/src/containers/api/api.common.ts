@@ -346,16 +346,38 @@ const sendSocketIoMessage = async (
  */
 const disconnectWebSocket = async (tab_id: string) => {
   let url = "";
+  let abortController;
+  let isRequestCancelled = false;
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
       url = wsData.url;
-      wsData.status = "disconnecting";
+      if(wsData?.status === "connecting"){
+        wsData.status = "disconnected";
+        abortController = wsData?.abortController;
+        isRequestCancelled = true;
+        wsData.messages.unshift({
+          data: `Connection aborted`,
+          transmitter: "disconnector",
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+      }
+      else{
+        wsData.status = "disconnecting";
+        isRequestCancelled = false;
+      }
       wsData.url = "";
       webSocketDataMap.set(tab_id, wsData);
     }
     return webSocketDataMap;
   });
+  if(isRequestCancelled){
+    if (abortController) {
+        abortController.abort(); // Abort the request using the stored controller
+    }
+   return;
+  }
   await invoke("disconnect_websocket", { tabid: tab_id })
     .then(async (data: string) => {
       try {
@@ -422,15 +444,21 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
     const { connectListener, disconnectListener, messageListener } = wsData;
 
     if (err && err.includes("Invalid")) {
-      // Clean up listeners and delete the socket data
+      const errorMesssage = err.replace(/["\\]/g, "").trim();
+      // Clean up listeners and update the error message in map.
       connectListener?.();
       disconnectListener?.();
       messageListener?.();
-      webSocketDataMap.delete(tab_id);
-
-      notifications.error(
-        `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      updateSocketDataStore(
+        tab_id,
+        errorMesssage,
+        "disconnector",
+        "disconnected",
       );
+
+      // notifications.error(
+      //   `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      // );
     } else {
       updateSocketDataStore(
         tab_id,
@@ -525,17 +553,39 @@ const storeListenerstoMap = (
  */
 const disconnectSocketIo = async (tab_id: string) => {
   let url = "";
+  let abortController;
+  let isRequestCancelled = false;
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
 
     if (wsData) {
       url = wsData.url;
-      wsData.status = "disconnecting";
+      if(wsData?.status === "connecting"){
+        wsData.status = "disconnected";
+        abortController = wsData?.abortController;
+        isRequestCancelled = true;
+        updateSocketDataStore(
+          tab_id,
+          `Connection aborted`,
+          "disconnector",
+          "disconnected",
+        );
+      }
+      else{
+        wsData.status = "disconnecting";
+        isRequestCancelled = false;
+      }
       wsData.url = "";
       webSocketDataMap.set(tab_id, wsData);
     }
     return webSocketDataMap;
   });
+  if(isRequestCancelled){
+    if (abortController) {
+        abortController.abort(); // Abort the request using the stored controller
+    }
+   return;
+  }
   await invoke("disconnect_socket_io", { tabid: tab_id })
     .then(async (data: string) => {
       try {
@@ -598,9 +648,11 @@ const connectWebSocket = async (
   requestHeaders: string,
 ) => {
   const httpurl = convertWebSocketUrl(url);
+  const abortController = new AbortController();
   console.table({ url, httpurl, tabId, requestHeaders });
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
+      abortController: abortController,
       messages: [],
       status: "connecting",
       search: "",
@@ -613,18 +665,19 @@ const connectWebSocket = async (
 
     return webSocketDataMap;
   });
+
+  const { signal } = abortController; // Extract the signal for the request
+
   await invoke("connect_websocket", {
     url: url,
     httpurl: httpurl,
     tabid: tabId,
     headers: requestHeaders,
   })
-    .then(async (data: string) => {
+    .then(async () => {
       try {
-        // Logic to handle response
-        if (data) {
-          const dt = JSON.parse(data);
-          console.log(dt);
+        if (signal?.aborted) { // Ignore response if request was cancelled
+          return;
         }
         // Store the WebSocket and initialize data
         webSocketDataStore.update((webSocketDataMap) => {
@@ -699,12 +752,28 @@ const connectWebSocket = async (
     })
     .catch((e) => {
       console.error(e);
+      // Store the error state in websocket
       webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
+        const wsData = webSocketDataMap.get(tabId);
+        if (wsData) {
+          wsData.messages.unshift({
+            data: e,
+            transmitter: "disconnector",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
+          });
+          wsData.status = "disconnected";
+          webSocketDataMap.set(tabId, wsData);
+        }
         return webSocketDataMap;
       });
-      notifications.error("Failed to connect WebSocket. Please try again.");
-      return error("error");
+
+      // webSocketDataStore.update((webSocketDataMap) => {
+      //   webSocketDataMap.delete(tabId);
+      //   return webSocketDataMap;
+      // });
+      // notifications.error("Failed to connect WebSocket. Please try again.");
+      return error(e);
     });
 };
 
@@ -724,8 +793,10 @@ const connectSocketIo = async (
   requestHeaders: string,
 ) => {
   console.table({ url, tabId, requestHeaders });
+  const abortController = new AbortController();
   socketIoDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
+      abortController: abortController,
       messages: [],
       status: "connecting",
       search: "",
@@ -741,6 +812,8 @@ const connectSocketIo = async (
     return webSocketDataMap;
   });
 
+  const { signal } = abortController; // Extract the signal for the request
+
   let urlObject;
   try {
     let validUrl = url;
@@ -750,35 +823,11 @@ const connectSocketIo = async (
     urlObject = new URL(validUrl);
   } catch (e) {
     console.error("Invalid host name", e);
-    removeSocketDataFromMap(tabId, url, "Invalid");
+    removeSocketDataFromMap(tabId, url, "Invalid host name");
     return;
   }
 
-  // Connect Listener
-  const connectListener = await listen(`socket-connect-${tabId}`, async () => {
-    return addSocketDataToMap(tabId, url);
-  });
-  // Disconnect listener
-  const disconnectListener = await listen(
-    `socket-disconnect-${tabId}`,
-    async (data) => {
-      const err = data.payload.message;
-      console.log("invalid namespace", err);
-      return removeSocketDataFromMap(tabId, url, err);
-    },
-  );
-  // Handle message listener
-  const messageListener = await listen(`socket-message-${tabId}`, (event) =>
-    processMessageEvent(tabId, event),
-  );
-
-  // store listeners inside map against tab id for future removal
-  storeListenerstoMap(
-    connectListener,
-    disconnectListener,
-    messageListener,
-    tabId,
-  );
+  
 
   await invoke("connect_socket_io", {
     url: urlObject.origin || "",
@@ -789,6 +838,41 @@ const connectSocketIo = async (
     .then(async () => {
       try {
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
+        // Connect Listener
+        const connectListener = await listen(`socket-connect-${tabId}`, async () => {
+          if (signal?.aborted) {
+            return;
+          }
+          return addSocketDataToMap(tabId, url);
+        });
+        // Disconnect listener
+        const disconnectListener = await listen(
+          `socket-disconnect-${tabId}`,
+          async (data) => {
+            if (signal?.aborted) {
+              return;
+            }
+            const err = data.payload.message;
+            console.error("invalid namespace", err);
+            return removeSocketDataFromMap(tabId, url, err);
+          },
+        );
+        // Handle message listener
+        const messageListener = await listen(`socket-message-${tabId}`, (event) =>{
+          if (signal?.aborted) {
+            return;
+          }
+          processMessageEvent(tabId, event);
+        }
+        );
+
+        // store listeners inside map against tab id for future removal
+        storeListenerstoMap(
+          connectListener,
+          disconnectListener,
+          messageListener,
+          tabId,
+        );
       } catch (e) {
         console.error(e);
         notifications.error(
@@ -799,7 +883,7 @@ const connectSocketIo = async (
     })
     .catch((e) => {
       console.error("Invalid host name", e);
-      removeSocketDataFromMap(tabId, url, "Invalid");
+      removeSocketDataFromMap(tabId, url, "Invalid host name");
       return error("error");
     });
 };
@@ -862,8 +946,8 @@ const makeHttpRequestV2 = async (
       console.log("api response : ", apiResponse);
       return success(apiResponse);
     } catch (e) {
-      console.error(e);
-      throw new Error("Error parsing response");
+      const responseBody = JSON.parse(data);
+      return error(responseBody.body);
     }
   } catch (e) {
     if (signal?.aborted) {

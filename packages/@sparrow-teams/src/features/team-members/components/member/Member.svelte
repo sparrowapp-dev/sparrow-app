@@ -5,6 +5,7 @@
     workspaceDocumentWithPosition,
   } from "@sparrow/common/interfaces";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
+
   import { AdminLevelPermission } from "@sparrow/common/constants/permissions.constant";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
@@ -283,17 +284,18 @@
       style=" margin-top:16px !important; margin-bottom:16px !important;"
     >
       <div class="d-flex align-items-center">
-          <Avatar
+        <Avatar
           type={"letter"}
           size={"large"}
           letter={user.name[0].toUpperCase() || ""}
-          bgColor={"var(--bg-tertiary-700)"}/>
+          bgColor={"var(--bg-tertiary-700)"}
+        />
 
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span style="font-size:12px;display: inline-block;" class="text-textColor"
             >{user.email}</span
           >
         </div>
@@ -321,16 +323,18 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-           <Avatar
-          type={"image"}
-          size={"large"}
-          image={base64ToURL(openTeam?.logo)}/>
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -363,16 +367,17 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
     <div class="d-flex rounded mb-3">
       <div class=" d-flex align-items-center">
-         <Avatar
-            type={"letter"}
-            size={"large"}
-            letter={ user?.name[0]|| ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+        <Avatar
+          type={"letter"}
+          size={"large"}
+          letter={user?.name[0] || ""}
+          bgColor={"var(--bg-tertiary-700)"}
+        />
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span style="font-size:12px;display: inline-block;" class="text-textColor "
             >{user.email}</span
           >
         </div>
@@ -394,13 +399,15 @@
           <Avatar
             type={"image"}
             size={"large"}
-            image={base64ToURL(openTeam?.logo)}/>
+            image={base64ToURL(openTeam?.logo)}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -436,16 +443,17 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <div class="d-flex rounded mb-3" style="padding-left: 0px !important;">
       <div class="d-flex align-items-center">
-           <Avatar
+        <Avatar
           type={"letter"}
           size={"large"}
           letter={user.name[0] || ""}
-          bgColor={"var(--bg-tertiary-700)"}/>
+          bgColor={"var(--bg-tertiary-700)"}
+        />
         <div class="name px-2" style="width: 80%;">
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span style="font-size:12px;display: inline-block;" class="text-textColor"
             >{user.email}</span
           >
         </div>
@@ -494,13 +502,19 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={"var(--bg-secondary-600)"}/>
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+            bgColor={"var(--bg-secondary-600)"}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -560,18 +574,19 @@
   />
 </Modal>
 
-<div class="d-flex tile rounded align-items-center">
+<div class="d-flex tile rounded align-items-center custom-bd" tabindex="0">
   <div
     class="info d-flex align-items-center"
     on:click={() => {
       memberPopObj.isMemberInfoPopup = true;
     }}
   >
-     <Avatar
+    <Avatar
       type={"letter"}
       size={"large"}
       letter={user?.name?.charAt(0)}
-      bgColor={"var(--bg-secondary-600)"}/>
+      bgColor={""}
+    />
     <div class="name px-2">
       <span style="font-size:12px;" class="text-whiteColor"
         >{user.name} {owner ? "(You)" : ""}</span
@@ -668,5 +683,9 @@
   }
   .error-border {
     border: 1px solid var(--error--color) !important;
+  }
+  .custom-bd:focus-visible {
+    border: 2px solid var(--bg-ds-primary-300) !important;
+    outline: none;
   }
 </style>

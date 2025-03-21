@@ -79,11 +79,15 @@ import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
-import {  CollectionAuthTypeBaseEnum, CollectionItemTypeBaseEnum, CollectionRequestAddToBaseEnum, type CollectionAuthBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionAuthTypeBaseEnum,
+  CollectionItemTypeBaseEnum,
+  CollectionRequestAddToBaseEnum,
+  type CollectionAuthBaseInterface,
+} from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
-class RestExplorerViewModel
-{
+class RestExplorerViewModel {
   /**
    * Repository
    */
@@ -122,19 +126,21 @@ class RestExplorerViewModel
   public collectionSubscriber(_collectionId: string) {
     return this.collectionRepository.subscribeCollection(_collectionId);
   }
-  
-  private _collectionAuth = new BehaviorSubject< Partial<HttpRequestCollectionLevelAuthTabInterface>>({});
 
-  private fetchCollection = async(_collectionId: string)=>{
-    const collectionRx = await this.collectionRepository.readCollection(_collectionId);
+  private _collectionAuth = new BehaviorSubject<
+    Partial<HttpRequestCollectionLevelAuthTabInterface>
+  >({});
+
+  private fetchCollection = async (_collectionId: string) => {
+    const collectionRx =
+      await this.collectionRepository.readCollection(_collectionId);
     const collectionDoc = collectionRx?.toMutableJSON();
-    if(collectionDoc?.auth){
+    if (collectionDoc?.auth) {
       this.collectionAuth = {
-        auth : collectionDoc?.auth,
-        collectionAuthNavigation: collectionDoc?.selectedAuthType
-      } as HttpRequestCollectionLevelAuthTabInterface
-    }
-    else{
+        auth: collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType,
+      } as HttpRequestCollectionLevelAuthTabInterface;
+    } else {
       this.collectionAuth = {
         auth: {
           bearerToken: "",
@@ -148,14 +154,14 @@ class RestExplorerViewModel
             addTo: CollectionRequestAddToBaseEnum.HEADER,
           },
         },
-        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
-      }
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+      };
     }
-  }
+  };
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
-      setTimeout(async() => {
+      setTimeout(async () => {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
@@ -163,17 +169,21 @@ class RestExplorerViewModel
         this.tab = t;
         await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
-        if(m.property.request?.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+        if (
+          m.property.request?.state.requestAuthNavigation ===
+          HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+        ) {
           this.authHeader = new ReduceAuthHeader(
-            this._collectionAuth.getValue().collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+            this._collectionAuth.getValue()
+              .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
             this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
           ).getValue();
           this.authParameter = new ReduceAuthParameter(
-            this._collectionAuth.getValue().collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+            this._collectionAuth.getValue()
+              .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
             this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
           ).getValue();
-        }      
-        else{
+        } else {
           this.authHeader = new ReduceAuthHeader(
             this._tab.getValue().property.request?.state.requestAuthNavigation,
             this._tab.getValue().property.request?.auth,
@@ -187,12 +197,17 @@ class RestExplorerViewModel
     }
   }
 
-  public openCollection = async ()=>{
-    const collectionRx = await this.collectionRepository.readCollection(this._tab.getValue().path.collectionId);
+  public openCollection = async () => {
+    const collectionRx = await this.collectionRepository.readCollection(
+      this._tab.getValue().path.collectionId,
+    );
     const collectionDoc = collectionRx?.toMutableJSON();
-    const collectionTab = new CollectionTabAdapter().adapt(this._tab.getValue().path.workspaceId, collectionDoc);
+    const collectionTab = new CollectionTabAdapter().adapt(
+      this._tab.getValue().path.workspaceId,
+      collectionDoc,
+    );
     this.tabRepository.createTab(collectionTab);
-  }
+  };
 
   public get activeWorkspace() {
     return this.workspaceRepository.getActiveWorkspace();
@@ -210,11 +225,15 @@ class RestExplorerViewModel
     this._tab.next(value);
   }
 
-  public get collectionAuth(): Observable<Partial<HttpRequestCollectionLevelAuthTabInterface>> {
+  public get collectionAuth(): Observable<
+    Partial<HttpRequestCollectionLevelAuthTabInterface>
+  > {
     return this._collectionAuth.asObservable();
   }
 
-  private set collectionAuth(value: HttpRequestCollectionLevelAuthTabInterface) {
+  private set collectionAuth(
+    value: HttpRequestCollectionLevelAuthTabInterface,
+  ) {
     this._collectionAuth.next(value);
   }
 
@@ -279,6 +298,11 @@ class RestExplorerViewModel
     // method
     else if (
       requestServer.request.method !== progressiveTab.property.request.method
+    ) {
+      result = false;
+    } else if (
+      requestServer.request.selectedRequestAuthType !==
+      progressiveTab.property.request.state.requestAuthNavigation
     ) {
       result = false;
     }
@@ -407,7 +431,11 @@ class RestExplorerViewModel
   };
 
   private formatDate = (date: Date) => {
-    const options : Intl.DateTimeFormatOptions = { day: "2-digit", month: "short", year: "numeric" };
+    const options: Intl.DateTimeFormatOptions = {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    };
     const formattedDate = date.toLocaleDateString("en-GB", options);
 
     let hours = date.getHours();
@@ -788,17 +816,22 @@ class RestExplorerViewModel
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if(_state.requestAuthNavigation){
-      if(_state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if (_state.requestAuthNavigation) {
+      if (
+        _state.requestAuthNavigation ===
+        HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+      ) {
         this.authHeader = new ReduceAuthHeader(
-          this._collectionAuth.getValue().collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
           this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
         ).getValue();
         this.authParameter = new ReduceAuthParameter(
-          this._collectionAuth.getValue().collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
           this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
         ).getValue();
-      }    else{
+      } else {
         this.authHeader = new ReduceAuthHeader(
           progressiveTab.property.request.state.requestAuthNavigation,
           progressiveTab.property.request.auth,
@@ -809,6 +842,7 @@ class RestExplorerViewModel
         ).getValue();
       }
     }
+    this.compareRequestWithServer();
   };
 
   /**
@@ -952,7 +986,7 @@ class RestExplorerViewModel
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
-      this._collectionAuth.getValue()
+      this._collectionAuth.getValue(),
     );
     makeHttpRequestV2(...decodeData, signal)
       .then((response) => {
@@ -960,7 +994,7 @@ class RestExplorerViewModel
           restExplorerDataStore.update((restApiDataMap) => {
             const data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
-              data.response.body = "";
+              data.response.body = response?.message || "";
               data.response.headers = [];
               data.response.status = ResponseStatusCode.ERROR;
               data.response.time = 0;
@@ -1016,6 +1050,7 @@ class RestExplorerViewModel
 
         restExplorerDataStore.update((restApiDataMap) => {
           const data = restApiDataMap.get(progressiveTab?.tabId);
+
           if (data) {
             data.response.body = "";
             data.response.headers = [];
@@ -1551,6 +1586,24 @@ class RestExplorerViewModel
               progressiveTab.tabId,
               progressiveTab,
             );
+            await this.fetchCollection(expectedPath.collectionId as string);
+            if (
+              progressiveTab.property.request?.state.requestAuthNavigation ===
+              HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+            ) {
+              this.authHeader = new ReduceAuthHeader(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+              this.authParameter = new ReduceAuthParameter(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+            }
           } else {
             /**
              * Create new copy of the existing request
@@ -1618,6 +1671,24 @@ class RestExplorerViewModel
               progressiveTab.tabId,
               progressiveTab,
             );
+            await this.fetchCollection(expectedPath.collectionId as string);
+            if (
+              progressiveTab.property.request?.state.requestAuthNavigation ===
+              HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+            ) {
+              this.authHeader = new ReduceAuthHeader(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+              this.authParameter = new ReduceAuthParameter(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+            }
           } else {
             /**
              * Create new copy of the existing request
@@ -1691,6 +1762,24 @@ class RestExplorerViewModel
               progressiveTab.tabId,
               progressiveTab,
             );
+            await this.fetchCollection(expectedPath.collectionId as string);
+            if (
+              progressiveTab.property.request?.state.requestAuthNavigation ===
+              HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+            ) {
+              this.authHeader = new ReduceAuthHeader(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+              this.authParameter = new ReduceAuthParameter(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+            }
           } else {
             const initRequestTab = new InitRequestTab(req.id, "UNTRACKED-");
             initRequestTab.updateName(req.name);
@@ -1754,6 +1843,24 @@ class RestExplorerViewModel
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+            await this.fetchCollection(expectedPath.collectionId as string);
+            if (
+              progressiveTab.property.request?.state.requestAuthNavigation ===
+              HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+            ) {
+              this.authHeader = new ReduceAuthHeader(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+              this.authParameter = new ReduceAuthParameter(
+                this._collectionAuth.getValue()
+                  .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+                this._collectionAuth.getValue()
+                  .auth as CollectionAuthBaseInterface,
+              ).getValue();
+            }
           } else {
             const initRequestTab = new InitRequestTab(
               res.data.data.id,

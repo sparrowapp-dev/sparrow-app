@@ -684,6 +684,23 @@
                 </div>
               {/each}
             {/if}
+            {#if operationSearch && !queryBuilder?.length}
+              <div
+                class="fields-column h-100 ellipsis"
+                style="min-width: 260px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
+              >
+                <div
+                  class="h-100 d-flex align-items-center justify-content-center"
+                >
+                  <p
+                    class="text-fs-12 text-secondary-200"
+                    style="text-align: center;"
+                  >
+                    No result found.
+                  </p>
+                </div>
+              </div>
+            {/if}
           </div>
         </div>
       </div>
@@ -819,21 +836,6 @@
           </div>
         {/if}
       {/each}
-      {#if operationSearch && !queryBuilder?.length}
-        <div
-          class="fields-column h-100 ellipsis"
-          style="min-width: 260px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
-        >
-          <div class="h-100 d-flex align-items-center justify-content-center">
-            <p
-              class="text-fs-12 text-secondary-200"
-              style="text-align: center;"
-            >
-              No result found.
-            </p>
-          </div>
-        </div>
-      {/if}
     </div>
   </div>
 </div>
