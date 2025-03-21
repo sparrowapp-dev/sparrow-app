@@ -7,6 +7,7 @@ const config = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "@storybook/blocks",
+    "@storybook/addon-svelte-csf",
   ],
   framework: {
     name: "@storybook/svelte-vite",
