@@ -155,8 +155,8 @@
   :global(.codex-editor__redactor) {
     border: none;
     overflow-y: auto;
-    padding-left: 16px;
-    padding-top: 10px;
+    /* padding-left: 16px; */
+    /* padding-top: 10px; */
     min-height: 150px;
     padding-bottom: 30px !important;
     border: 1px solid transparent;
