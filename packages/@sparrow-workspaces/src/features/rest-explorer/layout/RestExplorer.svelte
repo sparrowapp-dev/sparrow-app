@@ -384,6 +384,7 @@
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
                       <ResponseErrorScreen
                         onSendButtonClicked={onSendRequest}
+                        response={storeData.response}
                       />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column">
