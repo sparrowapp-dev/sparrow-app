@@ -124,6 +124,7 @@
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
+  let totalTeamCount = writable(0);
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -438,6 +439,9 @@
   let prevWorkspaceId = "";
   let count = 0;
 
+  let autoRefreshEnable = writable(true);
+  let refreshLoad = writable(false);
+
   let isAccessDeniedModalOpen = false;
 
   // Add userValidation state
@@ -490,6 +494,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
+        totalTeamCount.set(value._data?.users?.length);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -571,6 +576,60 @@
     });
     totalCollectionCount.set(count);
   });
+
+  // This function will set the value of Users in the Workspace.
+  currentWorkspace.subscribe((workspace) => {
+    let userCount = workspace?._data?.users.length;
+    totalTeamCount.set(userCount);
+  });
+
+  let refreshInterval: NodeJS.Timeout | null = null;
+
+  //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
+  const handleRefreshWorkspace = async (): Promise<void> => {
+    if (!currentWorkspace) return;
+    refreshLoad.set(true);
+    currentWorkspace.subscribe(async (workspace) => {
+      if (workspace && workspace._data.users?.length) {
+        try {
+          // Fetch data in parallel
+          await Promise.all([
+            _viewModel.fetchCollections(workspace._id),
+            _viewModel2.refreshEnvironment(workspace._id),
+            _viewModel3.refreshTestflow(workspace._id),
+          ]);
+        } catch (error) {
+          return;
+        }
+      }
+      refreshLoad.set(false);
+    });
+  };
+
+  // It will autorefresh the handle function of refresh in 2 minutes interval Time.
+  const startAutoRefresh = (): void => {
+    if (!$autoRefreshEnable) {
+      return;
+    }
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+    refreshInterval = setInterval(
+      () => {
+        handleRefreshWorkspace();
+      },
+      2 * 60 * 1000,
+    );
+  };
+
+  const refreshWorkspace = (): void => {
+    handleRefreshWorkspace();
+    startAutoRefresh();
+  };
+
+  onMount(() => {
+    startAutoRefresh();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -591,6 +650,9 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          userCount={$totalTeamCount}
+          {refreshWorkspace}
+          refreshLoad={$refreshLoad}
           {collectionList}
           {currentWorkspace}
           {navigateToGithub}
