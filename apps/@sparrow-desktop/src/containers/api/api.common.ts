@@ -444,15 +444,21 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
     const { connectListener, disconnectListener, messageListener } = wsData;
 
     if (err && err.includes("Invalid")) {
-      // Clean up listeners and delete the socket data
+      const errorMesssage = err.replace(/["\\]/g, "").trim();
+      // Clean up listeners and update the error message in map.
       connectListener?.();
       disconnectListener?.();
       messageListener?.();
-      webSocketDataMap.delete(tab_id);
-
-      notifications.error(
-        `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      updateSocketDataStore(
+        tab_id,
+        errorMesssage,
+        "disconnector",
+        "disconnected",
       );
+
+      // notifications.error(
+      //   `Failed to connect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
+      // );
     } else {
       updateSocketDataStore(
         tab_id,
@@ -752,12 +758,28 @@ const connectWebSocket = async (
     })
     .catch((e) => {
       console.error(e);
+      // Store the error state in websocket
       webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
+        const wsData = webSocketDataMap.get(tabId);
+        if (wsData) {
+          wsData.messages.unshift({
+            data: e,
+            transmitter: "disconnector",
+            timestamp: formatTime(new Date()),
+            uuid: uuidv4(),
+          });
+          wsData.status = "disconnected";
+          webSocketDataMap.set(tabId, wsData);
+        }
         return webSocketDataMap;
       });
-      notifications.error("Failed to connect WebSocket. Please try again.");
-      return error("error");
+
+      // webSocketDataStore.update((webSocketDataMap) => {
+      //   webSocketDataMap.delete(tabId);
+      //   return webSocketDataMap;
+      // });
+      // notifications.error("Failed to connect WebSocket. Please try again.");
+      return error(e);
     });
 };
 
@@ -807,7 +829,7 @@ const connectSocketIo = async (
     urlObject = new URL(validUrl);
   } catch (e) {
     console.error("Invalid host name", e);
-    removeSocketDataFromMap(tabId, url, "Invalid");
+    removeSocketDataFromMap(tabId, url, "Invalid host name");
     return;
   }
 
@@ -867,7 +889,7 @@ const connectSocketIo = async (
     })
     .catch((e) => {
       console.error("Invalid host name", e);
-      removeSocketDataFromMap(tabId, url, "Invalid");
+      removeSocketDataFromMap(tabId, url, "Invalid host name");
       return error("error");
     });
 };
@@ -930,8 +952,8 @@ const makeHttpRequestV2 = async (
       console.log("api response : ", apiResponse);
       return success(apiResponse);
     } catch (e) {
-      console.error(e);
-      throw new Error("Error parsing response");
+      const responseBody = JSON.parse(data);
+      return error(responseBody.body);
     }
   } catch (e) {
     if (signal?.aborted) {

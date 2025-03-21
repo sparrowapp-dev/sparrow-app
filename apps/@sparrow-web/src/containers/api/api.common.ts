@@ -341,7 +341,7 @@ const disconnectWebSocket = async (tab_id: string) => {
       ) {
         socketInsta.close();
 
-        // ToDo -> Messages and Constants strings/values should be stored in a single script (named Constants) 
+        // ToDo -> Messages and Constants strings/values should be stored in a single script (named Constants)
         notifications.success("WebSocket disconnected successfully.");
       } else {
         socketInsta?.emit(
@@ -430,6 +430,7 @@ const connectWebSocket = async (
       });
 
       return new Promise((resolve) => {
+        let hasErrorOccurred = false;
         ws.onopen = () => {
           if (signal?.aborted) {
             return;
@@ -492,11 +493,7 @@ const connectWebSocket = async (
             return;
           }
           console.error("WebSocket error:", error);
-          notifications.error("Failed to connect WebSocket. Please try again.");
-          webSocketDataStore.update((webSocketDataMap) => {
-            webSocketDataMap.delete(tabId);
-            return webSocketDataMap;
-          });
+          hasErrorOccurred = true;
         };
 
         ws.onclose = () => {
@@ -507,7 +504,9 @@ const connectWebSocket = async (
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: `Disconnected from ${url}`,
+                data: hasErrorOccurred
+                  ? "Error: Failed to connect Websocket"
+                  : `Disconnected from ${url}`,
                 transmitter: "disconnector",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
@@ -758,16 +757,16 @@ const makeHttpRequestV2 = async (
           },
         };
       } catch (axiosError: any) {
-        const error = axiosError;
-        response = {
-          data: {
-            status: `${error.response.status} ${error.response.statusText}`,
-            data: error.response?.data || error.message,
-            headers: error.response?.headers
-              ? Object.fromEntries(Object.entries(error.response.headers))
-              : {},
-          },
-        };
+        // response = {
+        //   data: {
+        //     status: `${error.response.status} ${error.response.statusText}`,
+        //     data: error.response?.data || error.message,
+        //     headers: error.response?.headers
+        //       ? Object.fromEntries(Object.entries(error.response.headers))
+        //       : {},
+        //   },
+        // };
+        return error(axiosError.message);
       }
     }
     if (signal?.aborted) {
@@ -777,13 +776,16 @@ const makeHttpRequestV2 = async (
     const duration = endTime - startTime;
     try {
       let responseData;
+
       if (typeof response.data.data !== "string") {
         responseData = JSON.stringify(response.data.data);
       } else {
         responseData = response.data.data;
       }
       if (!response.data.status) {
-        throw new Error("Error parsing response");
+        throw new Error(
+          response?.data?.data?.message || "Error parsing response",
+        );
       }
 
       appInsights?.trackDependencyData({
@@ -801,7 +803,7 @@ const makeHttpRequestV2 = async (
       });
     } catch (e) {
       console.error("Response parsing error:", e);
-      throw new Error("Error parsing response");
+      return error(e.toString());
     }
   } catch (e) {
     if (signal?.aborted) {
@@ -817,7 +819,7 @@ const makeHttpRequestV2 = async (
       responseCode: 400,
       properties: { source: "frontend", type: "BA_HTTP" },
     });
-    throw new Error("Error with the request");
+    throw new Error(e);
   }
 };
 
@@ -1071,7 +1073,11 @@ const connectSocketIo = async (
         return;
       }
       console.error(new DOMException(err + " (URL Issue)", "ConnectError"));
-      removeSocketIoDataFromMap(_tabId);
+      insertSocketIoDataToMap(
+        _tabId,
+        err.toString(),
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+      );
     });
 
     // Listen for disconnect events from the target Socket.IO.
