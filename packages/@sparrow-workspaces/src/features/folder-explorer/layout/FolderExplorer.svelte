@@ -4,11 +4,36 @@
    * The tab of the folder
    */
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import {
+    AddRegular,
+    CaretDownFilled,
+    CaretUpFilled,
+    SaveRegular,
+    FolderAddRegular,
+    ArrowSwapRegular,
+    SocketIoIcon,
+    SocketIcon,
+    GraphIcon,
+  } from "@sparrow/library/icons";
+  import { Dropdown, Button } from "@sparrow/library/ui";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+
+  import { Input } from "@sparrow/library/forms";
+  import {
+    CollectionItemTypeBaseEnum,
+    type CollectionBaseInterface,
+    type CollectionItemBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
   export let tab: TabDocument;
+  // ViewModel initialization
   /**
    * The folder data from repository
    */
   export let folder: Folder;
+
+  export let onItemCreated;
+  export let isCollectionEditable;
+
   /**
    * The collection of the folder
    */
@@ -21,6 +46,8 @@
     folder: Folder,
     newName: string,
   ) => Promise<void>;
+  // export let onRename;
+
   /**
    * Callback to create new api request
    */
@@ -38,6 +65,7 @@
   /**
    * Callback to get total number of requests in folder
    */
+  export let explorer: CollectionItemBaseInterface;
 
   export let getTotalRequests: (
     collection: CollectionDocument,
@@ -58,6 +86,7 @@
    * Components
    */
   import { Tooltip } from "@sparrow/library/ui";
+  import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
   /**
    * Types
@@ -78,10 +107,108 @@
   let totalGraphQl: number = 0;
   let totalSocketIo: number = 0;
   let totalWebSocket: number = 0;
-
+  let showAddItemMenu = false;
+  let currentDescription = folder?.description || "";
   /**
    * Funciton to update total requests
    */
+  $: {
+    if (folder) {
+      currentDescription = folder?.description || "";
+    }
+  }
+  const addButtonData = isWebApp
+    ? [
+        {
+          onclick: () => {
+            onCreateAPIRequest(collection, folder);
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioFolder", {
+              collection: collection,
+              folder: folder,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketFolder", {
+              collection: collection,
+              folder: folder,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ]
+    : [
+        {
+          onclick: () => {
+            onCreateAPIRequest(collection, folder);
+          },
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: ArrowSwapRegular,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("socketioFolder", {
+              collection: collection,
+              folder: folder,
+            });
+          },
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("websocketFolder", {
+              collection: collection,
+              folder: folder,
+            });
+          },
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+        {
+          onclick: () => {
+            onItemCreated("graphqlFolder", {
+              collection: collection,
+              folder: folder,
+            });
+          },
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-ds-neutral-50)",
+          iconSize: "14px",
+        },
+      ];
+  const handleSelectClick = (event: MouseEvent) => {
+    const selectElement = document.getElementById(
+      `add-item-collection-${collection.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
+  };
+  let isBackgroundClickable = true;
   const updateTotalRequests = async () => {
     let res = await getTotalRequests(collection, tab);
     if (res) {
@@ -120,21 +247,25 @@
   <div class="my-collection d-flex flex-column w-100 z-3">
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
-        <input
-          type="text"
-          required
-          id="renameInputFieldFolder"
+        <Input
+          placeholder={""}
+          type={"text"}
+          size={"medium"}
+          maxlength={100}
           value={folder?.name || ""}
+          id={"renameInputFieldFolder"}
+          variant={"inline"}
+          width={"398px"}
           disabled={tab?.source === "SPEC" ||
             userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent input-outline border-0 text-left w-100 ps-2 py-0 text-fs-18"
-          maxlength={100}
           on:blur={(event) => {
-            const newValue = event.target.value.trim();
+            console.log(folder);
+            const newValue = event.detail;
             const previousValue = folder.name;
             if (newValue === "") {
               resetInputField();
             } else if (newValue !== previousValue) {
+              console.log(newValue, previousValue);
               onRename(collection, folder, newValue, tab);
             }
           }}
@@ -145,16 +276,37 @@
           }}
         />
       </div>
-      <div class="d-flex flex-row">
-        <button
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-            tab?.source === "SPEC"}
-          class="btn add-button rounded mx-1 border-0 text-align-right py-1"
-          style="max-height:60px; width:200px; margin-top: -2px;"
-          on:click={() => {
-            onCreateAPIRequest(collection, folder);
-          }}>New Request</button
+      <div class="d-flex flex-row" style="gap:8px">
+        <Dropdown
+          minWidth={171}
+          zIndex={600}
+          buttonId={`add-item-collection`}
+          bind:isMenuOpen={showAddItemMenu}
+          bind:isBackgroundClickable
+          options={addButtonData}
+          horizontalPosition="left"
         >
+          <Button
+            id={`add-item-collection`}
+            title={"New Request"}
+            type={"primary"}
+            onClick={() => {
+              showAddItemMenu = !showAddItemMenu;
+            }}
+            size="medium"
+            startIcon={AddRegular}
+            endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+          />
+        </Dropdown>
+        <Button
+          type={"secondary"}
+          startIcon={SaveRegular}
+          onClick={() => {
+            if (folder?.description !== currentDescription) {
+              onUpdateDescription(tab, currentDescription);
+            }
+          }}
+        />
       </div>
     </div>
 
@@ -186,13 +338,11 @@
           tab?.source === "SPEC"}
         id="updateFolderDescField"
         style="margin-top: -2px;"
-        class="bg-transparent border-0 text-fs-12 h-50 input-outline shadow-none w-100 p-2"
+        class="border-0 text-fs-12 h-50 input-outline shadow-none w-100 p-2"
         value={folder?.description || ""}
-        placeholder="Describe the folder. Add code examples and tips for your team to effectively use the APIs."
-        on:blur={(event) => {
-          if (folder?.description !== event.target.value) {
-            onUpdateDescription(tab, event.target.value);
-          }
+        placeholder="Describe this folder and share code examples or usage tips for the APIs."
+        on:input={(event) => {
+          currentDescription = event.target.value;
         }}
       />
     </div>
@@ -221,9 +371,9 @@
   .my-collection {
     padding: 24px;
   }
-
   .input-outline {
     border-radius: 0%;
+    background-color: var(--bg-ds-surface-600);
   }
   textarea {
     border-radius: 4px !important;

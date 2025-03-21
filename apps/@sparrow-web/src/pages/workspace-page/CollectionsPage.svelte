@@ -678,7 +678,10 @@
                 {:else if $activeTab?.type === ItemType.FOLDER}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <FolderExplorerPage tab={$activeTab} />
+                      <FolderExplorerPage
+                        tab={$activeTab}
+                        onItemCreated={_viewModel.handleCreateItem}
+                      />
                     </div>
                   </Motion>
                 {:else if $activeTab?.type === ItemType.ENVIRONMENT}
