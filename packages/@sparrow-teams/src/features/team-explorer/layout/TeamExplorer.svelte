@@ -11,7 +11,6 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
-  import { ListRegular } from "@sparrow/library/icons";
 
   import {
     TeamTabsEnum,
@@ -20,7 +19,7 @@
   import { WorkspaceListView } from "../components";
   import WorkspaceGridView from "../components/workspace-grid-view/WorkspaceGridView.svelte";
   import { TeamMembers, TeamSettings } from "@sparrow/teams/features";
-  import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
+  import { CrossIcon, MoreOptions, ListRegular } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   export let isWebApp = false;
@@ -305,6 +304,24 @@
                 loader={isWorkspaceCreationInProgress}
                 disable={isGuestUser || isWorkspaceCreationInProgress}
               />
+            {:else}
+              <Button
+                title="Invite"
+                type="secondary"
+                textStyleProp="font-size: var(--small-text)"
+                buttonClassProp="my-auto px-3 pt-1 m-2"
+                buttonStyleProp="height: 30px; opacity: 0.5; cursor: not-allowed;"
+                disable={true}
+              />
+              <Button
+                title="New Workspace"
+                type="primary"
+                loaderSize={17}
+                textStyleProp="font-size: var(--small-text)"
+                buttonClassProp="my-auto ms-1"
+                buttonStyleProp="height: 30px; opacity: 0.5; cursor: not-allowed;"
+                disable={true}
+              />
             {/if}
           </div>
         </div>
@@ -325,7 +342,10 @@
               {activeTeamTab}
             />
           </div>
-          <div class="teams-menu__right">
+          <div
+            class="teams-menu__right"
+            style="cursor:pointer;display:flex;justify-content:center;align-items:center"
+          >
             {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
               <span class="mx-3" style="cursor:pointer;">
                 <img
@@ -529,8 +549,5 @@
   }
   .moreOption-icon:hover {
     background-color: var(--bg-tertiary-190);
-  }
-  .teams-menu__right {
-    display: flex;
   }
 </style>
