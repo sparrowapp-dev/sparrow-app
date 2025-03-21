@@ -564,12 +564,6 @@ const disconnectSocketIo = async (tab_id: string) => {
         wsData.status = "disconnected";
         abortController = wsData?.abortController;
         isRequestCancelled = true;
-        // wsData.messages.unshift({
-        //   data: `Connection aborted`,
-        //   transmitter: "disconnector",
-        //   timestamp: formatTime(new Date()),
-        //   uuid: uuidv4(),
-        // });
         updateSocketDataStore(
           tab_id,
           `Connection aborted`,
