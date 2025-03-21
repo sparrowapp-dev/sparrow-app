@@ -559,7 +559,7 @@
     if (!currentWorkspace) return;
     refreshLoad.set(true);
     currentWorkspace.subscribe(async (workspace) => {
-      if (workspace && workspace._data.users?.length) {
+      if (workspace && workspace._data.users?.length > 1) {
         try {
           // Fetch data in parallel
           await Promise.all([
