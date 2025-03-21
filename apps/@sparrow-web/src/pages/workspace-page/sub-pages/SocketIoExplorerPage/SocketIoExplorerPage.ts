@@ -4,7 +4,12 @@ import {
   ReduceQueryParams,
   DecodeSocketio,
 } from "@sparrow/workspaces/features/socketio-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  moveNavigation,
+  startLoading,
+  stopLoading,
+} from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -60,7 +65,6 @@ import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
-import { saveTabs } from "../../../../../../../packages/@sparrow-workspaces/src/stores/save-tabs";
 
 class SocketIoExplorerPageViewModel {
   /**
@@ -697,12 +701,10 @@ class SocketIoExplorerPageViewModel {
     const componentData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path as Path;
     const tabId = componentData?.tabId;
-    saveTabs.update((tabs) => ({
-      ...tabs,
-      [tabId]: true,
-    }));
+    startLoading(tabId);
 
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -783,10 +785,7 @@ class SocketIoExplorerPageViewModel {
           data,
         );
       }
-      saveTabs.update((tabs) => ({
-        ...tabs,
-        [tabId]: false,
-      }));
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -821,19 +820,13 @@ class SocketIoExplorerPageViewModel {
           res.data.data,
         );
       }
-      saveTabs.update((tabs) => ({
-        ...tabs,
-        [tabId]: false,
-      }));
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
-      saveTabs.update((tabs) => ({
-        ...tabs,
-        [tabId]: false,
-      }));
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation, startLoading, stopLoading } from "@sparrow/common/utils";
 import {
   CompareArray,
   Debounce,
@@ -81,8 +81,6 @@ import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import {  CollectionAuthTypeBaseEnum, CollectionItemTypeBaseEnum, CollectionRequestAddToBaseEnum, type CollectionAuthBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-import { saveTabs } from "@sparrow/workspaces/stores";
-
 class RestExplorerViewModel
 {
   /**
@@ -1298,16 +1296,9 @@ class RestExplorerViewModel
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;
-    saveTabs.update(tabs => ({
-      ...tabs,
-      [tabId]:true
-    }))
-
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:true
-      }))
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -1388,6 +1379,7 @@ class RestExplorerViewModel
           data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -1420,19 +1412,13 @@ class RestExplorerViewModel
           res.data.data,
         );
       }
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:false
-      }))
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:false
-      }))
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

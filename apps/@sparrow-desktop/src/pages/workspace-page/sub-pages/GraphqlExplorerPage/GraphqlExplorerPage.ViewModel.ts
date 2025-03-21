@@ -3,7 +3,7 @@ import {
   DecodeGraphql,
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation, startLoading, stopLoading } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -65,7 +65,7 @@ import {
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import { parse, GraphQLError } from "graphql";
-import { saveTabs } from "@sparrow/workspaces/stores";
+
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -1969,15 +1969,9 @@ class GraphqlExplorerViewModel {
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
     const tabId = graphqlTabData?.tabId;
-    saveTabs.update(tabs => ({
-          ...tabs,
-          [tabId]:true
-        }))
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:false
-      }))
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -2031,10 +2025,7 @@ class GraphqlExplorerViewModel {
           guestGraphqlRequest,
         );
       }
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:false
-      }))
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -2087,19 +2078,13 @@ class GraphqlExplorerViewModel {
           res.data.data,
         );
       }
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:false
-      }))
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
-      saveTabs.update(tabs => ({
-        ...tabs,
-        [tabId]:false
-      }))
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

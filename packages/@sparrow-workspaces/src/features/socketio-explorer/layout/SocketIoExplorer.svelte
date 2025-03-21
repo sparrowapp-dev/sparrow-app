@@ -32,8 +32,9 @@
     ResponseData,
     RequestEvents,
   } from "../components";
+  import { writable } from "svelte/store";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/socket-io-request-tab";
-  import { saveTabs } from "../../../stores";
+  import { loadingState } from "../../../../../@sparrow-common/src/stores";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<any[]>;
@@ -53,6 +54,7 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onUpdateEvents;
+  const loading = writable<boolean>(false);
   /**
    * Role of user in active workspace
    */
@@ -75,6 +77,15 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsSocket = flag;
   };
+
+  loadingState.subscribe((tab) => {
+    const tabIdValue = tab.get($tab.tabId);
+    if (tabIdValue === undefined) {
+      loading.set(false);
+    } else {
+      loading.set(tabIdValue);
+    }
+  });
 </script>
 
 {#if $tab.tabId}
@@ -82,7 +93,7 @@
     <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
       <!-- HTTP URL Section -->
       <HttpUrlSection
-        isSaveLoad={$saveTabs[$tab.tabId]}
+        isSaveLoad={$loading}
         class=""
         isSave={$tab.isSaved}
         bind:userRole

@@ -34,7 +34,8 @@
   } from "../components";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
-  import { saveTabs } from "../../../stores";
+  import { writable } from "svelte/store";
+  import { loadingState } from "../../../../../@sparrow-common/src/stores";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -70,9 +71,18 @@
   export let onClearInput;
   export let onUpdateFilterType;
   let isExposeSaveAsSocket = false;
+  const loading = writable<boolean>(false);
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsSocket = flag;
   };
+  loadingState.subscribe((tab) => {
+    const tabIdValue = tab.get($tab.tabId);
+    if (tabIdValue === undefined) {
+      loading.set(false);
+    } else {
+      loading.set(tabIdValue);
+    }
+  });
 </script>
 
 {#if $tab.tabId}
@@ -80,7 +90,7 @@
     <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
       <!-- HTTP URL Section -->
       <HttpUrlSection
-        isSaveLoad={$saveTabs[$tab.tabId]}
+        isSaveLoad={$loading}
         class=""
         isSave={$tab.isSaved}
         bind:userRole

@@ -73,7 +73,8 @@
     CheckmarkCircleFilled,
     ErrorCircleFilled,
   } from "@sparrow/library/icons";
-  import { saveTabs } from "../../../stores";
+  import { loadingState } from "../../../../../@sparrow-common/src/stores";
+  import { writable } from "svelte/store";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -122,6 +123,7 @@
   export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  const loading = writable<boolean>(false);
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -161,6 +163,11 @@
     isExposeSaveAsRequest = flag;
   };
 
+  $: {
+    loadingState.subscribe((tab) => {
+      loading.set(tab.get($tab.tabId));
+    });
+  }
   let isGuidePopup = false;
 </script>
 
@@ -208,7 +215,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
-        isSaveLoad={$saveTabs[$tab.tabId]}
+        isSaveLoad={$loading}
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={$tab.property.request?.url}

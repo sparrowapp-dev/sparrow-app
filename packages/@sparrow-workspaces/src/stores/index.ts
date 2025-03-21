@@ -16,6 +16,4 @@ export {
   isDefaultTourGuideClose,
 } from "./defaultGuide.tour";
 
-export { saveTabs } from "./save-tabs";
-
 export { tabsSplitterDirection } from "./tabs-view";
