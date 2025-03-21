@@ -34,6 +34,7 @@
     parentNodeId: string;
     parentNodeName: string;
     itemType: string;
+    type: string;
   }
 
   interface QueryBuilder {
@@ -48,6 +49,7 @@
     parentNodeName: string;
     isLeafNode: boolean;
     itemType: string;
+    type: string;
   }
 
   interface Breadcrum {
@@ -187,6 +189,7 @@
           isExpanded,
           isSelected,
           isInputField,
+          type,
           parentNodeId,
           parentNodeName,
           items,
@@ -200,6 +203,7 @@
           isExpanded: isExpanded,
           isSelected: isSelected,
           isInputField: isInputField,
+          type: type,
           parentNodeId: parentNodeId,
           parentNodeName: parentNodeName,
           isLeafNode: items?.length ? false : true,
@@ -474,7 +478,7 @@
    * @param _id - The ID of the node whose value is being updated.
    * @param _value - The new value to be set for the node with the specified ID.
    */
-  const updateAttributeInputData = (_id: string, _value: string) => {
+  const updateAttributeInputData = (_id: string, _value: any) => {
     const searchFieldById = (_item: QuerySchema): boolean => {
       if (_item.id === _id) {
         _item.value = _value;
@@ -503,8 +507,35 @@
    * @param _e - The event object that contains the input value from the input box.
    * @param _id - The ID of the node to be updated.
    */
-  const handleQBuilderInputboxChange = (_e: Event, _id: string) =>
-    updateAttributeInputData(_id, (_e.target as HTMLInputElement).value);
+
+  const convertStringToDataType = (value: string, dataType: string) => {
+    switch (dataType) {
+      case "Int": {
+        if (!value.length) return 0;
+        const parsedInt = parseInt(value, 10);
+        return isNaN(parsedInt) || /[^0-9]/.test(value) ? value : parsedInt;
+      }
+      case "Float": {
+        if (!value.length) return 0;
+        const parsedFloat = parseFloat(value);
+        return isNaN(parsedFloat) || /[^0-9.]/.test(value)
+          ? value
+          : parsedFloat;
+      }
+      default:
+        return value;
+    }
+  };
+
+  const handleQBuilderInputboxChange = (
+    _e: any,
+    _id: string,
+    _datatype: string,
+  ) =>
+    updateAttributeInputData(
+      _id,
+      convertStringToDataType(_e.detail, _datatype),
+    );
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -623,7 +654,7 @@
                         {item.name}
                       </span>
                       {#if item.isLeafNode && item.isInputField}
-                        <span class="input-arg-text text-fs-12 ms-3">ARG</span>
+                        <span class="input-arg-text text-fs-12 ms-2">ARG</span>
                       {/if}
                     </p>
 
@@ -652,7 +683,7 @@
                         placeholder="Enter value"
                         value={item.value || ""}
                         on:input={(e) => {
-                          handleQBuilderInputboxChange(e, item.id);
+                          handleQBuilderInputboxChange(e, item.id, item.type);
                         }}
                         on:focus={() => {
                           isQueryInputFocused = true;
@@ -767,8 +798,9 @@
                         >
                           {t.name}
                         </span>
+                        <span class="node-type-text ms-2">{t.type}</span>
                         {#if t.isLeafNode && t.isInputField}
-                          <span class="input-arg-text text-fs-12 ms-3">ARG</span
+                          <span class="input-arg-text text-fs-12 ms-2">ARG</span
                           >
                         {/if}
                       </p>
@@ -801,7 +833,7 @@
                         placeholder="Enter value"
                         value={t.value || ""}
                         on:input={(e) => {
-                          handleQBuilderInputboxChange(e, t?.id);
+                          handleQBuilderInputboxChange(e, t?.id, t?.type);
                         }}
                         on:focus={() => {
                           isQueryInputFocused = true;
@@ -951,6 +983,14 @@
     font-size: 12px;
     font-family: "JetBrains Mono", monospace;
   }
+
+  .node-type-text {
+    color: var(--text-ds-neutral-400);
+    font-weight: 400;
+    font-size: 10px;
+    font-family: "JetBrains Mono", monospace;
+  }
+
   .node-valu-text {
     font-weight: 500;
     font-size: 12px;

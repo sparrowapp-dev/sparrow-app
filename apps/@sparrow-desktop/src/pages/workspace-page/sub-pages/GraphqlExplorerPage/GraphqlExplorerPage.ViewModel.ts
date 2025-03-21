@@ -817,6 +817,15 @@ class GraphqlExplorerViewModel {
               value: arg.value.value, // Set value for StringValue
               items: [], // No nested items
             };
+          case "IntValue":
+            // For IntValue, set value directly
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: arg.value.value,
+              items: [], // No nested items
+            };
           case "ObjectValue":
             // For ObjectValue, process nested fields and place them in items
             items = processObjectFields(arg.value.fields);
