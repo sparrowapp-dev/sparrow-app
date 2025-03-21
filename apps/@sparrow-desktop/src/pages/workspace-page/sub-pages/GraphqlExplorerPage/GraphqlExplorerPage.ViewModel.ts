@@ -3,7 +3,7 @@ import {
   DecodeGraphql,
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation, startLoading, stopLoading } from "@sparrow/common/utils";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -65,6 +65,7 @@ import {
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import { parse, GraphQLError } from "graphql";
+
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -1967,8 +1968,10 @@ class GraphqlExplorerViewModel {
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
-
+    const tabId = graphqlTabData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -2022,6 +2025,7 @@ class GraphqlExplorerViewModel {
           guestGraphqlRequest,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -2074,11 +2078,13 @@ class GraphqlExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

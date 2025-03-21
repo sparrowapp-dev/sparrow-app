@@ -3,7 +3,7 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import {SaveRegular} from "@sparrow/library/icons";
+  import { SaveRegular } from "@sparrow/library/icons";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
@@ -21,6 +21,7 @@
   export let onUpdateEnvironment;
   export let isSave;
   export let isGraphqlEditable;
+  export let isSaveLoad = false;
 
   const theme = new UrlInputTheme().build();
   /**
@@ -59,8 +60,6 @@
       onSendButtonClicked(environmentVariables?.filtered || []);
     }
   };
-
-
 </script>
 
 <div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
@@ -101,22 +100,25 @@
       }}
     />
   {:else}
-  <Button title="Cancel"
-  type="secondary"
-  customWidth={"96px"}
-  size="medium"
-  onClick={() => {
+    <Button
+      title="Cancel"
+      type="secondary"
+      customWidth={"96px"}
+      size="medium"
+      onClick={() => {
         onCancelButtonClicked();
-      }}/>
+      }}
+    />
   {/if}
 
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <Button
-    type="secondary"
-    size="medium"
-    startIcon={SaveRegular}
-    disable={isSave || !isGraphqlEditable ? true : false}
-    onClick={() => {
+      type="secondary"
+      size="medium"
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
+      disable={isSave || !isGraphqlEditable ? true : false}
+      onClick={() => {
         handleSaveRequest();
         MixpanelEvent(Events.Save_GraphQL_Request, {
           description: "Save GraphQL Request",
@@ -128,12 +130,10 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-
   .save-disk:disabled {
     background-color: var(--bg-secondary-550);
   }
   :global(.url-red-border) {
     border: 1px solid var(--border-danger-200) !important;
   }
-  
 </style>
