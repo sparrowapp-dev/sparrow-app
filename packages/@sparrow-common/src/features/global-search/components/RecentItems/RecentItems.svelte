@@ -90,7 +90,7 @@
     workspaces: {
       items: filteredWorkspaces,
       title: searchQuery === "" ? "Recent Workspaces" : "Workspaces",
-      shortcutKeys: [osKeyName, "Shift", "W"],
+      // shortcutKeys: [osKeyName, "Shift", "W"],
       icon: WorkspaceIcongs,
       nav: (item) => handleGlobalSearchWorkspaceNavigation(item),
       getName: (item) => item.name,

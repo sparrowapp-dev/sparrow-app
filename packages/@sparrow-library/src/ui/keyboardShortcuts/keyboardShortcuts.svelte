@@ -8,7 +8,7 @@
     {#each keys as key}
       {#if key.toLowerCase() === "cmd"}
         <span class="key">
-           <CommandKey />
+          <CommandKey />
         </span>
       {:else}
         <span class="key">{key}</span>

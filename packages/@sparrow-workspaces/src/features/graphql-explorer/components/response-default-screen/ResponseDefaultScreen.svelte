@@ -48,7 +48,7 @@
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3">
-          <ComboText {key} {value} type="combo" />
+          <Com boText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}
