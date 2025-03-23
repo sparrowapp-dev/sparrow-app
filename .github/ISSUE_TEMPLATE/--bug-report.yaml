@@ -3,7 +3,7 @@ description: Create a bug report to help us improve Sparrow
 title: "[bug]: "
 labels: [bug]
 assignees: [LordNayan]
-type: [Bug]
+type: Bug
 projects: [Sparrow]
 body:
 - type: markdown
