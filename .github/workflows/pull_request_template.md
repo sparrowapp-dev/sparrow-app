@@ -5,7 +5,7 @@ Add your description here.
 Fixes #<your_issue_number>
 
 ### Add Screenshots/GIFs
-If applicable, add relavent screenshot/gif here.
+If applicable, add relevant screenshot/gif here.
 
 ### Add Known Issue
 If applicable, add any known issues.
