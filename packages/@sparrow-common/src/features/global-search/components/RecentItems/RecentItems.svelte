@@ -158,7 +158,7 @@
     flows: {
       items: filteredTestflows,
       title: searchQuery === "" ? "Recent Test Flows" : "Test Flows",
-      shortcutKeys: [osKeyName, "Shift", "T"],
+      // shortcutKeys: [osKeyName, "Shift", "T"],
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
