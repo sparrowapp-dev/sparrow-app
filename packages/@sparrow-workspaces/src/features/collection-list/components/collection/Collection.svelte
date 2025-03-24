@@ -488,7 +488,7 @@
       }
     }
   }}
-  style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "
+  style="height:32px; gap:4px;  padding-left:19px; margin-bottom:2px; "
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -527,7 +527,7 @@
     {:else}
       <div
         class="collection-collection-name justify-content-center d-flex py-1 mb-0 flex-column"
-        style="height: 32px; text-align: left; width:80%"
+        style="height: 32px; text-align: left; width:80% ; padding:2px 4px;"
       >
         <p
           class="ellipsis mb-0"
@@ -575,7 +575,10 @@
             size="extra-small"
             customWidth={"24px"}
             type="teritiary-regular"
-            onClick={rightClickContextMenu2}
+            onClick={(e) => {
+              e.stopPropagation();
+              rightClickContextMenu2(e);
+            }}
             startIcon={AddRegular}
           />
         </span>
@@ -670,7 +673,7 @@
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ms-2" style="padding-left: 42px;">
+        <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip
               title={"Add Folder"}
@@ -949,8 +952,8 @@
   .box-line {
     position: absolute;
     top: 0;
-    bottom: 26px;
-    left: 32.5px;
+    bottom: 0%;
+    left: 30.5px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 1;

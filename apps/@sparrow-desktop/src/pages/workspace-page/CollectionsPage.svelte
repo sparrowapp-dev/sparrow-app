@@ -1094,7 +1094,7 @@
       .collection-splitter .splitpanes__splitter:active,
       .collection-splitter .splitpanes__splitter:hover
     ) {
-    background-color: var(--bg-ds-primary-300) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .gradient-text {
     font-size: 18;

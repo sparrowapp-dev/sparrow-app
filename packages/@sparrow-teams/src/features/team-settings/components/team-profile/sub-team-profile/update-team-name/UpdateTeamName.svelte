@@ -1,10 +1,9 @@
 <script lang="ts">
   import { TeamPropertyEnum } from "../../../../types";
   import { NAME_CONFIG } from "../../../../constants";
-
+  import { Input } from "@sparrow/library/forms";
   export let teamName: string;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
-
   const inputId = "input-team-name";
   const blurInputField = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -14,21 +13,20 @@
   };
 </script>
 
-<div class="d-flex pb-3">
+<div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mt-2 mb-0 fs-12 text-textColor">{NAME_CONFIG.TITLE}</p>
+    <p class="team-title mt-2 mb-0 fs-12 text-textColor">
+      {NAME_CONFIG.TITLE}
+    </p>
   </div>
   <div class="container-width">
-    <input
-      required
+    <Input
+      size={"small"}
+      width={"398px"}
       type="text"
+      variant={"primary"}
       id={inputId}
       placeholder={NAME_CONFIG.PLACEHOLDER}
-      class="settings-team-name w-100 fs-12 border-0 p-2 rounded"
-      autocomplete="off"
-      spellcheck="false"
-      autocorrect="off"
-      autocapitalize="off"
       maxlength={NAME_CONFIG.MAX_TEXT_SIZE}
       bind:value={teamName}
       on:keydown={(e) => {
@@ -37,6 +35,7 @@
       on:blur={() => {
         onUpdateTeam(TeamPropertyEnum.NAME);
       }}
+      disabled={true}
     />
   </div>
 </div>
@@ -58,6 +57,6 @@
     width: 98px;
   }
   .container-width {
-    width: calc(100% - 98px);
+    width: calc(100%-98px);
   }
 </style>

@@ -14,8 +14,8 @@
         <input
           type="text"
           placeholder={header.key}
-          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
-          style="font-size: 13px;"
+          class="px-2 py-1 border-0 w-100 border-radius-2"
+          style="font-size: 13px; background-color: var(--bg-ds-surface-800);"
           readonly
           disabled
         />
@@ -24,8 +24,8 @@
         <input
           type="text"
           placeholder={header.value}
-          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
-          style="font-size: 13px;"
+          class="px-2 py-1 border-0 w-100 border-radius-2"
+          style="font-size: 13px; background-color: var(--bg-ds-surface-800);"
           readonly
           disabled
         />

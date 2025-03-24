@@ -309,9 +309,7 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id
-      ? "padding-left: 70.5px; gap:4px;"
-      : "padding-left: 44.5px; gap:4px; "}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -333,7 +331,7 @@
       on:click|stopPropagation={() => {
         expand = !expand;
       }}
-      style="  display: flex; "
+      style="  display: flex; margin-right:4px; "
     >
       {#if api?.items && api?.items?.length > 0}
         <Button
@@ -342,6 +340,11 @@
           customWidth={"24px"}
           type="teritiary-regular"
         />
+      {:else}
+        <div
+          class="api-method"
+          style="width: 24px !important; height:24px !important; padding:0;"
+        ></div>
       {/if}
     </span>
     <div
@@ -411,7 +414,7 @@
   <div class="sub-files position-relative">
     <div
       class="box-line"
-      style={folder?.id ? "left: 84.5px;" : "left: 58.5px;"}
+      style={folder?.id ? "left: 57.6px;" : "left: 45.1px;"}
     ></div>
     <!-- {#if } -->
     {#each api?.items || [] as exp}
@@ -445,7 +448,7 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
   }
   .api-name {
     height: 24px;
@@ -453,11 +456,11 @@
     font-weight: 500;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
+    color: var(--bg-ds-neutral-200);
     display: flex;
     align-items: center;
 
-    padding: 4px 2px;
+    padding: 2px 4px;
     caret-color: var(--bg-ds-primary-300);
   }
   .api-name:focus {

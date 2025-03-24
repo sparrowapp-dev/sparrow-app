@@ -3,6 +3,8 @@ description: Suggest a feature to improve Sparrow
 title: "[feature]: "
 labels: [feature]
 assignees: [LordNayan]
+type: Feature
+projects: [Sparrow]
 body:
 - type: markdown
   attributes:
