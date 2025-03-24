@@ -477,7 +477,7 @@
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         if (visibility) {
-          addCollectionItem(collection, "collection");
+          addCollectionItem(collection.id, "collection");
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,

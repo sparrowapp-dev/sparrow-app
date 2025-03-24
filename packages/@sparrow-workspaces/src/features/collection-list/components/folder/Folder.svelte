@@ -411,7 +411,7 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
-                addCollectionItem(explorer, "Folder");
+                addCollectionItem(explorer.id, "Folder");
                 onItemOpened("folder", {
                   workspaceId: collection.workspaceId,
                   collection,

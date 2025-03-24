@@ -287,7 +287,7 @@
     if (!isRenaming) {
       expand = !expand;
       if (expand) {
-        addCollectionItem(api, "Request");
+        addCollectionItem(api.id, "Request");
         onItemOpened("request", {
           workspaceId: collection.workspaceId,
           collection,

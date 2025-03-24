@@ -5,10 +5,10 @@ export const isExpandEnvironment = writable<boolean>(false);
 export const isExpandTestflow = writable<boolean>(false);
 export const openedComponent = writable(new Map());
 
-export const addCollectionItem = (item, name:string) => {
+export const addCollectionItem = (id, name:string) => {
     openedComponent.update((map) => {
       const newMap = new Map(map);
-      newMap.set(item.id, name);
+      newMap.set(id, name);
       return newMap;
     });
   };
