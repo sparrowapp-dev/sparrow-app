@@ -8,6 +8,7 @@
   -ms-user-select: none;
   user-select: none;
 }
+
 @supports (font-variation-settings: normal) {
   * {
     font-family: InterVariable, sans-serif;
