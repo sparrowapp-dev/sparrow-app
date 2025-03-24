@@ -295,8 +295,9 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;display: inline-block;" class="text-textColor"
-            >{user.email}</span
+          <span
+            style="font-size:12px;display: inline-block;"
+            class="text-textColor">{user.email}</span
           >
         </div>
       </div>
@@ -377,8 +378,9 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;display: inline-block;" class="text-textColor "
-            >{user.email}</span
+          <span
+            style="font-size:12px;display: inline-block;"
+            class="text-textColor">{user.email}</span
           >
         </div>
       </div>
@@ -453,8 +455,9 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;display: inline-block;" class="text-textColor"
-            >{user.email}</span
+          <span
+            style="font-size:12px;display: inline-block;"
+            class="text-textColor">{user.email}</span
           >
         </div>
       </div>
