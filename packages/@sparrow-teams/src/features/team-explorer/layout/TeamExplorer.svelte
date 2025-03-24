@@ -140,7 +140,7 @@
         name: "Settings",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
-        visible: openTeam?.owner === userId,
+        visible: openTeam?.owner === userId || isGuestUser,
         disabled: isGuestUser === true ? true : false,
       },
     ];
