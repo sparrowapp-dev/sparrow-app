@@ -505,7 +505,7 @@
         class="py-0 renameInputFieldCollection w-100 ellipsis"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px; "
+        style="font-size: 12px; font-weight:400; line-height:18px; gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -521,7 +521,7 @@
       >
         <p
           class="ellipsis mb-0"
-          style="font-size: 12px; font-weight:500; line-height:18px;  "
+          style="font-size: 12px; font-weight:400; line-height:18px;  "
         >
           {collection.name}
         </p>

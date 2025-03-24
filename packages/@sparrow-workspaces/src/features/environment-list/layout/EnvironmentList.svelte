@@ -182,7 +182,7 @@
       <span style="padding:2px 4px;">
         <p
           class=" mb-0 sparrow-fs-13"
-          style="font-weight: 500; font-size:12px; line-height:18px;"
+          style="font-weight:400; font-size:12px; line-height:18px;"
         >
           Environments
         </p>
@@ -225,7 +225,7 @@
           <p
             tabindex="0"
             role="button"
-            class={`fw-normal   env-item text-fs-12 border-radius-2  ${
+            class={`fw-normal env-item text-fs-12 border-radius-2  ${
               globalEnvironment[0]?.id === activeTabId && "active"
             }`}
             style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
@@ -243,7 +243,7 @@
             </span>
 
             <span class="box-line1"></span>
-            <span class="" style="padding: 2px 4px;"
+            <span class="" style="padding: 2px 4px; font-weight: 400;"
               >{globalEnvironment[0]?.name}
             </span>
           </p>

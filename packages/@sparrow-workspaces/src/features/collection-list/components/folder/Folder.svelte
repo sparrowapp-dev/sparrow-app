@@ -458,7 +458,7 @@
               class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px; padding-left:5px; font-weight:500; color : var(--text-ds-neutral-50); line-height:18px;"
+              style="font-size: 12px; padding-left:5px; font-weight:400; color : var(--text-ds-neutral-50); line-height:18px;"
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -472,7 +472,7 @@
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
                       height: 32px;
-                      font-weight:500;
+                      font-weight:400;
                       margin-left:0px;
                       font-size:12px;
                       color:var(--text-ds-neutral-50);

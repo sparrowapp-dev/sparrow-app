@@ -346,7 +346,7 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
+        style="font-size: 12px; font-weight:400;"
       >
         <p class="ellipsis m-0 p-0">
           {api.name}
@@ -414,7 +414,7 @@
   }
   .api-method {
     font-size: 9px;
-    font-weight: 600;
+    font-weight: 500;
     width: 30px !important;
     height: 24px;
     border-radius: 4px;

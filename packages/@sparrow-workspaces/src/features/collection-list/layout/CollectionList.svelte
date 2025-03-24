@@ -250,7 +250,7 @@
         >
           <p
             class="sparrow-fs-13 mb-0"
-            style="font-weight: 500; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
+            style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
           >
             Collections
           </p>
