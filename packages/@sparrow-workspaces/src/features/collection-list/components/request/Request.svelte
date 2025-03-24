@@ -27,6 +27,7 @@
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
+  import { afterUpdate } from "svelte";
 
   let expand = false;
   /**
@@ -70,6 +71,32 @@
   export let userRole;
   export let activeTabType;
   export let isWebApp;
+
+  export let verticalCollectionLine = false;
+  export let handleVerticalCollectionLine;
+  export let verticalFolderLine = false;
+  export let handleFolderLine;
+
+  afterUpdate(() => {
+    {
+      if (api.id === activeTabId && !folder?.id) {
+        if (!verticalCollectionLine) {
+          handleVerticalCollectionLine();
+        }
+      } else if (api.id === activeTabId && folder?.id) {
+        if (!verticalFolderLine) {
+          handleFolderLine();
+        }
+      } else {
+        if (verticalCollectionLine) {
+          handleVerticalCollectionLine();
+        }
+        if (verticalFolderLine) {
+          handleFolderLine();
+        }
+      }
+    }
+  });
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -141,6 +168,17 @@
       api?.request?.method as HttpRequestMethodBaseEnum,
     );
   }
+
+  let verticalActiveLine = false;
+
+  $: {
+    if (api.id === activeTabId) {
+      verticalActiveLine = false;
+    }
+  }
+  const handleVerticalActiveLine = () => {
+    verticalActiveLine = !verticalActiveLine;
+  };
 </script>
 
 <svelte:window
@@ -262,6 +300,7 @@
     dragStart(event, collection);
   }}
   on:click|preventDefault={() => {
+    expand = !expand;
     if (!isRenaming) {
       onItemOpened("request", {
         workspaceId: collection.workspaceId,
@@ -385,7 +424,7 @@
 <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
   <div class="sub-files position-relative">
     <div
-      class="box-line"
+      class={verticalActiveLine ? "box-line-active" : "box-line"}
       style={folder?.id ? "left: 57.6px;" : "left: 45.1px;"}
     ></div>
     <!-- {#if } -->
@@ -401,6 +440,8 @@
           {folder}
           {collection}
           {activeTabId}
+          {verticalActiveLine}
+          {handleVerticalActiveLine}
         />
       </div>
     {/each}
@@ -579,5 +620,13 @@
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 150;
+  }
+  .box-line-active {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    z-index: 150;
+    background-color: var(--bg-ds-neutral-500);
   }
 </style>

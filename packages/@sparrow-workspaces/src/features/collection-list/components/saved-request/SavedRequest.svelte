@@ -62,6 +62,19 @@
   export let userRole;
 
   export let request;
+  export let handleVerticalActiveLine;
+  export let verticalActiveLine;
+  $: {
+    if (api.id === activeTabId) {
+      if (!verticalActiveLine) {
+        handleVerticalActiveLine();
+      }
+    } else {
+      if (verticalActiveLine) {
+        handleVerticalActiveLine();
+      }
+    }
+  }
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;

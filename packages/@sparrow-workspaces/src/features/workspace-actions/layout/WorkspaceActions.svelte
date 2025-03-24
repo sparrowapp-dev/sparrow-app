@@ -144,6 +144,33 @@
   export let isExpandEnvironment = false;
   export let isExpandTestflow = false;
 
+  let isExpandCollectionLine = false;
+  let isExpandEnviromentLine = false;
+  let isExpandTestflowLine = false;
+
+  const handleExpandCollectionLine = () => {
+    isExpandCollectionLine = !isExpandCollectionLine;
+    console.log(isExpandCollectionLine);
+  };
+  const handleExpandEnviromentLine = () => {
+    isExpandEnviromentLine = !isExpandEnviromentLine;
+  };
+  const handleTestflowLine = () => {
+    isExpandTestflowLine = !isExpandTestflow;
+  };
+
+  // $: {
+  //   if (isExpandCollectionLine) {
+  //     isExpandCollectionLine = false;
+  //   }
+  //   if (isExpandEnviromentLine) {
+  //     isExpandEnviromentLine = false;
+  //   }
+  //   if (isExpandTestflowLine) {
+  //     isExpandTestflowLine = false;
+  //   }
+  // }
+
   let isGithubStarHover = false;
 
   let collectionFilter: any = [];
@@ -649,6 +676,8 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
+          {isExpandCollectionLine}
+          {handleExpandCollectionLine}
           bind:isExpandCollection
           bind:isFirstCollectionExpand
           {isWebApp}
@@ -676,6 +705,8 @@
           {searchData}
           {activeTabId}
           {toggleExpandEnvironment}
+          {isExpandEnviromentLine}
+          {handleExpandEnviromentLine}
           bind:isExpandEnvironment
         />
       </div>
@@ -699,6 +730,8 @@
           {searchData}
           {activeTabId}
           {toggleExpandTestflow}
+          {isExpandTestflowLine}
+          {handleTestflowLine}
           bind:isExpandTestflow
         />
       </div>

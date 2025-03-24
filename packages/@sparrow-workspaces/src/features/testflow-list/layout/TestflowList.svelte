@@ -25,6 +25,7 @@
     currentStep,
   } from "../../../stores/guide.tour";
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
+  import { afterUpdate } from "svelte";
 
   /**
    * current workspace
@@ -67,6 +68,23 @@
   export let toggleExpandTestflow;
 
   export let activeTabId;
+
+  export let isExpandTestflowLine = false;
+  export let handleTestflowLine;
+
+  afterUpdate(() => {
+    {
+      if (isExpandTestflow) {
+        if (!isExpandTestflowLine) {
+          handleTestflowLine();
+        }
+      } else {
+        if (isExpandTestflow) {
+          handleTestflowLine();
+        }
+      }
+    }
+  });
 
   let scrollList: ScrollList;
   let isHovered = false;

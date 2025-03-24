@@ -19,7 +19,7 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { onDestroy } from "svelte";
+  import { afterUpdate, onDestroy } from "svelte";
   import {
     AddRegular,
     AngleLeftIcon,
@@ -90,6 +90,23 @@
   export let isWebApp = false;
   export let activeTabType;
   export let isFirstCollectionExpand = false;
+
+  export let isExpandCollectionLine = false;
+  export let handleExpandCollectionLine;
+
+  afterUpdate(() => {
+    {
+      if (isExpandCollection) {
+        if (!isExpandCollectionLine) {
+          handleExpandCollectionLine();
+        }
+      } else {
+        if (isExpandCollectionLine) {
+          handleExpandCollectionLine();
+        }
+      }
+    }
+  });
 
   let collectionListDocument: CollectionDocument[];
 
@@ -293,7 +310,12 @@
         class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {isExpandCollectionLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
         {/if}
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
@@ -536,7 +558,7 @@
     bottom: 0;
     left: 13.6px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    /* background-color: var(--bg-ds-surface-100); */
     z-index: 10;
     /* height: 100px; */
   }

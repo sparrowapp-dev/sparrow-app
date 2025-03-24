@@ -19,6 +19,7 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { afterUpdate } from "svelte";
 
   /**
    * Callback for Item Deleted
@@ -59,6 +60,32 @@
    * Role of user in workspace
    */
   export let userRole;
+
+  export let verticalCollectionLine = false;
+  export let handleVerticalCollectionLine;
+  export let verticalFolderLine = false;
+  export let handleFolderLine;
+
+  afterUpdate(() => {
+    {
+      if (socketIo.id === activeTabId && !folder?.id) {
+        if (!verticalCollectionLine) {
+          handleVerticalCollectionLine();
+        }
+      } else if (socketIo.id === activeTabId && folder?.id) {
+        if (!verticalFolderLine) {
+          handleFolderLine();
+        }
+      } else {
+        if (verticalCollectionLine) {
+          handleVerticalCollectionLine();
+        }
+        if (verticalFolderLine) {
+          handleFolderLine();
+        }
+      }
+    }
+  });
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;

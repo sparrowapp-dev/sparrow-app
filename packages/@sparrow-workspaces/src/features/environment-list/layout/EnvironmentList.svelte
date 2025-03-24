@@ -19,6 +19,7 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
+  import { afterUpdate } from "svelte";
 
   /**
    * current workspace
@@ -69,6 +70,23 @@
   export let toggleExpandEnvironment;
 
   export let activeTabId;
+
+  export let isExpandEnviromentLine = false;
+  export let handleExpandEnviromentLine;
+
+  afterUpdate(() => {
+    {
+      if (isExpandEnvironment) {
+        if (!isExpandEnviromentLine) {
+          handleExpandEnviromentLine();
+        }
+      } else {
+        if (isExpandEnviromentLine) {
+          handleExpandEnviromentLine();
+        }
+      }
+    }
+  });
 
   let scrollList;
   let localEnvironment;
@@ -242,7 +260,12 @@
               <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
             </span>
 
-            <span class="box-line1"></span>
+            <span
+              class="box-line1"
+              style="background-color: {isExpandEnviromentLine
+                ? 'var(--bg-ds-neutral-500)'
+                : 'var(--bg-ds-surface-100)'}"
+            ></span>
             <span class="" style="padding: 2px 4px;"
               >{globalEnvironment[0]?.name}
             </span>
@@ -279,7 +302,12 @@
       <div class="position-relative">
         {#if filteredLocalEnvironment?.length}
           <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {isExpandEnviromentLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
           <List
             bind:scrollList
             height={"auto"}
@@ -485,7 +513,7 @@
     bottom: 0;
     left: 14.6px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    // background-color: var(--bg-ds-surface-100);
     z-index: 10;
     /* height: 100px; */
   }
@@ -495,7 +523,7 @@
     bottom: 0;
     left: 14.6px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    // background-color: var(--bg-ds-surface-100);
     z-index: 10;
     height: 45px;
   }

@@ -251,6 +251,20 @@
       inputField.blur();
     }
   };
+
+  let verticalCollectionLine = false;
+  let verticalFolderLine = false;
+  $: {
+    if (collection.id === activeTabId) {
+      verticalCollectionLine = false;
+    }
+  }
+  const handleVerticalCollectionLine = () => {
+    verticalCollectionLine = !verticalCollectionLine;
+  };
+  const handleFolderLine = () => {
+    verticalFolderLine = !verticalFolderLine;
+  };
 </script>
 
 <svelte:window
@@ -636,7 +650,12 @@
     >
       <div class=" ps-0 position-relative">
         {#if collection?.items?.length > 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {verticalCollectionLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
         {/if}
         <div class="">
           {#each collection.items as explorer}
@@ -654,6 +673,10 @@
               {activeTabId}
               {searchData}
               {isWebApp}
+              {verticalCollectionLine}
+              {handleVerticalCollectionLine}
+              {verticalFolderLine}
+              {handleFolderLine}
             />
           {/each}
         </div>
@@ -945,7 +968,7 @@
     bottom: 0%;
     left: 30.5px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+
     z-index: 1;
   }
 
