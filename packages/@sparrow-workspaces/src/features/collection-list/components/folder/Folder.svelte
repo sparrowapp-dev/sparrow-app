@@ -106,25 +106,17 @@
   let requestIds: string[] = [];
   let folderTabWrapper: HTMLElement;
 
-  export let verticalCollectionLine = false;
-  export let handleVerticalCollectionLine;
+  let verticalFolderLine = false;
 
-  export let verticalFolderLine = false;
-  export let handleFolderLine;
-
-  afterUpdate(() => {
-    {
-      if (explorer.id === activeTabId && explorer.type === "FOLDER") {
-        if (!verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
+  $: {
+    if (explorer.type === "FOLDER") {
+      if (explorer.items.find((item) => item.id === activeTabId)) {
+        verticalFolderLine = true;
       } else {
-        if (verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
+        verticalFolderLine = false;
       }
     }
-  });
+  }
 
   $: {
     if (searchData) {
@@ -430,7 +422,7 @@
             }
           }
         }}
-        style="height:32px; padding-left:33px; margin-bottom:2px; "
+        style="height:32px; padding-left:30px; margin-bottom:2px; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -581,10 +573,6 @@
               folder={explorer}
               {activeTabId}
               {isWebApp}
-              {verticalCollectionLine}
-              {handleVerticalCollectionLine}
-              {verticalFolderLine}
-              {handleFolderLine}
             />
           {/each}
           {#if !explorer?.items?.length}
@@ -638,10 +626,6 @@
           {collection}
           {activeTabId}
           {isWebApp}
-          {verticalCollectionLine}
-          {handleVerticalCollectionLine}
-          {verticalFolderLine}
-          {handleFolderLine}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
@@ -655,10 +639,6 @@
           {folder}
           {collection}
           {activeTabId}
-          {verticalCollectionLine}
-          {handleVerticalCollectionLine}
-          {verticalFolderLine}
-          {handleFolderLine}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.SOCKETIO}
@@ -672,10 +652,6 @@
           {folder}
           {collection}
           {activeTabId}
-          {verticalCollectionLine}
-          {handleVerticalCollectionLine}
-          {verticalFolderLine}
-          {handleFolderLine}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL && !isWebApp}
@@ -689,10 +665,6 @@
           {folder}
           {collection}
           {activeTabId}
-          {verticalCollectionLine}
-          {handleVerticalCollectionLine}
-          {verticalFolderLine}
-          {handleFolderLine}
         />
       </div>
     {/if}
@@ -826,7 +798,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 44.5px;
+    left: 41.2px;
     width: 1px;
     z-index: 200;
   }

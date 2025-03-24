@@ -31,7 +31,7 @@
     UntrackedItems,
   } from "@sparrow/common/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
-  import { onDestroy, onMount } from "svelte";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -253,18 +253,13 @@
   };
 
   let verticalCollectionLine = false;
-  let verticalFolderLine = false;
   $: {
-    if (collection.id === activeTabId) {
+    if (collection.items.find((item) => item.id === activeTabId)) {
+      verticalCollectionLine = true;
+    } else {
       verticalCollectionLine = false;
     }
   }
-  const handleVerticalCollectionLine = () => {
-    verticalCollectionLine = !verticalCollectionLine;
-  };
-  const handleFolderLine = () => {
-    verticalFolderLine = !verticalFolderLine;
-  };
 </script>
 
 <svelte:window
@@ -492,7 +487,7 @@
       }
     }
   }}
-  style="height:32px; gap:4px;  padding-left:19px; margin-bottom:2px; "
+  style="height:32px; gap:4px;  padding-left:16px; margin-bottom:2px; "
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -673,10 +668,6 @@
               {activeTabId}
               {searchData}
               {isWebApp}
-              {verticalCollectionLine}
-              {handleVerticalCollectionLine}
-              {verticalFolderLine}
-              {handleFolderLine}
             />
           {/each}
         </div>
@@ -966,7 +957,7 @@
     position: absolute;
     top: 0;
     bottom: 0%;
-    left: 30.5px;
+    left: 27.5px;
     width: 1px;
 
     z-index: 1;

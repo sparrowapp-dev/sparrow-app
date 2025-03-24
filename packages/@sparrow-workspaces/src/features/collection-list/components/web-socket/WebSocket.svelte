@@ -69,32 +69,6 @@
    */
   export let userRole;
 
-  export let verticalCollectionLine = false;
-  export let handleVerticalCollectionLine;
-  export let verticalFolderLine = false;
-  export let handleFolderLine;
-
-  afterUpdate(() => {
-    {
-      if (api.id === activeTabId && !folder?.id) {
-        if (!verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-      } else if (api.id === activeTabId && folder?.id) {
-        if (!verticalFolderLine) {
-          handleFolderLine();
-        }
-      } else {
-        if (verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-        if (verticalFolderLine) {
-          handleFolderLine();
-        }
-      }
-    }
-  });
-
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
@@ -383,6 +357,7 @@
     text-align: left;
     align-items: center;
     padding: 2px 4px;
+    color: var(--text-ds-neutral-200);
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

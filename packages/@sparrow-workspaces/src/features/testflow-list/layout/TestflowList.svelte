@@ -72,20 +72,13 @@
   export let isExpandTestflowLine = false;
   export let handleTestflowLine;
 
-  afterUpdate(() => {
-    {
-      if (isExpandTestflow) {
-        if (!isExpandTestflowLine) {
-          handleTestflowLine();
-        }
-      } else {
-        if (isExpandTestflow) {
-          handleTestflowLine();
-        }
-      }
+  $: {
+    if (testflows.find((item) => item._data._id === activeTabId)) {
+      isExpandTestflowLine = true;
+    } else {
+      isExpandTestflowLine = false;
     }
-  });
-
+  }
   let scrollList: ScrollList;
   let isHovered = false;
 
@@ -254,7 +247,12 @@
   -->
       <div class="position-relative">
         {#if filteredflows?.length > 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {isExpandTestflowLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
           <List
             bind:scrollList
             height={"auto"}

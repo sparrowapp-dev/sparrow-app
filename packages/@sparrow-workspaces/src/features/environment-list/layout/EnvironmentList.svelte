@@ -71,22 +71,17 @@
 
   export let activeTabId;
 
-  export let isExpandEnviromentLine = false;
-  export let handleExpandEnviromentLine;
+  let isExpandEnviromentLine = false;
 
-  afterUpdate(() => {
-    {
-      if (isExpandEnvironment) {
-        if (!isExpandEnviromentLine) {
-          handleExpandEnviromentLine();
-        }
-      } else {
-        if (isExpandEnviromentLine) {
-          handleExpandEnviromentLine();
-        }
-      }
+  $: {
+    // console.log(activeTabId);
+
+    if (environments?.find((item) => item._data.id === activeTabId)) {
+      isExpandEnviromentLine = true;
+    } else {
+      isExpandEnviromentLine = false;
     }
-  });
+  }
 
   let scrollList;
   let localEnvironment;

@@ -65,32 +65,6 @@
    */
   export let userRole;
 
-  export let verticalCollectionLine = false;
-  export let handleVerticalCollectionLine;
-  export let verticalFolderLine = false;
-  export let handleFolderLine;
-
-  afterUpdate(() => {
-    {
-      if (graphql.id === activeTabId && !folder?.id) {
-        if (!verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-      } else if (graphql.id === activeTabId && folder?.id) {
-        if (!verticalFolderLine) {
-          handleFolderLine();
-        }
-      } else {
-        if (verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-        if (verticalFolderLine) {
-          handleFolderLine();
-        }
-      }
-    }
-  });
-
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;

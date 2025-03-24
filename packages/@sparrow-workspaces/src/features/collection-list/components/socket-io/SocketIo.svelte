@@ -61,32 +61,6 @@
    */
   export let userRole;
 
-  export let verticalCollectionLine = false;
-  export let handleVerticalCollectionLine;
-  export let verticalFolderLine = false;
-  export let handleFolderLine;
-
-  afterUpdate(() => {
-    {
-      if (socketIo.id === activeTabId && !folder?.id) {
-        if (!verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-      } else if (socketIo.id === activeTabId && folder?.id) {
-        if (!verticalFolderLine) {
-          handleFolderLine();
-        }
-      } else {
-        if (verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-        if (verticalFolderLine) {
-          handleFolderLine();
-        }
-      }
-    }
-  });
-
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
@@ -370,8 +344,7 @@
     font-weight: 500;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
-    // display: flex;
+    color: var(--bg-ds-neutral-200);
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
     padding: 2px 4px;

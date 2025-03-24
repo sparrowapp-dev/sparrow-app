@@ -72,32 +72,6 @@
   export let activeTabType;
   export let isWebApp;
 
-  export let verticalCollectionLine = false;
-  export let handleVerticalCollectionLine;
-  export let verticalFolderLine = false;
-  export let handleFolderLine;
-
-  afterUpdate(() => {
-    {
-      if (api.id === activeTabId && !folder?.id) {
-        if (!verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-      } else if (api.id === activeTabId && folder?.id) {
-        if (!verticalFolderLine) {
-          handleFolderLine();
-        }
-      } else {
-        if (verticalCollectionLine) {
-          handleVerticalCollectionLine();
-        }
-        if (verticalFolderLine) {
-          handleFolderLine();
-        }
-      }
-    }
-  });
-
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
   let noOfColumns = 180;
@@ -172,13 +146,14 @@
   let verticalActiveLine = false;
 
   $: {
-    if (api.id === activeTabId) {
-      verticalActiveLine = false;
+    if (api.items) {
+      if (api.items.find((item) => item.id === activeTabId)) {
+        verticalActiveLine = true;
+      } else {
+        verticalActiveLine = false;
+      }
     }
   }
-  const handleVerticalActiveLine = () => {
-    verticalActiveLine = !verticalActiveLine;
-  };
 </script>
 
 <svelte:window
@@ -320,7 +295,7 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
+    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 28px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -385,7 +360,7 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
+        style={`font-size: 12px; color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
         <p class="ellipsis m-0 p-0">
           {api.name}
@@ -424,8 +399,8 @@
 <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
   <div class="sub-files position-relative">
     <div
-      class={verticalActiveLine ? "box-line-active" : "box-line"}
-      style={folder?.id ? "left: 57.6px;" : "left: 45.1px;"}
+      class="box-line"
+      style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
     ></div>
     <!-- {#if } -->
     {#each api?.items || [] as exp}
@@ -440,8 +415,6 @@
           {folder}
           {collection}
           {activeTabId}
-          {verticalActiveLine}
-          {handleVerticalActiveLine}
         />
       </div>
     {/each}
@@ -469,7 +442,6 @@
     font-weight: 500;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-200);
     display: flex;
     align-items: center;
 
@@ -618,15 +590,7 @@
     top: 0;
     bottom: 0;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    // background-color: var(--bg-ds-surface-100);
     z-index: 150;
-  }
-  .box-line-active {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    z-index: 150;
-    background-color: var(--bg-ds-neutral-500);
   }
 </style>

@@ -91,22 +91,16 @@
   export let activeTabType;
   export let isFirstCollectionExpand = false;
 
-  export let isExpandCollectionLine = false;
-  export let handleExpandCollectionLine;
+  let isExpandCollectionLine = false;
+  // export let handleExpandCollectionLine;
 
-  afterUpdate(() => {
-    {
-      if (isExpandCollection) {
-        if (!isExpandCollectionLine) {
-          handleExpandCollectionLine();
-        }
-      } else {
-        if (isExpandCollectionLine) {
-          handleExpandCollectionLine();
-        }
-      }
+  $: {
+    if (collectionFilter.find((item) => item._data.id === activeTabId)) {
+      isExpandCollectionLine = true;
+    } else {
+      isExpandCollectionLine = false;
     }
-  });
+  }
 
   let collectionListDocument: CollectionDocument[];
 
@@ -541,12 +535,6 @@
     height: 70vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
-  .searchField {
-  }
-  .filter-btn {
     /* border: 1px solid var(--border-color) !important; */
   }
   .filter-active {

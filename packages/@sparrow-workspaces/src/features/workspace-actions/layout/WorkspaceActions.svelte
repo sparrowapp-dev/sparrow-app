@@ -150,7 +150,7 @@
 
   const handleExpandCollectionLine = () => {
     isExpandCollectionLine = !isExpandCollectionLine;
-    console.log(isExpandCollectionLine);
+    // console.log(isExpandCollectionLine);
   };
   const handleExpandEnviromentLine = () => {
     isExpandEnviromentLine = !isExpandEnviromentLine;
@@ -705,8 +705,6 @@
           {searchData}
           {activeTabId}
           {toggleExpandEnvironment}
-          {isExpandEnviromentLine}
-          {handleExpandEnviromentLine}
           bind:isExpandEnvironment
         />
       </div>
