@@ -1701,18 +1701,18 @@ class GraphqlExplorerViewModel {
           return;
         }
 
-        graphqlExplorerDataStore.update((restApiDataMap) => {
-          const data = restApiDataMap.get(progressiveTab?.tabId);
+        graphqlExplorerDataStore.update((graphqlDataMap) => {
+          const data = graphqlDataMap.get(progressiveTab?.tabId);
           if (data) {
-            data.response.body = "";
+            data.response.body = error.toString();
             data.response.headers = [];
             data.response.status = ResponseStatusCode.ERROR;
             data.response.time = 0;
             data.response.size = 0;
             data.isSendRequestInProgress = false;
-            restApiDataMap.set(progressiveTab.tabId, data);
+            graphqlDataMap.set(progressiveTab.tabId, data);
           }
-          return restApiDataMap;
+          return graphqlDataMap;
         });
       });
   };

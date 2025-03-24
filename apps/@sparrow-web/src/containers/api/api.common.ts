@@ -303,16 +303,34 @@ const sendMessage = async (tab_id: string, message: string) => {
  */
 const disconnectWebSocket = async (tab_id: string) => {
   let url = "";
+  let abortController;
+  let isRequestCancelled = false;
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
       url = wsData.url;
-      wsData.status = "disconnecting";
+      if(wsData?.status === "connecting"){
+        wsData.status = "disconnected";
+        abortController = wsData?.abortController;
+        isRequestCancelled = true;
+        wsData.messages.unshift({
+          data: `Connection aborted`,
+          transmitter: "disconnector",
+          timestamp: formatTime(new Date()),
+          uuid: uuidv4(),
+        });
+      }
       wsData.url = "";
       webSocketDataMap.set(tab_id, wsData);
     }
     return webSocketDataMap;
   });
+  if(isRequestCancelled){
+    if (abortController) {
+        abortController.abort(); // Abort the request using the stored controller
+    }
+   return;
+  }
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
@@ -323,7 +341,7 @@ const disconnectWebSocket = async (tab_id: string) => {
       ) {
         socketInsta.close();
 
-        // ToDo -> Messages and Constants strings/values should be stored in a single script (named Constants) 
+        // ToDo -> Messages and Constants strings/values should be stored in a single script (named Constants)
         notifications.success("WebSocket disconnected successfully.");
       } else {
         socketInsta?.emit(
@@ -373,12 +391,14 @@ const connectWebSocket = async (
   tabId: string,
   requestHeaders: string,
 ) => {
+  const abortController = new AbortController();
   const selectedAgent = localStorage.getItem(
     "selectedAgent",
   ) as WorkspaceUserAgentBaseEnum;
   // Initialize WebSocket store
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
+      abortController: abortController,
       messages: [],
       status: "connecting",
       agent: selectedAgent,
@@ -390,6 +410,8 @@ const connectWebSocket = async (
     });
     return webSocketDataMap;
   });
+
+  const { signal } = abortController; // Extract the signal for the request
 
   if (
     selectedAgent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
@@ -407,8 +429,12 @@ const connectWebSocket = async (
         return webSocketDataMap;
       });
 
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
+        let hasErrorOccurred = false;
         ws.onopen = () => {
+          if (signal?.aborted) {
+            return;
+          }
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
@@ -429,6 +455,9 @@ const connectWebSocket = async (
         };
 
         ws.onmessage = async (event) => {
+          if (signal?.aborted) {
+            return;
+          }
           let result: string;
 
           if (event.data instanceof Blob) {
@@ -460,20 +489,24 @@ const connectWebSocket = async (
         };
 
         ws.onerror = (error) => {
+          if (signal?.aborted) {
+            return;
+          }
           console.error("WebSocket error:", error);
-          notifications.error("Failed to connect WebSocket. Please try again.");
-          webSocketDataStore.update((webSocketDataMap) => {
-            webSocketDataMap.delete(tabId);
-            return webSocketDataMap;
-          });
+          hasErrorOccurred = true;
         };
 
         ws.onclose = () => {
+          if (signal?.aborted) {
+            return;
+          }
           webSocketDataStore.update((webSocketDataMap) => {
             const wsData = webSocketDataMap.get(tabId);
             if (wsData) {
               wsData.messages.unshift({
-                data: `Disconnected from ${url}`,
+                data: hasErrorOccurred
+                  ? "Error: Failed to connect Websocket"
+                  : `Disconnected from ${url}`,
                 transmitter: "disconnector",
                 timestamp: formatTime(new Date()),
                 uuid: uuidv4(),
@@ -486,6 +519,9 @@ const connectWebSocket = async (
         };
       });
     } catch (error) {
+      if (signal?.aborted) {
+        return;
+      }
       console.error("WebSocket connection error:", error);
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
@@ -519,6 +555,9 @@ const connectWebSocket = async (
 
     proxySocketIO.onAny(async (event, args) => {
       if (event === "sparrow_internal_connect_error") {
+        if (signal?.aborted) {
+          return;
+        }
         // Connect_error listener from the target Socket.IO.
         console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
         // removeSocketIoDataFromMap(_tabId);
@@ -528,6 +567,9 @@ const connectWebSocket = async (
         });
         notifications.error("Failed to connect WebSocket");
       } else if (event === "sparrow_internal_connect") {
+        if (signal?.aborted) {
+          return;
+        }
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tabId);
           if (wsData) {
@@ -545,6 +587,9 @@ const connectWebSocket = async (
         });
         notifications.success("WebSocket connected successfully.");
       } else if (event === "sparrow_internal_disconnect") {
+        if (signal?.aborted) {
+          return;
+        }
         // Disconnect listener from the target Socket.IO.
         console.error(
           new DOMException(args + " (Connection Lost)", "DisconnectError"),
@@ -593,6 +638,9 @@ const connectWebSocket = async (
 
     // Listen for connect_error events from the proxy Socket.IO.
     proxySocketIO.on("connect_error", (err) => {
+      if (signal?.aborted) {
+        return;
+      }
       console.error(new DOMException(err + " (Proxy Failed)", "ConnectError"));
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
@@ -709,16 +757,16 @@ const makeHttpRequestV2 = async (
           },
         };
       } catch (axiosError: any) {
-        const error = axiosError;
-        response = {
-          data: {
-            status: `${error.response.status} ${error.response.statusText}`,
-            data: error.response?.data || error.message,
-            headers: error.response?.headers
-              ? Object.fromEntries(Object.entries(error.response.headers))
-              : {},
-          },
-        };
+        // response = {
+        //   data: {
+        //     status: `${error.response.status} ${error.response.statusText}`,
+        //     data: error.response?.data || error.message,
+        //     headers: error.response?.headers
+        //       ? Object.fromEntries(Object.entries(error.response.headers))
+        //       : {},
+        //   },
+        // };
+        return error(axiosError.message);
       }
     }
     if (signal?.aborted) {
@@ -728,13 +776,16 @@ const makeHttpRequestV2 = async (
     const duration = endTime - startTime;
     try {
       let responseData;
+
       if (typeof response.data.data !== "string") {
         responseData = JSON.stringify(response.data.data);
       } else {
         responseData = response.data.data;
       }
       if (!response.data.status) {
-        throw new Error("Error parsing response");
+        throw new Error(
+          response?.data?.data?.message || "Error parsing response",
+        );
       }
 
       appInsights?.trackDependencyData({
@@ -752,7 +803,7 @@ const makeHttpRequestV2 = async (
       });
     } catch (e) {
       console.error("Response parsing error:", e);
-      throw new Error("Error parsing response");
+      return error(e.toString());
     }
   } catch (e) {
     if (signal?.aborted) {
@@ -768,7 +819,7 @@ const makeHttpRequestV2 = async (
       responseCode: 400,
       properties: { source: "frontend", type: "BA_HTTP" },
     });
-    throw new Error("Error with the request");
+    throw new Error(e);
   }
 };
 
@@ -950,12 +1001,14 @@ const connectSocketIo = async (
   _headers: string,
 ): Promise<void> => {
   console.table({ URL: _url, Headers: _headers });
+  const abortController = new AbortController();
   const selectedAgent = localStorage.getItem(
     "selectedAgent",
   ) as WorkspaceUserAgentBaseEnum;
   socketIoDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(_tabId, {
       messages: [],
+      abortController: abortController,
       agent: selectedAgent,
       status: SocketIORequestStatusTabEnum.CONNECTING,
       search: "",
@@ -968,6 +1021,7 @@ const connectSocketIo = async (
 
     return webSocketDataMap;
   });
+  const { signal } = abortController; // Extract the signal for the request
 
   let urlObject: URL;
   try {
@@ -999,6 +1053,9 @@ const connectSocketIo = async (
 
     // Listen for connect events from the target Socket.IO.
     targetSocketIO.on("connect", () => {
+      if (signal?.aborted) {
+        return;
+      }
       const message = processConnectEvent(_url);
       insertSocketIoDataToMap(
         _tabId,
@@ -1012,12 +1069,22 @@ const connectSocketIo = async (
 
     // Listen for connect_error events from the target Socket.IO.
     targetSocketIO.on("connect_error", (err) => {
+      if (signal?.aborted) {
+        return;
+      }
       console.error(new DOMException(err + " (URL Issue)", "ConnectError"));
-      removeSocketIoDataFromMap(_tabId);
+      insertSocketIoDataToMap(
+        _tabId,
+        err.toString(),
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+      );
     });
 
     // Listen for disconnect events from the target Socket.IO.
     targetSocketIO.on("disconnect", (err) => {
+      if (signal?.aborted) {
+        return;
+      }
       console.error(
         new DOMException(err + " (Connection Lost)", "DisconnectError"),
       );
@@ -1031,6 +1098,9 @@ const connectSocketIo = async (
 
     // Listen for all dynamic events from the target Socket.IO.
     targetSocketIO.onAny(async (event: string, ...args: any[]) => {
+      if (signal?.aborted) {
+        return;
+      }
       const message = await processMessageEvent(_tabId, {
         payload: {
           event: event,
@@ -1063,10 +1133,16 @@ const connectSocketIo = async (
 
     proxySocketIO.onAny(async (event, args) => {
       if (event === "sparrow_internal_connect_error") {
+        if (signal?.aborted) {
+          return;
+        }
         // Connect_error listener from the target Socket.IO.
         console.error(new DOMException(args + " (URL Issue)", "ConnectError"));
         removeSocketIoDataFromMap(_tabId);
       } else if (event === "sparrow_internal_connect") {
+        if (signal?.aborted) {
+          return;
+        }
         // Connect listener from the target Socket.IO.
         const message = processConnectEvent(_url);
         insertSocketIoDataToMap(
@@ -1078,6 +1154,9 @@ const connectSocketIo = async (
           `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
         );
       } else if (event === "sparrow_internal_disconnect") {
+        if (signal?.aborted) {
+          return;
+        }
         // Disconnect listener from the target Socket.IO.
         console.error(
           new DOMException(args + " (Connection Lost)", "DisconnectError"),
@@ -1090,6 +1169,9 @@ const connectSocketIo = async (
         );
       } else {
         // Message listener from the target Socket.IO.
+        if (signal?.aborted) {
+          return;
+        }
         const message = await processMessageEvent(_tabId, {
           payload: {
             event: event,
@@ -1108,6 +1190,9 @@ const connectSocketIo = async (
 
     // Listen for connect_error events from the proxy Socket.IO.
     proxySocketIO.on("connect_error", (err) => {
+      if (signal?.aborted) {
+        return;
+      }
       console.error(new DOMException(err + " (Proxy Failed)", "ConnectError"));
       removeSocketIoDataFromMap(_tabId);
     });
@@ -1120,17 +1205,38 @@ const connectSocketIo = async (
  */
 const disconnectSocketIo = async (_tabId: string): Promise<void> => {
   let url = "";
+  let abortController;
+  let isRequestCancelled = false;
   socketIoDataStore.update((socketIoDataMap) => {
     const wsData = socketIoDataMap.get(_tabId);
-
     if (wsData) {
       url = wsData.url;
-      wsData.status = SocketIORequestStatusTabEnum.DISCONNECTING;
+      if(wsData?.status === "connecting"){
+        wsData.status = "disconnected";
+        abortController = wsData?.abortController;
+        isRequestCancelled = true;
+      
+      insertSocketIoDataToMap(
+        _tabId,
+        "Connection aborted",
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+      );
+      }
+      else{
+        wsData.status = "disconnecting";
+        isRequestCancelled = false;
+      }
       wsData.url = "";
       socketIoDataMap.set(_tabId, wsData);
     }
     return socketIoDataMap;
   });
+  if(isRequestCancelled){
+    if (abortController) {
+        abortController.abort(); // Abort the request using the stored controller
+    }
+   return;
+  }
 
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(_tabId);
