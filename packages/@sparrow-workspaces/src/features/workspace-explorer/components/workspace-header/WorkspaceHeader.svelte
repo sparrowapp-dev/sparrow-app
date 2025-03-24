@@ -53,6 +53,21 @@
     ) as HTMLInputElement;
     inputField.value = workspaceName;
   };
+  const handleInputName = (event) => {
+    if (event.key === "Enter") {
+      onRenameInputKeyPress();
+    }
+  };
+
+  const handleBlurName = () => {
+    const newValue = event.target.value;
+    const previousValue = workspaceName;
+    if (event.target.value?.trim() === "") {
+      resetInputField();
+    } else if (newValue !== previousValue) {
+      onUpdateWorkspaceName(workspaceID, newValue);
+    }
+  };
 </script>
 
 <section>
@@ -65,7 +80,7 @@
         class="ellipsis w-auto"
         style="font-weight: 700; color:var(--text-secondary-100);"
       >
-        <input
+        <!-- <input
           on:blur={(event) => {
             const newValue = event.target.value;
             const previousValue = workspaceName;
@@ -87,6 +102,18 @@
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
           class="bg-transparent input-outline border-0 text-fs-18 text-left w-auto ps-2 py-0"
           maxlength={100}
+        /> -->
+        <Input
+          width={"398px"}
+          placeholder={""}
+          type={"text"}
+          value={workspaceName}
+          variant={"inline"}
+          id="renameInputFieldWorkspace"
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          maxlength={100}
+          on:input={handleInputName}
+          on:blur={handleBlurName}
         />
       </div>
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
