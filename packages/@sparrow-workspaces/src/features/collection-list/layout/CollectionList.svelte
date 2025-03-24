@@ -19,7 +19,7 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     AddRegular,
     AngleLeftIcon,
@@ -33,6 +33,7 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandCollection } from "../../../stores/recent-left-panel";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -82,8 +83,6 @@
   export let scrollList;
 
   export let searchData: string = "";
-
-  export let isExpandCollection: boolean;
 
   export let toggleExpandCollection;
 
@@ -234,7 +233,7 @@
             size="extra-small"
             type="teritiary-regular"
             customWidth="24px"
-            startIcon={!isExpandCollection
+            startIcon={!$isExpandCollection
               ? ChevronRightRegular
               : ChevronDownRegular}
           />
@@ -274,7 +273,7 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
-                isExpandCollection = true;
+                isExpandCollection.set(true);
                 isGuestUser
                   ? onItemCreated("collection", {
                       workspaceId: currentWorkspaceId,
@@ -288,7 +287,7 @@
       {/if}
     </div>
 
-    {#if isExpandCollection}
+    {#if $isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
       >
@@ -316,7 +315,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={col?.toMutableJSON()}
+                    collection={col}
                     {activeTabId}
                     {searchData}
                     {isWebApp}
@@ -360,8 +359,8 @@
                   {activeTabType}
                   collection={col?.toMutableJSON()}
                   {activeTabId}
-                  {isWebApp}
                   bind:isFirstCollectionExpand
+                  {isWebApp}
                 />
               {/each}
             </List>

@@ -24,6 +24,13 @@
   export let userRole;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
+
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
@@ -200,7 +207,7 @@
   });
 
   $: {
-    if (isFirstCollectionExpand) {
+    if ($openedComponent.has(collection.id) || isFirstCollectionExpand) {
       visibility = true;
     }
   }
@@ -470,10 +477,13 @@
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         if (visibility) {
+          addCollectionItem(collection.id, "collection");
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
           });
+        } else {
+          removeCollectionItem(collection.id);
         }
       }
     }
