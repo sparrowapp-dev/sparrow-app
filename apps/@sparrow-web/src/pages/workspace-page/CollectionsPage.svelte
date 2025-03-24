@@ -589,20 +589,45 @@
   const handleRefreshWorkspace = async (): Promise<void> => {
     if (!currentWorkspace) return;
     refreshLoad.set(true);
+
     currentWorkspace.subscribe(async (workspace) => {
       if (workspace && workspace._data.users?.length) {
         try {
           // Fetch data in parallel
-          await Promise.all([
+          const [
+            fetchCollectionsResult,
+            refreshEnvironmentResult,
+            refreshTestflowResult,
+          ] = await Promise.all([
             _viewModel.fetchCollections(workspace._id),
             _viewModel2.refreshEnvironment(workspace._id),
             _viewModel3.refreshTestflow(workspace._id),
           ]);
+
+          // Handle the results of each API call here
+          const collectionTabsToBeDeleted =
+            fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+          const environmentTabsToBeDeleted =
+            refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+          const testflowTabsToBeDeleted =
+            refreshTestflowResult?.testflowTabsToBeDeleted || [];
+
+          const totalTabsToBeDeleted: string[] = [
+            ...collectionTabsToBeDeleted,
+            ...environmentTabsToBeDeleted,
+            ...testflowTabsToBeDeleted,
+          ];
+
+          _viewModel.deleteTabsWithTabIdInAWorkspace(
+            workspace._id,
+            totalTabsToBeDeleted,
+          );
+          refreshLoad.set(false);
         } catch (error) {
+          refreshLoad.set(false);
           return;
         }
       }
-      refreshLoad.set(false);
     });
   };
 
