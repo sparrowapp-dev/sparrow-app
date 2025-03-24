@@ -20,6 +20,7 @@
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   import { ArrowDownloadRegular, CopyRegular, SaveRegular } from "@sparrow/library/icons";
+  import { Select } from "@sparrow/library/forms";
 
   export let response;
   export let apiState;
@@ -183,8 +184,9 @@
 
       {#if apiState.bodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-          <WithSelectV3
-            id={"hash565"}
+ 
+          <Select
+       id={"hash565"}
             data={[
               {
                 name: "JSON",
@@ -211,7 +213,14 @@
             onclick={handleTypeDropdown}
             zIndex={499}
             disabled={false}
-          />
+            menuItem={"v2"}
+            headerFontSize={"10px"}
+            isDropIconFilled={true}
+            headerTheme={"transparent"}
+            bodyTheme={"surface"}
+            borderType={"none"}
+            borderActiveType={"none"}
+/>
         </span>
       {/if}
     </div>

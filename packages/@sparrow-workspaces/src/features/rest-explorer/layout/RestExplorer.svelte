@@ -391,7 +391,7 @@
                         {environmentVariables}
                       />
                     {:else if storeData?.response.status}
-                      <div class="h-100 d-flex flex-column" style="gap:5px">
+                      <div class="h-100 d-flex flex-column" style="gap:12px">
                         <div class="d-flex">
                           <ResponseNavigator
                             requestStateSection={storeData?.response.navigation}
