@@ -4,9 +4,12 @@
   export let tabs;
   export let currentTabId;
   export let onTabClick;
+  export let tabUnderline = true;
+  export let isSegmentedTab = false;
   let leftSliderDistance = 0;
   let sliderWidth = 0;
   let tabElements: { [key: string]: HTMLButtonElement | undefined } = {};
+
 
   const handleClick = (id: string) => {
     const tab = tabElements[id];
@@ -48,7 +51,8 @@
 
 <div>
   <!-- Tabs -->
-  <div class="d-flex position-relative gap-1">
+  <div class={"d-flex position-relative gap-1"}
+  style={isSegmentedTab ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content" : ""}>
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
@@ -78,7 +82,7 @@
       </button>
     {/each}
   </div>
-  {#if !allDisableState}
+  {#if !allDisableState && tabUnderline}
     <div
       class="slider"
       style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
@@ -116,7 +120,7 @@
   
   }
   .tab-container.selected{
-    background-color: var(--bg-ds-surface-600);
+    background-color: var(--bg-ds-surface-600) !important;
     color: var(--bg-ds-neutral-50);
   }
   .tab-container.selected:hover{
@@ -168,4 +172,5 @@
     top: 0px;
     z-index: 100;
   }
+
 </style>
