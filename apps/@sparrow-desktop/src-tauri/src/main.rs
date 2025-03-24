@@ -61,6 +61,7 @@ use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::process::Command;
+use std::str::FromStr;
 use std::time::Duration;
 use tauri::Emitter;
 use tauri::Manager;
@@ -70,7 +71,7 @@ use utils::response_decoder::decode_response_body;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
-use hyper::header::HeaderValue;
+// use hyper::header::HeaderValue;
 use hyper::header::{CONNECTION, UPGRADE};
 use hyper::{Client as OtherClient, Request};
 use hyper_tls::HttpsConnector;
@@ -79,6 +80,9 @@ use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::watch;
 use tokio::sync::Mutex;
 use tokio_tungstenite::connect_async;
+use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+use tokio_tungstenite::tungstenite::http::header::HeaderName;
+use tokio_tungstenite::tungstenite::http::header::HeaderValue;
 use tokio_tungstenite::tungstenite::protocol::Message;
 // Socket.IO imports
 use futures_util::FutureExt;
@@ -643,21 +647,18 @@ async fn abort_websocket_connection(
         headers: None,
     };
     return Err(serde_json::to_string(&cancel_response)
-    .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
+        .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
 }
 
 #[tauri::command]
 async fn connect_websocket(
     url: String,
-    httpurl: String,
     tabid: String,
-    headers: String, // Stringified JSON headers
+    headers: String,
     state: tauri::State<'_, Arc<AppState>>,
     app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
-
-    // Create a cancellation watch channel.
-    // The sender is stored in state so that an abort can trigger a cancellation.
+    // Create a cancellation watch channel: The sender is stored in state so that an abort can trigger a cancellation.
     let (cancel_sender, mut cancel_receiver) = tokio::sync::watch::channel(false);
     {
         let mut cancel_handles = state.cancel_handles.lock().await;
@@ -672,34 +673,22 @@ async fn connect_websocket(
         headers_map.insert(kv.key, kv.value);
     }
 
-    // Build the HTTP request for the WebSocket upgrade.
-    let https = HttpsConnector::new();
-    let client: OtherClient<_, hyper::Body> = OtherClient::builder().build::<_, hyper::Body>(https);
-    let mut req_builder = Request::builder()
-        .uri(&httpurl)
-        .header(UPGRADE, "websocket")
-        .header(CONNECTION, "Upgrade");
+    // Create request client from websocket url
+    let mut req = url
+        .into_client_request()
+        .map_err(|e| format!("Failed to parse URL: {}", e))?;
+    let headers = req.headers_mut();
+
+    // Add user specified headers to the request client
     for (key, value) in headers_map.iter() {
-        req_builder = req_builder.header(
-            key,
+        headers.insert(
+            HeaderName::from_str(key).map_err(|e| format!("Invalid header name: {}", e))?,
             HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
         );
     }
-    let req = req_builder
-        .body(hyper::Body::empty())
-        .map_err(|e| format!("Failed to build request: {}", e))?;
 
-    // Send the HTTP request.
-    let response = client
-        .request(req)
-        .await
-        .map_err(|e| format!("Failed to request: {}", e))?;
-    if response.status() != 101 {
-        return Err(format!("Failed to upgrade: {:?}", response.status()));
-    }
-
-    // Await the WebSocket connection using tokio::select! to also listen for cancellation.
-    let ws_future = connect_async(url.clone());
+    // Await the WebSocket connection using tokio::select! to also listen for cancellation. - Its kind of Promise.race() of JS.
+    let ws_future = connect_async(req);
     let (ws_stream, ws_response) = tokio::select! {
         res = ws_future => {
             match res {
@@ -724,13 +713,13 @@ async fn connect_websocket(
         }
     };
 
-    // Connection established—remove the cancellation sender.
+    // Connection established: Remove the cancellation sender.
     {
         let mut cancel_handles = state.cancel_handles.lock().await;
         cancel_handles.remove(&tabid);
     }
 
-    // Capture handshake response headers.
+    // Capture response headers.
     let mut response_headers = std::collections::HashMap::new();
     for (key, value) in ws_response.headers() {
         if let Ok(val_str) = value.to_str() {
@@ -746,7 +735,7 @@ async fn connect_websocket(
     let (disconnect_tx, _disconnect_rx) = tokio::sync::oneshot::channel::<Result<(), String>>();
     let disconnect_handle = Arc::new(tokio::sync::Mutex::new(Some(disconnect_tx)));
 
-    // **Insert the connection into state immediately.**
+    // Insert the connection into state.
     {
         let mut connections = state.connections.lock().await;
         connections.insert(
@@ -770,7 +759,7 @@ async fn connect_websocket(
             headers: None,
         };
         return Err(serde_json::to_string(&cancel_response)
-        .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
+            .map_err(|e| format!("Failed to serialize cancel response: {}", e))?);
     }
 
     // Spawn a task to handle incoming messages.

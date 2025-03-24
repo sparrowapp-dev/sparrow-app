@@ -1449,9 +1449,7 @@ class RestExplorerViewModel {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 
-  public connectWebsocket = async (
-    environmentVariables
-  ) => {
+  public connectWebsocket = async (environmentVariables) => {
     const websocketData = this._tab.getValue();
 
     const decodeData = new DecodeWebsocket().init(
@@ -1470,7 +1468,7 @@ class RestExplorerViewModel {
     const websocketData = this._tab.getValue();
     return await this.webSocketService.disconnectWebsocket(
       websocketData?.tabId,
-      isCancelled
+      isCancelled,
     );
   };
 

@@ -350,53 +350,54 @@ const disconnectWebSocket = async (tabId: string, isCancelled = false) => {
     const wsData = webSocketDataMap.get(tabId);
     if (wsData) {
       url = wsData.url;
-      wsData.status = isCancelled ? "disconnected": "disconnecting";
+      wsData.status = isCancelled ? "disconnected" : "disconnecting";
       wsData.url = "";
       webSocketDataMap.set(tabId, wsData);
     }
     return webSocketDataMap;
   });
-  if(!isCancelled){
-  await invoke("disconnect_websocket", { tabid: tabId })
-    .then(async () => {
-      try {
-        // Logic to handle response
-        let listener;
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            listener = wsData.listener;
-            wsData.messages.unshift({
-              data: `Disconnected from ${url}`,
-              transmitter: "disconnector",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "disconnected";
-            webSocketDataMap.set(tabId, wsData);
-            if (listener) {
-              listener();
+  if (!isCancelled) {
+    await invoke("disconnect_websocket", { tabid: tabId })
+      .then(async () => {
+        try {
+          // Logic to handle response
+          let listener;
+          webSocketDataStore.update((webSocketDataMap) => {
+            const wsData = webSocketDataMap.get(tabId);
+            if (wsData) {
+              listener = wsData.listener;
+              wsData.messages.unshift({
+                data: `Disconnected from ${url}`,
+                transmitter: "disconnector",
+                timestamp: formatTime(new Date()),
+                uuid: uuidv4(),
+              });
+              wsData.status = "disconnected";
+              webSocketDataMap.set(tabId, wsData);
+              if (listener) {
+                listener();
+              }
             }
-          }
-          return webSocketDataMap;
-        });
+            return webSocketDataMap;
+          });
 
-        notifications.success("WebSocket disconnected successfully.");
-      } catch (e) {
+          notifications.success("WebSocket disconnected successfully.");
+        } catch (e) {
+          console.error(e);
+          notifications.error(
+            "Failed to disconnect WebSocket. Please try again.",
+          );
+          return error("error");
+        }
+      })
+      .catch((e) => {
         console.error(e);
         notifications.error(
           "Failed to disconnect WebSocket. Please try again.",
         );
         return error("error");
-      }
-    })
-    .catch((e) => {
-      console.error(e);
-      notifications.error("Failed to disconnect WebSocket. Please try again.");
-      return error("error");
-    });
+      });
   }
-
 };
 
 const addSocketDataToMap = (tabId, url) => {
@@ -570,23 +571,17 @@ const disconnectSocketIo = async (tab_id: string) => {
     });
 };
 
-const convertWebSocketUrl = (url: string) => {
-  // Check if the URL starts with 'wss://'
-  if (url.startsWith("wss://")) {
-    return { httpUrl: "https:/" + url.slice(5), wsUrl: url }; // Replace 'wss://' with 'https://'
-  }
-
-  // Check if the URL starts with 'ws://'
-  else if (url.startsWith("ws://")) {
-    return { httpUrl: "http:/" + url.slice(4), wsUrl: url };
-  }
-  // Just append 'http://' to the URL
-  else {
+const getWebsocketUrl = (url: string) => {
+  if (url.startsWith("https://") || url.startsWith("http://")) {
+    return url.startsWith("https://")
+      ? url.replace("https://", "wss://")
+      : url.replace("http://", "ws://");
+  } else if (url.startsWith("wss://") || url.startsWith("ws://")) {
+    return url;
+  } else {
     const isLocalHostUrl =
       url.includes("localhost") || url.includes("127.0.0.1");
-    const httpUrl = isLocalHostUrl ? `http://${url}` : `https://${url}`;
-    const wsUrl = isLocalHostUrl ? `ws://${url}` : `wss://${url}`;
-    return { httpUrl, wsUrl };
+    return isLocalHostUrl ? `ws://${url}` : `wss://${url}`;
   }
 };
 
@@ -596,7 +591,7 @@ const convertWebSocketUrl = (url: string) => {
  * @param tabId - The ID of the tab for which the WebSocket messages are being listened.
  * @param url - The WebSocket server URL.
  */
-const webSocketMessageListener = async (tabId: string , url: string) => {
+const webSocketMessageListener = async (tabId: string, url: string) => {
   const unlisten = await listen(`ws_message_${tabId}`, (event) => {
     // When a disconnect event occurs:
     if (event?.payload?.type === "disconnect") {
@@ -683,12 +678,11 @@ const connectWebSocket = async (
     return webSocketDataMap;
   });
 
-  const { httpUrl, wsUrl } = convertWebSocketUrl(url);
+  const wsUrl = getWebsocketUrl(url);
 
   // Invoke the backend connection function.
   return await invoke("connect_websocket", {
     url: wsUrl,
-    httpurl: httpUrl,
     tabid: tabId,
     headers: requestHeaders,
   })
@@ -716,13 +710,15 @@ const connectWebSocket = async (
         notifications.success("WebSocket connected successfully.");
         return {
           connected: true,
-          cancelled: false
+          cancelled: false,
         };
       } catch (e) {
-        notifications.error("Failed to fetch WebSocket response. Please try again.");
+        notifications.error(
+          "Failed to fetch WebSocket response. Please try again.",
+        );
         return {
           connected: false,
-          cancelled: false
+          cancelled: false,
         };
       }
     })
@@ -732,7 +728,7 @@ const connectWebSocket = async (
         if (dt.is_cancelled) {
           return {
             connected: false,
-            cancelled: true
+            cancelled: true,
           };
         }
       } catch (e) {
@@ -747,7 +743,7 @@ const connectWebSocket = async (
         notifications.error("Failed to connect WebSocket. Please try again.");
         return {
           connected: false,
-          cancelled: false
+          cancelled: false,
         };
       }
     });
