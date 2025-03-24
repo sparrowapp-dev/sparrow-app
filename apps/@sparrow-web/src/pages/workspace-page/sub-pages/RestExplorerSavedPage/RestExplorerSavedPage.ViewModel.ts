@@ -81,7 +81,7 @@ export class RestExplorerSavedViewModel {
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
   private aiAssistentService = new AiAssistantService();
-  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistentWebSocketService = AiAssistantWebSocketService.getInstance();
   /**
    * Utils
    */

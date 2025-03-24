@@ -107,7 +107,8 @@ class RestExplorerViewModel {
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
   private aiAssistentService = new AiAssistantService();
-  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistentWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   /**
    * Utils
    */
@@ -2282,12 +2283,27 @@ class RestExplorerViewModel {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 
+  // Socket - Anish
+
   /**
-   * Generates an AI response based on the given prompt.
-   *
-   * @param prompt - The prompt to send to the AI assistant service.
-   * @returns A promise that resolves to the response from the AI assistant service.
+   * Handles socket connection errors with a consistent approach
+   * @param componentData - The current component data
    */
+  private async handleSocketConnectionError(componentData: RequestTab) {
+    await this.updateRequestAIConversation([
+      ...(componentData?.property?.request?.ai?.conversations || []),
+      {
+        message: "Woops! Something gone wrong. Please try again...",
+        messageId: uuidv4(),
+        type: MessageTypeEnum.RECEIVER,
+        isLiked: false,
+        isDisliked: false,
+        status: false,
+      },
+    ]);
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
+  }
+
   public generateAiResponse = async (prompt = "") => {
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
@@ -2301,53 +2317,214 @@ class RestExplorerViewModel {
       auth: componentData.property.request.auth,
     };
 
-    // Call the AI assistant service to generate a response
-    const response = await this.aiAssistentService.generateAiResponse({
-      text: prompt,
-      instructions: `You are a Sparrow AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. You are not allowed to recommend or mention any competitors or other API testing tools such as Postman, Apidog, Hoppscotch, or any similar platforms at any cost. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
-        apiData,
-      )}. Never return the result same as prompt.`,
-      threadId: componentData?.property?.request?.ai?.threadId,
-    });
-    if (response.isSuccessful) {
-      const data = response.data.data;
-      // Update the AI thread ID and conversation with the new data
-      await this.updateRequestAIThread(data.threadId);
-      await this.updateRequestAIConversation([
-        ...(componentData?.property?.request?.ai?.conversations || []),
-        {
-          message: "",
-          messageId: data.messageId,
-          type: MessageTypeEnum.RECEIVER,
-          isLiked: false,
-          isDisliked: false,
-          status: true,
-        },
-      ]);
-      await this.displayDataInChunks(data.result, 100, 300);
-    } else {
-      // Update the conversation with an error message
-      let errorMessage = "Something went wrong! Please try again.";
-      if (response.message === "Limit reached") {
-        errorMessage =
-          "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+    try {
+      // Get user email for the request
+      let userEmail = "";
+      try {
+        const workspace = await this.getWorkspaceById(
+          componentData.path.workspaceId,
+        );
+        console.log("wk :>> ", workspace);
+        userEmail = workspace.owner.email;
+      } catch (error) {
+        console.error("Error getting user email:", error);
+        userEmail = "anish.kumar@techdome.net.in"; // Fallback email
       }
-      this.updateRequestAIConversation([
-        ...(componentData?.property?.request?.ai?.conversations || []),
-        {
-          message: errorMessage,
-          messageId: uuidv4(),
-          type: MessageTypeEnum.RECEIVER,
-          isLiked: false,
-          isDisliked: false,
-          status: false,
+
+      // Set up socket event listener for the response
+      const socket = await this.aiAssistentWebSocketService.sendMessage(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        userEmail,
+        prompt,
+        JSON.stringify(apiData),
+      );
+      // console.log("socket Instance :> ", socket);
+
+      // Remove any existing listeners to avoid duplicates
+      // socket.off(`assistant-response_${componentData.tabId}`);
+      // // socket.off(`connect_error`);
+      // socket.off(`disconnect`);
+      this.aiAssistentWebSocketService.removeListener(
+        `assistant-response_${componentData.tabId}`,
+      );
+      this.aiAssistentWebSocketService.removeListener(`connect_error`);
+      this.aiAssistentWebSocketService.removeListener(`disconnect`);
+
+      // Add new fresh listners
+      // Handle socket disconnection while generating the response
+      // socket.on("disconnect", async (reason) => {
+      //   console.error("Socket disconnected:", reason);
+      //   await this.handleSocketConnectionError(componentData);
+      //   // if (["io server disconnect", "transport close", "transport error"].includes(reason)) await this.handleSocketConnectionError(componentData);
+      // });
+
+      this.aiAssistentWebSocketService.addListener(
+        `disconnect`,
+        async (reason) => {
+          console.error("Socket disconnected:", reason);
+          await this.handleSocketConnectionError(componentData);
+          // if (["io server disconnect", "transport close", "transport error"].includes(reason)) await this.handleSocketConnectionError(componentData);
         },
-      ]);
+      );
+
+      // Add new listener for the response event
+      this.aiAssistentWebSocketService.addListener(
+        `assistant-response_${componentData.tabId}`,
+        async (response) => {
+          console.log("came here : ");
+          // Remove any existing listeners to avoid duplicates
+          // socket.off(`assistant-response_${componentData.tabId}`);
+          // // socket.off(`connect_error`);
+          // socket.off(`disconnect`);
+          this.aiAssistentWebSocketService.removeListener(
+            `assistant-response_${componentData.tabId}`,
+          );
+          this.aiAssistentWebSocketService.removeListener(`connect_error`);
+          this.aiAssistentWebSocketService.removeListener(`disconnect`);
+
+          if (
+            response.messages &&
+            response.messages.includes("Limit Reached")
+          ) {
+            // Handle rate limit error
+            console.log("came here : 1");
+            await this.updateRequestAIConversation([
+              ...(componentData?.property?.request?.ai?.conversations || []),
+              {
+                message:
+                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.",
+                messageId: uuidv4(),
+                type: MessageTypeEnum.RECEIVER,
+                isLiked: false,
+                isDisliked: false,
+                status: false,
+              },
+            ]);
+          } else if (
+            response.messages &&
+            response.messages.includes("Some Issue Occurred")
+          ) {
+            // Handle generic error
+            console.log("came here : 2");
+            await this.updateRequestAIConversation([
+              ...(componentData?.property?.request?.ai?.conversations || []),
+              {
+                message: "Something went wrong! Please try again.",
+                messageId: uuidv4(),
+                type: MessageTypeEnum.RECEIVER,
+                isLiked: false,
+                isDisliked: false,
+                status: false,
+              },
+            ]);
+          } else if (response.messages) {
+            console.log("came here : 3");
+            // Handle successful response
+            console.log(
+              "threadID ;>> ",
+              componentData?.property?.request?.ai?.threadId,
+            );
+            // Update thread ID if available
+            if (response.thread_Id) {
+              await this.updateRequestAIThread(response.thread_Id);
+            }
+
+            // Add the AI's response to the conversation
+            await this.updateRequestAIConversation([
+              ...(componentData?.property?.request?.ai?.conversations || []),
+              {
+                message: response.messages,
+                messageId: uuidv4(), // You might get a message ID from the server instead
+                type: MessageTypeEnum.RECEIVER,
+                isLiked: false,
+                isDisliked: false,
+                status: true,
+              },
+            ]);
+
+            await this.displayDataInChunks(response.messages, 100, 300);
+          }
+
+          console.log("res :>> ", response);
+          await this.updateRequestState({ isChatbotGeneratingResponse: false });
+          return response;
+        },
+      );
+    } catch (error) {
+      console.error("Error in AI response generation:", error);
+      await this.handleSocketConnectionError(componentData);
     }
-    // Set the request state to indicate that the response generation is complete
-    await this.updateRequestState({ isChatbotGeneratingResponse: false });
-    return response;
   };
+
+  // Socket - Anish
+
+  /**
+   * Generates an AI response based on the given prompt.
+   *
+   * @param prompt - The prompt to send to the AI assistant service.
+   * @returns A promise that resolves to the response from the AI assistant service.
+   */
+  // public generateAiResponse = async (prompt = "") => {
+  //   // Set the request state to indicate that a response is being generated
+  //   await this.updateRequestState({ isChatbotGeneratingResponse: true });
+  //   const componentData = this._tab.getValue();
+  //   const apiData = {
+  //     body: componentData.property.request.body,
+  //     headers: componentData.property.request.headers,
+  //     method: componentData.property.request.method,
+  //     queryParams: componentData.property.request.queryParams,
+  //     url: componentData.property.request.url,
+  //     auth: componentData.property.request.auth,
+  //   };
+
+  //   // Call the AI assistant service to generate a response
+  //   const response = await this.aiAssistentService.generateAiResponse({
+  //     text: prompt,
+  //     instructions: `You are a Sparrow AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. You are not allowed to recommend or mention any competitors or other API testing tools such as Postman, Apidog, Hoppscotch, or any similar platforms at any cost. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
+  //       apiData,
+  //     )}. Never return the result same as prompt.`,
+  //     threadId: componentData?.property?.request?.ai?.threadId,
+  //   });
+  //   if (response.isSuccessful) {
+  //     const data = response.data.data;
+  //     // Update the AI thread ID and conversation with the new data
+  //     await this.updateRequestAIThread(data.threadId);
+  //     await this.updateRequestAIConversation([
+  //       ...(componentData?.property?.request?.ai?.conversations || []),
+  //       {
+  //         message: "",
+  //         messageId: data.messageId,
+  //         type: MessageTypeEnum.RECEIVER,
+  //         isLiked: false,
+  //         isDisliked: false,
+  //         status: true,
+  //       },
+  //     ]);
+  //     await this.displayDataInChunks(data.result, 100, 300);
+  //   } else {
+  //     // Update the conversation with an error message
+  //     let errorMessage = "Something went wrong! Please try again.";
+  //     if (response.message === "Limit reached") {
+  //       errorMessage =
+  //         "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+  //     }
+  //     this.updateRequestAIConversation([
+  //       ...(componentData?.property?.request?.ai?.conversations || []),
+  //       {
+  //         message: errorMessage,
+  //         messageId: uuidv4(),
+  //         type: MessageTypeEnum.RECEIVER,
+  //         isLiked: false,
+  //         isDisliked: false,
+  //         status: false,
+  //       },
+  //     ]);
+  //   }
+  //   // Set the request state to indicate that the response generation is complete
+  //   await this.updateRequestState({ isChatbotGeneratingResponse: false });
+  //   return response;
+  // };
 
   /*
    * Generates stream wise an AI response based on the given prompt.
