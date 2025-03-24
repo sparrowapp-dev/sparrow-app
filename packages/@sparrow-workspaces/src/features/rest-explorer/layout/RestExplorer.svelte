@@ -371,10 +371,9 @@
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"
-                style="overflow:auto;"
               >
                 <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto; ">
+                  <div style="flex:1; overflow:hidden;">
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div
@@ -392,7 +391,10 @@
                       />
                     {:else if storeData?.response.status}
                       <div class="h-100 d-flex flex-column" style="gap:12px">
-                        <div class="d-flex">
+                        <div
+                          class="d-flex"
+                          style="position:sticky; top:0; z-index:2; background-color:var(--bg-ds-surface-900)"
+                        >
                           <ResponseNavigator
                             requestStateSection={storeData?.response.navigation}
                             {onUpdateResponseState}
@@ -401,40 +403,45 @@
                           />
                           <ResponseStatus response={storeData.response} />
                         </div>
-                        {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
-                          {#if storeData?.response.bodyLanguage !== "Image"}
-                            <ResponseBodyNavigator
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                              path={$tab.path}
-                              {onUpdateResponseState}
-                              {onClearResponse}
-                              {onSaveResponse}
-                              {isWebApp}
-                              {isGuestUser}
-                            />
+                        <div
+                          class="flex-grow-1 d-flex flex-column"
+                          style="overflow:auto; min-height:0;"
+                        >
+                          {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
+                            {#if storeData?.response.bodyLanguage !== "Image"}
+                              <ResponseBodyNavigator
+                                response={storeData?.response}
+                                apiState={storeData?.response}
+                                path={$tab.path}
+                                {onUpdateResponseState}
+                                {onClearResponse}
+                                {onSaveResponse}
+                                {isWebApp}
+                                {isGuestUser}
+                              />
+                            {/if}
+                            <div
+                              style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                            >
+                              <ResponseBody
+                                response={storeData?.response}
+                                apiState={storeData?.response}
+                              />
+                            </div>
+                          {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
+                            <div style="overflow:auto;">
+                              <ResponseHeaders
+                                responseHeader={storeData.response?.headers}
+                              />
+                            </div>
                           {/if}
-                          <div
-                            style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
-                          >
-                            <ResponseBody
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                            />
-                          </div>
-                        {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                          <div style="">
-                            <ResponseHeaders
-                              responseHeader={storeData.response?.headers}
-                            />
-                          </div>
-                        {/if}
+                        </div>
                       </div>
                     {/if}
                   </div>
                 </div>
-              </div></Pane
-            >
+              </div>
+            </Pane>
           </Splitpanes>
         {:else}
           <!-- loading state -->
