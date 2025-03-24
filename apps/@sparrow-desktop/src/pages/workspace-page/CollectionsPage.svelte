@@ -560,7 +560,7 @@
     refreshLoad.set(true);
 
     currentWorkspace.subscribe(async (workspace) => {
-      if (workspace && workspace._data.users?.length) {
+      if (workspace && $totalTeamCount > 1) {
         try {
           // Fetch data in parallel
           const [
