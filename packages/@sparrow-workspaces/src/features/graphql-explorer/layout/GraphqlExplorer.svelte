@@ -44,7 +44,7 @@
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { loadingState } from "../../../../../@sparrow-common/src/stores";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
 
   export let tab;
   export let collections;

@@ -73,7 +73,7 @@
     CheckmarkCircleFilled,
     ErrorCircleFilled,
   } from "@sparrow/library/icons";
-  import { loadingState } from "../../../../../@sparrow-common/src/stores";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
 
   export let tab: Observable<Tab>;

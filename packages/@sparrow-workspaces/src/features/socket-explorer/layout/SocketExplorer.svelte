@@ -35,7 +35,7 @@
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/web-socket";
   import ResponseData from "../components/response-data/ResponseData.svelte";
   import { writable } from "svelte/store";
-  import { loadingState } from "../../../../../@sparrow-common/src/stores";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;

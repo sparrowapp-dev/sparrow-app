@@ -34,7 +34,7 @@
   } from "../components";
   import { writable } from "svelte/store";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/socket-io-request-tab";
-  import { loadingState } from "../../../../../@sparrow-common/src/stores";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<any[]>;
