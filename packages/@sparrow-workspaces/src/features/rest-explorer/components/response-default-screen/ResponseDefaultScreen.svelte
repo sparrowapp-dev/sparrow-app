@@ -6,6 +6,7 @@
   import { Button } from "@sparrow/library/ui";
 
   export let isMainScreen = false;
+  export let isWebApp;
   let platformName = "";
 
   let ctrlCommands: { [key: string]: string } = {};
@@ -19,19 +20,18 @@
     const controlKey = platformName === "macos" ? "cmd" : "Ctrl";
     const altKey = platformName === "macos" ? "option" : "Alt";
 
- ctrlCommands = {
-  "Send Request": [`${controlKey}`, "Enter"],
-  "New Request": [`${controlKey}`, "N"],
-  "Save Request": [`${controlKey}`, "S"],
-};
+    ctrlCommands = {
+      "Send Request": [`${controlKey}`, "Enter"],
+      ...(!isWebApp ? { "New Request": [`${controlKey}`, "N"] } : {}),
+      "Save Request": [`${controlKey}`, "S"],
+    };
 
-altCommands = {
-  "Edit link": [`${altKey}`, "L"],
-  "Add Parameter": [`${altKey}`, "P"],
-  "Add Header": [`${altKey}`, "H"],
-  "Edit Body": [`${altKey}`, "B"],
-};
-
+    altCommands = {
+      "Edit link": [`${altKey}`, "L"],
+      "Add Parameter": [`${altKey}`, "P"],
+      "Add Header": [`${altKey}`, "H"],
+      "Edit Body": [`${altKey}`, "B"],
+    };
   });
   let isExpandShortcuts = false;
 </script>
@@ -53,59 +53,49 @@ altCommands = {
       </div>
     </div>
   </div>
-<div>
-  <div class={"d-flex flex-wrap justify-content-center mt-auto"}>
-    {#each Object.entries(ctrlCommands) as [key, value]}
-      {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
-        <!-- <span class="me-3"></span> -->
-        <div class="px-3 flex items-center">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
-        </div>
-      {/if}
-    {/each}
-    {#each Object.entries(altCommands) as [key, value]}
-      {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
-        <!-- <span class="me-3"></span> -->
-        <div class="px-3">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
-        </div>
-        <!-- <span class="me-3"></span> -->
-      {/if}
-    {/each}
-  </div>
-  {#if !isExpandShortcuts}
-    <div class="d-flex justify-content-center">
-      <Button
-      type="outline-secondary"
-      title="See All Shortcuts"
-      onClick={() => {
-        isExpandShortcuts = true;
-      }}
-      size="small"
-      fontSize={14}
-      />
+  <div>
+    <div class={"d-flex flex-wrap justify-content-center mt-auto"}>
+      {#each Object.entries(ctrlCommands) as [key, value]}
+        {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
+          <!-- <span class="me-3"></span> -->
+          <div class="px-3 flex items-center">
+            <ComboText {key} {value} type="combo" />
+          </div>
+        {/if}
+      {/each}
+      {#each Object.entries(altCommands) as [key, value]}
+        {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
+          <!-- <span class="me-3"></span> -->
+          <div class="px-3">
+            <ComboText {key} {value} type="combo" />
+          </div>
+          <!-- <span class="me-3"></span> -->
+        {/if}
+      {/each}
     </div>
-  {:else}
-    <div class="d-flex justify-content-center">
-       <Button
-      type="outline-secondary"
-      title="Hide All Shortcuts"
-      onClick={() => {
-        isExpandShortcuts = false;
-      }}
-      size="small"
-      fontSize={14}
-      />
-    </div>
-  {/if}
+    {#if !isExpandShortcuts}
+      <div class="d-flex justify-content-center mt-2">
+        <Button
+          type="outline-secondary"
+          title="See All Shortcuts"
+          onClick={() => {
+            isExpandShortcuts = true;
+          }}
+          size="medium"
+        />
+      </div>
+    {:else}
+      <div class="d-flex justify-content-center mt-2">
+        <Button
+          type="outline-secondary"
+          title="Hide All Shortcuts"
+          onClick={() => {
+            isExpandShortcuts = false;
+          }}
+          size="medium"
+        />
+      </div>
+    {/if}
   </div>
 </div>
 

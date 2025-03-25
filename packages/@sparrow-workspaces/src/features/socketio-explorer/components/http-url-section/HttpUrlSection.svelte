@@ -27,6 +27,7 @@
   export let onConnect;
   export let webSocket;
   export let onDisconnect;
+  export let isSaveLoad = false;
   /**
    * Role of user in active workspace
    */
@@ -101,7 +102,8 @@
     <Button
       type="secondary"
       size="medium"
-      startIcon={SaveRegular}
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
       onClick={handleSaveRequest}
       disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
