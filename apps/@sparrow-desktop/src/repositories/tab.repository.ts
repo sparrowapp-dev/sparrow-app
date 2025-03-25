@@ -992,7 +992,6 @@ export class TabRepository {
     return;
   };
 
-
   /**
    * Removes multiple tabs from the RxDB database in a single operation.
    *
@@ -1005,11 +1004,39 @@ export class TabRepository {
    */
   public bulkRemoveTabs = async (ids: string[]): Promise<void> => {
     if (ids.length === 0) return;
-    await this.rxdb?.find({
-      selector: {
-        id: { $in: ids },
-      },
-    }).remove();
+    await this.rxdb
+      ?.find({
+        selector: {
+          id: { $in: ids },
+        },
+      })
+      .remove();
+
+    // Activating the last valid tab from the tabbar
+    const activeWorkspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    const workspaceId = activeWorkspace.toMutableJSON()._id;
+
+    // Get tabs excluding the ones in 'ids' list
+    const currOpenedTabs = await this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+          id: { $nin: ids }, // Exclude tabs that are in the ids array
+        },
+      })
+      .sort({ index: "asc" })
+      .exec();
+
+    // If there are remaining tabs, activate the last one
+    const totalOpenedTabs = currOpenedTabs.length;
+    if (totalOpenedTabs > 0) {
+      await this.activeTab(currOpenedTabs[currOpenedTabs.length - 1].get("id"));
+    }
   };
-  
 }
