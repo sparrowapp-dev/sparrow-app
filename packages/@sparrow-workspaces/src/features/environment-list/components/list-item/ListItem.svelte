@@ -272,7 +272,7 @@
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
-          style="font-size: 12px; font-weight:500; line-height:18px;"
+          style="font-size: 12px; font-weight:400; line-height:18px;"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -286,7 +286,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 32px; font-size:12px; font-weight:500; line-height:18px; padding:2px 4px; "
+          style="height: 32px; font-size:12px; font-weight:400; line-height:18px; padding:2px 4px; "
         >
           <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
             {env.name}

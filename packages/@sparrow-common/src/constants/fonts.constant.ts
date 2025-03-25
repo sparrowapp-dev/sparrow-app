@@ -1,3 +1,3 @@
-const EditorFont = "'Source Code Pro', monospace !important";
+const EditorFont = "'JetBrains Mono', monospace !important";
 
 export { EditorFont };
