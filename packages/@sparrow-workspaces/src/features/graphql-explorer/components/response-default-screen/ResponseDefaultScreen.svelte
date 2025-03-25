@@ -5,6 +5,7 @@
   import { SparrowLogo } from "@sparrow/common/images";
   import { OSDetector } from "@sparrow/common/utils";
   export let isMainScreen = false;
+  export let isWebApp;
 
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
@@ -15,7 +16,7 @@
     let altKey = platformName === "macos" ? "option" : "Alt";
     ctrlCommands = {
       "Send Request": [controlKey, "Enter"],
-      "New Request": [controlKey, "N"],
+      ...(!isWebApp ? { "New Request": [`${controlKey}`, "N"] } : {}),
       "Save Request": [controlKey, "S"],
     };
 
