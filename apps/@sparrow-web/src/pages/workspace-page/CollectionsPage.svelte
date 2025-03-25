@@ -720,12 +720,12 @@
                       <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
+                {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
                     </div>
-                  </Motion> -->
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>

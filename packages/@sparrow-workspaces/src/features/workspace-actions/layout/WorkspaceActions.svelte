@@ -296,6 +296,18 @@
           },
         },
         {
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("graphql", {});
+            MixpanelEvent(Events.Add_GraphQL, {
+              description: "Add GraphQL From + Icon in Left Panel",
+            });
+          },
+        },
+        {
           name: "Add Environment",
           icon: StackIcon,
           iconColor: "var(--icon-secondary-130)",

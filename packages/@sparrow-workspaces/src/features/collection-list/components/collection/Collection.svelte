@@ -285,12 +285,10 @@
       <span class="text-plusButton">{requestCount}</span>
       <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
-    {#if !isWebApp}
-      <div class="d-flex gap-1">
-        <span class="text-plusButton">{graphQLCount}</span>
-        <p>GraphQL</p>
-      </div>
-    {/if}
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{graphQLCount}</span>
+      <p>GraphQL</p>
+    </div>
     <div class="d-flex gap-1">
       <span class="text-plusButton">{webSocketCount}</span>
       <p>WebSocket</p>
@@ -454,7 +452,7 @@
         },
         displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
-        hidden: isWebApp ? true : false,
+        hidden: false,
         icon: GraphIcon,
       },
     ]}
@@ -763,34 +761,33 @@
                 />
               </div>
             </Tooltip>
-            {#if !isWebApp}
-              <Tooltip
-                title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-                placement={"bottom-center"}
-                distance={12}
+
+            <Tooltip
+              title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+              placement={"bottom-center"}
+              distance={12}
+            >
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("graphqlCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_GraphQL, {
+                    description: "Created GraphQL inside collection.",
+                  });
+                }}
               >
-                <div
-                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                  style="height: 24px; width: 24px;"
-                  role="button"
-                  on:click={() => {
-                    onItemCreated("graphqlCollection", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                    });
-                    MixpanelEvent(Events.Collection_GraphQL, {
-                      description: "Created GraphQL inside collection.",
-                    });
-                  }}
-                >
-                  <GraphIcon
-                    height={"13px"}
-                    width={"13px"}
-                    color={"var(--request-arc)"}
-                  />
-                </div>
-              </Tooltip>
-            {/if}
+                <GraphIcon
+                  height={"13px"}
+                  width={"13px"}
+                  color={"var(--request-arc)"}
+                />
+              </div>
+            </Tooltip>
           {/if}
         </div>
         <!-- {#if showFolderAPIButtons}

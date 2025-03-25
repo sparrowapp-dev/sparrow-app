@@ -1261,6 +1261,114 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
   });
 };
 
+/**
+ * Invoke Proxy service function to fetch graphql result.
+ * @param url - Request URL
+ * @param headers - Request Header
+ * @param body - Request GraphQL Query
+ */
+const makeGraphQLRequest = async (
+  _url: string,
+  _headers: string,
+  _query: string,
+  _selectedAgent: WorkspaceUserAgentBaseEnum,
+  _variables?: string,
+  _signal?: AbortSignal,
+): Promise<
+  HttpClientResponseInterface<{
+    body: string;
+    headers: object;
+    status: string;
+  }>
+> => {
+  let httpResponse: string;
+  const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
+  const startTime = performance.now();
+  try {
+    if (_selectedAgent === "Cloud Agent"){
+     
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/graphql-request";
+      const axiosResponse = await axios({
+        data: { 
+          url: _url, 
+          method: "POST", 
+          headers: "[]", 
+          body: JSON.stringify({
+          query: _query,
+          variables: _variables || {}
+          }), 
+          contentType: "application/json" },
+        url: proxyUrl,
+        method: "POST",
+      });
+
+      httpResponse = JSON.stringify({
+        body: JSON.stringify(axiosResponse.data.data),
+        headers: axiosResponse.data.headers,
+        status:  axiosResponse.data.status
+      });
+    }
+    else{
+      const axiosResponse = await axios({
+        method: "POST",
+        url: _url,
+        data: { query: _query, variables: _variables || {} } || {},
+      });
+  
+      httpResponse = JSON.stringify({
+        body: JSON.stringify(axiosResponse.data),
+        headers: axiosResponse.headers,
+        status:  axiosResponse.status + " " + (axiosResponse.statusText || "OK")
+      });
+    }
+
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    const appInsightData = {
+      id: uuidv4(),
+      name: "Proxy Duration Metric",
+      duration,
+      success: true,
+      responseCode: 200,
+      properties: {
+        source: "frontend",
+        type: "RPC_GRAPHQL",
+      },
+    };
+    appInsights.trackDependencyData(appInsightData);
+  } catch (err) {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "Proxy Duration Metric",
+      duration: duration,
+      success: false,
+      responseCode: 400,
+      properties: {
+        source: "frontend",
+        type: "PROXY_GRAPHQL",
+      },
+    });
+    if (_signal?.aborted) {
+      // Check if request is aborted after request fails
+      throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+    }
+    throw new Error(err as string);
+  }
+  if (_signal?.aborted) {
+    // Check if request is aborted after request success
+    throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+  }
+  try {
+    const parsedResponse = JSON.parse(httpResponse);
+    return success(parsedResponse);
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 export {
   makeRequest,
   getAuthHeaders,
@@ -1274,4 +1382,5 @@ export {
   sendSocketIoMessage,
   connectSocketIo,
   disconnectSocketIo,
+  makeGraphQLRequest
 };

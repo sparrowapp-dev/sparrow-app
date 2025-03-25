@@ -1089,6 +1089,7 @@ const makeGraphQLRequest = async (
       query: _query,
       variables: _variables || "{}",
     });
+    console.log("httpresponse",JSON.parse(httpResponse));
     const endTime = performance.now();
     const duration = endTime - startTime;
     const appInsightData = {
@@ -1129,6 +1130,7 @@ const makeGraphQLRequest = async (
   }
   try {
     const parsedResponse = JSON.parse(httpResponse);
+    debugger
     return success(parsedResponse);
   } catch (err) {
     throw err;
