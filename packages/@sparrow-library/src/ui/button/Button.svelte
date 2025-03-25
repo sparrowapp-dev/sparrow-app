@@ -235,7 +235,7 @@
   {:else if title}
     <span
       class="btn-title"
-      style={`font-size:${fontSize}px; font-weight:500; `}
+      style={`font-size:${fontSize}px; font-weight:400; `}
     >
       {title}
     </span>

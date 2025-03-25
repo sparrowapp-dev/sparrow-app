@@ -90,7 +90,7 @@
     workspaces: {
       items: filteredWorkspaces,
       title: searchQuery === "" ? "Recent Workspaces" : "Workspaces",
-      shortcutKeys: [osKeyName, "Shift", "W"],
+      ...(!isWebApp ? { shortcutKeys: [osKeyName, "Shift", "W"] } : {}),
       icon: WorkspaceIcongs,
       nav: (item) => handleGlobalSearchWorkspaceNavigation(item),
       getName: (item) => item.name,
@@ -158,7 +158,7 @@
     flows: {
       items: filteredTestflows,
       title: searchQuery === "" ? "Recent Test Flows" : "Test Flows",
-      shortcutKeys: [osKeyName, "Shift", "T"],
+      ...(!isWebApp ? { shortcutKeys: [osKeyName, "Shift", "T"] } : {}),
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
