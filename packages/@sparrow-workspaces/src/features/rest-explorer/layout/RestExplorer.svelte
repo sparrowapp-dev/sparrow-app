@@ -452,7 +452,7 @@
           </Splitpanes>
         {:else}
           <!-- loading state -->
-          <ResponseDefaultScreen isMainScreen={true} />
+          <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
         {/if}
       </div>
     </div>
