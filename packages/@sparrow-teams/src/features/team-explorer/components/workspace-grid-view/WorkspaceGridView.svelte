@@ -61,11 +61,7 @@
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    if (searchQuery && filteredResults.length > 0) {
-      currPage = 1;
-    } else {
-      if (prevPage != -1) currPage = prevPage;
-    }
+    currPage = searchQuery && filteredResults.length > 0 ? 1 : prevPage !== -1 ? prevPage : currPage;
 
     filteredWorkspaces = filteredResults.sort(
       (a, b) =>
