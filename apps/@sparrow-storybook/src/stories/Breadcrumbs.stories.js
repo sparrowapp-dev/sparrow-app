@@ -63,24 +63,3 @@ export const LongBreadcrumbs = {
     icon: FolderIcon,
   },
 };
-// // Breadcrumbs with long names to demonstrate ellipsis behavior
-// export const LongNames = {
-//   args: {
-//     breadcrumbs: [
-//       [
-//         { id: 'home', name: 'Home' },
-//         { id: 'projects', name: 'Project Management Dashboardnnnnnnnnnnnnnnnnndisha dusga' }
-//       ],
-//       [
-//         { id: 'frontend', name: 'Frontend Development Resourceskjjjk' },
-//         { id: 'backend', name: 'Backend System Architecture' },
-//         { id: 'devops', name: 'DevOps Infrastructure Management' }
-//       ],
-//       [
-//         { id: 'component', name: 'Component Library Documentation' },
-//         { id: 'breadcrumb', name: 'Breadcrumb Navigation Implementation' }
-//       ]
-//     ],
-//     icon: FolderIcon,
-//   },
-// };
