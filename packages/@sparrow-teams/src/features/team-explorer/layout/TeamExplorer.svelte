@@ -319,7 +319,7 @@
             style="padding-bottom: 4px;"
           >
             <Navigator
-              tabs={teamTabs}
+              tabs={teamTabs.filter((tab) => tab.visible !== false)}
               currentTabId={"Workspaces"}
               onTabClick={onUpdateActiveTab}
               {activeTeamTab}
