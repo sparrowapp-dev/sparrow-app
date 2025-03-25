@@ -23,6 +23,7 @@
   export let onUpdateEnvironment;
   export let isSave;
   export let userRole;
+  export let isSaveLoad = false;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -129,7 +130,7 @@
   <CodeMirrorInput
     value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter URL here"}
+    placeholder={"Enter a URL"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
@@ -192,7 +193,8 @@
     <Button
       type="secondary"
       size="medium"
-      startIcon={SaveRegular}
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
       onClick={handleSaveRequest}
       disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true

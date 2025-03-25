@@ -195,7 +195,7 @@
       type="letter"
       size="medium"
       letter={user?.name[0]}
-      bgColor="var(--bg-secondary-600)"
+      bgColor="var(--bg-ds-secondary-400)"
     />
   </div>
   <div
@@ -238,7 +238,7 @@
 
 <style>
   .member-data-container:hover {
-    background-color: var(--dropdown-option-hover);
+    background-color: var(--bg-ds-surface-500);
   }
 
   .member-data-container:hover .username-text {
