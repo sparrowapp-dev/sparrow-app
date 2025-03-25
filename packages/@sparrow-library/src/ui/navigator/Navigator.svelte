@@ -6,16 +6,22 @@
   export let onTabClick;
   export let tabUnderline = true;
   export let isSegmentedTab = false;
+  export let isVerticalTab = false;
   let leftSliderDistance = 0;
   let sliderWidth = 0;
+  let sliderHeight = 0;
   let tabElements: { [key: string]: HTMLButtonElement | undefined } = {};
-
 
   const handleClick = (id: string) => {
     const tab = tabElements[id];
     if (tab && !tab.disabled) {
-      leftSliderDistance = tab.offsetLeft;
-      sliderWidth = tab.offsetWidth;
+      if (isVerticalTab) {
+        leftSliderDistance = tab.offsetTop;
+        sliderHeight = tab.offsetHeight;
+      } else {
+        leftSliderDistance = tab.offsetLeft;
+        sliderWidth = tab.offsetWidth;
+      }
     }
   };
 
@@ -46,18 +52,25 @@
       handleClick(currentTabId);
     }
   }
-
 </script>
 
-<div>
+<div class={isVerticalTab ? "d-flex" : ""}>
   <!-- Tabs -->
-  <div class={"d-flex position-relative gap-1"}
-  style={isSegmentedTab ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content" : ""}>
+  <div
+    class={`d-flex position-relative gap-1 ${isVerticalTab ? "vertical-tabs-container" : ""}`}
+    style={isSegmentedTab
+      ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content"
+      : ""}
+  >
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
         tabindex={allDisableState ? -1 : 0}
-        class={`${tab.disabled ? "tab-container-disabled" : "tab-container"} ${tab.id === currentTabId ? "selected" : ""}`}
+        class={`
+          ${tab.disabled ? "tab-container-disabled" : "tab-container"} 
+          ${tab.id === currentTabId ? "selected" : ""}
+          ${isVerticalTab ? "vertical-tab" : ""}
+        `}
         role="tab"
         on:click={() => {
           if (!tab.disabled) {
@@ -75,7 +88,7 @@
           <span class="text">{tab.name} </span>
           {#if tab?.count}
             <span class="ms-1" style="margin-right: -4px;">
-            <Badge count={tab.count} variant={"neutral"} size={"medium"} />
+              <Badge count={tab.count} variant={"neutral"} size={"medium"} />
             </span>
           {/if}
         </span>
@@ -84,18 +97,26 @@
   </div>
   {#if !allDisableState && tabUnderline}
     <div
-      class="slider"
-      style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
+      class={`slider ${isVerticalTab ? "vertical-slider" : ""}`}
+      style={isVerticalTab
+        ? `top:${leftSliderDistance + 1}px; height:${sliderHeight - 1.5}px; width:2px;`
+        : `left:${leftSliderDistance + 1}px; width:${sliderWidth - 1.5}px;`}
     ></div>
   {/if}
 </div>
 
 <style>
+  .vertical-tabs-container {
+    flex-direction: column;
+    align-items: flex-start;
+    width: fit-content;
+    justify-content: left !important;
+  }
+
   .tab-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
 
+    align-items: center;
     min-width: fit-content;
     max-width: 182px;
     text-align: center;
@@ -109,6 +130,11 @@
     min-height: 28px;
     border: 0px;
   }
+
+  .vertical-tab {
+    width: 100%;
+  }
+
   .tab-container:hover {
     background-color: var(--bg-ds-surface-400);
     color: var(--bg-ds-neutral-50);
@@ -117,21 +143,17 @@
     background-color: var(--bg-ds-surface-900);
     outline: 2px solid var(--border-ds-primary-300);
     outline-offset: -2px;
-    color:var(--bg-ds-neutral-100) !important;
-  
+    color: var(--bg-ds-neutral-100) !important;
   }
-  
-  .tab-container.selected{
+
+  .tab-container.selected {
     background-color: var(--bg-ds-surface-600);
     color: var(--bg-ds-neutral-50);
   }
-  .tab-container.selected:hover{
+  .tab-container.selected:hover {
     background-color: var(--bg-ds-surface-400) !important;
     color: var(--bg-ds-neutral-50);
   }
-  /* .tab-container:focus-visible .slider {
-    left: calc(var(--left-distance) + 1px) !important;
-  } */
   .tab-contianer:active {
     background-color: var(--bg-ds-surface-700);
     color: var(--bg-ds-neutral-50);
@@ -157,13 +179,12 @@
   }
 
   .icon {
-    max-width: 12px;
-    max-height: 12px;
+    width: 12px;
+    height: 12px;
     margin-right: 5px;
     border-radius: 50%;
   }
   .slider {
-    width: 30px;
     height: 2px;
     border-radius: 2px;
     background-color: var(--bg-ds-primary-400);
@@ -175,4 +196,9 @@
     z-index: 100;
   }
 
+  .vertical-slider {
+    width: 2px;
+    position: absolute;
+    left: 0;
+  }
 </style>

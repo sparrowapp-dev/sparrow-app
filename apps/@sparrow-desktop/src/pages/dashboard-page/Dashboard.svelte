@@ -539,7 +539,17 @@
       id: 'enterprise', 
       name: 'Enterprise Edition',
       icon: DismissRegular,
-    }
+    },
+      { 
+      id: 'profes', 
+      name: 'Professional',
+      icon: DismissRegular,
+    },
+       { 
+      id: 'enterpr', 
+      name: 'Enterpris',
+      icon: DismissRegular,
+    },
   ];
   let currentTabId="community";
 </script>
@@ -583,8 +593,9 @@
   currentTabId = id;
 }}
 {currentTabId}
-tabUnderline={false}
-isSegmentedTab={true}
+tabUnderline={true}
+isSegmentedTab={false}
+isVerticalTab={true}
 />
   <Header
     environments={$environments?.filter((element) => {
