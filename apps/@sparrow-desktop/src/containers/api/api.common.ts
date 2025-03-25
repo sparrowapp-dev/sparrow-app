@@ -1086,7 +1086,6 @@ const makeGraphQLRequest = async (
   }
   try {
     const parsedResponse = JSON.parse(httpResponse);
-    debugger
     return success(parsedResponse);
   } catch (err) {
     throw err;
