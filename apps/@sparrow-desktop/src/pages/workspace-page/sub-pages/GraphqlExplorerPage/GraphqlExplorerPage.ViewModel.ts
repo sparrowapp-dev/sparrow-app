@@ -817,6 +817,15 @@ class GraphqlExplorerViewModel {
               value: arg.value.value, // Set value for StringValue
               items: [], // No nested items
             };
+          case "IntValue":
+            // For IntValue, set value directly
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: arg.value.value,
+              items: [], // No nested items
+            };
           case "ObjectValue":
             // For ObjectValue, process nested fields and place them in items
             items = processObjectFields(arg.value.fields);
@@ -1701,18 +1710,18 @@ class GraphqlExplorerViewModel {
           return;
         }
 
-        graphqlExplorerDataStore.update((restApiDataMap) => {
-          const data = restApiDataMap.get(progressiveTab?.tabId);
+        graphqlExplorerDataStore.update((graphqlDataMap) => {
+          const data = graphqlDataMap.get(progressiveTab?.tabId);
           if (data) {
-            data.response.body = "";
+            data.response.body = error.toString();
             data.response.headers = [];
             data.response.status = ResponseStatusCode.ERROR;
             data.response.time = 0;
             data.response.size = 0;
             data.isSendRequestInProgress = false;
-            restApiDataMap.set(progressiveTab.tabId, data);
+            graphqlDataMap.set(progressiveTab.tabId, data);
           }
-          return restApiDataMap;
+          return graphqlDataMap;
         });
       });
   };

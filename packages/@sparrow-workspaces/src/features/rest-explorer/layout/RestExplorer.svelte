@@ -165,7 +165,10 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 pt-3 pb-3" style="padding:0px 12px">
+    <div
+      class="w-100 d-flex flex-column h-100 pt-3 pb-3"
+      style="padding:0px 12px"
+    >
       <!-- Request Name Header -->
       <!-- 
         --
@@ -369,7 +372,6 @@
                   ? 'pt-1'
                   : 'ps-2'}"
                 style="overflow:auto;"
-                
               >
                 <div class="h-100 d-flex flex-column">
                   <div style="flex:1; overflow:auto; ">
@@ -385,14 +387,11 @@
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
                       <ResponseErrorScreen
                         onSendButtonClicked={onSendRequest}
+                        response={storeData.response}
                         {environmentVariables}
                       />
                     {:else if storeData?.response.status}
-                      <div
-                        class="h-100 d-flex flex-column"
-                        style="gap:5px"
-                        
-                      >
+                      <div class="h-100 d-flex flex-column" style="gap:5px">
                         <div class="d-flex">
                           <ResponseNavigator
                             requestStateSection={storeData?.response.navigation}
@@ -415,7 +414,9 @@
                               {isGuestUser}
                             />
                           {/if}
-                          <div style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;">
+                          <div
+                            style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                          >
                             <ResponseBody
                               response={storeData?.response}
                               apiState={storeData?.response}

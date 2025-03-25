@@ -86,9 +86,8 @@ use rust_socketio::{
     asynchronous::{Client as SocketClient, ClientBuilder},
     Event as SocketIoEvent, Payload as SocketIoPayload, TransportType,
 };
-use tokio::sync::Mutex as SocketMutex;
 use tauri_plugin_os::platform;
-
+use tokio::sync::Mutex as SocketMutex;
 
 // MacOs Window Titlebar Config Imports
 #[cfg(target_os = "macos")]
@@ -101,7 +100,6 @@ extern crate cocoa;
 #[cfg(target_os = "macos")]
 use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
 use tauri::{Runtime, WebviewWindow};
-
 
 pub trait WindowExt {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool);
@@ -1015,9 +1013,18 @@ async fn connect_socket_io(
 
             // If socket_io server is not connected, that means it was a abrupt socket.io server disconnection and we need to emit the disconnect event
             if !connected {
+                let error_message = match err {
+                    SocketIoPayload::Binary(_) => "Binary data error".to_string(),
+                    SocketIoPayload::Text(values) => values
+                        .iter()
+                        .map(|v| v.to_string()) // Convert each JSON value to a string
+                        .collect::<Vec<_>>()
+                        .join(", "), // Join multiple values with a comma
+                    SocketIoPayload::String(s) => s, // Directly use the string if it's already in that form
+                };
                 let _ = app_handle_clone.emit(
                     &format!("socket-disconnect-{}", tabid_clone),
-                    json!({ "message": format!("Error: {:#?}", err) }),
+                    json!({ "message": error_message }),
                 );
             }
         }
