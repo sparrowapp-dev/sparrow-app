@@ -4,7 +4,8 @@ import {
   ReduceQueryParams,
   DecodeSocketio,
 } from "@sparrow/workspaces/features/socketio-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation,} from "@sparrow/common/utils";
+import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -698,8 +699,10 @@ class SocketIoExplorerPageViewModel {
   public saveSocket = async () => {
     const componentData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path as Path;
-
+    const tabId = componentData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -780,6 +783,7 @@ class SocketIoExplorerPageViewModel {
           data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -814,11 +818,13 @@ class SocketIoExplorerPageViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

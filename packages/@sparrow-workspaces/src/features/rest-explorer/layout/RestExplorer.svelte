@@ -73,6 +73,8 @@
     CheckmarkCircleFilled,
     ErrorCircleFilled,
   } from "@sparrow/library/icons";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
+  import { writable } from "svelte/store";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -121,6 +123,7 @@
   export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  const loading = writable<boolean>(false);
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -160,6 +163,11 @@
     isExposeSaveAsRequest = flag;
   };
 
+  $: {
+    loadingState.subscribe((tab) => {
+      loading.set(tab.get($tab.tabId));
+    });
+  }
   let isGuidePopup = false;
 </script>
 
@@ -197,9 +205,7 @@
                 notifications.success("API request saved successfully.");
               }
             }}
-          />
-
-          <span class="position-relative" style="width:35px;"> </span>
+          /> <span class="position-relative" style="width:35px;"> </span>
           <Button
             title="Share"
             type={"secondary"}
@@ -212,6 +218,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$loading}
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={$tab.property.request?.url}
