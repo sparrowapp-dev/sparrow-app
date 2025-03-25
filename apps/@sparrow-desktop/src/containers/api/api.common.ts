@@ -386,7 +386,7 @@ const addSocketDataToMap = (tabId, url) => {
       `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -440,7 +440,6 @@ async function processMessageEvent(tabId, event) {
   // Retrieve tab data and check event inclusion
   const tabData = await tabRepository.getTabByTabId(tabId);
   const tabDataJSON = tabData?.toMutableJSON();
-  console.log(event, "event");
   const socketIOresponse = event.payload;
   const eventName = socketIOresponse.event;
   const message = socketIOresponse.message;
@@ -469,7 +468,6 @@ async function processMessageEvent(tabId, event) {
 function updateSocketDataStore(tabId, data, transmitter, status = "") {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tabId);
-    console.log(wsData.status);
     if (wsData) {
       wsData.messages.unshift({
         data,
@@ -899,7 +897,6 @@ const makeHttpRequestV2 = async (
         },
       };
       appInsights.trackDependencyData(appInsightData);
-      console.log("api response : ", apiResponse);
       return success(apiResponse);
     } catch (e) {
       const responseBody = JSON.parse(data);
@@ -1045,7 +1042,6 @@ const makeGraphQLRequest = async (
       query: _query,
       variables: _variables || "{}",
     });
-    console.log("httpresponse",JSON.parse(httpResponse));
     const endTime = performance.now();
     const duration = endTime - startTime;
     const appInsightData = {
