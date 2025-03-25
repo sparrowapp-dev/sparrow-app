@@ -183,7 +183,7 @@ export class EnvironmentExplorerViewModel {
         {
           name: currentEnvironment.name,
           variable: currentEnvironment?.property?.environment?.variable,
-          updatedAt: new Date().toString(),
+          updatedAt: new Date().toISOString(),
         },
       );
       const progressiveTab = this._tab.getValue();

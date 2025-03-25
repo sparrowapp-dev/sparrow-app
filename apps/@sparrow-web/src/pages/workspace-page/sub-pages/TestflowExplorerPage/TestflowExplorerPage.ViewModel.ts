@@ -793,7 +793,7 @@ export class TestflowExplorerPageViewModel {
           name: currentTestflow.name,
           nodes: currentTestflow?.property?.testflow?.nodes,
           edges: currentTestflow?.property?.testflow?.edges,
-          updatedAt: new Date().toString(),
+          updatedAt: new Date().toISOString(),
         },
       );
       const progressiveTab = this._tab.getValue();

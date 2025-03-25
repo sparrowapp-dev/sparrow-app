@@ -2139,7 +2139,7 @@ export default class CollectionsViewModel {
         const response = {
           data: {
             name: newCollectionName,
-            updatedAt: new Date().toString(),
+            updatedAt: new Date().toISOString(),
           },
         };
         await this.collectionRepository.updateCollection(
@@ -2215,7 +2215,7 @@ export default class CollectionsViewModel {
           );
         if (res) {
           res.name = newFolderName;
-          res.updatedAt = new Date().toString();
+          res.updatedAt = new Date().toISOString();
         }
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
@@ -2429,7 +2429,7 @@ export default class CollectionsViewModel {
           );
         const storage = request;
         storage.name = newRequestName;
-        response.updatedAt = new Date().toString();
+        response.updatedAt = new Date().toISOString();
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
@@ -2449,7 +2449,7 @@ export default class CollectionsViewModel {
         );
         const storage = request;
         storage.name = newRequestName;
-        response.updatedAt = new Date().toString();
+        response.updatedAt = new Date().toISOString();
         await this.collectionRepository.updateRequestInFolder(
           collection.id,
           folder.id,
