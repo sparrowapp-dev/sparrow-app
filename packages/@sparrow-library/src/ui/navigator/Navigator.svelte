@@ -68,8 +68,8 @@
       >
         <span class="d-flex align-items-center">
           {#if tab?.icon}
-            <span class="d-flex align-items-center w-16px h-16px me-1">
-              <svelte:component this={tab.icon} class="icon" />
+            <span class="d-flex align-items-center w-3 h-3 me-1">
+              <svelte:component this={tab.icon} class="icon" size="16px" />
             </span>
           {/if}
           <span class="text">{tab.name} </span>
@@ -117,14 +117,16 @@
     background-color: var(--bg-ds-surface-900);
     outline: 2px solid var(--border-ds-primary-300);
     outline-offset: -2px;
+    color:var(--bg-ds-neutral-100) !important;
   
   }
+  
   .tab-container.selected{
-    background-color: var(--bg-ds-surface-600) !important;
+    background-color: var(--bg-ds-surface-600);
     color: var(--bg-ds-neutral-50);
   }
   .tab-container.selected:hover{
-    background-color: var(--bg-ds-surface-400);
+    background-color: var(--bg-ds-surface-400) !important;
     color: var(--bg-ds-neutral-50);
   }
   /* .tab-container:focus-visible .slider {
@@ -155,8 +157,8 @@
   }
 
   .icon {
-    width: 12px;
-    height: 12px;
+    max-width: 12px;
+    max-height: 12px;
     margin-right: 5px;
     border-radius: 50%;
   }
