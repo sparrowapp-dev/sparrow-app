@@ -5,7 +5,6 @@
    * The description of the workspace.
    */
   export let workspaceDescription: string = "";
-  export let handleUpdateDescription;
   /**
    * The ID of the workspace.
    */
@@ -40,8 +39,7 @@
       placeholder="Describe this workspace's objectives or add links to generate API documentation. Start typing."
       on:blur={(event) => {
         if (workspaceDescription !== event.target.value) {
-          handleUpdateDescription(event.target.value);
-          // onUpdateWorkspaceDescription(workspaceID, event.target.value);
+          onUpdateWorkspaceDescription(workspaceID, event.target.value);
         }
       }}
     />

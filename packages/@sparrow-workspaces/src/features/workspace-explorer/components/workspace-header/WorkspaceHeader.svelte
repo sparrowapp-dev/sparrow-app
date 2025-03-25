@@ -22,8 +22,6 @@
    * Function to handle deletion of the workspace.
    */
   export let onDeleteWorkspace;
-  export let data: string = "";
-  export let onUpdateWorkspaceDescription;
 
   /**
    * Function to update the workspace name.
@@ -58,7 +56,6 @@
       onRenameInputKeyPress();
     }
   };
-
   const handleBlurName = () => {
     const newValue = event.target.value;
     const previousValue = workspaceName;
@@ -80,29 +77,6 @@
         class="ellipsis w-auto"
         style="font-weight: 700; color:var(--text-secondary-100);"
       >
-        <!-- <input
-          on:blur={(event) => {
-            const newValue = event.target.value;
-            const previousValue = workspaceName;
-            if (event.target.value?.trim() === "") {
-              resetInputField();
-            } else if (newValue !== previousValue) {
-              onUpdateWorkspaceName(workspaceID, newValue);
-            }
-          }}
-          on:keydown={(event) => {
-            if (event.key === "Enter") {
-              onRenameInputKeyPress();
-            }
-          }}
-          type="text"
-          required
-          id="renameInputFieldWorkspace"
-          value={workspaceName}
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent input-outline border-0 text-fs-18 text-left w-auto ps-2 py-0"
-          maxlength={100}
-        /> -->
         <Input
           width={"398px"}
           placeholder={""}
@@ -127,14 +101,6 @@
               isWorkspaceInviteModalOpen = true;
             }}
             disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          />
-          <Button
-            type={"secondary"}
-            startIcon={SaveRegular}
-            size={"medium"}
-            onClick={(e) => {
-              onUpdateWorkspaceDescription(workspaceID, data);
-            }}
           />
         </div>
       {/if}
