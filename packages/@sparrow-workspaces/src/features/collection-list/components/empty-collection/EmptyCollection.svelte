@@ -45,7 +45,7 @@
         <span class="mb-2">
           <Button
             title="Add Collection"
-            type="outline-secondary"
+            type="secondary"
             size="small"
             customWidth="100%"
             startIcon={AddRegular}

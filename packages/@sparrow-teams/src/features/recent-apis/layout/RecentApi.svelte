@@ -23,9 +23,6 @@
     ?.sort((a, b) => new Date(b.time) - new Date(a.time)) // Sort descending by time
     ?.slice(0, 5)
     ?.reverse();
-  $: {
-    console.log(filteredApis);
-  }
 </script>
 
 <div class="d-flex justify-content-between pb-0" style="gap:8px;">

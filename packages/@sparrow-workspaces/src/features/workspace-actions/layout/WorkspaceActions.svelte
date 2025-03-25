@@ -654,7 +654,7 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandCollection ? 'flex:1;' : ''}"
+        style=" overflow:auto; {isExpandCollection ? 'flex:2;' : ''}"
       >
         <CollectionList
           bind:scrollList
@@ -704,6 +704,7 @@
           environments={$environments}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandEnvironment}
           bind:isExpandEnvironment
         />
@@ -727,6 +728,7 @@
           currentWorkspace={activeWorkspace}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandTestflow}
           {isExpandTestflowLine}
           {handleTestflowLine}

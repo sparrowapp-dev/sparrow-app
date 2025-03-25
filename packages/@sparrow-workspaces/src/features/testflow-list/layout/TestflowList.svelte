@@ -71,6 +71,7 @@
 
   export let isExpandTestflowLine = false;
   export let handleTestflowLine;
+  export let activeTabType;
 
   $: {
     if (testflows.find((item) => item._data._id === activeTabId)) {
@@ -151,7 +152,10 @@
     style="cursor:pointer; justify-content: space-between; height:32px; "
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={toggleExpandTestflow}
+    on:click={() => {
+      toggleExpandTestflow();
+      activeTabType = "";
+    }}
   >
     <div
       class="d-flex align-items-center"
@@ -210,7 +214,13 @@
   </div>
 
   {#if isExpandTestflow}
-    <div style="flex:1;" class="overflow-auto h-100" bind:this={scrollDiv}>
+    <div
+      style="flex: 1; height: 32px; background-color: {!activeTabType
+        ? 'var(--bg-ds-surface-600)'
+        : 'transparent'};"
+      class="overflow-auto h-100"
+      bind:this={scrollDiv}
+    >
       <!-- 
   --  Testflow Empty screen 
   -->

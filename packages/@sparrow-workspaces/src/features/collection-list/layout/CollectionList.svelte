@@ -113,6 +113,11 @@
   });
 
   let isHovered = false;
+  let collectionActive = false;
+
+  const handleCollection = () => {
+    collectionActive = false;
+  };
 
   let collectionFilter: any = [];
   /**
@@ -230,11 +235,14 @@
   >
     <div
       tabindex="0"
-      class=" collection-container d-flex align-items-center pe-2 border-radius-2"
+      class="collection-container d-flex align-items-center pe-2 border-radius-2"
       style="cursor:pointer; justify-content: space-between; height:32px; margin-bottom:0;"
       on:mouseover={handleMouseOver}
       on:mouseout={handleMouseOut}
-      on:click={toggleExpandCollection}
+      on:click={() => {
+        toggleExpandCollection();
+        activeTabType = "";
+      }}
     >
       <div
         class=" d-flex align-items-center"
@@ -302,6 +310,7 @@
     {#if isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
+        style={` background-color: ${!activeTabType ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
           <div
@@ -430,6 +439,9 @@
     outline: none;
     border-radius: 4px;
     border: 2px solid var(--border-ds-primary-300);
+  }
+  .collection-container.active {
+    background-color: var(--bg-ds-surface-500);
   }
   .collection-container:focus-visible .add-icon-container {
     visibility: visible;

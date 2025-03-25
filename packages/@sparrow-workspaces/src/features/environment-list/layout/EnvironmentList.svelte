@@ -72,6 +72,7 @@
   export let activeTabId;
 
   let isExpandEnviromentLine = false;
+  export let activeTabType;
 
   $: {
     // console.log(activeTabId);
@@ -170,7 +171,10 @@
     style="cursor:pointer; justify-content: space-between; height:32px ;gap:4px;"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={toggleExpandEnvironment}
+    on:click={() => {
+      toggleExpandEnvironment();
+      activeTabType = "";
+    }}
   >
     <div
       class="d-flex align-items-center"
@@ -219,6 +223,7 @@
             onClick={(e) => {
               e.stopPropagation();
               handleCreateEnvironment(e);
+              activeTabType = "";
             }}
             startIcon={AddRegular}
           />
@@ -229,7 +234,9 @@
 
   {#if isExpandEnvironment}
     <div
-      style="flex:1; height:32px; "
+      style="flex: 1; height: 32px; background-color: {!activeTabType
+        ? 'var(--bg-ds-surface-600)'
+        : 'transparent'};"
       class="overflow-auto"
       bind:this={scrollDiv}
     >

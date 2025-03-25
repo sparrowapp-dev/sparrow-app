@@ -290,7 +290,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px; gap:4px;  margin-bottom: 2px;"
+  style={`height:32px; padding-left:3px; gap:4px; {margin-bottom :2px;}`}
 >
   <button
     tabindex="-1"
@@ -397,7 +397,12 @@
   {/if}
 </div>
 <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div class="sub-files position-relative">
+  <div
+    class="sub-files position-relative"
+    style="background-color: {api.id === activeTabId
+      ? 'var(--bg-ds-surface-600)'
+      : 'transparent'};"
+  >
     <div
       class="box-line"
       style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}

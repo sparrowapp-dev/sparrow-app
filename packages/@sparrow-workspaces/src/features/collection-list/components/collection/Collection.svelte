@@ -487,7 +487,10 @@
       }
     }
   }}
-  style="height:32px; gap:4px;  padding-left:16px; margin-bottom:2px; "
+  style="height:32px; gap:4px;  padding-left:16px; margin-bottom:{collection.id ===
+  activeTabId
+    ? '0px'
+    : '2px'};"
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -643,7 +646,10 @@
         ? 'block'
         : 'none'};"
     >
-      <div class=" ps-0 position-relative">
+      <div
+        class=" ps-0 position-relative"
+        style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "2px"};`}
+      >
         {#if collection?.items?.length > 0}
           <div
             class="box-line"
@@ -672,7 +678,11 @@
           {/each}
         </div>
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-5 ms-2 my-2 text-secondary-300">
+          <p
+            class="text-fs-10 ps-5 ms-2 my-{collection.id === activeTabId
+              ? '0'
+              : '2'} text-secondary-300"
+          >
             This collection is empty
           </p>
         {/if}

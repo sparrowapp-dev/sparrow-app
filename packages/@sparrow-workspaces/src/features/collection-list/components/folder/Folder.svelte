@@ -422,7 +422,10 @@
             }
           }
         }}
-        style="height:32px; padding-left:30px; margin-bottom:2px; "
+        style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
+        activeTabId
+          ? '0px'
+          : '2px'} ; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -549,7 +552,10 @@
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div class="sub-files position-relative">
+        <div
+          class="sub-files position-relative"
+          style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+        >
           {#if explorer?.items?.length > 0}
             <div
               class="box-line"
@@ -614,7 +620,7 @@
         </div>
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style="cursor:pointer;">
+      <div style={`cursor: pointer; background-color: `}>
         <Request
           {userRole}
           api={explorer}
