@@ -32,7 +32,6 @@
   import { Modal } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { OSDetector } from "@sparrow/common/utils";
-  import { Navigator } from "@sparrow/library/ui";
 
   import { fade } from "svelte/transition";
   import { isGuestUserActive } from "@app/store/auth.store";
@@ -42,7 +41,6 @@
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import { GlobalSearch } from "@sparrow/common/features";
-  import { DismissCircleRegular, DismissRegular } from "@sparrow/library/icons";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -523,35 +521,6 @@
       handlehideGlobalSearch(false);
     }
   };
-
-    const myTabs = [
-    { 
-      id: 'community', 
-      name: 'Community Edition',
-      icon: DismissRegular,
-    },
-    { 
-      id: 'professional', 
-      name: 'Professional',
-      icon: DismissRegular,
-    },
-    { 
-      id: 'enterprise', 
-      name: 'Enterprise Edition',
-      icon: DismissRegular,
-    },
-      { 
-      id: 'profes', 
-      name: 'Professional',
-      icon: DismissRegular,
-    },
-       { 
-      id: 'enterpr', 
-      name: 'Enterpris',
-      icon: DismissRegular,
-    },
-  ];
-  let currentTabId="community";
 </script>
 
 {#if isGlobalSearchOpen && !hideGlobalSearch}
@@ -588,15 +557,6 @@
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
 >
-<Navigator tabs={myTabs} onTabClick={(id)=>{
-  console.log("Tab clicked");
-  currentTabId = id;
-}}
-{currentTabId}
-tabUnderline={true}
-isSegmentedTab={false}
-isVerticalTab={true}
-/>
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
