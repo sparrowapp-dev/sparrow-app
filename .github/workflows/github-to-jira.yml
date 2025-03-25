@@ -1,4 +1,4 @@
-name: Sync GITHUB issues to JIRA and vice versa
+name: Sync GitHub issues to JIRA and vice versa
 
 on:
   issues:
@@ -6,18 +6,22 @@ on:
 
 jobs:
   create_jira_issue:
-    if: contains(github.event.issue.labels.*.name, 'bug') || contains(github.event.issue.labels.*.name, 'feature')
+    if: contains(join(github.event.issue.labels.*.name, ','), 'bug') || contains(join(github.event.issue.labels.*.name, ','), 'feature')
     runs-on: ubuntu-latest
 
     steps:
-      - name: Map GitHub Label bug and feature to Jira Issue Type Bug and Story
+      - name: Map GitHub Label to Jira Issue Type
         id: map_type
         run: |
-          if [[ "${{ github.event.issue.labels.*.name }}" == *"bug"* ]]; then
-            echo "JIRA_ISSUE_TYPE=Bug" >> $GITHUB_ENV
-          elif [[ "${{ github.event.issue.labels.*.name }}" == *"feature"* ]]; then
-            echo "JIRA_ISSUE_TYPE=Story" >> $GITHUB_ENV
-          fi
+          ISSUE_TYPE="Task"
+          for label in "${{ join(github.event.issue.labels.*.name, ' ') }}"; do
+            if [[ "$label" == "bug" ]]; then
+              ISSUE_TYPE="Bug"
+            elif [[ "$label" == "feature" ]]; then
+              ISSUE_TYPE="Story"
+            fi
+          done
+          echo "JIRA_ISSUE_TYPE=$ISSUE_TYPE" >> $GITHUB_ENV
 
       - name: Create Jira Issue
         id: create_jira
@@ -31,8 +35,9 @@ jobs:
             **Description:**  
             ${{ github.event.issue.body }}
             **GitHub Labels:** ${{ join(github.event.issue.labels.*.name, ', ') }}
-             labels: "GitHub-Issue"
+          labels: "GitHub-Issue"
         env:
+          JIRA_SITE: ${{ secrets.JIRA_URL }}
           JIRA_BASE_URL: ${{ secrets.JIRA_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}

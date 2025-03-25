@@ -103,7 +103,7 @@
   };
 </script>
 
-<div class="pb-2">
+<div style="padding-bottom: 12px;">
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
 </div>
 <svelte:window on:keydown={handleKeyPress} />

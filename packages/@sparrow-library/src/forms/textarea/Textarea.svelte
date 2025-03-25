@@ -183,8 +183,12 @@
     scrollbar-width: none;
     caret-color: var(--border-primary-300);
     border: 1px solid transparent;
+<<<<<<< HEAD
     min-width: 240px;
     max-width: 540px;
+=======
+    background-color: var(--bg-ds-surface-400);
+>>>>>>> development
   }
   textarea::placeholder {
     color: var(--placeholder-color);
