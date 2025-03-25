@@ -22,6 +22,11 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
+  import {
     ChevronDownRegular,
     ChevronRightRegular,
     MoreHorizontalRegular,
@@ -63,6 +68,9 @@
    * Current Tab Path
    */
   export let activeTabId: string;
+
+  export let searchData: string;
+  export let activeTabPath;
 
   /**
    * Role of user in workspace
@@ -140,6 +148,20 @@
     httpMethodUIStyle = getMethodStyle(
       api?.request?.method as HttpRequestMethodBaseEnum,
     );
+  }
+
+  $: {
+    if ($openedComponent.has(api.id)) {
+      expand = true;
+    }
+    if (searchData) {
+      expand = true;
+    }
+    if (activeTabPath) {
+      if (activeTabPath.requestId === api.id) {
+        expand = true;
+      }
+    }
   }
 </script>
 
@@ -263,12 +285,18 @@
   }}
   on:click|preventDefault={() => {
     if (!isRenaming) {
-      onItemOpened("request", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        request: api,
-      });
+      expand = !expand;
+      if (expand) {
+        addCollectionItem(api.id, "Request");
+        onItemOpened("request", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          request: api,
+        });
+      } else {
+        removeCollectionItem(api.id);
+      }
     }
   }}
   bind:this={requestTabWrapper}

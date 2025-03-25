@@ -42,6 +42,11 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -193,6 +198,12 @@
       inputField.blur();
     }
   };
+
+  $: {
+    if ($openedComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -400,11 +411,14 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
+                addCollectionItem(explorer.id, "Folder");
                 onItemOpened("folder", {
                   workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                 });
+              } else {
+                removeCollectionItem(explorer.id);
               }
             }
           }
@@ -603,6 +617,8 @@
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}
