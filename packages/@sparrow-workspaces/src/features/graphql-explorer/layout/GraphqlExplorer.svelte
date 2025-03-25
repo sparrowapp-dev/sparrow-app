@@ -43,6 +43,8 @@
   import { WarningIcon } from "@sparrow/library/icons";
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
   import { onMount } from "svelte";
+  import { writable } from "svelte/store";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
 
   export let tab;
   export let collections;
@@ -74,6 +76,7 @@
   export let onUpdateVariables;
   export let updateOperationSearch;
   export let checkQueryErrorStatus;
+  const loading = writable<boolean>(false);
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -160,6 +163,15 @@
     await updateSchema(data);
     await handleQueryErrorStatus();
   };
+
+  loadingState.subscribe((tab) => {
+    const tabIdValue = tab.get($tab.tabId);
+    if (tabIdValue === undefined) {
+      loading.set(false);
+    } else {
+      loading.set(tabIdValue);
+    }
+  });
 </script>
 
 {#if $tab.tabId}
@@ -208,6 +220,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$loading}
         isSave={$tab.isSaved}
         {isGraphqlEditable}
         requestUrl={$tab.property.graphql.url}
@@ -354,7 +367,9 @@
                           {:else if !storeData?.response.status}
                             <ResponseDefaultScreen />
                           {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                            <ResponseErrorScreen />
+                            <ResponseErrorScreen
+                              response={storeData.response}
+                            />
                           {:else if storeData?.response.status}
                             <div class="h-100 d-flex flex-column">
                               <ResponseNavigator

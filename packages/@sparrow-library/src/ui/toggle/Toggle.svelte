@@ -2,9 +2,9 @@
   export let isActive: boolean = false;
   export let disabled: boolean = false;
   export let label = "";
-  export let textColor = "var(--text-ds-primary-400)";
+  export let textColor = "var(--text-ds-neutral-200)";
   export let fontSize = "12px";
-  export let fontWeight = "700";
+  export let fontWeight = "500";
   export let onChange: (event: Event) => void = () => {};
   export let onClick: (event: MouseEvent) => void = () => {};
 
@@ -17,14 +17,14 @@
     }
     isActive = !isActive;
     onChange(event);
-  }
+  };
   const handleClick=(event: MouseEvent)=> {
     if (disabled) {
       event.preventDefault();
       return;
     }
     onClick(event);
-  }
+  };
 
   const convertCasing = (sentence: string) => {
     let sen =
@@ -100,7 +100,7 @@
   }
 
   .main-container.hasLabel[tabindex="0"]:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-ds-primary-300) ;
+    box-shadow: 0 0 0 2px var(--bg-ds-primary-300);
     outline: none;
   }
 
@@ -124,7 +124,8 @@
     height: 16px;
     min-height: fit-content;
     transition: background-color 0.3s ease;
-    display: block;
+    display: flex;
+    align-items: center;
     outline: 1px solid var(--bg-ds-surface-100);
   }
 
@@ -175,31 +176,31 @@
   }
 
   .toggle-knob {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: var(--bg-ds-neutral-50);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.250s ease-out,
-    width 0.250s ease-out;
-  display: block;
-}
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--bg-ds-neutral-50);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(-50%);
+    transition:
+      transform 0.25s ease-out,
+      width 0.25s ease-out;
+    display: block;
+  }
 
 .toggle-track:active .toggle-knob {
   width: 18px;
 }
 
 input:checked ~ .toggle-track .toggle-knob {
-  transform: translateX(14px);
+  transform: translateX(14px) translateY(-50%);
 }
 
 input:checked ~ .toggle-track:active .toggle-knob {
-  transform: translateX(10px);
-  width: 16px;
+    transform: translateX(10px) translateY(-50%);
+    width: 16px;
 }
-  
 </style>

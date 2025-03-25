@@ -1,12 +1,13 @@
 <script lang="ts">
   import { LockIcon } from "@sparrow/library/icons";
   import { TeamSettingsTabsEnum } from "../../types";
+  import { LockClosedRegular, PeopleFilled } from "@sparrow/library/icons";
 
   export let activeTeamSettingsTabId: string = "";
 
   const settingsTabs = [
     {
-      name: "Team Profile",
+      name: "Teams",
       id: TeamSettingsTabsEnum.TEAM_PROFILE,
       visible: true,
       disabled: false,
@@ -61,11 +62,9 @@
           {tab.name}
         </span>
         {#if tab.disabled}
-          <LockIcon
-            height={"14px"}
-            width={"14px"}
-            color={"var(--icon-secondary-400)"}
-          />
+          <LockClosedRegular size={"16px"} color={"var(--bg-ds-neutral-500)"} />
+        {:else}
+          <PeopleFilled size={"16px"} color={"var(--bg-ds-neutral-100)"} />
         {/if}
       </button>
     {/if}
@@ -79,9 +78,11 @@
   }
   .settings-tab {
     text-align: left;
+    color: var(--text-ds-neutral-200);
     background-color: transparent;
   }
   .settings-tab-active {
     background-color: var(--bg-tertiary-750);
+    color: var(--text-ds-neutral-50);
   }
 </style>
