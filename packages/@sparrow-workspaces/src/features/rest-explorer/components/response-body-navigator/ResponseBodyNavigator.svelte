@@ -20,6 +20,7 @@
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   import { ArrowDownloadRegular, CopyRegular, SaveRegular } from "@sparrow/library/icons";
+  import { Select } from "@sparrow/library/forms";
 
   export let response;
   export let apiState;
@@ -183,7 +184,7 @@
 
       {#if apiState.bodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-          <WithSelectV3
+            <WithSelectV3
             id={"hash565"}
             data={[
               {

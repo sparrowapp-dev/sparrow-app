@@ -89,7 +89,7 @@
         <input
           type="text"
           bind:value={newVariableObj.value}
-          placeholder="Enter Value"
+          placeholder="Add Value"
           style={"outline:none;background-color: var(--bg-ds-surface-400);placeholder-color: var(--text-ds-neutral-400); color: var(--text-ds-neutral-200)"}
           class="w-100 border-0 outline-0 text-fs-12 border-radius-2 mb-2 p-2 fw-medium"
         />
