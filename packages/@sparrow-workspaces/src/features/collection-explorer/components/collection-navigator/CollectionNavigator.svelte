@@ -22,7 +22,7 @@
       },
       {
         name: "Auth",
-        id: CollectionNavigationTabEnm.AUTH,
+        id: CollectionNavigationTabEnum.AUTH,
         count: 0,
       },
     ];
