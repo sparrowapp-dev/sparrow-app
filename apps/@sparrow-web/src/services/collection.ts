@@ -2,7 +2,6 @@ import constants from "@app/constants/constants";
 import {
   makeRequest,
   getAuthHeaders,
-  makeHttpRequest,
 } from "@app/containers/api/api.common";
 
 import type {
