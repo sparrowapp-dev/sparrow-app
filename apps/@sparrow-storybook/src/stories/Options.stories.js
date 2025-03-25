@@ -47,30 +47,3 @@ export const Default = {
     ]
   }
 };
-
-export const WithDisabledItem = {
-  args: {
-    ...Default.args,
-    menuItems: [
-      {
-        onClick: () => console.log('Edit clicked'),
-        displayText: 'Edit',
-        icon: EditIcon,
-        iconColor: 'var(--text-ds-neutral-50)'
-      },
-      {
-        onClick: () => console.log('Share clicked'),
-        displayText: 'Share',
-        icon: SearchIcon,
-        iconColor: 'var(--text-ds-neutral-50)',
-        disabled: true
-      },
-      {
-        onClick: () => console.log('Settings clicked'),
-        displayText: 'Settings',
-        icon: SettingIcon,
-        iconColor: 'var(--text-ds-neutral-50)'
-      }
-    ]
-  }
-};

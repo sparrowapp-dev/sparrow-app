@@ -16,7 +16,7 @@
 </script>
 
 <Meta 
-  title="Components/Modal"
+  title="Components/ImageModal"
   component={ImageModal}
   argTypes={{
     title: {
@@ -86,7 +86,7 @@
   </Template>
 </div>
 
-<Story 
+<!-- <Story 
   name="Default"
   args={{
     title: 'Default Modal',
@@ -116,10 +116,10 @@
     <Button variant="outline-secondary" on:click={() => handleModalState(false)}>Cancel</Button>
     <Button variant="danger" on:click={() => handleModalState(false)}>Delete</Button>
   </div>
-</Story>
+</Story> -->
 
 <Story 
-  name="LargeContent"
+  name="Default"
   args={{
     title: 'Modal with Scrollable Content',
     type: 'dark',

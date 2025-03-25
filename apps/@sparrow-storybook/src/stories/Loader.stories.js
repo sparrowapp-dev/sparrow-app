@@ -7,7 +7,7 @@ import { Loader } from '@sparrow/library/ui';
 export default {
   title: 'Components/Loader', 
   component: Loader,
-  tags: ['autodoc'],
+  tags: ['autodocs'],
   argTypes: {
     loaderMessage: {
       control: 'text',

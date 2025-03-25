@@ -7,7 +7,7 @@ import { Progress } from '@sparrow/library/ui';
 export default {
   title: 'Components/Progress',
   component: Progress,
-//   tags: ['autodocs'],
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },

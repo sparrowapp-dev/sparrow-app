@@ -128,20 +128,20 @@ export const Default = {
   }
 };
 
-export const WithSubtitles = {
-  args: {
-    ...Default.args,
-    buttonId: 'subtitle-dropdown',
-    options: optionsWithSubtitles
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Dropdown with subtitle text for each option.'
-      }
-    }
-  }
-};
+// export const WithSubtitles = {
+//   args: {
+//     ...Default.args,
+//     buttonId: 'subtitle-dropdown',
+//     options: optionsWithSubtitles
+//   },
+//   parameters: {
+//     docs: {
+//       description: {
+//         story: 'Dropdown with subtitle text for each option.'
+//       }
+//     }
+//   }
+// };
 
 export const Disabled = {
   args: {

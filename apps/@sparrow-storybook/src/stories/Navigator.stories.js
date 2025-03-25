@@ -8,7 +8,8 @@ import { PersonIcon } from '@sparrow/library/icons';
 // Basic export with minimal configuration
 export default {
   title: 'Components/Navigator',
-  component: Navigator
+  component: Navigator,
+  tags: ['autodocs'],
 };
 
 export const BasicTabs = () => ({
