@@ -50,7 +50,8 @@
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
-  let filteredWorkspaces: any[] = []
+  let prevPage = -1;
+  let filteredWorkspaces: any[] = [];
 
   // filters the workspaces based on the search query
   $: {
@@ -62,6 +63,8 @@
 
     if (searchQuery && filteredResults.length > 0) {
       currPage = 1;
+    } else {
+      if (prevPage != -1) currPage = prevPage;
     }
 
     filteredWorkspaces = filteredResults.sort(
@@ -96,6 +99,7 @@
 
   const setPageWithinBounds = (newPage: number) => {
     currPage = Math.max(1, Math.min(newPage, totalPages));
+    prevPage = Math.max(1, Math.min(newPage, totalPages));
   };
 
   const handleClick = async () => {
