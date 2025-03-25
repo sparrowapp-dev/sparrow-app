@@ -24,6 +24,13 @@
   export let userRole;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
+
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
@@ -200,7 +207,7 @@
   });
 
   $: {
-    if (isFirstCollectionExpand) {
+    if ($openedComponent.has(collection.id) || isFirstCollectionExpand) {
       visibility = true;
     }
   }
@@ -468,10 +475,13 @@
       visibility = !visibility;
       if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
         if (visibility) {
+          addCollectionItem(collection.id, "collection");
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
           });
+        } else {
+          removeCollectionItem(collection.id);
         }
       }
     }
@@ -503,7 +513,7 @@
         class="py-0 renameInputFieldCollection w-100 ellipsis"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px; "
+        style="font-size: 12px; font-weight:400; line-height:18px; gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -519,7 +529,7 @@
       >
         <p
           class="ellipsis mb-0"
-          style="font-size: 12px; font-weight:500; line-height:18px;  "
+          style="font-size: 12px; font-weight:400; line-height:18px;  "
         >
           {collection.name}
         </p>

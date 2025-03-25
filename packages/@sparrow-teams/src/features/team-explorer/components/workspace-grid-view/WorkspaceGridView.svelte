@@ -50,19 +50,25 @@
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
+  let prevPage = -1;
+  let filteredWorkspaces: any[] = [];
 
   // filters the workspaces based on the search query
-  $: filteredWorkspaces = workspaces
-    .filter(
+  $: {
+    const filteredResults = workspaces.filter(
       (item) =>
         typeof item.name === "string" &&
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-    .sort(
+    );
+
+    currPage = searchQuery && filteredResults.length > 0 ? 1 : prevPage !== -1 ? prevPage : currPage;
+
+    filteredWorkspaces = filteredResults.sort(
       (a, b) =>
         new Date(b._data.updatedAt).getTime() -
         new Date(a._data.updatedAt).getTime(),
     );
+  }
 
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
@@ -89,6 +95,7 @@
 
   const setPageWithinBounds = (newPage: number) => {
     currPage = Math.max(1, Math.min(newPage, totalPages));
+    prevPage = Math.max(1, Math.min(newPage, totalPages));
   };
 
   const handleClick = async () => {

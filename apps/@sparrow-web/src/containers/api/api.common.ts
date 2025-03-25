@@ -101,6 +101,7 @@ export const regenerateAuthToken = async (
   }
 };
 
+// Makes Http Request to the Sparrow backend
 const makeRequest = async (
   method: Method,
   url: string,
@@ -202,41 +203,6 @@ function timeout(timeout: number) {
   });
 }
 
-const makeHttpRequest = async (
-  url: string,
-  method: string,
-  headers: string,
-  body: string,
-  request: string,
-) => {
-  console.table({ url, method, headers, body, request });
-  let response;
-  MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-  url = url.trim().replace(/ /g, "%20");
-  body = body.replace(/\[SPARROW_AMPERSAND$/, "");
-  return Promise.race([
-    timeout(apiTimeOut),
-    invoke("make_http_request", {
-      url,
-      method,
-      headers,
-      body,
-      request,
-    }),
-  ])
-    .then(async (data: string) => {
-      try {
-        response = JSON.parse(data);
-        response = JSON.parse(response.body);
-        return success(response);
-      } catch (e) {
-        return error("error");
-      }
-    })
-    .catch(() => {
-      return error("error");
-    });
-};
 
 function formatTime(date) {
   let hours = date.getHours();
@@ -652,14 +618,15 @@ const connectWebSocket = async (
 };
 
 /**
- * Invoke RPC Communication
- * @param url - Request URL
- * @param method - Request Method
- * @param headers - Request Headers
- * @param body - Request Body
- * @param contentType - Request Body Type
- * @param tabId - Tab ID
- * @returns
+ * 
+ * @param url 
+ * @param method 
+ * @param headers 
+ * @param body 
+ * @param contentType 
+ * @param selectedAgent 
+ * @param signal 
+ * @returns 
  */
 const makeHttpRequestV2 = async (
   url: string,

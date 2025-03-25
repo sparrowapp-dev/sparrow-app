@@ -75,6 +75,11 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import constants from "src/constants/constants";
   import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "@sparrow/workspaces/stores";
+  import {
     defaultCurrentStep,
     isDefaultTourGuideOpen,
     isDefaultTourGuideClose,
@@ -114,9 +119,8 @@
   let userId = "";
   let userRole = "";
 
-  let isExpandCollection = false;
-  let isExpandEnvironment = false;
-  let isExpandTestflow = false;
+  // let isExpandEnvironment = false;
+  // let isExpandTestflow = false;
   let isFirstCollectionExpand = false;
 
   let localEnvironment;
@@ -173,8 +177,8 @@
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
   async function handleCreateEnvironment() {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
 
     await onCreateEnvironment(localEnvironment);
@@ -526,8 +530,8 @@
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
-      isExpandCollection = value;
-      isExpandEnvironment = value;
+      isExpandCollection.set(value);
+      isExpandEnvironment.set(value);
       isFirstCollectionExpand = value;
     }
   });
@@ -629,9 +633,6 @@
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
           onOpenTestflow={_viewModel3.handleOpenTestflow}
-          bind:isExpandCollection
-          bind:isExpandEnvironment
-          bind:isExpandTestflow
           bind:isFirstCollectionExpand
           appVersion={"version"}
           isWebApp={true}
@@ -734,9 +735,8 @@
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
                           _viewModel3.handleCreateTestflow();
-                          isExpandTestflow = true;
+                          isExpandTestflow.set(true);
                         }}
-                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -905,26 +905,7 @@
 {/if}
 
 <svelte:window on:keydown={handleKeyPress} />
-<!-- <ImportCollection
-    {collectionList}
-    workspaceId={$currentWorkspace._id}
-    closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
-    onItemCreated={async (entityType, args) => {
-      const response = await _viewModel.handleCreateItem(entityType, args);
-      if (response.isSuccessful) {
-        setTimeout(() => {
-          scrollList("bottom");
-        }, 1000);
-      }
-    }}
-    onItemImported={async (entityType, args) => {
-      await _viewModel.handleImportItem(entityType, args);
-      scrollList("bottom");
-    }}
-    onImportDataChange={_viewModel.handleImportDataChange}
-    onUploadFile={_viewModel.uploadFormFile}
-    onExtractGitBranch={_viewModel.extractGitBranch}
-  /> -->
+
 <Modal
   title={"New Collection"}
   type={"dark"}
@@ -936,7 +917,7 @@
   }}
 >
   <ImportCollection
-    onClick={() => {
+    onCloseModal={() => {
       isImportCollectionPopup = false;
     }}
     {collectionList}
@@ -945,12 +926,12 @@
       if (response.isSuccessful) {
         setTimeout(() => {
           scrollList("bottom");
-          isExpandCollection = true;
+          isExpandCollection.set(true);
         }, 1000);
       }
     }}
     currentWorkspaceId={$currentWorkspace?._id}
-    onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
+    onImportOapiText={async (currentWorkspaceId, importJSON, contentType) => {
       const response = await _viewModel.importJSONObject(
         currentWorkspaceId,
         importJSON,
@@ -963,7 +944,7 @@
       }
       return response;
     }}
-    onCollectionFileUpload={async (currentWorkspaceId, file, type) => {
+    onImportOapiFile={async (currentWorkspaceId, file, type) => {
       const response = await _viewModel.collectionFileUpload(
         currentWorkspaceId,
         file,
@@ -993,11 +974,9 @@
       }
       return response;
     }}
-    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
-    onValidateDeployedURL={_viewModel.validateDeployedURL}
-    onValidateDeployedURLInput={_viewModel.validateDeployedURLInput}
-    onValidateLocalHostURLInput={_viewModel.validateLocalHostURLInput}
-    isWebApp={true}
+    onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
+    onValidateOapiText={_viewModel.validateOapiDataSyntax}
+    onValidateOapiFile={_viewModel.validateOapiFileSyntax}
   />
 </Modal>
 
