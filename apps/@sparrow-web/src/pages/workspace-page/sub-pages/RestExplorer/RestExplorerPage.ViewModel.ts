@@ -2289,11 +2289,15 @@ class RestExplorerViewModel {
    * Handles socket connection errors with a consistent approach
    * @param componentData - The current component data
    */
-  private async handleSocketConnectionError(componentData: RequestTab) {
+  private async handleAIResponseError(
+    componentData: RequestTab,
+    errorMessage: string,
+  ) {
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
-        message: "Woops! Something gone wrong. Please try again...",
+        message:
+          errorMessage || "Woops! Something gone wrong. Please try again...",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2332,39 +2336,36 @@ class RestExplorerViewModel {
       }
 
       // Set up socket event listener for the response
-      const socket = await this.aiAssistentWebSocketService.sendMessage(
+      const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
         componentData?.property?.request?.ai?.threadId || null,
         userEmail,
         prompt,
         JSON.stringify(apiData),
       );
-      // console.log("socket Instance :> ", socket);
+
+      if (!socketResponse) {
+        console.log("socket resonse invalid :> ");
+        throw new Error("Something Went Extremely Wrong!");
+      }
 
       // Remove any existing listeners to avoid duplicates
-      // socket.off(`assistant-response_${componentData.tabId}`);
-      // // socket.off(`connect_error`);
-      // socket.off(`disconnect`);
       this.aiAssistentWebSocketService.removeListener(
         `assistant-response_${componentData.tabId}`,
       );
-      this.aiAssistentWebSocketService.removeListener(`connect_error`);
       this.aiAssistentWebSocketService.removeListener(`disconnect`);
+      // this.aiAssistentWebSocketService.removeListener(`connect_error`);
 
       // Add new fresh listners
-      // Handle socket disconnection while generating the response
-      // socket.on("disconnect", async (reason) => {
-      //   console.error("Socket disconnected:", reason);
-      //   await this.handleSocketConnectionError(componentData);
-      //   // if (["io server disconnect", "transport close", "transport error"].includes(reason)) await this.handleSocketConnectionError(componentData);
-      // });
-
       this.aiAssistentWebSocketService.addListener(
         `disconnect`,
         async (reason) => {
           console.error("Socket disconnected:", reason);
-          await this.handleSocketConnectionError(componentData);
-          // if (["io server disconnect", "transport close", "transport error"].includes(reason)) await this.handleSocketConnectionError(componentData);
+          await this.handleAIResponseError(
+            componentData,
+            "Service Disconnect!",
+          );
+          // if (["io server disconnect", "transport close", "transport error"].includes(reason)) await this.handleAIResponseError(componentData, "Service Disconnect!");
         },
       );
 
@@ -2380,7 +2381,7 @@ class RestExplorerViewModel {
           this.aiAssistentWebSocketService.removeListener(
             `assistant-response_${componentData.tabId}`,
           );
-          this.aiAssistentWebSocketService.removeListener(`connect_error`);
+          // this.aiAssistentWebSocketService.removeListener(`connect_error`);
           this.aiAssistentWebSocketService.removeListener(`disconnect`);
 
           if (
@@ -2452,8 +2453,8 @@ class RestExplorerViewModel {
         },
       );
     } catch (error) {
-      console.error("Error in AI response generation:", error);
-      await this.handleSocketConnectionError(componentData);
+      console.error("Error in AI response generation:", error.message);
+      await this.handleAIResponseError(componentData, error.message);
     }
   };
 
