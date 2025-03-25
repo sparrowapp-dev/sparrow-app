@@ -74,27 +74,25 @@
       {/each}
     </div>
     {#if !isExpandShortcuts}
-      <div class="d-flex justify-content-center">
+      <div class="d-flex justify-content-center mt-2">
         <Button
           type="outline-secondary"
           title="See All Shortcuts"
           onClick={() => {
             isExpandShortcuts = true;
           }}
-          size="small"
-          fontSize={14}
+          size="medium"
         />
       </div>
     {:else}
-      <div class="d-flex justify-content-center">
+      <div class="d-flex justify-content-center mt-2">
         <Button
           type="outline-secondary"
           title="Hide All Shortcuts"
           onClick={() => {
             isExpandShortcuts = false;
           }}
-          size="small"
-          fontSize={14}
+          size="medium"
         />
       </div>
     {/if}

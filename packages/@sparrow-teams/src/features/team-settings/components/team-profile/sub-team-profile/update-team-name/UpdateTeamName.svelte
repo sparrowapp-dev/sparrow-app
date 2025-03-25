@@ -35,7 +35,6 @@
       on:blur={() => {
         onUpdateTeam(TeamPropertyEnum.NAME);
       }}
-      disabled={true}
     />
   </div>
 </div>

@@ -42,6 +42,11 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -193,6 +198,12 @@
       inputField.blur();
     }
   };
+
+  $: {
+    if ($openedComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -400,11 +411,14 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
+                addCollectionItem(explorer.id, "Folder");
                 onItemOpened("folder", {
                   workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                 });
+              } else {
+                removeCollectionItem(explorer.id);
               }
             }
           }
@@ -458,7 +472,7 @@
               class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px; padding-left:5px; font-weight:500; color : var(--text-ds-neutral-50); line-height:18px;"
+              style="font-size: 12px; padding-left:5px; font-weight:400; color : var(--text-ds-neutral-50); line-height:18px;"
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -472,7 +486,7 @@
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
                       height: 32px;
-                      font-weight:500;
+                      font-weight:400;
                       margin-left:0px;
                       font-size:12px;
                       color:var(--text-ds-neutral-50);
@@ -603,6 +617,8 @@
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}
