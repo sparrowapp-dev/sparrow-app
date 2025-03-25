@@ -1097,7 +1097,6 @@ export {
   makeRequest,
   getAuthHeaders,
   getRefHeaders,
-  makeHttpRequest,
   getMultipartAuthHeaders,
   makeHttpRequestV2,
   connectWebSocket,

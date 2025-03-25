@@ -1299,7 +1299,7 @@ const makeGraphQLRequest = async (
       responseCode: 200,
       properties: {
         source: "frontend",
-        type: "RPC_GRAPHQL",
+        type: "PROXY_GRAPHQL",
       },
     };
     appInsights.trackDependencyData(appInsightData);
@@ -1340,7 +1340,6 @@ export {
   makeRequest,
   getAuthHeaders,
   getRefHeaders,
-  makeHttpRequest,
   getMultipartAuthHeaders,
   makeHttpRequestV2,
   connectWebSocket,
