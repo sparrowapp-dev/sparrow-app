@@ -39,6 +39,7 @@
    * function to remove member from workspace
    */
   export let onRemoveUserFromWorkspace;
+
   /**
    * function to change user role at workspace
    */
@@ -612,9 +613,10 @@
         disabled={owner}
         isArrowIconRequired={!owner}
         borderRounded={"4px"}
+        minHeaderWidth={"105px"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
-      <Select
+      <!-- <Select
         id={user.id}
         data={getPermissionsData()}
         titleId={user.role ? user.role : ""}
@@ -627,7 +629,23 @@
         isArrowIconRequired={!owner}
         headerFontSize={"10px"}
         borderRounded={"4px"}
-      />
+        minHeaderWidth={"105px"}
+      /> -->
+      <div style="display:flex; justify-content:center;align-items:center">
+        <Button
+          id={user.id}
+          size={"small"}
+          onClick={() => {
+            handleDropdown;
+          }}
+          title={user.role
+            ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+            : ""}
+          type={"teritiary-regular"}
+          disabled={owner}
+          endIcon={!owner}
+        />
+      </div>
     {:else}
       <Select
         id={user.id}
@@ -640,6 +658,7 @@
         disabled={true}
         headerFontSize={"10px"}
         isArrowIconRequired={false}
+        minHeaderWidth={"105px"}
       />
     {/if}
   </div>

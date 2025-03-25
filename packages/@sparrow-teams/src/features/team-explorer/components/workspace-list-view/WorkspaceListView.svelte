@@ -1,12 +1,13 @@
 <script lang="ts">
-  import {
-    DoubleLeftIcon,
-    LeftIcon,
-    RightIcon,
-    DoubleRightIcon,
-  } from "@sparrow/library/assets";
   import type { TeamDocument } from "@app/database/database";
   import { calculateTimeDifferenceInDays } from "../../../../utils/workspacetimeUtils";
+  import { SparrowLogo } from "@sparrow/common/icons";
+  import {
+    ChevronDoubleLeftRegular,
+    ChevronDoubleRightRegular,
+    ChevronLeftRegular,
+    ChevronRightRegular,
+  } from "@sparrow/library/icons";
   import { Table } from "@sparrow/teams/components";
   import { Rows } from "@sparrow/teams/components";
   import { TeamSkeleton } from "../../images";
@@ -117,13 +118,21 @@
         </thead>
       </table>
       <div>
-        <img
-          src={TeamSkeleton}
-          alt="Team-Skelton"
-          width="100%"
-          height="100%"
-          style=""
-        />
+        <div class="container">
+          <div class="sparrow-logo">
+            <SparrowLogo />
+          </div>
+          <p
+            style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px;font-family: Inter, sans-serif;"
+          >
+            Welcome to Sparrow – where teamwork flows effortlessly.
+          </p>
+          <p
+            style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;font-family: Inter, sans-serif;"
+          >
+            Sign up or log in to unlock powerful tools and stay organized!
+          </p>
+        </div>
       </div>
     {/if}
 
@@ -170,7 +179,7 @@
             <button
               on:click={() => (currPage = 1)}
               class="bg-transparent border-0"
-              ><DoubleLeftIcon
+              ><ChevronDoubleLeftRegular
                 color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
               /></button
             >
@@ -179,7 +188,7 @@
                 if (currPage > 1) currPage -= 1;
               }}
               class="bg-transparent border-0"
-              ><LeftIcon
+              ><ChevronLeftRegular
                 color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
               /></button
             >
@@ -198,7 +207,7 @@
                   currPage += 1;
               }}
               class="bg-transparent border-0"
-              ><RightIcon
+              ><ChevronRightRegular
                 color={currPage ===
                 Math.ceil(
                   data?.filter((item) =>
@@ -221,7 +230,7 @@
                   ).length / workspacePerPage,
                 ))}
               class="bg-transparent border-0"
-              ><DoubleRightIcon
+              ><ChevronDoubleRightRegular
                 color={currPage ===
                 Math.ceil(
                   data?.filter((item) =>
@@ -263,6 +272,13 @@
     line-height: 18px;
     color: var(--text-secondary-200);
     background-color: transparent;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 150px 35px 24px;
   }
   .tab-change {
     margin-left: 203px;

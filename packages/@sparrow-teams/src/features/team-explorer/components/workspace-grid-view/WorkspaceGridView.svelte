@@ -197,12 +197,12 @@
           <SparrowLogo />
         </div>
         <p
-          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px;font-family: Inter, sans-serif;"
         >
           Welcome to Sparrow – where teamwork flows effortlessly.
         </p>
         <p
-          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;font-family: Inter, sans-serif;"
         >
           Sign up or log in to unlock powerful tools and stay organized!
         </p>
