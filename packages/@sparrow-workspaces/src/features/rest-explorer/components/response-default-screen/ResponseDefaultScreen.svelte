@@ -6,6 +6,7 @@
   import { Button } from "@sparrow/library/ui";
 
   export let isMainScreen = false;
+  export let isWebApp;
   let platformName = "";
 
   let ctrlCommands: { [key: string]: string } = {};
@@ -21,7 +22,7 @@
 
     ctrlCommands = {
       "Send Request": [`${controlKey}`, "Enter"],
-      // "New Request": [`${controlKey}`, "N"],
+      ...(!isWebApp ? { "New Request": [`${controlKey}`, "N"] } : {}),
       "Save Request": [`${controlKey}`, "S"],
     };
 
