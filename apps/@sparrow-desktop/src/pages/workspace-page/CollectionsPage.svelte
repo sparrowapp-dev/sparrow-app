@@ -34,6 +34,11 @@
     SaveAsCollectionItem,
     WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
+  import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "@sparrow/workspaces/stores";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
 
@@ -114,13 +119,9 @@
   let userId = "";
   let userRole = "";
 
-  let isExpandCollection = false;
-  let isExpandEnvironment = false;
-  let isExpandTestflow = false;
-  let isFirstCollectionExpand = false;
-
   let localEnvironment;
   let globalEnvironment;
+  let isFirstCollectionExpand;
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
@@ -173,8 +174,8 @@
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
   async function handleCreateEnvironment() {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
 
     await onCreateEnvironment(localEnvironment);
@@ -525,8 +526,8 @@
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
-      isExpandCollection = value;
-      isExpandEnvironment = value;
+      isExpandCollection.set(value);
+      isExpandEnvironment.set(value);
       isFirstCollectionExpand = value;
     }
   });
@@ -599,11 +600,8 @@
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
           onOpenTestflow={_viewModel3.handleOpenTestflow}
-          bind:isExpandCollection
-          bind:isExpandEnvironment
-          bind:isExpandTestflow
-          bind:isFirstCollectionExpand
           appVersion={version}
+          bind:isFirstCollectionExpand
         />
       </Pane>
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
@@ -702,9 +700,8 @@
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
                           _viewModel3.handleCreateTestflow();
-                          isExpandTestflow = true;
+                          isExpandTestflow.set(true);
                         }}
-                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -912,7 +909,7 @@
       if (response.isSuccessful) {
         setTimeout(() => {
           scrollList("bottom");
-          isExpandCollection = true;
+          isExpandCollection.set(true);
         }, 1000);
       }
     }}
@@ -1097,7 +1094,7 @@
       .collection-splitter .splitpanes__splitter:active,
       .collection-splitter .splitpanes__splitter:hover
     ) {
-    background-color: var(--bg-ds-primary-300) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .gradient-text {
     font-size: 18;

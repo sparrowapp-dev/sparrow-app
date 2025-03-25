@@ -19,6 +19,7 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandEnvironment } from "../../../stores/recent-left-panel";
 
   /**
    * current workspace
@@ -64,7 +65,7 @@
 
   export let searchData;
 
-  export let isExpandEnvironment = false;
+  // export let isExpandEnvironment = false;
 
   export let toggleExpandEnvironment;
 
@@ -113,8 +114,8 @@
   }
 
   const handleCreateEnvironment = async () => {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
     await onCreateEnvironment(localEnvironment);
     setTimeout(() => {
@@ -168,7 +169,7 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={!isExpandEnvironment
+          startIcon={!$isExpandEnvironment
             ? ChevronRightRegular
             : ChevronDownRegular}
         />
@@ -214,7 +215,7 @@
     {/if}
   </div>
 
-  {#if isExpandEnvironment}
+  {#if $isExpandEnvironment}
     <div
       style="flex:1; height:32px; "
       class="overflow-auto"
@@ -237,14 +238,14 @@
               class="icon-default"
               style="width: 24px; height:24px; margin-right:4px;"
             >
-              <span class="icon-default">
-                <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
-              </span>
+            </span>
+            <span class="icon-default">
+              <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
+            </span>
 
-              <span class="box-line1"></span>
-              <span class="" style="padding: 2px 4px;"
-                >{globalEnvironment[0]?.name}</span
-              >
+            <span class="box-line1"></span>
+            <span class="" style="padding: 2px 4px;"
+              >{globalEnvironment[0]?.name}
             </span>
           </p>
         </div>

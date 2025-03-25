@@ -26,6 +26,8 @@
   } from "../../../stores/guide.tour";
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
+  import { isExpandTestflow } from "../../../stores/recent-left-panel";
+
   /**
    * current workspace
    */
@@ -62,7 +64,7 @@
 
   export let searchData = "";
 
-  export let isExpandTestflow = false;
+  // export let isExpandTestflow = false;
 
   export let toggleExpandTestflow;
 
@@ -97,8 +99,8 @@
   }
 
   async function handleCreateTestflow() {
-    if (!isExpandTestflow) {
-      isExpandTestflow = !isExpandTestflow;
+    if (!$isExpandTestflow) {
+      isExpandTestflow.update((value) => !value);
     }
     await onCreateTestflow();
     setTimeout(() => {
@@ -122,8 +124,8 @@
       });
     }
   }
-  $: isExpandTestflow =
-    $isDefaultTourGuideOpen === true ? true : isExpandTestflow;
+  $: $isExpandTestflow =
+    $isDefaultTourGuideOpen === true ? true : $isExpandTestflow;
 </script>
 
 <div
@@ -151,7 +153,7 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={!isExpandTestflow
+          startIcon={!$isExpandTestflow
             ? ChevronRightRegular
             : ChevronDownRegular}
         />
@@ -198,8 +200,8 @@
     </Tooltip>
   </div>
 
-  {#if isExpandTestflow}
-    <div style="flex:1;" class="overflow-auto h-100" bind:this={scrollDiv}>
+  {#if $isExpandTestflow}
+    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
       <!-- 
   --  Testflow Empty screen 
   -->
