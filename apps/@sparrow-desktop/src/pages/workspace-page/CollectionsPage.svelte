@@ -98,6 +98,8 @@
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
 
+  let totalTeamCount: number | undefined = 0;
+
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
 
@@ -121,7 +123,7 @@
 
   let localEnvironment;
   let globalEnvironment;
-  
+
   let hasSetInitialEnvironment = false;
   let isFirstCollectionExpand;
 
@@ -459,7 +461,8 @@
   let activeTab: Observable<TabDocument | null> | undefined;
   let prevWorkspaceId = "";
   let count = 0;
-
+  let autoRefreshEnable: boolean = true;
+  let refreshLoad: boolean = false;
   let isAccessDeniedModalOpen = false;
 
   // Add userValidation state
@@ -467,42 +470,44 @@
     isValid: true,
     checked: false,
   };
+  const handleRefreshApicalls = async (workspaceId: string) => {
+    try {
+      const [
+        fetchCollectionsResult,
+        refreshEnvironmentResult,
+        refreshTestflowResult,
+      ] = await Promise.all([
+        _viewModel.fetchCollections(workspaceId),
+        _viewModel2.refreshEnvironment(workspaceId),
+        _viewModel3.refreshTestflow(workspaceId),
+      ]);
+
+      const collectionTabsToBeDeleted =
+        fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+      const environmentTabsToBeDeleted =
+        refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+      const testflowTabsToBeDeleted =
+        refreshTestflowResult?.testflowTabsToBeDeleted || [];
+
+      const totalTabsToBeDeleted = [
+        ...collectionTabsToBeDeleted,
+        ...environmentTabsToBeDeleted,
+        ...testflowTabsToBeDeleted,
+      ];
+      _viewModel.deleteTabsWithTabIdInAWorkspace(
+        workspaceId,
+        totalTabsToBeDeleted,
+      );
+      refreshLoad = false;
+    } catch (error) {
+      refreshLoad = false;
+    }
+  };
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        Promise.all([
-          _viewModel.fetchCollections(value?._id),
-          _viewModel2.refreshEnvironment(value?._id),
-          _viewModel3.refreshTestflow(value?._id),
-          ,
-        ]).then(
-          ([
-            fetchCollectionsResult,
-            refreshEnvironmentResult,
-            refreshTestflowResult,
-          ]) => {
-            // Handle the results of each API call here
-
-            const collectionTabsToBeDeleted =
-              fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
-            const environmentTabsToBeDeleted =
-              refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            const testflowTabsToBeDeleted =
-              refreshTestflowResult?.testflowTabsToBeDeleted || [];
-            const totalTabsToBeDeleted: string[] = [
-              ...collectionTabsToBeDeleted,
-              ...environmentTabsToBeDeleted,
-              ...testflowTabsToBeDeleted,
-            ];
-            _viewModel.deleteTabsWithTabIdInAWorkspace(
-              value?._id,
-              totalTabsToBeDeleted,
-            );
-            const userHasAccess = value.users?.some(
-              (user) => user.id === userId,
-            );
-          },
-        );
+        await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -512,6 +517,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
+        totalTeamCount = value._data?.users?.length;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -565,6 +571,42 @@
     });
     totalCollectionCount.set(count);
   });
+
+  let refreshInterval: NodeJS.Timeout | null = null;
+
+  //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
+  const handleRefreshWorkspace = () => {
+    if (!currentWorkspace) return;
+    refreshLoad = true;
+    if (totalTeamCount > 1) {
+      handleRefreshApicalls($currentWorkspace?._id);
+    }
+  };
+
+  // It will autorefresh the handle function of refresh in 2 minutes interval Time.
+  const startAutoRefresh = (): void => {
+    if (!autoRefreshEnable) {
+      return;
+    }
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+    refreshInterval = setInterval(
+      () => {
+        handleRefreshWorkspace();
+      },
+      2 * 60 * 1000,
+    );
+  };
+
+  const refreshWorkspace = (): void => {
+    handleRefreshWorkspace();
+    startAutoRefresh();
+  };
+
+  onMount(() => {
+    startAutoRefresh();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -585,6 +627,9 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          userCount={totalTeamCount}
+          {refreshWorkspace}
+          {refreshLoad}
           {collectionList}
           {navigateToGithub}
           {currentWorkspace}
