@@ -823,9 +823,8 @@ export default class CollectionsViewModel {
    * @param ids :string[] - the ids of tab to be removed
    */
   private removeMultipleTabs = async (ids: string[]) => {
-    ids.forEach((id) => {
-      this.tabRepository.removeTab(id);
-    });
+    if (ids.length === 0) return;
+    await this.tabRepository.bulkRemoveTabs(ids);
   };
 
   /**
@@ -5700,18 +5699,14 @@ export default class CollectionsViewModel {
    * @param url - The localhost URL to validate.
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateLocalHostURL = async (url: string) => {
-    const response = await makeRequest("GET", url, undefined, true);
-    return response;
-  };
-
-  /**
-   * Validates a deployed URL by making a GET request with specific headers.
-   *
-   * @param url - The deployed URL to validate.
-   * @returns  A promise that resolves with the response of the validation request.
-   */
-  public validateDeployedURL = async (url: string) => {
+  public getOapiJsonFromURL = async (url: string) => {
+    let agent = WorkspaceUserAgentBaseEnum.CLOUD_AGENT;
+    if (
+      url.includes("://127.0.0.1") ||
+      url.includes("://localhost")
+    ) {
+      agent = WorkspaceUserAgentBaseEnum.BROWSER_AGENT
+    }
     const headers = [
       { key: "Accept-Encoding", value: "gzip, br", checked: true },
       {
@@ -5729,7 +5724,7 @@ export default class CollectionsViewModel {
       JSON.stringify(headers),
       "",
       "text/plain",
-      WorkspaceUserAgentBaseEnum.CLOUD_AGENT,
+      agent,
     );
     return response;
   };
@@ -5739,23 +5734,19 @@ export default class CollectionsViewModel {
    * @param data - Open API Text Data
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateLocalHostURLInput = async (data: any) => {
+  public validateOapiDataSyntax = async (data: any) => {
     const response = await this.collectionService.validateImportCollectionInput(
       "",
-      data?.data?.data,
+      data?.data?.body,
     );
     return response;
   };
 
-  /**
-   * Validate the data of deployed URL if it follows Open API Specification or not.
-   * @param data - Open API Text Data
-   * @returns A promise that resolves with the response of the validation request.
-   */
-  public validateDeployedURLInput = async (data: any) => {
-    const response = await this.collectionService.validateImportCollectionInput(
+  public validateOapiFileSyntax = async (_fileUploadData: any) => {
+    const response = 
+    await this.collectionService.validateImportCollectionFileUpload(
       "",
-      JSON.parse(data?.data?.body),
+      _fileUploadData,
     );
     return response;
   };

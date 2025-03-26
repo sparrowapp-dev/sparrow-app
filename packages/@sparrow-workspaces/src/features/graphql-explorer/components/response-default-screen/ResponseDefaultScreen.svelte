@@ -3,17 +3,20 @@
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
+  import { OSDetector } from "@sparrow/common/utils";
   export let isMainScreen = false;
+  export let isWebApp;
 
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
   onMount(async () => {
-    const platformName = await platform();
+    const osDetector = new OSDetector();
+    const platformName = osDetector.getOS();
     let controlKey = platformName === "macos" ? "cmd" : "Ctrl";
     let altKey = platformName === "macos" ? "option" : "Alt";
     ctrlCommands = {
       "Send Request": [controlKey, "Enter"],
-      "New Request": [controlKey, "N"],
+      ...(!isWebApp ? { "New Request": [`${controlKey}`, "N"] } : {}),
       "Save Request": [controlKey, "S"],
     };
 

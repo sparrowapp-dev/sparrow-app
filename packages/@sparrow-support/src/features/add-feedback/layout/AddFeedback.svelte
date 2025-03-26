@@ -114,7 +114,7 @@
     title={"Add Feedback"}
     type={"dark"}
     width={"50%"}
-    zIndex={10000}
+    zIndex={1}
     isOpen={isExposeFeedbackForm}
     handleModalState={(flag = false) => {
       isExposeFeedbackForm = flag;
@@ -211,9 +211,7 @@
           type="text"
           isEditIconRequired={false}
           bind:value={feedbackSubject}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="transparent"
-          focusedBorderColor={"transparent"}
+          blankTextarea={true}
           class="text-fs-20 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;"
           disabled={false}

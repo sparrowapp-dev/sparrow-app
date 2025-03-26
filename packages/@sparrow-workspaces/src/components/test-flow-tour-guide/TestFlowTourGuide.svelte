@@ -87,16 +87,18 @@
   </p>
 
   <!-- Next/Done button -->
-  <button
-    class=" mt-2 rounded-1 text-fs-12"
-    style="font-weight:500; border: none; background-color:#2A2C3C; padding:7px 10px;"
-    on:click={handleNext}
-    >{#if isLastStep}
-      Done
-    {:else}
-      Next
-    {/if}</button
-  >
+  <div class="d-flex justify-content-end">
+    <button
+      class=" mt-2 rounded-1 text-fs-12"
+      style="font-weight:500; border: none; background-color:#2A2C3C; padding:7px 10px;"
+      on:click={handleNext}
+      >{#if isLastStep}
+        Done
+      {:else}
+        Next
+      {/if}</button
+    >
+  </div>
 </div>
 
 <style>

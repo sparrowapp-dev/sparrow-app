@@ -252,15 +252,17 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id
-      ? "padding-left: 74.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {graphql.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="height: 24px; width:24px !important; margin-right:4px;"
+    ></div>
     <span class="api-method">
       <GraphIcon
         height={"12px"}
@@ -286,7 +288,7 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; "
+        style="font-size: 12px; font-weight:400;"
       >
         <p class=" ellipsis m-0 p-0">{graphql.name}</p>
       </div>
@@ -324,18 +326,19 @@
 <style lang="scss">
   .delete-ticker {
     color: var(--error--color);
-    font-weight: 500;
+    font-weight: 400;
   }
   .api-method {
     font-size: 10px;
-    font-weight: 500;
+    font-weight: 400;
     width: 30px !important;
     height: 24px;
 
     border-radius: 8px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     font-weight: 500;
@@ -343,7 +346,7 @@
     text-align: left;
     font-size: 12px;
     line-height: 18px;
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
