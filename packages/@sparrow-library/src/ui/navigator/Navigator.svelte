@@ -4,7 +4,6 @@
   export let tabs;
   export let currentTabId;
   export let onTabClick;
-  export let tabUnderline = true;
   export let isSegmentedTab = false;
   let leftSliderDistance = 0;
   let sliderWidth = 0;
@@ -80,7 +79,7 @@
       </button>
     {/each}
   </div>
-  {#if !allDisableState && tabUnderline}
+  {#if !allDisableState && !isSegmentedTab }
     <div
       class="slider"
       style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
