@@ -106,6 +106,8 @@
 
   export let openInDesktop;
 
+  let currentTabId = TeamTabsEnum.WORKSPACES;
+
   let selectedView: string = "Grid";
 
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
@@ -320,8 +322,11 @@
           >
             <Navigator
               tabs={teamTabs.filter((tab) => tab.visible !== false)}
-              currentTabId={"Workspaces"}
-              onTabClick={onUpdateActiveTab}
+              {currentTabId}
+              onTabClick={(id)=>{
+                onUpdateActiveTab(id);
+                currentTabId= id;
+              }}
               {activeTeamTab}
             />
           </div>
