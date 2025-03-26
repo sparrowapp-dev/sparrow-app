@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
   import { OSDetector } from "@sparrow/common/utils";
-
+  import { keyCommandRegular } from "@sparrow/library/icons";
   export let isMainScreen = false;
   let platformName = "";
 
@@ -18,19 +18,18 @@
     const controlKey = platformName === "macos" ? "cmd" : "Ctrl";
     const altKey = platformName === "macos" ? "option" : "Alt";
 
- ctrlCommands = {
-  "Send Request": [`${controlKey}`, "Enter"],
-  "New Request": [`${controlKey}`, "N"],
-  "Save Request": [`${controlKey}`, "S"],
-};
+    ctrlCommands = {
+      "Send Request": [`${controlKey}`, "Enter"],
+      "New Request": [`${controlKey}`, "N"],
+      "Save Request": [`${controlKey}`, "S"],
+    };
 
-altCommands = {
-  "Edit link": [`${altKey}`, "L"],
-  "Add Parameter": [`${altKey}`, "P"],
-  "Add Header": [`${altKey}`, "H"],
-  "Edit Body": [`${altKey}`, "B"],
-};
-
+    altCommands = {
+      "Edit link": [`${altKey}`, "L"],
+      "Add Parameter": [`${altKey}`, "P"],
+      "Add Header": [`${altKey}`, "H"],
+      "Edit Body": [`${altKey}`, "B"],
+    };
   });
   let isExpandShortcuts = false;
 </script>
@@ -46,8 +45,11 @@ altCommands = {
         <SparrowLogo />
       </div>
       <div class="d-flex flex-column align-items-center">
-        <p class="text-secondary-200 fw-bold text-fs-14 mb-5">
-          Click Send to get a Response
+        <p
+          class="mb-5"
+          style="font-family: 'Inter', sans-serif;color:var(--text-ds-neutral-400);font-size:12px"
+        >
+          Enter a URL to load and explore your schema.
         </p>
       </div>
     </div>
@@ -57,11 +59,7 @@ altCommands = {
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3 flex items-center">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
       {/if}
     {/each}
@@ -69,11 +67,7 @@ altCommands = {
       {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}
