@@ -632,7 +632,7 @@
         </div>
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style={`cursor: pointer; background-color: `}>
+      <div style={`cursor: pointer; `}>
         <Request
           {userRole}
           api={explorer}
