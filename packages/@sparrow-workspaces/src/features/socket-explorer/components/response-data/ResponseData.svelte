@@ -227,7 +227,6 @@
           headerTheme={"transparent"}
           menuItem={"v2"}
           headerFontSize={"12px"}
-          maxHeaderWidth={"12px"}
           zIndex={200}
           bodyTheme={"surface"}
           borderRounded={"4px"}

@@ -5,6 +5,7 @@ import type {
   HttpRequestSavedAuthModeBaseEnum,
   HttpRequestSavedBodyModeBaseEnum,
   HttpRequestSavedMethodBaseEnum,
+  HttpResponseSavedBodyModeBaseEnum,
 } from "./http-request-saved-base";
 
 export interface HttpRequestSavedQueryParamsDtoInterface {
@@ -59,6 +60,7 @@ export interface HttpRequestSavedMetaDataDtoInterface {
   responseHeaders?: HttpRequestSavedKeyValueDtoInterface[];
   selectedRequestBodyType?: HttpRequestSavedBodyModeBaseEnum;
   selectedRequestAuthType?: HttpRequestSavedAuthModeBaseEnum;
+  selectedResponseBodyType?: HttpResponseSavedBodyModeBaseEnum;
   queryParams?: HttpRequestSavedKeyValueDtoInterface[];
   pathParams?: HttpRequestSavedKeyValueDtoInterface[];
   headers?: HttpRequestSavedKeyValueDtoInterface[];
@@ -94,6 +96,7 @@ export interface HttpRequestSavedUpdatePayloadDtoInterface {
   requestId?: string;
   name?: string;
   description?: string;
+  selectedResponseBodyType?: HttpResponseSavedBodyModeBaseEnum;
 }
 
 export interface HttpRequestSavedDeletePayloadDtoInterface {

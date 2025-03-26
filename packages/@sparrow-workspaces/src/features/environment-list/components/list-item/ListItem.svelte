@@ -224,7 +224,6 @@
   class="environment-tab"
   bind:this={environmentTabWrapper}
   on:click|preventDefault={() => {
-    handleSelectEnvironment();
     if (!isRenaming) {
       if (!env.id.includes(UntrackedItems.UNTRACKED)) {
         openEnvironment();
@@ -234,7 +233,7 @@
 >
   <button
     tabindex="0"
-    style="height:32px;gap:4px; padding-left:34px;  border-color: {showMenu
+    style="height:32px;gap:4px; padding-left:7px;  border-color: {showMenu
       ? '#ff7878'
       : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
@@ -242,6 +241,7 @@
       ? 'active-collection-tab'
       : ''}"
   >
+    <div class="box" style="height: 24px; width:30px; margin-right:4px;"></div>
     <div
       class="d-flex main-collection align-items-center"
       on:contextmenu|preventDefault={(e) => {
@@ -250,16 +250,17 @@
     >
       <button
         class="border-0 bg-transparent"
-        style="width: 30px; height:24px; display:flex; align-items:center; justify-content:center; "
+        style="width: 30px !important; height:24px; display:flex; align-items:center; justify-content:end; padding:4px; "
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
       >
         <SelectIcon
-          classProp={`my-auto`}
+          classProp={`my-auto p-0`}
           width={16}
           height={16}
           selected={currentWorkspace?.environmentId === env.id}
+          selectedColor={"var(--bg-ds-neutral-200)"}
         />
       </button>
       <!-- <RadioButton
@@ -268,11 +269,11 @@
         selected={currentWorkspace?.environmentId === env.id}
         handleChange={() => handleSelectEnvironment()}
         singleSelect={true}
-      /> -->
+        /> -->
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
-          style="font-size: 12px; font-weight:500; line-height:18px;"
+          style="font-size: 12px; font-weight:400; line-height:18px;"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -286,7 +287,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 32px; font-size:12px; font-weight:500; line-height:18px "
+          style="height: 32px; font-size:12px; font-weight:400; line-height:18px; padding:2px 4px; "
         >
           <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
             {env.name}
@@ -312,7 +313,6 @@
               WorkspaceRole.WORKSPACE_VIEWER}
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu(e);
             }}
           />
@@ -389,20 +389,28 @@
       border-left: 1px solid var(--border-color);
     }
     .main-collection {
-      width: calc(100% - 38px);
-      gap: 4px;
+      width: calc(100% - 71px);
     }
     .active-collection-tab {
       background-color: var(--bg-ds-surface-500) !important;
       border-radius: 4px;
     }
     .collection-title {
+      color: var(--bg-ds-neutral-200);
       width: calc(100% - 30px);
       text-align: left;
+      display: flex;
+      align-items: center;
+      position: relative;
     }
-  }
+    .ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .threedot-icon {
-    transform: rotate(90deg);
+    .threedot-icon {
+      transform: rotate(90deg);
+    }
   }
 </style>

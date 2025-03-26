@@ -24,6 +24,13 @@
   export let userRole;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
+
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import {
@@ -200,7 +207,7 @@
   });
 
   $: {
-    if (isFirstCollectionExpand) {
+    if ($openedComponent.has(collection.id) || isFirstCollectionExpand) {
       visibility = true;
     }
   }
@@ -251,6 +258,15 @@
       inputField.blur();
     }
   };
+
+  let verticalCollectionLine = false;
+  $: {
+    if (collection.items.find((item) => item.id === activeTabId)) {
+      verticalCollectionLine = true;
+    } else {
+      verticalCollectionLine = false;
+    }
+  }
 </script>
 
 <svelte:window
@@ -285,12 +301,10 @@
       <span class="text-plusButton">{requestCount}</span>
       <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
-    {#if !isWebApp}
-      <div class="d-flex gap-1">
-        <span class="text-plusButton">{graphQLCount}</span>
-        <p>GraphQL</p>
-      </div>
-    {/if}
+    <div class="d-flex gap-1">
+      <span class="text-plusButton">{graphQLCount}</span>
+      <p>GraphQL</p>
+    </div>
     <div class="d-flex gap-1">
       <span class="text-plusButton">{webSocketCount}</span>
       <p>WebSocket</p>
@@ -454,7 +468,7 @@
         },
         displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
         disabled: false,
-        hidden: isWebApp ? true : false,
+        hidden: false,
         icon: GraphIcon,
       },
     ]}
@@ -465,20 +479,10 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      visibility = !visibility;
-      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-        if (visibility) {
-          onItemOpened("collection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          });
-        }
-      }
-    }
-  }}
-  style="height:32px; gap:4px;  padding-left:20.5px; margin-bottom:2px; "
+  style="height:32px; gap:4px;  padding-left:16px; margin-bottom:{collection.id ===
+  activeTabId
+    ? '0px'
+    : '2px'};"
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -489,6 +493,22 @@
     class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        visibility = !visibility;
+        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+          if (visibility) {
+            addCollectionItem(collection.id, "collection");
+            onItemOpened("collection", {
+              workspaceId: collection.workspaceId,
+              collection,
+            });
+          } else {
+            removeCollectionItem(collection.id);
+          }
+        }
+      }
+    }}
   >
     <Button
       size="extra-small"
@@ -505,7 +525,7 @@
         class="py-0 renameInputFieldCollection w-100 ellipsis"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:500; line-height:18px; gap: 4px; "
+        style="font-size: 12px; font-weight:400; line-height:18px; gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -517,11 +537,11 @@
     {:else}
       <div
         class="collection-collection-name justify-content-center d-flex py-1 mb-0 flex-column"
-        style="height: 32px; text-align: left; width:80%"
+        style="height: 32px; text-align: left; width:80% ; padding:2px 4px;"
       >
         <p
           class="ellipsis mb-0"
-          style="font-size: 12px; font-weight:500; line-height:18px;  "
+          style="font-size: 12px; font-weight:400; line-height:18px;  "
         >
           {collection.name}
         </p>
@@ -565,7 +585,9 @@
             size="extra-small"
             customWidth={"24px"}
             type="teritiary-regular"
-            onClick={rightClickContextMenu2}
+            onClick={(e) => {
+              rightClickContextMenu2(e);
+            }}
             startIcon={AddRegular}
           />
         </span>
@@ -586,7 +608,6 @@
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu();
             }}
           />
@@ -631,9 +652,17 @@
         ? 'block'
         : 'none'};"
     >
-      <div class=" ps-0 position-relative">
+      <div
+        class=" ps-0 position-relative"
+        style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "2px"};`}
+      >
         {#if collection?.items?.length > 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {verticalCollectionLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
         {/if}
         <div class="">
           {#each collection.items as explorer}
@@ -655,12 +684,16 @@
           {/each}
         </div>
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-5 ms-2 my-2 text-secondary-300">
+          <p
+            class="text-fs-10 ps-5 ms-2 my-{collection.id === activeTabId
+              ? '0'
+              : '2'} text-secondary-300"
+          >
             This collection is empty
           </p>
         {/if}
 
-        <div class="d-flex gap-2 ms-2" style="padding-left: 42px;">
+        <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Tooltip
               title={"Add Folder"}
@@ -760,34 +793,33 @@
                 />
               </div>
             </Tooltip>
-            {#if !isWebApp}
-              <Tooltip
-                title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-                placement={"bottom-center"}
-                distance={12}
+
+            <Tooltip
+              title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+              placement={"bottom-center"}
+              distance={12}
+            >
+              <div
+                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+                style="height: 24px; width: 24px;"
+                role="button"
+                on:click={() => {
+                  onItemCreated("graphqlCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_GraphQL, {
+                    description: "Created GraphQL inside collection.",
+                  });
+                }}
               >
-                <div
-                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                  style="height: 24px; width: 24px;"
-                  role="button"
-                  on:click={() => {
-                    onItemCreated("graphqlCollection", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                    });
-                    MixpanelEvent(Events.Collection_GraphQL, {
-                      description: "Created GraphQL inside collection.",
-                    });
-                  }}
-                >
-                  <GraphIcon
-                    height={"13px"}
-                    width={"13px"}
-                    color={"var(--request-arc)"}
-                  />
-                </div>
-              </Tooltip>
-            {/if}
+                <GraphIcon
+                  height={"13px"}
+                  width={"13px"}
+                  color={"var(--request-arc)"}
+                />
+              </div>
+            </Tooltip>
           {/if}
         </div>
         <!-- {#if showFolderAPIButtons}
@@ -939,10 +971,10 @@
   .box-line {
     position: absolute;
     top: 0;
-    bottom: 26px;
-    left: 32.5px;
+    bottom: 0%;
+    left: 27.5px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+
     z-index: 1;
   }
 

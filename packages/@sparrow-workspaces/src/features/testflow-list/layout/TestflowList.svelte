@@ -26,6 +26,8 @@
   } from "../../../stores/guide.tour";
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
+  import { isExpandTestflow } from "../../../stores/recent-left-panel";
+
   /**
    * current workspace
    */
@@ -62,12 +64,26 @@
 
   export let searchData = "";
 
-  export let isExpandTestflow = false;
+  // export let isExpandTestflow = false;
 
   export let toggleExpandTestflow;
 
   export let activeTabId;
 
+  export let isExpandTestflowLine = false;
+  export let handleTestflowLine;
+  export let activeTabType;
+
+  export let ActiveTab;
+  export let handleTabUpdate;
+
+  $: {
+    if (testflows.find((item) => item._data._id === activeTabId)) {
+      isExpandTestflowLine = true;
+    } else {
+      isExpandTestflowLine = false;
+    }
+  }
   let scrollList: ScrollList;
   let isHovered = false;
 
@@ -97,8 +113,8 @@
   }
 
   async function handleCreateTestflow() {
-    if (!isExpandTestflow) {
-      isExpandTestflow = !isExpandTestflow;
+    if (!$isExpandTestflow) {
+      isExpandTestflow.update((value) => !value);
     }
     await onCreateTestflow();
     setTimeout(() => {
@@ -122,8 +138,8 @@
       });
     }
   }
-  $: isExpandTestflow =
-    $isDefaultTourGuideOpen === true ? true : isExpandTestflow;
+  $: $isExpandTestflow =
+    $isDefaultTourGuideOpen === true ? true : $isExpandTestflow;
 </script>
 
 <div
@@ -137,35 +153,38 @@
   <div
     tabindex="0"
     class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2 env-sidebar"
-    style="cursor:pointer; justify-content: space-between; height:32px; gap:4px"
+    style="cursor:pointer; justify-content: space-between; height:32px; "
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={toggleExpandTestflow}
+    on:click={() => {
+      toggleExpandTestflow();
+      handleTabUpdate("testflow");
+    }}
   >
     <div
       class="d-flex align-items-center"
-      style="width: calc(100% - 30px); gap:4px; padding-left:3px;"
+      style="width: calc(100% - 30px);  padding-left:3px;"
     >
-      <span style=" display: flex; ">
+      <span style=" display: flex; margin-right:4px; ">
         <Button
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={!isExpandTestflow
+          startIcon={!$isExpandTestflow
             ? ChevronRightRegular
             : ChevronDownRegular}
         />
       </span>
 
       <span
-        style=" display: flex;  align-items:center; justify-content:center;"
+        style=" display: flex;  align-items:center; justify-content:end; width:30px; height:24px; padding:4px;"
       >
         <FlowChartRegular size="16px" color="var(--bg-ds-neutral-300)" />
       </span>
       <span style="padding:2px 4px;">
         <p
           class=" mb-0 sparrow-fs-13"
-          style="font-weight: 500; font-size:12px; line-height:18px;   "
+          style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50);"
         >
           Test Flows
         </p>
@@ -198,8 +217,14 @@
     </Tooltip>
   </div>
 
-  {#if isExpandTestflow}
-    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
+  {#if $isExpandTestflow}
+    <div
+      style="flex: 1; height: 32px; background-color: {ActiveTab === 'testflow'
+        ? 'var(--bg-ds-surface-600)'
+        : 'transparent'};"
+      class="overflow-auto h-100"
+      bind:this={scrollDiv}
+    >
       <!-- 
   --  Testflow Empty screen 
   -->
@@ -236,12 +261,17 @@
   -->
       <div class="position-relative">
         {#if filteredflows?.length > 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {isExpandTestflowLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
           <List
             bind:scrollList
             height={"auto"}
             overflowY={"auto"}
-            classProps={"pe-0"}
+            classProps={"pe-0 ps-0"}
             style={"flex:1;"}
           >
             {#each filteredflows as flow}
@@ -407,7 +437,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 6.5px;
+    left: 14.6px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 10;

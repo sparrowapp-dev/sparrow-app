@@ -26,6 +26,9 @@
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
       event.preventDefault();
+    } else if (event.key === "Escape" && canClose) {
+      event.preventDefault();
+      handleModalState(false);
     }
   };
 

@@ -41,7 +41,13 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { afterUpdate } from "svelte";
 
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -104,6 +110,18 @@
   let socketIoCount: number;
   let requestIds: string[] = [];
   let folderTabWrapper: HTMLElement;
+
+  let verticalFolderLine = false;
+
+  $: {
+    if (explorer.type === "FOLDER") {
+      if (explorer.items.find((item) => item.id === activeTabId)) {
+        verticalFolderLine = true;
+      } else {
+        verticalFolderLine = false;
+      }
+    }
+  }
 
   $: {
     if (searchData) {
@@ -193,6 +211,12 @@
       inputField.blur();
     }
   };
+
+  $: {
+    if ($openedComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -221,12 +245,10 @@
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
-      {#if !isWebApp}
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{graghQlCount}</span>
-          <p>GraphQL</p>
-        </div>
-      {/if}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{graghQlCount}</span>
+        <p>GraphQL</p>
+      </div>
       <div class="d-flex gap-1">
         <span class="text-plusButton">{webSocketCount}</span>
         <p>WebSocket</p>
@@ -368,7 +390,7 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -395,21 +417,10 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        on:click|preventDefault={() => {
-          if (!isRenaming) {
-            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-              expand = !expand;
-              if (expand) {
-                onItemOpened("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              }
-            }
-          }
-        }}
-        style="height:32px; padding-left:48px; margin-bottom:2px; "
+        style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
+        activeTabId
+          ? '0px'
+          : '2px'} ; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -417,15 +428,32 @@
       >
         <button
           tabindex="-1"
-          style=" gap:4px; height:32px; "
+          style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
+          on:click|preventDefault={() => {
+            if (!isRenaming) {
+              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+                expand = !expand;
+                if (expand) {
+                  addCollectionItem(explorer.id, "Folder");
+                  onItemOpened("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                } else {
+                  removeCollectionItem(explorer.id);
+                }
+              }
+            }
+          }}
         >
           <span
             on:click|stopPropagation={() => {
               expand = !expand;
             }}
-            style="  display: flex; "
+            style="  display: flex; margin-right:4px; "
           >
             <Button
               startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
@@ -437,17 +465,20 @@
 
           {#if expand}
             <div
-              style="height:24px; width:30px;"
-              class="d-flex align-items-center justify-content-center"
+              style="height:24px; width:30px; padding:4px;"
+              class="d-flex align-items-center justify-content-end"
             >
-              <FolderOpenRegular color="var(--icon-ds-neutral-300)" />
+              <FolderOpenRegular
+                size={"16px"}
+                color="var(--icon-ds-neutral-300)"
+              />
             </div>
           {:else}
             <div
-              class="d-flex align-items-center justify-content-center"
-              style="height:24px; width:30px;"
+              class="d-flex align-items-center justify-content-end"
+              style="height:24px; width:30px; padding:4px;"
             >
-              <FolderRegular color="var(--icon-ds-neutral-300)" />
+              <FolderRegular size={"16px"} color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}
           {#if isRenaming}
@@ -455,7 +486,7 @@
               class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px; padding-left:5px; font-weight:500; color : var(--text-ds-neutral-50); line-height:18px;"
+              style="font-size: 12px; padding-left:5px; font-weight:400; color : var(--text-ds-neutral-50); line-height:18px;"
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -469,11 +500,12 @@
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
                       height: 32px;
-                      font-weight:500;
+                      font-weight:400;
                       margin-left:0px;
                       font-size:12px;
                       color:var(--text-ds-neutral-50);
                       line-height:18px;
+                      padding:2px 4px;
                       "
             >
               <p class="ellipsis mb-0" style="font-size: 12px;">
@@ -532,9 +564,17 @@
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div class="sub-files position-relative">
+        <div
+          class="sub-files position-relative"
+          style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+        >
           {#if explorer?.items?.length > 0}
-            <div class="box-line"></div>
+            <div
+              class="box-line"
+              style="background-color: {verticalFolderLine
+                ? 'var(--bg-ds-neutral-500)'
+                : 'var(--bg-ds-surface-100)'}"
+            ></div>
           {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
@@ -592,13 +632,15 @@
         </div>
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style="cursor:pointer;">
+      <div style={`cursor: pointer; `}>
         <Request
           {userRole}
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}
@@ -632,7 +674,7 @@
           {activeTabId}
         />
       </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL && !isWebApp}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
       <div style="cursor:pointer;">
         <Graphql
           {userRole}
@@ -776,9 +818,8 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 58.5px;
+    left: 41.2px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
     z-index: 200;
   }
 

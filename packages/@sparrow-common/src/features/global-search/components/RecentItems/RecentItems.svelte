@@ -90,7 +90,7 @@
     workspaces: {
       items: filteredWorkspaces,
       title: searchQuery === "" ? "Recent Workspaces" : "Workspaces",
-      shortcutKeys: [osKeyName, "Shift", "W"],
+      ...(!isWebApp ? { shortcutKeys: [osKeyName, "Shift", "W"] } : {}),
       icon: WorkspaceIcongs,
       nav: (item) => handleGlobalSearchWorkspaceNavigation(item),
       getName: (item) => item.name,
@@ -158,7 +158,7 @@
     flows: {
       items: filteredTestflows,
       title: searchQuery === "" ? "Recent Test Flows" : "Test Flows",
-      shortcutKeys: [osKeyName, "Shift", "T"],
+      ...(!isWebApp ? { shortcutKeys: [osKeyName, "Shift", "T"] } : {}),
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
@@ -251,6 +251,8 @@
                     name: details.name,
                     path: item.path,
                     url: details.url,
+                    isTitleHighLightEnable: true,
+                    charsToBeHightlighted: searchQuery,
                   }}
                   icon={methodIcons[details.method] || GraphIcon}
                   iconProps={{
@@ -271,7 +273,12 @@
               {/if}
             {:else if section.key === "collections"}
               <ItemBar
-                data={{ name: item.tree.name, path: item.path }}
+                data={{
+                  name: item.tree.name,
+                  path: item.path,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={CollectionIcongs}
                 iconProps={{
                   width: "16px",
@@ -287,7 +294,12 @@
               />
             {:else if section.key === "environments"}
               <ItemBar
-                data={{ name: item.title, path: "" }}
+                data={{
+                  name: item.title,
+                  path: item.path || "",
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={StackIcon}
                 iconProps={{
                   width: "16px",
@@ -298,7 +310,12 @@
               />
             {:else if section.key === "folders"}
               <ItemBar
-                data={{ name: item.tree.name, path: item.path }}
+                data={{
+                  name: item.tree.name,
+                  path: item.path,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={FolderIcon}
                 iconProps={{
                   width: "16px",
@@ -314,7 +331,12 @@
               />
             {:else if section.key === "workspaces" && !isGuestUser}
               <ItemBar
-                data={{ name: item.name, path: item.team.teamName }}
+                data={{
+                  name: item.name,
+                  path: item.team.teamName,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={WorkspaceIcongs}
                 iconProps={{
                   width: "16px",
@@ -327,7 +349,9 @@
               <ItemBar
                 data={{
                   name: item.name,
-                  path: item.description || "",
+                  path: item.path || "",
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={FlowIcon}
                 iconProps={{
@@ -359,6 +383,8 @@
                     name: details.name,
                     path: item.path,
                     url: details.url,
+                    isTitleHighLightEnable: true,
+                    charsToBeHightlighted: searchQuery,
                   }}
                   icon={methodIcons[details.method] || GraphIcon}
                   iconProps={{
@@ -378,7 +404,12 @@
               {/if}
             {:else if section.key === "collections"}
               <ItemBar
-                data={{ name: item.tree.name, path: item.path }}
+                data={{
+                  name: item.tree.name,
+                  path: item.path,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={CollectionIcongs}
                 iconProps={{
                   width: "16px",
@@ -393,7 +424,12 @@
               />
             {:else if section.key === "folders"}
               <ItemBar
-                data={{ name: item.tree.name, path: item.path }}
+                data={{
+                  name: item.tree.name,
+                  path: item.path,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={FolderIcon}
                 iconProps={{
                   width: "16px",
@@ -409,7 +445,12 @@
               />
             {:else if section.key === "environments"}
               <ItemBar
-                data={{ name: item.title, path: "" }}
+                data={{
+                  name: item.title,
+                  path: item.path || "",
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={StackIcon}
                 iconProps={{
                   width: "16px",
@@ -422,7 +463,9 @@
               <ItemBar
                 data={{
                   name: item.name,
-                  path: item.description || "",
+                  path: item.path || "",
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
                 }}
                 icon={FlowIcon}
                 iconProps={{
@@ -434,7 +477,12 @@
               />
             {:else if section.key === "workspaces" && !isGuestUser}
               <ItemBar
-                data={{ name: item.name, path: item.team.teamName }}
+                data={{
+                  name: item.name,
+                  path: item.team.teamName,
+                  isTitleHighLightEnable: true,
+                  charsToBeHightlighted: searchQuery,
+                }}
                 icon={WorkspaceIcongs}
                 iconProps={{
                   width: "16px",
@@ -467,6 +515,8 @@
                 name: config.getName(item),
                 path: config.getPath(item),
                 url: config.getUrl ? config.getUrl(item) : undefined,
+                isTitleHighLightEnable: true,
+                charsToBeHightlighted: searchQuery,
               }}
               icon={config.getIcon ? config.getIcon(item) : config.icon}
               iconProps={config.getIconProps
