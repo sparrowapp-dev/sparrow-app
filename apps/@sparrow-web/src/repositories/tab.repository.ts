@@ -663,7 +663,6 @@ export class TabRepository {
       })
       .exec();
   };
-  z;
 
   /**
    * Retrieves a tab by its unique identifier.
@@ -993,51 +992,111 @@ export class TabRepository {
   };
 
   /**
-   * Removes multiple tabs from the RxDB database in a single operation.
+   * Retrieves all tabs associated with a specific collection ID.
    *
-   * This function takes an array of tab IDs and removes all corresponding tab documents
-   * from the RxDB database using a bulk operation.
-   *
-   * @param {string[]} ids - An array of tab IDs to be removed.
-   *
-   * @returns {Promise<void>} - A promise that resolves when the tabs have been successfully removed.
+   * @param {string} collectionId - The ID of the collection
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
    */
-  public bulkRemoveTabs = async (ids: string[]): Promise<void> => {
-    if (ids.length === 0) return;
-    await this.rxdb
-      ?.find({
-        selector: {
-          id: { $in: ids },
-        },
-      })
-      .remove();
-
-
-    // Activating the last valid tab from the tabbar
-    const activeWorkspace = await RxDB.getInstance()
-      .rxdb.workspace.findOne({
-        selector: {
-          isActiveWorkspace: true,
-        },
-      })
-      .exec();
-    const workspaceId = activeWorkspace.toMutableJSON()._id;
-
-    // Get tabs excluding the ones in 'ids' list
-    const currOpenedTabs = await this.rxdb
-      ?.find({
-        selector: {
-          "path.workspaceId": workspaceId,
-          id: { $nin: ids }, // Exclude tabs that are in the ids array
-        },
-      })
-      .sort({ index: "asc" })
-      .exec();
-
-    // If there are remaining tabs, activate the last one
-    const totalOpenedTabs = currOpenedTabs.length;
-    if (totalOpenedTabs > 0) {
-      await this.activeTab(currOpenedTabs[currOpenedTabs.length - 1].get("id"));
-    }
+  public getTabsByCollectionId = async (
+    collectionId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.collectionId": collectionId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
   };
+
+  /**
+   * Retrieves all tabs associated with a specific folder ID.
+   *
+   * @param {string} folderId - The ID of the folder
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByFolderId = async (
+    folderId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.folderId": folderId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific request ID.
+   *
+   * @param {string} requestId - The ID of the request
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByRequestId = async (
+    requestId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.requestId": requestId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific parent ID (collection, folder, or request).
+   * This is a generic method that can be used for any parent type.
+   *
+   * @param {string} parentId - The ID of the parent entity
+   * @param {string} parentType - The type of the parent entity ('collection', 'folder', or 'request')
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  // public getTabsByParentId = async (
+  //   parentId: string,
+  //   parentType: "request" | "collection" | "folder",
+  // ): Promise<TabDocument[]> => {
+
+  //   switch (parentType) {
+  //     case "collection":
+  //       return this.getTabsByCollectionId(parentId);
+  //     case "folder":
+  //       return this.getTabsByFolderId(parentId);
+  //     case "request":
+  //       return this.getTabsByRequestId(parentId);
+  //     default:
+  //       // Fallback to the original implementation for unknown types
+  //       const parentEnumType: Record<string, string> = {
+  //         collection: "path.collectionId",
+  //         folder: "path.folderId",
+  //         request: "path.requestId",
+  //       };
+
+  //       const pathSelector = parentEnumType[parentType] || "";
+  //       if (!pathSelector) {
+  //         console.warn(`Unknown parent type: ${parentType}`);
+  //         return [];
+  //       }
+
+  //       const query = {
+  //         selector: {
+  //           [pathSelector]: parentId,
+  //         },
+  //       };
+
+  //       return (
+  //         (await this.rxdb?.find(query).sort({ index: "asc" }).exec()) || []
+  //       );
+  //   }
+  // };
 }
