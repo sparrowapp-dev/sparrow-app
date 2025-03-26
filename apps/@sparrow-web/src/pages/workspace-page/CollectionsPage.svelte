@@ -474,42 +474,46 @@
     isValid: true,
     checked: false,
   };
+
+  // handle all the refresh api calls
+  const handleRefreshApicalls = async (workspaceId: string) => {
+    try {
+      const [
+        fetchCollectionsResult,
+        refreshEnvironmentResult,
+        refreshTestflowResult,
+      ] = await Promise.all([
+        _viewModel.fetchCollections(workspaceId),
+        _viewModel2.refreshEnvironment(workspaceId),
+        _viewModel3.refreshTestflow(workspaceId),
+      ]);
+
+      const collectionTabsToBeDeleted =
+        fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+      const environmentTabsToBeDeleted =
+        refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+      const testflowTabsToBeDeleted =
+        refreshTestflowResult?.testflowTabsToBeDeleted || [];
+
+      const totalTabsToBeDeleted = [
+        ...collectionTabsToBeDeleted,
+        ...environmentTabsToBeDeleted,
+        ...testflowTabsToBeDeleted,
+      ];
+      _viewModel.deleteTabsWithTabIdInAWorkspace(
+        workspaceId,
+        totalTabsToBeDeleted,
+      );
+      refreshLoad.set(false);
+    } catch (error) {
+      refreshLoad.set(false);
+    }
+  };
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        Promise.all([
-          _viewModel.fetchCollections(value?._id),
-          _viewModel2.refreshEnvironment(value?._id),
-          _viewModel3.refreshTestflow(value?._id),
-        ]).then(
-          ([
-            fetchCollectionsResult,
-            refreshEnvironmentResult,
-            refreshTestflowResult,
-            ,
-          ]) => {
-            // Handle the results of each API call here
-
-            const collectionTabsToBeDeleted =
-              fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
-            const environmentTabsToBeDeleted =
-              refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            const testflowTabsToBeDeleted =
-              refreshTestflowResult?.testflowTabsToBeDeleted || [];
-            const totalTabsToBeDeleted: string[] = [
-              ...collectionTabsToBeDeleted,
-              ...environmentTabsToBeDeleted,
-              ...testflowTabsToBeDeleted,
-            ];
-            _viewModel.deleteTabsWithTabIdInAWorkspace(
-              value?._id,
-              totalTabsToBeDeleted,
-            );
-            const userHasAccess = value.users?.some(
-              (user) => user.id === userId,
-            );
-          },
-        );
+        await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -602,58 +606,15 @@
     totalCollectionCount.set(count);
   });
 
-  // This function will set the value of Users in the Workspace.
-  currentWorkspace.subscribe((workspace) => {
-    let userCount = workspace?._data?.users.length;
-    totalTeamCount.set(userCount);
-  });
-
   let refreshInterval: NodeJS.Timeout | null = null;
 
   //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
-  const handleRefreshWorkspace = async (): Promise<void> => {
+  const handleRefreshWorkspace = () => {
     if (!currentWorkspace) return;
     refreshLoad.set(true);
-
-    currentWorkspace.subscribe(async (workspace) => {
-      if (workspace && $totalTeamCount > 1) {
-        try {
-          // Fetch data in parallel
-          const [
-            fetchCollectionsResult,
-            refreshEnvironmentResult,
-            refreshTestflowResult,
-          ] = await Promise.all([
-            _viewModel.fetchCollections(workspace._id),
-            _viewModel2.refreshEnvironment(workspace._id),
-            _viewModel3.refreshTestflow(workspace._id),
-          ]);
-
-          // Handle the results of each API call here
-          const collectionTabsToBeDeleted =
-            fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
-          const environmentTabsToBeDeleted =
-            refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-          const testflowTabsToBeDeleted =
-            refreshTestflowResult?.testflowTabsToBeDeleted || [];
-
-          const totalTabsToBeDeleted: string[] = [
-            ...collectionTabsToBeDeleted,
-            ...environmentTabsToBeDeleted,
-            ...testflowTabsToBeDeleted,
-          ];
-
-          _viewModel.deleteTabsWithTabIdInAWorkspace(
-            workspace._id,
-            totalTabsToBeDeleted,
-          );
-          refreshLoad.set(false);
-        } catch (error) {
-          refreshLoad.set(false);
-          return;
-        }
-      }
-    });
+    if ($totalTeamCount > 1) {
+      handleRefreshApicalls($currentWorkspace?._id);
+    }
   };
 
   // It will autorefresh the handle function of refresh in 2 minutes interval Time.
