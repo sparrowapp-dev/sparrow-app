@@ -45,6 +45,13 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@babel/runtime@^7.22.6":
+  version "7.26.10"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.26.10.tgz#a07b4d8fa27af131a633d7b3524db803eb4764c2"
+  integrity sha512-2WJMeRQPHKSPemqk/awGrAiuFfzBmOIPXKizAsVhWH9YJqLZ0H+HS4c8loHGgW6utJ3E/ejXQUsiGaQy2NZ9Fw==
+  dependencies:
+    regenerator-runtime "^0.14.0"
+
 "@bundled-es-modules/cookie@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@bundled-es-modules/cookie/-/cookie-2.0.0.tgz#c3b82703969a61cf6a46e959a012b2c257f6b164"
@@ -637,6 +644,16 @@
     "@storybook/global" "^5.0.0"
     ts-dedent "^2.0.0"
 
+"@storybook/addon-svelte-csf@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-svelte-csf/-/addon-svelte-csf-4.2.0.tgz#839d6cf7fc6dc47e4af5287c33472ade7ce239d5"
+  integrity sha512-ius5C6vp+55upbi7MAiJvBSkXxZuokNwkBfmUgY3sAdvp4IAvBp8A+Yvk6bWZqo2TJTfM4ccT3WAmNTxa9m0sw==
+  dependencies:
+    "@babel/runtime" "^7.22.6"
+    "@storybook/types" "^8.0.0"
+    dedent "^1.2.0"
+    magic-string "^0.30.1"
+
 "@storybook/addon-toolbars@8.3.2":
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/@storybook/addon-toolbars/-/addon-toolbars-8.3.2.tgz#4cb86b9d67fd23593d7b29d03fc8b780e73602ef"
@@ -801,6 +818,11 @@
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/@storybook/theming/-/theming-8.3.2.tgz#f3bf95888fe43ec884aad5d5f97ad406561ab83b"
   integrity sha512-JXAVc08Tlbu4GTTMGNmwUy69lShqSpJixAJc4bvWTnNAtPTRltiNJCg/KJ0GauEyRFk8ZR2Ha4KhN3DB1felNQ==
+
+"@storybook/types@^8.0.0":
+  version "8.6.7"
+  resolved "https://registry.yarnpkg.com/@storybook/types/-/types-8.6.7.tgz#749e30c13e708b05a08574254dea8b3f5c499d70"
+  integrity sha512-Zs8SWF099Bkw39vSdS+81X/12PEiVzg5s84j47YUXF4XTPtjB38Fl36TdEUXUcL/VOOU7uyRQyZu3EoB+sambg==
 
 "@sveltejs/vite-plugin-svelte-inspector@^2.1.0":
   version "2.1.0"
@@ -1426,6 +1448,11 @@ debug@^4.1.1, debug@^4.3.2, debug@^4.3.4:
   integrity sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==
   dependencies:
     ms "^2.1.3"
+
+dedent@^1.2.0:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/dedent/-/dedent-1.5.3.tgz#99aee19eb9bae55a67327717b6e848d0bf777e5a"
+  integrity sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==
 
 deep-eql@^5.0.1:
   version "5.0.2"
@@ -2351,6 +2378,13 @@ magic-string@^0.30.0, magic-string@^0.30.10, magic-string@^0.30.4, magic-string@
   version "0.30.11"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.11.tgz#301a6f93b3e8c2cb13ac1a7a673492c0dfd12954"
   integrity sha512-+Wri9p0QHMy+545hKww7YAu5NyzF8iomPL/RQazugQ9+Ez4Ic3mERMd8ZTX5rfK944j+560ZJi8iAwgak1Ac7A==
+  dependencies:
+    "@jridgewell/sourcemap-codec" "^1.5.0"
+
+magic-string@^0.30.1:
+  version "0.30.17"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.17.tgz#450a449673d2460e5bbcfba9a61916a1714c7453"
+  integrity sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.0"
 
