@@ -630,17 +630,6 @@
         borderRounded={"4px"}
         minHeaderWidth={"110px"}
       />
-      <!-- <div style="display:flex; justify-content:center;align-items:center">
-        <Button
-          id={user.id}
-          type={"teritiary-regular"}
-          size={"small"}
-          title={user.role
-            ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-            : ""}
-          disable={owner}
-        />
-      </div> -->
     {:else}
       <Select
         id={user.id}
