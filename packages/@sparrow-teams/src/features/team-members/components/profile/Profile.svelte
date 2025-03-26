@@ -140,10 +140,7 @@
 </div>
 
 <hr style="background-color: var(--border-ds-surface-100); margin-bottom:4px" />
-<div
-  class="team-workspace mb-1 sparrow-fs-14"
-  style=" color:var(--text-ds-neutral-600);"
->
+<div class="team-workspace mb-1 sparrow-fs-14">
   {#each workspaces as workspace}
     {#if workspace.position}
       <ProfileWorkspace

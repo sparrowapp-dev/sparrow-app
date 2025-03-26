@@ -616,7 +616,7 @@
         minHeaderWidth={"110px"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
-      <!-- <Select
+      <Select
         id={user.id}
         data={getPermissionsData()}
         titleId={user.role ? user.role : ""}
@@ -630,8 +630,8 @@
         headerFontSize={"10px"}
         borderRounded={"4px"}
         minHeaderWidth={"105px"}
-      /> -->
-      <div style="display:flex; justify-content:center;align-items:center">
+      />
+      <!-- <div style="display:flex; justify-content:center;align-items:center">
         <Button
           id={user.id}
           type={"teritiary-regular"}
@@ -641,7 +641,7 @@
             : ""}
           disable={owner}
         />
-      </div>
+      </div> -->
     {:else}
       <Select
         id={user.id}
