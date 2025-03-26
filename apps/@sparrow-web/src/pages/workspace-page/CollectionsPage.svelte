@@ -464,8 +464,8 @@
   let prevWorkspaceId = "";
   let count = 0;
 
-  let autoRefreshEnable = writable(true);
-  let refreshLoad = writable(false);
+  let autoRefreshEnable: boolean = true;
+  let refreshLoad: boolean = false;
 
   let isAccessDeniedModalOpen = false;
 
@@ -504,9 +504,9 @@
         workspaceId,
         totalTabsToBeDeleted,
       );
-      refreshLoad.set(false);
+      refreshLoad = false;
     } catch (error) {
-      refreshLoad.set(false);
+      refreshLoad = false;
     }
   };
 
@@ -611,7 +611,7 @@
   //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
   const handleRefreshWorkspace = () => {
     if (!currentWorkspace) return;
-    refreshLoad.set(true);
+    refreshLoad = true;
     if (totalTeamCount > 1) {
       handleRefreshApicalls($currentWorkspace?._id);
     }
@@ -619,7 +619,7 @@
 
   // It will autorefresh the handle function of refresh in 2 minutes interval Time.
   const startAutoRefresh = (): void => {
-    if (!$autoRefreshEnable) {
+    if (!autoRefreshEnable) {
       return;
     }
     if (refreshInterval) {
@@ -663,7 +663,7 @@
           bind:userRole
           userCount={totalTeamCount}
           {refreshWorkspace}
-          refreshLoad={$refreshLoad}
+          {refreshLoad}
           {collectionList}
           {currentWorkspace}
           {navigateToGithub}
