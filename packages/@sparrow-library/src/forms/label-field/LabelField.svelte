@@ -121,8 +121,6 @@
     font-family: "Inter", sans-serif;
   }
   .input-container {
-    max-width: 540px;
-    min-width: 240px;
     gap: 2px;
   }
 
