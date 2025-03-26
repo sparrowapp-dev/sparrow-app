@@ -25,7 +25,6 @@
     currentStep,
   } from "../../../stores/guide.tour";
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
-  import { afterUpdate } from "svelte";
 
   import { isExpandTestflow } from "../../../stores/recent-left-panel";
 
@@ -185,7 +184,7 @@
       <span style="padding:2px 4px;">
         <p
           class=" mb-0 sparrow-fs-13"
-          style="font-weight:400; font-size:12px; line-height:18px;"
+          style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50);"
         >
           Test Flows
         </p>

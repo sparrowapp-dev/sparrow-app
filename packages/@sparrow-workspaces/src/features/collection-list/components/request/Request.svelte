@@ -32,7 +32,6 @@
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
-  import { afterUpdate } from "svelte";
 
   let expand = false;
   /**

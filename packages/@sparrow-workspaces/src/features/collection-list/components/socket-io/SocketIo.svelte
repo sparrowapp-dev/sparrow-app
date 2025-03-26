@@ -19,7 +19,6 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
-  import { afterUpdate } from "svelte";
 
   /**
    * Callback for Item Deleted
@@ -249,7 +248,7 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
+    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 29px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )

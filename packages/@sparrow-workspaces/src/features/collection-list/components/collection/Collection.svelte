@@ -38,7 +38,7 @@
     UntrackedItems,
   } from "@sparrow/common/enums/item-type.enum";
   import { Spinner } from "@sparrow/library/ui";
-  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";

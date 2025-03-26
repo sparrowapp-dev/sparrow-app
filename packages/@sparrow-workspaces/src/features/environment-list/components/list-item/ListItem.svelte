@@ -256,10 +256,11 @@
         }}
       >
         <SelectIcon
-          classProp={`my-auto`}
+          classProp={`my-auto p-0`}
           width={16}
           height={16}
           selected={currentWorkspace?.environmentId === env.id}
+          selectedColor={"var(--bg-ds-neutral-200)"}
         />
       </button>
       <!-- <RadioButton
