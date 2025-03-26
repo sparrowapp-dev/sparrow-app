@@ -228,8 +228,8 @@
   }
   // when it have text  and focused
   .inline.entered:focus {
-    // background-color: var(--bg-ds-surface-400);
-    border: 1px solid var(--border-ds-primary-300);
+    outline: 2px solid var(--border-ds-primary-300);
+    outline-offset: -2px; /* Adjusts the position to match the border */
     border-radius: 4px;
   }
   // when it have text and not focused
