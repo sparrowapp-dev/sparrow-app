@@ -138,54 +138,72 @@
   };
 
   /**
+   * Checks if a message contains any markdown code blocks.
+   *
+   * @param message - The message to check for code blocks.
+   * @returns True if the message contains at least one code block, false otherwise.
+   */
+  const hasCodeBlocks = (message: string): boolean => {
+    const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
+    // Test if message contains code blocks and reset regex state
+    const result = codeBlockRegex.test(message);
+    codeBlockRegex.lastIndex = 0; // Reset regex state
+    return result;
+  };
+
+  /**
+   * Cleans message by removing markdown code block syntax (backticks and language identifiers)
+   * while preserving the actual code content and surrounding text.
+   *
+   * @param message - The original message containing code blocks.
+   * @returns A cleaned message with code block syntax removed.
+   */
+  const cleanMessageCodeBlocks = (message: string): string => {
+    const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
+    let match;
+    let lastIndex = 0;
+    let parts = [];
+
+    // Iterate through all matches and build the message piece by piece
+    while ((match = codeBlockRegex.exec(message)) !== null) {
+      // Add text before the code block
+      parts.push(message.substring(lastIndex, match.index));
+
+      // Add the cleaned code block (just the code without backticks and language)
+      if (match[2]) {
+        const code = match[2].trim();
+        if (code) {
+          parts.push(code);
+        }
+      }
+
+      // Update lastIndex to continue after this code block
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add any remaining text after the last code block
+    if (lastIndex < message.length) {
+      parts.push(message.substring(lastIndex));
+    }
+
+    // Join all parts to create the cleaned message
+    return parts.join("");
+  };
+
+  /**
    * Handles the response copy to clipboard functionality.
    */
   const handleCopyResponse = async () => {
     try {
-      // Check if the message contains code blocks
-      const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
-      let hasCodeBlock = codeBlockRegex.test(message);
+      console.log("message :>> ", message);
+      if (hasCodeBlocks(message)) {
+        // Clean message by removing code block syntax but preserving content
+        const cleanedMessage = cleanMessageCodeBlocks(message);
 
-      // Reset regex state
-      codeBlockRegex.lastIndex = 0;
-
-      if (hasCodeBlock) {
-        // store all code blocks in a single message (normal text + code blocks)
-        let allCodeBlocks = [];
-        let match; // [```, languageName, code, ```]
-
-        // Find all code blocks in the message
-        while ((match = codeBlockRegex.exec(message)) !== null) {
-          if (match[2]) {
-            // Store each code block with a prefix indicating its language (if available)
-            const language = match[1] ? match[1].trim() : "";
-            const code = match[2].trim();
-
-            // if (language) {
-            //   allCodeBlocks.push(`// ${language}:\n${code}\n`);
-            // } else {
-            //   allCodeBlocks.push(code + "\n");
-            // }
-
-            allCodeBlocks.push(code + "\n");
-          }
-        }
-
-        const totalCodeBlocks = allCodeBlocks.length;
-        if (totalCodeBlocks > 0) {
-          // Copy only last code block as copy button appears only for last code block only.
-          await navigator.clipboard.writeText(
-            allCodeBlocks[totalCodeBlocks - 1],
-          );
-
-          // Join all code blocks with newlines between them
-          // await navigator.clipboard.writeText(allCodeBlocks.join("\n"));
-        } else {
-          // When code block is empty
-          await navigator.clipboard.writeText(message);
-        }
+        // Copy the cleaned message to clipboard
+        await navigator.clipboard.writeText(cleanedMessage);
       } else {
-        // For non-code responses, copy the entire message
+        // For non-code responses, copy the entire message as is
         await navigator.clipboard.writeText(message);
       }
 
