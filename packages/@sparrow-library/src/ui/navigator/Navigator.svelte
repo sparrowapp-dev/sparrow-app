@@ -4,7 +4,7 @@
   export let tabs;
   export let currentTabId;
   export let onTabClick;
-  export let isSegmentedTab = false;
+  export let type : "segmentedTab" | "default" = "default";
   let leftSliderDistance = 0;
   let sliderWidth = 0;
   let tabElements: { [key: string]: HTMLButtonElement | undefined } = {};
@@ -49,7 +49,7 @@
 <div tabindex={allDisableState ? -1 : 0}>
   <!-- Tabs -->
   <div class={"d-flex position-relative gap-1"}
-  style={isSegmentedTab ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content" : ""}>
+  style={type === "segmentedTab" ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content" : ""}>
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
@@ -79,7 +79,7 @@
       </button>
     {/each}
   </div>
-  {#if !allDisableState && !isSegmentedTab }
+  {#if !allDisableState && type != "segmentedTab"}
     <div
       class="slider"
       style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
