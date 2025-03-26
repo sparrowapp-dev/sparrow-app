@@ -598,7 +598,7 @@
       <span style="font-size:12px;" class="text-textColor">{user.email}</span>
     </div>
   </div>
-  <div class="position">
+  <div class="position custom-fd" tabindex="0">
     {#if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_MEMBER) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_MEMBER)}
       <Select
         id={user.id}
@@ -703,6 +703,10 @@
     border: 1px solid var(--error--color) !important;
   }
   .custom-bd:focus-visible {
+    border: 2px solid var(--bg-ds-primary-300) !important;
+    outline: none;
+  }
+  .custom-fd:focus-visible {
     border: 2px solid var(--bg-ds-primary-300) !important;
     outline: none;
   }
