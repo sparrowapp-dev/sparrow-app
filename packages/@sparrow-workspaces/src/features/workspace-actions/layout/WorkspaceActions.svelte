@@ -489,6 +489,12 @@
       return version;
     }
   };
+
+  let ActiveTab = "";
+
+  const handleTabUpdate = (tabName: string) => {
+    ActiveTab = tabName;
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -697,6 +703,8 @@
           {isExpandCollectionLine}
           {handleExpandCollectionLine}
           {isWebApp}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
@@ -722,6 +730,8 @@
           {activeTabId}
           {activeTabType}
           {toggleExpandEnvironment}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
@@ -747,6 +757,8 @@
           {toggleExpandTestflow}
           {isExpandTestflowLine}
           {handleTestflowLine}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 

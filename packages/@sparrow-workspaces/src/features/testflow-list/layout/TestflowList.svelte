@@ -75,6 +75,9 @@
   export let handleTestflowLine;
   export let activeTabType;
 
+  export let ActiveTab;
+  export let handleTabUpdate;
+
   $: {
     if (testflows.find((item) => item._data._id === activeTabId)) {
       isExpandTestflowLine = true;
@@ -156,7 +159,7 @@
     on:mouseout={handleMouseOut}
     on:click={() => {
       toggleExpandTestflow();
-      activeTabType = "";
+      handleTabUpdate("testflow");
     }}
   >
     <div
@@ -217,7 +220,7 @@
 
   {#if $isExpandTestflow}
     <div
-      style="flex: 1; height: 32px; background-color: {!activeTabType
+      style="flex: 1; height: 32px; background-color: {ActiveTab === 'testflow'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
       class="overflow-auto h-100"

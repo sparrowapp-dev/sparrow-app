@@ -70,6 +70,8 @@
   export let toggleExpandEnvironment;
 
   export let activeTabId;
+  export let ActiveTab;
+  export let handleTabUpdate;
 
   let isExpandEnviromentLine = false;
   export let activeTabType;
@@ -173,8 +175,7 @@
     on:mouseout={handleMouseOut}
     on:click={() => {
       toggleExpandEnvironment();
-      activeTabType = "";
-      // console.log(activeTabType);
+      handleTabUpdate("enviroment");
     }}
   >
     <div
@@ -234,7 +235,8 @@
 
   {#if $isExpandEnvironment}
     <div
-      style="flex: 1; height: 32px; background-color: {!activeTabType
+      style="flex: 1; height: 32px; background-color: {ActiveTab ===
+      'enviroment'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
       class="overflow-auto"

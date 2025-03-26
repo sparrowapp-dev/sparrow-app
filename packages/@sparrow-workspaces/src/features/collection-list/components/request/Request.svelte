@@ -296,7 +296,6 @@
     dragStart(event, collection);
   }}
   on:click|preventDefault={() => {
-    expand = !expand;
     if (!isRenaming) {
       expand = !expand;
       if (expand) {

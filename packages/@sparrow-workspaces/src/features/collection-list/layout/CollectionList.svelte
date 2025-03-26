@@ -90,10 +90,16 @@
   export let activeTabType;
   export let isFirstCollectionExpand = false;
 
+  export let ActiveTab;
+  export let handleTabUpdate;
+
   let isExpandCollectionLine = false;
   // export let handleExpandCollectionLine;
 
   $: {
+    if (activeTabType !== "Collection") {
+      handleTabUpdate("");
+    }
     if (collectionFilter.find((item) => item._data.id === activeTabId)) {
       isExpandCollectionLine = true;
     } else {
@@ -240,8 +246,7 @@
       on:mouseout={handleMouseOut}
       on:click={() => {
         toggleExpandCollection();
-        activeTabType = "";
-        // console.log(activeTabType);
+        handleTabUpdate("collection");
       }}
     >
       <div
@@ -310,7 +315,7 @@
     {#if $isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
-        style={` background-color: ${activeTabType === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
+        style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
           <div
