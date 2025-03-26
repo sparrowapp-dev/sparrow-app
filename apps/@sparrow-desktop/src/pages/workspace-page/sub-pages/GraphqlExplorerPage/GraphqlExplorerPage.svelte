@@ -162,4 +162,5 @@
   onUpdateVariables={_viewModel.updateRequestVariables}
   updateOperationSearch={_viewModel.updateRequestOperationSearch}
   checkQueryErrorStatus={_viewModel.updateQueryErrorState}
+  isWebApp={false}
 />

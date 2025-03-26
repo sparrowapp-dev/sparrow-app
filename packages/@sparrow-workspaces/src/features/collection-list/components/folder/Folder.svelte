@@ -232,12 +232,10 @@
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
-      {#if !isWebApp}
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{graghQlCount}</span>
-          <p>GraphQL</p>
-        </div>
-      {/if}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{graghQlCount}</span>
+        <p>GraphQL</p>
+      </div>
       <div class="d-flex gap-1">
         <span class="text-plusButton">{webSocketCount}</span>
         <p>WebSocket</p>
@@ -379,7 +377,7 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -652,7 +650,7 @@
           {activeTabId}
         />
       </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL && !isWebApp}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
       <div style="cursor:pointer;">
         <Graphql
           {userRole}
