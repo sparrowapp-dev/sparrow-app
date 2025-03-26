@@ -154,12 +154,10 @@
       {
         name: "Admin",
         id: TeamRole.TEAM_ADMIN,
-        color: "light",
       },
       {
         name: "Member",
         id: TeamRole.TEAM_MEMBER,
-        color: "light",
       },
     ];
     if (
@@ -606,7 +604,7 @@
         titleId={user.role ? user.role : ""}
         onclick={handleDropdown}
         menuItem={"v2"}
-        headerTheme={"blur"}
+        headerTheme={"transparent"}
         bodyTheme={"violet"}
         borderType={"none"}
         headerFontSize={"10px"}
@@ -614,6 +612,7 @@
         isArrowIconRequired={!owner}
         borderRounded={"4px"}
         minHeaderWidth={"110px"}
+        borderActiveType={"none"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
       <Select
@@ -622,14 +621,14 @@
         titleId={user.role ? user.role : ""}
         onclick={handleDropdown}
         menuItem={"v2"}
-        headerTheme={"blur"}
+        headerTheme={"transparent"}
         bodyTheme={"violet"}
         borderType={"none"}
         disabled={owner}
         isArrowIconRequired={!owner}
         headerFontSize={"10px"}
         borderRounded={"4px"}
-        minHeaderWidth={"105px"}
+        minHeaderWidth={"110px"}
       />
       <!-- <div style="display:flex; justify-content:center;align-items:center">
         <Button
