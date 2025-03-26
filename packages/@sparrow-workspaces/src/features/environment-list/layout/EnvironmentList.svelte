@@ -7,6 +7,7 @@
     ChevronDownRegular,
     AddRegular,
     LayerRegular,
+    GlobeRegular,
   } from "@sparrow/library/icons";
   import { Button, List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -18,6 +19,7 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandEnvironment } from "../../../stores/recent-left-panel";
 
   /**
    * current workspace
@@ -63,7 +65,7 @@
 
   export let searchData;
 
-  export let isExpandEnvironment = false;
+  // export let isExpandEnvironment = false;
 
   export let toggleExpandEnvironment;
 
@@ -112,8 +114,8 @@
   }
 
   const handleCreateEnvironment = async () => {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
     await onCreateEnvironment(localEnvironment);
     setTimeout(() => {
@@ -160,26 +162,28 @@
   >
     <div
       class="d-flex align-items-center"
-      style="width: calc(100% - 30px); gap:4px; padding:2px 4px;"
+      style="width: calc(100% - 30px);  padding:2px 4px;"
     >
-      <span style="  display: flex; ">
+      <span style="  display: flex; margin-right:4px; ">
         <Button
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={!isExpandEnvironment
+          startIcon={!$isExpandEnvironment
             ? ChevronRightRegular
             : ChevronDownRegular}
         />
       </span>
 
-      <span style="   display: flex;  ">
+      <span
+        style="   display: flex; width:30px; height:24px; align-items:center; justify-content:end; padding:4px;  "
+      >
         <LayerRegular size={"16px"} color="var(--bg-ds-neutral-300)" />
       </span>
       <span style="padding:2px 4px;">
         <p
           class=" mb-0 sparrow-fs-13"
-          style="font-weight: 500; font-size:12px; line-height:18px;"
+          style="font-weight:400; font-size:12px; line-height:18px;"
         >
           Environments
         </p>
@@ -211,10 +215,10 @@
     {/if}
   </div>
 
-  {#if isExpandEnvironment}
+  {#if $isExpandEnvironment}
     <div
       style="flex:1; height:32px; "
-      class="overflow-auto ps-2"
+      class="overflow-auto"
       bind:this={scrollDiv}
     >
       {#if filteredGlobalEnvironment?.length}
@@ -222,33 +226,30 @@
           <p
             tabindex="0"
             role="button"
-            class={`fw-normal   env-item text-fs-12 border-radius-2  ${
+            class={`fw-normal env-item text-fs-12 border-radius-2  ${
               globalEnvironment[0]?.id === activeTabId && "active"
             }`}
-            style="height: 32px; display:flex; align-items:center; padding-left:35px; margin-bottom:2px; position:relative;"
+            style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
             on:click={() => {
               onOpenGlobalEnvironment(globalEnvironment[0]);
             }}
           >
+            <span
+              class="icon-default"
+              style="width: 24px; height:24px; margin-right:4px;"
+            >
+            </span>
             <span class="icon-default">
-              <StackIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
+              <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
             </span>
-            <span class="icon-hover">
-              <StackFilled
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
-            </span>
+
             <span class="box-line1"></span>
-            <span class="">{globalEnvironment[0]?.name}</span>
+            <span class="" style="padding: 2px 4px; font-weight: 400;"
+              >{globalEnvironment[0]?.name}
+            </span>
           </p>
         </div>
-        <hr class="m-0 ms-4 me-1 mt-1 mb-1" />
+        <hr class="m-0 ms-3 me-1 mt-1 mb-1" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>
@@ -380,7 +381,8 @@
     width: 30px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
 
   .icon-hover {
@@ -389,22 +391,6 @@
     width: 30px;
     align-items: center;
     justify-content: center;
-  }
-
-  .env-item:hover .icon-default {
-    display: none;
-  }
-
-  .env-item:hover .icon-hover {
-    display: flex;
-  }
-
-  .env-item.active .icon-default {
-    display: none;
-  }
-
-  .env-item.active .icon-hover {
-    display: flex;
   }
 
   .environment-inactive {
@@ -436,7 +422,7 @@
     background: var(--workspace-hover-color);
   }
   .env-item {
-    gap: 4px;
+    // gap: 4px;
   }
   .env-item:hover {
     background-color: var(--bg-ds-surface-400);
@@ -498,7 +484,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 6.5px;
+    left: 14.6px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 10;
@@ -508,7 +494,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 6.5px;
+    left: 14.6px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
     z-index: 10;

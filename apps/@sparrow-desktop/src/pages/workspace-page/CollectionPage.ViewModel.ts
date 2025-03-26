@@ -5684,22 +5684,10 @@ export default class CollectionsViewModel {
    * @param url - The localhost URL to validate.
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateLocalHostURL = async (url: string) => {
+  public getOapiJsonFromURL = async (url: string) => {
     const response = await this.collectionService.validateImportCollectionURL(
-      url.replace("localhost", "127.0.0.1"),
+      url
     );
-    return response;
-  };
-
-  /**
-   * Validates a deployed URL by making a GET request.
-   *
-   * @param url - The deployed URL to validate.
-   * @returns  A promise that resolves with the response of the validation request.
-   */
-  public validateDeployedURL = async (url: string) => {
-    const response =
-      await this.collectionService.validateImportCollectionURL(url);
     return response;
   };
 
@@ -5708,10 +5696,19 @@ export default class CollectionsViewModel {
    * @param data - Open API Text Data
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateURLInput = async (data: any) => {
+  public validateOapiDataSyntax = async (data: any) => {
     const response = await this.collectionService.validateImportCollectionInput(
       "",
-      JSON.parse(data?.data?.response),
+      data?.data?.body,
+    );
+    return response;
+  };
+
+  public validateOapiFileSyntax = async (_fileUploadData: any) => {
+    const response = 
+    await this.collectionService.validateImportCollectionFileUpload(
+      "",
+      _fileUploadData,
     );
     return response;
   };

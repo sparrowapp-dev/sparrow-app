@@ -9,7 +9,10 @@
     : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center position-relative"
 >
   <div class="">
-    <span class="text-fs-12 text-secondary-300" style="font-weight:600;position:absolute;left:0px;top:5px">Response</span>
+    <span
+      class="text-fs-12 text-secondary-300"
+      style="font-weight:600;position:absolute;left:0px;top:5px">Response</span
+    >
     <div
       class="d-flex align-items-center flex-column justify-content-center pt-5"
     >

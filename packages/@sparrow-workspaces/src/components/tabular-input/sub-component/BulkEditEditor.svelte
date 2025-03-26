@@ -128,7 +128,7 @@
   }
 
   :global(.key-highlight) {
-    color: var(--text-primary-150);
+    color: var(--text-ds-neutral-50);
   }
 
   :global(.value-highlight) {

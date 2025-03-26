@@ -10,6 +10,8 @@
     Decoration,
     placeholder as CreatePlaceHolder,
   } from "@codemirror/view";
+  import { undo, redo } from "@codemirror/commands";
+  import { history, historyKeymap } from "@codemirror/commands";
   /**
    * input value
    */
@@ -122,6 +124,26 @@
    * Disable keys in codemirror
    */
   const keyBinding = keymap.of([
+    {
+      key: "Ctrl-z",
+      run: undo,
+    },
+    {
+      key: "Ctrl-y",
+      run: redo,
+    },
+    {
+      key: "Cmd-z",
+      run: undo,
+    },
+    {
+      key: "Cmd-Shift-z",
+      run: redo,
+    },
+    {
+      key: "Cmd-y",
+      run: redo,
+    },
     {
       key: "Enter",
       run: (view) => {
@@ -346,6 +368,8 @@
         theme,
         updateExtensionView,
         keyBinding,
+        history(), // Add history extension
+        keymap.of(historyKeymap),
         languageConf.of(javascriptLanguage),
         EditorState.readOnly.of(disabled ? true : false),
         handleEventsRegister,

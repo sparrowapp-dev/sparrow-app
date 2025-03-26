@@ -4,7 +4,10 @@ import {
   ReduceQueryParams,
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/socket-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation,
+  
+} from "@sparrow/common/utils";
+import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
   Debounce,
@@ -631,8 +634,10 @@ class RestExplorerViewModel {
   public saveSocket = async () => {
     const componentData: Tab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
-
+    const tabId = componentData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -713,6 +718,7 @@ class RestExplorerViewModel {
           data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -745,11 +751,13 @@ class RestExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

@@ -1,8 +1,15 @@
-<script>
+<script lang="ts">
   import { DangerIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
   import { Alert } from "@sparrow/library/ui";
+  import type { Response } from "@sparrow/common/types/workspace";
   export let onSendButtonClicked;
+  export let response: Response;
+  export let environmentVariables;
+
+  const handleClickSendButton = () => {
+    onSendButtonClicked(environmentVariables);
+  };
 </script>
 
 <div class="response-default">
@@ -18,10 +25,12 @@
       </div>
       <Alert
         varient="error"
-        description="Unable to reach the API endpoint. Please verify the request URL and try again.
-"
+        heading="Error"
+        description={response?.body.length > 0
+          ? response.body
+          : "Unable to reach the API endpoint. Please verify the request URL and try again."}
         ctaShow={true}
-        onClick={onSendButtonClicked}
+        onClick={handleClickSendButton}
       />
     </div>
   </div>

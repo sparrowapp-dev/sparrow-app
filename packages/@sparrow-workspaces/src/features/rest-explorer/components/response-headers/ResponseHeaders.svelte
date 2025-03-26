@@ -8,14 +8,15 @@
 >
   {#each responseHeader as header}
     <div
-      class="d-flex align-items-center justify-content-center ps-0 gap-2 mb-2 w-100"
+      class="d-flex align-items-center justify-content-center ps-0 gap-1 mb-1 w-100"
+      style="min-width: 28px;"
     >
-      <div class="flex-grow-1 w-100">
+      <div class="flex-grow-1 w-100" >
         <input
           type="text"
           placeholder={header.key}
-          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
-          style="font-size: 13px;"
+          class="px-2 py-1 border-0 w-100 border-radius-4"
+          style="font-size: 12px;font-weight:500; background-color: var(--bg-ds-surface-800);"
           readonly
           disabled
         />
@@ -24,8 +25,8 @@
         <input
           type="text"
           placeholder={header.value}
-          class="bg-secondary-700 px-2 py-1 border-0 w-100 border-radius-2"
-          style="font-size: 13px;"
+          class="px-2 py-1 border-0 w-100 border-radius-2"
+          style="font-size: 12px;font-weight:500;background-color: var(--bg-ds-surface-800);"
           readonly
           disabled
         />

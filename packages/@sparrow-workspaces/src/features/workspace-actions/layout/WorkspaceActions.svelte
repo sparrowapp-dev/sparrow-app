@@ -7,6 +7,11 @@
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown, Button } from "@sparrow/library/ui";
   import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "../../../stores/recent-left-panel";
+  import {
     AddRegular,
     ChevronDoubleRightRegular,
     PlusIcon2,
@@ -140,9 +145,9 @@
     }
   });
 
-  export let isExpandCollection = false;
-  export let isExpandEnvironment = false;
-  export let isExpandTestflow = false;
+  // export let isExpandCollection = false;
+  // export let isExpandEnvironment = false;
+  // export let isExpandTestflow = false;
 
   let isGithubStarHover = false;
 
@@ -251,90 +256,7 @@
             } else {
               showImportCollectionPopup();
             }
-            isExpandCollection = true;
-          },
-        },
-        {
-          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-          icon: VectorIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "12px",
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
-          name: "Import cURL",
-          icon: BubbleIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            MixpanelEvent(Events.IMPORT_CURL, {
-              source: "curl import popup",
-            });
-            showImportCurlPopup();
-          },
-        },
-        {
-          name: "Add WebSocket",
-          icon: SocketIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onItemCreated("web-socket", {});
-            MixpanelEvent(Events.Add_WebSocket);
-          },
-        },
-        {
-          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-          icon: SocketIoIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "14px",
-          onclick: () => {
-            onItemCreated("socket-io", {});
-            MixpanelEvent(Events.Add_SocketIO, {
-              description: "Add Socket.IO From + Icon in Left Panel",
-            });
-          },
-        },
-        {
-          name: "Add Environment",
-          icon: StackIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            isExpandEnvironment = true;
-            onCreateEnvironment();
-          },
-        },
-
-        {
-          name: `Add ${TFDefaultEnum.FULL_NAME}`,
-          icon: TreeIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onCreateTestflow();
-            MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
-          },
-          isHoverConstant: false,
-        },
-      ]
-    : [
-        {
-          name: "Add Collection",
-          icon: CollectionIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            if (isGuestUser) {
-              onItemCreated("collection", {
-                workspaceId: currentWorkspaceId,
-                collection: collectionList,
-              });
-            } else {
-              showImportCollectionPopup();
-            }
-            isExpandCollection = true;
+            isExpandCollection.set(true);
           },
         },
         {
@@ -396,7 +318,102 @@
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
           onclick: () => {
-            isExpandEnvironment = true;
+            isExpandEnvironment.set(true);
+            onCreateEnvironment();
+          },
+        },
+
+        {
+          name: `Add ${TFDefaultEnum.FULL_NAME}`,
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onCreateTestflow();
+            MixpanelEvent(Events.LeftPanel_Plus_Icon);
+            isExpandTestflow.set(true);
+          },
+          isHoverConstant: false,
+        },
+      ]
+    : [
+        {
+          name: "Add Collection",
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
+          onclick: () => {
+            if (isGuestUser) {
+              onItemCreated("collection", {
+                workspaceId: currentWorkspaceId,
+                collection: collectionList,
+              });
+            } else {
+              showImportCollectionPopup();
+            }
+            isExpandCollection.set(true);
+          },
+        },
+        {
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+        {
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onItemCreated("web-socket", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("socket-io", {});
+            MixpanelEvent(Events.Add_SocketIO, {
+              description: "Add Socket.IO From + Icon in Left Panel",
+            });
+          },
+        },
+        {
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("graphql", {});
+            MixpanelEvent(Events.Add_GraphQL, {
+              description: "Add GraphQL From + Icon in Left Panel",
+            });
+          },
+        },
+        {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment.set(true);
             onCreateEnvironment();
           },
         },
@@ -408,21 +425,21 @@
           onclick: () => {
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
+            isExpandTestflow.set(true);
           },
           isHoverConstant: false,
         },
       ];
 
   const toggleExpandCollection = () => {
-    isExpandCollection = !isExpandCollection;
+    isExpandCollection.update((value) => !value);
   };
 
   const toggleExpandEnvironment = () => {
-    isExpandEnvironment = !isExpandEnvironment;
+    isExpandEnvironment.update((value) => !value);
   };
   const toggleExpandTestflow = () => {
-    isExpandTestflow = !isExpandTestflow;
+    isExpandTestflow.update((value) => !value);
   };
 
   const toggleTourGuideActive = () => {
@@ -507,9 +524,9 @@
         bind:value={searchData}
         on:input={() => {
           handleSearch();
-          isExpandCollection = true;
-          isExpandEnvironment = true;
-          isExpandTestflow = true;
+          isExpandCollection.set(true);
+          isExpandEnvironment.set(true);
+          isExpandTestflow.set(true);
         }}
         placeholder={"Search"}
       />
@@ -608,7 +625,7 @@
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
-              isExpandTestflow = true;
+              isExpandTestflow.set(true);
               toggleTourGuideActive();
             }}
             onClose={() => {
@@ -627,11 +644,12 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandCollection ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandCollection ? 'flex:1;' : ''}"
       >
         <CollectionList
           bind:scrollList
           bind:userRole
+          bind:isFirstCollectionExpand
           {onRefetchCollection}
           {showImportCurlPopup}
           {collectionList}
@@ -649,8 +667,6 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
-          bind:isExpandCollection
-          bind:isFirstCollectionExpand
           {isWebApp}
         />
       </div>
@@ -661,7 +677,7 @@
 
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandEnvironment ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandEnvironment ? 'flex:1;' : ''}"
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
@@ -676,7 +692,6 @@
           {searchData}
           {activeTabId}
           {toggleExpandEnvironment}
-          bind:isExpandEnvironment
         />
       </div>
 
@@ -686,7 +701,7 @@
 
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandTestflow ? 'flex:1;' : ''}"
       >
         <TestflowList
           testflows={$testflows}
@@ -699,7 +714,6 @@
           {searchData}
           {activeTabId}
           {toggleExpandTestflow}
-          bind:isExpandTestflow
         />
       </div>
 
