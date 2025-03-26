@@ -242,16 +242,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("websocket", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        websocket: api,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
@@ -261,6 +251,16 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("websocket", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          websocket: api,
+        });
+      }
+    }}
     style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,

@@ -295,22 +295,6 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      expand = !expand;
-      if (expand) {
-        addCollectionItem(api.id, "Request");
-        onItemOpened("request", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          request: api,
-        });
-      } else {
-        removeCollectionItem(api.id);
-      }
-    }
-  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -321,6 +305,22 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        expand = !expand;
+        if (expand) {
+          addCollectionItem(api.id, "Request");
+          onItemOpened("request", {
+            workspaceId: collection.workspaceId,
+            collection,
+            folder,
+            request: api,
+          });
+        } else {
+          removeCollectionItem(api.id);
+        }
+      }
+    }}
     style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 28px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
@@ -414,7 +414,6 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
-            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />

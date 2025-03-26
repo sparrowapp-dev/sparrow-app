@@ -230,16 +230,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("socket-io", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        socketio: socketIo,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
@@ -249,6 +239,16 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("socket-io", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          socketio: socketIo,
+        });
+      }
+    }}
     style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,

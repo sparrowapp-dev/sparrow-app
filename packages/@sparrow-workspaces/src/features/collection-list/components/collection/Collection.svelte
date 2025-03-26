@@ -479,22 +479,6 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      visibility = !visibility;
-      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-        if (visibility) {
-          addCollectionItem(collection.id, "collection");
-          onItemOpened("collection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          });
-        } else {
-          removeCollectionItem(collection.id);
-        }
-      }
-    }
-  }}
   style="height:32px; gap:4px;  padding-left:16px; margin-bottom:{collection.id ===
   activeTabId
     ? '0px'
@@ -509,6 +493,22 @@
     class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        visibility = !visibility;
+        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+          if (visibility) {
+            addCollectionItem(collection.id, "collection");
+            onItemOpened("collection", {
+              workspaceId: collection.workspaceId,
+              collection,
+            });
+          } else {
+            removeCollectionItem(collection.id);
+          }
+        }
+      }
+    }}
   >
     <Button
       size="extra-small"
@@ -586,7 +586,6 @@
             customWidth={"24px"}
             type="teritiary-regular"
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu2(e);
             }}
             startIcon={AddRegular}
@@ -609,7 +608,6 @@
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu();
             }}
           />

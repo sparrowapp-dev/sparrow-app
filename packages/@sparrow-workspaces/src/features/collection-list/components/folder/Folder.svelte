@@ -417,23 +417,6 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        on:click|preventDefault={() => {
-          if (!isRenaming) {
-            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-              expand = !expand;
-              if (expand) {
-                addCollectionItem(explorer.id, "Folder");
-                onItemOpened("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              } else {
-                removeCollectionItem(explorer.id);
-              }
-            }
-          }
-        }}
         style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
         activeTabId
           ? '0px'
@@ -448,6 +431,23 @@
           style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
+          on:click|preventDefault={() => {
+            if (!isRenaming) {
+              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+                expand = !expand;
+                if (expand) {
+                  addCollectionItem(explorer.id, "Folder");
+                  onItemOpened("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                } else {
+                  removeCollectionItem(explorer.id);
+                }
+              }
+            }
+          }}
         >
           <span
             on:click|stopPropagation={() => {

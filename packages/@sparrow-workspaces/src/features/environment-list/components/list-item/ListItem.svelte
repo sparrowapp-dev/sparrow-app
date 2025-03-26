@@ -312,7 +312,6 @@
               WorkspaceRole.WORKSPACE_VIEWER}
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu(e);
             }}
           />
