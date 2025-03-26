@@ -89,7 +89,7 @@
           ]}
           onclick={handleDropdown}
           menuItem={"v2"}
-          headerTheme={"violet"}
+          headerTheme={"transparent"}
           borderType={"none"}
           disabled={owner}
           isArrowIconRequired={!owner}

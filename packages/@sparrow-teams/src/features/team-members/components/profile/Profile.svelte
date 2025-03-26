@@ -93,14 +93,14 @@
           onclick={handleDropdown}
           menuItem={"v2"}
           bodyTheme={"violet"}
-          headerTheme={"violet"}
+          headerTheme={"transparent"}
           borderType={"none"}
           disabled={owner}
           headerFontSize={"10px"}
           headerFontWeight={400}
           borderRounded={"4px"}
           isArrowIconRequired={!owner}
-          minHeaderWidth={"105px"}
+          minHeaderWidth={"110px"}
         />
       {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
         <Select
@@ -109,7 +109,7 @@
           titleId={user.role ? user.role : ""}
           onclick={handleDropdown}
           menuItem={"v2"}
-          headerTheme={"violet"}
+          headerTheme={"transparent"}
           bodyTheme={"violet"}
           borderType={"none"}
           disabled={owner}
@@ -117,7 +117,7 @@
           headerFontWeight={400}
           borderRounded={"4px"}
           isArrowIconRequired={!owner}
-          minHeaderWidth={"105px"}
+          minHeaderWidth={"110px"}
         />
       {:else}
         <Select
@@ -132,7 +132,7 @@
           headerFontSize={"10px"}
           position={"absolute"}
           isArrowIconRequired={false}
-          minHeaderWidth={"105px"}
+          minHeaderWidth={"110px"}
         />
       {/if}
     </div>

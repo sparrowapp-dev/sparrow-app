@@ -613,7 +613,7 @@
         disabled={owner}
         isArrowIconRequired={!owner}
         borderRounded={"4px"}
-        minHeaderWidth={"105px"}
+        minHeaderWidth={"110px"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
       <!-- <Select
@@ -634,16 +634,12 @@
       <div style="display:flex; justify-content:center;align-items:center">
         <Button
           id={user.id}
+          type={"teritiary-regular"}
           size={"small"}
-          onClick={() => {
-            handleDropdown;
-          }}
           title={user.role
             ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
             : ""}
-          type={"teritiary-regular"}
-          disabled={owner}
-          endIcon={!owner}
+          disable={owner}
         />
       </div>
     {:else}
@@ -658,7 +654,7 @@
         disabled={true}
         headerFontSize={"10px"}
         isArrowIconRequired={false}
-        minHeaderWidth={"105px"}
+        minHeaderWidth={"110px"}
       />
     {/if}
   </div>
