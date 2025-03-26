@@ -19,7 +19,7 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { afterUpdate, onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     AddRegular,
     AngleLeftIcon,
@@ -33,6 +33,7 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandCollection } from "../../../stores/recent-left-panel";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -82,8 +83,6 @@
   export let scrollList;
 
   export let searchData: string = "";
-
-  export let isExpandCollection: boolean;
 
   export let toggleExpandCollection;
 
@@ -242,6 +241,7 @@
       on:click={() => {
         toggleExpandCollection();
         activeTabType = "";
+        // console.log(activeTabType);
       }}
     >
       <div
@@ -253,7 +253,7 @@
             size="extra-small"
             type="teritiary-regular"
             customWidth="24px"
-            startIcon={!isExpandCollection
+            startIcon={!$isExpandCollection
               ? ChevronRightRegular
               : ChevronDownRegular}
           />
@@ -269,7 +269,7 @@
         >
           <p
             class="sparrow-fs-13 mb-0"
-            style="font-weight: 500; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
+            style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
           >
             Collections
           </p>
@@ -293,7 +293,7 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
-                isExpandCollection = true;
+                isExpandCollection.set(true);
                 isGuestUser
                   ? onItemCreated("collection", {
                       workspaceId: currentWorkspaceId,
@@ -307,10 +307,10 @@
       {/if}
     </div>
 
-    {#if isExpandCollection}
+    {#if $isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
-        style={` background-color: ${!activeTabType ? "var(--bg-ds-surface-600)" : "transparent"};`}
+        style={` background-color: ${activeTabType === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
           <div
@@ -341,7 +341,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={col?.toMutableJSON()}
+                    collection={col}
                     {activeTabId}
                     {searchData}
                     {isWebApp}
@@ -385,8 +385,8 @@
                   {activeTabType}
                   collection={col?.toMutableJSON()}
                   {activeTabId}
-                  {isWebApp}
                   bind:isFirstCollectionExpand
+                  {isWebApp}
                 />
               {/each}
             </List>

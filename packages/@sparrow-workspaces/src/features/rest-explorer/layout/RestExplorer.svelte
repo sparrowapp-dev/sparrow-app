@@ -73,6 +73,8 @@
     CheckmarkCircleFilled,
     ErrorCircleFilled,
   } from "@sparrow/library/icons";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
+  import { writable } from "svelte/store";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -121,6 +123,7 @@
   export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  const loading = writable<boolean>(false);
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -160,12 +163,20 @@
     isExposeSaveAsRequest = flag;
   };
 
+  $: {
+    loadingState.subscribe((tab) => {
+      loading.set(tab.get($tab.tabId));
+    });
+  }
   let isGuidePopup = false;
 </script>
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 pt-3 pb-3" style="padding:0px 12px">
+    <div
+      class="w-100 d-flex flex-column h-100 pt-3 pb-3"
+      style="padding:0px 12px"
+    >
       <!-- Request Name Header -->
       <!-- 
         --
@@ -194,9 +205,7 @@
                 notifications.success("API request saved successfully.");
               }
             }}
-          />
-
-          <span class="position-relative" style="width:35px;"> </span>
+          /> <span class="position-relative" style="width:35px;"> </span>
           <Button
             title="Share"
             type={"secondary"}
@@ -209,6 +218,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$loading}
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={$tab.property.request?.url}
@@ -368,11 +378,9 @@
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"
-                style="overflow:auto;"
-                
               >
                 <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto; ">
+                  <div style="flex:1; overflow:hidden;">
                     {#if storeData?.isSendRequestInProgress}
                       <ResponseDefaultScreen />
                       <div
@@ -385,15 +393,15 @@
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
                       <ResponseErrorScreen
                         onSendButtonClicked={onSendRequest}
+                        response={storeData.response}
                         {environmentVariables}
                       />
                     {:else if storeData?.response.status}
-                      <div
-                        class="h-100 d-flex flex-column"
-                        style="gap:5px"
-                        
-                      >
-                        <div class="d-flex">
+                      <div class="h-100 d-flex flex-column" style="gap:12px">
+                        <div
+                          class="d-flex"
+                          style="position:sticky; top:0; z-index:2; background-color:var(--bg-ds-surface-900)"
+                        >
                           <ResponseNavigator
                             requestStateSection={storeData?.response.navigation}
                             {onUpdateResponseState}
@@ -402,42 +410,49 @@
                           />
                           <ResponseStatus response={storeData.response} />
                         </div>
-                        {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
-                          {#if storeData?.response.bodyLanguage !== "Image"}
-                            <ResponseBodyNavigator
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                              path={$tab.path}
-                              {onUpdateResponseState}
-                              {onClearResponse}
-                              {onSaveResponse}
-                              {isWebApp}
-                              {isGuestUser}
-                            />
+                        <div
+                          class="flex-grow-1 d-flex flex-column"
+                          style="overflow:auto; min-height:0;"
+                        >
+                          {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
+                            {#if storeData?.response.bodyLanguage !== "Image"}
+                              <ResponseBodyNavigator
+                                response={storeData?.response}
+                                apiState={storeData?.response}
+                                path={$tab.path}
+                                {onUpdateResponseState}
+                                {onClearResponse}
+                                {onSaveResponse}
+                                {isWebApp}
+                                {isGuestUser}
+                              />
+                            {/if}
+                            <div
+                              style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                            >
+                              <ResponseBody
+                                response={storeData?.response}
+                                apiState={storeData?.response}
+                              />
+                            </div>
+                          {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
+                            <div style="overflow:auto;">
+                              <ResponseHeaders
+                                responseHeader={storeData.response?.headers}
+                              />
+                            </div>
                           {/if}
-                          <div style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;">
-                            <ResponseBody
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                            />
-                          </div>
-                        {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                          <div style="">
-                            <ResponseHeaders
-                              responseHeader={storeData.response?.headers}
-                            />
-                          </div>
-                        {/if}
+                        </div>
                       </div>
                     {/if}
                   </div>
                 </div>
-              </div></Pane
-            >
+              </div>
+            </Pane>
           </Splitpanes>
         {:else}
           <!-- loading state -->
-          <ResponseDefaultScreen isMainScreen={true} />
+          <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
         {/if}
       </div>
     </div>

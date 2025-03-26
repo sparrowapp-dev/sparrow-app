@@ -271,7 +271,7 @@
     {#if isRenaming}
       <input
         class="py-0 rename-input-field-socket-io"
-        style="font-size: 12px; font-weight:500; line-height:18px;  width: calc(100% - 50px);"
+        style="font-size: 12px; font-weight:400; line-height:18px;  width: calc(100% - 50px);"
         id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
@@ -341,7 +341,7 @@
   .api-name {
     height: 24px;
     line-height: 18px;
-    font-weight: 500;
+    font-weight: 400;
     width: calc(100% - 58px);
     text-align: left;
     color: var(--bg-ds-neutral-200);

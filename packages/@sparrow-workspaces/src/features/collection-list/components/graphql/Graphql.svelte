@@ -289,7 +289,7 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; "
+        style="font-size: 12px; font-weight:400;"
       >
         <p class=" ellipsis m-0 p-0">{graphql.name}</p>
       </div>
@@ -327,11 +327,11 @@
 <style lang="scss">
   .delete-ticker {
     color: var(--error--color);
-    font-weight: 500;
+    font-weight: 400;
   }
   .api-method {
     font-size: 10px;
-    font-weight: 500;
+    font-weight: 400;
     width: 30px !important;
     height: 24px;
 

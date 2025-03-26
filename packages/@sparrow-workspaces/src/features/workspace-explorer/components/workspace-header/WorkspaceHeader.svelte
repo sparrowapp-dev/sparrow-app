@@ -2,7 +2,7 @@
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-
+  import { PeopleRegular, SaveRegular } from "@sparrow/library/icons";
   /**
    * The name of the workspace.
    */
@@ -51,6 +51,20 @@
     ) as HTMLInputElement;
     inputField.value = workspaceName;
   };
+  const handleInputName = (event) => {
+    if (event.key === "Enter") {
+      onRenameInputKeyPress();
+    }
+  };
+  const handleBlurName = () => {
+    const newValue = event.target.value;
+    const previousValue = workspaceName;
+    if (event.target.value?.trim() === "") {
+      resetInputField();
+    } else if (newValue !== previousValue) {
+      onUpdateWorkspaceName(workspaceID, newValue);
+    }
+  };
 </script>
 
 <section>
@@ -63,52 +77,31 @@
         class="ellipsis w-auto"
         style="font-weight: 700; color:var(--text-secondary-100);"
       >
-        <input
-          on:blur={(event) => {
-            const newValue = event.target.value;
-            const previousValue = workspaceName;
-            if (event.target.value?.trim() === "") {
-              resetInputField();
-            } else if (newValue !== previousValue) {
-              onUpdateWorkspaceName(workspaceID, newValue);
-            }
-          }}
-          on:keydown={(event) => {
-            if (event.key === "Enter") {
-              onRenameInputKeyPress();
-            }
-          }}
-          type="text"
-          required
-          id="renameInputFieldWorkspace"
+        <Input
+          width={"398px"}
+          placeholder={""}
+          type={"text"}
           value={workspaceName}
+          variant={"inline"}
+          id="renameInputFieldWorkspace"
           disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          class="bg-transparent input-outline border-0 text-fs-18 text-left w-auto ps-2 py-0"
           maxlength={100}
+          on:input={handleInputName}
+          on:blur={handleBlurName}
         />
       </div>
       {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
         <div class="d-flex gap-2 ms-3">
           <Button
-            type={"secondary"}
-            title={"Delete Workspace"}
-            textClassProp={"fs-12 "}
-            textStyleProp={"font-weight:400; font-size:12px;"}
-            onClick={() => {
-              onDeleteWorkspace();
-            }}
-            disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          />
-          <Button
+            startIcon={PeopleRegular}
+            size={"medium"}
             type={"primary"}
             title={"Invite"}
-            textClassProp={"fs-12"}
-            textStyleProp={"font-weight:400; font-size:12px;"}
             onClick={() => {
               isWorkspaceInviteModalOpen = true;
             }}
             disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          ></Button>
+          />
         </div>
       {/if}
     </div>

@@ -26,6 +26,7 @@
   export let onConnect;
   export let webSocket;
   export let onDisconnect;
+  export let isSaveLoad = false;
   /**
    * Role of user in active workspace
    */
@@ -46,7 +47,6 @@
       notifications.success("WebSocket request saved successfully.");
     }
   };
-
 </script>
 
 <div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
@@ -64,13 +64,15 @@
 
   <!-- Send button -->
   <Button
-  title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
-    type="primary"
+    title={webSocket?.status === "connected"
+      ? "Disconnect"
+      : webSocket?.status === "connecting"
+        ? "Cancel"
+        : "Connect"}
+    type={webSocket?.status === "connecting" ? "secondary" : "primary"}
     customWidth={"96px"}
-    loader={webSocket?.status === "connecting" ||
-      webSocket?.status === "disconnecting"}
-    disable={webSocket?.status === "connecting" ||
-      webSocket?.status === "disconnecting"}
+    loader={webSocket?.status === "disconnecting"}
+    disable={webSocket?.status === "disconnecting"}
     onClick={() => {
       if (requestUrl === "") {
         const codeMirrorElement = document.querySelector(
@@ -80,7 +82,10 @@
           codeMirrorElement.classList.add("url-red-border");
         }
       } else {
-        if (webSocket?.status === "connected") {
+        if (
+          webSocket?.status === "connected" ||
+          webSocket?.status === "connecting"
+        ) {
           onDisconnect();
           MixpanelEvent(Events.WebSocket_Disconnected);
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
@@ -91,16 +96,16 @@
     }}
   />
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-
-     <Button
-    type="secondary"
-    size="medium"
-    startIcon={SaveRegular}
-    onClick={handleSaveRequest}
-    disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+    <Button
+      type="secondary"
+      size="medium"
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
+      onClick={handleSaveRequest}
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-        />
+    />
   </Tooltip>
 </div>
 

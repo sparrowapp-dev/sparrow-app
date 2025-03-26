@@ -48,11 +48,7 @@
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}
@@ -61,11 +57,7 @@
       {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-4">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}

@@ -283,7 +283,7 @@
     {#if isRenaming}
       <input
         class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px); font-weight:500; line-height:18px;"
+        style="font-size: 12px; width: calc(100% - 50px); font-weight:400; line-height:18px;"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -297,7 +297,7 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; font-weight:500; line-height:18px;"
+        style="font-size: 12px; font-weight:400; line-height:18px;"
       >
         <p class="ellipsis m-0 p-0">{api.name}</p>
       </div>

@@ -52,14 +52,13 @@
 
 <div class="workspace-setting h-100" style="padding-top:0;">
   <div class="d-flex flex-column" style="">
-    <div class="pb-3">
+    <div class="pb-3" style="">
       <Search
-        variant="primary"
-        size="large"
+        variant="secondary"
+        size="small"
         bind:value={search}
         on:input={() => {}}
         customWidth={"300px"}
-        placeholder={`Search People in ${workspaceName}`}
       />
     </div>
     <Member user={activeUser} isActiveUser={true} />

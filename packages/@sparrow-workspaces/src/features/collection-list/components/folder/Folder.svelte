@@ -43,6 +43,11 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { afterUpdate } from "svelte";
 
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -206,6 +211,12 @@
       inputField.blur();
     }
   };
+
+  $: {
+    if ($openedComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -234,12 +245,10 @@
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
-      {#if !isWebApp}
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{graghQlCount}</span>
-          <p>GraphQL</p>
-        </div>
-      {/if}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{graghQlCount}</span>
+        <p>GraphQL</p>
+      </div>
       <div class="d-flex gap-1">
         <span class="text-plusButton">{webSocketCount}</span>
         <p>WebSocket</p>
@@ -381,7 +390,7 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -413,11 +422,14 @@
             if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
               expand = !expand;
               if (expand) {
+                addCollectionItem(explorer.id, "Folder");
                 onItemOpened("folder", {
                   workspaceId: collection.workspaceId,
                   collection,
                   folder: explorer,
                 });
+              } else {
+                removeCollectionItem(explorer.id);
               }
             }
           }
@@ -474,7 +486,7 @@
               class="py-0 renameInputFieldFolder w-100"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px; padding-left:5px; font-weight:500; color : var(--text-ds-neutral-50); line-height:18px;"
+              style="font-size: 12px; padding-left:5px; font-weight:400; color : var(--text-ds-neutral-50); line-height:18px;"
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -488,7 +500,7 @@
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
                       height: 32px;
-                      font-weight:500;
+                      font-weight:400;
                       margin-left:0px;
                       font-size:12px;
                       color:var(--text-ds-neutral-50);
@@ -627,6 +639,8 @@
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}
@@ -660,7 +674,7 @@
           {activeTabId}
         />
       </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL && !isWebApp}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
       <div style="cursor:pointer;">
         <Graphql
           {userRole}

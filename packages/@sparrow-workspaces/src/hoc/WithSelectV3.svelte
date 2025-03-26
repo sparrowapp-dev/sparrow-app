@@ -39,7 +39,6 @@
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
   headerHeight={"26px"}
-  minBodyWidth={"150px"}
   borderRounded={"4px"}
   headerTheme={"transparent"}
   bodyTheme={"surface"}
