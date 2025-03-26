@@ -3,6 +3,7 @@ import { Badge } from "@sparrow/library/ui";
 export default {
   title: 'Components/Badge',
   component: Badge,
+  tags: ['autodocs'],
   argTypes: {
     variant: {
       control: { type: 'select' },
