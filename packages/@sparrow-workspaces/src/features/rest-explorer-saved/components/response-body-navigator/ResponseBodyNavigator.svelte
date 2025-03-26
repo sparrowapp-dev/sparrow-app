@@ -27,6 +27,7 @@
   export let onUpdateRequestState;
   export let onClearResponse;
   export let isWebApp = false;
+  export let onUpdateResponseState;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -58,7 +59,7 @@
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
-    onUpdateRequestState({
+    onUpdateResponseState({
       responseBodyLanguage: tab,
     });
   };
