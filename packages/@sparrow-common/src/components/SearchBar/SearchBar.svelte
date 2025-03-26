@@ -19,7 +19,7 @@
   });
 </script>
 
-<div class="container" on:click={onClick}>
+<div class="container" tabindex="0" on:click={onClick}>
   <div class="first">
     <div class="image-container">
       <SearchIcon
@@ -61,6 +61,11 @@
   .container:hover {
     border: 1px solid var(--border-ds-neutral-200);
     background-color: var(--bg-ds-surface-500);
+  }
+  .container:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    background-color: transparent;
+    outline: none;
   }
   .input {
     border: none;
