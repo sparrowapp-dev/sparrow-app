@@ -268,12 +268,14 @@
                 ? 'var(--bg-ds-neutral-500)'
                 : 'var(--bg-ds-surface-100)'}"
             ></span>
-            <span class="" style="padding: 2px 4px;"
+            <span
+              class=""
+              style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
               >{globalEnvironment[0]?.name}
             </span>
           </p>
         </div>
-        <hr class="m-0 ms-3 me-1 mt-1 mb-1" />
+        <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>

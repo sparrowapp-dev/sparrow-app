@@ -384,6 +384,7 @@
       background-color: var(--bg-ds-surface-500) !important;
     }
     .collection-title {
+      color: var(--bg-ds-neutral-200);
       padding: 2px 4px;
       width: calc(100% - 54px);
       text-align: left;
