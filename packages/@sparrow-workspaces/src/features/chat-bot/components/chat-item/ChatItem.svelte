@@ -142,7 +142,54 @@
    */
   const handleCopyResponse = async () => {
     try {
-      await navigator.clipboard.writeText(message);
+      // Check if the message contains code blocks
+      const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
+      let hasCodeBlock = codeBlockRegex.test(message);
+
+      // Reset regex state
+      codeBlockRegex.lastIndex = 0;
+
+      if (hasCodeBlock) {
+        // store all code blocks in a single message (normal text + code blocks)
+        let allCodeBlocks = [];
+        let match; // [```, languageName, code, ```]
+
+        // Find all code blocks in the message
+        while ((match = codeBlockRegex.exec(message)) !== null) {
+          if (match[2]) {
+            // Store each code block with a prefix indicating its language (if available)
+            const language = match[1] ? match[1].trim() : "";
+            const code = match[2].trim();
+
+            // if (language) {
+            //   allCodeBlocks.push(`// ${language}:\n${code}\n`);
+            // } else {
+            //   allCodeBlocks.push(code + "\n");
+            // }
+
+            allCodeBlocks.push(code + "\n");
+          }
+        }
+
+        const totalCodeBlocks = allCodeBlocks.length;
+        if (totalCodeBlocks > 0) {
+          // Copy only last code block as copy button appears only for last code block only.
+          await navigator.clipboard.writeText(
+            allCodeBlocks[totalCodeBlocks - 1],
+          );
+
+          // Join all code blocks with newlines between them
+          // await navigator.clipboard.writeText(allCodeBlocks.join("\n"));
+        } else {
+          // When code block is empty
+          await navigator.clipboard.writeText(message);
+        }
+      } else {
+        // For non-code responses, copy the entire message
+        await navigator.clipboard.writeText(message);
+      }
+
+      // await navigator.clipboard.writeText(message);
       notifications.success("Response copied to clipboard.");
       showTickIcon = true;
       await tick();
