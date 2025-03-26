@@ -258,7 +258,7 @@
           </Popover>
         {/if}
       </div>
-      <div class="pt-2"></div>
+      <div class="pt-1"></div>
       <div style="flex:1; overflow:auto;">
         {#if !isLoading}
           <Splitpanes
