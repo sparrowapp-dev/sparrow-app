@@ -129,7 +129,7 @@
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
-  let totalTeamCount = writable(0);
+  let totalTeamCount: number | undefined = 0;
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -523,7 +523,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
-        totalTeamCount.set(value._data?.users?.length);
+        totalTeamCount = value._data?.users?.length;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -612,7 +612,7 @@
   const handleRefreshWorkspace = () => {
     if (!currentWorkspace) return;
     refreshLoad.set(true);
-    if ($totalTeamCount > 1) {
+    if (totalTeamCount > 1) {
       handleRefreshApicalls($currentWorkspace?._id);
     }
   };
@@ -661,7 +661,7 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
-          userCount={$totalTeamCount}
+          userCount={totalTeamCount}
           {refreshWorkspace}
           refreshLoad={$refreshLoad}
           {collectionList}
