@@ -991,4 +991,53 @@ export class TabRepository {
     await RxDB?.getInstance()?.rxdb?.tab?.bulkRemove(_deletabletabIds);
     return;
   };
+
+  /**
+   * Removes multiple tabs from the RxDB database in a single operation.
+   *
+   * This function takes an array of tab IDs and removes all corresponding tab documents
+   * from the RxDB database using a bulk operation.
+   *
+   * @param {string[]} ids - An array of tab IDs to be removed.
+   *
+   * @returns {Promise<void>} - A promise that resolves when the tabs have been successfully removed.
+   */
+  public bulkRemoveTabs = async (ids: string[]): Promise<void> => {
+    if (ids.length === 0) return;
+    await this.rxdb
+      ?.find({
+        selector: {
+          id: { $in: ids },
+        },
+      })
+      .remove();
+
+
+    // Activating the last valid tab from the tabbar
+    const activeWorkspace = await RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          isActiveWorkspace: true,
+        },
+      })
+      .exec();
+    const workspaceId = activeWorkspace.toMutableJSON()._id;
+
+    // Get tabs excluding the ones in 'ids' list
+    const currOpenedTabs = await this.rxdb
+      ?.find({
+        selector: {
+          "path.workspaceId": workspaceId,
+          id: { $nin: ids }, // Exclude tabs that are in the ids array
+        },
+      })
+      .sort({ index: "asc" })
+      .exec();
+
+    // If there are remaining tabs, activate the last one
+    const totalOpenedTabs = currOpenedTabs.length;
+    if (totalOpenedTabs > 0) {
+      await this.activeTab(currOpenedTabs[currOpenedTabs.length - 1].get("id"));
+    }
+  };
 }

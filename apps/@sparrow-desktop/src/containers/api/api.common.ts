@@ -183,50 +183,6 @@ const makeRequest = async (
   }
 };
 
-function timeout(timeout: number) {
-  return new Promise((res, rej) => {
-    setTimeout(() => {
-      rej("Timeout");
-    }, timeout);
-  });
-}
-
-const makeHttpRequest = async (
-  url: string,
-  method: string,
-  headers: string,
-  body: string,
-  request: string,
-) => {
-  console.table({ url, method, headers, body, request });
-  let response;
-  MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-  url = url.trim().replace(/ /g, "%20");
-  body = body.replace(/\[SPARROW_AMPERSAND$/, "");
-  return Promise.race([
-    timeout(apiTimeOut),
-    invoke("make_http_request", {
-      url,
-      method,
-      headers,
-      body,
-      request,
-    }),
-  ])
-    .then(async (data: string) => {
-      try {
-        response = JSON.parse(data);
-        response = JSON.parse(response.body);
-        return success(response);
-      } catch (e) {
-        return error("error");
-      }
-    })
-    .catch(() => {
-      return error("error");
-    });
-};
-
 function formatTime(date) {
   let hours = date.getHours();
   const minutes = date.getMinutes();
@@ -430,7 +386,7 @@ const addSocketDataToMap = (tabId, url) => {
       `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -484,7 +440,6 @@ async function processMessageEvent(tabId, event) {
   // Retrieve tab data and check event inclusion
   const tabData = await tabRepository.getTabByTabId(tabId);
   const tabDataJSON = tabData?.toMutableJSON();
-  console.log(event, "event");
   const socketIOresponse = event.payload;
   const eventName = socketIOresponse.event;
   const message = socketIOresponse.message;
@@ -513,7 +468,6 @@ async function processMessageEvent(tabId, event) {
 function updateSocketDataStore(tabId, data, transmitter, status = "") {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tabId);
-    console.log(wsData.status);
     if (wsData) {
       wsData.messages.unshift({
         data,
@@ -943,7 +897,6 @@ const makeHttpRequestV2 = async (
         },
       };
       appInsights.trackDependencyData(appInsightData);
-      console.log("api response : ", apiResponse);
       return success(apiResponse);
     } catch (e) {
       const responseBody = JSON.parse(data);
@@ -1139,7 +1092,6 @@ export {
   makeRequest,
   getAuthHeaders,
   getRefHeaders,
-  makeHttpRequest,
   getMultipartAuthHeaders,
   makeHttpRequestV2,
   connectWebSocket,

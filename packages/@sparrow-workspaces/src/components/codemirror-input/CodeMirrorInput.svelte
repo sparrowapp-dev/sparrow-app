@@ -137,6 +137,7 @@
     {handleEnvironmentBox}
     {environmentVariables}
     {localEnvKey}
+    {disabled}
     {id}
   />
 {:else if dialogType === "env-found"}

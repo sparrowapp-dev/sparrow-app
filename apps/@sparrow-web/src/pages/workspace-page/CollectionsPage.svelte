@@ -125,9 +125,11 @@
 
   let localEnvironment;
   let globalEnvironment;
+  let hasSetInitialEnvironment = false;
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
+  let totalTeamCount: number | undefined = 0;
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -173,6 +175,26 @@
       mapEnvironmentToWorkspace(environmentsValues, currentWOrkspaceValue?._id);
     }
   }
+
+  ///////////////////////////////////////////////////////
+  // Auto select environment for the first time - st
+  //////////////////////////////////////////////////////
+  $: {
+    // Set the first environment by default from the list if no env. already set.
+    if (!hasSetInitialEnvironment && localEnvironment?.length > 0) {
+      setInitialEnvironment();
+    }
+  }
+
+  // Function to handle default environment selection
+  async function setInitialEnvironment() {
+    if (hasSetInitialEnvironment) return;
+    const currActiveEnv = currentWOrkspaceValue.environmentId;
+    if (!currActiveEnv)
+      await _viewModel2.onSelectEnvironment(localEnvironment[0]);
+    hasSetInitialEnvironment = true;
+  }
+  // Auto select environment for the first time - End
 
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
@@ -442,6 +464,9 @@
   let prevWorkspaceId = "";
   let count = 0;
 
+  let autoRefreshEnable: boolean = true;
+  let refreshLoad: boolean = false;
+
   let isAccessDeniedModalOpen = false;
 
   // Add userValidation state
@@ -449,42 +474,46 @@
     isValid: true,
     checked: false,
   };
+
+  // handle all the refresh api calls
+  const handleRefreshApicalls = async (workspaceId: string) => {
+    try {
+      const [
+        fetchCollectionsResult,
+        refreshEnvironmentResult,
+        refreshTestflowResult,
+      ] = await Promise.all([
+        _viewModel.fetchCollections(workspaceId),
+        _viewModel2.refreshEnvironment(workspaceId),
+        _viewModel3.refreshTestflow(workspaceId),
+      ]);
+
+      const collectionTabsToBeDeleted =
+        fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+      const environmentTabsToBeDeleted =
+        refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+      const testflowTabsToBeDeleted =
+        refreshTestflowResult?.testflowTabsToBeDeleted || [];
+
+      const totalTabsToBeDeleted = [
+        ...collectionTabsToBeDeleted,
+        ...environmentTabsToBeDeleted,
+        ...testflowTabsToBeDeleted,
+      ];
+      _viewModel.deleteTabsWithTabIdInAWorkspace(
+        workspaceId,
+        totalTabsToBeDeleted,
+      );
+      refreshLoad = false;
+    } catch (error) {
+      refreshLoad = false;
+    }
+  };
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        Promise.all([
-          _viewModel.fetchCollections(value?._id),
-          _viewModel2.refreshEnvironment(value?._id),
-          _viewModel3.refreshTestflow(value?._id),
-        ]).then(
-          ([
-            fetchCollectionsResult,
-            refreshEnvironmentResult,
-            refreshTestflowResult,
-            ,
-          ]) => {
-            // Handle the results of each API call here
-
-            const collectionTabsToBeDeleted =
-              fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
-            const environmentTabsToBeDeleted =
-              refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            const testflowTabsToBeDeleted =
-              refreshTestflowResult?.testflowTabsToBeDeleted || [];
-            const totalTabsToBeDeleted: string[] = [
-              ...collectionTabsToBeDeleted,
-              ...environmentTabsToBeDeleted,
-              ...testflowTabsToBeDeleted,
-            ];
-            _viewModel.deleteTabsWithTabIdInAWorkspace(
-              value?._id,
-              totalTabsToBeDeleted,
-            );
-            const userHasAccess = value.users?.some(
-              (user) => user.id === userId,
-            );
-          },
-        );
+        await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -494,6 +523,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
+        totalTeamCount = value._data?.users?.length;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -575,6 +605,42 @@
     });
     totalCollectionCount.set(count);
   });
+
+  let refreshInterval: NodeJS.Timeout | null = null;
+
+  //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
+  const handleRefreshWorkspace = () => {
+    if (!currentWorkspace) return;
+    refreshLoad = true;
+    if (totalTeamCount > 1) {
+      handleRefreshApicalls($currentWorkspace?._id);
+    }
+  };
+
+  // It will autorefresh the handle function of refresh in 2 minutes interval Time.
+  const startAutoRefresh = (): void => {
+    if (!autoRefreshEnable) {
+      return;
+    }
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+    refreshInterval = setInterval(
+      () => {
+        handleRefreshWorkspace();
+      },
+      2 * 60 * 1000,
+    );
+  };
+
+  const refreshWorkspace = (): void => {
+    handleRefreshWorkspace();
+    startAutoRefresh();
+  };
+
+  onMount(() => {
+    startAutoRefresh();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -595,6 +661,9 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          userCount={totalTeamCount}
+          {refreshWorkspace}
+          {refreshLoad}
           {collectionList}
           {currentWorkspace}
           {navigateToGithub}
@@ -721,12 +790,12 @@
                       <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
-                  <!-- {:else if $activeTab?.type === ItemType.GRAPHQL}
+                {:else if $activeTab?.type === ItemType.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
                     </div>
-                  </Motion> -->
+                  </Motion>
                 {:else if !$tabList?.length}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
@@ -905,26 +974,7 @@
 {/if}
 
 <svelte:window on:keydown={handleKeyPress} />
-<!-- <ImportCollection
-    {collectionList}
-    workspaceId={$currentWorkspace._id}
-    closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
-    onItemCreated={async (entityType, args) => {
-      const response = await _viewModel.handleCreateItem(entityType, args);
-      if (response.isSuccessful) {
-        setTimeout(() => {
-          scrollList("bottom");
-        }, 1000);
-      }
-    }}
-    onItemImported={async (entityType, args) => {
-      await _viewModel.handleImportItem(entityType, args);
-      scrollList("bottom");
-    }}
-    onImportDataChange={_viewModel.handleImportDataChange}
-    onUploadFile={_viewModel.uploadFormFile}
-    onExtractGitBranch={_viewModel.extractGitBranch}
-  /> -->
+
 <Modal
   title={"New Collection"}
   type={"dark"}
@@ -936,7 +986,7 @@
   }}
 >
   <ImportCollection
-    onClick={() => {
+    onCloseModal={() => {
       isImportCollectionPopup = false;
     }}
     {collectionList}
@@ -950,7 +1000,7 @@
       }
     }}
     currentWorkspaceId={$currentWorkspace?._id}
-    onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
+    onImportOapiText={async (currentWorkspaceId, importJSON, contentType) => {
       const response = await _viewModel.importJSONObject(
         currentWorkspaceId,
         importJSON,
@@ -963,7 +1013,7 @@
       }
       return response;
     }}
-    onCollectionFileUpload={async (currentWorkspaceId, file, type) => {
+    onImportOapiFile={async (currentWorkspaceId, file, type) => {
       const response = await _viewModel.collectionFileUpload(
         currentWorkspaceId,
         file,
@@ -993,11 +1043,9 @@
       }
       return response;
     }}
-    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
-    onValidateDeployedURL={_viewModel.validateDeployedURL}
-    onValidateDeployedURLInput={_viewModel.validateDeployedURLInput}
-    onValidateLocalHostURLInput={_viewModel.validateLocalHostURLInput}
-    isWebApp={true}
+    onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
+    onValidateOapiText={_viewModel.validateOapiDataSyntax}
+    onValidateOapiFile={_viewModel.validateOapiFileSyntax}
   />
 </Modal>
 

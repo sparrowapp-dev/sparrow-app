@@ -260,7 +260,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 32px; font-size:12px; font-weight:500; line-height:18px;"
+          style="height: 32px; font-size:12px; font-weight:400; line-height:18px;"
         >
           <p class="ellipsis w-100 me-4 mb-0">
             {flow.name}
@@ -384,6 +384,7 @@
       background-color: var(--bg-ds-surface-500) !important;
     }
     .collection-title {
+      color: var(--bg-ds-neutral-200);
       padding: 2px 4px;
       width: calc(100% - 54px);
       text-align: left;

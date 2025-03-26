@@ -13,6 +13,7 @@
   } from "../../../stores/recent-left-panel";
   import {
     AddRegular,
+    ArrowClockWiseRegular,
     ChevronDoubleRightRegular,
     PlusIcon2,
   } from "@sparrow/library/icons";
@@ -131,6 +132,9 @@
   export let onOpenTestflow;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+  export let refreshLoad = false;
+  export let refreshWorkspace: () => void;
+  export let userCount = 0;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -148,6 +152,33 @@
   // export let isExpandCollection = false;
   // export let isExpandEnvironment = false;
   // export let isExpandTestflow = false;
+
+  let isExpandCollectionLine = false;
+  let isExpandEnviromentLine = false;
+  let isExpandTestflowLine = false;
+
+  const handleExpandCollectionLine = () => {
+    isExpandCollectionLine = !isExpandCollectionLine;
+    // console.log(isExpandCollectionLine);
+  };
+  const handleExpandEnviromentLine = () => {
+    isExpandEnviromentLine = !isExpandEnviromentLine;
+  };
+  const handleTestflowLine = () => {
+    isExpandTestflowLine = !isExpandTestflow;
+  };
+
+  // $: {
+  //   if (isExpandCollectionLine) {
+  //     isExpandCollectionLine = false;
+  //   }
+  //   if (isExpandEnviromentLine) {
+  //     isExpandEnviromentLine = false;
+  //   }
+  //   if (isExpandTestflowLine) {
+  //     isExpandTestflowLine = false;
+  //   }
+  // }
 
   let isGithubStarHover = false;
 
@@ -301,6 +332,18 @@
           },
         },
         {
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("graphql", {});
+            MixpanelEvent(Events.Add_GraphQL, {
+              description: "Add GraphQL From + Icon in Left Panel",
+            });
+          },
+        },
+        {
           name: "Add Environment",
           icon: StackIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -450,6 +493,12 @@
       return version;
     }
   };
+
+  let ActiveTab = "";
+
+  const handleTabUpdate = (tabName: string) => {
+    ActiveTab = tabName;
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -503,7 +552,7 @@
     </div>
 
     <div
-      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-1"
+      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-2"
     >
       <Search
         id="collection-list-search"
@@ -518,6 +567,17 @@
         }}
         placeholder={"Search"}
       />
+      {#if userCount > 1}
+        <Tooltip title={"Refresh"} placement={"bottom-center"}>
+          <Button
+            type="secondary"
+            startIcon={refreshLoad ? "" : ArrowClockWiseRegular}
+            size="small"
+            loader={refreshLoad}
+            onClick={refreshWorkspace}
+          />
+        </Tooltip>
+      {/if}
       <div class="d-flex align-items-center justify-content-center d-none">
         <button
           id="filter-btn"
@@ -632,7 +692,7 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
-        style=" overflow:auto; {$isExpandCollection ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandCollection ? 'flex:2;' : ''}"
       >
         <CollectionList
           bind:scrollList
@@ -655,7 +715,11 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
+          {isExpandCollectionLine}
+          {handleExpandCollectionLine}
           {isWebApp}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
@@ -679,7 +743,10 @@
           environments={$environments}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandEnvironment}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
@@ -701,7 +768,12 @@
           currentWorkspace={activeWorkspace}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandTestflow}
+          {isExpandTestflowLine}
+          {handleTestflowLine}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 

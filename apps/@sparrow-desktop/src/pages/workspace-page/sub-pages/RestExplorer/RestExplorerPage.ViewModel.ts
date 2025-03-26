@@ -6,7 +6,8 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation, } from "@sparrow/common/utils";
+import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
   Debounce,
@@ -581,6 +582,7 @@ class RestExplorerViewModel {
         savedRequestTab.updateResponseDate(this.formatDate(new Date()));
         savedRequestTab.updateState({
           responseBodyLanguage: data.response.bodyLanguage,
+          responseBodyFormatter: data.response.bodyFormatter,
         });
         responseCode = data.response.status;
       }
@@ -1321,10 +1323,13 @@ class RestExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
+    
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
-
+    const tabId = componentData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -1405,6 +1410,7 @@ class RestExplorerViewModel {
           data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -1437,11 +1443,13 @@ class RestExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

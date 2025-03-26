@@ -814,9 +814,8 @@ export default class CollectionsViewModel {
    * @param ids :string[] - the ids of tab to be removed
    */
   private removeMultipleTabs = async (ids: string[]) => {
-    ids.forEach((id) => {
-      this.tabRepository.removeTab(id);
-    });
+    if (ids.length === 0) return;
+    await this.tabRepository.bulkRemoveTabs(ids);
   };
 
   /**
@@ -2127,6 +2126,7 @@ export default class CollectionsViewModel {
         const response = {
           data: {
             name: newCollectionName,
+            updatedAt: new Date().toISOString(),
           },
         };
         await this.collectionRepository.updateCollection(
@@ -2202,6 +2202,7 @@ export default class CollectionsViewModel {
           );
         if (res) {
           res.name = newFolderName;
+          res.updatedAt = new Date().toISOString();
         }
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
@@ -2415,6 +2416,7 @@ export default class CollectionsViewModel {
           );
         const storage = request;
         storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
@@ -2434,6 +2436,7 @@ export default class CollectionsViewModel {
         );
         const storage = request;
         storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
         await this.collectionRepository.updateRequestInFolder(
           collection.id,
           folder.id,
@@ -5685,22 +5688,10 @@ export default class CollectionsViewModel {
    * @param url - The localhost URL to validate.
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateLocalHostURL = async (url: string) => {
+  public getOapiJsonFromURL = async (url: string) => {
     const response = await this.collectionService.validateImportCollectionURL(
-      url.replace("localhost", "127.0.0.1"),
+      url
     );
-    return response;
-  };
-
-  /**
-   * Validates a deployed URL by making a GET request.
-   *
-   * @param url - The deployed URL to validate.
-   * @returns  A promise that resolves with the response of the validation request.
-   */
-  public validateDeployedURL = async (url: string) => {
-    const response =
-      await this.collectionService.validateImportCollectionURL(url);
     return response;
   };
 
@@ -5709,10 +5700,19 @@ export default class CollectionsViewModel {
    * @param data - Open API Text Data
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateURLInput = async (data: any) => {
+  public validateOapiDataSyntax = async (data: any) => {
     const response = await this.collectionService.validateImportCollectionInput(
       "",
-      JSON.parse(data?.data?.response),
+      data?.data?.body,
+    );
+    return response;
+  };
+
+  public validateOapiFileSyntax = async (_fileUploadData: any) => {
+    const response = 
+    await this.collectionService.validateImportCollectionFileUpload(
+      "",
+      _fileUploadData,
     );
     return response;
   };

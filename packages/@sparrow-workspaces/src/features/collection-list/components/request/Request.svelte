@@ -150,6 +150,17 @@
     );
   }
 
+  let verticalActiveLine = false;
+
+  $: {
+    if (api.items) {
+      if (api.items.find((item) => item.id === activeTabId)) {
+        verticalActiveLine = true;
+      } else {
+        verticalActiveLine = false;
+      }
+    }
+  }
   $: {
     if ($openedComponent.has(api.id)) {
       expand = true;
@@ -283,33 +294,33 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      expand = !expand;
-      if (expand) {
-        addCollectionItem(api.id, "Request");
-        onItemOpened("request", {
-          workspaceId: collection.workspaceId,
-          collection,
-          folder,
-          request: api,
-        });
-      } else {
-        removeCollectionItem(api.id);
-      }
-    }
-  }}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px; gap:4px;  margin-bottom: 2px;"
+  style={`height:32px; padding-left:3px; gap:4px; {margin-bottom :2px;}`}
 >
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        expand = !expand;
+        if (expand) {
+          addCollectionItem(api.id, "Request");
+          onItemOpened("request", {
+            workspaceId: collection.workspaceId,
+            collection,
+            folder,
+            request: api,
+          });
+        } else {
+          removeCollectionItem(api.id);
+        }
+      }
+    }}
+    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 28px;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -374,7 +385,7 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
+        style={`font-size: 12px; color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
         <p class="ellipsis m-0 p-0">
           {api.name}
@@ -402,7 +413,6 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
-            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />
@@ -411,10 +421,15 @@
   {/if}
 </div>
 <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div class="sub-files position-relative">
+  <div
+    class="sub-files position-relative"
+    style="background-color: {api.id === activeTabId
+      ? 'var(--bg-ds-surface-600)'
+      : 'transparent'};"
+  >
     <div
       class="box-line"
-      style={folder?.id ? "left: 57.6px;" : "left: 45.1px;"}
+      style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
     ></div>
     <!-- {#if } -->
     {#each api?.items || [] as exp}
@@ -442,7 +457,7 @@
   }
   .api-method {
     font-size: 9px;
-    font-weight: 600;
+    font-weight: 500;
     width: 30px !important;
     height: 24px;
     border-radius: 4px;
@@ -456,7 +471,6 @@
     font-weight: 500;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-200);
     display: flex;
     align-items: center;
 
@@ -605,7 +619,7 @@
     top: 0;
     bottom: 0;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    // background-color: var(--bg-ds-surface-100);
     z-index: 150;
   }
 </style>

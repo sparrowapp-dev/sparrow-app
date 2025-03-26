@@ -90,6 +90,23 @@
   export let activeTabType;
   export let isFirstCollectionExpand = false;
 
+  export let ActiveTab;
+  export let handleTabUpdate;
+
+  let isExpandCollectionLine = false;
+  // export let handleExpandCollectionLine;
+
+  $: {
+    if (activeTabType !== "Collection") {
+      handleTabUpdate("");
+    }
+    if (collectionFilter.find((item) => item._data.id === activeTabId)) {
+      isExpandCollectionLine = true;
+    } else {
+      isExpandCollectionLine = false;
+    }
+  }
+
   let collectionListDocument: CollectionDocument[];
 
   let activeWorkspace: WorkspaceDocument;
@@ -101,6 +118,11 @@
   });
 
   let isHovered = false;
+  let collectionActive = false;
+
+  const handleCollection = () => {
+    collectionActive = false;
+  };
 
   let collectionFilter: any = [];
   /**
@@ -218,11 +240,14 @@
   >
     <div
       tabindex="0"
-      class=" collection-container d-flex align-items-center pe-2 border-radius-2"
+      class="collection-container d-flex align-items-center pe-2 border-radius-2"
       style="cursor:pointer; justify-content: space-between; height:32px; margin-bottom:0;"
       on:mouseover={handleMouseOver}
       on:mouseout={handleMouseOut}
-      on:click={toggleExpandCollection}
+      on:click={() => {
+        toggleExpandCollection();
+        handleTabUpdate("collection");
+      }}
     >
       <div
         class=" d-flex align-items-center"
@@ -249,7 +274,7 @@
         >
           <p
             class="sparrow-fs-13 mb-0"
-            style="font-weight: 500; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
+            style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
           >
             Collections
           </p>
@@ -290,9 +315,15 @@
     {#if $isExpandCollection}
       <div
         class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
+        style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {isExpandCollectionLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
         {/if}
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
@@ -414,6 +445,9 @@
     border-radius: 4px;
     border: 2px solid var(--border-ds-primary-300);
   }
+  .collection-container.active {
+    background-color: var(--bg-ds-surface-500);
+  }
   .collection-container:focus-visible .add-icon-container {
     visibility: visible;
   }
@@ -518,12 +552,6 @@
     height: 70vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
-  .searchField {
-  }
-  .filter-btn {
     /* border: 1px solid var(--border-color) !important; */
   }
   .filter-active {
@@ -535,7 +563,7 @@
     bottom: 0;
     left: 13.6px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    /* background-color: var(--bg-ds-surface-100); */
     z-index: 10;
     /* height: 100px; */
   }
