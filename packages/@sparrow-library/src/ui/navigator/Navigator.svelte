@@ -46,7 +46,8 @@
     }
   }
 </script>
-<div>
+
+<div tabindex={allDisableState ? -1 : 0}>
   <!-- Tabs -->
   <div class={"d-flex position-relative gap-1"}
   style={isSegmentedTab ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content" : ""}>
