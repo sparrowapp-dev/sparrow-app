@@ -258,6 +258,15 @@
       inputField.blur();
     }
   };
+
+  let verticalCollectionLine = false;
+  $: {
+    if (collection.items.find((item) => item.id === activeTabId)) {
+      verticalCollectionLine = true;
+    } else {
+      verticalCollectionLine = false;
+    }
+  }
 </script>
 
 <svelte:window
@@ -470,23 +479,10 @@
 <div
   tabindex="0"
   bind:this={collectionTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      visibility = !visibility;
-      if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
-        if (visibility) {
-          addCollectionItem(collection.id, "collection");
-          onItemOpened("collection", {
-            workspaceId: collection.workspaceId,
-            collection,
-          });
-        } else {
-          removeCollectionItem(collection.id);
-        }
-      }
-    }
-  }}
-  style="height:32px; gap:4px;  padding-left:19px; margin-bottom:2px; "
+  style="height:32px; gap:4px;  padding-left:16px; margin-bottom:{collection.id ===
+  activeTabId
+    ? '0px'
+    : '2px'};"
   class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
   activeTabId
     ? 'active-collection-tab'
@@ -497,6 +493,22 @@
     class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        visibility = !visibility;
+        if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+          if (visibility) {
+            addCollectionItem(collection.id, "collection");
+            onItemOpened("collection", {
+              workspaceId: collection.workspaceId,
+              collection,
+            });
+          } else {
+            removeCollectionItem(collection.id);
+          }
+        }
+      }
+    }}
   >
     <Button
       size="extra-small"
@@ -574,7 +586,6 @@
             customWidth={"24px"}
             type="teritiary-regular"
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu2(e);
             }}
             startIcon={AddRegular}
@@ -597,7 +608,6 @@
             type="teritiary-regular"
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu();
             }}
           />
@@ -642,9 +652,17 @@
         ? 'block'
         : 'none'};"
     >
-      <div class=" ps-0 position-relative">
+      <div
+        class=" ps-0 position-relative"
+        style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "2px"};`}
+      >
         {#if collection?.items?.length > 0}
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {verticalCollectionLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
         {/if}
         <div class="">
           {#each collection.items as explorer}
@@ -666,7 +684,11 @@
           {/each}
         </div>
         {#if !collection?.items?.length}
-          <p class="text-fs-10 ps-5 ms-2 my-2 text-secondary-300">
+          <p
+            class="text-fs-10 ps-5 ms-2 my-{collection.id === activeTabId
+              ? '0'
+              : '2'} text-secondary-300"
+          >
             This collection is empty
           </p>
         {/if}
@@ -950,9 +972,9 @@
     position: absolute;
     top: 0;
     bottom: 0%;
-    left: 30.5px;
+    left: 27.5px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+
     z-index: 1;
   }
 

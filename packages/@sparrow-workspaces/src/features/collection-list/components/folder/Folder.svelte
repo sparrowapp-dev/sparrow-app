@@ -41,6 +41,7 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { afterUpdate } from "svelte";
 
   import {
     openedComponent,
@@ -109,6 +110,18 @@
   let socketIoCount: number;
   let requestIds: string[] = [];
   let folderTabWrapper: HTMLElement;
+
+  let verticalFolderLine = false;
+
+  $: {
+    if (explorer.type === "FOLDER") {
+      if (explorer.items.find((item) => item.id === activeTabId)) {
+        verticalFolderLine = true;
+      } else {
+        verticalFolderLine = false;
+      }
+    }
+  }
 
   $: {
     if (searchData) {
@@ -404,24 +417,10 @@
       <div
         tabindex="0"
         bind:this={folderTabWrapper}
-        on:click|preventDefault={() => {
-          if (!isRenaming) {
-            if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-              expand = !expand;
-              if (expand) {
-                addCollectionItem(explorer.id, "Folder");
-                onItemOpened("folder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              } else {
-                removeCollectionItem(explorer.id);
-              }
-            }
-          }
-        }}
-        style="height:32px; padding-left:33px; margin-bottom:2px; "
+        style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
+        activeTabId
+          ? '0px'
+          : '2px'} ; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -432,6 +431,23 @@
           style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
+          on:click|preventDefault={() => {
+            if (!isRenaming) {
+              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+                expand = !expand;
+                if (expand) {
+                  addCollectionItem(explorer.id, "Folder");
+                  onItemOpened("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                } else {
+                  removeCollectionItem(explorer.id);
+                }
+              }
+            }
+          }}
         >
           <span
             on:click|stopPropagation={() => {
@@ -548,9 +564,17 @@
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div class="sub-files position-relative">
+        <div
+          class="sub-files position-relative"
+          style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+        >
           {#if explorer?.items?.length > 0}
-            <div class="box-line"></div>
+            <div
+              class="box-line"
+              style="background-color: {verticalFolderLine
+                ? 'var(--bg-ds-neutral-500)'
+                : 'var(--bg-ds-surface-100)'}"
+            ></div>
           {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
@@ -608,7 +632,7 @@
         </div>
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style="cursor:pointer;">
+      <div style={`cursor: pointer; `}>
         <Request
           {userRole}
           api={explorer}
@@ -794,9 +818,8 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 44.5px;
+    left: 41.2px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
     z-index: 200;
   }
 

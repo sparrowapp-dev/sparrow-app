@@ -256,10 +256,11 @@
         }}
       >
         <SelectIcon
-          classProp={`my-auto`}
+          classProp={`my-auto p-0`}
           width={16}
           height={16}
           selected={currentWorkspace?.environmentId === env.id}
+          selectedColor={"var(--bg-ds-neutral-200)"}
         />
       </button>
       <!-- <RadioButton
@@ -268,7 +269,7 @@
         selected={currentWorkspace?.environmentId === env.id}
         handleChange={() => handleSelectEnvironment()}
         singleSelect={true}
-      /> -->
+        /> -->
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
@@ -312,7 +313,6 @@
               WorkspaceRole.WORKSPACE_VIEWER}
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu(e);
             }}
           />
@@ -396,6 +396,7 @@
       border-radius: 4px;
     }
     .collection-title {
+      color: var(--bg-ds-neutral-200);
       width: calc(100% - 30px);
       text-align: left;
       display: flex;

@@ -153,6 +153,33 @@
   // export let isExpandEnvironment = false;
   // export let isExpandTestflow = false;
 
+  let isExpandCollectionLine = false;
+  let isExpandEnviromentLine = false;
+  let isExpandTestflowLine = false;
+
+  const handleExpandCollectionLine = () => {
+    isExpandCollectionLine = !isExpandCollectionLine;
+    // console.log(isExpandCollectionLine);
+  };
+  const handleExpandEnviromentLine = () => {
+    isExpandEnviromentLine = !isExpandEnviromentLine;
+  };
+  const handleTestflowLine = () => {
+    isExpandTestflowLine = !isExpandTestflow;
+  };
+
+  // $: {
+  //   if (isExpandCollectionLine) {
+  //     isExpandCollectionLine = false;
+  //   }
+  //   if (isExpandEnviromentLine) {
+  //     isExpandEnviromentLine = false;
+  //   }
+  //   if (isExpandTestflowLine) {
+  //     isExpandTestflowLine = false;
+  //   }
+  // }
+
   let isGithubStarHover = false;
 
   let collectionFilter: any = [];
@@ -466,6 +493,12 @@
       return version;
     }
   };
+
+  let ActiveTab = "";
+
+  const handleTabUpdate = (tabName: string) => {
+    ActiveTab = tabName;
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
@@ -659,7 +692,7 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
-        style=" overflow:auto; {$isExpandCollection ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandCollection ? 'flex:2;' : ''}"
       >
         <CollectionList
           bind:scrollList
@@ -682,7 +715,11 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
+          {isExpandCollectionLine}
+          {handleExpandCollectionLine}
           {isWebApp}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
@@ -706,7 +743,10 @@
           environments={$environments}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandEnvironment}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
@@ -728,7 +768,12 @@
           currentWorkspace={activeWorkspace}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandTestflow}
+          {isExpandTestflowLine}
+          {handleTestflowLine}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 

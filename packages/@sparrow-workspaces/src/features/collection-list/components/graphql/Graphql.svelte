@@ -233,16 +233,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("graphql", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        graphql: graphql,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
     ? 'active-request-tab'
@@ -252,7 +242,17 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("graphql", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          graphql: graphql,
+        });
+      }
+    }}
+    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 29px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {graphql.id?.includes(
       UntrackedItems.UNTRACKED,
     )

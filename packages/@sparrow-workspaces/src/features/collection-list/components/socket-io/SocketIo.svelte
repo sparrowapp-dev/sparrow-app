@@ -229,16 +229,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("socket-io", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        socketio: socketIo,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
@@ -248,7 +238,17 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("socket-io", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          socketio: socketIo,
+        });
+      }
+    }}
+    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 29px;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -343,8 +343,7 @@
     font-weight: 400;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
-    // display: flex;
+    color: var(--bg-ds-neutral-200);
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
     padding: 2px 4px;

@@ -70,6 +70,21 @@
   export let toggleExpandEnvironment;
 
   export let activeTabId;
+  export let ActiveTab;
+  export let handleTabUpdate;
+
+  let isExpandEnviromentLine = false;
+  export let activeTabType;
+
+  $: {
+    // console.log(activeTabId);
+
+    if (environments?.find((item) => item._data.id === activeTabId)) {
+      isExpandEnviromentLine = true;
+    } else {
+      isExpandEnviromentLine = false;
+    }
+  }
 
   let scrollList;
   let localEnvironment;
@@ -158,11 +173,14 @@
     style="cursor:pointer; justify-content: space-between; height:32px ;gap:4px;"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={toggleExpandEnvironment}
+    on:click={() => {
+      toggleExpandEnvironment();
+      handleTabUpdate("enviroment");
+    }}
   >
     <div
       class="d-flex align-items-center"
-      style="width: calc(100% - 30px);  padding:2px 4px;"
+      style="width: calc(100% - 30px);  padding:4px 2px;"
     >
       <span style="  display: flex; margin-right:4px; ">
         <Button
@@ -183,7 +201,7 @@
       <span style="padding:2px 4px;">
         <p
           class=" mb-0 sparrow-fs-13"
-          style="font-weight:400; font-size:12px; line-height:18px;"
+          style="font-weight:400; font-size:12px; line-height:18px; color:var(--bg-ds-neutral-50);"
         >
           Environments
         </p>
@@ -217,7 +235,10 @@
 
   {#if $isExpandEnvironment}
     <div
-      style="flex:1; height:32px; "
+      style="flex: 1; height: 32px; background-color: {ActiveTab ===
+      'enviroment'
+        ? 'var(--bg-ds-surface-600)'
+        : 'transparent'};"
       class="overflow-auto"
       bind:this={scrollDiv}
     >
@@ -243,13 +264,20 @@
               <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
             </span>
 
-            <span class="box-line1"></span>
-            <span class="" style="padding: 2px 4px; font-weight: 400;"
+            <span
+              class="box-line1"
+              style="background-color: {isExpandEnviromentLine
+                ? 'var(--bg-ds-neutral-500)'
+                : 'var(--bg-ds-surface-100)'}"
+            ></span>
+            <span
+              class=""
+              style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
               >{globalEnvironment[0]?.name}
             </span>
           </p>
         </div>
-        <hr class="m-0 ms-3 me-1 mt-1 mb-1" />
+        <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>
@@ -280,7 +308,12 @@
       <div class="position-relative">
         {#if filteredLocalEnvironment?.length}
           <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
-          <div class="box-line"></div>
+          <div
+            class="box-line"
+            style="background-color: {isExpandEnviromentLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
           <List
             bind:scrollList
             height={"auto"}
@@ -486,7 +519,7 @@
     bottom: 0;
     left: 14.6px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    // background-color: var(--bg-ds-surface-100);
     z-index: 10;
     /* height: 100px; */
   }
@@ -496,7 +529,7 @@
     bottom: 0;
     left: 14.6px;
     width: 1px;
-    background-color: var(--bg-ds-surface-100);
+    // background-color: var(--bg-ds-surface-100);
     z-index: 10;
     height: 45px;
   }
