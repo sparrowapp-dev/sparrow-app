@@ -168,11 +168,11 @@
     if (searchData) {
       expand = true;
     }
-    if (activeTabPath) {
-      if (activeTabPath.requestId === api.id) {
-        expand = true;
-      }
-    }
+    // if (activeTabPath) {
+    //   if (activeTabPath.requestId === api.id) {
+    //     expand = true;
+    //   }
+    // }
   }
 </script>
 
@@ -308,7 +308,6 @@
       if (!isRenaming) {
         expand = !expand;
         if (expand) {
-          console.log(expand);
           addCollectionItem(api.id, "Request");
           onItemOpened("request", {
             workspaceId: collection.workspaceId,
