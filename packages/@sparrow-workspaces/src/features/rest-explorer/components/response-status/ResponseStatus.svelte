@@ -33,7 +33,7 @@
       <div class="d-flex align-items-center gap-3">
         <Tooltip
           title="HTTP Status - {response.status}"
-          placement={"top-center"}
+          placement={"bottom-center"}
           zIndex={500}
         >
           <span
@@ -60,8 +60,8 @@
           </span>
         </Tooltip>
         <Tooltip
-          title="Response Time"
-          placement={"top-center"}
+          title="Time"
+          placement={"bottom-center"}
           zIndex={500}
         >
           <span
@@ -96,8 +96,8 @@
           </span>
         </Tooltip>
         <Tooltip
-          title="Response Size"
-          placement={"top-center"}
+          title="Size"
+          placement={"bottom-center"}
           zIndex={500}
         >
           <span

@@ -199,7 +199,6 @@
     border-radius: 4px;
   }
   .select-environment-popup .left-panel {
-    height: 100%;
     max-height: 324px;
     overflow-y: auto;
   }
