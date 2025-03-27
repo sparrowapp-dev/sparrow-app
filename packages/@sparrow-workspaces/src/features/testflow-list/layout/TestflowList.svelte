@@ -27,7 +27,6 @@
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
   import { isExpandTestflow } from "../../../stores/recent-left-panel";
-  import { moveNavigation } from "@sparrow/common/utils";
 
   /**
    * current workspace
