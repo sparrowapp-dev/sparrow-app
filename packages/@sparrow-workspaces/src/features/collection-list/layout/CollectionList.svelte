@@ -100,7 +100,7 @@
     if (activeTabType !== "Collection") {
       handleTabUpdate("");
     }
-    if (collectionFilter.find((item) => item._data.id === activeTabId)) {
+    if (collectionFilter.find((item) => item?._data?.id === activeTabId)) {
       isExpandCollectionLine = true;
     } else {
       isExpandCollectionLine = false;
