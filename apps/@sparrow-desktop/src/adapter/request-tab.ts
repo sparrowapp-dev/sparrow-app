@@ -177,12 +177,6 @@ export class RequestTabAdapter {
     const body = request?.request?.body;
     if (body) {
       const textData = body.formdata.text
-        .filter((text: FormData) => {
-          if (text.key || text.value) {
-            return true;
-          }
-          return false;
-        })
         .map((text: FormData) => {
           return {
             key: text.key,
@@ -192,14 +186,7 @@ export class RequestTabAdapter {
             base: "",
           };
         });
-      const fileData = body.formdata.file
-        .filter((file: FormData) => {
-          if (file.key || file.value) {
-            return true;
-          }
-          return false;
-        })
-        .map((file: FormData) => {
+      const fileData = body.formdata.file.map((file: FormData) => {
           return {
             key: file.key,
             value: file.value,
@@ -209,15 +196,8 @@ export class RequestTabAdapter {
           };
         });
       const formdata = [
-        ...textData,
         ...fileData,
-        {
-          key: "",
-          value: "",
-          checked: false,
-          type: "text",
-          base: "",
-        },
+        ...textData
       ];
       request.request.body.formdata = formdata;
       adaptedRequest.updateBody(request.request?.body);
