@@ -133,7 +133,6 @@
       isExpandEnvironment.update((value) => !value);
     }
     await onCreateEnvironment(localEnvironment);
-    moveNavigation("right");
     setTimeout(() => {
       scrollToBottom();
     }, 1000);

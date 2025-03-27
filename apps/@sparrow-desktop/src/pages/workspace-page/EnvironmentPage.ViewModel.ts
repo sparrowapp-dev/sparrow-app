@@ -11,7 +11,7 @@ import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
 
-import { createDeepCopy } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 export class EnvironmentViewModel {
@@ -191,6 +191,8 @@ export class EnvironmentViewModel {
         workspaceId: currentWorkspace._id,
         id: res._id,
       });
+      // scroll the top tab bar to right 
+      moveNavigation("right")
       notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
