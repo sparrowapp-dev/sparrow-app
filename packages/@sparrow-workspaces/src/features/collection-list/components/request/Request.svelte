@@ -305,6 +305,10 @@
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
+      if (api?.items && api?.items?.length > 0) {
+      } else {
+        expand = false;
+      }
       if (!isRenaming) {
         expand = !expand;
         if (expand) {
