@@ -279,7 +279,7 @@
                 <span class="my-auto">{openTeam?.users.length} Members</span>
               </p>
             {/if}
-            {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
+            {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER || isGuestUser}
               <Button
                 title={`Invite`}
                 type={"secondary"}
@@ -303,24 +303,6 @@
                 }}
                 loader={isWorkspaceCreationInProgress}
                 disable={isGuestUser || isWorkspaceCreationInProgress}
-              />
-            {:else}
-              <Button
-                title="Invite"
-                type="secondary"
-                textStyleProp="font-size: var(--small-text)"
-                buttonClassProp="my-auto px-3 pt-1 m-2"
-                buttonStyleProp="height: 30px; opacity: 0.5; cursor: not-allowed;"
-                disable={true}
-              />
-              <Button
-                title="New Workspace"
-                type="primary"
-                loaderSize={17}
-                textStyleProp="font-size: var(--small-text)"
-                buttonClassProp="my-auto ms-1"
-                buttonStyleProp="height: 30px; opacity: 0.5; cursor: not-allowed;"
-                disable={true}
               />
             {/if}
           </div>
