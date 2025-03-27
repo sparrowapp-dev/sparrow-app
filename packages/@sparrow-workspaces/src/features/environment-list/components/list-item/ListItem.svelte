@@ -249,18 +249,21 @@
       }}
     >
       <button
+        tabindex="-1"
         class="border-0 bg-transparent"
-        style="width: 30px !important; height:24px; display:flex; align-items:center; justify-content:end; padding:4px; "
+        style="width: 30px !important; height:24px; display:flex; align-items:center; justify-content:end; "
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
       >
-        <SelectIcon
-          classProp={`my-auto p-0`}
-          width={16}
-          height={16}
-          selected={currentWorkspace?.environmentId === env.id}
-          selectedColor={"var(--bg-ds-neutral-200)"}
+        <RadioButton
+          name={"radio"}
+          buttonSize="small"
+          group={currentWorkspace?.environmentId}
+          value={env.id}
+          id={env.id}
+          handleChange={() => handleSelectEnvironment()}
+          singleSelect={true}
         />
       </button>
       <!-- <RadioButton

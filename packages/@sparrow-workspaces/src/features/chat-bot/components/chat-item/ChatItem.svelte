@@ -165,9 +165,7 @@
    * @returns A promise that resolves when the listeners are embedded.
    */
   const embedListenerToCopyCode = async () => {
-    const cleanedMessage = removeTopLevelCodeBlockWrapper(message); // "```sh\n" + message + "\n```"
-    // console.log("chat message : ", cleanedMessage);
-    // extractedMessage = decodeMessage(await marked(cleanedMessage));
+    const cleanedMessage = removeTopLevelCodeBlockWrapper(message);
     console.log("cleaned :>> ", cleanedMessage);
 
     extractedMessage = decodeMessage(await marked(cleanedMessage));
@@ -222,19 +220,6 @@
   };
 
   /**
-   * Checks if the message contains any nested code blocks wrapped in a top-level code block.
-   *
-   * @param message - The message to check.
-   * @returns True if the message contains nested code blocks in a top-level block.
-   */
-  const hasTopLevelCodeBlockWrapper = (message: string): boolean => {
-    // Check for a pattern where a code block contains other code blocks
-    // This matches any language, not just markdown
-    const nestedBlockRegex = /^\s*```(\w+)?\s*\n([\s\S]*?```[\s\S]*?```)/;
-    return nestedBlockRegex.test(message);
-  };
-
-  /**
    * Removes only the top-level code block wrapper while preserving all content inside,
    * including any nested code blocks with their formatting intact.
    *
@@ -245,32 +230,24 @@
     console.log("received msg :>> ", message);
 
     // Handle the simple case of a markdown wrapper first
-    // if (isWrappedInMarkdownBlock(message)) {
-    //   // Extract just the content between the markdown wrapper
-    //   const markdownBlockRegex = /^\s*```markdown\s*\n([\s\S]*?)```\s*$/;
-    //   const match = markdownBlockRegex.exec(message);
-    //   if (match && match[1]) {
-    //     return match[1];
-    //   }
-    // }
+    if (isWrappedInMarkdownBlock(message)) {
+      // Extract just the content between the markdown wrapper
+      const markdownBlockRegex = /^\s*```markdown\s*\n([\s\S]*?)```\s*$/;
+      const match = markdownBlockRegex.exec(message);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
 
     // Handle unclosed markdown code block
-    // const unclosedMarkdownStart = /^\s*```markdown\s*\n/;
-    // if (unclosedMarkdownStart.test(message)) {
-    //   // Remove just the opening markdown identifier
-    //   return message.replace(unclosedMarkdownStart, "");
-    // }
-
-    // Handle unclosed code block with any language identifier
-    const unclosedCodeStart = /^\s*```(\w+)?\s*\n/;
-    if (unclosedCodeStart.test(message) && !message.trim().endsWith("```")) {
-      // If a message starts with code block marker but doesn't end with one,
-      // add closing backticks rather than removing opening ones
-      return message + "\n```";
+    const unclosedMarkdownStart = /^\s*```markdown\s*\n/;
+    if (unclosedMarkdownStart.test(message)) {
+      // Remove just the opening markdown identifier
+      return message.replace(unclosedMarkdownStart, "");
     }
 
     // Handle any generic top-level code block wrapper
-    if (hasTopLevelCodeBlockWrapper(message)) {
+    if (isWrappedInMarkdownBlock(message)) {
       // This is a more complex case - extract content while preserving nested blocks
       const topLevelBlockRegex = /^\s*```(\w+)?\s*\n([\s\S]*?)```\s*$/;
       const match = topLevelBlockRegex.exec(message);

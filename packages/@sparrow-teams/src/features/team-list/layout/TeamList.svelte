@@ -97,7 +97,7 @@
             <p class="mb-0 new-invite text-labelColor w-50 ellipsis">
               NEW INVITE
             </p>
-          {:else}
+          {:else if team?._data?.users?.length > 1}
             <Button
               size="extra-small"
               customWidth="24px"

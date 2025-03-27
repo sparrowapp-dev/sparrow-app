@@ -418,7 +418,7 @@
     flex-wrap: wrap;
     background-color: var(--bg-ds-surface-400);
     border: 1px solid;
-    padding: 4px 8px;
+    padding: 3px 8px;
     border: 1px solid var(--border-color);
     max-height: 100px;
     overflow-y: auto;
