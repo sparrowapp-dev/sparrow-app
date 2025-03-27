@@ -118,7 +118,6 @@
       isExpandTestflow.update((value) => !value);
     }
     await onCreateTestflow();
-    moveNavigation("right")
     setTimeout(() => {
       scrollToBottom();
     }, 1000);
