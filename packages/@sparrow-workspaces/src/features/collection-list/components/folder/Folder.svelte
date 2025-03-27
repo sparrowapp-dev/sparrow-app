@@ -449,12 +449,7 @@
             }
           }}
         >
-          <span
-            on:click|stopPropagation={() => {
-              expand = !expand;
-            }}
-            style="  display: flex; margin-right:4px; "
-          >
+          <span on:click={() => {}} style="  display: flex; margin-right:4px; ">
             <Button
               startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
               size="extra-small"

@@ -308,6 +308,7 @@
       if (!isRenaming) {
         expand = !expand;
         if (expand) {
+          console.log(expand);
           addCollectionItem(api.id, "Request");
           onItemOpened("request", {
             workspaceId: collection.workspaceId,
@@ -338,12 +339,7 @@
       <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
     {/if} -->
 
-    <span
-      on:click|stopPropagation={() => {
-        expand = !expand;
-      }}
-      style="  display: flex; margin-right:4px; "
-    >
+    <span style="  display: flex; margin-right:4px; ">
       {#if api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
