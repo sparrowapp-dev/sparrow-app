@@ -138,76 +138,12 @@
   };
 
   /**
-   * Checks if a message contains any markdown code blocks.
-   *
-   * @param message - The message to check for code blocks.
-   * @returns True if the message contains at least one code block, false otherwise.
-   */
-  const hasCodeBlocks = (message: string): boolean => {
-    const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
-    // Test if message contains code blocks and reset regex state
-    const result = codeBlockRegex.test(message);
-    codeBlockRegex.lastIndex = 0; // Reset regex state
-    return result;
-  };
-
-  /**
-   * Cleans message by removing markdown code block syntax (backticks and language identifiers)
-   * while preserving the actual code content and surrounding text.
-   *
-   * @param message - The original message containing code blocks.
-   * @returns A cleaned message with code block syntax removed.
-   */
-  const cleanMessageCodeBlocks = (message: string): string => {
-    const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
-    let match;
-    let lastIndex = 0;
-    let parts = [];
-
-    // Iterate through all matches and build the message piece by piece
-    while ((match = codeBlockRegex.exec(message)) !== null) {
-      // Add text before the code block
-      parts.push(message.substring(lastIndex, match.index));
-
-      // Add the cleaned code block (just the code without backticks and language)
-      if (match[2]) {
-        const code = match[2].trim();
-        if (code) {
-          parts.push(code);
-        }
-      }
-
-      // Update lastIndex to continue after this code block
-      lastIndex = match.index + match[0].length;
-    }
-
-    // Add any remaining text after the last code block
-    if (lastIndex < message.length) {
-      parts.push(message.substring(lastIndex));
-    }
-
-    // Join all parts to create the cleaned message
-    return parts.join("");
-  };
-
-  /**
    * Handles the response copy to clipboard functionality.
    */
   const handleCopyResponse = async () => {
     try {
-      console.log("message :>> ", message);
-      if (hasCodeBlocks(message)) {
-        // Clean message by removing code block syntax but preserving content
-        const cleanedMessage = cleanMessageCodeBlocks(message);
-
-        // Copy the cleaned message to clipboard
-        await navigator.clipboard.writeText(cleanedMessage);
-      } else {
-        // For non-code responses, copy the entire message as is
-        await navigator.clipboard.writeText(message);
-      }
-
-      // await navigator.clipboard.writeText(message);
+      // console.log("message :>> ", message);
+      await navigator.clipboard.writeText(message);
       notifications.success("Response copied to clipboard.");
       showTickIcon = true;
       await tick();
@@ -229,7 +165,13 @@
    * @returns A promise that resolves when the listeners are embedded.
    */
   const embedListenerToCopyCode = async () => {
-    extractedMessage = decodeMessage(await marked(message));
+    console.log("received msg :>> ", message);
+    const cleanedMessage = removeTopLevelCodeBlockWrapper(message); // "```sh\n" + message + "\n```"
+    // console.log("chat message : ", cleanedMessage);
+    // extractedMessage = decodeMessage(await marked(cleanedMessage));
+    console.log("cleaned :>> ", cleanedMessage);
+
+    extractedMessage = decodeMessage(await marked(cleanedMessage));
     // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
@@ -267,6 +209,63 @@
       cleanUpListeners();
     }
   });
+
+  /**
+   * Checks if the message is wrapped in a top-level markdown code block.
+   *
+   * @param message - The message to check.
+   * @returns True if the message is wrapped in a top-level markdown code block.
+   */
+  const isWrappedInMarkdownBlock = (message: string): boolean => {
+    // Check if message starts with ```markdown and ends with ```
+    const markdownBlockRegex = /^\s*```markdown\s*\n([\s\S]*?)```\s*$/;
+    return markdownBlockRegex.test(message);
+  };
+
+  /**
+   * Checks if the message contains any nested code blocks wrapped in a top-level code block.
+   *
+   * @param message - The message to check.
+   * @returns True if the message contains nested code blocks in a top-level block.
+   */
+  const hasTopLevelCodeBlockWrapper = (message: string): boolean => {
+    // Check for a pattern where a code block contains other code blocks
+    // This matches any language, not just markdown
+    const nestedBlockRegex = /^\s*```(\w+)?\s*\n([\s\S]*?```[\s\S]*?```)/;
+    return nestedBlockRegex.test(message);
+  };
+
+  /**
+   * Removes only the top-level code block wrapper while preserving all content inside,
+   * including any nested code blocks with their formatting intact.
+   *
+   * @param message - The message that might be wrapped in a top-level code block.
+   * @returns The message with only the outermost code block wrapper removed.
+   */
+  const removeTopLevelCodeBlockWrapper = (message: string): string => {
+    // Handle the simple case of a markdown wrapper first
+    // if (isWrappedInMarkdownBlock(message)) {
+    //   // Extract just the content between the markdown wrapper
+    //   const markdownBlockRegex = /^\s*```markdown\s*\n([\s\S]*?)```\s*$/;
+    //   const match = markdownBlockRegex.exec(message);
+    //   if (match && match[1]) {
+    //     return match[1];
+    //   }
+    // }
+
+    // Handle any generic top-level code block wrapper
+    if (hasTopLevelCodeBlockWrapper(message)) {
+      // This is a more complex case - extract content while preserving nested blocks
+      const topLevelBlockRegex = /^\s*```(\w+)?\s*\n([\s\S]*?)```\s*$/;
+      const match = topLevelBlockRegex.exec(message);
+      if (match && match[2]) {
+        return match[2];
+      }
+    }
+
+    // If no top-level wrapper was found, return the original message
+    return message;
+  };
 </script>
 
 <div class="message-wrapper">
