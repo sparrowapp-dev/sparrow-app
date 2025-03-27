@@ -320,7 +320,9 @@
         }
       }
     }}
-    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 28px;"}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100% "
+      : "padding-left: 28px; height:100%;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )

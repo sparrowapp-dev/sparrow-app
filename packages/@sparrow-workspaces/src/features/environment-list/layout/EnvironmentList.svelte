@@ -291,7 +291,7 @@
           <Button
             title="Add Environment"
             startIcon={AddRegular}
-            type="outline-secondary"
+            type="secondary"
             size="small"
             customWidth="100%"
             disabled={loggedUserRoleInWorkspace ===
