@@ -4,6 +4,7 @@
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
+  import { Button } from "../button";
 
   export let isOpen = false;
   export let title: string;
@@ -24,6 +25,7 @@
     if (event.key === "Tab") {
       event.preventDefault();
     } else if (event.key === "Escape" && canClose) {
+      event.preventDefault();
       handleModalState(false);
     }
   };
@@ -82,13 +84,14 @@
           </div>
         </div>
         {#if canClose}
-          <button
-            class="sparrow-modal-close-icon-btn border-0 d-flex justify-content-center align-items-center"
-            style="height: 30px; width:30px; "
-            on:click={handleModalState(false)}
-          >
-            <DismissRegular size={"20px"} color="var(--bg-ds-neutral-100)" />
-          </button>
+          <Button
+            size="extra-small"
+            startIcon={DismissRegular}
+            type="teritiary-regular"
+            onClick={() => {
+              handleModalState(false);
+            }}
+          />
         {/if}
       </div>
 

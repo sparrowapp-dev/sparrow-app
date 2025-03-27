@@ -45,6 +45,7 @@
   export let userRole;
   export let isWebApp = false;
   export let onFetchParentRequest;
+  export let onUpdateResponseState;
 
   let parentRequest: {
     name: string;
@@ -225,6 +226,7 @@
                             body={$tab.property.savedRequest?.responseBody}
                             apiState={$tab.property.savedRequest?.state}
                             {onUpdateRequestState}
+                            {onUpdateResponseState}
                             {onClearResponse}
                             {isWebApp}
                           />

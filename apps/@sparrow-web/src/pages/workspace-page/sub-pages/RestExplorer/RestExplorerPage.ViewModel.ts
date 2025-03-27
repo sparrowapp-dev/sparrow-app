@@ -587,6 +587,7 @@ class RestExplorerViewModel {
         savedRequestTab.updateResponseDate(this.formatDate(new Date()));
         savedRequestTab.updateState({
           responseBodyLanguage: data.response.bodyLanguage,
+          responseBodyFormatter: data?.response?.bodyFormatter,
         });
         responseCode = data.response.status;
       }

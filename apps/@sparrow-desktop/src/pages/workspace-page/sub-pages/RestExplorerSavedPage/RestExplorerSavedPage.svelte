@@ -7,7 +7,7 @@
   import { RestExplorerSaved } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
   import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
   import constants from "../../../../constants/constants";
@@ -16,6 +16,7 @@
   let isLoginBannerActive = false;
   const _viewModel = new RestExplorerSavedViewModel(tab);
   const environments = _viewModel.environments;
+  const activeWorkspace = _viewModel.activeWorkspace;
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
@@ -63,9 +64,21 @@
     }
   }
 
-  let environmentVariables = [];
+  let environmentVariables;
   let environmentId: string;
   let currentWorkspaceId = "";
+  let currentWorkspace;
+
+  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
+    async (value: WorkspaceDocument) => {
+      const activeWorkspaceRxDoc = value;
+      if (activeWorkspaceRxDoc) {
+        currentWorkspace = activeWorkspaceRxDoc;
+        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+        environmentId = activeWorkspaceRxDoc.get("environmentId");
+      }
+    },
+  );
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -122,6 +135,10 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+  });
+
+  onDestroy(() => {
+    activeWorkspaceSubscriber.unsubscribe();
   });
 
   let restExplorerData: restExplorerData | undefined;
