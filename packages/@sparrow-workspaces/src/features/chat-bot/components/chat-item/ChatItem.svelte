@@ -165,7 +165,6 @@
    * @returns A promise that resolves when the listeners are embedded.
    */
   const embedListenerToCopyCode = async () => {
-    console.log("received msg :>> ", message);
     const cleanedMessage = removeTopLevelCodeBlockWrapper(message); // "```sh\n" + message + "\n```"
     // console.log("chat message : ", cleanedMessage);
     // extractedMessage = decodeMessage(await marked(cleanedMessage));
@@ -243,6 +242,8 @@
    * @returns The message with only the outermost code block wrapper removed.
    */
   const removeTopLevelCodeBlockWrapper = (message: string): string => {
+    console.log("received msg :>> ", message);
+
     // Handle the simple case of a markdown wrapper first
     // if (isWrappedInMarkdownBlock(message)) {
     //   // Extract just the content between the markdown wrapper
@@ -252,6 +253,21 @@
     //     return match[1];
     //   }
     // }
+
+    // Handle unclosed markdown code block
+    // const unclosedMarkdownStart = /^\s*```markdown\s*\n/;
+    // if (unclosedMarkdownStart.test(message)) {
+    //   // Remove just the opening markdown identifier
+    //   return message.replace(unclosedMarkdownStart, "");
+    // }
+
+    // Handle unclosed code block with any language identifier
+    const unclosedCodeStart = /^\s*```(\w+)?\s*\n/;
+    if (unclosedCodeStart.test(message) && !message.trim().endsWith("```")) {
+      // If a message starts with code block marker but doesn't end with one,
+      // add closing backticks rather than removing opening ones
+      return message + "\n```";
+    }
 
     // Handle any generic top-level code block wrapper
     if (hasTopLevelCodeBlockWrapper(message)) {
