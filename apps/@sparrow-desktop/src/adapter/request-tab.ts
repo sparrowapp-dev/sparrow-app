@@ -186,7 +186,8 @@ export class RequestTabAdapter {
             base: "",
           };
         });
-      const fileData = body.formdata.file.map((file: FormData) => {
+      const fileData = body.formdata.file
+        .map((file: FormData) => {
           return {
             key: file.key,
             value: file.value,
