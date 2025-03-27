@@ -841,10 +841,12 @@ export default class CollectionsViewModel {
     workspaceId: string,
     entityType: "request" | "collection" | "folder",
   ): Promise<void> {
+    const tabsIdsToDelete = [];
     let childTabs = [];
 
     // Remove the main tab
-    await this.tabRepository.removeTab(mainEntityId);
+    const mainTabId = (await this.tabRepository.getTabById(mainEntityId)).tabId;
+    tabsIdsToDelete.push(mainTabId);
 
     // Get child tabs based on entity type
     if (entityType === "request") {
@@ -857,9 +859,10 @@ export default class CollectionsViewModel {
 
     // Delete all child tabs if any exist
     if (childTabs.length > 0) {
-      const tabIdsToDelete = childTabs.map((tab) => tab.tabId);
-      await this.removeMultipleTabs(tabIdsToDelete, workspaceId);
+      const allChildTabs = childTabs.map((tab) => tab.tabId);
+      tabsIdsToDelete.push(...allChildTabs);
     }
+    await this.removeMultipleTabs(tabsIdsToDelete, workspaceId);
   }
 
   /**
@@ -5768,11 +5771,8 @@ export default class CollectionsViewModel {
    */
   public getOapiJsonFromURL = async (url: string) => {
     let agent = WorkspaceUserAgentBaseEnum.CLOUD_AGENT;
-    if (
-      url.includes("://127.0.0.1") ||
-      url.includes("://localhost")
-    ) {
-      agent = WorkspaceUserAgentBaseEnum.BROWSER_AGENT
+    if (url.includes("://127.0.0.1") || url.includes("://localhost")) {
+      agent = WorkspaceUserAgentBaseEnum.BROWSER_AGENT;
     }
     const headers = [
       { key: "Accept-Encoding", value: "gzip, br", checked: true },
@@ -5810,11 +5810,11 @@ export default class CollectionsViewModel {
   };
 
   public validateOapiFileSyntax = async (_fileUploadData: any) => {
-    const response = 
-    await this.collectionService.validateImportCollectionFileUpload(
-      "",
-      _fileUploadData,
-    );
+    const response =
+      await this.collectionService.validateImportCollectionFileUpload(
+        "",
+        _fileUploadData,
+      );
     return response;
   };
 

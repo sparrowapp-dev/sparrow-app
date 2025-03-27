@@ -832,10 +832,12 @@ export default class CollectionsViewModel {
     workspaceId: string,
     entityType: "request" | "collection" | "folder",
   ): Promise<void> {
+    const tabsIdsToDelete = [];
     let childTabs = [];
 
     // Remove the main tab
-    await this.tabRepository.removeTab(mainEntityId);
+    const mainTabId = (await this.tabRepository.getTabById(mainEntityId)).tabId;
+    tabsIdsToDelete.push(mainTabId);
 
     // Get child tabs based on entity type
     if (entityType === "request") {
@@ -848,9 +850,10 @@ export default class CollectionsViewModel {
 
     // Delete all child tabs if any exist
     if (childTabs.length > 0) {
-      const tabIdsToDelete = childTabs.map((tab) => tab.tabId);
-      await this.removeMultipleTabs(tabIdsToDelete, workspaceId);
+      const allChildTabs = childTabs.map((tab) => tab.tabId);
+      tabsIdsToDelete.push(...allChildTabs);
     }
+    await this.removeMultipleTabs(tabsIdsToDelete, workspaceId);
   }
 
   /**
