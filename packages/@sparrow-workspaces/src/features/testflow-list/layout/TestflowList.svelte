@@ -242,7 +242,7 @@
             <Button
               title={`Add ${TFDefaultEnum.NAME}`}
               size={"small"}
-              type="outline-secondary"
+              type="secondary"
               customWidth={"100%"}
               startIcon={AddRegular}
               disabled={loggedUserRoleInWorkspace ===
