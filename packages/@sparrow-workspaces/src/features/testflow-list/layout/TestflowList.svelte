@@ -27,6 +27,7 @@
   import { defaultCurrentStep, isDefaultTourGuideOpen } from "../../../stores";
 
   import { isExpandTestflow } from "../../../stores/recent-left-panel";
+  import { moveNavigation } from "@sparrow/common/utils";
 
   /**
    * current workspace
@@ -117,6 +118,7 @@
       isExpandTestflow.update((value) => !value);
     }
     await onCreateTestflow();
+    moveNavigation("right")
     setTimeout(() => {
       scrollToBottom();
     }, 1000);

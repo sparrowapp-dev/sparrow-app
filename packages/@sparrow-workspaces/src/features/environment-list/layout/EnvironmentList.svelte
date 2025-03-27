@@ -15,7 +15,7 @@
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
   } from "@sparrow/common/constants/permissions.constant";
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
+  import { hasWorkpaceLevelPermission, moveNavigation } from "@sparrow/common/utils";
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
@@ -133,6 +133,7 @@
       isExpandEnvironment.update((value) => !value);
     }
     await onCreateEnvironment(localEnvironment);
+    moveNavigation("right");
     setTimeout(() => {
       scrollToBottom();
     }, 1000);
