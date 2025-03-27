@@ -218,7 +218,6 @@ export class EnvironmentViewModel {
       .setVariable(environment?.variable);
     initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
-    notifications.warning("iheelo");
   };
 
   /**
