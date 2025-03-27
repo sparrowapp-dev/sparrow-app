@@ -288,7 +288,7 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; font-weight:400;"
+        style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-200);"
       >
         <p class=" ellipsis m-0 p-0">{graphql.name}</p>
       </div>
