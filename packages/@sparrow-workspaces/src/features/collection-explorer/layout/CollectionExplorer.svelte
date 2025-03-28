@@ -163,111 +163,64 @@
       showAddItemMenu = false;
     }
   };
-  const addButtonData = isWebApp
-    ? [
-        {
-          onclick: () => {
-            onItemCreated("folder", {
-              collection: collection,
-            });
-          },
-          name: "Add Folder",
-          icon: FolderAddRegular,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-        {
-          onclick: () => {
-            onItemCreated("requestCollection", {
-              collection: collection,
-            });
-          },
-          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-          icon: ArrowSwapRegular,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-        {
-          onclick: () => {
-            onItemCreated("socketioCollection", {
-              collection: collection,
-            });
-          },
-          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-          icon: SocketIoIcon,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-        {
-          onclick: () => {
-            onItemCreated("websocketCollection", {
-              collection: collection,
-            });
-          },
-          name: "Add WebSocket",
-          icon: SocketIcon,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-      ]
-    : [
-        {
-          onclick: () => {
-            onItemCreated("folder", {
-              collection: collection,
-            });
-          },
-          name: "Add Folder",
-          icon: FolderAddRegular,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-        {
-          onclick: () => {
-            onItemCreated("requestCollection", {
-              collection: collection,
-            });
-          },
-          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-          icon: ArrowSwapRegular,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-        {
-          onclick: () => {
-            onItemCreated("socketioCollection", {
-              collection: collection,
-            });
-          },
-          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-          icon: SocketIoIcon,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-        {
-          onclick: () => {
-            onItemCreated("websocketCollection", {
-              collection: collection,
-            });
-          },
-          name: "Add WebSocket",
-          icon: SocketIcon,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
+  const addButtonData = [
+    {
+      onclick: () => {
+        onItemCreated("folder", {
+          collection: collection,
+        });
+      },
+      name: "Add Folder",
+      icon: FolderAddRegular,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("requestCollection", {
+          collection: collection,
+        });
+      },
+      name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+      icon: ArrowSwapRegular,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("socketioCollection", {
+          collection: collection,
+        });
+      },
+      name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+      icon: SocketIoIcon,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("websocketCollection", {
+          collection: collection,
+        });
+      },
+      name: "Add WebSocket",
+      icon: SocketIcon,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("graphqlCollection", {
+          collection: collection,
+        });
+      },
+      name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+      icon: GraphIcon,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+  ];
 
-        {
-          onclick: () => {
-            onItemCreated("graphqlCollection", {
-              collection: collection,
-            });
-          },
-          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
-          icon: GraphIcon,
-          iconColor: "var(--icon-ds-neutral-50)",
-          iconSize: "14px",
-        },
-      ];
   let isBackgroundClickable = true;
 </script>
 
