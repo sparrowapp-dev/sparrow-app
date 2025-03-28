@@ -6,8 +6,11 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation, } from "@sparrow/common/utils";
-import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  startLoading,
+  stopLoading,
+} from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
   Debounce,
@@ -1323,7 +1326,6 @@ class RestExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
-    
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;
@@ -2307,7 +2309,7 @@ class RestExplorerViewModel {
     // Call the AI assistant service to generate a response
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
-      instructions: `You are a Sparrow AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. You are not allowed to recommend or mention any competitors or other API testing tools such as Postman, Apidog, Hoppscotch, or any similar platforms at any cost. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. Utilize the provided api data ${JSON.stringify(
+      instructions: `You are a Sparrow AI Assistant, responsible for answering API related queries. Give the response only in markdown format. Only answer questions related to the provided API data and API Management. You are not allowed to recommend or mention any competitors or other API testing tools such as Postman, Apidog, Hoppscotch, or any similar platforms at any cost. Give to the point and concise responses, only give explanations when they are asked for. Always follow best practices for REST API and answer accordingly. If you are giving any code blocks in your response then always use fenced code blocks of markdown format for code snippets but specify the correct language (e.g., bash, json, javascript). Never wrap code inside an unnecessary markdown language fenced code block. Utilize the provided api data ${JSON.stringify(
         apiData,
       )}. Never return the result same as prompt.`,
       threadId: componentData?.property?.request?.ai?.threadId,
