@@ -164,6 +164,7 @@
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
+      currentTabId = TeamTabsEnum.WORKSPACES;
     }
   }
 
@@ -323,9 +324,9 @@
             <Navigator
               tabs={teamTabs.filter((tab) => tab.visible !== false)}
               {currentTabId}
-              onTabClick={(id)=>{
+              onTabClick={(id) => {
                 onUpdateActiveTab(id);
-                currentTabId= id;
+                currentTabId = id;
               }}
               {activeTeamTab}
             />

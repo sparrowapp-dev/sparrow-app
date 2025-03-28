@@ -314,7 +314,7 @@
 
     {#if $isExpandCollection}
       <div
-        class="overflow-auto position-relative d-flex flex-column me-0 pt-1 mb-2"
+        class="overflow-auto position-relative d-flex flex-column me-0 pt-1"
         style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
