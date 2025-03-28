@@ -608,6 +608,7 @@
     startAutoRefresh();
   });
 
+  // ToDo: Need to move the truncate functionality to `modal` component itself
   const truncateTabName = (name, maxLength = 15) => {
     if (!name) return "Untitled";
     return name.length > maxLength
