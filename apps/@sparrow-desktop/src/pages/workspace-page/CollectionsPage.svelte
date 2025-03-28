@@ -608,6 +608,14 @@
   onMount(() => {
     startAutoRefresh();
   });
+
+  // ToDo: Need to move the truncate functionality to `modal` component itself
+  const truncateTabName = (name, maxLength = 15) => {
+    if (!name) return "Untitled";
+    return name.length > maxLength
+      ? `${name.substring(0, maxLength)}...`
+      : name;
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -861,7 +869,7 @@
       Do you want to save changes in this tab “<span
         class="text-whiteColor fw-bold"
       >
-        {!removeTab ? "Untitled" : removeTab.name}</span
+        {!removeTab ? "Untitled" : truncateTabName(removeTab.name, 25)}</span
       >”? Changes will be lost in case you choose not to save.
     </p>
   </div>
