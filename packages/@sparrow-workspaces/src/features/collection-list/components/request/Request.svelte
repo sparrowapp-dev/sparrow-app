@@ -305,6 +305,10 @@
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
+      if (api?.items && api?.items?.length > 0) {
+      } else {
+        expand = false;
+      }
       if (!isRenaming) {
         expand = !expand;
         if (expand) {
@@ -320,7 +324,9 @@
         }
       }
     }}
-    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 28px;"}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100% "
+      : "padding-left: 28px; height:100%;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )

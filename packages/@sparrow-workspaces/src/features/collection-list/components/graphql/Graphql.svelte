@@ -252,7 +252,9 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 41.5px; " : "padding-left: 29px;  "}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px; height:100%;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {graphql.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -288,7 +290,7 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; font-weight:400;"
+        style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-200);"
       >
         <p class=" ellipsis m-0 p-0">{graphql.name}</p>
       </div>
