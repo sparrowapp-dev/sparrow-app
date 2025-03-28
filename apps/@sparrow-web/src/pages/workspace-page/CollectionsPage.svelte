@@ -125,7 +125,7 @@
 
   let localEnvironment;
   let globalEnvironment;
-  let hasSetInitialEnvironment = false;
+  // let hasSetInitialEnvironment = false;
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
@@ -176,25 +176,26 @@
     }
   }
 
+  // Rolling back the changes for auto select environment - Require Fix
   ///////////////////////////////////////////////////////
   // Auto select environment for the first time - st
   //////////////////////////////////////////////////////
-  $: {
-    // Set the first environment by default from the list if no env. already set.
-    if (!hasSetInitialEnvironment && localEnvironment?.length > 0) {
-      setInitialEnvironment();
-    }
-  }
+  // $: {
+  //   // Set the first environment by default from the list if no env. already set.
+  //   if (!hasSetInitialEnvironment && localEnvironment?.length > 0) {
+  //     setInitialEnvironment();
+  //   }
+  // }
 
-  // Function to handle default environment selection
-  async function setInitialEnvironment() {
-    if (hasSetInitialEnvironment) return;
-    const currActiveEnv = currentWOrkspaceValue.environmentId;
-    if (!currActiveEnv)
-      await _viewModel2.onSelectEnvironment(localEnvironment[0]);
-    hasSetInitialEnvironment = true;
-  }
-  // Auto select environment for the first time - End
+  // // Function to handle default environment selection
+  // async function setInitialEnvironment() {
+  //   if (hasSetInitialEnvironment) return;
+  //   const currActiveEnv = currentWOrkspaceValue.environmentId;
+  //   if (!currActiveEnv)
+  //     await _viewModel2.onSelectEnvironment(localEnvironment[0]);
+  //   hasSetInitialEnvironment = true;
+  // }
+  // // Auto select environment for the first time - End
 
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
