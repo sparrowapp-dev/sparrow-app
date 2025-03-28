@@ -142,6 +142,7 @@
    */
   const handleCopyResponse = async () => {
     try {
+      // console.log("message :>> ", message);
       await navigator.clipboard.writeText(message);
       notifications.success("Response copied to clipboard.");
       showTickIcon = true;
@@ -164,7 +165,10 @@
    * @returns A promise that resolves when the listeners are embedded.
    */
   const embedListenerToCopyCode = async () => {
-    extractedMessage = decodeMessage(await marked(message));
+    const cleanedMessage = removeTopLevelCodeBlockWrapper(message);
+    console.log("cleaned :>> ", cleanedMessage);
+
+    extractedMessage = decodeMessage(await marked(cleanedMessage));
     // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
@@ -202,6 +206,59 @@
       cleanUpListeners();
     }
   });
+
+  /**
+   * Checks if the message is wrapped in a top-level markdown code block.
+   *
+   * @param message - The message to check.
+   * @returns True if the message is wrapped in a top-level markdown code block.
+   */
+  const isWrappedInMarkdownBlock = (message: string): boolean => {
+    // Check if message starts with ```markdown and ends with ```
+    const markdownBlockRegex = /^\s*```markdown\s*\n([\s\S]*?)```\s*$/;
+    return markdownBlockRegex.test(message);
+  };
+
+  /**
+   * Removes only the top-level code block wrapper while preserving all content inside,
+   * including any nested code blocks with their formatting intact.
+   *
+   * @param message - The message that might be wrapped in a top-level code block.
+   * @returns The message with only the outermost code block wrapper removed.
+   */
+  const removeTopLevelCodeBlockWrapper = (message: string): string => {
+    console.log("received msg :>> ", message);
+
+    // Handle the simple case of a markdown wrapper first
+    if (isWrappedInMarkdownBlock(message)) {
+      // Extract just the content between the markdown wrapper
+      const markdownBlockRegex = /^\s*```markdown\s*\n([\s\S]*?)```\s*$/;
+      const match = markdownBlockRegex.exec(message);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    // Handle unclosed markdown code block
+    const unclosedMarkdownStart = /^\s*```markdown\s*\n/;
+    if (unclosedMarkdownStart.test(message)) {
+      // Remove just the opening markdown identifier
+      return message.replace(unclosedMarkdownStart, "");
+    }
+
+    // Handle any generic top-level code block wrapper
+    if (isWrappedInMarkdownBlock(message)) {
+      // This is a more complex case - extract content while preserving nested blocks
+      const topLevelBlockRegex = /^\s*```(\w+)?\s*\n([\s\S]*?)```\s*$/;
+      const match = topLevelBlockRegex.exec(message);
+      if (match && match[2]) {
+        return match[2];
+      }
+    }
+
+    // If no top-level wrapper was found, return the original message
+    return message;
+  };
 </script>
 
 <div class="message-wrapper">
