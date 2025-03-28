@@ -388,6 +388,7 @@
                                 <div style="flex:1; overflow:auto;">
                                   <ResponseBody
                                     response={storeData?.response}
+                                    {isWebApp}
                                   />
                                 </div>
                               {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}

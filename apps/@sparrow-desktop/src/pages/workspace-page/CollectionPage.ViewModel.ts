@@ -2413,6 +2413,7 @@ export default class CollectionsViewModel {
       collection,
       navigation,
     );
+    collectionTabAdapter.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
   };
