@@ -68,7 +68,7 @@
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage);
 </script>
 
-<div class="h-100 d-flex flex-column pb-2">
+<div class="h-100 d-flex flex-column">
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
     style="flex:1; overflow:auto;"

@@ -61,7 +61,12 @@
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    currPage = searchQuery && filteredResults.length > 0 ? 1 : prevPage !== -1 ? prevPage : currPage;
+    currPage =
+      searchQuery && filteredResults.length > 0
+        ? 1
+        : prevPage !== -1
+          ? prevPage
+          : currPage;
 
     filteredWorkspaces = filteredResults.sort(
       (a, b) =>
@@ -107,7 +112,7 @@
   };
 </script>
 
-<div class="h-100 pb-2">
+<div class="h-100">
   <div class="d-flex flex-column h-100">
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
