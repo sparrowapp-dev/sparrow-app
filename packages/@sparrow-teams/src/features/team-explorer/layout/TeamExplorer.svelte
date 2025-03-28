@@ -52,9 +52,10 @@
    * Invite team toggler
    */
   export let isTeamInviteModalOpen;
-
+  /**
+   * stores leave team modal state
+   */
   export let isLeaveTeamModelOpen;
-
   /**
    * Callback For creating workspace
    */
@@ -101,20 +102,35 @@
    * Flag to check if user is guest user
    */
   export let isGuestUser = false;
-
   export let onAddMember;
-
   export let openInDesktop;
 
-  let currentTabId = TeamTabsEnum.WORKSPACES;
-
   let selectedView: string = "Grid";
+  let userRole: string;
+  let previousTeamId = "";
+  let searchQuery = "";
+  let hasText = false;
+  let leaveButtonMenu: boolean = false;
+  const addButtonData = [
+    {
+      name: "Leave Team",
+      color: "var(--dangerColor)",
+      onclick: () => handleLeaveTeam(),
+    },
+  ];
+  let isWorkspaceCreationInProgress = false;
+  let teamTabs = [];
 
+  /**
+   *
+   */
   const selectedViewSubscribe = workspaceView.subscribe((value) => {
     selectedView = value;
   });
 
-  let userRole: string;
+  /**
+   *
+   */
   const findUserType = () => {
     openTeam?.users.forEach((user) => {
       if (user.id === userId) {
@@ -123,19 +139,22 @@
     });
   };
 
+  /**
+   *
+   */
   const refreshTabs = () => {
     return [
       {
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
-        count: openTeam?.workspaces?.length,
+        count: openTeam?.workspaces?.length || 0,
         visible: true,
         disabled: isGuestUser === true ? true : false,
       },
       {
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
-        count: openTeam?.users?.length,
+        count: openTeam?.users?.length || 1,
         visible: true,
         disabled: isGuestUser === true ? true : false,
       },
@@ -143,72 +162,75 @@
         name: "Settings",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
-        visible: openTeam?.owner === userId,
+        visible: openTeam?.owner === userId || isGuestUser === true,
         disabled: isGuestUser === true ? true : false,
       },
     ];
   };
-  let teamTabs = [];
+
+  /**
+   *
+   */
   $: {
-    if (userId) {
+    if (userId || openTeam) {
       findUserType();
     }
   }
-  let previousTeamId = "";
+
+  /**
+   *
+   */
+  $: {
+    if (isGuestUser || openTeam) {
+      teamTabs = refreshTabs();
+    }
+  }
+
+  /**
+   *
+   */
   $: {
     if (openTeam) {
-      findUserType();
-      teamTabs = refreshTabs();
       if (previousTeamId !== openTeam?.teamId) {
         searchQuery = "";
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
-      currentTabId = TeamTabsEnum.WORKSPACES;
     }
   }
 
-  let isWorkspaceCreationInProgress = false;
+  /**
+   *
+   */
   const handleCreateNewWorkspace = async () => {
     isWorkspaceCreationInProgress = true;
     await onCreateWorkspace(openTeam.teamId);
     isWorkspaceCreationInProgress = false;
   };
 
-  let searchQuery = "";
-  let hasText = false;
-  let leaveButtonMenu: boolean = false;
-
+  /**
+   *
+   */
   const handleLeaveTeam = () => {
     leaveButtonMenu = !leaveButtonMenu;
     isLeaveTeamModelOpen = true;
   };
 
+  /**
+   *
+   * @param event
+   */
   const handleSearchInput = (event) => {
     searchQuery = event.detail.toLowerCase();
     hasText = searchQuery.length > 0;
   };
-  const clearSearchInput = () => {
-    searchQuery = "";
-    hasText = false;
-  };
 
+  /**
+   *
+   */
   onDestroy(() => {
     selectedViewSubscribe();
   });
-
-  const addButtonData = [
-    {
-      name: "Leave Team",
-      color: "var(--dangerColor)",
-      onclick: () => handleLeaveTeam(),
-    },
-  ];
-  $: {
-    if (isGuestUser) {
-      teamTabs = refreshTabs();
-    }
-  }
 </script>
 
 {#if openTeam}
@@ -323,12 +345,8 @@
           >
             <Navigator
               tabs={teamTabs.filter((tab) => tab.visible !== false)}
-              {currentTabId}
-              onTabClick={(id) => {
-                onUpdateActiveTab(id);
-                currentTabId = id;
-              }}
-              {activeTeamTab}
+              currentTabId={activeTeamTab}
+              onTabClick={onUpdateActiveTab}
             />
           </div>
           <div class="teams-menu__right">
