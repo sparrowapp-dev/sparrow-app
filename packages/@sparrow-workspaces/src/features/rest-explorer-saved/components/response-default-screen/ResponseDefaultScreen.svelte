@@ -19,19 +19,18 @@
     const controlKey = platformName === "macos" ? "cmd" : "Ctrl";
     const altKey = platformName === "macos" ? "option" : "Alt";
 
- ctrlCommands = {
-  "Send Request": [`${controlKey}`, "Enter"],
-  "New Request": [`${controlKey}`, "N"],
-  "Save Request": [`${controlKey}`, "S"],
-};
+    ctrlCommands = {
+      "Send Request": [`${controlKey}`, "Enter"],
+      "New Request": [`${controlKey}`, "N"],
+      "Save Request": [`${controlKey}`, "S"],
+    };
 
-altCommands = {
-  "Edit link": [`${altKey}`, "L"],
-  "Add Parameter": [`${altKey}`, "P"],
-  "Add Header": [`${altKey}`, "H"],
-  "Edit Body": [`${altKey}`, "B"],
-};
-
+    altCommands = {
+      "Edit link": [`${altKey}`, "L"],
+      "Add Parameter": [`${altKey}`, "P"],
+      "Add Header": [`${altKey}`, "H"],
+      "Edit Body": [`${altKey}`, "B"],
+    };
   });
   let isExpandShortcuts = false;
 </script>
@@ -58,11 +57,7 @@ altCommands = {
       {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3 flex items-center">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
       {/if}
     {/each}
@@ -70,11 +65,7 @@ altCommands = {
       {#if key === "Edit link" || key === "Add Parameter" || isExpandShortcuts}
         <!-- <span class="me-3"></span> -->
         <div class="px-3">
-          <ComboText
-            {key}
-            {value}
-            type="combo"
-          />
+          <ComboText {key} {value} type="combo" />
         </div>
         <!-- <span class="me-3"></span> -->
       {/if}

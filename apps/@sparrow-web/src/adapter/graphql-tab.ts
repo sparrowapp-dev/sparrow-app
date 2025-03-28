@@ -79,6 +79,7 @@ export class GraphqlTabAdapter {
     adaptedRequest.updateDescription(request.description);
     adaptedRequest.updateUrl(request.graphql?.url);
     adaptedRequest.updateQuery(request.graphql?.query);
+    adaptedRequest.updateMutation(request.graphql?.mutation);
     adaptedRequest.updateSchema(request.graphql?.schema);
     adaptedRequest.updateVariables(request.graphql?.variables);
     adaptedRequest.updateAuth(request.graphql?.auth);
@@ -102,6 +103,7 @@ export class GraphqlTabAdapter {
       url: requestTab.property.graphql?.url,
       headers: requestTab.property.graphql?.headers,
       query: requestTab.property.graphql?.query,
+      mutation: requestTab.property.graphql?.mutation,
       schema: requestTab.property.graphql?.schema,
       variables: requestTab.property.graphql?.variables,
       auth: requestTab.property.graphql?.auth,

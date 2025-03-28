@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { notifications } from "@sparrow/library/ui";
   import { Spinner } from "@sparrow/library/ui";
-  import { CollectionService } from "@app/services/collection.service";
   import { Select } from "@sparrow/library/forms";
   import {
     debounce,
-    isUrlValid,
     validateClientJSON,
     validateClientURL,
     validateClientXML,
@@ -19,20 +16,18 @@
   import { InfoIcon } from "@sparrow/library/icons";
 
   export let currentWorkspaceId;
-  export let isurl = false;
-  export let onClick: (flag: boolean) => void;
-  const _collectionService = new CollectionService();
-
-  export let onImportJSONObject;
+  export let onCloseModal;
   export let onItemCreated;
   export let collectionList;
-  export let onCollectionFileUpload;
   export let onImportCollectionURL;
-  export let isWebApp = false;
-  export let onValidateLocalHostUrl;
-  export let onValidateDeployedURL;
-  export let onValidateDeployedURLInput;
-  export let onValidateLocalHostURLInput;
+
+  export let onGetOapiTextFromURL; // Sends http request to the URL and get the (JSON / XML) text of Oapi                               (1)
+
+  export let onValidateOapiText; // Sends the (JSON / XML) text to the server (checks format and syntax) and returns true or false      (2)
+  export let onValidateOapiFile; // Sends the (JSON / XML) file to the server (checks format and syntax) and returns true or false      (2)
+
+  export let onImportOapiText; // Sends the (JSON / XML) text to backend and create a collection                                        (3)
+  export let onImportOapiFile; // Sends the (JSON / XML) file to backend and create a collection                                        (3)
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -86,13 +81,10 @@
         importData.includes("://localhost")
       ) {
         isValidClientURL = true;
-        const response = await onValidateLocalHostUrl(importData);
-        if (
-          response?.data?.status === ResponseStatusCode.OK ||
-          (response?.status === "success" && isWebApp)
-        ) {
+        const response = await onGetOapiTextFromURL(importData);
+        if (response?.data?.status === ResponseStatusCode.OK) {
           try {
-            const res = await onValidateLocalHostURLInput(response);
+            const res = await onValidateOapiText(response);
             if (res?.isSuccessful) {
               isValidServerURL = true;
             }
@@ -100,10 +92,10 @@
         }
       } else {
         isValidClientDeployedURL = true;
-        const response = await onValidateDeployedURL(importData);
+        const response = await onGetOapiTextFromURL(importData);
         if (response?.data?.status === ResponseStatusCode.OK) {
           try {
-            const res = await onValidateDeployedURLInput(response);
+            const res = await onValidateOapiText(response);
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
@@ -112,19 +104,21 @@
       }
     } else if (validateClientJSON(importData)) {
       isValidClientJSON = true;
-      const response = await _collectionService.validateImportCollectionInput(
-        "",
-        importData,
-      );
+      const response = await onValidateOapiText({
+        data: {
+          body: importData,
+        },
+      });
       if (response.isSuccessful) {
         isValidServerJSON = true;
         importData = JSON.stringify(JSON.parse(importData), null, 3);
       }
     } else if (validateClientXML(importData)) {
-      const response = await _collectionService.validateImportCollectionInput(
-        "",
-        importData,
-      );
+      const response = await onValidateOapiText({
+        data: {
+          body: importData,
+        },
+      });
       if (response.isSuccessful) {
         isValidClientXML = true;
         isValidServerXML = true;
@@ -143,16 +137,14 @@
   };
   let uploadFileType = "";
 
-  const validateFileUpload = async (_fileUploadData: string): boolean => {
+  const validateFileUpload = async (
+    _fileUploadData: string,
+  ): Promise<boolean> => {
     if (
       validateClientJSON(_fileUploadData) ||
       validateClientXML(_fileUploadData)
     ) {
-      const response =
-        await _collectionService.validateImportCollectionFileUpload(
-          "",
-          _fileUploadData,
-        );
+      const response = await onValidateOapiFile(_fileUploadData);
       if (response.isSuccessful) {
         uploadFileType = response.data.type;
         return true;
@@ -207,12 +199,12 @@
     uploadCollection.file.value = [];
   };
 
-  async function handleFileUpload(file: Request) {
+  const handleFileUpload = async (file: Request) => {
     if (file) {
       progressBar.isLoading = true;
       progressBar.isProgress = false;
       progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
-      const response = await onCollectionFileUpload(
+      const response = await onImportOapiFile(
         currentWorkspaceId,
         file,
         uploadFileType,
@@ -220,13 +212,13 @@
       if (response.isSuccessful) {
         progressBar.title = ProgressTitle.FETCHING_DATA;
         progressBar.isProgress = true;
-        onClick(false);
+        onCloseModal();
       } else {
         progressBar.isLoading = false;
         isSyntaxError = true;
       }
     }
-  }
+  };
 
   const validateJSON = (data) => {
     return validateImportBody(data);
@@ -251,6 +243,9 @@
       ((isValidClientJSON && isValidServerJSON) ||
         (isValidClientXML && isValidServerXML))
     ) {
+      /**
+       * Handle imports using JSON / XML textarea
+       */
       const contentType = validateJSON(importData);
       handleImportJsonObject(contentType, importData);
     } else if (
@@ -259,13 +254,13 @@
       isValidClientDeployedURL &&
       isValidServerDeployedURL
     ) {
-      const response = await onValidateDeployedURL(importData);
-
+      /**
+       * Handle imports using deployed URL
+       */
+      const response = await onGetOapiTextFromURL(importData);
+      const contentType = validateJSON(importData);
       if (response?.data?.status === ResponseStatusCode.OK) {
-        handleImportJsonObject(
-          ContentTypeEnum["application/json"],
-          isWebApp ? response?.data?.body : response.data.response,
-        );
+        handleImportJsonObject(contentType, response?.data?.body);
       }
     } else if (
       importType === "text" &&
@@ -273,56 +268,48 @@
       isValidClientURL &&
       isValidServerURL
     ) {
-      const importUrl = importData.replace("localhost", "127.0.0.1");
-      const response = await onValidateLocalHostUrl(importData);
-      if (
-        !activeSync &&
-        (response?.data?.status === ResponseStatusCode.OK ||
-          response?.status === "success")
-      ) {
-        const requestBody = {
-          urlData: {
-            data: isWebApp
-              ? response?.data?.data
-              : JSON.parse(response.data.response),
-            headers: response.data.headers,
-          },
-          url: importUrl,
-        };
-        handleImportUrl(requestBody);
-      } else if (
-        activeSync &&
-        response?.data?.status === ResponseStatusCode.OK &&
-        isRepositoryPath &&
-        repositoryBranch &&
-        repositoryPath &&
-        repositoryBranch !== "not exist" &&
-        currentBranch
-      ) {
-        if (
-          getBranchList
-            .map((elem) => {
-              return elem.name;
-            })
-            .includes(currentBranch)
-        ) {
-          const requestBody = {
-            urlData: {
-              data: JSON.parse(response.data.response),
-              headers: response.data.headers,
-            },
-            url: importUrl,
-            primaryBranch: repositoryBranch,
-            currentBranch: currentBranch,
-            localRepositoryPath: repositoryPath,
-          };
-          handleImportUrl(requestBody);
-        } else {
-          notifications.error(
-            `Can't import local branch. Please push ${currentBranch} to remote first.`,
-          );
-        }
+      /**
+       * Handle imports using localhost URL
+       */
+      const response = await onGetOapiTextFromURL(importData);
+      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
+        const contentType = validateJSON(response?.data?.body);
+        handleImportJsonObject(contentType, response?.data?.body);
       }
+
+      // else if (
+      //   activeSync &&
+      //   response?.data?.status === ResponseStatusCode.OK &&
+      //   isRepositoryPath &&
+      //   repositoryBranch &&
+      //   repositoryPath &&
+      //   repositoryBranch !== "not exist" &&
+      //   currentBranch
+      // ) {
+      //   if (
+      //     getBranchList
+      //       .map((elem) => {
+      //         return elem.name;
+      //       })
+      //       .includes(currentBranch)
+      //   ) {
+      //     const requestBody = {
+      //       urlData: {
+      //         data: JSON.parse(response.data.response),
+      //         headers: response.data.headers,
+      //       },
+      //       url: importUrl,
+      //       primaryBranch: repositoryBranch,
+      //       currentBranch: currentBranch,
+      //       localRepositoryPath: repositoryPath,
+      //     };
+      //     handleImportUrl(requestBody);
+      //   } else {
+      //     notifications.error(
+      //       `Can't import local branch. Please push ${currentBranch} to remote first.`,
+      //     );
+      //   }
+      // }
     } else if (
       importType === "file" &&
       uploadCollection?.file?.value?.length !== 0
@@ -350,7 +337,7 @@
     progressBar.isLoading = true;
     progressBar.isProgress = false;
     progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
-    const response = await onImportJSONObject(
+    const response = await onImportOapiText(
       currentWorkspaceId,
       importJSON,
       contentType,
@@ -358,7 +345,7 @@
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
       progressBar.isProgress = true;
-      onClick(false);
+      onCloseModal();
     } else {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -377,7 +364,7 @@
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
       progressBar.isProgress = true;
-      onClick(false);
+      onCloseModal();
     } else {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -459,7 +446,7 @@
 
 <!-- {#if progressBar.isLoading}
   <ProgressBar
-    {onClick}
+    onClick={onCloseModal}
     title={progressBar.title}
     zIndex={10000}
     isProgress={progressBar.isProgress}
@@ -799,7 +786,7 @@
         workspaceId: currentWorkspaceId,
         collection: collectionList,
       });
-      onClick(false);
+      onCloseModal();
     }}>Create Empty Collection</button
   >
 </div>

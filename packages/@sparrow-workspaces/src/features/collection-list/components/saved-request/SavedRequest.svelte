@@ -238,7 +238,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px; gap:4px; margin-bottom:2px;"
+  style="height:32px; padding-left:3px; margin-bottom:2px;"
 >
   <button
     tabindex="-1"
@@ -255,8 +255,8 @@
       }
     }}
     style={folder?.id
-      ? "padding-left: 110.5px; gap:4px;"
-      : "padding-left: 90.5px; gap:4px; "}
+      ? "padding-left: 88.5px; height:100%;"
+      : "padding-left: 90.5px; height:100%;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -359,10 +359,10 @@
     font-weight: 500;
     width: calc(100% - 48px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
+    color: var(--bg-ds-neutral-200);
     display: flex;
     align-items: center;
-    padding: 4px 2px;
+    padding: 2px 4px;
     caret-color: var(--bg-ds-primary-300);
   }
   .api-name:focus {

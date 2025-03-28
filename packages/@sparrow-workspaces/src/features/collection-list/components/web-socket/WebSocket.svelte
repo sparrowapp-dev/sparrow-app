@@ -241,16 +241,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("websocket", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        websocket: api,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
@@ -260,15 +250,29 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("websocket", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          websocket: api,
+        });
+      }
+    }}
     style={folder?.id
-      ? "padding-left: 74.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px;  height:100%;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="width: 24px!important; height:24px; margin-right:4px;"
+    ></div>
     <span class="api-method"
       ><SocketIcon
         height={"12px"}
@@ -280,7 +284,7 @@
     {#if isRenaming}
       <input
         class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px); font-weight:500; line-height:18px;"
+        style="font-size: 12px; width: calc(100% - 50px); font-weight:400; line-height:18px;"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -294,7 +298,7 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; font-weight:500; line-height:18px;"
+        style="font-size: 12px; font-weight:400; line-height:18px;"
       >
         <p class="ellipsis m-0 p-0">{api.name}</p>
       </div>
@@ -342,7 +346,8 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     font-weight: 500;
@@ -351,9 +356,9 @@
     line-height: 18px;
     width: calc(100% - 58px);
     text-align: left;
-    // display: flex;
     align-items: center;
-    padding: 4px 2px;
+    padding: 2px 4px;
+    color: var(--text-ds-neutral-200);
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

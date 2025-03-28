@@ -289,7 +289,7 @@ export class CollectionRepository {
       if (element.id.toString() === uuid) {
         element = {
           ...element,
-          ...items
+          ...items,
         };
       }
       return element;
@@ -449,6 +449,10 @@ export class CollectionRepository {
                 request.items[i] = {
                   ...request.items[i],
                   ...savedRequest,
+                  requestResponse: {
+                    ...(request.items[i].requestResponse || {}), // Preserve existing fields
+                    ...(savedRequest?.requestResponse || {}), // Merge new data
+                  },
                 };
                 break;
               }
@@ -524,6 +528,10 @@ export class CollectionRepository {
             element.items[i] = {
               ...element.items[i],
               ...savedRequest,
+              requestResponse: {
+                ...(element.items[i].requestResponse || {}), // Preserve existing fields
+                ...(savedRequest?.requestResponse || {}), // Merge new data
+              },
             };
             break;
           }
@@ -627,7 +635,8 @@ export class CollectionRepository {
           if (element.items[i].id === uuid) {
             element.items[i] = {
               ...element.items[i],
-              ...request};
+              ...request,
+            };
             break;
           }
         }

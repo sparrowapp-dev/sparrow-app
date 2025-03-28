@@ -819,14 +819,51 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Handles removing multiple tabs from tab
-   * @param ids :string[] - the ids of tab to be removed
+   * Removes tabs from workspace
+   * @param mainEntityId - tab Ids to be deleted
+   * @param workspaceId - ID of the workspace containing the tabs
+   * @returns Promise<void>
    */
-  private removeMultipleTabs = async (ids: string[]) => {
-    ids.forEach((id) => {
-      this.tabRepository.removeTab(id);
-    });
+  private removeMultipleTabs = async (ids: string[], workspaceId: string) => {
+    if (!ids.length) return;
+    await this.tabRepository.deleteTabsWithTabIdInAWorkspace(workspaceId, ids);
   };
+
+  /**
+   * Removes a primary tab and all its associated child tabs from the workspace
+   * @param mainEntityId - ID of the main entity (request, collection, folder, etc.)
+   * @param workspaceId - ID of the workspace containing the tabs
+   * @param entityType - Type of the entity ('request', 'collection', 'folder')
+   * @returns Promise<void>
+   */
+  private async removeTabWithChildren(
+    mainEntityId: string,
+    workspaceId: string,
+    entityType: "request" | "collection" | "folder",
+  ): Promise<void> {
+    const tabsIdsToDelete = [];
+    let childTabs = [];
+
+    // Remove the main tab
+    const mainTabId = await this.tabRepository.getTabById(mainEntityId);
+    if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+
+    // Get child tabs based on entity type
+    if (entityType === "request") {
+      childTabs = await this.tabRepository.getTabsByRequestId(mainEntityId);
+    } else if (entityType === "collection") {
+      childTabs = await this.tabRepository.getTabsByCollectionId(mainEntityId);
+    } else if (entityType === "folder") {
+      childTabs = await this.tabRepository.getTabsByFolderId(mainEntityId);
+    }
+
+    // Delete all child tabs if any exist
+    if (childTabs.length > 0) {
+      const allChildTabs = childTabs.map((tab) => tab.tabId);
+      tabsIdsToDelete.push(...allChildTabs);
+    }
+    await this.removeMultipleTabs(tabsIdsToDelete, workspaceId);
+  }
 
   /**
    * Get list of collections from current active workspace
@@ -2139,6 +2176,7 @@ export default class CollectionsViewModel {
         const response = {
           data: {
             name: newCollectionName,
+            updatedAt: new Date().toISOString(),
           },
         };
         await this.collectionRepository.updateCollection(
@@ -2214,6 +2252,7 @@ export default class CollectionsViewModel {
           );
         if (res) {
           res.name = newFolderName;
+          res.updatedAt = new Date().toISOString();
         }
         this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
@@ -2386,6 +2425,7 @@ export default class CollectionsViewModel {
       collection,
       navigation,
     );
+    collectionTabAdapter.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
   };
@@ -2427,6 +2467,7 @@ export default class CollectionsViewModel {
           );
         const storage = request;
         storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
@@ -2446,6 +2487,7 @@ export default class CollectionsViewModel {
         );
         const storage = request;
         storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
         await this.collectionRepository.updateRequestInFolder(
           collection.id,
           folder.id,
@@ -3147,8 +3189,15 @@ export default class CollectionsViewModel {
     if (isGuestUser === true) {
       this.collectionRepository.deleteCollection(collection.id);
       this.deleteCollectioninWorkspace(workspaceId, collection.id);
+
+      // Deleting the main and child tabs
+      await this.removeTabWithChildren(
+        collection.id,
+        workspaceId,
+        "collection",
+      );
+
       notifications.success(`"${collection.name}" Collection deleted.`);
-      this.removeMultipleTabs(deletedIds);
       MixpanelEvent(Events.DELETE_COLLECTION, {
         source: "Collection list",
       });
@@ -3162,8 +3211,15 @@ export default class CollectionsViewModel {
     if (response.isSuccessful) {
       this.collectionRepository.deleteCollection(collection.id);
       this.deleteCollectioninWorkspace(workspaceId, collection.id);
+
+      // Deleting the main and child tabs
+      await this.removeTabWithChildren(
+        collection.id,
+        workspaceId,
+        "collection",
+      );
+
       notifications.success(`"${collection.name}" Collection deleted.`);
-      this.removeMultipleTabs(deletedIds);
       MixpanelEvent(Events.DELETE_COLLECTION, {
         source: "Collection list",
       });
@@ -3206,8 +3262,10 @@ export default class CollectionsViewModel {
         explorer.id,
       );
 
+      // Deleting the main and child tabs
+      await this.removeTabWithChildren(explorer.id, workspaceId, "folder");
+
       notifications.success(`"${explorer.name}" Folder deleted.`);
-      this.removeMultipleTabs(requestIds);
       MixpanelEvent(Events.DELETE_FOLDER, {
         source: "Collection list",
       });
@@ -3228,8 +3286,10 @@ export default class CollectionsViewModel {
         explorer.id,
       );
 
+      // Deleting the main and child tabs
+      await this.removeTabWithChildren(explorer.id, workspaceId, "folder");
+
       notifications.success(`"${explorer.name}" Folder deleted.`);
-      this.removeMultipleTabs(requestIds);
       MixpanelEvent(Events.DELETE_FOLDER, {
         source: "Collection list",
       });
@@ -3318,8 +3378,10 @@ export default class CollectionsViewModel {
         );
       }
 
+      // Deleting the main and child tabs
+      await this.removeTabWithChildren(request.id, workspaceId, "request");
+
       notifications.success(`"${request.name}" Request deleted.`);
-      this.removeMultipleTabs([request.id]);
       MixpanelEvent(Events.DELETE_REQUEST, {
         source: "Collection list",
       });
@@ -3416,8 +3478,10 @@ export default class CollectionsViewModel {
         );
       }
 
+      // Deleting the main tab no child exists
+      this.handleRemoveTab(requestResponse.id);
+
       notifications.success(`"${requestResponse.name}" Response deleted.`);
-      this.removeMultipleTabs([requestResponse.id]);
       MixpanelEvent(Events.DELETE_RESPONSE, {
         source: "Collection list",
       });
@@ -3474,13 +3538,13 @@ export default class CollectionsViewModel {
           folder.id,
           websocket.id,
         );
-        this.removeMultipleTabs([websocket.id]);
+        this.handleRemoveTab(websocket.id);
       } else {
         await this.collectionRepository.deleteRequestOrFolderInCollection(
           collection.id,
           websocket.id,
         );
-        this.removeMultipleTabs([websocket.id]);
+        this.handleRemoveTab(websocket.id);
       }
 
       return true;
@@ -3508,8 +3572,10 @@ export default class CollectionsViewModel {
         );
       }
 
+      // Deleting the main tab no child exists
+      this.handleRemoveTab(websocket.id);
+
       notifications.success(`"${websocket.name}" WebSocket deleted.`);
-      this.removeMultipleTabs([websocket.id]);
       MixpanelEvent(Events.DELETE_REQUEST, {
         source: "Collection list",
       });
@@ -3553,13 +3619,13 @@ export default class CollectionsViewModel {
           _folder.id,
           _socketIo.id,
         );
-        this.removeMultipleTabs([_socketIo.id]);
+        this.handleRemoveTab(_socketIo.id);
       } else {
         await this.collectionRepository.deleteRequestOrFolderInCollection(
           _collection.id,
           _socketIo.id,
         );
-        this.removeMultipleTabs([_socketIo.id]);
+        this.handleRemoveTab(_socketIo.id);
       }
 
       return true;
@@ -3596,10 +3662,12 @@ export default class CollectionsViewModel {
       );
     }
 
+    // Deleting the main tab no child exists
+    this.handleRemoveTab(_socketIo.id);
+
     notifications.success(
       `"${_socketIo.name}" ${SocketIORequestDefaultAliasBaseEnum.NAME} deleted.`,
     );
-    this.removeMultipleTabs([_socketIo.id]);
     MixpanelEvent(Events.DELETE_REQUEST, {
       source: "Collection list",
     });
@@ -3639,13 +3707,13 @@ export default class CollectionsViewModel {
           _folder.id,
           _graphql.id,
         );
-        this.removeMultipleTabs([_graphql.id]);
+        this.handleRemoveTab(_graphql.id);
       } else {
         await this.collectionRepository.deleteRequestOrFolderInCollection(
           _collection.id,
           _graphql.id,
         );
-        this.removeMultipleTabs([_graphql.id]);
+        this.handleRemoveTab(_graphql.id);
       }
 
       return true;
@@ -3682,10 +3750,12 @@ export default class CollectionsViewModel {
       );
     }
 
+    // Deleting the main tab no child exists
+    this.handleRemoveTab(_graphql.id);
+
     notifications.success(
       `"${_graphql.name}" ${GraphqlRequestDefaultAliasBaseEnum.NAME} deleted.`,
     );
-    this.removeMultipleTabs([_graphql.id]);
     MixpanelEvent(Events.DELETE_REQUEST, {
       source: "Collection list",
     });
@@ -5700,18 +5770,11 @@ export default class CollectionsViewModel {
    * @param url - The localhost URL to validate.
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateLocalHostURL = async (url: string) => {
-    const response = await makeRequest("GET", url, undefined, true);
-    return response;
-  };
-
-  /**
-   * Validates a deployed URL by making a GET request with specific headers.
-   *
-   * @param url - The deployed URL to validate.
-   * @returns  A promise that resolves with the response of the validation request.
-   */
-  public validateDeployedURL = async (url: string) => {
+  public getOapiJsonFromURL = async (url: string) => {
+    let agent = WorkspaceUserAgentBaseEnum.CLOUD_AGENT;
+    if (url.includes("://127.0.0.1") || url.includes("://localhost")) {
+      agent = WorkspaceUserAgentBaseEnum.BROWSER_AGENT;
+    }
     const headers = [
       { key: "Accept-Encoding", value: "gzip, br", checked: true },
       {
@@ -5729,7 +5792,7 @@ export default class CollectionsViewModel {
       JSON.stringify(headers),
       "",
       "text/plain",
-      WorkspaceUserAgentBaseEnum.CLOUD_AGENT,
+      agent,
     );
     return response;
   };
@@ -5739,24 +5802,20 @@ export default class CollectionsViewModel {
    * @param data - Open API Text Data
    * @returns A promise that resolves with the response of the validation request.
    */
-  public validateLocalHostURLInput = async (data: any) => {
+  public validateOapiDataSyntax = async (data: any) => {
     const response = await this.collectionService.validateImportCollectionInput(
       "",
-      data?.data?.data,
+      data?.data?.body,
     );
     return response;
   };
 
-  /**
-   * Validate the data of deployed URL if it follows Open API Specification or not.
-   * @param data - Open API Text Data
-   * @returns A promise that resolves with the response of the validation request.
-   */
-  public validateDeployedURLInput = async (data: any) => {
-    const response = await this.collectionService.validateImportCollectionInput(
-      "",
-      JSON.parse(data?.data?.body),
-    );
+  public validateOapiFileSyntax = async (_fileUploadData: any) => {
+    const response =
+      await this.collectionService.validateImportCollectionFileUpload(
+        "",
+        _fileUploadData,
+      );
     return response;
   };
 

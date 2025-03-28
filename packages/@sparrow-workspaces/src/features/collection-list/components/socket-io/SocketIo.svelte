@@ -229,16 +229,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("socket-io", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        socketio: socketIo,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
@@ -248,15 +238,29 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("socket-io", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          socketio: socketIo,
+        });
+      }
+    }}
     style={folder?.id
-      ? "padding-left: 74.5px; gap:4px;"
-      : "padding-left: 48.5px; gap:4px;"}
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px; height:100%;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="height: 24px; width:24px !important; margin-right:4px;"
+    ></div>
     <span class="api-method">
       <SocketIoIcon
         height={"12px"}
@@ -268,7 +272,7 @@
     {#if isRenaming}
       <input
         class="py-0 rename-input-field-socket-io"
-        style="font-size: 12px; font-weight:500; line-height:18px;  width: calc(100% - 50px);"
+        style="font-size: 12px; font-weight:400; line-height:18px;  width: calc(100% - 50px);"
         id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
@@ -332,19 +336,19 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
     height: 24px;
     line-height: 18px;
-    font-weight: 500;
+    font-weight: 400;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
-    // display: flex;
+    color: var(--bg-ds-neutral-200);
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
-    padding: 4px 2px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;

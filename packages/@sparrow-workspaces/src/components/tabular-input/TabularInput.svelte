@@ -279,7 +279,7 @@
                   label="Bulk Edit"
                   fontSize="12px"
                   textColor="var(--text-ds-neutral-200)"
-                  fontWeight="400"
+                  fontWeight="500"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
                 />
@@ -336,8 +336,13 @@
         >
           <!-- Bulk Edit Text  -->
           <div class="d-flex align-items-center">
-            <p class="mb-0 text-fs-12 fw-medium"
-            style="color:var(--text-ds-neutral-200)">Bulk Edit</p>
+            <p
+              class="mb-0 text-fs-12 fw-medium"
+              style="color:var(--text-ds-neutral-200)"
+            >
+              Bulk Edit
+            </p>
+
             <div>
               {#if isBulkEditHeaderInfoRequired}
                 <div

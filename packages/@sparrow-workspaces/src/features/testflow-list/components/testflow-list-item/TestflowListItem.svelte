@@ -226,7 +226,7 @@
     <!-- <div style="height: 32px; width:14px ;border-left:1px solid blue;"></div> -->
     <div
       class="d-flex main-collection align-items-center"
-      style="gap:4px; padding-left:35px; "
+      style=" padding-left:22px; "
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
@@ -238,8 +238,9 @@
         }
       }}
     >
+      <span class="box" style="width: 24px; height:24px;"></span>
       <span
-        style="display: flex; flex-direction:row; align-items:center; justify-content:center; height:24px; width:30px;"
+        style="display: flex; flex-direction:row; align-items:center; justify-content:end; height:24px; width:30px; padding:4px;"
       >
         <FlowChartRegular size={"16px"} color={"var(--bg-ds-neutral-300"} />
       </span>
@@ -259,7 +260,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 32px; font-size:12px; font-weight:500; line-height:18px;"
+          style="height: 32px; font-size:12px; font-weight:400; line-height:18px;"
         >
           <p class="ellipsis w-100 me-4 mb-0">
             {flow.name}
@@ -383,7 +384,9 @@
       background-color: var(--bg-ds-surface-500) !important;
     }
     .collection-title {
-      width: calc(100% - 30px);
+      color: var(--bg-ds-neutral-200);
+      padding: 2px 4px;
+      width: calc(100% - 54px);
       text-align: left;
     }
   }

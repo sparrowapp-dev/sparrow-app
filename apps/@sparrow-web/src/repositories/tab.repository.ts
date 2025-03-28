@@ -663,7 +663,6 @@ export class TabRepository {
       })
       .exec();
   };
-  z;
 
   /**
    * Retrieves a tab by its unique identifier.
@@ -990,5 +989,68 @@ export class TabRepository {
     // Remove deletable tabs.
     await RxDB?.getInstance()?.rxdb?.tab?.bulkRemove(_deletabletabIds);
     return;
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific collection ID.
+   *
+   * @param {string} collectionId - The ID of the collection
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByCollectionId = async (
+    collectionId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.collectionId": collectionId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific folder ID.
+   *
+   * @param {string} folderId - The ID of the folder
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByFolderId = async (
+    folderId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.folderId": folderId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific request ID.
+   *
+   * @param {string} requestId - The ID of the request
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByRequestId = async (
+    requestId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.requestId": requestId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
   };
 }
