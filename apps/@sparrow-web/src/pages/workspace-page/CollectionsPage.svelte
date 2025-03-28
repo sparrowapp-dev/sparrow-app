@@ -513,7 +513,7 @@
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        await handleRefreshApicalls(value._id);
+        await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {

@@ -868,7 +868,7 @@
       Do you want to save changes in this tab “<span
         class="text-whiteColor fw-bold"
       >
-        {!removeTab ? "Untitled" : truncateTabName(removeTab.name)}</span
+        {!removeTab ? "Untitled" : truncateTabName(removeTab.name, 25)}</span
       >”? Changes will be lost in case you choose not to save.
     </p>
   </div>
