@@ -94,7 +94,7 @@
   };
 </script>
 
-<div class="d-flex" style="justify-content: space-between;">
+<div class="d-flex" style="justify-content: space-between; margin-bottom:12px;">
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
   <div>
     <button
