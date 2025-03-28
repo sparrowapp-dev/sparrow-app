@@ -836,8 +836,8 @@ export default class CollectionsViewModel {
     let childTabs = [];
 
     // Remove the main tab
-    const mainTabId = (await this.tabRepository.getTabById(mainEntityId)).tabId;
-    tabsIdsToDelete.push(mainTabId);
+    const mainTabId = await this.tabRepository.getTabById(mainEntityId);
+    if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
 
     // Get child tabs based on entity type
     if (entityType === "request") {

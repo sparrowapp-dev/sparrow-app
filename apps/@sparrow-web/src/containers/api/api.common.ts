@@ -27,7 +27,7 @@ import {
   SocketIORequestStatusTabEnum,
   type EventsValues,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
-import { Base64Converter, Sleep } from "@sparrow/common/utils";
+import { Base64Converter, Sleep, StatusCode } from "@sparrow/common/utils";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -1285,10 +1285,9 @@ const makeGraphQLRequest = async (
       httpResponse = JSON.stringify({
         body: JSON.stringify(axiosResponse.data),
         headers: axiosResponse.headers,
-        status:  axiosResponse.status + " " + (axiosResponse.statusText || "OK")
+        status:  axiosResponse.status + " " + (new StatusCode().getText(axiosResponse.status))
       });
     }
-
     const endTime = performance.now();
     const duration = endTime - startTime;
     const appInsightData = {
@@ -1320,6 +1319,16 @@ const makeGraphQLRequest = async (
     if (_signal?.aborted) {
       // Check if request is aborted after request fails
       throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+    }
+    if(err?.response){
+      httpResponse = JSON.stringify({
+        body: JSON.stringify(err.response.data 
+        ),
+        headers: err.response.headers,
+        status:  err.response.status + " " + (new StatusCode().getText(err.response.status))
+      });
+      const parsedResponse = JSON.parse(httpResponse);
+      return success(parsedResponse);
     }
     throw new Error(err as string);
   }
