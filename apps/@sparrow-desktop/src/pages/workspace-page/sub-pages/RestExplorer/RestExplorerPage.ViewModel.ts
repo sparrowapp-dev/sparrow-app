@@ -6,8 +6,11 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation, } from "@sparrow/common/utils";
-import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  startLoading,
+  stopLoading,
+} from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
   Debounce,
@@ -1323,7 +1326,6 @@ class RestExplorerViewModel {
    * @returns save status
    */
   public saveRequest = async () => {
-    
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;

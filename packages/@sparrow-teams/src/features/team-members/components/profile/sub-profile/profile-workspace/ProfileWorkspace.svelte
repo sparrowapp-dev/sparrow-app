@@ -76,10 +76,12 @@
             {
               name: "Editor",
               id: WorkspaceRole.WORKSPACE_EDITOR,
+              color: "light",
             },
             {
               name: "Viewer",
               id: WorkspaceRole.WORKSPACE_VIEWER,
+              color: "light",
             },
             {
               name: "Remove",
@@ -135,11 +137,11 @@
         />
       {/if}
     </div>
-    {#if user.role !== TeamRole.TEAM_MEMBER}
+    <!-- {#if user.role !== TeamRole.TEAM_MEMBER}
       <div style="position: relative; right: 2.8rem; padding-right: 2px;">
         <CaretDownFilled size="16px" color="var(--bg-ds-neutral-600)" />
       </div>
-    {/if}
+    {/if} -->
   </div>
 </section>
 
