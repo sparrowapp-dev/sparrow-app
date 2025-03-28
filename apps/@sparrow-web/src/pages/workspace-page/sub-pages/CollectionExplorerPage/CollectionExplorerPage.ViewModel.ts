@@ -41,7 +41,10 @@ import {
   type CollectionBaseInterface as CollectionDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
 } from "@sparrow/common/types/workspace/collection-base";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import type {
   Auth,
   State,
@@ -184,14 +187,18 @@ class CollectionExplorerPage {
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = true;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
