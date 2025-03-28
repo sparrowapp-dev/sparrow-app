@@ -166,6 +166,8 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
+      // scroll the top tab bar to right 
+      moveNavigation("right")
       notifications.success("New Environment created successfully.");
       return;
     }
