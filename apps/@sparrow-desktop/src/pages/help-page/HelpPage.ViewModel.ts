@@ -258,11 +258,13 @@ class HelpPageViewModel {
       return { ...post, isPostLiked: isLiked };
     });
 
-    // debugger
     const filteredResult = currentCategory
-      ? result?.filter((post) => post.category?.name === currentCategory)
+      ? result?.filter(
+          (post) =>
+            post.category?.name?.toLowerCase() ===
+            currentCategory.toLowerCase(),
+        )
       : result;
-
     return filteredResult;
   };
 
