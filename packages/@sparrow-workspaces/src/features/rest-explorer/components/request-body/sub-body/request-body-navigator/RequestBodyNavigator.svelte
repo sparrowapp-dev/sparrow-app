@@ -73,7 +73,7 @@
     </div>
   {/if}
 </div>
-<div class="mb-2 d-flex align-items-center justify-content-between">
+<div class="d-flex align-items-center justify-content-between" style="margin-bottom:12px;">
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash124"}
@@ -104,8 +104,10 @@
       onclick={handleDropdown}
       zIndex={499}
       disabled={false}
+      minHeaderWidth={"160px"}
+      headerHeight={"28px"}
     />
-    <span class="pe-3" />
+    <span style="padding-right:12px" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <WithSelect
         id={"hash987"}
@@ -135,6 +137,8 @@
         onclick={handleRawDropDown}
         zIndex={499}
         disabled={false}
+        minHeaderWidth={"160px"}
+        headerHeight={"28px"}
       />
     {/if}
   </div>

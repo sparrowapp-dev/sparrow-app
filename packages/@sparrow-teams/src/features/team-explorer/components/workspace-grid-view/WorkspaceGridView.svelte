@@ -9,7 +9,13 @@
   import { Button, Spinner } from "@sparrow/library/ui";
   import { WorkspaceGrid } from "@sparrow/teams/compopnents";
   import { TeamSkeleton } from "../../images";
-
+  import { SparrowLogo } from "@sparrow/common/icons";
+  import {
+    ChevronDoubleLeftRegular,
+    ChevronDoubleRightRegular,
+    ChevronLeftRegular,
+    ChevronRightRegular,
+  } from "@sparrow/library/icons";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -44,19 +50,25 @@
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
+  let prevPage = -1;
+  let filteredWorkspaces: any[] = [];
 
   // filters the workspaces based on the search query
-  $: filteredWorkspaces = workspaces
-    .filter(
+  $: {
+    const filteredResults = workspaces.filter(
       (item) =>
         typeof item.name === "string" &&
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-    .sort(
+    );
+
+    currPage = searchQuery && filteredResults.length > 0 ? 1 : prevPage !== -1 ? prevPage : currPage;
+
+    filteredWorkspaces = filteredResults.sort(
       (a, b) =>
         new Date(b._data.updatedAt).getTime() -
         new Date(a._data.updatedAt).getTime(),
     );
+  }
 
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
@@ -83,6 +95,7 @@
 
   const setPageWithinBounds = (newPage: number) => {
     currPage = Math.max(1, Math.min(newPage, totalPages));
+    prevPage = Math.max(1, Math.min(newPage, totalPages));
   };
 
   const handleClick = async () => {
@@ -146,54 +159,57 @@
               on:click={() => setPageWithinBounds(1)}
               class="bg-transparent border-0"
             >
-              <DoubleLeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              />
+              <ChevronDoubleLeftRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage - 1)}
               class="bg-transparent border-0"
             >
-              <LeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              />
+              <ChevronLeftRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(currPage + 1)}
               class="bg-transparent border-0"
             >
-              <RightIcon
-                color={currPage === totalPages
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              />
+              <ChevronRightRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
             <button
               on:click={() => setPageWithinBounds(totalPages)}
               class="bg-transparent border-0"
             >
-              <DoubleRightIcon
-                color={currPage === totalPages
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              />
+              <ChevronDoubleRightRegular color={"var(--bg-ds-neutral-100)"} />
             </button>
           </div>
         </div>
       {/if}
     {:else}
-      <img
-        src={TeamSkeleton}
-        alt="Team-Skelton"
-        width="100%"
-        height="100%"
-        style="padding-bottom:100px;"
-      />
+      <div class="container">
+        <div class="sparrow-logo">
+          <SparrowLogo />
+        </div>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+        >
+          Welcome to Sparrow – where teamwork flows effortlessly.
+        </p>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+        >
+          Sign up or log in to unlock powerful tools and stay organized!
+        </p>
+      </div>
     {/if}
   </div>
 </div>
 
 <style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 150px 35px 24px;
+  }
   .tab-head {
     padding: 8px;
     font-size: 12px;

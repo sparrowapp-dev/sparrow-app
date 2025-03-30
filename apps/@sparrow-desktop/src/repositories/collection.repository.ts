@@ -41,7 +41,7 @@ export class CollectionRepository {
       if (data.activeSync) value.activeSync = data.activeSync;
       if (data.createdBy) value.createdBy = data.createdBy;
       if (data.items) value.items = data.items;
-      if (data.selectedAuthType)  value.selectedAuthType = data.selectedAuthType;
+      if (data.selectedAuthType) value.selectedAuthType = data.selectedAuthType;
       if (data.auth) value.auth = data.auth;
       if (data.branches) value.branches = data.branches;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
@@ -54,7 +54,9 @@ export class CollectionRepository {
     return;
   };
 
-  public readCollection = async (uuid: string): Promise<CollectionDocument | null | undefined> => {
+  public readCollection = async (
+    uuid: string,
+  ): Promise<CollectionDocument | null | undefined> => {
     return await RxDB.getInstance()
       .rxdb?.collection?.findOne({
         selector: {
@@ -64,14 +66,14 @@ export class CollectionRepository {
       .exec();
   };
 
-  public subscribeCollection = (uuid: string): Observable<RxDocument<CollectionDocument>> => {
-    return RxDB.getInstance()
-      .rxdb?.collection?.findOne({
-        selector: {
-          id: uuid,
-        },
-      })
-      .$;
+  public subscribeCollection = (
+    uuid: string,
+  ): Observable<RxDocument<CollectionDocument>> => {
+    return RxDB.getInstance().rxdb?.collection?.findOne({
+      selector: {
+        id: uuid,
+      },
+    }).$;
   };
 
   public getCollection = (): Observable<CollectionDocument[]> => {
@@ -83,12 +85,18 @@ export class CollectionRepository {
     return RxDB.getInstance().rxdb?.collection.find().exec();
   };
 
-  public getCollectionsByWorkspaceId = async (_workspaceId: string): Promise<CollectionDocument[]> => {
-    return await RxDB.getInstance().rxdb?.collection.find({
-      selector: {
-        workspaceId: _workspaceId,
-      },
-    }).exec() || [];
+  public getCollectionsByWorkspaceId = async (
+    _workspaceId: string,
+  ): Promise<CollectionDocument[]> => {
+    return (
+      (await RxDB.getInstance()
+        .rxdb?.collection.find({
+          selector: {
+            workspaceId: _workspaceId,
+          },
+        })
+        .exec()) || []
+    );
   };
 
   // public updateCollection = async (
@@ -287,7 +295,7 @@ export class CollectionRepository {
       if (element.id.toString() === uuid) {
         element = {
           ...element,
-          ...items
+          ...items,
         };
       }
       return element;
@@ -450,6 +458,10 @@ export class CollectionRepository {
                 request.items[i] = {
                   ...request.items[i],
                   ...savedRequest,
+                  requestResponse: {
+                    ...(request.items[i].requestResponse || {}), // Preserve existing fields
+                    ...(savedRequest?.requestResponse || {}), // Merge new data
+                  },
                 };
                 break;
               }
@@ -525,6 +537,10 @@ export class CollectionRepository {
             element.items[i] = {
               ...element.items[i],
               ...savedRequest,
+              requestResponse: {
+                ...(element.items[i].requestResponse || {}), // Preserve existing fields
+                ...(savedRequest?.requestResponse || {}), // Merge new data
+              },
             };
             break;
           }
@@ -628,7 +644,8 @@ export class CollectionRepository {
           if (element.items[i].id === uuid) {
             element.items[i] = {
               ...element.items[i],
-              ...request};
+              ...request,
+            };
             break;
           }
         }

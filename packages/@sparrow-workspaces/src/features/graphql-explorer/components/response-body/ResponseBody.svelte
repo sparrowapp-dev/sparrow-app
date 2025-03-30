@@ -15,6 +15,7 @@
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   export let response: Response;
+  export let isWebApp;
   let fileExtension = "json";
   let language = RequestDataTypeEnum.JSON;
 
@@ -106,13 +107,15 @@
         onClick={handleCopy}
       />
     </Tooltip>
-    <Tooltip title={"Export"} placement="top-center">
-      <WithButtonV6
-        icon={ArrowDownloadRegular}
-        disable={false}
-        onClick={handleDownloaded}
-        loader={false}
-      />
-    </Tooltip>
+    {#if !isWebApp}
+      <Tooltip title={"Export"} placement="top-center">
+        <WithButtonV6
+          icon={ArrowDownloadRegular}
+          disable={false}
+          onClick={handleDownloaded}
+          loader={false}
+        />
+      </Tooltip>
+    {/if}
   </div>
 </div>

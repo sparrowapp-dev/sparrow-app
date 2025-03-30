@@ -34,10 +34,10 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <p
         class="text-fs-12 text-center w-100"
-        style="color: var(--text-secondary-50)"
+        style="color: var(--text-ds-neutral-400)"
       >
-        Add Collections to your Workspace to group your requests or send an API
-        request directly.
+        Build your API workflow and organize it with collections. Add a
+        collection or import a cURL command to get started.
       </p>
     {/if}
     <div class="w-100 mt-2" style="display: flex; flex-direction:column; ">
@@ -45,7 +45,7 @@
         <span class="mb-2">
           <Button
             title="Add Collection"
-            type="outline-secondary"
+            type="secondary"
             size="small"
             customWidth="100%"
             startIcon={AddRegular}

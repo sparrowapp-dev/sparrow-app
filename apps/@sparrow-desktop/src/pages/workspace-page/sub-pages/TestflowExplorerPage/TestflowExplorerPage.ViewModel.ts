@@ -337,32 +337,32 @@ export class TestflowExplorerPageViewModel {
 
   private fetchCollectionAuth = async(_collectionId: string)=>{
       const collectionRx = await this.collectionRepository.readCollection(_collectionId);
-      const collectionDoc = collectionRx?.toMutableJSON();
-      let collectionAuth;
+    const collectionDoc = collectionRx?.toMutableJSON();
+    let collectionAuth;
       if(collectionDoc?.auth){
-        collectionAuth = {
+      collectionAuth = {
           auth : collectionDoc?.auth,
           collectionAuthNavigation: collectionDoc?.selectedAuthType
         } as HttpRequestCollectionLevelAuthTabInterface
       }
       else{
-        collectionAuth = {
-          auth: {
-            bearerToken: "",
-            basicAuth: {
-              username: "",
-              password: "",
-            },
-            apiKey: {
-              authKey: "",
-              authValue: "",
-              addTo: CollectionRequestAddToBaseEnum.HEADER,
-            },
+      collectionAuth = {
+        auth: {
+          bearerToken: "",
+          basicAuth: {
+            username: "",
+            password: "",
           },
+          apiKey: {
+            authKey: "",
+            authValue: "",
+            addTo: CollectionRequestAddToBaseEnum.HEADER,
+          },
+        },
           collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
         }
-      }
-      return collectionAuth;
+    }
+    return collectionAuth;
     }
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
@@ -789,6 +789,7 @@ export class TestflowExplorerPageViewModel {
           name: currentTestflow.name,
           nodes: currentTestflow?.property?.testflow?.nodes,
           edges: currentTestflow?.property?.testflow?.edges,
+          updatedAt: new Date().toISOString(),
         },
       );
       const progressiveTab = this._tab.getValue();

@@ -238,7 +238,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''}"
-  style="height:32px; padding-left:3px;  margin-bottom:2px;"
+  style="height:32px; padding-left:3px; margin-bottom:2px;"
 >
   <button
     tabindex="-1"
@@ -254,7 +254,9 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 88.5px;" : "padding-left: 90.5px;"}
+    style={folder?.id
+      ? "padding-left: 88.5px; height:100%;"
+      : "padding-left: 90.5px; height:100%;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )

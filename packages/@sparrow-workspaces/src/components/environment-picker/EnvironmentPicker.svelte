@@ -69,27 +69,27 @@
 </script>
 
 <div
-  class="select-environment-popup bg-tertiary-700 d-flex p-3 rounded"
+  class="select-environment-popup d-flex"
   style="
     top:{environmentAxisY}px;
     left:{environmentAxisX}px;
     "
 >
   <div
-    class="left-panel pe-2 w-100"
+    class="left-panel w-100"
     id="left-panel-environment"
     bind:this={scrollPosition}
   >
     {#if filterData.filter((elem) => {
       return elem.type === "E";
     }).length > 0}
-      <p class="text-fs-12 mb-2">ENVIRONMENT VARIABLES</p>
+      <div class="variable-heading mb-2">ENVIRONMENT VARIABLES</div>
     {/if}
     {#each filterData as mock, index}
       {#if mock.type === "E"}
         <div
           role="button"
-          class="env-item border-radius-2"
+          class="env-item border-radius-1"
           on:click={() => {
             const preUrl = inputText?.substring(0, trackParanthesis[0]);
             const postUrl = inputText?.substring(trackCursor, inputText.length);
@@ -97,17 +97,18 @@
             handleInputValue();
           }}
         >
-          <div class="d-flex mb-1 align-items-center border-radius-2">
+          <div
+            class="d-flex align-items-center border-radius-2"
+            style="padding:4px 6px 4px 8px;"
+          >
             <div
-              class="ms-1 d-flex align-items-center justify-content-center"
-              style="height:22px; width:22px;"
+              class=" d-flex align-items-center justify-content-center"
+              style="height:28px; width:30px;"
             >
               <div
                 class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center local-environment"
               >
-                <span class={"text-secondary-100 fw-bold text-fs-16"}
-                  >{mock.type}</span
-                >
+                <span class={"icon-text"}>{mock.type}</span>
               </div>
             </div>
             <div
@@ -115,15 +116,13 @@
               class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
             >
               <p
-                class="text-fs-11 text-secondary-100 m-0 p-0 env-value word-break"
+                class="mock-key m-0 p-0 env-value word-break"
                 style="margin-bottom:2px; "
               >
                 {mock.key}
               </p>
               {#if mock.value}
-                <p
-                  class="text-fs-9 text-secondary-300 m-0 p-0 env-value word-break"
-                >
+                <p class="mock-value m-0 p-0 env-value word-break">
                   {mock.value}
                 </p>
               {/if}
@@ -135,12 +134,9 @@
     {#if filterData.filter((elem) => {
       return elem.type === "G";
     }).length > 0}
-      <p
-        class="text-fs-12 mt-2 mb-2"
-        style="font-size: 12px; font-weight:500; line-height:18px;"
-      >
+      <div class="variable-heading mb-2" style="margin-top:12px;">
         GLOBAL VARIABLES
-      </p>
+      </div>
     {/if}
 
     {#each filterData.filter((elem) => {
@@ -156,32 +152,29 @@
           handleInputValue();
         }}
       >
-        <div class="d-flex mb-1 align-items-center border-radius-2">
+        <div
+          class="d-flex align-items-center border-radius-2"
+          style="padding:4px 6px 4px 8px;"
+        >
           <div
-            class="ms-1 d-flex align-items-center justify-content-center"
-            style="height:22px; width:22px;"
+            class="d-flex align-items-center justify-content-center"
+            style="height:28px; width:31px;"
           >
             <div
-              class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center global-environment"
+              class="d-flex align-items-center border-radius-2 justify-content-center global-environment"
             >
-              <span class={"text-secondary-100 fw-bold text-fs-16"}
-                >{mock.type}</span
-              >
+              <span class={"icon-text"}>{mock.type}</span>
             </div>
           </div>
           <div
             style="height: 33px;"
             class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
           >
-            <p
-              class="text-fs-11 text-secondary-100 m-0 p-0 env-value word-break"
-            >
+            <p class="mock-key m-0 p-0 env-value word-break">
               {mock.key}
             </p>
             {#if mock.value}
-              <p
-                class="text-fs-9 text-secondary-300 m-0 p-0 env-value word-break"
-              >
+              <p class="mock-value m-0 p-0 env-value word-break">
                 {mock.value}
               </p>
             {/if}
@@ -195,21 +188,33 @@
 
 <style>
   .select-environment-popup {
-    width: 394px;
-    height: 168px;
+    width: 252px;
+    height: fit-content;
+    max-height: 348px;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
+    background-color: var(--bg-ds-surface-600);
+    padding: 12px;
+    border-radius: 4px;
   }
   .select-environment-popup .left-panel {
-    height: 138px;
+    max-height: 324px;
     overflow-y: auto;
   }
   .global-environment {
-    background-color: #3670f7;
+    background-color: var(--bg-ds-primary-500);
+    border: 1px solid var(--border-ds-surface-50);
+    padding: 4px;
+    width: 100%;
+    height: 100%;
   }
   .local-environment {
-    background-color: #69d696;
+    background-color: var(--bg-ds-success-500);
+    border: 1px solid var(--border-ds-surface-50);
+    padding: 4px;
+    width: 100%;
+    height: 100%;
   }
   .env-value {
     display: -webkit-box;
@@ -240,5 +245,26 @@
 
   .word-break {
     word-break: break-all;
+  }
+  .variable-heading {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    color: var(--text-ds-neutral-50);
+  }
+  .icon-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-ds-neutral-50);
+  }
+  .mock-value {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-ds-neutral-300);
+  }
+  .mock-key {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-ds-neutral-50);
   }
 </style>

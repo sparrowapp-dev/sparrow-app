@@ -1,90 +1,126 @@
-// import Button from './Button.svelte'; // Uncomment if you're using a local component
-import { Button } from '@sparrow/library/ui';  // Adjust import based on your package structure
+import { Button } from '@sparrow/library/ui';
+import { action } from '@storybook/addon-actions';
 
-// More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 export default {
   title: 'Components/Button',
   component: Button,
   tags: ['autodocs'],
   argTypes: {
-    title: { control: 'text', defaultValue: 'Submit' },
-    onClick: { action: 'clicked' },
-    loader: { control: 'boolean' },
-    loaderSize: { control: 'number' },
+    type: {
+      control: { type: 'select' },
+      options: [
+        'primary',
+        'secondary',
+        'dark',
+        'danger',
+        'teritiary-regular',
+        'teritiary-danger',
+        'underline',
+        'outline-primary',
+        'outline-secondary',
+        'outline-danger',
+        'link-primary',
+        'link-secondary'
+      ]
+    },
+    size: {
+      control: { type: 'select' },
+      options: ['extra-small', 'small', 'medium', 'large']
+    },
     disable: { control: 'boolean' },
-    buttonStyleProp: { control: 'text' },
-    buttonClassProp: { control: 'text' },
-    textClassProp: { control: 'text' },
-    textStyleProp: { control: 'text' },
-    buttonStartIcon: { control: 'text' },
-    buttonStartIconStyle: { control: 'text' },
-    allowChild: { control: 'boolean' },
-    type: { control: 'select', options: ['primary', 'dark', 'danger', 'violet', 'transparent', 'teritiary', 'other', 'icon'] },
-    id: { control: 'text' },
-  },
+    loader: { control: 'boolean' },
+    customWidth: { control: 'text' },
+     startIcon: { 
+      control: 'boolean',
+      description: 'Show start icon (uses plusWhiteIcon)'
+    },
+    endIcon: { 
+      control: 'boolean',
+      description: 'Show end icon (uses plusWhiteIcon)'
+    }
+     
+  }
 };
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
+// Common props that will be used across all stories
+const commonProps = {
+  title: 'Button',
+  size: 'medium',
+  disable: false,
+  loader: false,
+  onClick: action('clicked')
+};
+
+// Stories for each button type
 export const Primary = {
   args: {
-    title: 'Submit',
-    type: 'primary',
-  },
+    ...commonProps,
+    type: 'primary'
+  }
 };
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-export const Red = {
+export const Secondary = {
   args: {
-    title: 'Submit',
-    textStyleProp: 'background-color:red;',
-  },
+    ...commonProps,
+    type: 'secondary'
+  }
 };
 
-export const Dark = {
-  args: {
-    title: 'Submit',
-    type: 'dark',
-  },
-};
 
 export const Danger = {
   args: {
-    title: 'Delete',
-    type: 'danger',
-  },
+    ...commonProps,
+    type: 'danger'
+  }
 };
 
-export const Transparent = {
+
+export const TeritiaryRegular = {
   args: {
-    title: 'Cancel',
-    type: 'transparent',
-  },
+    ...commonProps,
+    type: 'teritiary-regular'
+  }
 };
 
-export const WithLoader = {
+export const TeritiaryDanger = {
   args: {
-    title: 'Loading...',
-    loader: true,
-    loaderSize: 20,
-    type: 'other',
-  },
+    ...commonProps,
+    type: 'teritiary-danger'
+  }
 };
 
-export const WithIcon = {
+
+export const OutlinePrimary = {
   args: {
-    title: 'Submit',
-    type: 'icon',
-    buttonStartIcon: 'path/to/icon.svg', // Replace with a valid icon URL or path
-  },
+    ...commonProps,
+    type: 'outline-primary'
+  }
 };
 
-export const WithCustomChild = {
+export const OutlineSecondary = {
   args: {
-    allowChild: true,
-  },
-  // Use the `slots` property to insert content inside the button's slot
-  // This will make the button render with custom child content
-  slots: {
-    default: '<span>Custom Child Content</span>',
-  },
+    ...commonProps,
+    type: 'outline-secondary'
+  }
+};
+
+export const OutlineDanger = {
+  args: {
+    ...commonProps,
+    type: 'outline-danger'
+  }
+};
+
+export const LinkPrimary = {
+  args: {
+    ...commonProps,
+    type: 'link-primary'
+  }
+};
+
+export const LinkSecondary = {
+  args: {
+    ...commonProps,
+    type: 'link-secondary'
+  }
 };

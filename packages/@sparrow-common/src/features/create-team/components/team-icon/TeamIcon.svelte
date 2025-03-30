@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { IconUploader } from "@sparrow/library/forms";
+  import IconUploader from "../../../../../../@sparrow-library/src/forms/file-uploader/IconUploader.svelte";
   import { OSDetector } from "@sparrow/common/utils";
 
   /**

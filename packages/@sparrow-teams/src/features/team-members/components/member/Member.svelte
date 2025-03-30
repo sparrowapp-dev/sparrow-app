@@ -295,8 +295,9 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;display: inline-block;" class="text-textColor"
-            >{user.email}</span
+          <span
+            style="font-size:12px;display: inline-block;"
+            class="text-textColor">{user.email}</span
           >
         </div>
       </div>
@@ -377,8 +378,9 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;display: inline-block;" class="text-textColor "
-            >{user.email}</span
+          <span
+            style="font-size:12px;display: inline-block;"
+            class="text-textColor">{user.email}</span
           >
         </div>
       </div>
@@ -453,8 +455,9 @@
           <span style="font-size:12px;" class="text-whiteColor"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;display: inline-block;" class="text-textColor"
-            >{user.email}</span
+          <span
+            style="font-size:12px;display: inline-block;"
+            class="text-textColor">{user.email}</span
           >
         </div>
       </div>
@@ -609,6 +612,7 @@
         disabled={owner}
         isArrowIconRequired={!owner}
         borderRounded={"4px"}
+        minHeaderWidth={"110px"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
       <Select

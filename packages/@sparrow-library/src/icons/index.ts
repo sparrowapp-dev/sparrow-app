@@ -151,7 +151,6 @@ export { default as FolderRegular } from "./FolderRegular.svelte";
 export { default as FolderOpenRegular } from "./FolderOpenRegular.svelte";
 export { default as ChevronDoubleLeftRegular } from "./ChevronDoubleLeftRegular.svelte";
 export { default as ChevronDoubleRightRegular } from "./ChevronDoubleRightRegular.svelte";
-
 export { default as FolderIcon3 } from "./FolderIcon.svelte";
 export { default as SearchIcon2 } from "./SearchIcon2.svelte";
 export { default as PlusIcon2 } from "./PlusIcon.svelte";
@@ -215,7 +214,6 @@ export { default as ArrowClockWiseRegular } from "./ArrowClockWiseRegular.svelte
 export { default as QuestionCirlceReqular } from "./QuestionCircleReqular.svelte";
 export { default as DocumentRegular } from "./DocumentRegular.svelte";
 export { default as GiftReqular } from "./GiftRegular.svelte";
-export { default as OpenRegular } from "./OpenRegular.svelte";
 export { default as CircleFilled } from "./CircleFilled.svelte";
 export { default as QuestionCircleRegular } from "./QuestionCircleRegular.svelte";
 export { default as CaretUpFilled } from "./CaretUpFilled.svelte";
@@ -223,3 +221,5 @@ export { default as ListRegular } from "./ListRegular.svelte";
 export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
 export { default as WarningFilled } from "./WarningFilled.svelte";
 export { default as DismissCircleRegular } from "./DismissCircleRegular.svelte";
+export { default as InfoFilled } from "./InfoFilled.svelte";
+export { default as OpenRegular } from "./OpenRegular.svelte";

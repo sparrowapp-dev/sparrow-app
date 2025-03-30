@@ -19,7 +19,8 @@
   import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-  import { ArrowDownloadRegular, CopyRegular } from "@sparrow/library/icons";
+  import { ArrowDownloadRegular, CopyRegular, SaveRegular } from "@sparrow/library/icons";
+  import { Select } from "@sparrow/library/forms";
 
   export let response;
   export let apiState;
@@ -120,12 +121,12 @@
   };
 </script>
 
-<div class="d-flex flex-column align-items-start justify-content-between w-100">
+<div class="d-flex flex-column align-items-center justify-content-between w-100">
   <div
     class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
-    <div class="d-flex gap-3 align-items-center justify-content-center">
+    <div class="d-flex gap-1 align-items-center justify-content-center">
       <div class="d-flex align-items-center rounded mb-0 py-1">
         <span
           role="button"
@@ -135,9 +136,10 @@
               ResponseFormatter.PRETTY,
             );
           }}
-          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.bodyFormatter ===
+          class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
+          style="{apiState.bodyFormatter ===
           ResponseFormatter.PRETTY
-            ? 'bg-tertiary-500 text-secondary-100'
+            ? 'background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);'
             : ''}"
         >
           Text
@@ -171,13 +173,18 @@
           class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.bodyFormatter ===
           ResponseFormatterEnum.PREVIEW
             ? 'bg-tertiary-500 text-secondary-100'
-            : ''}">Preview</span
+            : ''}"
+            style="{apiState.bodyFormatter ===
+          ResponseFormatterEnum.PREVIEW
+            ? 'background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);'
+            : ''}"
+            >Preview</span
         >
       </div>
 
       {#if apiState.bodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-          <WithSelectV3
+            <WithSelectV3
             id={"hash565"}
             data={[
               {
@@ -228,7 +235,7 @@
         {#if path?.collectionId}
           <!-- Save button -->
           <Button
-            startIcon={SaveIcon}
+            startIcon={SaveRegular}
             onClick={onSaveResponse}
             disable={false}
             loader={false}
