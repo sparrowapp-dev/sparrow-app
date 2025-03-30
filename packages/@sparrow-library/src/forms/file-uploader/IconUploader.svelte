@@ -20,12 +20,11 @@
   export let height = "auto";
   export let disabled = false;
   export let headerLabel: boolean = false;
+  export let varient: "primary" = "primary";
   export let inputLadelId: string = "";
   export let headerLabelText: string = "Label";
-  export let inputValueRequired: boolean = false;
-  export let supportLabel: boolean = false;
   export let helpLabel: boolean = false;
-  export let helpLabelValue: boolean = false;
+  export let inputValueRequired: boolean = false;
   export let helpIcon;
   export let errorMessage: string = "ErrorMessage";
   export let helpLabelText: string = "help";
@@ -63,7 +62,7 @@
         <span style="color:var(--text-ds-danger-400)">*</span>
       {/if}
     </div>
-    {#if supportLabel}
+    {#if supportLabelText !== ""}
       <div class="pb-2">
         <p style="margin: 0px;" class="support-label-text">
           {supportLabelText}
@@ -88,7 +87,7 @@
             : 'transparent'
           : 'var(--bg-ds-surface-600)'};
     "
-        class="sparrow-file-input text-fs-14 p-2 w-100 px-auto bg-ds-surface-400 {isDragOver
+        class="sparrow-file-input-{varient} text-fs-14 p-2 w-100 px-auto bg-ds-surface-400 {isDragOver
           ? 'drag-over'
           : ''}"
         tabindex="0"
@@ -161,7 +160,7 @@
 
   {#if !Array.isArray(value) && value.size > 0}
     <div
-      class="sparrow-input-image-preview d-flex gap-2 border-radius-4 align-items-center justify-content-center"
+      class="sparrow-input-image-preview-{varient} d-flex gap-2 border-radius-4 align-items-center justify-content-center"
       style="border: {isError ? '2px' : '1px'} dashed {isError
         ? 'var(--border-ds-danger-300)'
         : 'var(--border-ds-surface-100)'};
@@ -247,7 +246,7 @@
         <p style="margin:0px;" class="help-label-error">
           {errorMessage}
         </p>
-      {:else if helpLabelValue}
+      {:else if helpLabelText !== ""}
         <p style="margin:0px;" class="help-label-text">{helpLabelText}</p>
       {/if}
     </div>
@@ -259,7 +258,7 @@
     margin-top: 22px;
     margin-bottom: 22px;
   }
-  .sparrow-file-input {
+  .sparrow-file-input-primary {
     height: 164px;
     min-width: 240px;
     max-width: 540px;
@@ -285,11 +284,11 @@
     }
   }
 
-  .sparrow-file-input.drag-over {
+  .sparrow-file-input-primary.drag-over {
     border: 1px dashed var(--border-ds-primary-300) !important;
     background-color: var(--bg-ds-surface-500);
   }
-  .sparrow-file-input:hover {
+  .sparrow-file-input-primary:hover {
     border: 1px solid var(--border-ds-neutral-300);
     cursor: pointer;
   }
@@ -299,13 +298,13 @@
     border: 0;
   }
 
-  .sparrow-input-image-preview > img {
+  .sparrow-input-image-preview-primary > img {
     width: 80px;
     border: 1px solid #313233;
     height: 80px;
     background-color: var(--bg-ds-surface-400);
   }
-  .sparrow-input-image-preview {
+  .sparrow-input-image-preview-primary {
     height: 164px;
     min-width: 240px;
     max-width: 540px;
