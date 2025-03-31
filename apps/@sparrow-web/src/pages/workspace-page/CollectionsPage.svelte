@@ -176,67 +176,24 @@
     }
   }
 
-  // Rolling back the changes for auto select environment - Require Fix
-  ///////////////////////////////////////////////////////
   // Auto select environment for the first time - st
-  //////////////////////////////////////////////////////
-  async function fetchAndSetEnvironments(workspaceId) {
-    console.log("2. Inside fS() : ", workspaceId);
+  async function setInitialEnvironment(workspaceId: string) {
     if (!workspaceId) return;
-    console.log("3. Inside fS() : ");
-
     const wkEnvs = await _viewModel2.getEnvironmentByWorkspaceId(workspaceId);
-    console.log("4. Inside fS() : ", wkEnvs);
 
-    console.log(
-      "5. Inside fS() : ",
-      currentWOrkspaceValue,
-      hasSetInitialEnvironment,
-    );
-    // Set the first environment by default from the list if no env. already set.
     if (
       currentWOrkspaceValue &&
       !hasSetInitialEnvironment &&
       wkEnvs?.length > 1
     ) {
-      console.log("6. Inside fS() : ");
-      setInitialEnvironment(wkEnvs);
+      const currActiveEnv = currentWOrkspaceValue?.environmentId;
+      if (!currActiveEnv) {
+        await _viewModel2.onSelectEnvironment(wkEnvs[1]);
+        hasSetInitialEnvironment = true;
+        // notifications.warning(`Environment is selected by default!`);
+      }
     }
   }
-
-  // Function to handle default environment selection
-  async function setInitialEnvironment(wkEnvs) {
-    console.log("7. Inside SE() : ", currentWOrkspaceValue);
-    if (hasSetInitialEnvironment) return;
-    console.log("8. Inside SE() : ");
-    const currActiveEnv = currentWOrkspaceValue.environmentId;
-    console.log("9. Inside SE() : ", currActiveEnv);
-    if (!currActiveEnv) {
-      console.log("10. Inside SE() : ", wkEnvs[1]);
-      await _viewModel2.onSelectEnvironment(wkEnvs[1]);
-      hasSetInitialEnvironment = true;
-      notifications.warning(
-        `Environment ${wkEnvs[1].name} is selected by default! `,
-      );
-    }
-  }
-  // $: {
-  //   console.log("1. curr Wk :>> ", currentWOrkspaceValue);
-  //   if (currentWOrkspaceValue?._id) {
-  //     setTimeout(() => {
-  //       fetchAndSetEnvironments(currentWOrkspaceValue._id);
-  //     }, 1000);
-  //   }
-  // }
-
-  // Function to handle default environment selection
-  // async function setInitialEnvironment(wkEnvs) {
-  //   if (hasSetInitialEnvironment) return;
-  //   const currActiveEnv = currentWOrkspaceValue.environmentId;
-  //   if (!currActiveEnv) await _viewModel2.onSelectEnvironment(wkEnvs[0]);
-  //   hasSetInitialEnvironment = true;
-  // }
-  // // Auto select environment for the first time - End
 
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
@@ -567,7 +524,7 @@
         activeTab = _viewModel.getActiveTab(value._id);
         totalTeamCount = value._data?.users?.length;
 
-        await fetchAndSetEnvironments(value._id);
+        await setInitialEnvironment(value._id);
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
