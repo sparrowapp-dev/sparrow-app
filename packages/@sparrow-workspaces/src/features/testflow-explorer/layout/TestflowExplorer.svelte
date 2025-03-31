@@ -83,6 +83,7 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onSelectRequest;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -119,7 +120,7 @@
    * @param method - Request method (e.g., GET, POST).
    * @param folderId - Folder ID (optional).
    */
-  const updateSelectedAPI = (
+  const updateSelectedAPI = async (
     id: string,
     name: string,
     requestId: string,
@@ -127,6 +128,12 @@
     method: string,
     folderId?: string,
   ) => {
+    const requestData = await onSelectRequest(
+      collectionId,
+      requestId,
+      folderId,
+    );
+
     nodes.update((_nodes) => {
       const dbNodes = _nodes;
       for (let index = 0; index < dbNodes.length; index++) {
@@ -136,6 +143,8 @@
           dbNodes[index].data.collectionId = collectionId;
           dbNodes[index].data.method = method;
           dbNodes[index].data.folderId = folderId ?? "";
+          dbNodes[index].data.requestData = requestData.request;
+          dbNodes[index].data.isDeleted = false;
         }
       }
       return dbNodes;

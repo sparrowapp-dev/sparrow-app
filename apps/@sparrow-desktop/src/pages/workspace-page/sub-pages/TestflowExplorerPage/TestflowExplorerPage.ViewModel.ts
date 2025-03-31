@@ -18,7 +18,10 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
-import { RequestDataTypeEnum, type HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
+import {
+  RequestDataTypeEnum,
+  type HttpRequestCollectionLevelAuthTabInterface,
+} from "@sparrow/common/types/workspace";
 import {
   TabPersistenceTypeEnum,
   type Tab,
@@ -42,7 +45,10 @@ import { notifications } from "@sparrow/library/ui";
 import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
-import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionAuthTypeBaseEnum,
+  CollectionRequestAddToBaseEnum,
+} from "@sparrow/common/types/workspace/collection-base";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -113,6 +119,8 @@ export class TestflowExplorerPageViewModel {
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
           method: elem.data.method, // not required to save in db
+          requestData: elem.data.requestData,
+          isDeleted: elem.data.isDeleted,
         },
         position: { x: elem.position.x, y: elem.position.y },
       };
@@ -334,18 +342,17 @@ export class TestflowExplorerPageViewModel {
     return nodes;
   };
 
-
-  private fetchCollectionAuth = async(_collectionId: string)=>{
-      const collectionRx = await this.collectionRepository.readCollection(_collectionId);
+  private fetchCollectionAuth = async (_collectionId: string) => {
+    const collectionRx =
+      await this.collectionRepository.readCollection(_collectionId);
     const collectionDoc = collectionRx?.toMutableJSON();
     let collectionAuth;
-      if(collectionDoc?.auth){
+    if (collectionDoc?.auth) {
       collectionAuth = {
-          auth : collectionDoc?.auth,
-          collectionAuthNavigation: collectionDoc?.selectedAuthType
-        } as HttpRequestCollectionLevelAuthTabInterface
-      }
-      else{
+        auth: collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType,
+      } as HttpRequestCollectionLevelAuthTabInterface;
+    } else {
       collectionAuth = {
         auth: {
           bearerToken: "",
@@ -359,11 +366,11 @@ export class TestflowExplorerPageViewModel {
             addTo: CollectionRequestAddToBaseEnum.HEADER,
           },
         },
-          collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
-        }
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+      };
     }
     return collectionAuth;
-    }
+  };
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -434,11 +441,13 @@ export class TestflowExplorerPageViewModel {
             element.data.folderId,
             request,
           );
-          const collectionAuth = await this.fetchCollectionAuth(element.data.collectionId);
+          const collectionAuth = await this.fetchCollectionAuth(
+            element.data.collectionId,
+          );
           const decodeData = this._decodeRequest.init(
             adaptedRequest.property.request,
             environments?.filtered || [],
-            collectionAuth
+            collectionAuth,
           );
           const start = Date.now();
 
@@ -884,5 +893,34 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
+  };
+
+  /**
+   * @description - Fetches request data based on collection, request, and folder IDs.
+   * @param {string} collectionId - The ID of the collection containing the request.
+   * @param {string} requestId - The ID of the specific request to retrieve.
+   * @param {string} folderId - The ID of the folder containing the request.
+   * @returns {Promise<any>} - Returns the request data asynchronously.
+   */
+  public getRequestdata = async (
+    collectionId: string,
+    requestId: string,
+    folderId: string,
+  ) => {
+    let request;
+    if (folderId) {
+      request = await this.collectionRepository.readRequestInFolder(
+        collectionId,
+        folderId,
+        requestId,
+      );
+      return request;
+    } else {
+      request = await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        requestId,
+      );
+      return request;
+    }
   };
 }

@@ -1,3 +1,4 @@
+import type { CollectionItemDtoInterface } from "./collection-dto";
 import type { RequestDataTypeEnum } from "./http-request-tab";
 import type { Tab } from "./tab";
 
@@ -13,6 +14,8 @@ export interface TFNodeType {
     collectionId: string;
     name: string;
     method: string;
+    requestData: CollectionItemDtoInterface;
+    isDeleted: boolean;
   };
   position: {
     x: number;

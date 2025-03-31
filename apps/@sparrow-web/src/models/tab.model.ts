@@ -4,6 +4,179 @@ import {
   type RxJsonSchema,
 } from "rxdb";
 
+const requestBody = {
+  raw: {
+    type: "string",
+  },
+  urlencoded: {
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        key: {
+          type: "string",
+        },
+        value: {
+          type: "string",
+        },
+        checked: {
+          type: "boolean",
+        },
+      },
+    },
+  },
+  formdata: {
+    type: "object",
+    properties: {
+      text: {
+        type: "array",
+        properties: {
+          key: {
+            type: "string",
+          },
+          value: {
+            type: "string",
+          },
+          checked: {
+            type: "boolean",
+          },
+        },
+      },
+      file: {
+        type: "array",
+        properties: {
+          key: {
+            type: "string",
+          },
+          value: {
+            type: "string",
+          },
+          checked: {
+            type: "boolean",
+          },
+          base: {
+            type: "string",
+          },
+        },
+      },
+    },
+  },
+};
+
+const params = {
+  key: {
+    type: "string",
+  },
+  value: {
+    type: "string",
+  },
+  checked: {
+    type: "boolean",
+  },
+};
+
+const httpRequestAuth = {
+  bearerToken: {
+    type: "string",
+  },
+  basicAuth: {
+    type: "object",
+    properties: {
+      username: {
+        type: "string",
+      },
+      password: {
+        type: "string",
+      },
+    },
+  },
+  apiKey: {
+    type: "object",
+    properties: {
+      authKey: {
+        type: "string",
+      },
+      authValue: {
+        type: "string",
+      },
+      addTo: {
+        type: "string",
+      },
+    },
+  },
+};
+
+const requestItems = {
+  method: {
+    type: "string",
+  },
+  operationId: {
+    type: "string",
+  },
+  url: {
+    type: "string",
+  },
+  body: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedRequestBodyType: {
+    type: "string",
+  },
+  selectedRequestAuthType: {
+    type: "string",
+  },
+  queryParams: {
+    type: "array",
+    properties: params,
+  },
+  auth: {
+    type: "object",
+    properties: httpRequestAuth,
+  },
+  headers: {
+    type: "array",
+    properties: params,
+  },
+};
+
+const itemsProperties = {
+  id: {
+    type: "number",
+  },
+  name: {
+    type: "string",
+  },
+  description: {
+    type: "string",
+  },
+  type: {
+    type: "string",
+  },
+  source: {
+    type: "string",
+  },
+  isDeleted: {
+    type: "boolean",
+  },
+  request: {
+    type: "object",
+    properties: requestItems,
+  },
+  createdAt: {
+    type: "date-time",
+  },
+  updatedAt: {
+    type: "date-time",
+  },
+  createdBy: {
+    type: "string",
+  },
+  updatedBy: {
+    type: "string",
+  },
+};
+
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
@@ -1017,7 +1190,14 @@ export const tabSchemaLiteral = {
                         type: "string",
                       },
                       method: {
-                        type: " string",
+                        type: "string",
+                      },
+                      requestData: {
+                        type: "object",
+                        properties: itemsProperties,
+                      },
+                      isDeleted: {
+                        type: "boolean",
                       },
                     },
                   },

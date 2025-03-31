@@ -93,5 +93,6 @@
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={false}
+    onSelectRequest={_viewModel.getRequestdata}
   />
 {/if}
