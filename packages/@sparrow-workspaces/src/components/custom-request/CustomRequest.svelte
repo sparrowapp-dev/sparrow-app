@@ -5,13 +5,18 @@
   import Input from "../../../../@sparrow-library/src/forms/Input/Input.svelte";
 
   export let handleModalState;
-  let requestName = "";
-  let requestURL = "";
-  let httpRequestMethod = "GET";
-  let isAddingNode = false;
+  export let handleCreateCustomRequest;
+  export let handleUpdateRequestName;
+  export let handleUpdateRequestURL;
+  export let handleUpdateRequestMethod;
+  export let requestName = "";
+  export let requestURL = "";
+  export let httpRequestMethod = "GET";
+  export let isAddingNode = false;
 
   const handleDropdown = (tabId) => {
     httpRequestMethod = tabId;
+    handleUpdateRequestMethod(tabId);
   };
 
   const httpMethodData = [
@@ -56,6 +61,7 @@
       variant="primary"
       bind:value={requestName}
       width="100%"
+      on:input={handleUpdateRequestName}
     />
   </div>
 
@@ -82,12 +88,13 @@
       headerFontSize={"12px"}
       headerHeight={"36px"}
     />
-    <div style="width: 10px;"></div>
+    <div style="width: 8px;"></div>
     <Input
       placeholder="Enter URL here"
       variant="primary"
       bind:value={requestURL}
       width="100%"
+      on:input={handleUpdateRequestURL}
     />
   </div>
 
@@ -111,7 +118,7 @@
       textClassProp={"fs-6"}
       type={"primary"}
       onClick={() => {
-        handleModalState(false);
+        handleCreateCustomRequest();
       }}
       loader={isAddingNode}
     />

@@ -45,7 +45,7 @@
   import { RunIcon } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
-  import CustomeRequest from "../../../components/custome-request/CustomeRequest.svelte";
+  import CustomRequest from "../../../components/custom-request/CustomRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
     TFDataStoreType,
@@ -241,6 +241,26 @@
 
   let deletedNodeId: string;
   let deleteNodeName: string = "";
+  let customRequestName: string = "";
+  let customRequestURL: string = "";
+  let customHTTPRequestMethod: string = "GET";
+  let isDeleteNodeModalOpen = false;
+  let isAddCustomRequestModalOpen = false;
+  // API response UI states
+  let responseState: TFResponseStateType = {
+    responseBodyLanguage: "JSON",
+    responseBodyFormatter: "Pretty",
+  };
+  let divElement: HTMLElement;
+  let sampleApiData: TFNodeStoreType;
+  let deleteCount = 0; // Variable to store the count of nodes to be deleted
+  let selectedTab = "response";
+  let requestNavigation = "Request Body";
+  let responseNavigation = "Response";
+  let nodesValue = 1;
+  let selectedNodeName = "";
+  let selectedNodeId = "";
+  let selectedNode: TFNodeStoreType | undefined;
 
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
@@ -258,6 +278,40 @@
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
     countNextDeletedNode(id);
+  };
+
+  /**
+   * @description - Updates the custom request name based on user input.
+   * @param {Event} e - The input event containing the new request name.
+   */
+  const handleUpdateRequestName = (e: any) => {
+    customRequestName = e?.detail || e?.target?.value;
+  };
+
+  /**
+   * @description - Updates the custom request URL based on user input.
+   * @param {Event} e - The input event containing the new request URL.
+   */
+  const handleUpdateRequestURL = (e: any) => {
+    customRequestURL = e?.detail || e?.target?.value;
+  };
+
+  /**
+   * @description - Updates the selected HTTP request method.
+   * @param {string} value - The new HTTP request method (e.g., GET, POST, PUT).
+   */
+  const handleUpdateRequestMethod = (value: string) => {
+    customHTTPRequestMethod = value;
+  };
+
+  /**
+   * @description - Handles the creation of a custom request.
+   * the selected HTTP method, request name, and request URL.
+   */
+  const handleCreateCustomRequest = () => {
+    console.log({ customHTTPRequestMethod });
+    console.log({ customRequestName });
+    console.log({ customRequestURL });
   };
 
   /**
@@ -443,8 +497,6 @@
     });
   });
 
-  let selectedNode: TFNodeStoreType | undefined;
-
   // Get the platform
   const getPlatform = async () => {
     const os = await platform();
@@ -477,10 +529,6 @@
     startBlock: StartBlock,
     requestBlock: RequestBlock,
   } as unknown as NodeTypes;
-  let nodesValue = 1;
-
-  let selectedNodeName = "";
-  let selectedNodeId = "";
 
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
@@ -501,11 +549,6 @@
   const edgesSubscriber = edges.subscribe((val) => {
     if (val) onUpdateEdges(val);
   });
-
-  let selectedTab = "response";
-
-  let requestNavigation = "Request Body";
-  let responseNavigation = "Response";
 
   /**
    * Updates the active tab inside the Request Body section.
@@ -538,9 +581,6 @@
     return responseNavigation;
   }
 
-  let isDeleteNodeModalOpen = false;
-  let isAddCustomRequestModalOpen = false;
-
   /**
    * Handles the deletion of a node and its related edges by filtering
    * the `nodes` and `edges` stores, and performs necessary cleanup actions.
@@ -568,8 +608,6 @@
 
     isDeleteNodeModalOpen = false;
   };
-
-  let deleteCount = 0; // Variable to store the count of nodes to be deleted
 
   /**
    *  Count nodes with an id greater than the one being deleted
@@ -601,12 +639,6 @@
       event.preventDefault();
       handleDeleteModal(selectedNodeId);
     }
-  };
-
-  // API response UI states
-  let responseState: TFResponseStateType = {
-    responseBodyLanguage: "JSON",
-    responseBodyFormatter: "Pretty",
   };
 
   /**
@@ -648,7 +680,6 @@
     });
   };
 
-  let divElement: HTMLElement;
   /**
    * Focuses the div element by calling its focus method.
    */
@@ -698,7 +729,6 @@
     edgesSubscriber();
   });
 
-  let sampleApiData: TFNodeStoreType;
   onMount(() => {
     setTimeout(() => {
       sampleApiData = onRunSampleApi();
@@ -1192,10 +1222,17 @@
     isAddCustomRequestModalOpen = flag;
   }}
 >
-  <CustomeRequest
+  <CustomRequest
+    requestName={customRequestName}
+    requestURL={customRequestURL}
+    httpRequestMethod={customHTTPRequestMethod}
     handleModalState={(flag = false) => {
       isAddCustomRequestModalOpen = flag;
     }}
+    {handleCreateCustomRequest}
+    {handleUpdateRequestName}
+    {handleUpdateRequestURL}
+    {handleUpdateRequestMethod}
   />
 </Modal>
 
