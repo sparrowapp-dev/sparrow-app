@@ -17,6 +17,7 @@
     isTestFlowTourGuideOpen,
   } from "../../../../stores/guide.tour";
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
+
   export let name;
   export let method;
   export let collections = [];
@@ -31,6 +32,7 @@
   });
 
   let arrayData = collections;
+  let filteredArrayData = collections;
   let selectedRequest = null;
   let isOpen = false;
   let previousItem;
@@ -38,18 +40,21 @@
   let selectedFolder;
   let selectedItem = "COLLECTION";
   let ignoreClickOutside = false;
+  let searchQuery = "";
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
       selectedCollection = data;
       selectedItem = "COLLECTION";
       arrayData = data.items;
+      filteredArrayData = data.items;
       previousItem = data;
     }
     if (data?.type === "FOLDER") {
       selectedFolder = data;
       selectedItem = "FOLDER";
       arrayData = data.items;
+      filteredArrayData = data.items;
       previousItem = data;
     }
     if (data?.type === "REQUEST") {
@@ -73,6 +78,7 @@
         );
       }
       arrayData = collections;
+      filteredArrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
     }
@@ -91,12 +97,13 @@
         isOpen = false;
       }
       arrayData = collections;
+      filteredArrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
     }
     ignoreClickOutside = false;
   };
-
+  let searchInputRef;
   $: {
     if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
       isOpen = true;
@@ -176,6 +183,20 @@
       ? name.substring(0, charLimit) + "..."
       : name;
   };
+
+  // Update search query manually
+  const handleInputChange = (event) => {
+    searchQuery = event.target.value.toLowerCase();
+    isOpen = true;
+
+    filteredArrayData = arrayData.filter((item) =>
+      item.name?.toLowerCase().includes(searchQuery),
+    );
+  };
+
+  const handleInputClick = () => {
+    isOpen = true;
+  };
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -211,7 +232,16 @@
           <span class="select-txt">{truncateName(name, 21)}</span>
         </div>
       {:else}
-        <span class="select-txt-new">Select API Request</span>
+        <input
+          class="border-none bg-transparent border-0 search-box"
+          style="width: 80%;"
+          type="text"
+          placeholder="Select API Request"
+          value={searchQuery}
+          on:input={handleInputChange}
+          on:click|stopPropagation={handleInputClick}
+          bind:this={searchInputRef}
+        />
       {/if}
     </div>
     <div
@@ -227,6 +257,7 @@
       {/if}
     </div>
   </div>
+
   <div
     class="dropdown-options px-1"
     style="overflow:auto; display: {isOpen
@@ -283,7 +314,7 @@
         {/if}
       </div>
     {/if}
-    <div class="scrollable-list">
+    <div class="scrollable-list" style="max-height: 288px;">
       {#if showSampleApi}
         {#each dummyCollection as data}
           {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
@@ -317,11 +348,11 @@
             </div>
           {/if}
         {/each}
-      {:else if arrayData?.filter((data) => {
+      {:else if filteredArrayData?.filter((data) => {
         if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
         return false;
       })?.length > 0}
-        {#each arrayData as data}
+        {#each filteredArrayData as data}
           {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
             <div
               class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
@@ -502,5 +533,23 @@
     align-content: center;
     padding-left: 13px;
     border-top: 1px solid var(--border-ds-surface-100);
+  }
+
+  .search-box:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: white;
+  }
+
+  .search-box::placeholder {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
   }
 </style>

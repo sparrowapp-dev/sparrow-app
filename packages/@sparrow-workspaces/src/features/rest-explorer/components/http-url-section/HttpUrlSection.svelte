@@ -24,8 +24,6 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
-  export let showSendButton = true;
-  export let isCustomRequestPopup = false;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -132,7 +130,7 @@
   <CodeMirrorInput
     value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={isCustomRequestPopup ? "Enter URL here" : "Enter a URL"}
+    placeholder={"Enter a URL"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
@@ -142,36 +140,34 @@
     isFocusedOnMount={true}
   />
 
-  {#if showSendButton}
-    <!-- Send button -->
-    {#if !isSendRequestInProgress}
-      <Button
-        title="Send"
-        type="primary"
-        customWidth={"96px"}
-        onClick={() => {
-          if (requestUrl === "") {
-            const codeMirrorElement = document.querySelector(
-              ".input-url .cm-editor",
-            );
-            if (codeMirrorElement) {
-              codeMirrorElement.classList.add("url-red-border");
-            }
-          } else {
-            onSendButtonClicked(environmentVariables);
+  <!-- Send button -->
+  {#if !isSendRequestInProgress}
+    <Button
+      title="Send"
+      type="primary"
+      customWidth={"96px"}
+      onClick={() => {
+        if (requestUrl === "") {
+          const codeMirrorElement = document.querySelector(
+            ".input-url .cm-editor",
+          );
+          if (codeMirrorElement) {
+            codeMirrorElement.classList.add("url-red-border");
           }
-        }}
-      />
-    {:else}
-      <Button
-        type="secondary"
-        customWidth={"96px"}
-        title="Cancel"
-        onClick={() => {
-          onCancelButtonClicked();
-        }}
-      />
-    {/if}
+        } else {
+          onSendButtonClicked(environmentVariables);
+        }
+      }}
+    />
+  {:else}
+    <Button
+      type="secondary"
+      customWidth={"96px"}
+      title="Cancel"
+      onClick={() => {
+        onCancelButtonClicked();
+      }}
+    />
   {/if}
 
   <!-- Switch pane layout button -->
@@ -193,25 +189,18 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  {#if showSendButton}
-    <Tooltip
-      title={"Save"}
-      placement={"bottom-center"}
-      distance={12}
-      zIndex={10}
-    >
-      <Button
-        type="secondary"
-        size="medium"
-        loader={isSaveLoad}
-        startIcon={isSaveLoad ? "" : SaveRegular}
-        onClick={handleSaveRequest}
-        disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-          ? true
-          : false}
-      />
-    </Tooltip>
-  {/if}
+  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
+    <Button
+      type="secondary"
+      size="medium"
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
+      onClick={handleSaveRequest}
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+        ? true
+        : false}
+    />
+  </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

@@ -1,51 +1,98 @@
 <script>
+  import { RequestMethod } from "@sparrow/common/enums";
+  import { Select } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-  import { HttpUrlSection } from "../../features/rest-explorer/components";
+  import Input from "../../../../@sparrow-library/src/forms/Input/Input.svelte";
 
   export let handleModalState;
-  let requestName = "New REST API";
-  let requestURL = "New REST API";
+  let requestName = "";
+  let requestURL = "";
   let httpRequestMethod = "GET";
   let isAddingNode = false;
+
+  const handleDropdown = (tabId) => {
+    httpRequestMethod = tabId;
+  };
+
+  const httpMethodData = [
+    {
+      name: "GET",
+      id: RequestMethod.GET,
+      color: "success",
+    },
+    {
+      name: "POST",
+      id: RequestMethod.POST,
+      color: "warning",
+    },
+    {
+      name: "PUT",
+      id: RequestMethod.PUT,
+      color: "secondary",
+    },
+    {
+      name: "DELETE",
+      id: RequestMethod.DELETE,
+      color: "danger",
+    },
+    {
+      name: "PATCH",
+      id: RequestMethod.PATCH,
+      color: "patch",
+    },
+  ];
 </script>
 
 <!-- Section for the modal content -->
 <section>
-  <div class="header-label mb-3 text-white">New Request</div>
+  <div style="margin-top: 24px;">
+    <div class="d-flex gap-1" style="margin-bottom: 8px;">
+      <div class="input-label">Request Name</div>
+      <span class="required-mark-primary">*</span>
+    </div>
 
-  <div>
-    <div class="input-label">Request Name</div>
-
-    <input
-      type="text"
-      bind:value={requestName}
-      on:input={() => {
-        // onUpdateAiPrompt(prompt);
-      }}
-      class="w-100 pe-5 py-2 ps-2 border-radius-4 text-fs-12 mt-2 input input-label text-white"
-      autofocus
+    <Input
       placeholder="Enter request name"
+      variant="primary"
+      bind:value={requestName}
+      width="100%"
     />
   </div>
 
-  <div class="mt-4">
+  <div class="input-request">
     <!-- HTTP URL Section -->
-    <HttpUrlSection
-      class=""
-      isSaveLoad={false}
-      isSave={false}
-      requestUrl={requestURL}
-      httpMethod={httpRequestMethod}
-      isSendRequestInProgress={false}
-      onSendButtonClicked={() => {}}
-      onCancelButtonClicked={() => {}}
-      showSendButton={false}
-      isCustomRequestPopup={true}
+    <Select
+      headerTheme={"light-violet"}
+      id={"api-request"}
+      size={"medium"}
+      data={httpMethodData}
+      borderRounded={"4px"}
+      titleId={httpRequestMethod}
+      onclick={handleDropdown}
+      borderHighlight={"active"}
+      headerHighlight={"hover"}
+      minHeaderWidth={"100px"}
+      borderActiveType={"none"}
+      zIndex={500}
+      borderType={"none"}
+      menuItem={"v2"}
+      bodyTheme={"surface"}
+      isDropIconFilled={true}
+      highlightTickedItem={false}
+      headerFontSize={"12px"}
+      headerHeight={"36px"}
+    />
+    <div style="width: 10px;"></div>
+    <Input
+      placeholder="Enter URL here"
+      variant="primary"
+      bind:value={requestURL}
+      width="100%"
     />
   </div>
 
   <!-- Container for the action buttons -->
-  <div class="d-flex justify-content-end" style="margin-top: 28px;">
+  <div class="d-flex justify-content-end" style="margin-top: 52px;">
     <span style="margin-right: 15px;">
       <!-- Cancel button to close the modal without leaving the team -->
       <Button
@@ -96,5 +143,16 @@
     font-weight: 400;
     font-size: 14px;
     color: var(--text-ds-neutral-400);
+  }
+
+  .input-request {
+    display: flex;
+    flex-direction: row;
+    margin-top: 35px;
+  }
+
+  .required-mark-primary {
+    color: var(--text-ds-danger-400);
+    font-family: "Inter", sans-serif;
   }
 </style>
