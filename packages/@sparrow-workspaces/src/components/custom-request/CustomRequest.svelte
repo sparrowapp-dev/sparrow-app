@@ -3,6 +3,7 @@
   import { Select } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import Input from "../../../../@sparrow-library/src/forms/Input/Input.svelte";
+  import { onMount } from "svelte";
 
   export let handleModalState;
   export let handleCreateCustomRequest;
@@ -46,6 +47,13 @@
       color: "patch",
     },
   ];
+
+  // Reset the fields on model open
+  onMount: {
+    requestName = "";
+    requestURL = "";
+    handleDropdown("GET");
+  }
 </script>
 
 <!-- Section for the modal content -->
