@@ -81,7 +81,7 @@
   };
 </script>
 
-<div class="position-relative" style="width: {width};">
+<div class="position-relative">
   <input
     {id}
     {value}

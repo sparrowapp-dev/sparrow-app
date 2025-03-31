@@ -89,13 +89,15 @@
       headerHeight={"36px"}
     />
     <div style="width: 8px;"></div>
-    <Input
-      placeholder="Enter URL here"
-      variant="primary"
-      bind:value={requestURL}
-      width="100%"
-      on:input={handleUpdateRequestURL}
-    />
+    <div style="width: 100%;">
+      <Input
+        placeholder="Enter URL here"
+        variant="primary"
+        bind:value={requestURL}
+        width="100%"
+        on:input={handleUpdateRequestURL}
+      />
+    </div>
   </div>
 
   <!-- Container for the action buttons -->
