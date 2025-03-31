@@ -45,6 +45,7 @@
   import { RunIcon } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
+  import CustomeRequest from "../../../components/custome-request/CustomeRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
     TFDataStoreType,
@@ -250,6 +251,15 @@
   };
 
   /**
+   * Opens the "Add Custom Request" modal.
+   *
+   * @param id - The ID associated with the custom request.
+   */
+  const handleOpenAddCustomRequestModal = () => {
+    isAddCustomRequestModalOpen = true;
+  };
+
+  /**
    * Creates a new node and connects it to the existing node.
    * @param _id - The ID of the existing node.
    */
@@ -314,6 +324,9 @@
             },
             onOpenDeleteModal: function (id: string) {
               handleDeleteModal(id);
+            },
+            onOpenAddCustomRequestModal: function (id: string) {
+              handleOpenAddCustomRequestModal();
             },
             name: _requestData ? _requestData?.name : "",
             method: _requestData ? _requestData?.method : "",
@@ -382,6 +395,9 @@
             },
             onOpenDeleteModal: function (id: string) {
               handleDeleteModal(id);
+            },
+            onOpenAddCustomRequestModal: function (id: string) {
+              handleOpenAddCustomRequestModal();
             },
             name: dbNodes[i].data?.name,
             method: dbNodes[i].data?.method,
@@ -512,6 +528,7 @@
   }
 
   let isDeleteNodeModalOpen = false;
+  let isAddCustomRequestModalOpen = false;
 
   /**
    * Handles the deletion of a node and its related edges by filtering
@@ -1150,6 +1167,23 @@
     {deleteCount}
     handleModalState={(flag = false) => {
       isDeleteNodeModalOpen = flag;
+    }}
+  />
+</Modal>
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isAddCustomRequestModalOpen}
+  handleModalState={(flag = false) => {
+    isAddCustomRequestModalOpen = flag;
+  }}
+>
+  <CustomeRequest
+    handleModalState={(flag = false) => {
+      isAddCustomRequestModalOpen = flag;
     }}
   />
 </Modal>

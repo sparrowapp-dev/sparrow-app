@@ -48,6 +48,7 @@
       folderId?: string,
     ) => void;
     onOpenDeleteModal: (id: string) => void;
+    onOpenAddCustomRequestModal: (id: string) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
     parentDrag: boolean;
@@ -176,6 +177,10 @@
     moreOptionsMenu = !moreOptionsMenu;
     data.onOpenDeleteModal(id);
   };
+
+  const handleOpenAddCustomRequestModal = () => {
+    data.onOpenAddCustomRequestModal(id);
+  };
 </script>
 
 <div
@@ -270,6 +275,7 @@
         collectionData={data.collections}
         name={req.name}
         method={req.method}
+        {handleOpenAddCustomRequestModal}
       />
     </div>
     {#if !currentBlock}

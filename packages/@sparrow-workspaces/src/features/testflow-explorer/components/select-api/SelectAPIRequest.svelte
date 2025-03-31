@@ -5,6 +5,7 @@
     CollectionIcon,
     ChevronUpRegular,
     FolderRegular,
+    AddRegular,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
@@ -21,6 +22,8 @@
   export let collections = [];
   export let updateNode;
   export let collectionData: Observable<CollectionDocument[]>;
+  export let handleOpenAddCustomRequestModal;
+
   collectionData.subscribe((value) => {
     if (value) {
       collections = value;
@@ -225,7 +228,7 @@
     </div>
   </div>
   <div
-    class="dropdown-options"
+    class="dropdown-options px-1"
     style="overflow:auto; display: {isOpen
       ? 'block'
       : 'none'}; position:absolute"
@@ -335,7 +338,9 @@
                     <span
                       class={"request-icon"}
                       style="font-size: 9px; font-weight: 600;"
-                      >{data?.request?.method === "DELETE" ? "DEL" : data?.request?.method || ""}</span
+                      >{data?.request?.method === "DELETE"
+                        ? "DEL"
+                        : data?.request?.method || ""}</span
                     >
                   </span>
                 {:else if data?.type === "FOLDER"}
@@ -361,6 +366,18 @@
         </div>
       {/if}
     </div>
+
+    {#if !name && !method}
+      <div
+        on:click={handleOpenAddCustomRequestModal}
+        class="custom-component mt-1 py-2"
+      >
+        <AddRegular size={"12px"} color={"var(--icon-ds-neutral-100)"} />
+        <div class="label-text" style="margin-left: 18px;">
+          Add Custom Request
+        </div>
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -375,6 +392,7 @@
     cursor: pointer;
     outline: none;
   }
+
   .dropdown-header:hover {
     border: 1px solid var(--border-ds-neutral-300);
   }
@@ -475,5 +493,14 @@
     font-weight: 500;
     font-size: 12px;
     color: var(--text-ds-neutral-50);
+  }
+
+  .custom-component {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    padding-left: 13px;
+    border-top: 1px solid var(--border-ds-surface-100);
   }
 </style>
