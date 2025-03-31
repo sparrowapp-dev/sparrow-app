@@ -29,10 +29,10 @@
       class="teams-heading ms-2 px-1"
       style="font-size: 14px; color:var(--bg-ds-neutral-300); line-height:20.02px; display:flex;align-items:center; margin-bottom:0;"
     >
-      Teams
+      Sparrow Hubs
     </h6>
     <div>
-      <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
+      <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
         <Button
           type="primary"
           size="small"

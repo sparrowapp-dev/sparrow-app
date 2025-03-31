@@ -248,7 +248,7 @@
 </Motion>
 
 <Modal
-  title={"New Team"}
+  title={"New Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
