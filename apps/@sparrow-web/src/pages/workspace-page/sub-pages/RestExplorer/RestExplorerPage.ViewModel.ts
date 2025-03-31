@@ -2319,7 +2319,7 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isChatbotGeneratingResponse: false });
   }
 
-  public generateAiResponseWithSocket = async (prompt = "") => {
+  public generateAIResponseWS = async (prompt = "") => {
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
@@ -2365,7 +2365,7 @@ class RestExplorerViewModel {
         `assistant-response_${componentData.tabId}`,
       );
       this.aiAssistentWebSocketService.removeListener(`disconnect`);
-      // this.aiAssistentWebSocketService.removeListener(`connect_error`);
+      this.aiAssistentWebSocketService.removeListener(`connect_error`);
 
       // Add new fresh listners
       this.aiAssistentWebSocketService.addListener(
@@ -2376,7 +2376,17 @@ class RestExplorerViewModel {
             componentData,
             "Service Disconnect!",
           );
-          // if (["io server disconnect", "transport close", "transport error"].includes(reason)) await this.handleAIResponseError(componentData, "Service Disconnect!");
+        },
+      );
+
+      this.aiAssistentWebSocketService.addListener(
+        `connect_error`,
+        async (reason) => {
+          console.error("Socket connect_error:", reason);
+          await this.handleAIResponseError(
+            componentData,
+            "Service Disconnect!",
+          );
         },
       );
 
@@ -2385,15 +2395,12 @@ class RestExplorerViewModel {
         `assistant-response_${componentData.tabId}`,
         async (response) => {
           console.log("came here : ");
-          // Remove any existing listeners to avoid duplicates
-          // socket.off(`assistant-response_${componentData.tabId}`);
-          // // socket.off(`connect_error`);
-          // socket.off(`disconnect`);
+
           this.aiAssistentWebSocketService.removeListener(
             `assistant-response_${componentData.tabId}`,
           );
-          // this.aiAssistentWebSocketService.removeListener(`connect_error`);
           this.aiAssistentWebSocketService.removeListener(`disconnect`);
+          this.aiAssistentWebSocketService.removeListener(`connect_error`);
 
           if (
             response.messages &&
@@ -2432,16 +2439,15 @@ class RestExplorerViewModel {
             ]);
           } else if (response.messages) {
             console.log("came here : 3");
-            // Handle successful response
-            console.log(
-              "threadID ;>> ",
-              componentData?.property?.request?.ai?.threadId,
-            );
+            const thisTabThreadId =
+              componentData?.property?.request?.ai?.threadId;
+            console.log("threadID ;>> ", thisTabThreadId);
+
             // Update thread ID if available
-            if (response.thread_Id) {
+            if (!thisTabThreadId) {
               await this.updateRequestAIThread(response.thread_Id);
             }
-
+            // Handle successful response
             // Add the AI's response to the conversation
             await this.updateRequestAIConversation([
               ...(componentData?.property?.request?.ai?.conversations || []),
