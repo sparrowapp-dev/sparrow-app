@@ -208,6 +208,7 @@
             }
             dbNodes[index].data.name = request?.name || "";
             dbNodes[index].data.method = request?.request?.method || "";
+            dbNodes[index].data.requestData = request?.request || {};
           }
         }
       }
@@ -413,6 +414,7 @@
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,
+            requestData: dbNodes[i].data?.requestData,
             collections: filteredCollections,
             tabId: $tab.tabId,
           },
