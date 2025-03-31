@@ -249,17 +249,21 @@
       }}
     >
       <button
+        tabindex="-1"
         class="border-0 bg-transparent"
-        style="width: 30px !important; height:24px; display:flex; align-items:center; justify-content:end; padding:4px; "
+        style="width: 30px !important; height:24px; display:flex; align-items:center; justify-content:end; "
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
       >
-        <SelectIcon
-          classProp={`my-auto`}
-          width={16}
-          height={16}
-          selected={currentWorkspace?.environmentId === env.id}
+        <RadioButton
+          name={"radio"}
+          buttonSize="small"
+          group={currentWorkspace?.environmentId}
+          value={env.id}
+          id={env.id}
+          handleChange={() => handleSelectEnvironment()}
+          singleSelect={true}
         />
       </button>
       <!-- <RadioButton
@@ -268,11 +272,11 @@
         selected={currentWorkspace?.environmentId === env.id}
         handleChange={() => handleSelectEnvironment()}
         singleSelect={true}
-      /> -->
+        /> -->
       {#if isRenaming}
         <input
           class="py-0 renameInputFieldCollection text-fs-12 w-100"
-          style="font-size: 12px; font-weight:500; line-height:18px;"
+          style="font-size: 12px; font-weight:400; line-height:18px;"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -286,7 +290,7 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 32px; font-size:12px; font-weight:500; line-height:18px; padding:2px 4px; "
+          style="height: 32px; font-size:12px; font-weight:400; line-height:18px; padding:2px 4px; "
         >
           <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
             {env.name}
@@ -312,7 +316,6 @@
               WorkspaceRole.WORKSPACE_VIEWER}
             startIcon={MoreHorizontalRegular}
             onClick={(e) => {
-              e.stopPropagation();
               rightClickContextMenu(e);
             }}
           />
@@ -396,6 +399,7 @@
       border-radius: 4px;
     }
     .collection-title {
+      color: var(--bg-ds-neutral-200);
       width: calc(100% - 30px);
       text-align: left;
       display: flex;

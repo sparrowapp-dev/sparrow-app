@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {  InfoFilled } from "@sparrow/library/icons";
+  import { InfoFilled } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { Toggle } from "@sparrow/library/ui";
 
@@ -8,6 +8,7 @@
    */
   export let environmentAxisX: number;
   export let environmentAxisY: number;
+  export let disabled;
   /**
    * missed environment
    */
@@ -46,7 +47,6 @@
   };
   let checkedToggle = false;
   let isGlobalVariable = false;
-
 
   $: {
     if (environmentVariables) {
@@ -89,26 +89,27 @@
         <input
           type="text"
           bind:value={newVariableObj.value}
-          placeholder="Enter Value"
+          placeholder="Add Value"
           style={"outline:none;background-color: var(--bg-ds-surface-400);placeholder-color: var(--text-ds-neutral-400); color: var(--text-ds-neutral-200)"}
           class="w-100 border-0 outline-0 text-fs-12 border-radius-2 mb-2 p-2 fw-medium"
         />
         <div
           class="global-variable d-flex align-items-center justify-content-between pb-2"
         >
-          <p class="text-fs-12 mb-0" style="color:var(--text-ds-neutral-200)">Global variable</p>
+          <p class="text-fs-12 mb-0" style="color:var(--text-ds-neutral-200)">
+            Global variable
+          </p>
           <div class="form-check form-switch">
-          
             <Toggle
-            bind:isActive={checkedToggle}
-            disabled={!environmentVariables.local}
-            onChange={() => {
+              bind:isActive={checkedToggle}
+              disabled={!environmentVariables.local}
+              onChange={() => {
                 isGlobalVariable = !isGlobalVariable;
               }}
             />
           </div>
         </div>
-   
+
         <div
           class="prevent-default text-fs-12 text-center border-radius-2 p-2 bg-primary-300"
           on:click={async (e) => {
@@ -130,29 +131,39 @@
       <p class="text-fs-12 d-flex align-items-center">
         <span>
           <InfoFilled size="16px" color="var(--bg-ds-danger-300)" />
-        </span><span class="ms-2" style="color:var(--text-ds-neutral-50); line-height: 1.5;" >Missing Variable</span>
+        </span><span
+          class="ms-2"
+          style="color:var(--text-ds-neutral-50); line-height: 1.5;"
+          >Missing Variable</span
+        >
       </p>
-      <p class="text-fs-12" style="color:var(--text-ds-neutral-50); line-height: 1.5;">
-        This variable is missing in your workspace. Try adding it as a global
-        variable or under the active environment.
-      </p>
-
-      <div
-        class="add-btn prevent-default text-fs-12 text-center add-variable-btn border-radius-2 p-2"
-        role="button"
-        on:click={(e) => {
-          e.preventDefault();
-          addVariable = true;
-        }}
+      <p
+        class="text-fs-12"
+        style="color:var(--text-ds-neutral-50); line-height: 1.5;"
       >
-        Add Variable
-      </div>
+        This variable is missing in your workspace.
+        {#if !disabled}
+          Try adding it as a global variable or under the active environment.
+        {/if}
+      </p>
+      {#if !disabled}
+        <div
+          class="add-btn prevent-default text-fs-12 text-center add-variable-btn border-radius-2 p-2"
+          role="button"
+          on:click={(e) => {
+            e.preventDefault();
+            addVariable = true;
+          }}
+        >
+          Add Variable
+        </div>
+      {/if}
     {/if}
   </div>
 </div>
 
 <style>
-  .content-panel{
+  .content-panel {
     background-color: var(--bg-ds-surface-600);
   }
   .select-environment-popup {
@@ -164,12 +175,12 @@
     overflow-y: auto;
     background-color: var(--bg-ds-surface-600);
     border-radius: 4px;
-    padding:12px;
+    padding: 12px;
   }
   .variable-highlight {
     color: white;
   }
-  .add-btn{
+  .add-btn {
     background-color: var(--bg-ds-primary-400);
   }
 

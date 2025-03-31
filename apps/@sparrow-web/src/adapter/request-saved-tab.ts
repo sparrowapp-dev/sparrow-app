@@ -1,9 +1,18 @@
-import {
-  createDeepCopy,
-} from "@sparrow/common/utils";
+import { createDeepCopy } from "@sparrow/common/utils";
 import { InitTab } from "@sparrow/common/factory";
-import { HttpRequestSavedAuthModeBaseEnum, HttpRequestSavedBodyModeBaseEnum, HttpRequestSavedMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
-import {  RequestDataTypeEnum, RequestDatasetEnum, type Auth, type KeyValueChecked, type Body } from "@sparrow/common/types/workspace/http-request-saved-tab";
+import {
+  HttpRequestSavedAuthModeBaseEnum,
+  HttpRequestSavedBodyModeBaseEnum,
+  HttpRequestSavedMethodBaseEnum,
+  HttpResponseSavedBodyModeBaseEnum,
+} from "@sparrow/common/types/workspace/http-request-saved-base";
+import {
+  RequestDataTypeEnum,
+  RequestDatasetEnum,
+  type Auth,
+  type KeyValueChecked,
+  type Body,
+} from "@sparrow/common/types/workspace/http-request-saved-tab";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import type { CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestSavedMetaDataDtoInterface } from "@sparrow/common/types/workspace/http-request-saved-dto";
@@ -15,7 +24,9 @@ export class RequestSavedTabAdapter {
   constructor() {}
 
   // parsing from frontend to backend
-  private unsetAuthType = (auth: HttpRequestSavedAuthModeBaseEnum): HttpRequestSavedAuthModeBaseEnum => {
+  private unsetAuthType = (
+    auth: HttpRequestSavedAuthModeBaseEnum,
+  ): HttpRequestSavedAuthModeBaseEnum => {
     let authType = HttpRequestSavedAuthModeBaseEnum.NO_AUTH;
     switch (auth) {
       case HttpRequestSavedAuthModeBaseEnum.NO_AUTH:
@@ -35,7 +46,9 @@ export class RequestSavedTabAdapter {
   };
 
   // parsing from frontend to backend
-  private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) => {
+  private unsetBodyType = (
+    bodyType: RequestDataTypeEnum | RequestDatasetEnum,
+  ) => {
     let contentType = HttpRequestSavedBodyModeBaseEnum.TEXT;
     switch (bodyType) {
       case RequestDataTypeEnum.JSON:
@@ -63,8 +76,35 @@ export class RequestSavedTabAdapter {
     return contentType;
   };
 
+  // parsing from frontend to backend
+  private unsetResponseBodyType = (
+    bodyType: RequestDataTypeEnum | RequestDatasetEnum,
+  ) => {
+    let contentType = HttpResponseSavedBodyModeBaseEnum.TEXT;
+    switch (bodyType) {
+      case RequestDataTypeEnum.JSON:
+        contentType = HttpResponseSavedBodyModeBaseEnum.JSON;
+        break;
+      case RequestDataTypeEnum.XML:
+        contentType = HttpResponseSavedBodyModeBaseEnum.XML;
+        break;
+      case RequestDataTypeEnum.HTML:
+        contentType = HttpResponseSavedBodyModeBaseEnum.HTML;
+        break;
+      case RequestDataTypeEnum.JAVASCRIPT:
+        contentType = HttpResponseSavedBodyModeBaseEnum.JAVASCRIPT;
+        break;
+      case RequestDataTypeEnum.TEXT:
+        contentType = HttpResponseSavedBodyModeBaseEnum.TEXT;
+        break;
+    }
+    return contentType;
+  };
+
   // parsing from backend to frontend
-  private setAuthType = (auth: HttpRequestSavedAuthModeBaseEnum): HttpRequestSavedAuthModeBaseEnum => {
+  private setAuthType = (
+    auth: HttpRequestSavedAuthModeBaseEnum,
+  ): HttpRequestSavedAuthModeBaseEnum => {
     let requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.NO_AUTH;
     switch (auth) {
       case HttpRequestSavedAuthModeBaseEnum.NO_AUTH:
@@ -80,7 +120,7 @@ export class RequestSavedTabAdapter {
         requestAuthNavigation = HttpRequestSavedAuthModeBaseEnum.BEARER_TOKEN;
         break;
     }
-    return requestAuthNavigation ;
+    return requestAuthNavigation;
   };
 
   // parsing from backend to frontend
@@ -118,6 +158,35 @@ export class RequestSavedTabAdapter {
     return { requestBodyLanguage, requestBodyNavigation };
   };
 
+  // parsing from backend to frontend
+  private setResponseBodyType = (header: HttpResponseSavedBodyModeBaseEnum) => {
+    let responseBodyNavigation = RequestDatasetEnum.RAW;
+    let responseBodyLanguage = RequestDataTypeEnum.TEXT;
+    switch (header) {
+      case HttpResponseSavedBodyModeBaseEnum.JSON:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.JSON;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.XML:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.XML;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.JAVASCRIPT:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.JAVASCRIPT;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.TEXT:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.HTML:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.HTML;
+        break;
+    }
+    return { responseBodyLanguage, responseBodyNavigation };
+  };
+
   /**
    * @description - parse backend data to frontend compatible
    * @param workspaceId - workspace id
@@ -134,7 +203,10 @@ export class RequestSavedTabAdapter {
     _savedRequest: CollectionItemBaseInterface,
   ): Tab {
     _savedRequest = createDeepCopy(_savedRequest);
-    const adaptedRequest = new InitTab().savedRequest(_savedRequest.id, workspaceId);
+    const adaptedRequest = new InitTab().savedRequest(
+      _savedRequest.id,
+      workspaceId,
+    );
     const path = {
       workspaceId: workspaceId,
       collectionId: collectionId,
@@ -143,31 +215,58 @@ export class RequestSavedTabAdapter {
     };
     adaptedRequest.updateName(_savedRequest.name);
     adaptedRequest.updateDescription(_savedRequest.description);
-    adaptedRequest.updateMethod(_savedRequest.requestResponse?.method as HttpRequestSavedMethodBaseEnum);
+    adaptedRequest.updateMethod(
+      _savedRequest.requestResponse?.method as HttpRequestSavedMethodBaseEnum,
+    );
     adaptedRequest.updateUrl(_savedRequest.requestResponse?.url as string);
-    adaptedRequest.updateQueryParams(_savedRequest.requestResponse?.queryParams as KeyValueChecked[]);
+    adaptedRequest.updateQueryParams(
+      _savedRequest.requestResponse?.queryParams as KeyValueChecked[],
+    );
     adaptedRequest.updateAuth(_savedRequest.requestResponse?.auth as Auth);
-    adaptedRequest.updateResponseBody(_savedRequest.requestResponse?.responseBody as string);
-    adaptedRequest.updateResponseDate(_savedRequest.requestResponse?.responseDate as string);
-    adaptedRequest.updateResponseHeaders(_savedRequest.requestResponse?.responseHeaders as KeyValueChecked[]);
-    adaptedRequest.updateResponseStatus(_savedRequest.requestResponse?.responseStatus as string);
-    adaptedRequest.updateHeaders(_savedRequest.requestResponse?.headers as KeyValueChecked[]);
+    adaptedRequest.updateResponseBody(
+      _savedRequest.requestResponse?.responseBody as string,
+    );
+    adaptedRequest.updateResponseDate(
+      _savedRequest.requestResponse?.responseDate as string,
+    );
+    adaptedRequest.updateResponseHeaders(
+      _savedRequest.requestResponse?.responseHeaders as KeyValueChecked[],
+    );
+    adaptedRequest.updateResponseStatus(
+      _savedRequest.requestResponse?.responseStatus as string,
+    );
+    adaptedRequest.updateHeaders(
+      _savedRequest.requestResponse?.headers as KeyValueChecked[],
+    );
     adaptedRequest.updatePath(path);
 
     // parsing body type
-    const selectedRequestBodyType = _savedRequest.requestResponse?.selectedRequestBodyType;
+    const selectedRequestBodyType =
+      _savedRequest.requestResponse?.selectedRequestBodyType;
     if (selectedRequestBodyType) {
-      const bodyType = this.setBodyType(_savedRequest.requestResponse?.selectedRequestBodyType as HttpRequestSavedBodyModeBaseEnum);
+      const bodyType = this.setBodyType(
+        _savedRequest.requestResponse
+          ?.selectedRequestBodyType as HttpRequestSavedBodyModeBaseEnum,
+      );
+      const responseBodyType = this.setResponseBodyType(
+        _savedRequest.requestResponse
+          ?.selectedResponseBodyType as HttpResponseSavedBodyModeBaseEnum,
+      );
       adaptedRequest.updateState({
         requestBodyLanguage: bodyType.requestBodyLanguage,
         requestBodyNavigation: bodyType.requestBodyNavigation,
+        responseBodyLanguage: responseBodyType.responseBodyLanguage,
       });
     }
 
     // parsing request auth
-    const selectedRequestAuthType = _savedRequest.requestResponse?.selectedRequestAuthType;
+    const selectedRequestAuthType =
+      _savedRequest.requestResponse?.selectedRequestAuthType;
     if (selectedRequestAuthType) {
-      const AuthType = this.setAuthType(_savedRequest.requestResponse?.selectedRequestAuthType as HttpRequestSavedAuthModeBaseEnum);
+      const AuthType = this.setAuthType(
+        _savedRequest.requestResponse
+          ?.selectedRequestAuthType as HttpRequestSavedAuthModeBaseEnum,
+      );
       adaptedRequest.updateState({
         requestAuthNavigation: AuthType,
       });
@@ -220,11 +319,11 @@ export class RequestSavedTabAdapter {
           base: "",
         },
       ];
-      
+
       adaptedRequest.updateBody({
         raw: _savedRequest.requestResponse?.body.raw,
         urlencoded: _savedRequest.requestResponse?.body.urlencoded,
-        formdata: formdata
+        formdata: formdata,
       } as Body);
     }
     return adaptedRequest.getValue();
@@ -235,7 +334,7 @@ export class RequestSavedTabAdapter {
    * @param requestTab - request backend data
    * @returns
    */
-  public unadapt(_requestTab: Tab) : HttpRequestSavedMetaDataDtoInterface {
+  public unadapt(_requestTab: Tab): HttpRequestSavedMetaDataDtoInterface {
     _requestTab = createDeepCopy(_requestTab);
     const bodyType =
       _requestTab?.property?.savedRequest?.state.requestBodyNavigation ===
@@ -243,18 +342,18 @@ export class RequestSavedTabAdapter {
         ? _requestTab.property?.savedRequest?.state.requestBodyLanguage
         : _requestTab.property?.savedRequest?.state.requestBodyNavigation;
     // parsing form data
-    const textFormData : {
+    const textFormData: {
       key: string;
       value: string;
       checked: boolean;
     }[] = [];
-    const fileFormData : {
+    const fileFormData: {
       key: string;
       value: string;
       checked: boolean;
       base: string;
     }[] = [];
-    
+
     _requestTab.property.savedRequest?.body.formdata.map((pair) => {
       if (pair.type == "text") {
         textFormData.push({
@@ -273,26 +372,35 @@ export class RequestSavedTabAdapter {
     });
 
     return {
-      method: _requestTab.property.savedRequest?.method as HttpRequestSavedMethodBaseEnum,
+      method: _requestTab.property.savedRequest
+        ?.method as HttpRequestSavedMethodBaseEnum,
       url: _requestTab.property.savedRequest?.url as string,
       body: {
-        raw : _requestTab.property.savedRequest?.body.raw,
-        urlencoded : _requestTab.property.savedRequest?.body.urlencoded,
-        formdata : {
+        raw: _requestTab.property.savedRequest?.body.raw,
+        urlencoded: _requestTab.property.savedRequest?.body.urlencoded,
+        formdata: {
           text: textFormData,
           file: fileFormData,
-        }
+        },
       },
       headers: _requestTab.property.savedRequest?.headers,
       responseBody: _requestTab.property.savedRequest?.responseBody,
       responseHeaders: _requestTab.property.savedRequest?.responseHeaders,
-      responseStatus: _requestTab.property.savedRequest?.responseStatus as string,
+      responseStatus: _requestTab.property.savedRequest
+        ?.responseStatus as string,
       responseDate: _requestTab.property.savedRequest?.responseDate as string,
       queryParams: _requestTab.property.savedRequest?.queryParams,
       auth: _requestTab.property.savedRequest?.auth,
-      selectedRequestBodyType: this.unsetBodyType(bodyType as RequestDatasetEnum | RequestDataTypeEnum),
+      selectedRequestBodyType: this.unsetBodyType(
+        bodyType as RequestDatasetEnum | RequestDataTypeEnum,
+      ),
+      selectedResponseBodyType: this.unsetResponseBodyType(
+        _requestTab.property.savedRequest?.state
+          .responseBodyLanguage as RequestDataTypeEnum,
+      ),
       selectedRequestAuthType: this.unsetAuthType(
-        _requestTab.property.savedRequest?.state?.requestAuthNavigation as HttpRequestSavedAuthModeBaseEnum,
+        _requestTab.property.savedRequest?.state
+          ?.requestAuthNavigation as HttpRequestSavedAuthModeBaseEnum,
       ),
     };
   }

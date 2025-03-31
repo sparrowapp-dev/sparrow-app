@@ -229,16 +229,6 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      onItemOpened("socket-io", {
-        workspaceId: collection.workspaceId,
-        collection,
-        folder,
-        socketio: socketIo,
-      });
-    }
-  }}
   class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
@@ -248,7 +238,19 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    style={folder?.id ? "padding-left: 43.5px; " : "padding-left: 31px;  "}
+    on:click|preventDefault={() => {
+      if (!isRenaming) {
+        onItemOpened("socket-io", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          socketio: socketIo,
+        });
+      }
+    }}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px; height:100%;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )
@@ -270,7 +272,7 @@
     {#if isRenaming}
       <input
         class="py-0 rename-input-field-socket-io"
-        style="font-size: 12px; font-weight:500; line-height:18px;  width: calc(100% - 50px);"
+        style="font-size: 12px; font-weight:400; line-height:18px;  width: calc(100% - 50px);"
         id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
@@ -340,11 +342,10 @@
   .api-name {
     height: 24px;
     line-height: 18px;
-    font-weight: 500;
+    font-weight: 400;
     width: calc(100% - 58px);
     text-align: left;
-    color: var(--bg-ds-neutral-50);
-    // display: flex;
+    color: var(--bg-ds-neutral-200);
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
     padding: 2px 4px;

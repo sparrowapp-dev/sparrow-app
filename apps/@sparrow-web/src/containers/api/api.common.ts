@@ -27,7 +27,7 @@ import {
   SocketIORequestStatusTabEnum,
   type EventsValues,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
-import { Base64Converter, Sleep } from "@sparrow/common/utils";
+import { Base64Converter, Sleep, StatusCode } from "@sparrow/common/utils";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -101,6 +101,7 @@ export const regenerateAuthToken = async (
   }
 };
 
+// Makes Http Request to the Sparrow backend
 const makeRequest = async (
   method: Method,
   url: string,
@@ -202,41 +203,6 @@ function timeout(timeout: number) {
   });
 }
 
-const makeHttpRequest = async (
-  url: string,
-  method: string,
-  headers: string,
-  body: string,
-  request: string,
-) => {
-  console.table({ url, method, headers, body, request });
-  let response;
-  MixpanelEvent(Events.SEND_API_REQUEST, { method: method });
-  url = url.trim().replace(/ /g, "%20");
-  body = body.replace(/\[SPARROW_AMPERSAND$/, "");
-  return Promise.race([
-    timeout(apiTimeOut),
-    invoke("make_http_request", {
-      url,
-      method,
-      headers,
-      body,
-      request,
-    }),
-  ])
-    .then(async (data: string) => {
-      try {
-        response = JSON.parse(data);
-        response = JSON.parse(response.body);
-        return success(response);
-      } catch (e) {
-        return error("error");
-      }
-    })
-    .catch(() => {
-      return error("error");
-    });
-};
 
 function formatTime(date) {
   let hours = date.getHours();
@@ -652,14 +618,15 @@ const connectWebSocket = async (
 };
 
 /**
- * Invoke RPC Communication
- * @param url - Request URL
- * @param method - Request Method
- * @param headers - Request Headers
- * @param body - Request Body
- * @param contentType - Request Body Type
- * @param tabId - Tab ID
- * @returns
+ * 
+ * @param url 
+ * @param method 
+ * @param headers 
+ * @param body 
+ * @param contentType 
+ * @param selectedAgent 
+ * @param signal 
+ * @returns 
  */
 const makeHttpRequestV2 = async (
   url: string,
@@ -1261,11 +1228,127 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
   });
 };
 
+/**
+ * Invoke Proxy service function to fetch graphql result.
+ * @param url - Request URL
+ * @param headers - Request Header
+ * @param body - Request GraphQL Query
+ */
+const makeGraphQLRequest = async (
+  _url: string,
+  _headers: string,
+  _query: string,
+  _selectedAgent: WorkspaceUserAgentBaseEnum,
+  _variables?: string,
+  _signal?: AbortSignal,
+): Promise<
+  HttpClientResponseInterface<{
+    body: string;
+    headers: object;
+    status: string;
+  }>
+> => {
+  let httpResponse: string;
+  const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
+  const startTime = performance.now();
+  try {
+    if (_selectedAgent === "Cloud Agent"){
+     
+      const proxyUrl = constants.PROXY_SERVICE + "/proxy/graphql-request";
+      const axiosResponse = await axios({
+        data: { 
+          url: _url, 
+          method: "POST", 
+          headers: "[]", 
+          body: JSON.stringify({
+          query: _query,
+          variables: _variables || {}
+          }), 
+          contentType: "application/json" },
+        url: proxyUrl,
+        method: "POST",
+      });
+
+      httpResponse = JSON.stringify({
+        body: JSON.stringify(axiosResponse.data.data),
+        headers: axiosResponse.data.headers,
+        status:  axiosResponse.data.status
+      });
+    }
+    else{
+      const axiosResponse = await axios({
+        method: "POST",
+        url: _url,
+        data: { query: _query, variables: _variables || {} } || {},
+      });
+  
+      httpResponse = JSON.stringify({
+        body: JSON.stringify(axiosResponse.data),
+        headers: axiosResponse.headers,
+        status:  axiosResponse.status + " " + (new StatusCode().getText(axiosResponse.status))
+      });
+    }
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    const appInsightData = {
+      id: uuidv4(),
+      name: "Proxy Duration Metric",
+      duration,
+      success: true,
+      responseCode: 200,
+      properties: {
+        source: "frontend",
+        type: "PROXY_GRAPHQL",
+      },
+    };
+    appInsights.trackDependencyData(appInsightData);
+  } catch (err) {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    appInsights.trackDependencyData({
+      id: uuidv4(),
+      name: "Proxy Duration Metric",
+      duration: duration,
+      success: false,
+      responseCode: 400,
+      properties: {
+        source: "frontend",
+        type: "PROXY_GRAPHQL",
+      },
+    });
+    if (_signal?.aborted) {
+      // Check if request is aborted after request fails
+      throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+    }
+    if(err?.response){
+      httpResponse = JSON.stringify({
+        body: JSON.stringify(err.response.data 
+        ),
+        headers: err.response.headers,
+        status:  err.response.status + " " + (new StatusCode().getText(err.response.status))
+      });
+      const parsedResponse = JSON.parse(httpResponse);
+      return success(parsedResponse);
+    }
+    throw new Error(err as string);
+  }
+  if (_signal?.aborted) {
+    // Check if request is aborted after request success
+    throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
+  }
+  try {
+    const parsedResponse = JSON.parse(httpResponse);
+    return success(parsedResponse);
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 export {
   makeRequest,
   getAuthHeaders,
   getRefHeaders,
-  makeHttpRequest,
   getMultipartAuthHeaders,
   makeHttpRequestV2,
   connectWebSocket,
@@ -1274,4 +1357,5 @@ export {
   sendSocketIoMessage,
   connectSocketIo,
   disconnectSocketIo,
+  makeGraphQLRequest
 };

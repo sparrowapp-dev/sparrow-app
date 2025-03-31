@@ -47,6 +47,8 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
+  RequestDataTypeEnum,
+  RequestDatasetEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { GuideRepository } from "../../../../repositories/guide.repository";
@@ -64,6 +66,7 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 import { InitTab } from "@sparrow/common/factory";
+import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
 
 export class RestExplorerSavedViewModel {
   /**
@@ -154,6 +157,31 @@ export class RestExplorerSavedViewModel {
     this._authParameter.next(value);
   }
 
+  // parsing from frontend to backend
+  private getResponseBodyType = (
+    bodyType: RequestDataTypeEnum | RequestDatasetEnum,
+  ) => {
+    let contentType = HttpResponseSavedBodyModeBaseEnum.TEXT;
+    switch (bodyType) {
+      case RequestDataTypeEnum.JSON:
+        contentType = HttpResponseSavedBodyModeBaseEnum.JSON;
+        break;
+      case RequestDataTypeEnum.XML:
+        contentType = HttpResponseSavedBodyModeBaseEnum.XML;
+        break;
+      case RequestDataTypeEnum.HTML:
+        contentType = HttpResponseSavedBodyModeBaseEnum.HTML;
+        break;
+      case RequestDataTypeEnum.JAVASCRIPT:
+        contentType = HttpResponseSavedBodyModeBaseEnum.JAVASCRIPT;
+        break;
+      case RequestDataTypeEnum.TEXT:
+        contentType = HttpResponseSavedBodyModeBaseEnum.TEXT;
+        break;
+    }
+    return contentType;
+  };
+
   /**
    * Compares the current request tab with the server version and updates the saved status accordingly.
    * This method is debounced to reduce the number of server requests.
@@ -181,6 +209,13 @@ export class RestExplorerSavedViewModel {
     if (!requestServer) result = false;
     // description
     else if (requestServer.description !== progressiveTab.description) {
+      result = false;
+    } else if (
+      requestServer.requestResponse.selectedResponseBodyType !==
+      this.getResponseBodyType(
+        progressiveTab.property.savedRequest.state.responseBodyLanguage,
+      )
+    ) {
       result = false;
     }
     if (result) {
@@ -450,35 +485,24 @@ export class RestExplorerSavedViewModel {
    *
    * @param  - response state
    */
-  public updateResponseState = async (key, val) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    if (key === "responseNavigation") {
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.navigation = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    } else if (key === "responseBodyLanguage") {
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.bodyLanguage = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    } else if (key === "responseBodyFormatter") {
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.bodyFormatter = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
+  public updateResponseState = async (_state: StatePartial) => {
+    if (_state?.responseBodyLanguage) {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      progressiveTab.property.savedRequest.state = {
+        ...progressiveTab.property.savedRequest.state,
+        ..._state,
+      };
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      this.compareRequestWithServer();
+    } else {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      progressiveTab.property.savedRequest.state = {
+        ...progressiveTab.property.savedRequest.state,
+        ..._state,
+      };
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     }
   };
 
@@ -838,6 +862,9 @@ export class RestExplorerSavedViewModel {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
+    const responeBodyType = this.getResponseBodyType(
+      componentData.property.savedRequest.state.responseBodyLanguage,
+    );
     if (isGuestUser === true) {
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
@@ -852,6 +879,9 @@ export class RestExplorerSavedViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       } else {
@@ -861,6 +891,9 @@ export class RestExplorerSavedViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       }
@@ -876,6 +909,7 @@ export class RestExplorerSavedViewModel {
         requestId: requestId,
         folderId: folderId,
         description: componentData.description,
+        selectedResponseBodyType: responeBodyType,
       },
     );
 
@@ -894,6 +928,9 @@ export class RestExplorerSavedViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       } else {
@@ -903,6 +940,9 @@ export class RestExplorerSavedViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       }

@@ -18,8 +18,8 @@
 </script>
 
 <div
-  class="mb-2 d-flex align-items-center justify-content-between"
-  style="gap:6px;"
+  class="d-flex align-items-center justify-content-between"
+  style="gap:6px;margin-bottom: 10px"
 >
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect

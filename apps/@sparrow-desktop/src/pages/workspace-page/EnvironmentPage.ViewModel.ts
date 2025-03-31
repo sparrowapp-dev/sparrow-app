@@ -216,6 +216,7 @@ export class EnvironmentViewModel {
       .setName(environment?.name)
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable);
+    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
   };
 

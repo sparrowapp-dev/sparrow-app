@@ -165,12 +165,10 @@
           {HttpRequestDefaultNameBaseEnum.NAME}
         </p>
       </div>
-      {#if !isWebApp}
-        <div class="d-flex align-items-center gap-2">
-          <span class="fs-4 text-primary-300">{totalGraphQl}</span>
-          <p style="font-size: 12px;" class="mb-0">GraphQL</p>
-        </div>
-      {/if}
+      <div class="d-flex align-items-center gap-2">
+        <span class="fs-4 text-primary-300">{totalGraphQl}</span>
+        <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+      </div>
       <div class="d-flex align-items-center gap-2">
         <span class="fs-4 text-primary-300">{totalWebSocket}</span>
         <p style="font-size: 12px;" class="mb-0">WebSocket</p>

@@ -93,21 +93,19 @@
         });
       }}
     />
-    {#if !isWebApp}
-      <Card
-        icon={GraphIcon}
-        label={`${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-        iconColor="var(--text-primary-300)"
-        iconSize={"18px"}
-        onClick={() => {
-          onItemCreated("graphql", {});
-          MixpanelEvent(Events.GraphQL_button, {
-            description: "Socket Io created from Default screen page.",
-            location: "Default Page",
-          });
-        }}
-      />
-    {/if}
+    <Card
+      icon={GraphIcon}
+      label={`${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+      iconColor="var(--text-primary-300)"
+      iconSize={"18px"}
+      onClick={() => {
+        onItemCreated("graphql", {});
+        MixpanelEvent(Events.GraphQL_button, {
+          description: "Socket Io created from Default screen page.",
+          location: "Default Page",
+        });
+      }}
+    />
 
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
