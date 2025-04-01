@@ -9,15 +9,15 @@ export const ICON_CONFIG = {
 };
 
 export const NAME_CONFIG = {
-  TITLE: `Team Name`,
+  TITLE: `Hub Name`,
   MAX_TEXT_SIZE: 500,
-  PLACEHOLDER: `Team or Organization name`,
+  PLACEHOLDER: `Hub name`,
 };
 
 export const DESCRIPTION_CONFIG = {
   TITLE: `About`,
   MAX_TEXT_SIZE: 500,
-  PLACEHOLDER: `Tell us something about your team`,
+  PLACEHOLDER: `Write a little about your hub`,
 };
 
 export const OWNER_CONFIG = {

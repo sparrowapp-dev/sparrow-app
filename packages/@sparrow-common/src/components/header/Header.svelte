@@ -318,7 +318,7 @@
             position={"absolute"}
             isHeaderCombined={true}
             maxBodyHeight={"300px"}
-            placeholderText=" Team / Workspace  "
+            placeholderText=" Hub / Workspace  "
             iconRequired={true}
             icon={WorkspaceRegular}
             iconColor={"var(--icon-ds-neutral-100)"}

@@ -227,7 +227,7 @@
 {/if}
 
 <Modal
-  title={"Invite Team Members"}
+  title={"Add People to Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

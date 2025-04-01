@@ -7,14 +7,18 @@
   let activeTeamSettingsTabId = TeamSettingsTabsEnum.TEAM_PROFILE;
 </script>
 
-<div>
-  <section class="h-100 pb-2 pt-2">
+<div class="h-100">
+  <section class="h-100">
     <div class="d-flex h-100">
       <div class="h-100 d-flex flex-column" style="width: 250px;">
         <div style="flex:1; overflow:auto;">
           <SettingsNavigator bind:activeTeamSettingsTabId />
         </div>
       </div>
+      <div
+        class="h-100 mx-2"
+        style="border-right: 1px solid var(--border-color);"
+      ></div>
       <div class="h-100 d-flex flex-column" style="width: calc(100% - 250px);">
         <div style="flex:1; overflow:auto;" class="ps-5 pe-1">
           {#if activeTeamSettingsTabId === TeamSettingsTabsEnum.TEAM_PROFILE}
