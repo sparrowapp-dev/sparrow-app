@@ -4,6 +4,7 @@
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
   import { CaretDownFilled } from "@sparrow/library/icons";
+
   /**
    * Determines id of the menu item.
    */
@@ -64,25 +65,10 @@
   export let searchErrorMessage = "No value found.";
 
   /**
-   * Determines the border positioning state for the Select header.
-   */
-  let borderType: "none" = "none";
-  let borderActiveType: "all" = "all"; // active case
-
-  /**
    * Determines the background state for the Select header.
    */
-  export let variant: "primary" | "secondary" = "primary";
+  export let variant: "primary" | "secondary" | "tertiary" = "primary";
 
-  /**
-   * Determines the background highlighting state for the Select header.
-   */
-  let headerHighlight: "active" | "hover" | "hover-active" | "" =
-    "hover-active";
-  /**
-   * Determines the border highlighting state for the Select header.
-   */
-  let borderHighlight: "active" | "hover" | "hover-active" | "" = "active";
   /**
    * Determines the border radius of Select header.
    */
@@ -167,34 +153,15 @@
   };
 
   let selectBorderClass = "";
-  switch (borderType) {
-    case "none":
+  $: {
+    if (variant === "primary" || variant === "secondary") {
       selectBorderClass = "select-border-none";
-      break;
-    // case "all":
-    //   selectBorderClass = "select-border-all";
-    //   break;
-    // case "bottom":
-    //   selectBorderClass = "select-border-bottom";
-    //   break;
+    } else if (variant === "tertiary") {
+      selectBorderClass = "select-border-all";
+    }
   }
 
-  let selectActiveBorderClass = "";
-  let selectErrorBorderClass = "";
-  switch (borderActiveType) {
-    // case "none":
-    //   selectActiveBorderClass = "select-active-border-none";
-    //   selectErrorBorderClass = "select-error-border-none";
-    //   break;
-    case "all":
-      selectActiveBorderClass = "select-active-border-all";
-      selectErrorBorderClass = "select-error-border-all";
-      break;
-    // case "bottom":
-    //   selectActiveBorderClass = "select-active-border-bottom";
-    //   selectErrorBorderClass = "select-error-border-bottom";
-    //   break;
-  }
+  let selectErrorBorderClass = "select-error-border-all";
 
   let selectBackgroundClass = "";
   switch (variant) {
@@ -203,6 +170,9 @@
       break;
     case "secondary":
       selectBackgroundClass = "select-background-secondary";
+      break;
+    case "tertiary":
+      selectBackgroundClass = "select-background-violet2";
       break;
   }
 
@@ -213,6 +183,9 @@
       break;
     case "secondary":
       selectBodyBackgroundClass = "select-body-background-surface";
+      break;
+    case "tertiary":
+      selectBodyBackgroundClass = "select-body-background-violet";
       break;
   }
 
@@ -261,12 +234,11 @@
   });
 
   const extractHeaderHighlight = (
-    _headerHighlight: string,
     _isOpen: boolean,
     _isHover: boolean,
     _isClicked: boolean,
   ) => {
-    if (_isClicked && _isHover && _headerHighlight !== "") {
+    if (_isClicked && _isHover) {
       let x;
       switch (variant) {
         case "primary":
@@ -274,15 +246,14 @@
           break;
         case "secondary":
           x = "secondary";
+          break;
+        case "tertiary":
+          x = "tertiary";
           break;
       }
       return `select-btn-state-clicked-${x}`;
     }
-    if (
-      (_headerHighlight === "hover" && isHover) ||
-      (_headerHighlight === "active" && _isOpen) ||
-      (_headerHighlight === "hover-active" && (_isOpen || isHover))
-    ) {
+    if (_isOpen || _isHover) {
       let x;
       switch (variant) {
         case "primary":
@@ -290,23 +261,36 @@
           break;
         case "secondary":
           x = "secondary";
+          break;
+        case "tertiary":
+          x = "tertiary";
           break;
       }
       return `select-btn-state-active-${x}`;
     }
     return "";
   };
-  const extractBorderHighlight = (
-    _borderHighlight: string,
-    _isHover: boolean,
-    _isOpen: boolean,
-  ) => {
-    if (
-      (_borderHighlight === "hover" && _isHover) ||
-      (_borderHighlight === "active" && _isOpen) ||
-      (_borderHighlight === "hover-active" && (_isOpen || _isHover))
-    ) {
-      return selectActiveBorderClass;
+  const extractBorderHighlight = (_isHover: boolean, _isOpen: boolean) => {
+    if (_isOpen) {
+      switch (variant) {
+        case "primary":
+          return "";
+        case "secondary":
+          return "";
+        case "tertiary":
+          return "select-active-border-all";
+      }
+    }
+    if (_isHover) {
+      switch (variant) {
+        case "primary":
+          return "";
+        case "secondary":
+          return "";
+        case "tertiary":
+          // return "select-active-border-all";
+          return "";
+      }
     } else {
       return "";
     }
@@ -368,9 +352,9 @@
       }}
       class="select-btn
       {selectBackgroundClass}
-      {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}  
+      {extractHeaderHighlight(isOpen, isHover, isClicked)}  
       {selectBorderClass}
-      {extractBorderHighlight(borderHighlight, isHover, isOpen)}
+      {extractBorderHighlight(isHover, isOpen)}
       {isError ? selectErrorBorderClass : ''}
         d-flex align-items-center justify-content-between"
       style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight};"
@@ -572,7 +556,7 @@
     background-color: var(--bg-tertiary-400);
   }
   .select-background-violet2 {
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-400);
   }
   .select-background-dark-violet {
     background-color: var(--bg-secondary-600);
@@ -612,6 +596,9 @@
   .select-btn-state-active-secondary {
     background-color: var(--bg-ds-surface-600);
   }
+  .select-btn-state-active-tertiary {
+    background-color: var(--bg-ds-surface-400);
+  }
 
   // clicked states
   .select-btn-state-clicked-transparent {
@@ -637,6 +624,9 @@
   }
   .select-btn-state-clicked-secondary {
     background-color: var(--bg-ds-surface-500);
+  }
+  .select-btn-state-clicked-tertiary {
+    background-color: var(--bg-ds-surface-400);
   }
 
   // focused
@@ -677,8 +667,7 @@
   .select-data {
     background-color: var(--bg-ds-surface-600);
   }
-  .select-active {
-  }
+
   .select-logo-active {
     transform: rotateX(180deg) !important;
   }
@@ -741,9 +730,7 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-  .select-btn:hover {
-    background-color: var(--bg-ds-surface-400) !important;
-  }
+
   .color-primary {
     color: var(--text-ds-primary-300);
   }

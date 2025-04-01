@@ -76,11 +76,7 @@
     titleId={selectedTeam}
     minHeaderWidth={"auto"}
     size={"medium"}
-    iconRequired={false}
-    borderType={"none"}
-    borderActiveType={"none"}
-    headerHighlight={""}
-    variant={"primary"}
+    variant={"tertiary"}
     menuItem={"v3"}
     maxHeaderWidth={"1285px"}
     zIndex={200}

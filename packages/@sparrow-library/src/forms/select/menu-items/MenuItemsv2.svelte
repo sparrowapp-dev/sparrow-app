@@ -65,9 +65,17 @@
       _isMenuItemHover
     ) {
       return `select-clicked-highlight-surface-btn`;
+    } else if (
+      _bodyTheme === "tertiary" &&
+      _isMenuItemClicked &&
+      _isMenuItemHover
+    ) {
+      return `select-clicked-highlight-surface-btn`;
     } else if (_bodyTheme === "primary" && _isMenuItemHover) {
       return `select-hover-highlight-surface-btn`;
     } else if (_bodyTheme === "secondary" && _isMenuItemHover) {
+      return `select-hover-highlight-surface-btn`;
+    } else if (_bodyTheme === "tertiary" && _isMenuItemHover) {
       return `select-hover-highlight-surface-btn`;
     } else {
       return "";
