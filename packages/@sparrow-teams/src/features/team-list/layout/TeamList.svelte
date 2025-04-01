@@ -16,7 +16,6 @@
   export let teamList = [];
   export let disableNewInviteTag;
   export let modifyTeam;
-  export let activeIndex;
   export let threeDotIconDisable = false;
 </script>
 
@@ -29,10 +28,10 @@
       class="teams-heading ms-2 px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
       style=" color:var(--bg-ds-neutral-300); display:flex;align-items:center; margin-bottom:0;"
     >
-      Teams
+      Sparrow Hubs
     </h6>
     <div>
-      <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
+      <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
         <Button
           type="primary"
           size="small"
@@ -52,14 +51,13 @@
         <button
           class={`sidebar-items d-flex w-100 mb-1 
         px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
-          team.teamId === activeIndex ? "active" : ""
+          team.isOpen ? "active" : ""
         }`}
           style={!isGuestUser
             ? "gap:4px; padding:4px; padding-left:8px;"
             : "pointer-events: none; gap:4px; padding:4px; padding-left:8px; "}
           on:click={async () => {
             await setOpenTeam(team.teamId);
-            activeIndex = team.teamId;
             if (team.isNewInvite) {
               let data = await disableNewInviteTag(team.teamId);
               if (data) {
@@ -102,9 +100,7 @@
               size="extra-small"
               customWidth="24px"
               type="teritiary-regular"
-              startIcon={team.teamId !== activeIndex
-                ? PeopleRegular
-                : PeopleFilled}
+              startIcon={!team.isOpen ? PeopleRegular : PeopleFilled}
             />
           {/if}
           {#if threeDotIconDisable}

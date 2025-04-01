@@ -108,17 +108,6 @@
       isWelcomePopupOpen = value;
     }
   });
-  let isGithubStarHover = false;
-
-  let activeIndex = "";
-
-  $: {
-    if ($openTeam) {
-      activeIndex = $openTeam?.teamId;
-    }
-  }
-
-  let isExpandLoginButton = false;
 
   const launchSparrowWebApp = () => {
     let appDetected = false;
@@ -212,7 +201,6 @@
                 teamList={$teamList}
                 {disableNewInviteTag}
                 {modifyTeam}
-                bind:activeIndex
               />
               <!-- Recent APIs-->
               {#if !isGuestUser}
@@ -348,7 +336,7 @@
 </Modal>
 
 <Modal
-  title={"New Team"}
+  title={"New Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

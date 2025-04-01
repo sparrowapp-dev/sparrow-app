@@ -13,7 +13,7 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 
-import { createDeepCopy } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   currentStep,
   isFirstTimeInTestFlow,
@@ -156,6 +156,8 @@ export class TestflowViewModel {
         ...res,
         workspaceId: currentWorkspace._id,
       });
+      // scroll the top tab bar to right
+      moveNavigation("right")
       notifications.success("New Testflow created successfully.");
       // MixpanelEvent(Events.CREATE_TESTFLOW);
       let isFirstTimeUsingTestFlow = false;

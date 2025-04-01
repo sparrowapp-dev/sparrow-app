@@ -112,7 +112,7 @@
   };
 </script>
 
-<div class="h-100 pb-2">
+<div class="h-100">
   <div class="d-flex flex-column h-100">
     {#if !isGuestUser}
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">

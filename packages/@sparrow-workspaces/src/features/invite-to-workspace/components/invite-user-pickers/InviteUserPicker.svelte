@@ -158,7 +158,7 @@
         <input
           id="input"
           placeholder={!emailstoBeSentArr.length
-            ? "Enter email ID or name of team member."
+            ? "Enter email ID or name of hub member."
             : ""}
           autocomplete="off"
           autocapitalize="none"
