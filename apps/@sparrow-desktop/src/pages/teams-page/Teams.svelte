@@ -89,16 +89,6 @@
     }
   }
 
-  let isGithubStarHover = false;
-
-  let activeIndex = "";
-
-  $: {
-    if ($openTeam) {
-      activeIndex = $openTeam.teamId;
-    }
-  }
-
   const formatVersion = (version) => {
     try {
       const parts = version.split(".");
@@ -167,7 +157,6 @@
                 teamList={$teamList}
                 {disableNewInviteTag}
                 {modifyTeam}
-                bind:activeIndex
               />
               <!-- Recent APIs-->
               {#if !isGuestUser}
