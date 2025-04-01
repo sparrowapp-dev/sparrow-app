@@ -131,8 +131,9 @@
         style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
       >
         <h4 class="ellipsis overflow-hidden me-4">
-          <span style="font-size: 16px; color:var(--text-ds-neutral-50)"
-            >{workspace.name}</span
+          <span
+            class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-Medium"
+            style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
           >
         </h4>
       </div>
@@ -143,7 +144,10 @@
         }`}
       >
         <span>{workspace?.collections?.length ?? 0}</span>
-        <span style="font-size: 12px; color:var(--text-secondary-200)">
+        <span
+          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          style="color:var(--text-secondary-200)"
+        >
           Collections
         </span>
       </p>
@@ -153,9 +157,13 @@
           showMenu ? "color: var(--sparrow-text-color) !important;" : null
         }`}
       >
-        <span style="size: 12px; color:var(--text-secondary-200)"
+        <span
+          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          style=" color:var(--text-secondary-200)"
           >Last updated on
-        </span><span style="font-size: 12px; color:var(--text-ds-neutral-50)"
+        </span><span
+          class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Semi-bold"
+          style=" color:var(--text-ds-neutral-50)"
           >{formatDateInString(workspace?.updatedAt)}</span
         >
       </p>
@@ -229,7 +237,6 @@
     font-size: 16px;
   }
   .teams-workspace__date span {
-    font-size: 14px;
     color: var(--text-secondary-110);
   }
   .threedot-icon-container {

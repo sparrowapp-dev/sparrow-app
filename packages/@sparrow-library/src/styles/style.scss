@@ -571,6 +571,29 @@ $theme-colors: map-merge($theme-colors,
       "sparrowBgContainerFour": $sparrow-bg-container-four,
     ));
 
+$sparrow-ds-font-sizes: (
+  // px : rem  
+  12 : 0.857rem,
+  14 : 1.000rem,
+  16 : 1.143rem,
+  20 : 1.429rem,
+  24 : 1.714rem,
+  28 : 2.000rem,
+);
+$sparrow-ds-line-heights: (
+  // line-height : percentage line-height
+  120 : 120%,
+  130 : 130%,
+  143 : 143%,
+  150 : 150%,
+);
+
+$sparrow-ds-font-weights: (
+  // type : value
+  Semi-bold :600,
+  Medium : 500,
+  Regular : 400,
+);
 // Define a map for font sizes in pixels
 $sparrow-font-sizes: (
   6: 0.4rem,
@@ -766,6 +789,24 @@ $sparrow-border-colors: (
   danger-900: $theme-red-fe2e2e,
   danger-1000: $theme-red-312325,
 );
+
+@each $size , $value in $sparrow-ds-font-sizes {
+  .text-ds-font-size-#{$size} {
+    font-size: $value;
+  }
+}
+
+@each $height , $value in $sparrow-ds-line-heights {
+  .text-ds-line-height-#{$height} {
+    line-height: $value;
+  }
+}
+
+@each $fontWeight , $value in $sparrow-ds-font-weights {
+  .text-ds-font-weight-#{$fontWeight} {
+    font-weight: $value;
+  }
+}
 
 // Generate utility classes
 @each $size, $value in $sparrow-font-sizes {

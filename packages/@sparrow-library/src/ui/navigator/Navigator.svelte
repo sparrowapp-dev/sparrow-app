@@ -4,12 +4,11 @@
   export let tabs;
   export let currentTabId;
   export let onTabClick;
-  export let type : "segmentedTab" | "default" = "default";
+  export let type: "segmentedTab" | "default" = "default";
   let leftSliderDistance = 0;
   let sliderWidth = 0;
   let tabElements: { [key: string]: HTMLButtonElement | undefined } = {};
- 
- 
+
   const handleClick = (id: string) => {
     const tab = tabElements[id];
     if (tab && !tab.disabled) {
@@ -37,7 +36,7 @@
     }
     handleClick(currentTabId);
   });
- 
+
   // Add reactive statement to watch currentTabId changes
   $: {
     if (currentTabId && Object.keys(tabElements).length > 0) {
@@ -48,13 +47,17 @@
 
 <div tabindex={allDisableState ? -1 : 0}>
   <!-- Tabs -->
-  <div class={"d-flex position-relative gap-1"}
-  style={type === "segmentedTab" ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content" : ""}>
+  <div
+    class={"d-flex position-relative gap-1"}
+    style={type === "segmentedTab"
+      ? "border: 1px solid var(--border-ds-surface-100); border-radius: 6px; padding: 4px; width:fit-content"
+      : ""}
+  >
     {#each tabs as tab}
       <button
         bind:this={tabElements[tab.id]}
         tabindex={allDisableState ? -1 : 0}
-        class={`${tab.disabled ? "tab-container-disabled" : "tab-container"} ${tab.id === currentTabId ? "selected" : ""}`}
+        class={`${tab.disabled ? "tab-container-disabled" : "tab-container"} ${tab.id === currentTabId ? "selected" : ""}  text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium`}
         role="tab"
         on:click={() => {
           if (!tab.disabled) {
@@ -86,12 +89,13 @@
     ></div>
   {/if}
 </div>
+
 <style>
   .tab-container {
     display: flex;
     justify-content: center;
     align-items: center;
- 
+
     min-width: fit-content;
     max-width: 182px;
     text-align: center;
@@ -100,8 +104,6 @@
     gap: 4px;
     background-color: transparent;
     color: var(--text-ds-neutral-100);
-    font-size: 12px;
-    line-height: 16px;
     min-height: 28px;
     border: 0px;
   }
@@ -113,15 +115,14 @@
     background-color: var(--bg-ds-surface-900);
     outline: 2px solid var(--border-ds-primary-300);
     outline-offset: -2px;
-    color:var(--bg-ds-neutral-100) !important;
- 
+    color: var(--bg-ds-neutral-100) !important;
   }
- 
-  .tab-container.selected{
+
+  .tab-container.selected {
     background-color: var(--bg-ds-surface-600);
     color: var(--bg-ds-neutral-50);
   }
-  .tab-container.selected:hover{
+  .tab-container.selected:hover {
     background-color: var(--bg-ds-surface-400) !important;
     color: var(--bg-ds-neutral-50);
   }
@@ -132,7 +133,7 @@
     background-color: var(--bg-ds-surface-700);
     color: var(--bg-ds-neutral-50);
   }
- 
+
   .tab-container-disabled {
     display: flex;
     justify-content: center;
@@ -145,13 +146,11 @@
     gap: 4px;
     background-color: transparent;
     color: var(--text-ds-neutral-500);
-    font-size: 12px;
-    line-height: 18px;
     min-height: 28px;
     border: 0px;
     cursor: default;
   }
- 
+
   .icon {
     max-width: 12px;
     max-height: 12px;
@@ -170,7 +169,4 @@
     top: 0px;
     z-index: 100;
   }
- 
 </style>
- 
- 

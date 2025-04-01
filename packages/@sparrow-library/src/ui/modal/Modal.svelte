@@ -74,7 +74,11 @@
           {/if}
           <div class="flex-column">
             {#if title}
-              <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+              <h3
+                class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-Medium ellipsis"
+              >
+                {title}
+              </h3>
             {/if}
             {#if description}
               <h3 class="sparrow-modal-description fw-normal ellipsis">

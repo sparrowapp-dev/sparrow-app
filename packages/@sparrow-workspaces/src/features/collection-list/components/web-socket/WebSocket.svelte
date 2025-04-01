@@ -137,8 +137,8 @@
   handleModalState={() => (isDeletePopup = false)}
 >
   <div
-    class="mb-1 mt-2"
-    style="color: var(--text-ds-nuetral-100); font-weight:400; line-height:20px;font-size:14px;"
+    class="mb-1 mt-2 text-ds-font-size-14 text-ds-font-weight-Regular"
+    style="color: var(--text-ds-nuetral-100); line-height:20px;"
   >
     <p>
       Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
@@ -147,8 +147,8 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;gap:12px"
+    class="d-flex align-items-center justify-content-end mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+    style="gap:12px"
   >
     <Button
       disable={deleteLoader}
@@ -283,8 +283,8 @@
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px); font-weight:400; line-height:18px;"
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        style=" width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -296,11 +296,12 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; font-weight:400; line-height:18px;"
-      >
-        <p class="ellipsis m-0 p-0">{api.name}</p>
+      <div class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}">
+        <p
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        >
+          {api.name}
+        </p>
       </div>
     {/if}
   </button>

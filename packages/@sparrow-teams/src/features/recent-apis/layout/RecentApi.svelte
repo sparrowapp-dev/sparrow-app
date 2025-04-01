@@ -26,7 +26,11 @@
 </script>
 
 <div class="d-flex justify-content-between pb-0" style="gap:8px;">
-  <h6 class="teams-heading">Recent APIs</h6>
+  <h6
+    class="teams-heading text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Regular"
+  >
+    Recent APIs
+  </h6>
 </div>
 
 <div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
@@ -57,9 +61,6 @@
     margin-bottom: 0;
     padding: 6px;
     padding-left: 15px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 20.02px;
     color: var(--text-ds-neutral-300);
   }
 

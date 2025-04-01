@@ -26,6 +26,7 @@
     TreeIcon,
     DismissCircleRegular,
     CopyRegular,
+    BoardRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -307,8 +308,10 @@
         </span>
       {/if}
       <span
-        class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
+        class=" ms-1 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium {!tab.isActive
+          ? 'request-text'
+          : ''}"
+        style={`color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
       >
         {tab.name}
       </span>

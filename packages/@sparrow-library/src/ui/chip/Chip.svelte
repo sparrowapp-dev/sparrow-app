@@ -43,7 +43,9 @@
       </span>
     {/if}
 
-    <span class="text-fs-12">
+    <span
+      class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+    >
       {label}
     </span>
 

@@ -273,8 +273,8 @@
           style="display: flex; height:24px; gap:4px; align-items:center; padding:2px 4px; "
         >
           <p
-            class="sparrow-fs-13 mb-0"
-            style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
+            class="text-ds-font-size-12 text-ds-line-height-120 text-ds-font-weight-Regular mb-0"
+            style=" color:var(--text-ds-neutral-50); "
           >
             Collections
           </p>
@@ -361,8 +361,8 @@
                 classProps={"pe-0"}
               >
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  class="mx-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular mb-0 text-center"
+                  style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
                   It seems we couldn't find the result matching your search
                   query.
@@ -414,8 +414,8 @@
 
           {#if searchData.length !== 0}
             <p
-              class="mx-1 text-fs-12 mb-0 text-center"
-              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              class="mx-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular mb-0 text-center"
+              style="color: var(--text-ds-neutral-400); letter-spacing: 0.5px;"
             >
               It seems we couldn't find the result matching your search query.
             </p>

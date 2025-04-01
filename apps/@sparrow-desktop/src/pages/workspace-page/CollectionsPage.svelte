@@ -833,7 +833,6 @@
   >
     <Button
       title="Don't Close"
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       onClick={() => {
         "click dont save";
@@ -842,7 +841,6 @@
     ></Button>
     <Button
       title="Force Close"
-      textStyleProp={"font-size: var(--base-text)"}
       type={"danger"}
       onClick={() => {
         "click dont save";

@@ -30,7 +30,9 @@
         <WindowsIcon height="12px" width="12px" color="white" />
       {/if}
 
-      <p class="ms-2 mb-0 text-fs-12" style="font-weight: 500;">
+      <p
+        class="ms-2 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+      >
         Launch Sparrow App
       </p>
     </div>

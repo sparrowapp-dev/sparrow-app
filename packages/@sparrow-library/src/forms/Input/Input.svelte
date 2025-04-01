@@ -79,6 +79,22 @@
     value = target?.value;
     dispatch("blur", target?.value);
   };
+
+  let textStyle = "";
+
+  if (size === "small") {
+    textStyle =
+      "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium";
+  } else if (size === "medium") {
+    textStyle =
+      "text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-Medium";
+  } else if (size === "large") {
+    textStyle =
+      "text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-Semi-bold";
+  } else {
+    textStyle =
+      "text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-Medium";
+  }
 </script>
 
 <div class="position-relative">
@@ -90,7 +106,7 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`${variant} ${size} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
+    class={`${variant} ${size} ${textStyle} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
     style="width: {width};"
     {placeholder}
     {disabled}
@@ -245,20 +261,16 @@
 
   .small {
     height: 28px;
-    font-size: 12px;
-    font-weight: 500;
+
     padding: 8px 4px;
   }
   .medium {
     height: 36px;
-    font-size: 14px;
-    font-weight: 500;
+
     padding: 8px;
   }
   .large {
     height: 40px;
-    font-size: 20px;
-    font-weight: 600;
     padding: 8px;
   }
 </style>

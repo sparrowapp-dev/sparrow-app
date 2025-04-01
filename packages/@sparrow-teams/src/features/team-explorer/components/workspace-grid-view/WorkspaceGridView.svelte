@@ -61,7 +61,12 @@
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    currPage = searchQuery && filteredResults.length > 0 ? 1 : prevPage !== -1 ? prevPage : currPage;
+    currPage =
+      searchQuery && filteredResults.length > 0
+        ? 1
+        : prevPage !== -1
+          ? prevPage
+          : currPage;
 
     filteredWorkspaces = filteredResults.sort(
       (a, b) =>
@@ -132,7 +137,10 @@
                   <Spinner size={`16px`} />
                 </span>
               {:else}
-                <span>+ Add New Workspace</span>
+                <span
+                  class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+                  >+ Add New Workspace</span
+                >
               {/if}
             </div>
           {/if}

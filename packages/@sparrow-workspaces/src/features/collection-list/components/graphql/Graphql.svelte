@@ -132,7 +132,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-12">
+  <div class="text-lightGray mb-1 text-ds-font-size-12">
     <p>
       Are you sure you want to delete this {GraphqlRequestDefaultAliasBaseEnum.NAME}?
       <span class="text-whiteColor fw-bold">"{graphql.name}"</span>
@@ -141,13 +141,11 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       loader={false}
       onClick={() => {
@@ -158,7 +156,6 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -275,8 +272,8 @@
 
     {#if isRenaming}
       <input
-        class="py-0 rename-input-field-graphql"
-        style="font-size: 12px; width: calc(100% - 50px);"
+        class="py-0 rename-input-field-graphql text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        style=" width: calc(100% - 50px);"
         id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
@@ -290,9 +287,13 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-200);"
+        style=" color: var(--text-ds-neutral-200);"
       >
-        <p class=" ellipsis m-0 p-0">{graphql.name}</p>
+        <p
+          class=" ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        >
+          {graphql.name}
+        </p>
       </div>
     {/if}
   </button>

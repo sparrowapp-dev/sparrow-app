@@ -237,8 +237,7 @@
               />
             {/if}
             <span
-              class="ms-3 my-auto ellipsis overflow-hidden heading"
-              style="font-size: 28px;"
+              class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-Semi-bold"
               >{openTeam?.name || ""}
             </span>
             <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
