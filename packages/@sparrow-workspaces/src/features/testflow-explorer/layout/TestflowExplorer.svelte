@@ -644,7 +644,7 @@
    */
   const handleKeyPress = async (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
-      event.preventDefault();
+      // event.preventDefault();
       const platform = await getPlatform();
       if (platform === "macos") {
         handleDeleteModal(selectedNodeId);

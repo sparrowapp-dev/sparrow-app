@@ -7,7 +7,7 @@
     FolderRegular,
     AddRegular,
   } from "@sparrow/library/icons";
-  import type { Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { ChevronLeftRegular } from "@sparrow/library/icons";
@@ -41,19 +41,22 @@
   let selectedItem = "COLLECTION";
   let ignoreClickOutside = false;
   let searchQuery = "";
+  let searchInputRef;
+  let dropdownRef: HTMLElement;
+  let showSampleApi = false;
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
       selectedCollection = data;
       selectedItem = "COLLECTION";
-      arrayData = data.items;
+      // arrayData = data.items;
       filteredArrayData = data.items;
       previousItem = data;
     }
     if (data?.type === "FOLDER") {
       selectedFolder = data;
       selectedItem = "FOLDER";
-      arrayData = data.items;
+      // arrayData = data.items;
       filteredArrayData = data.items;
       previousItem = data;
     }
@@ -77,13 +80,12 @@
           data.request.method,
         );
       }
-      arrayData = collections;
+      // arrayData = collections;
       filteredArrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
     }
   };
-  let dropdownRef: HTMLElement;
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -97,13 +99,13 @@
         isOpen = false;
       }
       arrayData = collections;
-      filteredArrayData = collections;
+      // filteredArrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
     }
     ignoreClickOutside = false;
   };
-  let searchInputRef;
+
   $: {
     if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
       isOpen = true;
@@ -151,8 +153,6 @@
     },
   ];
 
-  let showSampleApi = false;
-
   $: {
     if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen) {
       showSampleApi = true;
@@ -187,6 +187,8 @@
   // Update search query manually
   const handleInputChange = (event) => {
     searchQuery = event.target.value.toLowerCase();
+    selectedCollection = null;
+    selectedFolder = null;
     isOpen = true;
 
     filteredArrayData = arrayData.filter((item) =>
@@ -197,6 +199,24 @@
   const handleInputClick = () => {
     isOpen = true;
   };
+
+  const handleClickBackInList = () => {
+    if (selectedFolder) {
+      filteredArrayData = selectedCollection.items;
+      selectedFolder = null;
+    } else if (selectedCollection) {
+      filteredArrayData = arrayData.filter((item) =>
+        item.name?.toLowerCase().includes(searchQuery),
+      );
+      selectedCollection = null;
+      ignoreClickOutside = true;
+    }
+  };
+
+  // Reactive statement to focus input when isOpen changes
+  $: if (isOpen && searchInputRef) {
+    searchInputRef.focus();
+  }
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -209,7 +229,7 @@
     tabindex="0"
   >
     <div
-      style="display: flex; align-items: center; padding: 5px 8px; gap: 6px;"
+      style="display: flex; align-items: center; padding: 5px 0px; gap: 6px;"
     >
       {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
         <div style="display: flex; align-items: center; gap: 6px;">
@@ -221,20 +241,22 @@
           </span>
           <span class="select-txt">Sample API</span>
         </div>
-      {:else if name || method}
-        <div style="display: flex; align-items: center; gap: 6px;">
+      {:else if (name || method) && !isOpen}
+        <div
+          on:click={(e) => (e.stopPropagation(), (isOpen = !isOpen))}
+          style="display: flex; align-items: center; gap: 6px; padding:0px 8px;"
+        >
           <span
             class="request-icon text-{getMethodStyle(method)}"
             style="font-size: 9px; font-weight: 600; text-align: center;"
           >
             {method}
           </span>
-          <span class="select-txt">{truncateName(name, 21)}</span>
+          <span class="select-txt">{truncateName(name, 17)}</span>
         </div>
       {:else}
         <input
-          class="border-none bg-transparent border-0 search-box"
-          style="width: 80%;"
+          class="search-box"
           type="text"
           placeholder="Select API Request"
           value={searchQuery}
@@ -271,16 +293,7 @@
             size="extra-small"
             type="teritiary-regular"
             startIcon={ChevronLeftRegular}
-            onClick={() => {
-              if (selectedFolder) {
-                arrayData = selectedCollection.items;
-                selectedFolder = null;
-              } else if (selectedCollection) {
-                arrayData = collections;
-                selectedCollection = null;
-                ignoreClickOutside = true;
-              }
-            }}
+            onClick={handleClickBackInList}
           />
         </Tooltip>
         <div
@@ -295,7 +308,7 @@
             {truncateName(selectedCollection.name, 12)}
           </p>
         </div>
-        {#if selectedFolder}
+        {#if selectedFolder && !isOpen}
           <p style="margin-bottom: 0px; margin-top:4px;">
             <span class="ms-1"></span>/
           </p>
@@ -388,27 +401,20 @@
         {/each}
       {:else}
         <div
-          style="width:170px; align-items:center; justify-content:center;"
+          style="align-items:center; justify-content:center; padding-top:12px;"
           class="d-flex"
         >
-          <p style="color: #808080; font-size: 10px; margin-top: 10px; ">
-            No APIs Present.
-          </p>
+          <p class="empty-text">No results found.</p>
         </div>
       {/if}
     </div>
 
-    {#if !name && !method}
-      <div
-        on:click={handleOpenAddCustomRequestModal}
-        class="custom-component mt-1 py-2"
-      >
-        <AddRegular size={"12px"} color={"var(--icon-ds-neutral-100)"} />
-        <div class="label-text" style="margin-left: 18px;">
-          Add Custom Request
-        </div>
+    <div on:click={handleOpenAddCustomRequestModal} class="custom-component">
+      <AddRegular size={"12px"} color={"var(--icon-ds-neutral-100)"} />
+      <div class="label-text" style="margin-left: 18px;">
+        Add Custom Request
       </div>
-    {/if}
+    </div>
   </div>
 </div>
 
@@ -532,7 +538,18 @@
     align-items: center;
     align-content: center;
     padding-left: 13px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 4px;
     border-top: 1px solid var(--border-ds-surface-100);
+  }
+
+  .search-box {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding-left: 8px;
+    font-size: 12px;
   }
 
   .search-box:focus {
@@ -550,6 +567,12 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
+    color: var(--text-ds-neutral-400);
+  }
+
+  .empty-text {
+    font-size: 12px;
+    font-weight: 400;
     color: var(--text-ds-neutral-400);
   }
 </style>
