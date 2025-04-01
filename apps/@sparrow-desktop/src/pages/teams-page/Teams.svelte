@@ -210,8 +210,7 @@
                       color={"var(--bg-ds-neutral-50)"}
                     />
                     <span
-                      class=""
-                      style="font-size:12px; font-weight:500; line-height:18px; color:red;"
+                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
                     >
                       {githubRepoData?.stargazers_count || ""}
                     </span>
@@ -219,7 +218,7 @@
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
-                  <span class="text-fs-14 text-secondary-200 pe-2"
+                  <span class="text-ds-font-size-14 text-secondary-200 pe-2"
                     >v{formatVersion(version)}</span
                   >
                   <WithButton
