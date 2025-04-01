@@ -194,7 +194,7 @@
 
 <div class="container" style="padding: 20px;">
   <div class="mt-0">
-    <p class="text-ds-font-size-20 text-ds-font-weight-Semi-bold">
+    <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
       My Activity
     </p>
     <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
@@ -300,7 +300,7 @@
         <div>
           <SortIcon width={"12px"} height={"8px"} />
           <span
-            class="text-ds-font-size-14 text-ds-font-weight-Medium"
+            class="text-ds-font-size-14 text-ds-font-weight-medium"
             style="padding-left: 8px; padding-top:4px ; "
           >
             Sort By</span
@@ -359,7 +359,7 @@
           >
             <SparrowLogo />
             <p
-              class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-5"
+              class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-5"
               style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
               No activity yet. Start engaging to see it here
@@ -461,7 +461,7 @@
                   />
 
                   <p
-                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-3"
+                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-3"
                     style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
                     No feedback yet
@@ -517,7 +517,7 @@
                                       setPostId("feedback", comment?.post?.id);
                                       MixpanelEvent(Events.Activity_GoToPost);
                                     }}
-                                    class="go-to-post text-ds-font-size-12 text-ds-font-weight-Regular"
+                                    class="go-to-post text-ds-font-size-12 text-ds-font-weight-regular"
                                     style=" letter-spacing: 0.25px; "
                                     >Go to post</span
                                   >
@@ -592,7 +592,7 @@
                   />
 
                   <p
-                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-3"
+                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-3"
                     style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
                     No comments yet
@@ -692,7 +692,7 @@
                   />
 
                   <p
-                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-3"
+                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-3"
                     style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
                     No upvoted posts yet

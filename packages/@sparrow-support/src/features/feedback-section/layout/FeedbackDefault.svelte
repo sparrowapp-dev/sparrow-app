@@ -10,7 +10,7 @@
 
 <div style="height: 89px; !important; padding-bottom:21px;">
   <div
-    class="text-ds-font-size-20 text-ds-font-weight-Semi-bold"
+    class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
     style=" margin-bottom:12px;  "
   >
     Feedbacks
@@ -32,7 +32,7 @@
         bgColor={"var(--text-secondary-500)"}
       />
     </div>
-    <div class="text-ds-font-size-18 text-ds-font-weight-Medium">
+    <div class="text-ds-font-size-18 text-ds-font-weight-medium">
       Hey {userInfo?.name}, share your feedback
     </div>
   </div>

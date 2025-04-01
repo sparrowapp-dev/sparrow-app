@@ -38,21 +38,21 @@
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
-        "text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular";
+        "text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 28px; min-height: 28px; max-height: 28px;  gap: 8px; border-radius: 4px;`;
       break;
     case "large":
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
-        "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Medium";
+        "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 36px; min-height: 36px; max-height: 36px;   border-radius: 6px;`;
       break;
     default:
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
-        "text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular";
+        "text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 28px; min-height: 28px; max-height: 28px;   gap: 8px; border-radius: 4px;`;
       break;
   }

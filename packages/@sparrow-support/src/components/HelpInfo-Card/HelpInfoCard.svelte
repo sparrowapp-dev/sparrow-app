@@ -19,7 +19,7 @@
       <div class=" d-flex justify-content-between align-items-center">
         <div class="test">
           <p
-            class="card-title pb-0 mb-0 ellipsis text-ds-font-size-14 text-ds-font-weight-Medium"
+            class="card-title pb-0 mb-0 ellipsis text-ds-font-size-14 text-ds-font-weight-medium"
           >
             {status.title}
           </p>

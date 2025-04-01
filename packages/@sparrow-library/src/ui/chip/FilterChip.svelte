@@ -28,7 +28,7 @@
   {/if}
 
   <span
-    class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Medium"
+    class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-medium"
   >
     {label}
   </span>

@@ -362,7 +362,7 @@
           class="flex-column"
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
-          <span class="text-ds-font-size-18 text-ds-font-weight-Medium"
+          <span class="text-ds-font-size-18 text-ds-font-weight-medium"
             >{post?.title}</span
           >
           <Tag type={getColor(post?.status)} text={post?.status || ""} />
@@ -379,12 +379,12 @@
                 letter={post?.author?.name?.charAt(0)}
                 bgColor={"var(--text-secondary-600)"}
               />
-              <div class="text-ds-font-size-14 text-ds-font-weight-Medium">
+              <div class="text-ds-font-size-14 text-ds-font-weight-medium">
                 {post?.author?.name}
               </div>
             </div>
             <div
-              class="text-ds-font-size-12 text-ds-font-weight-Regular"
+              class="text-ds-font-size-12 text-ds-font-weight-regular"
               style=" padding-left:45px; "
             >
               {post?.details}

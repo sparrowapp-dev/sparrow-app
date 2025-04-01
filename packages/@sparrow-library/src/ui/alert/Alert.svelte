@@ -66,7 +66,7 @@
       <div style="display: flex; flex-direction: column; min-width: 322px; ">
         {#if heading}
           <p
-            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
             style="text-align: left; margin:0;  color:var(--text-ds-neutral-50);"
           >
             {heading}
@@ -75,7 +75,7 @@
 
         <div class="d-flex flex-column">
           <p
-            class="mb-0 pe-3 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+            class="mb-0 pe-3 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
             style=" color:var(--text-ds-neutral-50);"
           >
             {description}

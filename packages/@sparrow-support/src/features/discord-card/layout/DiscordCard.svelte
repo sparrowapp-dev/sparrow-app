@@ -24,7 +24,7 @@
     </div>
   </div>
   <div
-    class="fw-bold align-self-center text-ds-font-size-14 text-ds-font-weight-Medium"
+    class="fw-bold align-self-center text-ds-font-size-14 text-ds-font-weight-medium"
   >
     Join our Discord Channel
   </div>

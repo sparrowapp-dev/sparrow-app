@@ -84,16 +84,16 @@
 
   if (size === "small") {
     textStyle =
-      "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium";
+      "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium";
   } else if (size === "medium") {
     textStyle =
-      "text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-Medium";
+      "text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-medium";
   } else if (size === "large") {
     textStyle =
-      "text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-Semi-bold";
+      "text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold";
   } else {
     textStyle =
-      "text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-Medium";
+      "text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-medium";
   }
 </script>
 

@@ -75,7 +75,7 @@
           <div class="flex-column">
             {#if title}
               <h3
-                class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-Medium ellipsis"
+                class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium ellipsis"
               >
                 {title}
               </h3>

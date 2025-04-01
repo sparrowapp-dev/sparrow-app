@@ -93,25 +93,25 @@
       borderRadius = 4;
     } else if (size === "small") {
       btnTextStyle =
-        "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium";
+        "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium";
       buttonSize = 28;
       borderRadius = 4;
       iconSize = 16;
     } else if (size === "medium") {
       btnTextStyle =
-        "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Medium";
+        "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium";
       buttonSize = 36;
       borderRadius = 6;
       iconSize = 20;
     } else if (size === "large") {
       btnTextStyle =
-        "text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-Medium";
+        "text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-medium";
       buttonSize = 40;
       borderRadius = 4;
       iconSize = 24;
     } else {
       btnTextStyle =
-        "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium";
+        "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium";
       buttonSize = 28;
       borderRadius = 4;
       iconSize = 16;

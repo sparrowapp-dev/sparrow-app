@@ -185,7 +185,7 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p class="text-ds-font-size-20 text-ds-font-weight-Semi-bold">Updates</p>
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Updates</p>
       <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
         Check out our latest releases designed to boost your productivity and
         efficiency.
@@ -311,7 +311,7 @@
                     {#if event.plaintextDetails.split(" ").length > 20}
                       <p
                         style=" line-height:24px; "
-                        class="text-ds-font-size-14 text-ds-font-weight-Regular"
+                        class="text-ds-font-size-14 text-ds-font-weight-regular"
                       >
                         {truncateDescription(event.plaintextDetails)}
                         <span
@@ -327,7 +327,7 @@
                     {:else}
                       <p
                         style="line-height:24px; "
-                        class="text-ds-font-size-14 text-ds-font-weight-Regular"
+                        class="text-ds-font-size-14 text-ds-font-weight-regular"
                       >
                         {event.description}
                       </p>
@@ -369,7 +369,7 @@
             </div>
           {:else}
             <div
-              class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-Medium"
+              class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
               style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
               <p>No result found.</p>
@@ -391,7 +391,7 @@
                 </div>
               </div>
               <div
-                class="ms-2 text-ds-font-size-14 text-ds-font-weight-Medium"
+                class="ms-2 text-ds-font-size-14 text-ds-font-weight-medium"
                 style="margin-top:1.5px; color:var(--text-secondary-100); "
               >
                 {#if event.plaintextDetails}
@@ -405,7 +405,7 @@
             <div class="ms-2 timeline-content">
               <div class="d-flex gap-2">
                 <p
-                  class="pb-0 mb-1 text-ds-font-size-18 text-ds-font-weight-Semi-bold"
+                  class="pb-0 mb-1 text-ds-font-size-18 text-ds-font-weight-semi-bold"
                   style=" line-height: 27px;"
                 >
                   {selectedEvent.title}
@@ -442,7 +442,7 @@
                 {/each}
               </div>
 
-              <p class="mt-3 text-ds-font-size-14 text-ds-font-weight-Regular">
+              <p class="mt-3 text-ds-font-size-14 text-ds-font-weight-regular">
                 {@html marked(selectedEvent.markdownDetails)}
               </p>
 

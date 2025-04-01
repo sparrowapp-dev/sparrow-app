@@ -31,7 +31,7 @@
       {/if}
 
       <p
-        class="ms-2 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        class="ms-2 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
       >
         Launch Sparrow App
       </p>

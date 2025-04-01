@@ -472,14 +472,14 @@
 
         {#if placeholderText && !selectedRequest}
           <span
-            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           >
             {placeholderText}
           </span>
         {:else if isHeaderCombined}
           <div class="d-flex ellipsis">
             <span
-              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium {selectedRequest?.default
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {selectedRequest?.default
                 ? 'text-textColor'
                 : getTextColor(selectedRequest?.color)}"
             >
@@ -495,7 +495,7 @@
           </div>
         {:else}
           <span
-            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium {selectedRequest?.default
+            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {selectedRequest?.default
               ? 'text-textColor'
               : getTextColor(selectedRequest?.color)}"
             style=" {disabled || selectedRequest?.hide

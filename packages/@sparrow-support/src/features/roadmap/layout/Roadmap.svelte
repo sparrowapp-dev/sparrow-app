@@ -118,7 +118,7 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p class="text-ds-font-size-20 text-ds-font-weight-Semi-bold">Roadmap</p>
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Roadmap</p>
       <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
@@ -219,7 +219,7 @@
                   />
 
                   <p
-                    class="mx-1 mt-3 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-Medium"
+                    class="mx-1 mt-3 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
                     style="color: var(--text-secondary-550); letter-spacing: 0.5px;  text-align:center;"
                   >
                     Share your feedback and check back here for updates.

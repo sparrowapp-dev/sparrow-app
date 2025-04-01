@@ -27,7 +27,7 @@
 
 <div class="d-flex justify-content-between pb-0" style="gap:8px;">
   <h6
-    class="teams-heading text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Regular"
+    class="teams-heading text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
   >
     Recent APIs
   </h6>

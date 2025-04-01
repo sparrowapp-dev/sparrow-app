@@ -183,7 +183,7 @@
       </span>
       <span style="padding:2px 4px;">
         <p
-          class=" mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class=" mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           style=" color:var(--text-ds-neutral-50);"
         >
           Test Flows
@@ -232,7 +232,7 @@
         {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
           <div class={`pb-2 px-2`}>
             <p
-              class={`add-env-desc-text mb-3 text-ds-font-size-12  text-ds-font-weight-Regular text-center`}
+              class={`add-env-desc-text mb-3 text-ds-font-size-12  text-ds-font-weight-regular text-center`}
               style="color: var(--text-secondary-50); "
             >
               Start with basic test cases to check core functions and build a
@@ -290,7 +290,7 @@
       </div>
       {#if filteredflows?.length === 0 && searchData}
         <p
-          class="mx-1 mb-0 text-center text-ds-font-size-12 text-ds-font-weight-Regular"
+          class="mx-1 mb-0 text-center text-ds-font-size-12 text-ds-font-weight-regular"
           style="color: var(--text-secondary-550);   letter-spacing: 0.5px;"
         >
           It seems we couldn't find the result matching your search query.

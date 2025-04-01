@@ -200,7 +200,7 @@
       </span>
       <span style="padding:2px 4px;">
         <p
-          class=" mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class=" mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           style=" color:var(--bg-ds-neutral-50);"
         >
           Environments

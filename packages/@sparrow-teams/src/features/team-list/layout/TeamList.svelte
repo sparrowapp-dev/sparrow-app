@@ -26,7 +26,7 @@
     class="sidebar-teams-header d-flex justify-content-between p-3 px-2 pb-0 mb-1"
   >
     <h6
-      class="teams-heading ms-2 px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Regular"
+      class="teams-heading ms-2 px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
       style=" color:var(--bg-ds-neutral-300); display:flex;align-items:center; margin-bottom:0;"
     >
       Teams
@@ -88,7 +88,7 @@
             {/if}
             <p
               style=" padding:2px 4px; "
-              class="ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+              class="ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
             >
               {team.name || ""}
             </p>

@@ -370,7 +370,7 @@
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         style=" width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
@@ -388,7 +388,7 @@
         style={`color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
         <p
-          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         >
           {api.name}
         </p>

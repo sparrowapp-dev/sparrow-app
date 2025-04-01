@@ -160,7 +160,7 @@
   handleModalState={handleEnvironmentPopUpCancel}
 >
   <div class="text-lightGray mb-1">
-    <p class="text-ds-font-size-14 text-ds-font-weight-Regular">
+    <p class="text-ds-font-size-14 text-ds-font-weight-regular">
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
         class="">"{env.name}"</span
@@ -275,7 +275,7 @@
         /> -->
       {#if isRenaming}
         <input
-          class="py-0 renameInputFieldCollection w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class="py-0 renameInputFieldCollection w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -292,7 +292,7 @@
           style="height: 32px; font-size:12px; font-weight:400; line-height:18px; padding:2px 4px; "
         >
           <p
-            class="ellipsis w-100 me-4 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+            class="ellipsis w-100 me-4 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           >
             {env.name}
           </p>

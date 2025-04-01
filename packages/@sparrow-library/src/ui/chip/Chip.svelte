@@ -44,7 +44,7 @@
     {/if}
 
     <span
-      class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+      class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
     >
       {label}
     </span>

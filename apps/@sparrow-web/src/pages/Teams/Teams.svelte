@@ -257,7 +257,7 @@
                     />
 
                     <span
-                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                     >
                       {githubRepoData?.stargazers_count || ""}
                     </span>

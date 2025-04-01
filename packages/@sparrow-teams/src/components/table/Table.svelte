@@ -30,7 +30,7 @@
         {#if heading !== "Contributors" || (heading === "Contributors" && contributorsCount > 1)}
           <th
             data-sortable={headingDataSortable}
-            class="{headerContentClassProp} tab-head text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Semi-bold"
+            class="{headerContentClassProp} tab-head text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-semi-bold"
           >
             <div
               style="display: flex; gap: 4px; align-items: center; padding:8px;max-height:30px"

@@ -69,7 +69,7 @@
   <div class="request-details">
     <div class="request-header">
       <span
-        class="request-title text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        class="request-title text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
       >
         {#if data?.isTitleHighLightEnable && data?.charsToBeHightlighted && data?.name}
           <!-- Highlight specific substring -->
@@ -85,12 +85,12 @@
         {/if}
       </span>
       <span
-        class="request-path text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+        class="request-path text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >{data?.path}</span
       >
     </div>
     <span
-      class="request-url text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+      class="request-url text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
       >{data.url || ""}</span
     >
   </div>

@@ -10,16 +10,16 @@
 
   if (size === "small") {
     textStyle =
-      "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium";
+      "text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium";
   } else if (size === "medium") {
     textStyle =
-      "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Medium";
+      "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium";
   } else if (size === "large") {
     textStyle =
-      "text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-Medium";
+      "text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-medium";
   } else {
     textStyle =
-      "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Medium";
+      "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium";
   }
 </script>
 

@@ -159,7 +159,7 @@
 >
   <div class="text-lightGray mb-1">
     <p
-      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-Regular"
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-regular"
     >
       Are you sure you want to delete this Flow?
       <span style="font-weight:700;" class="">"{flow.name}"</span>
@@ -248,7 +248,7 @@
       </span>
       {#if isRenaming}
         <input
-          class="py-0 renameInputFieldCollection w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class="py-0 renameInputFieldCollection w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           id="renameInputFieldTestflow"
           type="text"
           value={flow.name}
@@ -265,7 +265,7 @@
           style="height: 32px;"
         >
           <p
-            class="ellipsis w-100 me-4 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+            class="ellipsis w-100 me-4 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           >
             {flow.name}
           </p>

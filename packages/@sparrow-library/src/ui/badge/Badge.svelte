@@ -27,7 +27,7 @@
 <div class="d-flex p-1">
   {#if type === "count"}
     <span
-      class="circle-bot {variant}-color text-center d-flex align-items-center justify-content-center text-center px-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+      class="circle-bot {variant}-color text-center d-flex align-items-center justify-content-center text-center px-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
       style={`min-width: 16px; max-width: 40px; width: auto; height: 16px;  border-radius: ${badgeBorderRadius};`}
     >
       {count > maxCount ? "+999" : count}

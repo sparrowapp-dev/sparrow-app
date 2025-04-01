@@ -9,7 +9,7 @@
 <div class="p-3 mt-1" style="background-color: black;">
   <div style="" class="">
     <div>
-      <p class="text-ds-font-size-20 text-ds-font-weight-Semi-bold">
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
         Community
       </p>
       <p class="text-ds-font-size-14" style="color: #999999; ">
@@ -18,7 +18,7 @@
       </p>
     </div>
     <div class="feedback-section active">
-      <h3 class="text-ds-font-size-14 text-ds-font-weight-Semi-bold">
+      <h3 class="text-ds-font-size-14 text-ds-font-weight-semi-bold">
         Share your feedback on our product!!
       </h3>
       <p class="fw-light text-ds-font-size-14" style="font-size: 14px;">

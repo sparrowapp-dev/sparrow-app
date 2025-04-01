@@ -478,7 +478,7 @@
           {/if}
           {#if isRenaming}
             <input
-              class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+              class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
               id="renameInputFieldFolder"
               type="text"
               style=" padding-left:5px;  color : var(--text-ds-neutral-50); "
@@ -504,7 +504,7 @@
                       "
             >
               <p
-                class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+                class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
               >
                 {explorer.name}
               </p>

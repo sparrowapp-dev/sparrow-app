@@ -42,7 +42,7 @@
 
 <div class="d-flex justify-content-between pb-0">
   <h6
-    class="workspace-heading text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Regular"
+    class="workspace-heading text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
   >
     Recent Workspaces
   </h6>
@@ -68,13 +68,13 @@
                 style="width: 100%; height:22["
               >
                 <p
-                  class="list-name mb-0 ellipsis overflow-hidden ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+                  class="list-name mb-0 ellipsis overflow-hidden ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                   style=" color:var(--text-ds-neutral-50);"
                 >
                   {list?.name || ""}
                 </p>
                 <p
-                  class="team-name mb-0 title fw-bold ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+                  class="team-name mb-0 title fw-bold ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                   style=" border-radius:0; line-height:18px;"
                 >
                   {list?.team?.teamName || ""}

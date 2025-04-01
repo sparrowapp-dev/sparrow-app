@@ -286,7 +286,7 @@
 >
   <div class="text-lightGray mb-1">
     <p
-      class="text-ds-font-size-12 text-ds-line-height-120 text-ds-font-weight-Medium"
+      class="text-ds-font-size-12 text-ds-line-height-120 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Collection? Everything in <span
         class="text-whiteColor fw-bold">"{collection.name}"</span
@@ -523,7 +523,7 @@
     />
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldCollection w-100 ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+        class="py-0 renameInputFieldCollection w-100 ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         id="renameInputFieldCollection"
         type="text"
         style=" gap: 4px; "
@@ -541,7 +541,7 @@
         style="height: 32px; text-align: left; width:80% ; padding:2px 4px;"
       >
         <p
-          class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         >
           {collection.name}
         </p>

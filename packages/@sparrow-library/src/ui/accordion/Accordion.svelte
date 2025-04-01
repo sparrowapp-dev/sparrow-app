@@ -40,7 +40,7 @@
     >
       {#if labelText !== ""}
         <p
-          class="label-text m-0 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-Medium"
+          class="label-text m-0 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
         >
           {labelText}
         </p>

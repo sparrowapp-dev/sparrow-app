@@ -7,7 +7,7 @@
 <div style=" padding:20px; background-color: black;">
   <div style="" class="">
     <div>
-      <p class="text-ds-font-size-20 text-ds-font-weight-Semi-bold">
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
         Community
       </p>
       <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
@@ -17,12 +17,12 @@
     </div>
     <div class="feedback-section active">
       <h3
-        class="text-ds-font-size-14 text-ds-font-weight-Semi-bold"
+        class="text-ds-font-size-14 text-ds-font-weight-semi-bold"
         style=" line-height: 21px; "
       >
         Share your feedback on our product!!
       </h3>
-      <p class="text-ds-font-size-14 text-ds-font-weight-Regular">
+      <p class="text-ds-font-size-14 text-ds-font-weight-regular">
         Please let us know how we can make Sparrow the best product for you.
       </p>
     </div>
@@ -34,14 +34,14 @@
       >
         <LogoSymbol height="25px" width="25px" />
         <div
-          class="text-ds-font-size-16 text-ds-font-weight-Semi-bold"
+          class="text-ds-font-size-16 text-ds-font-weight-semi-bold"
           style=" padding: 3px; padding-top:9px; padding-left:5px; display:inline;"
         >
           Welcome to Sparrow’s Community Hub!
         </div>
       </h2>
       <p
-        class="text-ds-font-size-14 text-ds-font-weight-Regular"
+        class="text-ds-font-size-14 text-ds-font-weight-regular"
         style="color:var(--text-secondary-50);"
       >
         We're excited to hear your thoughts and suggestions on how we can
@@ -53,13 +53,13 @@
 
     <div class="discord-section px-2">
       <h3
-        class="text-ds-font-size-14 text-ds-font-weight-Semi-bold"
+        class="text-ds-font-size-14 text-ds-font-weight-semi-bold"
         style="color: var(--text-secondary-100); "
       >
         Connect with Us
       </h3>
       <p
-        class="text-ds-font-size-14 text-ds-font-weight-Regular"
+        class="text-ds-font-size-14 text-ds-font-weight-regular"
         style="  color: var(--text-secondary-50); "
       >
         Utilize our integrated Discord community to send messages directly to
@@ -69,7 +69,7 @@
       </p>
 
       <div class="key-features">
-        <h3 class="text-ds-font-size-16 text-ds-font-weight-Semi-bold">
+        <h3 class="text-ds-font-size-16 text-ds-font-weight-semi-bold">
           Key Features
         </h3>
         <p
@@ -78,7 +78,7 @@
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold">Markdown Support:</span
-          ><span class="text-ds-font-size-14 text-ds-font-weight-Regular"
+          ><span class="text-ds-font-size-14 text-ds-font-weight-regular"
             >Use markdown to format your messages and feedback.</span
           >
         </p>
@@ -88,7 +88,7 @@
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold">Switchable Channel:</span
-          ><span class="text-ds-font-size-14 text-ds-font-weight-Regular"
+          ><span class="text-ds-font-size-14 text-ds-font-weight-regular"
             >Easily navigate between different feedback and support channels.</span
           >
         </p>
@@ -98,7 +98,7 @@
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold">Rich media sharing:</span
-          ><span class="text-ds-font-size-14 text-ds-font-weight-Regular">
+          ><span class="text-ds-font-size-14 text-ds-font-weight-regular">
             Share screenshots , videos and other files to provide comprehensive
             feedback.</span
           >
@@ -110,12 +110,12 @@
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold"
             >Tagging:
-          </span><span class="text-ds-font-size-14 text-ds-font-weight-Regular"
+          </span><span class="text-ds-font-size-14 text-ds-font-weight-regular"
             >Tag your feedback for easy categorization and searchability.</span
           >
         </p>
         <p
-          class="text-ds-font-size-14 text-ds-font-weight-Regular"
+          class="text-ds-font-size-14 text-ds-font-weight-regular"
           style="margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
         >
           Join our community and start contributing to Sparrow.

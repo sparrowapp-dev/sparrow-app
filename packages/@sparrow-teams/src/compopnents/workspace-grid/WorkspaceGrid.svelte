@@ -132,7 +132,7 @@
       >
         <h4 class="ellipsis overflow-hidden me-4">
           <span
-            class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-Medium"
+            class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-medium"
             style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
           >
         </h4>
@@ -145,7 +145,7 @@
       >
         <span>{workspace?.collections?.length ?? 0}</span>
         <span
-          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           style="color:var(--text-secondary-200)"
         >
           Collections
@@ -158,11 +158,11 @@
         }`}
       >
         <span
-          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           style=" color:var(--text-secondary-200)"
           >Last updated on
         </span><span
-          class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Semi-bold"
+          class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
           style=" color:var(--text-ds-neutral-50)"
           >{formatDateInString(workspace?.updatedAt)}</span
         >

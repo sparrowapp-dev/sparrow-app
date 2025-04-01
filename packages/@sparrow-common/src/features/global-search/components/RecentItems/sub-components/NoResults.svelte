@@ -11,7 +11,7 @@
     <SearchIcon width="24px" height="24px" />
   </div>
   <div
-    class="text-container text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+    class="text-container text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
   >
     {#if type === "Basic"}
       <p>Nothing found for "{searchQuery}"</p>

@@ -234,14 +234,14 @@
 >
   <div class="text-lightGray text-ds-font-size-14 mb-1">
     <p
-      class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+      class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
     >
       Are you sure you want to remove <span class="text-whiteColor"
         >"{user.name}"</span
       >
       ? They will lose access to the
       <span
-        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >"{openTeam?.name}"</span
       > team.
     </p>
@@ -296,12 +296,12 @@
 
         <div class="name px-2" style="width: 80%;">
           <span
-            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
             >{user.name}</span
           ><br />
           <span
             style="display: inline-block;"
-            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -344,7 +344,7 @@
         {/if}
       </div>
       <p
-        class="mb-0 text-ds-font-size-16 text-ds-line-height-130 text-ds-font-weight-Regular ellipsis"
+        class="mb-0 text-ds-font-size-16 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
       >
         {openTeam?.name}
       </p>
@@ -384,12 +384,12 @@
         />
         <div class="name px-2" style="width: 80%;">
           <span
-            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.name}</span
           ><br />
           <span
             style="display: inline-block;"
-            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -463,12 +463,12 @@
         />
         <div class="name px-2" style="width: 80%;">
           <span
-            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.name}</span
           ><br />
           <span
             style="display: inline-block;"
-            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -604,11 +604,11 @@
     />
     <div class="name px-2">
       <span
-        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >{user.name} {owner ? "(You)" : ""}</span
       ><br />
       <span
-        class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Regular"
+        class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >{user.email}</span
       >
     </div>

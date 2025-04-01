@@ -18,8 +18,8 @@
     on:click={() => {
       workspaceNavigatorId = "about";
     }}
-    class="side-bar-btn d-flex gap-2"
-    style="height:32px; padding:5px; padding-left:12px; border-radius:4px; font-size:12px; font-weight:700; background-color: {workspaceNavigatorId ===
+    class="side-bar-btn d-flex gap-2 text-ds-font-size-12 text-ds-font-weight-medium"
+    style="height:32px; padding:5px; padding-left:12px; border-radius:4px;  background-color: {workspaceNavigatorId ===
     'about'
       ? 'var(--bg-tertiary-300)'
       : 'transparent'};"
@@ -31,7 +31,12 @@
         color={"var(--icon-secondary-200)"}
       />
     </div>
-    <div class="active" style="padding-top:0.5px;">About</div>
+    <div
+      class="active text-ds-font-size-12 text-ds-font-weight-semi-bold"
+      style="padding-top:0.5px;"
+    >
+      About
+    </div>
   </div>
   {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
     <div
@@ -51,7 +56,12 @@
           color={"var(--icon-secondary-200)"}
         />
       </div>
-      <div class="" style="padding-top: 2px;">Workspace Settings</div>
+      <div
+        class="text-ds-font-size-12 text-ds-font-weight-semi-bold text-ds-line-height-130"
+        style="padding-top: 2px;"
+      >
+        Workspace Settings
+      </div>
     </div>
   {/if}
 </div>

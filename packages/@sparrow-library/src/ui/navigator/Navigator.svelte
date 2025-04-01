@@ -57,7 +57,7 @@
       <button
         bind:this={tabElements[tab.id]}
         tabindex={allDisableState ? -1 : 0}
-        class={`${tab.disabled ? "tab-container-disabled" : "tab-container"} ${tab.id === currentTabId ? "selected" : ""}  text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium`}
+        class={`${tab.disabled ? "tab-container-disabled" : "tab-container"} ${tab.id === currentTabId ? "selected" : ""}  text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium`}
         role="tab"
         on:click={() => {
           if (!tab.disabled) {

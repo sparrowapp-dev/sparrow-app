@@ -25,7 +25,7 @@
   >
     {#if api?.type === "REQUEST"}
       <span
-        class={`text-${getMethodStyle(api?.property?.request?.method)} text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Semi-bold`}
+        class={`text-${getMethodStyle(api?.property?.request?.method)} text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold`}
         style=" font-size: 9px; align-items:flex-start;"
       >
         <!-- {api?.property?.request?.method} -->
@@ -61,7 +61,7 @@
   </div>
   <div class="api-desc">
     <p
-      class="mb-0 api-type__title text-var(--text-ds-neutral-50) text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-Medium"
+      class="mb-0 api-type__title text-var(--text-ds-neutral-50) text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
     >
       {api.name}
     </p>
@@ -71,7 +71,7 @@
           {#if list}
             {#if list?._id === api?.path?.workspaceId}
               <p
-                class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+                class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                 style="color:var(--text-ds-neutral-200); "
               >
                 {list.team.teamName} / {list.name}
@@ -84,7 +84,7 @@
 
       {#if api?.path?.collectionId}
         <p
-          class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+          class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
           style="width: 8px;"
         >
           {"/ "}
@@ -96,7 +96,7 @@
           {#if list}
             {#if list?.id === api?.path?.collectionId}
               <p
-                class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+                class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                 style="color:var(--text-ds-neutral-200);"
               >
                 {list.name}
@@ -109,7 +109,7 @@
                 {#if list.items && item}
                   {#if item.id === api.path.folderId}
                     <p
-                      class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+                      class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                       style="color:var(--text-ds-neutral-200); font-weight:400;"
                     >
                       {item.name}
