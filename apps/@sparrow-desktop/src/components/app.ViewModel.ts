@@ -147,7 +147,7 @@ export class AppViewModel {
     const workspaceId = uuidv4();
     const dummyTeam = {
       teamId: teamId,
-      name: "Team",
+      name: "Hub",
       workspaces: [{ name: "My Workspace", workspaceId: workspaceId }],
       users: [{ id: user.id, name: user.name, email: "", role: "owner" }],
       owner: user.id,
@@ -166,7 +166,7 @@ export class AppViewModel {
       name: "My Workspace",
       team: {
         teamId: teamId,
-        teamName: "Team",
+        teamName: "Hub",
       },
       admins: [{ id: user.id, name: user.name }],
       users: [{ id: user.id, name: user.name, email: "", role: "admin" }],

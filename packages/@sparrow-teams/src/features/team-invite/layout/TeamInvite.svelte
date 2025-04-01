@@ -313,7 +313,7 @@
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
   <p class="invite-subheader text-textColor mt-1 mb-1">
-    Admins will have access to all current and future team workspaces.
+    Admins will have access to all current and future hub workspaces.
   </p>
 {/if}
 {#if roleError && selectedRole === defaultRole}

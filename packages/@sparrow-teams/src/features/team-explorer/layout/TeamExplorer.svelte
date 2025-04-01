@@ -113,7 +113,7 @@
   let leaveButtonMenu: boolean = false;
   const addButtonData = [
     {
-      name: "Leave Team",
+      name: "Leave Hub",
       color: "var(--dangerColor)",
       onclick: () => handleLeaveTeam(),
     },
@@ -279,7 +279,7 @@
                     options={addButtonData}
                   >
                     <Tooltip
-                      title={"Leave Team"}
+                      title={"Leave Hub"}
                       placement={"bottom-center"}
                       distance={12}
                       show={!leaveButtonMenu}
