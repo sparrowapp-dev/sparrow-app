@@ -5,6 +5,7 @@
     CollectionIcon,
     ChevronUpRegular,
     FolderRegular,
+    CrossIcon2,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
@@ -35,6 +36,26 @@
   let selectedFolder;
   let selectedItem = "COLLECTION";
   let ignoreClickOutside = false;
+  let selectApiName = name;
+  let inputRef: any;
+  let allApis: any = [];
+  let filteredApis = [];
+  let previousValue: string = "";
+  let itemIdToCollectionIdMap = new Map();
+
+  function initializeMap(collections: any) {
+    itemIdToCollectionIdMap.clear();
+
+    collections.forEach((collection) => {
+      if (collection.items && collection.items.length > 0) {
+        collection.items.forEach((item) => {
+          if (item.id) {
+            itemIdToCollectionIdMap.set(item.id, collection.id);
+          }
+        });
+      }
+    });
+  }
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
@@ -62,12 +83,14 @@
           previousItem.id,
         );
       } else {
+        const currentCollectionId = findCollectionIdForItem(data.id);
         updateNode(
           data.name,
           data.id,
-          selectedCollection.id,
+          currentCollectionId,
           data.request.method,
         );
+        selectApiName = data.name;
       }
       arrayData = collections;
       selectedCollection = null;
@@ -90,6 +113,7 @@
       arrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
+      selectApiName = name;
     }
     ignoreClickOutside = false;
   };
@@ -173,6 +197,69 @@
       ? name.substring(0, charLimit) + "..."
       : name;
   };
+
+  // Function to fetch and store APIs
+  const handleSearchApis = () => {
+    let apis: any = [];
+    for (let i = 0; i < collections.length; i++) {
+      if (collections[i]?._data?.items) {
+        apis = [...apis, ...collections[i]._data.items];
+      }
+    }
+    return apis;
+  };
+
+  function handleBlur() {
+    if (selectApiName.trim() === "") {
+      selectApiName = previousValue;
+    }
+  }
+
+  function findCollectionIdForItem(itemId) {
+    return itemIdToCollectionIdMap.get(itemId) || null;
+  }
+
+  // Fetch APIs on mount
+  onMount(() => {
+    initializeMap(collections);
+    allApis = handleSearchApis();
+    filteredApis = allApis;
+  });
+
+  // Function to search and filter APIs
+  const searchApis = () => {
+    isOpen = true;
+    filteredApis = allApis.filter((api: any) =>
+      api.name.toLowerCase().includes(selectApiName.toLowerCase()),
+    );
+  };
+
+  function clearSearch() {
+    selectApiName = "";
+    inputRef?.focus();
+  }
+
+  $: if (name) {
+    selectApiName = name;
+  }
+
+  function toggleDropdown() {
+    isOpen = !isOpen;
+    setTimeout(() => {
+      if (inputRef) {
+        inputRef.focus();
+      }
+    }, 0);
+  }
+
+  function openDropdown() {
+    isOpen = true;
+    setTimeout(() => {
+      if (inputRef) {
+        inputRef.focus();
+      }
+    }, 0);
+  }
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -181,48 +268,45 @@
     class="dropdown-header d-flex justify-content-between align-items-center mx-auto {isOpen
       ? 'active'
       : ''}"
-    on:click={() => (isOpen = !isOpen)}
     tabindex="0"
+    on:click={openDropdown}
   >
-    <div
-      style="display: flex; align-items: center; padding: 5px 8px; gap: 6px;"
-    >
-      {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span
-            class="request-icon text-{getMethodStyle(method)}"
-            style="font-size: 9px; font-weight: 600; text-align: center;"
-          >
-            GET
-          </span>
-          <span class="select-txt">Sample API</span>
+    <div class="d-flex align-items-center input-container">
+      {#if name && method}
+        <span
+          class="request-icon text-{getMethodStyle(method)}"
+          style="font-size: 9px; font-weight: 600; text-align: center; margin-right:5px;"
+        >
+          {method === "DELETE" ? "DEL" : method}
+        </span>
+      {/if}
+      <input
+        type="text"
+        placeholder="Select API Request"
+        bind:value={selectApiName}
+        bind:this={inputRef}
+        class="select-api-input"
+        style="outline: none;"
+        on:input={searchApis}
+        on:blur={handleBlur}
+      />
+      {#if !name && selectApiName}
+        <div class="clear-icon" on:click={clearSearch}>
+          <svelte:component
+            this={CrossIcon2}
+            width="12px"
+            height="12px"
+            color="var(--text-ds-neutral-100)"
+          />
         </div>
-      {:else if name || method}
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span
-            class="request-icon text-{getMethodStyle(method)}"
-            style="font-size: 9px; font-weight: 600; text-align: center;"
-          >
-            {method}
-          </span>
-          <span class="select-txt">{truncateName(name, 21)}</span>
-        </div>
-      {:else}
-        <span class="select-txt-new">Select API Request</span>
       {/if}
     </div>
-    <div
-      style="display: flex; align-items: center; padding-right: 7px; padding-bottom:1px"
-    >
-      {#if isOpen}
-        <ChevronUpRegular size={"16px"} color={"var(--icon-ds-neutral-100)"} />
-      {:else}
-        <ChevronDownRegular
-          size={"16px"}
-          color={"var(--icon-ds-neutral-100)"}
-        />
-      {/if}
-    </div>
+    <Button
+      type="teritiary-regular"
+      startIcon={isOpen ? ChevronUpRegular : ChevronDownRegular}
+      onClick={toggleDropdown}
+      size="small"
+    />
   </div>
   <div
     class="dropdown-options"
@@ -230,137 +314,176 @@
       ? 'block'
       : 'none'}; position:absolute"
   >
-    {#if selectedCollection}
-      <div class="d-flex ellipsis back-header px-1">
-        <Tooltip title={"Back"} placement={"top-center"} size="medium">
-          <Button
-            size="extra-small"
-            type="teritiary-regular"
-            startIcon={ChevronLeftRegular}
-            onClick={() => {
-              if (selectedFolder) {
-                arrayData = selectedCollection.items;
-                selectedFolder = null;
-              } else if (selectedCollection) {
-                arrayData = collections;
-                selectedCollection = null;
-                ignoreClickOutside = true;
-              }
-            }}
-          />
-        </Tooltip>
-        <div
-          class="d-flex"
-          style="margin-left: 2px; align-items:center; margin-right:2px;"
-        >
-          <StackRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
-          <p
-            class="ellipsis label-text"
-            style="margin-left: 4px; margin-bottom:0px"
-          >
-            {truncateName(selectedCollection.name, 12)}
-          </p>
-        </div>
-        {#if selectedFolder}
-          <p style="margin-bottom: 0px; margin-top:4px;">
-            <span class="ms-1"></span>/
-          </p>
+    {#if !selectApiName}
+      {#if selectedCollection}
+        <div class="d-flex ellipsis back-header px-1">
+          <Tooltip title={"Back"} placement={"top-center"} size="medium">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={ChevronLeftRegular}
+              onClick={() => {
+                if (selectedFolder) {
+                  arrayData = selectedCollection.items;
+                  selectedFolder = null;
+                } else if (selectedCollection) {
+                  arrayData = collections;
+                  selectedCollection = null;
+                  ignoreClickOutside = true;
+                }
+              }}
+            />
+          </Tooltip>
           <div
             class="d-flex"
-            style="margin-left: 2px; align-items:center; margin-right:3px;"
+            style="margin-left: 2px; align-items:center; margin-right:2px;"
           >
-            <FolderRegular size={"16px"} />
+            <StackRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
             <p
               class="ellipsis label-text"
-              style="margin-left: 4px; margin-bottom:0px;"
+              style="margin-left: 4px; margin-bottom:0px"
             >
-              {truncateName(selectedFolder.name, 6, true)}
+              {truncateName(selectedCollection.name, 12)}
+            </p>
+          </div>
+          {#if selectedFolder}
+            <p style="margin-bottom: 0px; margin-top:4px;">
+              <span class="ms-1"></span>/
+            </p>
+            <div
+              class="d-flex"
+              style="margin-left: 2px; align-items:center; margin-right:3px;"
+            >
+              <FolderRegular size={"16px"} />
+              <p
+                class="ellipsis label-text"
+                style="margin-left: 4px; margin-bottom:0px;"
+              >
+                {truncateName(selectedFolder.name, 6, true)}
+              </p>
+            </div>
+          {/if}
+        </div>
+      {/if}
+      <div class="scrollable-list">
+        {#if showSampleApi}
+          {#each dummyCollection as data}
+            {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
+              <div
+                class="d-flex align-items-center dropdown-single-option px-2 py-1 gap-1"
+                on:click|stopPropagation={() => {
+                  handleSelectApi(data);
+                }}
+              >
+                <div
+                  style="margin-left: 5px;"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  {#if data?.type === "REQUEST"}
+                    <span class="text-{getMethodStyle(data?.request?.method)}">
+                      <span
+                        class={"request-icon"}
+                        style="font-size: 10px; font-weight: 500;"
+                        >{data?.request?.method || ""}</span
+                      >
+                    </span>
+                  {:else if data?.type === "FOLDER"}
+                    <FolderRegular size={"16px"} />
+                  {:else}
+                    <StackRegular />
+                  {/if}
+                </div>
+                <p class="options-txt ellipsis label-text">
+                  {data.name}
+                </p>
+              </div>
+            {/if}
+          {/each}
+        {:else if arrayData?.filter((data) => {
+          if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
+          return false;
+        })?.length > 0}
+          {#each arrayData as data}
+            {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
+              <div
+                class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
+                on:click|stopPropagation={() => {
+                  handleSelectApi(data);
+                }}
+              >
+                <div
+                  style="margin-left: 5px;min-width: 28px;"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  {#if data?.type === "REQUEST"}
+                    <span class="text-{getMethodStyle(data?.request?.method)}">
+                      <span
+                        class={"request-icon"}
+                        style="font-size: 9px; font-weight: 600;"
+                        >{data?.request?.method === "DELETE"
+                          ? "DEL"
+                          : data?.request?.method || ""}</span
+                      >
+                    </span>
+                  {:else if data?.type === "FOLDER"}
+                    <FolderRegular size={"16px"} />
+                  {:else}
+                    <StackRegular />
+                  {/if}
+                </div>
+                <p class="options-txt ellipsis label-text">
+                  {data.name}
+                </p>
+              </div>
+            {/if}
+          {/each}
+        {:else}
+          <div
+            style="width:170px; align-items:center; justify-content:center;"
+            class="d-flex"
+          >
+            <p style="color: #808080; font-size: 10px; margin-top: 10px; ">
+              No APIs Present.
             </p>
           </div>
         {/if}
       </div>
+    {:else if filteredApis.length > 0}
+      {#each filteredApis as api}
+        {#if api?.type === "REQUEST"}
+          <div
+            class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
+            style="gap: 6px;"
+            on:click|stopPropagation={() => {
+              handleSelectApi(api);
+            }}
+          >
+            <span
+              class="text-{getMethodStyle(api?.request?.method)} text-center"
+              style="margin-left: 5px;"
+            >
+              <span
+                class={"request-icon"}
+                style="font-size: 9px; font-weight: 600;"
+                >{api?.request?.method === "DELETE"
+                  ? "DEL"
+                  : api?.request?.method || ""}</span
+              >
+            </span>
+            <span class="select-txt">{truncateName(api.name, 21)}</span>
+          </div>
+        {/if}
+      {/each}
+    {:else}
+      <div
+        class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
+        style="gap: 6px;"
+      >
+        <p class="text-center" style="margin: 0px; margin-left:5px;">
+          API not Found
+        </p>
+      </div>
     {/if}
-    <div class="scrollable-list">
-      {#if showSampleApi}
-        {#each dummyCollection as data}
-          {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
-            <div
-              class="d-flex align-items-center dropdown-single-option px-2 py-1 gap-1"
-              on:click|stopPropagation={() => {
-                handleSelectApi(data);
-              }}
-            >
-              <div
-                style="margin-left: 5px;"
-                class="d-flex align-items-center justify-content-center"
-              >
-                {#if data?.type === "REQUEST"}
-                  <span class="text-{getMethodStyle(data?.request?.method)}">
-                    <span
-                      class={"request-icon"}
-                      style="font-size: 10px; font-weight: 500;"
-                      >{data?.request?.method || ""}</span
-                    >
-                  </span>
-                {:else if data?.type === "FOLDER"}
-                  <FolderRegular size={"16px"} />
-                {:else}
-                  <StackRegular />
-                {/if}
-              </div>
-              <p class="options-txt ellipsis label-text">
-                {data.name}
-              </p>
-            </div>
-          {/if}
-        {/each}
-      {:else if arrayData?.filter((data) => {
-        if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
-        return false;
-      })?.length > 0}
-        {#each arrayData as data}
-          {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
-            <div
-              class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
-              on:click|stopPropagation={() => {
-                handleSelectApi(data);
-              }}
-            >
-              <div
-                style="margin-left: 5px;min-width: 28px;"
-                class="d-flex align-items-center justify-content-center"
-              >
-                {#if data?.type === "REQUEST"}
-                  <span class="text-{getMethodStyle(data?.request?.method)}">
-                    <span
-                      class={"request-icon"}
-                      style="font-size: 9px; font-weight: 600;"
-                      >{data?.request?.method === "DELETE" ? "DEL" : data?.request?.method || ""}</span
-                    >
-                  </span>
-                {:else if data?.type === "FOLDER"}
-                  <FolderRegular size={"16px"} />
-                {:else}
-                  <StackRegular />
-                {/if}
-              </div>
-              <p class="options-txt ellipsis label-text">
-                {data.name}
-              </p>
-            </div>
-          {/if}
-        {/each}
-      {:else}
-        <div
-          style="width:170px; align-items:center; justify-content:center;"
-          class="d-flex"
-        >
-          <p style="color: #808080; font-size: 10px; margin-top: 10px; ">
-            No APIs Present.
-          </p>
-        </div>
-      {/if}
-    </div>
   </div>
 </div>
 
@@ -369,20 +492,22 @@
     background-color: var(--bg-ds-surface-400);
     padding-top: 8px;
     padding-bottom: 8px;
+    padding-left: 8px;
+    padding-right: 4px;
     border-radius: 4px;
     width: 206px;
-    height: 28px;
+    height: 36px;
     cursor: pointer;
-    outline: none;
+    border: none;
   }
   .dropdown-header:hover {
-    border: 1px solid var(--border-ds-neutral-300);
+    outline: 1px solid var(--border-ds-neutral-300);
   }
   .dropdown-header.active {
-    border: 1px solid var(--border-ds-primary-300);
+    outline: 1px solid var(--border-ds-primary-300);
   }
   .dropdown-header:focus-visible {
-    border: 2px solid var(--border-ds-primary-300);
+    outline: 2px solid var(--border-ds-primary-300);
   }
   .dropdown-header p {
     margin: 0;
@@ -475,5 +600,18 @@
     font-weight: 500;
     font-size: 12px;
     color: var(--text-ds-neutral-50);
+  }
+  .select-api-input {
+    width: 140px;
+    height: 20px;
+    border: none;
+    background-color: var(--bg-ds-surface-400);
+    padding-right: 0px;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  .select-api-input::placeholder {
+    color: var(--text-ds-neutral-500);
   }
 </style>
