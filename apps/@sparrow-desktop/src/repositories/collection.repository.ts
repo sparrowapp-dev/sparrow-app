@@ -830,4 +830,22 @@ export class CollectionRepository {
   public clearCollections = async (): Promise<any> => {
     return RxDB.getInstance().rxdb.collection.find().remove();
   };
+
+  /**
+   * @description
+   * Read an API request within a tab.
+   */
+  public readRequestInTab = async (tabId: string, requestId: string) => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return undefined;
+
+    return tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.find(
+        (element) => element.data.requestId === requestId,
+      );
+  };
 }

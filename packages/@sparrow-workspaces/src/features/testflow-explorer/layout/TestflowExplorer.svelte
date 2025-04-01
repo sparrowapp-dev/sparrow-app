@@ -59,12 +59,13 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Debounce } from "@sparrow/common/utils";
-
+  import { v4 as uuidv4 } from "uuid";
   import {
     currentStep,
     isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { platform } from "@tauri-apps/plugin-os";
+  import { dumyRequestData } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -143,7 +144,8 @@
           dbNodes[index].data.collectionId = collectionId;
           dbNodes[index].data.method = method;
           dbNodes[index].data.folderId = folderId ?? "";
-          dbNodes[index].data.requestData = requestData.request;
+          dbNodes[index].data.requestData =
+            requestData?.request ?? dumyRequestData(method, customRequestURL);
           dbNodes[index].data.isDeleted = false;
         }
       }
@@ -244,6 +246,7 @@
   let customRequestName: string = "";
   let customRequestURL: string = "";
   let customHTTPRequestMethod: string = "GET";
+  let isCreatingCustomRequest: boolean = false;
   let isDeleteNodeModalOpen = false;
   let isAddCustomRequestModalOpen = false;
   // API response UI states
@@ -308,10 +311,22 @@
    * @description - Handles the creation of a custom request.
    * the selected HTTP method, request name, and request URL.
    */
-  const handleCreateCustomRequest = () => {
-    console.log({ customHTTPRequestMethod });
-    console.log({ customRequestName });
-    console.log({ customRequestURL });
+  const handleCreateCustomRequest = async () => {
+    try {
+      isCreatingCustomRequest = true;
+      await updateSelectedAPI(
+        selectedNodeId,
+        customRequestName,
+        uuidv4(),
+        "",
+        customHTTPRequestMethod,
+      );
+      isAddCustomRequestModalOpen = false;
+    } catch (error) {
+      console.error("Error creating custom request:", error);
+    } finally {
+      isCreatingCustomRequest = false;
+    }
   };
 
   /**
@@ -1223,6 +1238,7 @@
   }}
 >
   <CustomRequest
+    {isCreatingCustomRequest}
     requestName={customRequestName}
     requestURL={customRequestURL}
     httpRequestMethod={customHTTPRequestMethod}

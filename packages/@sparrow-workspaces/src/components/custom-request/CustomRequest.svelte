@@ -13,7 +13,7 @@
   export let requestName = "";
   export let requestURL = "";
   export let httpRequestMethod = "GET";
-  export let isAddingNode = false;
+  export let isCreatingCustomRequest = false;
 
   const handleDropdown = (tabId) => {
     httpRequestMethod = tabId;
@@ -49,11 +49,11 @@
   ];
 
   // Reset the fields on model open
-  onMount: {
+  onMount(() => {
     requestName = "";
     requestURL = "";
     handleDropdown("GET");
-  }
+  });
 </script>
 
 <!-- Section for the modal content -->
@@ -113,7 +113,7 @@
     <span style="margin-right: 15px;">
       <!-- Cancel button to close the modal without leaving the team -->
       <Button
-        disable={isAddingNode}
+        disable={isCreatingCustomRequest}
         title={"Cancel"}
         textClassProp={"fs-6"}
         type={"secondary"}
@@ -123,14 +123,14 @@
       />
     </span>
     <Button
-      disable={false}
+      disable={isCreatingCustomRequest}
       title={"Create"}
       textClassProp={"fs-6"}
       type={"primary"}
       onClick={() => {
         handleCreateCustomRequest();
       }}
-      loader={isAddingNode}
+      loader={isCreatingCustomRequest}
     />
   </div>
 </section>
