@@ -848,4 +848,28 @@ export class CollectionRepository {
         (element) => element.data.requestId === requestId,
       );
   };
+
+  /**
+   * @description
+   * Check if an API request exists within a node.
+   */
+  public readRequestExistInNode = async (
+    tabId: string,
+    nodeId: string,
+  ): Promise<boolean> => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return false;
+
+    const nodeExists = tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.some(
+        (element) =>
+          element.id === nodeId && element?.data?.requestData !== undefined,
+      );
+      
+    return nodeExists;
+  };
 }

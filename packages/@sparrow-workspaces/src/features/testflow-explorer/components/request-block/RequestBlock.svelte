@@ -49,6 +49,14 @@
     ) => void;
     onOpenDeleteModal: (id: string) => void;
     onOpenAddCustomRequestModal: (id: string) => void;
+    onOpenSaveNodeRequestModal: (
+      nodeId: string,
+      name: string,
+      requestId: string,
+      collectionId: string,
+      method: string,
+      folderId?: string,
+    ) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
     parentDrag: boolean;
@@ -78,8 +86,7 @@
     method: string,
     folderId?: string,
   ) => {
-    isRunTextVisible = true;
-    data.onUpdateSelectedAPI(
+    data.onOpenSaveNodeRequestModal(
       id,
       name,
       requestId,
@@ -87,6 +94,16 @@
       method,
       folderId ?? "",
     );
+
+    isRunTextVisible = true;
+    // data.onUpdateSelectedAPI(
+    //   id,
+    //   name,
+    //   requestId,
+    //   collectionId,
+    //   method,
+    //   folderId ?? "",
+    // );
   };
 
   let isCreateBlockArrowHovered = false;

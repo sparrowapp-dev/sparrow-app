@@ -94,5 +94,6 @@
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={false}
     onSelectRequest={_viewModel.getRequestdata}
+    checkRequestExistInNode={_viewModel.checkRequestExistInNode}
   />
 {/if}

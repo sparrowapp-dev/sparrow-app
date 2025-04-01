@@ -929,4 +929,16 @@ export class TestflowExplorerPageViewModel {
     );
     return request;
   };
+
+  /**
+   * @description
+   * Read an API request data within a node.
+   */
+  public checkRequestExistInNode = async (tabId: string, nodeId: string) => {
+    let request = await this.collectionRepository.readRequestExistInNode(
+      tabId,
+      nodeId,
+    );
+    return request;
+  };
 }

@@ -99,7 +99,9 @@
         isOpen = false;
       }
       arrayData = collections;
-      // filteredArrayData = collections;
+      filteredArrayData = arrayData.filter((item) =>
+        item.name?.toLowerCase().includes(searchQuery),
+      );
       selectedCollection = null;
       selectedFolder = null;
     }

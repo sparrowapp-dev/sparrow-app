@@ -45,7 +45,7 @@
   import { RunIcon } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
-  import CustomRequest from "../../../components/custom-request/CustomRequest.svelte";
+  import CustomRequest from "../../../components/custom-request-modal/CustomRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
     TFDataStoreType,
@@ -66,6 +66,7 @@
   } from "../../../stores/guide.tour";
   import { platform } from "@tauri-apps/plugin-os";
   import { dumyRequestData } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -85,6 +86,7 @@
   export let isWebApp;
   export let deleteNodeResponse;
   export let onSelectRequest;
+  export let checkRequestExistInNode;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -248,7 +250,10 @@
   let customHTTPRequestMethod: string = "GET";
   let isCreatingCustomRequest: boolean = false;
   let isDeleteNodeModalOpen = false;
+  let isSaveNodeModalOpen = false;
   let isAddCustomRequestModalOpen = false;
+  let isSavingRequestLoader = false;
+
   // API response UI states
   let responseState: TFResponseStateType = {
     responseBodyLanguage: "JSON",
@@ -264,6 +269,13 @@
   let selectedNodeName = "";
   let selectedNodeId = "";
   let selectedNode: TFNodeStoreType | undefined;
+
+  let updateNodeId: string;
+  let updateNodeName: string;
+  let updateNodeRequestId: string;
+  let updateNodeCollectionId: string;
+  let updateNodeMethod: string;
+  let updateNodeFolderId: any;
 
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
@@ -330,12 +342,74 @@
   };
 
   /**
+   * @description - Handles the update of an API request.
+   * This function updates the selected API with the provided node details,
+   * including the HTTP method, request name, request ID, collection ID,
+   * and folder ID. It also manages the request-saving state.
+   */
+  const handleSaveUpcomingRequest = async () => {
+    try {
+      isSavingRequestLoader = true;
+
+      await updateSelectedAPI(
+        updateNodeId,
+        updateNodeName,
+        updateNodeRequestId,
+        updateNodeCollectionId,
+        updateNodeMethod,
+        updateNodeFolderId,
+      );
+
+      isSaveNodeModalOpen = false;
+    } catch (error) {
+      console.error("Error in saving the request:", error);
+    } finally {
+      isSavingRequestLoader = false;
+    }
+  };
+
+  /**
    * Opens the "Add Custom Request" modal.
    *
    * @param id - The ID associated with the custom request.
    */
   const handleOpenAddCustomRequestModal = () => {
     isAddCustomRequestModalOpen = true;
+  };
+
+  /**
+   * Opens the "Save Request" modal.
+   **/
+  const handleOpenSaveNodeRequestModal = async (
+    tabId: string,
+    nodeId: string,
+    name: string,
+    requestId: string,
+    collectionId: string,
+    method: string,
+    folderId?: string,
+  ) => {
+    const isExist = await checkRequestExistInNode(tabId, nodeId);
+
+    updateNodeId = nodeId;
+    updateNodeName = name;
+    updateNodeRequestId = requestId;
+    updateNodeCollectionId = collectionId;
+    updateNodeMethod = method;
+    updateNodeFolderId = folderId;
+
+    if (isExist) {
+      isSaveNodeModalOpen = true;
+    } else {
+      await updateSelectedAPI(
+        nodeId,
+        name,
+        requestId,
+        collectionId,
+        method,
+        folderId,
+      );
+    }
   };
 
   /**
@@ -407,6 +481,24 @@
             onOpenAddCustomRequestModal: function (id: string) {
               handleOpenAddCustomRequestModal();
             },
+            onOpenSaveNodeRequestModal: function (
+              nodeId: string,
+              name: string,
+              requestId: string,
+              collectionId: string,
+              method: string,
+              folderId?: string,
+            ) {
+              handleOpenSaveNodeRequestModal(
+                $tab?.tabId,
+                nodeId,
+                name,
+                requestId,
+                collectionId,
+                method,
+                folderId,
+              );
+            },
             name: _requestData ? _requestData?.name : "",
             method: _requestData ? _requestData?.method : "",
             collectionId: _requestData ? _requestData?.collectionId : "",
@@ -477,6 +569,24 @@
             },
             onOpenAddCustomRequestModal: function (id: string) {
               handleOpenAddCustomRequestModal();
+            },
+            onOpenSaveNodeRequestModal: function (
+              nodeId: string,
+              name: string,
+              requestId: string,
+              collectionId: string,
+              method: string,
+              folderId?: string,
+            ) {
+              handleOpenSaveNodeRequestModal(
+                $tab?.tabId,
+                nodeId,
+                name,
+                requestId,
+                collectionId,
+                method,
+                folderId,
+              );
             },
             name: dbNodes[i].data?.name,
             method: dbNodes[i].data?.method,
@@ -1249,6 +1359,27 @@
     {handleUpdateRequestName}
     {handleUpdateRequestURL}
     {handleUpdateRequestMethod}
+  />
+</Modal>
+
+<Modal
+  title={"Unsaved Changes Detected"}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isSaveNodeModalOpen}
+  handleModalState={(flag = false) => {
+    isSaveNodeModalOpen = flag;
+  }}
+>
+  <SaveNode
+    requestName={updateNodeName}
+    nodeNumber={updateNodeId}
+    handleModalState={(flag = false) => {
+      isSaveNodeModalOpen = flag;
+    }}
+    onSaveRequest={handleSaveUpcomingRequest}
+    isSaveRequestLoader={isSavingRequestLoader}
   />
 </Modal>
 
