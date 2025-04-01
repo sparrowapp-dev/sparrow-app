@@ -9,10 +9,13 @@
 </script>
 
 <div style="height: 89px; !important; padding-bottom:21px;">
-  <div style="font-weight: 700; font-size:20px; margin-bottom:12px;  ">
+  <div
+    class="text-ds-font-size-20 text-ds-font-weight-Semi-bold"
+    style=" margin-bottom:12px;  "
+  >
     Feedbacks
   </div>
-  <p style="font-size: 14px; color:#999999;">
+  <p class="text-ds-font-size-14" style=" color:#999999;">
     Share your feedback to help us refine and enhance your experience.
   </p>
 </div>
@@ -23,12 +26,13 @@
   <div class="d-flex flex-row align-items-center" style="gap:20px;">
     <div class="" style="">
       <Avatar
-          type={"letter"}
-          size={"large"}
-          letter={userInfo?.name?.charAt(0)}
-          bgColor={"var(--text-secondary-500)"}/>
+        type={"letter"}
+        size={"large"}
+        letter={userInfo?.name?.charAt(0)}
+        bgColor={"var(--text-secondary-500)"}
+      />
     </div>
-    <div style="font-weight: 500px; font-size:19px;">
+    <div class="text-ds-font-size-18 text-ds-font-weight-Medium">
       Hey {userInfo?.name}, share your feedback
     </div>
   </div>

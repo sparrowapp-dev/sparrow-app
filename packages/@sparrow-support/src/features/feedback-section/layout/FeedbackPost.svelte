@@ -346,7 +346,7 @@
     }}
   >
     <LeftIcon color={"var(--text-secondary-100)"} />
-    <span class="px-2" style="font-size: 14px;">back</span>
+    <span class="px-2 text-ds-font-size-14">back</span>
   </div>
 
   <!-- Post Card -->
@@ -362,7 +362,9 @@
           class="flex-column"
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
-          <span style="font-size: 18px; font-weight: 500;">{post?.title}</span>
+          <span class="text-ds-font-size-18 text-ds-font-weight-Medium"
+            >{post?.title}</span
+          >
           <Tag type={getColor(post?.status)} text={post?.status || ""} />
         </div>
 
@@ -377,13 +379,13 @@
                 letter={post?.author?.name?.charAt(0)}
                 bgColor={"var(--text-secondary-600)"}
               />
-              <div style="font-size: 14px; font-weight: 500;">
+              <div class="text-ds-font-size-14 text-ds-font-weight-Medium">
                 {post?.author?.name}
               </div>
             </div>
             <div
-              class="text-fs-12"
-              style=" padding-left:45px; font-weight:400;"
+              class="text-ds-font-size-12 text-ds-font-weight-Regular"
+              style=" padding-left:45px; "
             >
               {post?.details}
             </div>
@@ -504,7 +506,8 @@
                       color={"var(--text-secondary-200)"}
                     />
                   </span>
-                  <span class="mb-0 text-fs-12 px-2 ellipsis">{file?.name}</span
+                  <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
+                    >{file?.name}</span
                   >
                   <span
                     on:click={() => {
@@ -525,7 +528,7 @@
       {#if nestedComments.length > 0}
         <div>
           <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6 class="text-fs-14">Activity Feed</h6>
+            <h6 class="text-ds-font-size-14">Activity Feed</h6>
 
             <Select
               data={[
@@ -593,8 +596,8 @@
           />
 
           <p
-            class="mx-1 text-fs-14 mb-0 text-center"
-            style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+            class="mx-1 text-ds-font-size-14 text-ds-font-weight-500 mb-0 text-center"
+            style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
           >
             No comments yet
           </p>
@@ -619,8 +622,8 @@
     <div class="pt-2"></div>
 
     <div style="">
-      <p class="text-fs-14 mb-0 text-secondary-150">Description</p>
-      <p class="text-fs-12 text-secondary-200 mb-0">
+      <p class="text-ds-font-size-14 mb-0 text-secondary-150">Description</p>
+      <p class="text-ds-font-size-12 text-secondary-200 mb-0">
         {feedbackDescription.length} / 200
       </p>
 
@@ -724,7 +727,7 @@
                   color={"var(--text-secondary-200)"}
                 />
               </span>
-              <span class="mb-0 text-fs-12 px-2 ellipsis"
+              <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
                 >{file?.name || file?.slice(-10)}</span
               >
               <span
@@ -755,7 +758,7 @@
                   color={"var(--text-secondary-200)"}
                 />
               </span>
-              <span class="mb-0 text-fs-12 px-2 ellipsis"
+              <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
                 >{file?.name || file?.slice(-10)}</span
               >
               <span

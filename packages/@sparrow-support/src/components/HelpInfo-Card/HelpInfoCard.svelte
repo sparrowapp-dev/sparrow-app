@@ -18,7 +18,9 @@
     >
       <div class=" d-flex justify-content-between align-items-center">
         <div class="test">
-          <p class="card-title pb-0 mb-0 ellipsis" style="font-weight: 500; ">
+          <p
+            class="card-title pb-0 mb-0 ellipsis text-ds-font-size-14 text-ds-font-weight-Medium"
+          >
             {status.title}
           </p>
           <span class="category"
@@ -34,7 +36,6 @@
 
 <style>
   .card-title {
-    font-size: 13px;
     cursor: pointer;
   }
   .card-title:hover {

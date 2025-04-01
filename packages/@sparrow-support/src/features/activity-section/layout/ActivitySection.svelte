@@ -194,8 +194,10 @@
 
 <div class="container" style="padding: 20px;">
   <div class="mt-0">
-    <p style="font-size: 20px; font-weight:700; ">My Activity</p>
-    <p class="text-fs-14" style="color: var(--text-secondary-50); ">
+    <p class="text-ds-font-size-20 text-ds-font-weight-Semi-bold">
+      My Activity
+    </p>
+    <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
       Find all your posts, comments, and likes in one place and easily keep
       track of them.
     </p>
@@ -298,8 +300,8 @@
         <div>
           <SortIcon width={"12px"} height={"8px"} />
           <span
-            class="text-fs-13"
-            style="padding-left: 8px; padding-top:4px ; font-weight:500;"
+            class="text-ds-font-size-14 text-ds-font-weight-Medium"
+            style="padding-left: 8px; padding-top:4px ; "
           >
             Sort By</span
           >
@@ -334,7 +336,7 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "oldest"}
           >
-            <div><span class="text-fs-13">Oldest</span></div>
+            <div><span class="text-ds-font-size-14">Oldest</span></div>
             <div class="tick-icon">
               <TickIcon
                 height={"12px"}
@@ -357,8 +359,8 @@
           >
             <SparrowLogo />
             <p
-              class="mx-1 text-fs-14 mb-0 text-center mt-5"
-              style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-5"
+              style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
               No activity yet. Start engaging to see it here
             </p>
@@ -407,7 +409,9 @@
                           >
                             <Tag
                               type={getColor(post?.status)}
-                              text={post?.status ? post.status.charAt(0) + post.status.slice(1) : ""}
+                              text={post?.status
+                                ? post.status.charAt(0) + post.status.slice(1)
+                                : ""}
                             />
                           </div>
                         </div>
@@ -421,7 +425,7 @@
 
                       <div style="margin-top: 10px; flex: 1;">
                         <p
-                          class="text-fs-14"
+                          class="text-ds-font-size-14"
                           style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                         >
                           {post?.details}
@@ -438,7 +442,7 @@
                             color={"var(--icon-secondary-950)"}
                           />
                         </span>
-                        <span style=" font-size: 13px;"
+                        <span class="text-ds-font-size-14"
                           >{post?.commentCount}</span
                         >
                       </div>
@@ -457,8 +461,8 @@
                   />
 
                   <p
-                    class="mx-1 text-fs-14 mb-0 text-center mt-3"
-                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-3"
+                    style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
                     No feedback yet
                   </p>
@@ -473,7 +477,8 @@
           {#if activityStatusType === ActivityStatusType.COMMENT || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
             <div class="comments mb-2">
               <h2
-                style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
+                class="text-ds-font-size-14"
+                style=" color: #999999; margin-bottom: 12px;"
               >
                 Comments
               </h2>
@@ -486,7 +491,12 @@
                       on:mouseenter={() => (isHovering = comment.id)}
                       on:mouseleave={() => (isHovering = null)}
                     >
-                      <Avatar type="letter" size="large" letter={comment?.author?.name?.charAt(0)} bgColor="var(--text-secondary-600)" />
+                      <Avatar
+                        type="letter"
+                        size="large"
+                        letter={comment?.author?.name?.charAt(0)}
+                        bgColor="var(--text-secondary-600)"
+                      />
                       <div class="comment-content">
                         <div
                           class="mt-1"
@@ -507,8 +517,8 @@
                                       setPostId("feedback", comment?.post?.id);
                                       MixpanelEvent(Events.Activity_GoToPost);
                                     }}
-                                    class="go-to-post"
-                                    style="font-size: 12px; letter-spacing: 0.25px; font-weight: 400;"
+                                    class="go-to-post text-ds-font-size-12 text-ds-font-weight-Regular"
+                                    style=" letter-spacing: 0.25px; "
                                     >Go to post</span
                                   >
                                   <ArrowOutwardIcon
@@ -582,8 +592,8 @@
                   />
 
                   <p
-                    class="mx-1 text-fs-14 mb-0 text-center mt-3"
-                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-3"
+                    style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
                     No comments yet
                   </p>
@@ -598,7 +608,8 @@
           {#if activityStatusType === ActivityStatusType.UPVOTED_POSTS || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
             <div class="">
               <h2
-                style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
+                class="text-ds-font-size-16"
+                style=" color: #999999; margin-bottom: 12px;"
               >
                 Upvoted Posts
               </h2>
@@ -645,7 +656,7 @@
 
                       <div style="margin-top: 10px; flex: 1;">
                         <p
-                          class="text-fs-14"
+                          class="text-ds-font-size-14"
                           style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                         >
                           {post?.details}
@@ -662,7 +673,7 @@
                             color={"var(--icon-secondary-950)"}
                           />
                         </span>
-                        <span style=" font-size: 13px;"
+                        <span class="text-ds-font-size-14px"
                           >{post?.commentCount}</span
                         >
                       </div>
@@ -681,8 +692,8 @@
                   />
 
                   <p
-                    class="mx-1 text-fs-14 mb-0 text-center mt-3"
-                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                    class="mx-1 text-ds-font-size-14 text-ds-font-weight-Medium mb-0 text-center mt-3"
+                    style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                   >
                     No upvoted posts yet
                   </p>

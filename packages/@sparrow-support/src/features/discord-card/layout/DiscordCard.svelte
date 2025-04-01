@@ -23,12 +23,14 @@
       <DiscordIcon width="49px" height="49px" />
     </div>
   </div>
-  <div class="fw-bold align-self-center" style="font-size: 14px;">
+  <div
+    class="fw-bold align-self-center text-ds-font-size-14 text-ds-font-weight-Medium"
+  >
     Join our Discord Channel
   </div>
   <div
-    class="fw-light text-center"
-    style="color: var(--text-secondary-250); font-size: 14px;  "
+    class="fw-light text-center text-ds-font-size-14"
+    style="color: var(--text-secondary-250);  "
   >
     <span> Join our Discord channel to </span>
     <span><br /> connect with the community.</span>
@@ -47,8 +49,8 @@
         }}
       >
         <div
-          class="fw-normal"
-          style="font-size: 14px; color:var(--white-color);"
+          class="fw-normal text-ds-font-size-14"
+          style=" color:var(--white-color);"
         >
           Join
         </div>
@@ -63,7 +65,7 @@
   >
     <Tooltip placement="right-center" title="Coming Soon">
       <span style=""> <SettingIcon color={"var(--text-secondary-50)"} /> </span>
-      <span class="text-fs-14">Support</span>
+      <span class="text-ds-font-size-14">Support</span>
     </Tooltip>
   </div>
   <div
@@ -72,7 +74,7 @@
   >
     <Tooltip placement="right-center" title="Coming Soon">
       <span> <HelpCenterIcon color={"var(--text-secondary-50)"} /> </span>
-      <span class="text-fs-14">Help Center</span>
+      <span class="text-ds-font-size-14">Help Center</span>
     </Tooltip>
   </div>
 </div>

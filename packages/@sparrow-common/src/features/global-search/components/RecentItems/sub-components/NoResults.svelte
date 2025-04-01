@@ -10,7 +10,9 @@
   <div style="display:flex; align-items:center; justify-content:center;">
     <SearchIcon width="24px" height="24px" />
   </div>
-  <div class="text-container">
+  <div
+    class="text-container text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-Regular"
+  >
     {#if type === "Basic"}
       <p>Nothing found for "{searchQuery}"</p>
     {:else}
@@ -33,8 +35,5 @@
     align-items: center;
     justify-content: center;
     color: var(--text-ds-neutral-300);
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 18px;
   }
 </style>
