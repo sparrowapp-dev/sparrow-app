@@ -75,18 +75,15 @@
     data={teamTabs}
     titleId={selectedTeam}
     minHeaderWidth={"auto"}
+    size={"medium"}
     iconRequired={false}
-    isDropIconFilled={true}
     borderType={"none"}
     borderActiveType={"none"}
     headerHighlight={""}
-    headerTheme={"violet2"}
+    variant={"primary"}
     menuItem={"v3"}
-    headerFontSize={"12px"}
     maxHeaderWidth={"1285px"}
     zIndex={200}
-    bodyTheme={"violet"}
-    borderRounded={"2px"}
     position={"absolute"}
     onclick={(flag) => handleSelectTeam(flag)}
     placeholderText="Select Team"
