@@ -132,9 +132,6 @@
 
   .teams-heading {
     outline: none;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 21px;
   }
   .teams-outer {
     padding: 6px 5px;
