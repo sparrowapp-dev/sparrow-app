@@ -186,23 +186,20 @@ jobs:
         run: |
           curl -sL https://firebase.tools | bash
 
-      - name: Get Branch Name
-        id: pr_branch
-        run: |
-          if [[ -n "${{ github.head_ref }}" ]]; then
-            echo "::set-output name=branch::${{ github.head_ref }}"
-          else
-            echo "::set-output name=branch::${{ github.ref_name }}"
-          fi
-
-          - name: Install Firebase CLI
-          run: curl -sL https://firebase.tools | bash
+    #   - name: Get Branch Name
+    #     id: pr_branch
+    #     run: |
+    #       if [[ -n "${{ github.head_ref }}" ]]; then
+    #         echo "::set-output name=branch::${{ github.head_ref }}"
+    #       else
+    #         echo "::set-output name=branch::${{ github.ref_name }}"
+    #       fi
   
       - name: Distribute DMG to Firebase App Distribution
         run: |
             firebase appdistribution:distribute /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg \
               --app ${{ secrets.FIREBASE_APP_ID }} \
-              --groups "Testers" \
+              --groups "testing" \
               --release-notes "Automated build ${{ github.run_number }}" \
               --token ${{ secrets.FIREBASE_TOKEN }}
 
