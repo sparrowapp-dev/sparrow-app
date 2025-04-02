@@ -85,7 +85,7 @@
       {#if api?.path?.collectionId}
         <p
           class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
-          style="width: 8px;"
+          style="width: 16px;"
         >
           {"/ "}
         </p>

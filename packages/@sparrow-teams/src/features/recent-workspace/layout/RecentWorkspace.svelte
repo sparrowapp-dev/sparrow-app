@@ -65,7 +65,7 @@
             >
               <div
                 class="overflow-hidden ellipsis"
-                style="width: 100%; height:22["
+                style="width: 100%; height:35px"
               >
                 <p
                   class="list-name mb-0 ellipsis overflow-hidden ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
@@ -74,7 +74,7 @@
                   {list?.name || ""}
                 </p>
                 <p
-                  class="team-name mb-0 title fw-bold ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+                  class="team-name mb-0 title ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                   style=" border-radius:0; line-height:18px;"
                 >
                   {list?.team?.teamName || ""}

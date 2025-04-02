@@ -301,7 +301,9 @@
                   color={"var(--sparrow-text-color)"}
                   classProp="mx-2 my-auto d-flex"
                 />
-                <span class="my-auto">{openTeam?.users.length} Members</span>
+                <span class="my-auto" style="width: 66px;"
+                  >{openTeam?.users.length} Members</span
+                >
               </p>
             {/if}
             {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}

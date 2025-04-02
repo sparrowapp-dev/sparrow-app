@@ -48,7 +48,9 @@
     </div>
   </div>
   <div>
-    <p class="text-secondary-300 text-fs-12 fw-normal">
+    <p
+      class="text-secondary-300 text-ds-font-size-12 text-ds-font-weight-regular"
+    >
       The auth header will be automatically generated when you send the request.
     </p>
   </div>
