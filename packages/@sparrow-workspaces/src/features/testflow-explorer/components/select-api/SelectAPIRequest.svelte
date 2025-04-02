@@ -264,15 +264,6 @@
       }
     }, 0);
   };
-
-  const openDropdown = () => {
-    isOpen = true;
-    setTimeout(() => {
-      if (inputRef) {
-        inputRef.focus();
-      }
-    }, 0);
-  };
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -281,7 +272,7 @@
       ? 'active'
       : ''}"
     tabindex="0"
-    on:click={openDropdown}
+    on:click={toggleDropdown}
   >
     <div class="d-flex align-items-center input-container">
       {#if name && method}
@@ -303,12 +294,13 @@
         on:blur={handleBlur}
       />
     </div>
-    <Button
-      type="teritiary-regular"
-      startIcon={isOpen ? ChevronUpRegular : ChevronDownRegular}
-      onClick={toggleDropdown}
-      size="small"
-    />
+    <div on:click|stopPropagation={toggleDropdown}>
+      <Button
+        type="teritiary-regular"
+        startIcon={isOpen ? ChevronUpRegular : ChevronDownRegular}
+        size="small"
+      />
+    </div>
   </div>
   <div
     class="dropdown-options"
