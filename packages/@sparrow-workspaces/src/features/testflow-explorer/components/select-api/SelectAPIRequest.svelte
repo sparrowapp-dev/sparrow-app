@@ -5,7 +5,6 @@
     CollectionIcon,
     ChevronUpRegular,
     FolderRegular,
-    CrossIcon2,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
@@ -277,7 +276,6 @@
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
-  <!-- <p>Select API Request</p> -->
   <div
     class="dropdown-header d-flex justify-content-between align-items-center mx-auto {isOpen
       ? 'active'
