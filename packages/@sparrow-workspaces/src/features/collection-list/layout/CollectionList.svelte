@@ -273,7 +273,7 @@
           style="display: flex; height:24px; gap:4px; align-items:center; padding:2px 4px; "
         >
           <p
-            class="text-ds-font-size-12 text-ds-line-height-120 text-ds-font-weight-regular mb-0"
+            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-0"
             style=" color:var(--text-ds-neutral-50); "
           >
             Collections

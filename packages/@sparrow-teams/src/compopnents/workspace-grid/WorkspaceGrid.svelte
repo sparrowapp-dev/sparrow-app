@@ -132,7 +132,7 @@
       >
         <h4 class="ellipsis overflow-hidden me-4">
           <span
-            class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-medium"
+            class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium"
             style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
           >
         </h4>

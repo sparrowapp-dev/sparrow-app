@@ -309,7 +309,7 @@
       {/if}
       <span
         class=" ms-1 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {!tab.isActive
-          ? 'request-text'
+          ? 'request-text text-ds-font-weight-medium'
           : ''}"
         style={`color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
       >
@@ -425,7 +425,6 @@
     color: inherit !important;
   }
   .request-text {
-    font-weight: 500 !important;
     color: var(--text-ds-neutral-300) !important;
   }
   .individual-tab:hover .request-text {
