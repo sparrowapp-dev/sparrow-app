@@ -377,7 +377,7 @@
                   <Search
                     variant={"primary"}
                     id="search-input"
-                    size="large"
+                    size="medium"
                     placeholder="Search workspaces in {openTeam?.name}"
                     on:input={handleSearchInput}
                     bind:value={searchQuery}

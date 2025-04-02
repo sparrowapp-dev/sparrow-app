@@ -72,7 +72,7 @@
       <div>
         <Search
           variant="primary"
-          size="large"
+          size="medium"
           id="search-input-team-member"
           placeholder="Search people in {openTeam?.name}"
           bind:value={filterText}
