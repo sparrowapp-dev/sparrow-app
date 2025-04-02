@@ -300,14 +300,11 @@
       },
     ]}
     maxHeaderWidth={"100%"}
+    variant={"tertiary"}
+    size={"medium"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
-    bodyTheme={"violet"}
-    headerTheme={"violet2"}
-    borderRounded={"4px"}
-    headerFontWeight={400}
-    headerFontSize={"12px"}
     isError={roleError && selectedRole === defaultRole}
   />
 </div>
