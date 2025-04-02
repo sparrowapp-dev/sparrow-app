@@ -64,7 +64,7 @@
       >
         <div class="p-2">
           <SparrowAIIcon height={"32px"} width={"32px"} />
-          <span class="gradient-text">Sparrow</span>
+          <span class="gradient-text">Sparrow AI</span>
         </div>
         <div
           on:click={() =>
@@ -76,6 +76,8 @@
           <CrossIcon height={"18px"} width={"18px"} color={"#8A9299"} />
         </div>
       </div>
+
+      <hr style="width: 92%; margin:auto;" />
 
       <div bind:this={chatContainer} style="flex:1; overflow:auto;">
         <div
@@ -169,7 +171,7 @@
 <style>
   .chat-box {
     background-color: var(--bg-ds-surface-700);
-    border: 0.5px solid #5751fd;
+    /* border: 0.5px solid #5751fd; */
     border-radius: 10px;
   }
 
@@ -179,7 +181,7 @@
     inset: 0;
     padding: 1px;
     border-radius: 8px;
-    background: linear-gradient(
+    /* background: linear-gradient(
       90deg,
       var(--border-ds-info-400) 0%,
       var(--border-ds-primary-400) 50%,
@@ -189,11 +191,12 @@
       linear-gradient(white 0 0) content-box,
       linear-gradient(white 0 0);
     -webkit-mask-composite: destination-out;
-    mask-composite: exclude;
+    mask-composite: exclude; */
     pointer-events: none;
   }
   .gradient-text {
-    background: linear-gradient(to right, #158ff1, #5751fd);
+    /* background: linear-gradient(to right, #158ff1, #5751fd); */
+    background: white;
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
