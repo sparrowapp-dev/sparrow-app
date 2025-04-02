@@ -85,7 +85,7 @@
 </script>
 
 <FolderExplorer
-  isWebApp={false}
+  isWebApp={true}
   {userRole}
   tab={_viewModel.tab}
   bind:folder
