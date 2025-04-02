@@ -19,14 +19,9 @@
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   export let name;
   export let method;
-  export let collections = [];
+  export let collections: any = [];
   export let updateNode;
   export let collectionData: Observable<CollectionDocument[]>;
-  collectionData.subscribe((value) => {
-    if (value) {
-      collections = value;
-    }
-  });
 
   let arrayData = collections;
   let selectedRequest = null;
@@ -63,22 +58,25 @@
       selectedItem = "COLLECTION";
       arrayData = data.items;
       previousItem = data;
+      selectApiName = "";
     }
     if (data?.type === "FOLDER") {
       selectedFolder = data;
       selectedItem = "FOLDER";
       arrayData = data.items;
       previousItem = data;
+      selectApiName = "";
     }
     if (data?.type === "REQUEST") {
       selectedItem = "REQUEST";
       isOpen = false;
       selectedRequest = data;
       if (previousItem?.type === "FOLDER") {
+        const currentCollectionId = findCollectionIdForItem(data.id);
         updateNode(
           data.name,
           data.id,
-          selectedCollection.id,
+          currentCollectionId,
           data.request.method,
           previousItem.id,
         );
@@ -198,33 +196,43 @@
       : name;
   };
 
-  // Function to fetch and store APIs
+  // Function to divide all the apis of it.
   const handleSearchApis = () => {
-    let apis: any = [];
+    let apis: any[] = [];
     for (let i = 0; i < collections.length; i++) {
-      if (collections[i]?._data?.items) {
-        apis = [...apis, ...collections[i]._data.items];
+      if (collections[i]?._data) {
+        apis.push(collections[i]._data);
+      }
+      if (collections[i]?._data?.items?.length) {
+        for (let item of collections[i]._data.items) {
+          apis.push(item);
+          if (item?.items?.length) {
+            apis = [...apis, ...item.items];
+          }
+        }
       }
     }
     return apis;
   };
 
-  function handleBlur() {
+  collectionData.subscribe((value) => {
+    if (value) {
+      collections = value;
+      allApis = handleSearchApis();
+      filteredApis = allApis;
+      initializeMap(collections);
+    }
+  });
+
+  const handleBlur = () => {
     if (selectApiName.trim() === "") {
       selectApiName = previousValue;
     }
-  }
+  };
 
-  function findCollectionIdForItem(itemId) {
+  const findCollectionIdForItem = (itemId: string) => {
     return itemIdToCollectionIdMap.get(itemId) || null;
-  }
-
-  // Fetch APIs on mount
-  onMount(() => {
-    initializeMap(collections);
-    allApis = handleSearchApis();
-    filteredApis = allApis;
-  });
+  };
 
   // Function to search and filter APIs
   const searchApis = () => {
@@ -234,32 +242,32 @@
     );
   };
 
-  function clearSearch() {
+  const clearSearch = () => {
     selectApiName = "";
     inputRef?.focus();
-  }
+  };
 
   $: if (name) {
     selectApiName = name;
   }
 
-  function toggleDropdown() {
+  const toggleDropdown = () => {
     isOpen = !isOpen;
     setTimeout(() => {
       if (inputRef) {
         inputRef.focus();
       }
     }, 0);
-  }
+  };
 
-  function openDropdown() {
+  const openDropdown = () => {
     isOpen = true;
     setTimeout(() => {
       if (inputRef) {
         inputRef.focus();
       }
     }, 0);
-  }
+  };
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -439,48 +447,55 @@
           {/each}
         {:else}
           <div
-            style="width:170px; align-items:center; justify-content:center;"
+            style="align-items:center; justify-content:center;"
             class="d-flex"
           >
-            <p style="color: #808080; font-size: 10px; margin-top: 10px; ">
-              No APIs Present.
+            <p style="margin: 0px;" class="search-notfound-text">
+              No results found.
             </p>
           </div>
         {/if}
       </div>
     {:else if filteredApis.length > 0}
-      {#each filteredApis as api}
-        {#if api?.type === "REQUEST"}
-          <div
-            class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
-            style="gap: 6px;"
-            on:click|stopPropagation={() => {
-              handleSelectApi(api);
-            }}
-          >
-            <span
-              class="text-{getMethodStyle(api?.request?.method)} text-center"
-              style="margin-left: 5px;"
+      <div class="scrollable-list">
+        {#each filteredApis as api}
+          {#if api?.type === "REQUEST" || api?.items}
+            <div
+              class="d-flex align-items-center dropdown-single-option px-2 py-1 gap-1"
+              style="gap: 6px;"
+              on:click|stopPropagation={() => {
+                handleSelectApi(api);
+              }}
             >
-              <span
-                class={"request-icon"}
-                style="font-size: 9px; font-weight: 600;"
-                >{api?.request?.method === "DELETE"
-                  ? "DEL"
-                  : api?.request?.method || ""}</span
-              >
-            </span>
-            <span class="select-txt">{truncateName(api.name, 21)}</span>
-          </div>
-        {/if}
-      {/each}
+              {#if api?.request?.method}
+                <span
+                  class="text-{getMethodStyle(
+                    api?.request?.method,
+                  )} text-center"
+                >
+                  <span
+                    class={"request-icon"}
+                    style="font-size: 9px; font-weight: 600;"
+                    >{api?.request?.method === "DELETE"
+                      ? "DEL"
+                      : api?.request?.method || ""}</span
+                  >
+                </span>
+              {:else}
+                <StackRegular
+                  size={"16px"}
+                  color={"var(--icon-ds-neutral-50)"}
+                />
+              {/if}
+              <span class="select-txt">{truncateName(api.name, 21)}</span>
+            </div>
+          {/if}
+        {/each}
+      </div>
     {:else}
-      <div
-        class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
-        style="gap: 6px;"
-      >
-        <p class="text-center" style="margin: 0px; margin-left:5px;">
-          API not Found
+      <div style="align-items:center; justify-content:center;" class="d-flex">
+        <p style="margin: 0px;" class="search-notfound-text">
+          No results found.
         </p>
       </div>
     {/if}
@@ -557,10 +572,22 @@
     margin-bottom: 0px;
   }
   .scrollable-list {
-    max-height: 300px;
+    max-height: 288px;
     overflow-y: auto;
     overflow-x: hidden;
   }
+  /* Scrollbar track */
+  .scrollable-list::-webkit-scrollbar-thumb {
+    background-color: var(--bg-ds-surface-100);
+    border-radius: 8px;
+  }
+  .search-notfound-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 153%;
+  }
+
   .method-container {
     display: flex;
     justify-content: center;

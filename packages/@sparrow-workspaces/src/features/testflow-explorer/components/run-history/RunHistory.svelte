@@ -39,6 +39,7 @@
     }
     return name;
   };
+  $: console.log("Test flow history------------>", testflowStore);
 </script>
 
 <div class="position-relative">
@@ -188,6 +189,9 @@
                           {#each history?.requests as request, index}
                             <div
                               class="d-flex mb-2 align-items-center justify-content-between gap-1"
+                              style="opacity: {request?.status === 'pending'
+                                ? 0.5
+                                : 1};"
                             >
                               <div
                                 class="d-flex align-items-center"
