@@ -93,6 +93,8 @@ import { RequestSavedTabAdapter } from "src/adapter/request-saved-tab";
 import { InitTab } from "@sparrow/common/factory";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
+import { getClientUser } from "src/utils/jwt";
+
 class RestExplorerViewModel {
   /**
    * Repository
@@ -2308,7 +2310,7 @@ class RestExplorerViewModel {
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
         message:
-          errorMessage || "Woops! Something gone wrong. Please try again...",
+          errorMessage || "Woops! Something went wrong. Please try again...",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2334,17 +2336,7 @@ class RestExplorerViewModel {
 
     try {
       // Get user email for the request
-      let userEmail = "";
-      try {
-        const workspace = await this.getWorkspaceById(
-          componentData.path.workspaceId,
-        );
-        console.log("wk :>> ", workspace);
-        userEmail = workspace.owner.email;
-      } catch (error) {
-        console.error("Error getting user email:", error);
-        userEmail = "anish.kumar@techdome.net.in"; // Fallback email
-      }
+      let userEmail = getClientUser().email;
 
       // Set up socket event listener for the response
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
@@ -2357,7 +2349,7 @@ class RestExplorerViewModel {
 
       if (!socketResponse) {
         console.log("socket resonse invalid :> ");
-        throw new Error("Something Went Extremely Wrong!");
+        throw new Error("Woops! Something went wrong. Please try again...");
       }
 
       // Remove any existing listeners to avoid duplicates
@@ -2374,7 +2366,7 @@ class RestExplorerViewModel {
           console.error("Socket disconnected:", reason);
           await this.handleAIResponseError(
             componentData,
-            "Service Disconnect!",
+            "Woops! Something went wrong. Please try again...",
           );
         },
       );
@@ -2385,17 +2377,17 @@ class RestExplorerViewModel {
           console.error("Socket connect_error:", reason);
           await this.handleAIResponseError(
             componentData,
-            "Service Disconnect!",
+            "Woops! Something went wrong. Please try again...",
           );
         },
       );
 
-      // Add new listener for the response event
       this.aiAssistentWebSocketService.addListener(
-        `assistant-response_${componentData.tabId}`,
+        `assistant-response`,
         async (response) => {
           console.log("came here : ");
 
+          this.aiAssistentWebSocketService.removeListener(`assistant-response`);
           this.aiAssistentWebSocketService.removeListener(
             `assistant-response_${componentData.tabId}`,
           );
@@ -2466,6 +2458,89 @@ class RestExplorerViewModel {
 
           console.log("res :>> ", response);
           await this.updateRequestState({ isChatbotGeneratingResponse: false });
+
+          return response;
+        },
+      );
+
+      // Add new listener for the response event
+      this.aiAssistentWebSocketService.addListener(
+        `assistant-response_${componentData.tabId}`,
+        async (response) => {
+          console.log("came here : ");
+
+          this.aiAssistentWebSocketService.removeListener(`assistant-response`);
+          this.aiAssistentWebSocketService.removeListener(
+            `assistant-response_${componentData.tabId}`,
+          );
+          this.aiAssistentWebSocketService.removeListener(`disconnect`);
+          this.aiAssistentWebSocketService.removeListener(`connect_error`);
+
+          if (
+            response.messages &&
+            response.messages.includes("Limit Reached")
+          ) {
+            // Handle rate limit error
+            console.log("came here : 1");
+            await this.updateRequestAIConversation([
+              ...(componentData?.property?.request?.ai?.conversations || []),
+              {
+                message:
+                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.",
+                messageId: uuidv4(),
+                type: MessageTypeEnum.RECEIVER,
+                isLiked: false,
+                isDisliked: false,
+                status: false,
+              },
+            ]);
+          } else if (
+            response.messages &&
+            response.messages.includes("Some Issue Occurred")
+          ) {
+            // Handle generic error
+            console.log("came here : 2");
+            await this.updateRequestAIConversation([
+              ...(componentData?.property?.request?.ai?.conversations || []),
+              {
+                message: "Something went wrong! Please try again.",
+                messageId: uuidv4(),
+                type: MessageTypeEnum.RECEIVER,
+                isLiked: false,
+                isDisliked: false,
+                status: false,
+              },
+            ]);
+          } else if (response.messages) {
+            console.log("came here : 3");
+            const thisTabThreadId =
+              componentData?.property?.request?.ai?.threadId;
+            console.log("threadID ;>> ", thisTabThreadId);
+
+            // Update thread ID if available
+            if (!thisTabThreadId) {
+              await this.updateRequestAIThread(response.thread_Id);
+            }
+            // Handle successful response
+            // Add the AI's response to the conversation
+            await this.updateRequestAIConversation([
+              ...(componentData?.property?.request?.ai?.conversations || []),
+              {
+                message: response.messages,
+                messageId: uuidv4(), // You might get a message ID from the server instead
+                type: MessageTypeEnum.RECEIVER,
+                isLiked: false,
+                isDisliked: false,
+                status: true,
+              },
+            ]);
+
+            await this.displayDataInChunks(response.messages, 100, 300);
+          }
+
+          console.log("res :>> ", response);
+          await this.updateRequestState({ isChatbotGeneratingResponse: false });
+
           return response;
         },
       );

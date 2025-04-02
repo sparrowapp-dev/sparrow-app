@@ -179,7 +179,11 @@ export class AiAssistantWebSocketService {
     try {
       const data = JSON.parse(event.data);
       console.log("data received :>> ", data);
-      this.triggerEvent(`assistant-response_${data.tab_id}`, data);
+      if (data.tab_id) {
+        this.triggerEvent(`assistant-response_${data.tab_id}`, data);
+      } else {
+        this.triggerEvent(`assistant-response`, data);
+      }
     } catch (error) {
       console.error("Error parsing WebSocket message:", error);
     }
@@ -261,29 +265,29 @@ export class AiAssistantWebSocketService {
    *
    * @param prompt - The prompt data to send.
    */
-  public sendPromptMessage = async (
-    prompt: StreamPromptDto,
-  ): Promise<WebSocket | null> => {
-    console.log("Inside sendPromptMessage() :>>");
+  // public sendPromptMessage = async (
+  //   prompt: StreamPromptDto,
+  // ): Promise<WebSocket | null> => {
+  //   console.log("Inside sendPromptMessage() :>>");
 
-    if (!this.webSocket || !this.isConnected) {
-      console.error("WebSocket not connected, cannot send prompt");
-      return null;
-    }
+  //   if (!this.webSocket || !this.isConnected) {
+  //     console.error("WebSocket not connected, cannot send prompt");
+  //     return null;
+  //   }
 
-    try {
-      this.webSocket.send(
-        JSON.stringify({
-          type: "sendPrompt",
-          payload: prompt,
-        }),
-      );
-      return this.webSocket;
-    } catch (error) {
-      console.error("Error sending prompt message:", error);
-      return null;
-    }
-  };
+  //   try {
+  //     this.webSocket.send(
+  //       JSON.stringify({
+  //         type: "sendPrompt",
+  //         payload: prompt,
+  //       }),
+  //     );
+  //     return this.webSocket;
+  //   } catch (error) {
+  //     console.error("Error sending prompt message:", error);
+  //     return null;
+  //   }
+  // };
 
   /**
    * Sends a message to the AI Assistant server via WebSocket.
