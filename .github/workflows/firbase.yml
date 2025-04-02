@@ -182,9 +182,28 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Install Firebase CLI
-        run: |
-          curl -sL https://firebase.tools | bash
+      - name: Upload .dmg to AWS S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+            args: --acl public-read
+        env:
+            AWS_S3_BUCKET: "firebase-build-upload"
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: ${{ secrets.AWS_REGION }}
+            SOURCE_DIR: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+        
+
+
+    #   - name: Install Firebase CLI
+    #     run: |
+    #       curl -sL https://firebase.tools | bash
+
+    #   - name: Set up Firebase authentication
+    #     run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > $HOME/firebase.json 
+        
+    #   - name: Authenticate Firebase CLI
+    #     run: export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase.json"  
 
     #   - name: Get Branch Name
     #     id: pr_branch
@@ -195,13 +214,12 @@ jobs:
     #         echo "::set-output name=branch::${{ github.ref_name }}"
     #       fi
   
-      - name: Distribute DMG to Firebase App Distribution
-        run: |
-            firebase appdistribution:distribute /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg \
-              --app ${{ secrets.FIREBASE_APP_ID }} \
-              --groups "testing" \
-              --release-notes "Automated build ${{ github.run_number }}" \
-              --token ${{ secrets.FIREBASE_TOKEN }}
+    #   - name: Distribute DMG to Firebase App Distribution
+    #     run: |
+    #         firebase appdistribution:distribute /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg \
+    #           --app ${{ secrets.FIREBASE_MAC_APP_ID }} \
+    #           --groups "testing" \
+    #           --release-notes "Automated build ${{ github.run_number }}" 
 
 
 
