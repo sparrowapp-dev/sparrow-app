@@ -25,7 +25,7 @@
     class="sidebar-teams-header d-flex justify-content-between p-3 px-2 pb-0 mb-1"
   >
     <h6
-      class="teams-heading ms-2 px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
+      class="teams-heading px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
       style=" color:var(--bg-ds-neutral-300); display:flex;align-items:center; margin-bottom:0;"
     >
       Sparrow Hubs
@@ -132,7 +132,6 @@
 
   .teams-heading {
     outline: none;
-    margin-left: 5px;
     font-size: 14px;
     font-weight: 400;
     line-height: 21px;

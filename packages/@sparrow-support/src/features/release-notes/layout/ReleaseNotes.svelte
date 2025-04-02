@@ -269,7 +269,7 @@
                     <div class=" d-flex gap-2">
                       <h3
                         style="cursor: pointer;"
-                        class="text-fs-18 mb-0"
+                        class="text-ds-font-size-16 text-ds-font-weight-semi-bold mb-0"
                         on:click={() => {
                           handleSeeMore(event);
                           MixpanelEvent(Events.Version_Updates);
@@ -596,8 +596,6 @@
   }
 
   .timeline-content h3 {
-    font-size: 18px;
-    font-weight: 700;
     line-height: 27px;
     color: var(--text-secondary-100);
   }
