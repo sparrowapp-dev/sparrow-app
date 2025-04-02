@@ -165,7 +165,7 @@
 <div
   style="position: fixed;
    bottom: 22px;
-   right:28px;
+   right:508px; // temp change
    z-index: 200;"
 >
   <div

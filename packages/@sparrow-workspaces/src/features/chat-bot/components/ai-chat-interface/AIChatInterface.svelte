@@ -50,129 +50,145 @@
 </script>
 
 <!-- <div class="d-flex flex-column h-100 chat-box"> -->
-<div
-  class="d-flex flex-column h-100 chat-box"
-  in:fly={{ y: 50, duration: 300, easing: cubicOut }}
-  out:fly={{ y: 50, duration: 300, easing: cubicOut }}
->
-  <div style="flex:1; overflow:auto;">
-    <div class="d-flex h-100 flex-column">
-      <div
-        class="d-flex"
-        style="justify-content: space-between; align-items:center"
-        in:fade={{ duration: 200 }}
-      >
-        <div class="p-2">
-          <SparrowAIIcon height={"32px"} width={"32px"} />
-          <span class="gradient-text">Sparrow AI</span>
-        </div>
-        <div
-          on:click={() =>
-            onUpdateRequestState({
-              isChatbotActive: false,
-            })}
-          class="close-btn d-flex align-items-center justify-content-center"
-        >
-          <CrossIcon height={"18px"} width={"18px"} color={"#8A9299"} />
-        </div>
-      </div>
 
-      <hr style="width: 92%; margin:auto;" />
-
-      <div bind:this={chatContainer} style="flex:1; overflow:auto;">
-        <div
-          class="d-flex flex-column h-100 align-items-center justify-content-center"
-        >
-          {#if !conversations?.length}
-            <div
-              class="h-100 p-3 w-100 d-flex flex-column justify-content-between"
-              in:fade={{ duration: 300 }}
-            >
-              <div></div>
-              <div class="d-flex flex-column align-items-center">
-                <span class="pb-3">
-                  <SparkleFilled height={"28px"} width={"28px"} />
-                </span>
-                <p class="text-fs-16 mb-1 text-secondary-180">
-                  Ask anything or write with AI
-                </p>
-                <p class="text-fs-12 text-secondary-250">
-                  Use AI to Quickly search for any Information
-                </p>
-              </div>
-              <div class="d-flex flex-column align-items-end">
-                <AISuggestionBox
-                  onClick={(text = "") => {
-                    sendPrompt(text);
-                    MixpanelEvent(Events.AI_Int_Gen_Curl_Prompt);
-                  }}
-                  title="Generate Curl"
-                />
-                <AISuggestionBox
-                  onClick={(text = "") => {
-                    sendPrompt(text);
-                    MixpanelEvent(Events.AI_Int_Gen_Doc_Prompt);
-                  }}
-                  title="Generate Documentation"
-                />
-                <AISuggestionBox
-                  onClick={(text = "") => {
-                    sendPrompt(text);
-                    MixpanelEvent(Events.AI_Int_Gen_Mock_Prompt);
-                  }}
-                  title="Generate Mock Parameter Data"
-                />
-              </div>
+<div class="ai-chat-panel h-100">
+  <div
+    class="d-flex flex-column h-100 chat-box"
+    in:fly={{ y: 50, duration: 300, easing: cubicOut }}
+    out:fly={{ y: 50, duration: 300, easing: cubicOut }}
+  >
+    <div style="flex:1; overflow:auto;">
+      <div class="d-flex h-100 flex-column">
+        <div class="heading">
+          <div
+            class="d-flex"
+            style="justify-content: space-between; align-items:center"
+            in:fade={{ duration: 200 }}
+          >
+            <div class="">
+              <SparrowAIIcon height={"32px"} width={"32px"} />
+              <span class="gradient-text">Sparrow AI</span>
             </div>
-          {:else}
-            <div class="h-100 w-100">
-              {#each conversations as chat, index}
-                <div in:fade={{ duration: 200, delay: index * 50 }}>
-                  <ChatItem
-                    message={chat.message}
-                    messageId={chat.messageId}
-                    type={chat.type}
-                    status={chat.status}
-                    isLiked={chat.isLiked}
-                    isDisliked={chat.isDisliked}
-                    {onToggleLike}
-                    {regenerateAiResponse}
-                    isLastRecieverMessage={conversations.length - 1 === index
-                      ? true
-                      : false}
+            <div
+              on:click={() =>
+                onUpdateRequestState({
+                  isChatbotActive: false,
+                })}
+              class="close-btn d-flex align-items-center justify-content-center"
+            >
+              <CrossIcon height={"18px"} width={"18px"} color={"#8A9299"} />
+            </div>
+          </div>
+        </div>
+
+        <div bind:this={chatContainer} style="flex:1; overflow:auto;">
+          <div
+            class="d-flex flex-column h-100 align-items-center justify-content-center"
+          >
+            {#if !conversations?.length}
+              <div
+                class="h-100 p-3 w-100 d-flex flex-column justify-content-between"
+                in:fade={{ duration: 300 }}
+              >
+                <div></div>
+                <div class="d-flex flex-column align-items-center">
+                  <span class="pb-3">
+                    <SparkleFilled height={"28px"} width={"28px"} />
+                  </span>
+                  <p class="text-fs-16 mb-1 text-secondary-180">
+                    Ask anything or write with AI
+                  </p>
+                  <p class="text-fs-12 text-secondary-250">
+                    Use AI to Quickly search for any Information
+                  </p>
+                </div>
+                <div class="d-flex flex-column align-items-end">
+                  <AISuggestionBox
+                    onClick={(text = "") => {
+                      sendPrompt(text);
+                      MixpanelEvent(Events.AI_Int_Gen_Curl_Prompt);
+                    }}
+                    title="Generate Curl"
+                  />
+                  <AISuggestionBox
+                    onClick={(text = "") => {
+                      sendPrompt(text);
+                      MixpanelEvent(Events.AI_Int_Gen_Doc_Prompt);
+                    }}
+                    title="Generate Documentation"
+                  />
+                  <AISuggestionBox
+                    onClick={(text = "") => {
+                      sendPrompt(text);
+                      MixpanelEvent(Events.AI_Int_Gen_Mock_Prompt);
+                    }}
+                    title="Generate Mock Parameter Data"
                   />
                 </div>
-              {/each}
-            </div>
-          {/if}
+              </div>
+            {:else}
+              <div class="h-100 w-100">
+                {#each conversations as chat, index}
+                  <div in:fade={{ duration: 200, delay: index * 50 }}>
+                    <ChatItem
+                      message={chat.message}
+                      messageId={chat.messageId}
+                      type={chat.type}
+                      status={chat.status}
+                      isLiked={chat.isLiked}
+                      isDisliked={chat.isDisliked}
+                      {onToggleLike}
+                      {regenerateAiResponse}
+                      isLastRecieverMessage={conversations.length - 1 === index
+                        ? true
+                        : false}
+                    />
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="input-parent">
-    {#if conversations?.length && isResponseGenerating}
-      <p
-        class="p-3 text-primary-300 generating-img"
-        in:fade={{ duration: 200 }}
-      >
-        <img src={generatingImage} style="width: 118px;" alt="" />
-      </p>
-    {/if}
-    <PromptInput
-      {prompt}
-      {onUpdateAiPrompt}
-      {isResponseGenerating}
-      placeholder={"How can I help you?"}
-      {sendPrompt}
-    />
+    <div class="input-parent">
+      {#if conversations?.length && isResponseGenerating}
+        <p
+          class="p-3 text-primary-300 generating-img"
+          in:fade={{ duration: 200 }}
+        >
+          <img src={generatingImage} style="width: 118px;" alt="" />
+        </p>
+      {/if}
+      <PromptInput
+        {prompt}
+        {onUpdateAiPrompt}
+        {isResponseGenerating}
+        placeholder={"How can I help you?"}
+        {sendPrompt}
+      />
+    </div>
   </div>
 </div>
 
 <style>
+  .ai-chat-panel {
+    /* min-width: 340px;
+    max-width: 530px; */
+    background-color: var(--bg-ds-surface-700);
+    border-radius: 6px;
+    border: 1px solid #31353f;
+    padding: 10px;
+  }
   .chat-box {
     background-color: var(--bg-ds-surface-700);
     /* border: 0.5px solid #5751fd; */
-    border-radius: 10px;
+    /* border-radius: 8px; */
+  }
+
+  .heading {
+    border-bottom: 1px solid #31353f;
+    padding-bottom: 6px;
   }
 
   .chat-box::before {
@@ -200,14 +216,14 @@
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
-    font-size: 16px;
-    font-weight: 600;
-    padding-left: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    /* padding-left: 8px; */
   }
 
   .close-btn {
     cursor: pointer;
-    margin-right: 10px;
+    /* margin-right: 10px; */
     height: 30px;
     width: 30px;
     border-radius: 4px;
