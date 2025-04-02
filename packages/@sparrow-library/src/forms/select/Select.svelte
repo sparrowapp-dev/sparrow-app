@@ -64,53 +64,11 @@
   export let searchText = "Search";
   export let searchErrorMessage = "No value found.";
 
-<<<<<<< HEAD
-  /**
-   * Determines the border positioning state for the Select header.
-   */
-  export let borderType: "all" | "bottom" | "none" = "all"; // normal case
-  export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
-
-  /**
-   * Determines the icon state for the Select header.
-   */
-  export let isDropIconFilled: boolean = false; // normal case
-
-  /**
-   * Determines the background state for the Select header.
-   */
-  export let headerTheme:
-    | "dark"
-    | "transparent"
-    | "violet"
-    | "violet2"
-    | "dark-violet"
-    | "dark-violet2"
-    | "primary"
-    | "secondary" = "dark";
-
-  /**
-   * Determines the background state for the Select body.
-   */
-  export let bodyTheme: "dark" | "blur" | "violet" | "surface" = "dark";
-
-  /**
-   * Determines the background highlighting state for the Select header.
-   */
-  export let headerHighlight: "active" | "hover" | "hover-active" | "" =
-    "hover-active";
-  /**
-   * Determines the border highlighting state for the Select header.
-   */
-  export let borderHighlight: "active" | "hover" | "hover-active" | "" =
-    "hover-active";
-=======
   /**
    * Determines the background state for the Select header.
    */
   export let variant: "primary" | "secondary" | "tertiary" = "primary";
 
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
   /**
    * Determines the border radius of Select header.
    */
@@ -122,20 +80,11 @@
   /**
    * Determines versions of the Select menu.
    */
-<<<<<<< HEAD
-  export let menuItem: "v1" | "v2" | "v3" = "v1";
-  /**
-   * Determines icons used in Select header.
-   */
-  export let iconRequired = false;
-  export let icon = GitBranchIcon;
-=======
   export let menuItem: "v2" | "v3" = "v2";
   /**
    * Determines icons used in Select header.
    */
   export let icon;
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
 
   /**
    * typography
@@ -156,11 +105,6 @@
   export let placeholderText = "";
   export let isHeaderCombined = false;
   export let showDescription = true;
-<<<<<<< HEAD
-
-  export let isArrowIconRequired = true;
-=======
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
 
   export let bodyAlignment: "right" | "left" = "right";
 
@@ -184,10 +128,6 @@
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
 
-<<<<<<< HEAD
-  const Icon = icon;
-=======
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
   let searchData = "";
   let isOpen = false;
   let isHover = false;
@@ -221,26 +161,7 @@
     }
   }
 
-<<<<<<< HEAD
-  let selectActiveBorderClass = "";
-  let selectErrorBorderClass = "";
-  switch (borderActiveType) {
-    case "none":
-      selectActiveBorderClass = "select-active-border-none";
-      selectErrorBorderClass = "select-error-border-none";
-      break;
-    case "all":
-      selectActiveBorderClass = "select-active-border-all";
-      selectErrorBorderClass = "select-error-border-all";
-      break;
-    case "bottom":
-      selectActiveBorderClass = "select-active-border-bottom";
-      selectErrorBorderClass = "select-error-border-bottom";
-      break;
-  }
-=======
   let selectErrorBorderClass = "select-error-border-all";
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
 
   let selectBackgroundClass = "";
   switch (variant) {
@@ -678,12 +599,9 @@
   .select-btn-state-active-secondary {
     background-color: var(--bg-ds-surface-600);
   }
-<<<<<<< HEAD
-=======
   .select-btn-state-active-tertiary {
     background-color: var(--bg-ds-surface-400);
   }
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
 
   // clicked states
   .select-btn-state-clicked-transparent {
@@ -710,12 +628,9 @@
   .select-btn-state-clicked-secondary {
     background-color: var(--bg-ds-surface-500);
   }
-<<<<<<< HEAD
-=======
   .select-btn-state-clicked-tertiary {
     background-color: var(--bg-ds-surface-400);
   }
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
 
   // focused
   .select-background-transparent:focus-visible {
@@ -818,13 +733,6 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-<<<<<<< HEAD
-  .select-btn:hover {
-    background-color: var(--bg-ds-surface-400) !important;
-  }
-=======
-
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
   .color-primary {
     color: var(--text-ds-primary-300);
   }
@@ -838,11 +746,7 @@
   }
 
   .color-white {
-<<<<<<< HEAD
-    color: var(--text-ds-neutral-200);
-=======
     color: var(--text-ds-neutral-100);
->>>>>>> 3fccd9496a8be0c91a6561b8af9aa9d82f9fa393
   }
 
   .color-get {
