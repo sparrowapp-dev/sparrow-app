@@ -182,16 +182,18 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Install AWS CLI
+        run: |
+            curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+            sudo installer -pkg AWSCLIV2.pkg -target /          
+
       - name: Upload .dmg to AWS S3
-        uses: jakejarvis/s3-sync-action@v0.5.1
-        with:
-            args: --acl public-read
+        run: |
+           aws s3 cp apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg s3://firebase-build-upload --acl public-read
         env:
-            AWS_S3_BUCKET: "firebase-build-upload"
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_REGION: ${{ secrets.AWS_REGION }}
-            SOURCE_DIR: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
         
 
 
