@@ -108,7 +108,7 @@ jobs:
 
       - name: Upload MSI files to S3
         run: |
-          for file in "${{ github.workspace }}apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/"*.msi; do
+          for file in "${{ github.workspace }}apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\"*.msi; do
             filename=$(basename "$file" .msi)
             new_filename="${filename}-${{ env.timestamp }}.msi"
             aws s3 cp "$file" "s3://firebase-build-upload/windows/$new_filename"
