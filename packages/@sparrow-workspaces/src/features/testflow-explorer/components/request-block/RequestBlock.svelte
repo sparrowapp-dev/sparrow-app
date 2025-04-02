@@ -569,6 +569,7 @@
     width: 222px;
   }
   .dummy-dropdown {
+    height: 36px;
     background-color: var(--bg-ds-surface-400);
     padding-top: 6px;
     padding-bottom: 6px;
