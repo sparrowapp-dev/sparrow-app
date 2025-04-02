@@ -247,11 +247,6 @@
     );
   };
 
-  const clearSearch = () => {
-    selectApiName = "";
-    inputRef?.focus();
-  };
-
   $: if (name) {
     selectApiName = name;
   }
