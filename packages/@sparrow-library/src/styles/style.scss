@@ -573,12 +573,12 @@ $theme-colors: map-merge($theme-colors,
 
 $sparrow-ds-font-sizes: (
   // px : rem  
-  12 : 0.857rem,
-  14 : 1.000rem,
-  16 : 1.143rem,
-  20 : 1.429rem,
-  24 : 1.714rem,
-  28 : 2.000rem,
+  12 : 0.75rem,
+  14 : 0.875rem,
+  16 : 1.000rem,
+  20 : 1.25rem,
+  24 : 1.5rem,
+  28 : 1.75rem,
 );
 $sparrow-ds-line-heights: (
   // line-height : percentage line-height
