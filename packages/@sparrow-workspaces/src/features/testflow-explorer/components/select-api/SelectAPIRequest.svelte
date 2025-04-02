@@ -38,19 +38,22 @@
   let previousValue: string = "";
   let itemIdToCollectionIdMap = new Map();
 
-  function initializeMap(collections: any) {
+  const initializeMap = (collections: any) => {
     itemIdToCollectionIdMap.clear();
 
-    collections.forEach((collection) => {
+    collections.forEach(function mapItems(collection: any) {
       if (collection.items && collection.items.length > 0) {
-        collection.items.forEach((item) => {
+        collection.items.forEach(function mapNestedItems(item: any) {
           if (item.id) {
             itemIdToCollectionIdMap.set(item.id, collection.id);
+          }
+          if (item.items && item.items.length > 0) {
+            item.items.forEach(mapNestedItems);
           }
         });
       }
     });
-  }
+  };
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
@@ -80,6 +83,9 @@
           data.request.method,
           previousItem.id,
         );
+        if ((data.name = name)) {
+          selectApiName = name;
+        }
       } else {
         const currentCollectionId = findCollectionIdForItem(data.id);
         updateNode(
@@ -298,16 +304,6 @@
         on:input={searchApis}
         on:blur={handleBlur}
       />
-      {#if !name && selectApiName}
-        <div class="clear-icon" on:click={clearSearch}>
-          <svelte:component
-            this={CrossIcon2}
-            width="12px"
-            height="12px"
-            color="var(--text-ds-neutral-100)"
-          />
-        </div>
-      {/if}
     </div>
     <Button
       type="teritiary-regular"
