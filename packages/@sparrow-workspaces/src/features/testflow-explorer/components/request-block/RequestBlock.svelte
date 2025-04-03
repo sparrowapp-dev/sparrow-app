@@ -239,11 +239,11 @@
 <div
   class="request-block position-relative"
   style={selected && !currentBlock
-    ? "border: 1px solid var(--border-ds-primary-300); outline:none;"
+    ? "outline: 1px solid var(--border-ds-primary-300); border:none;"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
-      ? "border: 1px solid var(--border-ds-success-300); outline:none;"
+      ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
-        ? "border: 1px solid var(--border-ds-danger-300); outline:none;"
+        ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
         : ""}
 >
   <Handle
@@ -518,7 +518,7 @@
         <hr class="my-0 base-line" />
         <div class="px-2 py-2">
           <p
-            class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-10 text-secondary-200"
+            class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-14 text-secondary-200"
           >
             <span> Select API Request </span>
             <span
@@ -579,7 +579,7 @@
     color: var(--text-ds-neutral-400);
     font-family: "Inter", sans-serif;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 18px;
   }
   .add-block-btn {
