@@ -725,6 +725,7 @@
             type="primary"
             size="medium"
             startIcon={PlayFilled}
+            disable={testflowStore?.isTestFlowRunning}
             title="Run"
             onClick={async () => {
               unselectNodes();
