@@ -961,4 +961,40 @@ export class TestflowExplorerPageViewModel {
       value,
     );
   };
+
+  /**
+   *
+   * @param  - response state
+   */
+  public updateResponseState = async (key, val) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (key === "responseNavigation") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.navigation = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyLanguage") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyLanguage = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyFormatter") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyFormatter = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    }
+  };
 }

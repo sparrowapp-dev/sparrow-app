@@ -96,5 +96,6 @@
     isWebApp={false}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
+    onUpdateResponseState={_viewModel.updateResponseState}
   />
 {/if}

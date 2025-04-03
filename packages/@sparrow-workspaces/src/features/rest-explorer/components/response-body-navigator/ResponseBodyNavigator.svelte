@@ -19,7 +19,11 @@
   import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-  import { ArrowDownloadRegular, CopyRegular, SaveRegular } from "@sparrow/library/icons";
+  import {
+    ArrowDownloadRegular,
+    CopyRegular,
+    SaveRegular,
+  } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
 
   export let response;
@@ -121,7 +125,9 @@
   };
 </script>
 
-<div class="d-flex flex-column align-items-center justify-content-between w-100">
+<div
+  class="d-flex flex-column align-items-center justify-content-between w-100"
+>
   <div
     class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
@@ -137,10 +143,9 @@
             );
           }}
           class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
-          style="{apiState.bodyFormatter ===
-          ResponseFormatter.PRETTY
-            ? 'background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);'
-            : ''}"
+          style={apiState.bodyFormatter === ResponseFormatter.PRETTY
+            ? "background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);"
+            : ""}
         >
           Text
         </span>
@@ -174,17 +179,15 @@
           ResponseFormatterEnum.PREVIEW
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}"
-            style="{apiState.bodyFormatter ===
-          ResponseFormatterEnum.PREVIEW
-            ? 'background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);'
-            : ''}"
-            >Preview</span
+          style={apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW
+            ? "background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);"
+            : ""}>Preview</span
         >
       </div>
 
       {#if apiState.bodyFormatter === ResponseFormatter.PRETTY}
         <span class="">
-            <WithSelectV3
+          <WithSelectV3
             id={"hash565"}
             data={[
               {

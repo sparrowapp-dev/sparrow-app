@@ -44,13 +44,6 @@
         onUpdateEnvironment={() => {}}
         onUpdateRequestBody={() => {}}
       />
-    {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
-      <FormData
-        keyValue={body.formdata}
-        {environmentVariables}
-        onUpdateRequestBody={() => {}}
-        onUpdateEnvironment={() => {}}
-      />
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
     {/if}

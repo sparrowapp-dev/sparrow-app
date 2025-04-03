@@ -7,7 +7,6 @@
   import { RequestMethod } from "@sparrow/common/enums";
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -16,7 +15,7 @@
   export let showRedirectButton = false;
   export let truncateName;
 
-  let requestUrl = "";
+  let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
   const httpMethodData = [
     {
@@ -45,12 +44,6 @@
       color: "patch",
     },
   ];
-
-  onMount(() => {
-    if (selectedBlock) {
-      requestUrl = selectedBlock?.data?.requestData?.url ?? "";
-    }
-  });
 </script>
 
 <div class="header-container">
@@ -61,7 +54,9 @@
       size={"medium"}
       data={httpMethodData}
       borderRounded={"4px"}
-      titleId={selectedBlock?.data?.method}
+      titleId={selectedBlock?.data?.method === ""
+        ? "GET"
+        : selectedBlock?.data?.method}
       onclick={async (e) => await handleUpdateRequestData("method", e)}
       borderHighlight={"active"}
       headerHighlight={"hover"}
@@ -78,7 +73,12 @@
       headerHeight={"36px"}
     />
     <div class="request-name-text">
-      {truncateName(selectedBlock?.data?.name, 11)}
+      {truncateName(
+        selectedBlock?.data?.name === ""
+          ? "Select API Request"
+          : selectedBlock?.data?.name,
+        10,
+      )}
     </div>
   </div>
 
@@ -91,6 +91,7 @@
         requestUrl = e?.detail;
         await handleUpdateRequestData("url", e?.detail);
       }}
+      placeholder="Enter Request URL"
     />
   </div>
 

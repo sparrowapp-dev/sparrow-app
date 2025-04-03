@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { downloadIcon } from "@sparrow/library/assets";
-  import { copyIcon } from "@sparrow/library/assets";
+  import { CopyRegular, ArrowDownloadRegular } from "@sparrow/library/icons";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications, Tooltip } from "@sparrow/library/ui";
   import {
@@ -15,11 +14,10 @@
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
 
   export let response;
   export let apiState;
-  export let onUpdateRequestState;
+  export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp;
 
@@ -47,7 +45,7 @@
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
-    onUpdateRequestState({ responseBodyLanguage: tab });
+    onUpdateResponseState("responseBodyLanguage", tab);
   };
 
   $: {
@@ -117,9 +115,10 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
-              responseBodyFormatter: ResponseFormatter.PRETTY,
-            });
+            onUpdateResponseState(
+              "responseBodyFormatter",
+              ResponseFormatter.PRETTY,
+            );
           }}
           class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.PRETTY
@@ -136,9 +135,10 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
-              responseBodyFormatter: ResponseFormatter.RAW,
-            });
+            onUpdateResponseState(
+              "responseBodyFormatter",
+              ResponseFormatter.RAW,
+            );
           }}
           class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.RAW
@@ -148,9 +148,10 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
-              responseBodyFormatter: ResponseFormatterEnum.PREVIEW,
-            });
+            onUpdateResponseState(
+              "responseBodyFormatter",
+              ResponseFormatterEnum.PREVIEW,
+            );
           }}
           class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatterEnum.PREVIEW
@@ -213,7 +214,7 @@
         <!-- Copy button -->
         <Tooltip title={"Copy"}>
           <WithButtonV6
-            icon={CopyIcon}
+            icon={CopyRegular}
             onClick={handleCopy}
             disable={false}
             loader={false}
@@ -223,7 +224,7 @@
         {#if !isWebApp}
           <Tooltip title={"Export"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={handleDownloaded}
               disable={false}
               loader={false}

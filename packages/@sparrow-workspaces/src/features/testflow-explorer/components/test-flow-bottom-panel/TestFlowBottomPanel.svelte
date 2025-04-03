@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TableNavbar from "../../../../components/table-navbar/TableNavbar.svelte";
   import {
@@ -6,24 +6,37 @@
     CheckmarkCircleRegular,
     ErrorCircleRegular,
   } from "@sparrow/library/icons";
-  import { RequestDoc } from "../../../rest-explorer-saved/components";
+  import {
+    RequestDoc,
+    ResponseErrorScreen,
+  } from "../../../rest-explorer-saved/components";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import {
     RequestBodyTestFlow,
     RequestHeaderTestFlow,
     RequestNavigatorTestFlow,
     RequestParameterTestFlow,
+    RequestAuthorizationTestFlow,
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
-  import { RequestDataset } from "@sparrow/common/enums";
+  import { RequestDataset, ResponseStatusCode } from "@sparrow/common/enums";
   import { testFlowDataStore } from "../../store";
   import { Input } from "@sparrow/library/forms";
+  import ResponseHeaders from "../response-headers/ResponseHeaders.svelte";
+  import ResponseBody from "../response-body/ResponseBody.svelte";
+  import ResponseNavigator from "../response-navigator/ResponseNavigator.svelte";
+  import ResponseBodyNavigator from "../response-body-navigator/ResponseBodyNavigator.svelte";
+  import ResponseStatus from "../response-status/ResponseStatus.svelte";
+  import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
 
   export let selectedBlock;
   export let onClose;
   export let onRedirect;
   export let environmentVariables;
   export let handleUpdateRequestData;
+  export let onClearResponse;
+  export let onUpdateResponseState;
+  export let isWebApp = false;
 
   let blockName = selectedBlock?.blockName ?? "";
   let height = 300;
@@ -32,13 +45,20 @@
   let isResizingActive = false;
   let requestNavigation = "Parameters";
   let inputRef;
+  let testflowStore = undefined;
+  let selectedNodeResponse: any = undefined;
+  let responseNavigation = "Response";
+  let responseState: TFResponseStateType = {
+    responseBodyLanguage: "JSON",
+    responseBodyFormatter: "Pretty",
+  };
 
   /**
    * Updates the active tab inside the Request Body section.
    * @param tab - The tab to update.
    * @returns- The updated request navigation.
    */
-  const updateActiveTabInsideRequestBody = (tab) => {
+  const updateActiveTabInsideRequestBody = (tab: string) => {
     if (tab === "Request Body") {
       requestNavigation = "Request Body";
     } else if (tab === "Headers") {
@@ -52,7 +72,7 @@
     return requestNavigation;
   };
 
-  const truncateName = (name, charLimit) => {
+  const truncateName = (name: string, charLimit: number) => {
     return name.length > charLimit
       ? name.substring(0, charLimit) + "..."
       : name;
@@ -67,7 +87,7 @@
     );
   };
 
-  const startResize = (event) => {
+  const startResize = (event: any) => {
     isResizing = true;
     let startY = event.clientY;
     let startHeight = height;
@@ -93,8 +113,19 @@
     window.addEventListener("mouseup", stopResize);
   };
 
-  let testflowStore = undefined;
-  let selectedNodeResponse = undefined;
+  /**
+   * Updates the navigation inside the Response section.
+   * @param tab - The tab to update.
+   * @returns - The updated response navigation.
+   */
+  function updateResponseNavigation(tab: string) {
+    if (tab === "Response") {
+      responseNavigation = "Response";
+    } else if (tab === "Headers") {
+      responseNavigation = "Headers";
+    }
+    return responseNavigation;
+  }
 
   $: {
     if (selectedBlock && testFlowDataStore) {
@@ -104,6 +135,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
+          console.log({ selectedNodeResponse });
         }
       });
     }
@@ -136,7 +168,6 @@
           color={"var(--icon-ds-success-400)"}
         />
         <div class="block-name">
-          <!-- {truncateName(selectedBlock?.blockName ?? "", 30)} -->
           <input
             type="text"
             placeholder="Enter Block Name"
@@ -186,7 +217,7 @@
         <div style="flex:1; overflow:auto; margin-top: 12px;" class="p-0">
           {#if requestNavigation === RequestSectionEnum.PARAMETERS}
             <RequestParameterTestFlow
-              params={selectedBlock?.data?.requestData?.queryParams}
+              params={selectedBlock?.data?.requestData?.queryParams ?? []}
               authParameter={{}}
               isBulkEditActive={false}
               onUpdateRequestState={() => {}}
@@ -194,7 +225,7 @@
             />
           {:else if requestNavigation === RequestSectionEnum.REQUEST_BODY}
             <RequestBodyTestFlow
-              body={selectedBlock?.data?.requestData?.body}
+              body={selectedBlock?.data?.requestData?.body ?? {}}
               method={selectedBlock?.data?.method}
               requestState={selectedBlock?.data?.requestData?.state}
               {environmentVariables}
@@ -202,14 +233,20 @@
             <div></div>
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow
-              headers={selectedBlock?.data?.requestData?.headers}
+              headers={selectedBlock?.data?.requestData?.headers ?? []}
               autoGeneratedHeaders={selectedBlock?.data?.requestData
-                ?.autoGeneratedHeaders}
+                ?.autoGeneratedHeaders ?? []}
               authHeader={{}}
               {environmentVariables}
               onHeadersChange={() => {}}
               isBulkEditActive={false}
               onUpdateRequestState={() => {}}
+            />
+          {:else if requestNavigation === RequestSectionEnum.AUTHORIZATION}
+            <RequestAuthorizationTestFlow
+              auth={selectedBlock?.data?.requestData?.auth}
+              {environmentVariables}
+              requestStateAuth={selectedBlock?.data?.requestData?.state}
             />
           {/if}
         </div>
@@ -217,23 +254,73 @@
     </Pane>
 
     <!-- Response Pane -->
-    <Pane
-      minSize={30}
-      size={"30%"}
-      class="position-relative bg-transparent response-pane-container"
-    >
-      <div class="dumy-response-container">
-        <SparrowLogo />
+    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+      <div class="response-pane-container">
+        {#if selectedNodeResponse === undefined}
+          <div class="dumy-response-container">
+            <SparrowLogo />
+            <div class="response-text-container">
+              <div style="font-weight: 700; margin-bottom: 8px;">
+                Test your APIs before running the entire flow
+              </div>
+              <div>
+                Any changes you make here will remain isolated from your
+                collections, modify the API and test it to see the response.
+              </div>
+            </div>
+          </div>
+        {:else}
+          <div
+            class="h-100 d-flex flex-column position-relative"
+            style="overflow:auto; flex:1;"
+          >
+            {#if selectedNodeResponse?.response?.status === ResponseStatusCode.ERROR}
+              <ResponseErrorScreen />
+            {:else if selectedNodeResponse?.response?.status}
+              <div
+                class="d-flex flex-column"
+                style="height: 100%; padding-bottom: 12px;"
+              >
+                <div class="d-flex" style="margin-bottom: 12px;">
+                  <ResponseNavigator
+                    requestStateSection={responseNavigation}
+                    {updateResponseNavigation}
+                    responseHeadersLength={selectedNodeResponse?.response
+                      ?.headers?.length || 0}
+                  />
+                  <ResponseStatus response={selectedNodeResponse?.response} />
+                </div>
 
-        <div class="response-text-container">
-          <div style="font-weight: 700; margin-bottom: 8px;">
-            Test your APIs before running the entire flow
+                {#if responseNavigation === "Response"}
+                  {#if responseState?.responseBodyLanguage !== "Image"}
+                    <ResponseBodyNavigator
+                      response={selectedNodeResponse?.response}
+                      apiState={responseState}
+                      {onUpdateResponseState}
+                      {onClearResponse}
+                      {isWebApp}
+                    />
+                  {/if}
+                  <div
+                    style="flex:1; overflow:auto; padding:8px;"
+                    class="border"
+                  >
+                    <ResponseBody
+                      response={selectedNodeResponse?.response}
+                      apiState={responseState}
+                    />
+                  </div>
+                {:else if responseNavigation === "Headers"}
+                  <div style="flex:1; overflow: auto;">
+                    <ResponseHeaders
+                      responseHeader={selectedNodeResponse?.response.headers}
+                    />
+                  </div>
+                {/if}
+              </div>
+            {/if}
           </div>
-          <div>
-            Any changes you make here will remain isolated from your
-            collections, modify the API and test it to see the response.
-          </div>
-        </div>
+        {/if}
       </div>
     </Pane>
   </Splitpanes>
@@ -297,6 +384,9 @@
   }
 
   .response-pane-container {
+    padding-left: 12px;
+    overflow: auto;
+    height: 85%;
   }
 
   .dumy-response-container {
