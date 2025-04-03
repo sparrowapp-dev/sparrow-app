@@ -87,10 +87,8 @@
   <div class="d-flex flex-column" style="">
     <div class="pb-3">
       <Search
-
         variant="primary"
-
-        size="large"
+        size="medium"
         bind:value={search}
         on:input={() => {}}
         customWidth={"300px"}

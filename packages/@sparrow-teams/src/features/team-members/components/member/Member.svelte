@@ -232,13 +232,18 @@
     handlePopup(flag, "isMemberRemovePopup");
   }}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
-    <p style="font-size:12px;" class="text-textColor">
+  <div class="text-lightGray text-ds-font-size-14 mb-1">
+    <p
+      class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+    >
       Are you sure you want to remove <span class="text-whiteColor"
         >"{user.name}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{openTeam?.name}"</span> hub.
+      <span
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >"{openTeam?.name}"</span
+      > hub.
     </p>
   </div>
   <div
@@ -248,7 +253,6 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       loader={false}
       onClick={() => {
@@ -259,7 +263,6 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Remove"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
@@ -292,12 +295,14 @@
         />
 
         <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
             >{user.name}</span
           ><br />
           <span
-            style="font-size:12px;display: inline-block;"
-            class="text-textColor">{user.email}</span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{user.email}</span
           >
         </div>
       </div>
@@ -338,13 +343,16 @@
           />
         {/if}
       </div>
-      <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
+      <p
+        class="mb-0 text-ds-font-size-16 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
+      >
+        {openTeam?.name}
+      </p>
     </div>
 
     <Button
       disable={memberPromotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberPromotePopupLoader}
@@ -375,12 +383,14 @@
           bgColor={"var(--bg-tertiary-700)"}
         />
         <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.name}</span
           ><br />
           <span
-            style="font-size:12px;display: inline-block;"
-            class="text-textColor">{user.email}</span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{user.email}</span
           >
         </div>
       </div>
@@ -452,12 +462,14 @@
           bgColor={"var(--bg-tertiary-700)"}
         />
         <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.name}</span
           ><br />
           <span
-            style="font-size:12px;display: inline-block;"
-            class="text-textColor">{user.email}</span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{user.email}</span
           >
         </div>
       </div>
@@ -591,10 +603,14 @@
       bgColor={""}
     />
     <div class="name px-2">
-      <span style="font-size:12px;" class="text-whiteColor"
+      <span
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >{user.name} {owner ? "(You)" : ""}</span
       ><br />
-      <span style="font-size:12px;" class="text-textColor">{user.email}</span>
+      <span
+        class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >{user.email}</span
+      >
     </div>
   </div>
   <div class="position">

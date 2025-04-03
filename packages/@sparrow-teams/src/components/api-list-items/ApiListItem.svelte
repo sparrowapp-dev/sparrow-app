@@ -21,12 +21,12 @@
 >
   <div
     class="d-flex"
-    style="  align-items:flex-start; margin-top:4px; height:24px; width:30px; justify-content:center;"
+    style="  align-items:flex-start; margin-top:3px; height:24px; width:30px; justify-content:center;"
   >
     {#if api?.type === "REQUEST"}
       <span
-        class={`text-${getMethodStyle(api?.property?.request?.method)}`}
-        style="font-weight: 600; font-size: 9px; line-height:13.5px; align-items:flex-start;"
+        class={`text-${getMethodStyle(api?.property?.request?.method)} text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold`}
+        style=" font-size: 9px; align-items:flex-start;"
       >
         <!-- {api?.property?.request?.method} -->
         {api?.property?.request?.method?.toUpperCase() === "DELETE"
@@ -59,8 +59,10 @@
       </span>
     {/if}
   </div>
-  <div class="api-desc" style="font-size: 12px; height:22px; line-height:18px;">
-    <p class="mb-0 api-type__title text-var(--text-ds-neutral-50)">
+  <div class="api-desc">
+    <p
+      class="mb-0 api-type__title text-var(--text-ds-neutral-50) text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+    >
       {api.name}
     </p>
     <div class="d-flex">
@@ -69,8 +71,8 @@
           {#if list}
             {#if list?._id === api?.path?.workspaceId}
               <p
-                class="mb-0 api-type__endpoint"
-                style="color:var(--text-ds-neutral-200); font-weight:400;"
+                class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+                style="color:var(--text-ds-neutral-200); "
               >
                 {list.team.teamName} / {list.name}
               </p>
@@ -81,7 +83,12 @@
       <!-- <p class="mb-0 api-type__endpoint">:</p> -->
 
       {#if api?.path?.collectionId}
-        <p class="mb-0 api-type__endpoint" style="width: 8px;">{"/ "}</p>
+        <p
+          class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+          style="width: 16px;"
+        >
+          {"/ "}
+        </p>
       {/if}
 
       {#if collectionList}
@@ -89,7 +96,7 @@
           {#if list}
             {#if list?.id === api?.path?.collectionId}
               <p
-                class="mb-0 api-type__endpoint"
+                class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                 style="color:var(--text-ds-neutral-200);"
               >
                 {list.name}
@@ -102,7 +109,7 @@
                 {#if list.items && item}
                   {#if item.id === api.path.folderId}
                     <p
-                      class="mb-0 api-type__endpoint"
+                      class="mb-0 api-type__endpoint text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
                       style="color:var(--text-ds-neutral-200); font-weight:400;"
                     >
                       {item.name}
@@ -159,15 +166,11 @@
     width: calc(100% - 61px);
   }
   .api-type__title {
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 18px;
     color: var(--text-ds-neutral-50);
   }
   .api-type__endpoint {
     /* font-family: Roboto Mono; */
-    font-size: 12px;
-    font-weight: 400;
+
     /* color: var(--recentApiText); */
   }
   .api-type__title,

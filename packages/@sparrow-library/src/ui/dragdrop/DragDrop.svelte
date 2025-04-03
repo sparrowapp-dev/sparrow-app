@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    DeleteIcon,
-    EditIcon,
-    UploadIcon,
-  } from "@sparrow/library/assets";
+  import { DeleteIcon, EditIcon, UploadIcon } from "@sparrow/library/assets";
   import { base64ToURL, imageDataToURL } from "@sparrow/common/utils";
   import { CrossIcon } from "@sparrow/library/assets";
 
@@ -159,7 +155,7 @@
     {/if}
     {#if (value.length === 0 || value.size === 0) && type === "image" && width !== "100%"}
       <span
-        class="sparrow-input-label-desc sparrow-fs-18 ms-4"
+        class="sparrow-input-label-desc text-ds-font-size-18 ms-4"
         style="font-size:{labelDescriptionSize}; width: calc(100% - {width})"
         >{labelDescription}</span
       >
