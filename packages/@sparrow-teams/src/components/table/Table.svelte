@@ -10,6 +10,7 @@
   export let headingDataSortable = "false";
   export let headerContentClassProp = "";
   export let onSortToggle = (field: string) => {};
+  export let isSortDisabled = false;
 
   import { ArrowSortRegular } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
@@ -42,6 +43,7 @@
                   size={"small"}
                   type={"teritiary-regular"}
                   onClick={() => handleSortClick("updatedAt")}
+                  disable={isSortDisabled}
                 />
               {/if}
             </div>

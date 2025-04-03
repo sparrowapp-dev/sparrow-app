@@ -89,7 +89,7 @@
     borderRounded={"2px"}
     position={"absolute"}
     onclick={(flag) => handleSelectTeam(flag)}
-    placeholderText="Select Team"
+    placeholderText="Select Hub"
   />
 
   <!-- 

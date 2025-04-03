@@ -238,7 +238,7 @@
         >"{user.name}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{openTeam?.name}"</span> team.
+      <span class="text-whiteColor">"{openTeam?.name}"</span> hub.
     </p>
   </div>
   <div
@@ -476,7 +476,7 @@
     class="confirm-header mb-0 sparrow-fs-14"
     style="color: var(--text-secondary-200);"
   >
-    Enter team name to confirm<span class="asterik ms-1">*</span>
+    Enter hub name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}

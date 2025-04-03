@@ -7,7 +7,7 @@
 
   const settingsTabs = [
     {
-      name: "Teams",
+      name: "Profile",
       id: TeamSettingsTabsEnum.TEAM_PROFILE,
       visible: true,
       disabled: false,
