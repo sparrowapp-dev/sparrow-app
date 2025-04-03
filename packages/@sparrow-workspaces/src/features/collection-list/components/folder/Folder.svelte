@@ -232,7 +232,7 @@
     isOpen={isFolderPopup}
     handleModalState={(flag = false) => (isFolderPopup = flag)}
   >
-    <div class="text-lightGray mb-1 sparrow-fs-14">
+    <div class="text-lightGray mb-1 text-ds-font-size-14">
       <p>
         Are you sure you want to delete this Folder? Everything in <span
           class="text-whiteColor fw-bold">"{explorer.name}"</span
@@ -240,7 +240,7 @@
         will be removed.
       </p>
     </div>
-    <div class="d-flex gap-3 sparrow-fs-12">
+    <div class="d-flex gap-3 text-ds-font-size-12">
       <div class="d-flex gap-1">
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
@@ -478,10 +478,10 @@
           {/if}
           {#if isRenaming}
             <input
-              class="py-0 renameInputFieldFolder w-100"
+              class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px; padding-left:5px; font-weight:400; color : var(--text-ds-neutral-50); line-height:18px;"
+              style=" padding-left:5px;  color : var(--text-ds-neutral-50); "
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -503,7 +503,9 @@
                       padding:2px 4px;
                       "
             >
-              <p class="ellipsis mb-0" style="font-size: 12px;">
+              <p
+                class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+              >
                 {explorer.name}
               </p>
             </div>
@@ -590,7 +592,7 @@
           {/each}
           {#if !explorer?.items?.length}
             <p
-              class="text-fs-10 my-2 text-secondary-300"
+              class="text-ds-font-size-10 my-2 text-secondary-300"
               style="padding-left: 90px;"
             >
               This folder is empty

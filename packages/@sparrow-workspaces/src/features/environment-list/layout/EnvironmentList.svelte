@@ -200,8 +200,8 @@
       </span>
       <span style="padding:2px 4px;">
         <p
-          class=" mb-0 sparrow-fs-13"
-          style="font-weight:400; font-size:12px; line-height:18px; color:var(--bg-ds-neutral-50);"
+          class=" mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+          style=" color:var(--bg-ds-neutral-50);"
         >
           Environments
         </p>

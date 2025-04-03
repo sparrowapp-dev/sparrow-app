@@ -284,32 +284,34 @@
   isOpen={isCollectionPopup}
   handleModalState={() => (isCollectionPopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p>
+  <div class="text-lightGray mb-1">
+    <p
+      class="text-ds-font-size-12 text-ds-line-height-120 text-ds-font-weight-medium"
+    >
       Are you sure you want to delete this Collection? Everything in <span
         class="text-whiteColor fw-bold">"{collection.name}"</span
       >
       will be removed.
     </p>
   </div>
-  <div class="d-flex gap-3 sparrow-fs-12">
-    <div class="d-flex gap-1">
+  <div class="d-flex gap-3">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{requestCount}</span>
       <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{graphQLCount}</span>
       <p>GraphQL</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{webSocketCount}</span>
       <p>WebSocket</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{socketIoCount}</span>
       <p>Socket.IO</p>
     </div>
@@ -521,10 +523,10 @@
     />
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldCollection w-100 ellipsis"
+        class="py-0 renameInputFieldCollection w-100 ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:400; line-height:18px; gap: 4px; "
+        style=" gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -539,8 +541,7 @@
         style="height: 32px; text-align: left; width:80% ; padding:2px 4px;"
       >
         <p
-          class="ellipsis mb-0"
-          style="font-size: 12px; font-weight:400; line-height:18px;  "
+          class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         >
           {collection.name}
         </p>
@@ -684,7 +685,8 @@
         </div>
         {#if !collection?.items?.length}
           <p
-            class="text-fs-10 ps-5 ms-2 my-{collection.id === activeTabId
+            class="text-ds-font-size-10 ps-5 ms-2 my-{collection.id ===
+            activeTabId
               ? '0'
               : '0'} text-secondary-300"
           >

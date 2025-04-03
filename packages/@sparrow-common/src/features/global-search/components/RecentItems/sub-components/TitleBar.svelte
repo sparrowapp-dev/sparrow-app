@@ -8,7 +8,10 @@
 </script>
 
 <div class="d-flex align-items-center justify-content-between px-1 mb-1">
-  <span class="" style="color: var(--text-ds-neutral-500); font-size: 12px;">
+  <span
+    class="text-ds-font-size-12"
+    style="color: var(--text-ds-neutral-500); "
+  >
     {data.title}
   </span>
   <div class="d-flex align-items-center gap-1">
