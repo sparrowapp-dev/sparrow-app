@@ -69,18 +69,19 @@
       MixpanelEvent(Events.AI_Regenerate_Response),
     );
   };
+
+  // $: {
+  //   if ($tab?.property?.request?.state?.isChatbotActive) {
+  //     console.log("Scrolling the list!");
+  //     setTimeout(() => {
+  //       scrollList("bottom", -1, "auto");
+  //     }, 1);
+  //   }
+  // }
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
-  <div
-    style="position: fixed;
-    top: 150px;
-    bottom: 80px;
-    right:28px;
-    z-index: 200;
-    width: 320px;
-    "
-  >
+  <div class="h-100">
     <AIChatInterface
       conversations={$tab?.property?.request?.ai?.conversations}
       prompt={$tab?.property?.request?.ai?.prompt}
@@ -118,7 +119,9 @@
       />
     </div>
     <!-- <div class="d-flex flex-column align-items-end"> -->
-    <div
+
+    <!-- Suggestion Box Outside Panel  -->
+    <!-- <div
       class="d-flex flex-column align-items-end"
       in:fade={{ duration: 400 }}
       out:fade={{ duration: 100 }}
@@ -159,10 +162,11 @@
         }}
         title="Generate Mock Data"
       />
-    </div>
+    </div> -->
   </div>
 {/if}
-<div
+
+<!-- <div
   style="position: fixed;
    bottom: 22px;
    right:508px; // temp change
@@ -189,7 +193,7 @@
       {/if}
     </div>
   </div>
-</div>
+</div> -->
 
 <style lang="scss">
   .chatten-box {

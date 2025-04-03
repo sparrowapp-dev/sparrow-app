@@ -72,10 +72,14 @@
   import {
     CheckmarkCircleFilled,
     ErrorCircleFilled,
+    CaretDownFilled,
   } from "@sparrow/library/icons";
+
+  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
   import { AIChatInterface } from "../../chat-bot/components";
+  import { ChatBot } from "../../chat-bot";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -106,12 +110,16 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onOpenCollection;
+
+  export let onGenerateAiResponse;
+  export let onToggleLike;
+
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
-  // export let onUpdateAiPrompt;
-  // export let onUpdateAiConversation;
+  export let onUpdateAiPrompt;
+  export let onUpdateAiConversation;
   export let onGenerateDocumentation;
   /**
    * Role of user in active workspace
@@ -458,18 +466,20 @@
             </Pane>
 
             <!-- AI Chatbot Interface -->
-            {#if true}
+            {#if $tab?.property?.request?.state?.isChatbotActive}
               <Pane
                 class="position-relative bg-transparent"
-                minSize={26.67}
-                maxSize={43.33}
+                minSize={30}
+                size={35}
+                maxSize={45}
               >
-                <AIChatInterface
-                  conversations={[]}
-                  prompt={""}
-                  onUpdateAiPrompt={() => {}}
-                  sendPrompt={() => {}}
-                  isResponseGenerating={false}
+                <ChatBot
+                  {tab}
+                  {onUpdateAiPrompt}
+                  {onUpdateAiConversation}
+                  {onUpdateRequestState}
+                  {onGenerateAiResponse}
+                  {onToggleLike}
                 />
               </Pane>
             {/if}
@@ -579,7 +589,68 @@
   </div>
 </Modal>
 
+<!-- ChatBot Toggler -->
+<div
+  style="position: fixed;
+        bottom: 22px;
+        right:70px;
+        z-index: 200;"
+>
+  <div
+    class="sparrow-ai-icon"
+    role="button"
+    on:click={() => {
+      if ($tabsSplitterDirection != "horizontal") {
+        tabsSplitterDirection.set("horizontal");
+      }
+      onUpdateRequestState({
+        isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
+      });
+      setTimeout(() => {
+        scrollList("bottom", -1, "auto");
+      }, 0);
+      MixpanelEvent(Events.AI_Chat_Initiation);
+    }}
+  >
+    <div
+      class="chatten-box"
+      tabindex="0"
+      style="display: {!$tab?.property?.request?.state?.isChatbotActive
+        ? 'flex'
+        : 'none'}"
+    >
+      <SparrowSecondaryIcon />
+
+      <!-- {#if !$tab?.property?.request?.state?.isChatbotActive}
+        <SparrowSecondaryIcon />
+      {:else}
+        <CaretDownFilled /> -->
+      <!-- {/if} -->
+    </div>
+  </div>
+</div>
+
 <style>
+  .chatten-box {
+    background-color: var(--bg-ds-primary-400);
+    height: 40px;
+    width: 40px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .chatten-box:hover {
+    background-color: var(--bg-ds-primary-500);
+  }
+  .chatten-box:focus-visible {
+    height: 40px;
+    width: 40px;
+    border-radius: 10px;
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+  }
+
   .rest-explorer-layout {
     background-color: var(--bg-ds-surface-900);
   }
