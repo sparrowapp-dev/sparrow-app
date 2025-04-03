@@ -42,8 +42,8 @@
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
-  import { RunIcon } from "@sparrow/library/icons";
-  import { Modal } from "@sparrow/library/ui";
+  import { BroomRegular, RunIcon } from "@sparrow/library/icons";
+  import { Button, Modal, Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
@@ -676,6 +676,8 @@
       sampleApiData = onRunSampleApi();
     }, 0);
   });
+
+  const handleClearResponse = () => {};
 </script>
 
 <div
@@ -750,6 +752,16 @@
             />
           </div>
         {/if}
+      </div>
+      <div style="margin-right: 5px;">
+        <Tooltip title="Clear Response" placement="top-center" size="small">
+          <Button
+            type="secondary"
+            size="medium"
+            startIcon={BroomRegular}
+            onClick={handleClearResponse}
+          />
+        </Tooltip>
       </div>
       <div>
         <SaveTestflow
