@@ -76,12 +76,12 @@ export class TabularInputTheme{
        
         "&.cm-focused": {
           carotColor:"var(--bg-ds-primary-300)",
-          border: "2px solid var(--border-ds-primary-300) !important",
+          border: "1px solid var(--border-ds-primary-300) !important",
           backgroundColor: "var(--bg-ds-surface-400)",
           // borderRadius: "4px",
           width: "100%",
           height: "auto !important",
-          maxHeight: "164px !important", // Increased max height
+          maxHeight: "165px !important", // Increased max height
           minHeight: "27px !important", // Keep minimum height
           overflowX: "hidden !important",
           overflowY: "auto !important",
@@ -94,17 +94,17 @@ export class TabularInputTheme{
           wordBreak: "break-word !important",
           overflowX: "hidden !important",
           overflowY: "auto !important",
-          height: "auto !important",
+          // height: "auto !important",
           maxHeight: "164px !important",
           width: "100% !important",
         },
         "&.cm-focused .cm-content": {
           whiteSpace: "pre-wrap !important",
           wordBreak: "break-all !important",
-          height: "auto !important",
+          // height: "auto !important",
           maxHeight: "164px !important",
           width: "100% !important",
-          overflow: "hidden !important",
+          
         },
         "&.cm-focused .cm-line": {
           width: "100% !important",

@@ -66,7 +66,7 @@
 
     <div
       class="d-flex"
-      style="width: calc(100% - 64px); height:27px; margin-bottom:0.2px;"
+      style="width: calc(100% - 64px); height:27px; margin-bottom:0px;"
     >
       <div class="w-50 position-relative" style="font-weight: 500;">
         <CodeMirrorInput
@@ -83,7 +83,7 @@
       </div>
       <div
         class="w-50 position-relative"
-        style="font-weight: 500; margin-left:2px;"
+        style="font-weight: 500; margin-left:0.03px;"
       >
         <CodeMirrorInput
           bind:value={element.value}
