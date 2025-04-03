@@ -81,7 +81,11 @@
           </div>
         </div>
 
-        <div bind:this={chatContainer} style="flex:1; overflow:auto;">
+        <div
+          bind:this={chatContainer}
+          class="mb-1"
+          style="flex:1; overflow:auto;"
+        >
           <div
             class="d-flex flex-column h-100 align-items-center justify-content-center"
           >

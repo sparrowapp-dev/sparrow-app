@@ -27,6 +27,7 @@
   }
 
   let isPromptBoxFocused = false;
+  let isTyping = false;
 
   const hanldeStartGenerating = async () => {
     if (prompt) {
@@ -43,7 +44,7 @@
 <div
   class="prompt-input-container d-flex flex-column gap-1 {isPromptBoxFocused
     ? 'focused'
-    : ''}"
+    : ''} {isTyping ? 'typing' : ''}"
 >
   <!-- <input
       type=""
@@ -66,6 +67,7 @@
   <textarea
     bind:value={prompt}
     on:input={() => {
+      isTyping = true;
       onUpdateAiPrompt(prompt);
       adjustTextareaHeight(event.target);
     }}
@@ -80,16 +82,26 @@
     autocapitalize="off"
     maxlength={10000}
     on:keydown={(event) => {
+      // isTyping = true;
       if (event.key === "Enter" && prompt && !isResponseGenerating) {
+        console.log("sending prompt:>> ");
         sendPrompt(prompt);
         onUpdateAiPrompt("");
+
+        isTyping = false;
+        isPromptBoxFocused = false;
+
+        // Remove focus from textarea
+        event.target.blur();
       }
     }}
     on:focus={() => {
       isPromptBoxFocused = true;
+      isTyping = false;
     }}
     on:blur={() => {
       isPromptBoxFocused = false;
+      isTyping = false;
     }}
   />
 
@@ -111,12 +123,14 @@
             id: "none2",
             display: "none",
             type: null,
+            disabled: true,
           },
           {
-            name: "DeepSeek R1",
+            name: "DeepSeek",
             id: "none3",
             display: "none",
             type: null,
+            disabled: true,
           },
         ]}
         titleId={"none1"}
@@ -124,20 +138,16 @@
           console.log("AI Model Selected!!");
         }}
         maxHeaderWidth={"88px"}
-        headerTheme={"violet2"}
+        headerTheme={"transparent"}
         minBodyWidth={"182px"}
         bodyTheme={"surface"}
         bodyDirection={"up"}
-        iconRequired={false}
         borderType={"none"}
         borderActiveType={"none"}
         headerHighlight={"hover-active"}
         menuItem={"v2"}
         headerFontSize={"12px"}
-        zIndex={200}
-        borderRounded={"2px"}
         position={"absolute"}
-        headerHeight={"28px"}
       />
     </div>
 
@@ -237,11 +247,15 @@
     outline: 2px solid #6894f9;
   }
 
+  .prompt-input-container.typing {
+    outline: 1px solid #6894f9;
+  }
+
   .prompt-text-field-area {
     width: 100%;
     height: 40px;
     font-family: "inter", sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     border: none !important;
     outline: none;
