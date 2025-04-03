@@ -1,8 +1,9 @@
 <script lang="ts">
   import { Events } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { GenerateIcon, SendRegular } from "@sparrow/library/icons";
+  import { SendRegular, StopFilled } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
+  import { Button, Tooltip } from "@sparrow/library/ui";
 
   export let placeholder = "";
   export let sendPrompt;
@@ -20,12 +21,27 @@
     isSendButtonHovered = false;
   };
 
+  function adjustTextareaHeight(textarea) {
+    textarea.style.height = "40px"; // Reset to initial height
+    textarea.style.height = textarea.scrollHeight + "px"; // Expand based on content
+  }
+
   let isPromptBoxFocused = false;
+
+  const hanldeStartGenerating = async () => {
+    if (prompt) {
+      sendPrompt(prompt);
+      onUpdateAiPrompt("");
+      MixpanelEvent(Events.AI_Initiate_Response);
+    }
+  };
+
+  const handleStopGenerating = () => {};
 </script>
 
 <!-- <div class="d-flex prompt-input-container"> -->
 <div
-  class="prompt-input-container d-flex flex-column gap-0 {isPromptBoxFocused
+  class="prompt-input-container d-flex flex-column gap-1 {isPromptBoxFocused
     ? 'focused'
     : ''}"
 >
@@ -51,6 +67,7 @@
     bind:value={prompt}
     on:input={() => {
       onUpdateAiPrompt(prompt);
+      adjustTextareaHeight(event.target);
     }}
     required
     id={"input-prompt-text"}
@@ -76,55 +93,55 @@
     }}
   />
 
-  {#if !isResponseGenerating}
-    <div
-      class="actions-container d-flex justify-content-between align-items-center"
-    >
-      <div id="ai-model-select-container">
-        <Select
-          id={"ai-model-selector"}
-          data={[
-            {
-              name: "Azure AI",
-              id: "none1",
-              type: null,
-              hide: false,
-            },
-            {
-              name: "Open AI 4.0",
-              id: "none2",
-              display: "none",
-              type: null,
-            },
-            {
-              name: "DeepSeek R1",
-              id: "none3",
-              display: "none",
-              type: null,
-            },
-          ]}
-          titleId={"none1"}
-          onclick={() => {
-            console.log("AI Model Selected!!");
-          }}
-          maxHeaderWidth={"88px"}
-          headerTheme={"violet2"}
-          minBodyWidth={"182px"}
-          bodyTheme={"surface"}
-          bodyDirection={"up"}
-          iconRequired={false}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={"hover-active"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          zIndex={200}
-          borderRounded={"2px"}
-          position={"absolute"}
-          headerHeight={"28px"}
-        />
-      </div>
+  <div
+    class="actions-container d-flex justify-content-between align-items-center"
+  >
+    <div id="ai-model-select-container">
+      <Select
+        id={"ai-model-selector"}
+        data={[
+          {
+            name: "Azure AI",
+            id: "none1",
+            type: null,
+            hide: false,
+          },
+          {
+            name: "Open AI 4.0",
+            id: "none2",
+            display: "none",
+            type: null,
+          },
+          {
+            name: "DeepSeek R1",
+            id: "none3",
+            display: "none",
+            type: null,
+          },
+        ]}
+        titleId={"none1"}
+        onclick={() => {
+          console.log("AI Model Selected!!");
+        }}
+        maxHeaderWidth={"88px"}
+        headerTheme={"violet2"}
+        minBodyWidth={"182px"}
+        bodyTheme={"surface"}
+        bodyDirection={"up"}
+        iconRequired={false}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        zIndex={200}
+        borderRounded={"2px"}
+        position={"absolute"}
+        headerHeight={"28px"}
+      />
+    </div>
 
+    <!-- {#if !isResponseGenerating}
       <div
         class="actionBtn-outline"
         style="cursor:pointer;"
@@ -141,28 +158,50 @@
         <SendRegular
           size={"14px"}
           color={prompt.trim()
-            ? "var( --bg-ds-neutral-50)"
+            ? "#6894F9"
             : isSendButtonHovered
               ? "var(--icon-secondary-100)"
               : "var(--border-ds-neutral-400)"}
         />
       </div>
-    </div>
-  {:else}
-    <!--Disabling it for now, will take stop generation when data streaming will be enabled.-->
-    <!-- <div
-        style="position:absolute; right:12px ; top: 50%; 
-    transform : translateY(-60%);
-  "
-        on:click={() => {}}
+    {:else}
+      <div
+        class="actionBtn-outline"
+        style="cursor:pointer;"
+        on:click={() => {
+          if (prompt) {
+            sendPrompt(prompt);
+            onUpdateAiPrompt("");
+            MixpanelEvent(Events.AI_Initiate_Response);
+          }
+        }}
+        on:mouseenter={handleMouseEnter}
+        on:mouseleave={handleMouseLeave}
       >
-        <GenerateIcon
-          height={"20px"}
-          width={"20px"}
-          color={"var(--icon-secondary-100)"}
-        />
-      </div> -->
-  {/if}
+        <StopRegular size={"14px"} color={"#ffffff"} />
+      </div>
+    {/if} -->
+
+    <Tooltip
+      title={isResponseGenerating ? "Stop Generating" : "Start Generating"}
+      placement={"top-center"}
+      size={"small"}
+    >
+      <Button
+        textStyleProp={"font-size: var(--base-text)"}
+        type={"outline-primary"}
+        size={"small"}
+        startIcon={isResponseGenerating ? StopFilled : SendRegular}
+        onClick={() => {
+          if (prompt.trim()) {
+            console.log("Action Button Called!");
+            if (isResponseGenerating) handleStopGenerating();
+            else hanldeStartGenerating();
+          }
+        }}
+      ></Button>
+    </Tooltip>
+  </div>
 </div>
 
 <!-- </div> -->
@@ -183,6 +222,7 @@
   } */
 
   .prompt-input-container {
+    max-height: 228px;
     background-color: #222630 !important;
     border-radius: 4px;
     padding: 8px;

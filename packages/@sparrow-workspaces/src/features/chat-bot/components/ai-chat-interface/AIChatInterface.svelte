@@ -87,7 +87,7 @@
           >
             {#if !conversations?.length}
               <div
-                class="h-100 p-3 w-100 d-flex flex-column justify-content-between"
+                class="h-100 w-100 d-flex flex-column justify-content-between"
                 in:fade={{ duration: 300 }}
               >
                 <div></div>
@@ -95,11 +95,11 @@
                   <span class="pb-3">
                     <SparkleFilled height={"28px"} width={"28px"} />
                   </span>
-                  <p class="text-fs-16 mb-1 text-secondary-180">
-                    Ask anything or write with AI
+                  <p class="text-fs-16 mb-1">
+                    Ask AI anything and get instant insights
                   </p>
                   <p class="text-fs-12 text-secondary-250">
-                    Use AI to Quickly search for any Information
+                    Generate mock data, debug errors, and explore solutions
                   </p>
                 </div>
                 <div class="d-flex flex-column align-items-end">
@@ -122,7 +122,7 @@
                       sendPrompt(text);
                       MixpanelEvent(Events.AI_Int_Gen_Mock_Prompt);
                     }}
-                    title="Generate Mock Parameter Data"
+                    title="Generate Mock Data"
                   />
                 </div>
               </div>

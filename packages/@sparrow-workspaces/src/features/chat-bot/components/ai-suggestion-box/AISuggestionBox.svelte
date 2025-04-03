@@ -27,7 +27,7 @@
 <style>
   .title-txt {
     font-size: 12px;
-    font-weight: 400;
+    font-weight: 500;
     color: var(--text-secondary-100);
     padding: 5px;
   }
@@ -45,7 +45,7 @@
     transition:
       background-color 0.3s,
       box-shadow 0.3s;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     right: 0;
   }
 
