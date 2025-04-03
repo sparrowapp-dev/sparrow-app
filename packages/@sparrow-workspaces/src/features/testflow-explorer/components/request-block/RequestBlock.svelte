@@ -219,13 +219,13 @@
   };
 
   let moreOptions = [
-    {
-      name: "Rename Block",
-      iconSize: "16px",
-      iconColor: "var(--icon-ds-neutral-50)",
-      Icon: RenameRegular,
-      onClick: enableEditing,
-    },
+    // {
+    //   name: "Rename Block",
+    //   iconSize: "16px",
+    //   iconColor: "var(--icon-ds-neutral-50)",
+    //   Icon: RenameRegular,
+    //   onClick: enableEditing,
+    // },
     {
       name: "Delete",
       iconSize: "16px",
