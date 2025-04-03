@@ -224,3 +224,4 @@ export { default as WarningFilled } from "./WarningFilled.svelte";
 export { default as DismissCircleRegular } from "./DismissCircleRegular.svelte";
 export { default as OpenRegular } from "./OpenRegular.svelte";
 export { default as RenameRegular } from "./RenameRegular.svelte";
+export { default as PlayFilled } from "./PlayFilled.svelte";

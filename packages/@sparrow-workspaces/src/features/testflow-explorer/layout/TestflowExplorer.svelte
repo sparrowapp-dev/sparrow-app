@@ -42,8 +42,8 @@
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
-  import { RunIcon } from "@sparrow/library/icons";
-  import { Modal } from "@sparrow/library/ui";
+  import { PlayFilled, RunIcon } from "@sparrow/library/icons";
+  import { Button, Modal } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
@@ -721,16 +721,11 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         {#if nodesValue > 1}
-          <DropButton
+          <Button
+            type="primary"
+            size="medium"
+            startIcon={PlayFilled}
             title="Run"
-            type="default"
-            iconRequired={true}
-            icon={RunIcon}
-            iconHeight={"14px"}
-            iconWidth={"14px"}
-            style="height: 36px;"
-            disable={testflowStore?.isTestFlowRunning}
-            iconColor={"var(--icon-secondary-100)"}
             onClick={async () => {
               unselectNodes();
               await onClickRun();

@@ -9,10 +9,9 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { Accordion, Button, Tooltip } from "@sparrow/library/ui";
-  import { WithButtonV5 } from "@sparrow/workspaces/hoc";
   import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import HistoryRegular from "../../icons/HistoryRegular.svelte";
+  import { HistoryRegular } from "../../icons";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let testflowStore;
   export let testflowName = "";
@@ -39,7 +38,6 @@
     }
     return name;
   };
-  $: console.log("Test flow history------------>", testflowStore);
 </script>
 
 <div class="position-relative">
@@ -50,14 +48,14 @@
       placement="bottom-right"
       distance={10}
     >
-      <WithButtonV5
-        icon={HistoryIcon}
+      <Button
+        type="secondary"
+        size="medium"
+        startIcon={HistoryRegular}
         onClick={() => {
           toggleHistoryContainer(!testflowStore?.isRunHistoryEnable);
           MixpanelEvent(Events.Run_History);
         }}
-        disable={false}
-        loader={false}
       />
     </Tooltip>
     {#if testflowStore?.isRunHistoryEnable}
