@@ -9,6 +9,7 @@ import {
   type TFTabEdgeType,
   type TFTabNodeType,
 } from "@sparrow/common/types/workspace/testflow";
+import { CollectionItemTypeDtoEnum } from "../types/workspace/collection-dto";
 
 class InitTestflowTab {
   private _tab: Tab;
@@ -33,12 +34,16 @@ class InitTestflowTab {
             {
               id: "1",
               type: "startBlock",
+              blockName: "startBlock",
               data: {
                 name: "",
                 collectionId: "",
                 folderId: "",
                 requestId: "",
                 method: "",
+                workspaceId: "",
+                isDeleted: false,
+                requestData: undefined,
               },
               position: { x: 100, y: 200 },
             },

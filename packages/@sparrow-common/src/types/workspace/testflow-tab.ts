@@ -1,4 +1,5 @@
 import type { CollectionItemDtoInterface } from "./collection-dto";
+import type { HttpRequestMetaDataDtoInterface } from "./http-request-dto";
 import type { RequestDataTypeEnum } from "./http-request-tab";
 import type { Tab } from "./tab";
 
@@ -7,6 +8,7 @@ import type { Tab } from "./tab";
  */
 export interface TFNodeType {
   id: string;
+  blockName: string;
   type: string;
   data: {
     requestId: string;
@@ -14,6 +16,7 @@ export interface TFNodeType {
     collectionId: string;
     name: string;
     method: string;
+    workspaceId: string;
     requestData: CollectionItemDtoInterface;
     isDeleted: boolean;
   };
@@ -95,6 +98,7 @@ export interface TFResponseStateType {
 
 export interface TFTabNodeType {
   id: string;
+  blockName: string;
   type: string;
   data: {
     requestId: string;
@@ -102,6 +106,9 @@ export interface TFTabNodeType {
     collectionId: string;
     name: string;
     method: string;
+    workspaceId: string;
+    requestData?: HttpRequestMetaDataDtoInterface;
+    isDeleted: boolean;
   };
   position: {
     x: number;

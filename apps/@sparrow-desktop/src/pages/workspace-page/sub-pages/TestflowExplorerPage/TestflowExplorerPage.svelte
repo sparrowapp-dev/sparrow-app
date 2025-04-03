@@ -91,6 +91,7 @@
     deleteNodeResponse={_viewModel.deleteNodeResponse}
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
+    onUpdateBlockData={_viewModel.updateBlockData}
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={false}
     onSelectRequest={_viewModel.getRequestdata}

@@ -869,7 +869,56 @@ export class CollectionRepository {
         (element) =>
           element.id === nodeId && element?.data?.requestData !== undefined,
       );
-      
+
     return nodeExists;
+  };
+
+  public updateBlockData = async (
+    tabId: string,
+    nodeId: string,
+    fieldPath: string,
+    value: any,
+  ): Promise<void> => {
+    try {
+      const tabData = await RxDB.getInstance()
+        .rxdb.tab.findOne({ selector: { tabId } })
+        .exec();
+
+      if (!tabData) return;
+
+      const tabJson = tabData.toJSON();
+      const nodes = tabJson?.property?.testflow?.nodes;
+      if (!nodes) return;
+
+      // Find the node with the specified nodeId
+      const node = nodes.find((element) => element.id === nodeId);
+      if (!node) return;
+
+      // Helper function to set nested properties dynamically at all occurrences
+      const setNestedProperty = (obj: any, path: string, value: any) => {
+        const keys = path.split(".");
+        const updateRecursively = (current: any) => {
+          if (typeof current !== "object" || current === null) return;
+          for (const key in current) {
+            if (key === keys[keys.length - 1]) {
+              current[key] = value;
+            } else if (typeof current[key] === "object") {
+              updateRecursively(current[key]);
+            }
+          }
+        };
+        updateRecursively(obj);
+      };
+
+      // Update all occurrences of the specified field dynamically
+      setNestedProperty(node, fieldPath, value);
+
+      // Save the updated data back to RxDB
+      await tabData.patch({
+        property: { ...tabJson.property, testflow: { nodes } },
+      });
+    } catch (error) {
+      console.error("Error updating block data:", error);
+    }
   };
 }

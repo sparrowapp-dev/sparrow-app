@@ -63,6 +63,46 @@ const requestBody = {
   },
 };
 
+const stateItems = {
+  requestBodyLanguage: {
+    type: "string",
+  },
+  requestBodyNavigation: {
+    type: "string",
+  },
+  requestAuthNavigation: {
+    type: "string",
+  },
+  requestNavigation: {
+    type: "string",
+  },
+  responseNavigation: {
+    type: "string",
+  },
+  responseBodyLanguage: {
+    type: "string",
+  },
+  responseBodyFormatter: {
+    type: "string",
+  },
+  requestExtensionNavigation: {
+    type: "string",
+  },
+  requestLeftSplitterWidthPercentage: "number",
+  requestRightSplitterWidthPercentage: "number",
+  isExposeEditDescription: "boolean",
+  isSendRequestInProgress: "boolean",
+  isSaveDescriptionInProgress: "boolean",
+  isSaveRequestInProgress: "boolean",
+  isParameterBulkEditActive: "boolean",
+  isHeaderBulkEditActive: "boolean",
+  isChatbotActive: "boolean",
+  isChatbotSuggestionsActive: "boolean",
+  isChatbotGeneratingResponse: "boolean",
+  isDocGenerating: "boolean",
+  isDocAlreadyGenerated: "boolean",
+};
+
 const params = {
   key: {
     type: "string",
@@ -138,6 +178,10 @@ const requestItems = {
     type: "array",
     properties: params,
   },
+  state: {
+    type: "object",
+    properties: stateItems,
+  },
 };
 
 const itemsProperties = {
@@ -181,7 +225,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 4,
+  version: 5,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1171,6 +1215,9 @@ export const tabSchemaLiteral = {
                   id: {
                     type: "string",
                   },
+                  blockName: {
+                    type: "string",
+                  },
                   type: {
                     type: "string",
                   },
@@ -1178,6 +1225,9 @@ export const tabSchemaLiteral = {
                     type: "object",
                     properties: {
                       name: {
+                        type: "string",
+                      },
+                      workspaceId: {
                         type: "string",
                       },
                       collectionId: {

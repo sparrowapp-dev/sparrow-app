@@ -67,6 +67,7 @@
   import { platform } from "@tauri-apps/plugin-os";
   import { dumyRequestData } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
+  import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -82,6 +83,7 @@
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
+  export let onUpdateBlockData;
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
@@ -137,11 +139,38 @@
       folderId,
     );
 
+    if (requestData?.request) {
+      requestData.request.state = {
+        requestBodyLanguage: "Text",
+        requestBodyNavigation: "Form Data",
+        requestAuthNavigation: "No Auth",
+        requestNavigation: "Request Body",
+        responseNavigation: "Response",
+        responseBodyLanguage: "Text",
+        responseBodyFormatter: "Pretty",
+        requestExtensionNavigation: "",
+        requestLeftSplitterWidthPercentage: 50,
+        requestRightSplitterWidthPercentage: 50,
+        isExposeEditDescription: true,
+        isSendRequestInProgress: false,
+        isSaveDescriptionInProgress: false,
+        isSaveRequestInProgress: false,
+        isParameterBulkEditActive: false,
+        isHeaderBulkEditActive: false,
+        isChatbotActive: false,
+        isChatbotSuggestionsActive: true,
+        isChatbotGeneratingResponse: false,
+        isDocGenerating: false,
+        isDocAlreadyGenerated: false,
+      };
+    }
+
     nodes.update((_nodes) => {
       const dbNodes = _nodes;
       for (let index = 0; index < dbNodes.length; index++) {
         if (dbNodes[index].id === id) {
           dbNodes[index].data.requestId = requestId;
+          dbNodes[index].data.workspaceId = $tab?.path?.workspaceId ?? "";
           dbNodes[index].data.name = name;
           dbNodes[index].data.collectionId = collectionId;
           dbNodes[index].data.method = method;
@@ -153,6 +182,11 @@
       }
       return dbNodes;
     });
+  };
+
+  const handleUpdateRequestData = (field: string, value: any) => {
+    console.log($tab?.tabId, selectedNodeId, field, value);
+    onUpdateBlockData($tab?.tabId, selectedNodeId, field, value);
   };
 
   /**
@@ -269,7 +303,7 @@
   let selectedNodeName = "";
   let selectedNodeId = "";
   let selectedNode: TFNodeStoreType | undefined;
-
+  let selectedBlock: any | undefined;
   let updateNodeId: string;
   let updateNodeName: string;
   let updateNodeRequestId: string;
@@ -378,7 +412,7 @@
   };
 
   /**
-   * Opens the "Save Request" modal.
+   * Opens the "Save Request" modal and update the node's API request.
    **/
   const handleOpenSaveNodeRequestModal = async (
     tabId: string,
@@ -449,6 +483,7 @@
         {
           id: targetNode,
           type: "requestBlock",
+          blockName: "Rest API Request",
           data: {
             blocks: nodes,
             connector: edges,
@@ -537,6 +572,7 @@
       for (let i = 0; i < dbNodes.length; i++) {
         res.push({
           id: dbNodes[i].id,
+          blockName: dbNodes[i].blockName,
           type: dbNodes[i].type,
           data: {
             blocks: nodes,
@@ -663,6 +699,7 @@
     let node = val.find((node: Node) => node.selected === true);
 
     if (node) {
+      selectedBlock = node;
       selectedNodeName = node?.data?.name as string;
       selectedNodeId = node.id;
     } else {
@@ -781,6 +818,7 @@
    * Unselect all the existing nodes
    */
   const unselectNodes = () => {
+    selectedBlock = undefined;
     nodes.update((_nodes: Node[] | any[]) => {
       _nodes.forEach((_nodeItem) => {
         _nodeItem.selected = false;
@@ -1019,145 +1057,15 @@
       </div>
     {/if}
   </div>
-  {#if testflowStore?.nodes?.length >= 1 && selectedNode}
-    <div class="request-container" style="z-index:10;">
-      <div
-        class="rounded-2 d-flex flex-column"
-        style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; height:350px;"
-      >
-        <!-- Request Response Nav -->
-        <TableNavbar
-          bind:selectedNode
-          onClose={() => {
-            unselectNodes();
-          }}
-          onRedirect={() => {
-            const path = selectedNode?.request?.path;
-            onRedrectRequest(
-              path?.workspaceId,
-              path?.collectionId,
-              path?.folderId,
-              selectedNode?.request?.id,
-            );
-          }}
-        />
-
-        <!-- Request Respone Body -->
-        <div
-          class="d-flex justify-content-between m-1"
-          style="flex:1; overflow:auto;"
-        >
-          <!-- Sidebar -->
-          <TableSidebar {selectedNode} bind:selectedTab />
-
-          <!-- Request Data -->
-          <div class="request-rhs-container h-100">
-            {#if selectedTab === "response"}
-              <div class="p-2 h-100" style="">
-                <div
-                  class="d-flex flex-column h-100 pt-1"
-                  style="overflow:auto;"
-                >
-                  <div class="h-100 d-flex flex-column">
-                    <div style="flex:1; overflow:auto;">
-                      {#if selectedNode?.response?.status === ResponseStatusCode.ERROR}
-                        <ResponseErrorScreen />
-                      {:else if selectedNode?.response?.status}
-                        <div class="h-100 d-flex flex-column">
-                          <ResponseStatus response={selectedNode?.response} />
-                          <ResponseNavigator
-                            requestStateSection={responseNavigation}
-                            {updateResponseNavigation}
-                            responseHeadersLength={selectedNode?.response
-                              ?.headers?.length || 0}
-                          />
-                          {#if responseNavigation === "Response"}
-                            {#if responseState?.responseBodyLanguage !== "Image"}
-                              <ResponseBodyNavigator
-                                response={selectedNode?.response}
-                                apiState={responseState}
-                                {onUpdateRequestState}
-                                onClearResponse={() => {}}
-                                {isWebApp}
-                              />
-                            {/if}
-                            <div style="flex:1; overflow:auto;">
-                              <ResponseBody
-                                response={selectedNode?.response}
-                                apiState={responseState}
-                              />
-                            </div>
-                          {:else if responseNavigation === "Headers"}
-                            <div style="flex:1; overflow:auto;">
-                              <ResponseHeaders
-                                responseHeader={selectedNode?.response.headers}
-                              />
-                            </div>
-                          {/if}
-                        </div>
-                      {/if}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {:else}
-              <div class="p-2 h-100" style="">
-                <div
-                  class="d-flex flex-column h-100 pt-1"
-                  style="overflow:auto;"
-                >
-                  <div class="h-100 d-flex flex-column">
-                    <RequestNavigatorTestFlow
-                      paramsLength={selectedNode?.request?.property?.request
-                        ?.queryParams?.length || 0}
-                      headersLength={selectedNode?.request?.property?.request
-                        ?.headers?.length || 0}
-                      autoGeneratedHeadersLength={selectedNode?.request
-                        ?.property?.request?.autoGeneratedHeaders?.length || 0}
-                      {updateActiveTabInsideRequestBody}
-                      bind:requestNavigation
-                    />
-
-                    <div style="flex:1; overflow:auto;" class="p-0 w-100">
-                      {#if requestNavigation === RequestSectionEnum.REQUEST_BODY}
-                        <RequestBodyTestFlow
-                          body={selectedNode?.request?.property?.request?.body}
-                          method={selectedNode?.request?.property?.request
-                            ?.method}
-                          requestState={selectedNode?.request?.property?.request
-                            ?.state}
-                          {environmentVariables}
-                        />
-                      {:else if requestNavigation === RequestSectionEnum.PARAMETERS}
-                        <RequestParameterTestFlow
-                          params={selectedNode?.request?.property?.request
-                            ?.queryParams}
-                          authParameter={{}}
-                          isBulkEditActive={false}
-                          onUpdateRequestState={() => {}}
-                          {environmentVariables}
-                        />
-                      {:else if requestNavigation === RequestSectionEnum.HEADERS}
-                        <RequestHeaderTestFlow
-                          headers={selectedNode?.request?.property?.request
-                            ?.headers}
-                          autoGeneratedHeaders={selectedNode?.request?.property
-                            ?.request?.autoGeneratedHeaders}
-                          authHeader={{}}
-                          {environmentVariables}
-                          onHeadersChange={() => {}}
-                          isBulkEditActive={false}
-                          onUpdateRequestState={() => {}}
-                        />
-                      {/if}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {/if}
-          </div>
-        </div>
-      </div>
+  {#if selectedBlock}
+    <div style=" background-color: transparent; margin: 0px 13px 7px 13px;">
+      <TestFlowBottomPanel
+        {selectedBlock}
+        {environmentVariables}
+        onClose={() => unselectNodes()}
+        onRedirect={onRedrectRequest}
+        {handleUpdateRequestData}
+      />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
     <div class="request-container" style="z-index:10;">
@@ -1171,15 +1079,7 @@
           onClose={() => {
             unselectNodes();
           }}
-          onRedirect={() => {
-            const path = sampleApiData?.request?.path;
-            onRedrectRequest(
-              path?.workspaceId,
-              path?.collectionId,
-              path?.folderId,
-              sampleApiData?.request?.id,
-            );
-          }}
+          onRedirect={onRedrectRequest}
         />
 
         <!-- Request Respone Body -->
@@ -1373,7 +1273,7 @@
   }}
 >
   <SaveNode
-    requestName={updateNodeName}
+    requestName={selectedNodeName}
     nodeNumber={updateNodeId}
     handleModalState={(flag = false) => {
       isSaveNodeModalOpen = flag;

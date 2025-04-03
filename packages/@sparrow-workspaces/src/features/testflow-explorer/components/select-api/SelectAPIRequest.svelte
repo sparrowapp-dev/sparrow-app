@@ -192,9 +192,12 @@
     selectedCollection = null;
     selectedFolder = null;
     isOpen = true;
-
-    filteredArrayData = arrayData.filter((item) =>
-      item.name?.toLowerCase().includes(searchQuery),
+    filteredArrayData = arrayData.filter(
+      (item) =>
+        item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.items?.some((subItem: any) =>
+          subItem.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
     );
   };
 

@@ -116,10 +116,12 @@ export class TestflowExplorerPageViewModel {
     const nodes = _nodes.map((elem) => {
       return {
         id: elem.id,
+        blockName: elem.blockName,
         type: elem.type,
         data: {
           name: elem.data.name, // not required to save in db
           requestId: elem.data.requestId,
+          workspaceId: elem.data.workspaceId,
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
           method: elem.data.method, // not required to save in db
@@ -940,5 +942,23 @@ export class TestflowExplorerPageViewModel {
       nodeId,
     );
     return request;
+  };
+
+  /**
+   * @description
+   * Update a block name.
+   */
+  public updateBlockData = async (
+    tabId: string,
+    nodeId: string,
+    filed: string,
+    value: string,
+  ) => {
+    await this.collectionRepository.updateBlockData(
+      tabId,
+      nodeId,
+      filed,
+      value,
+    );
   };
 }

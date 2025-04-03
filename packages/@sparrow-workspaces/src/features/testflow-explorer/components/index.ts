@@ -14,3 +14,4 @@ export { default as ResponseNavigator } from "./response-navigator/ResponseNavig
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
 export { default as TestFlowName } from "./test-flow-name/TestFlowName.svelte";
 export { default as SaveTestflow } from "./save-testflow/SaveTestflow.svelte";
+export { default as TestFlowBottomPanel } from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
