@@ -9,20 +9,19 @@
 <div class="p-3 mt-1" style="background-color: black;">
   <div style="" class="">
     <div>
-      <p style="font-size: 20px; font-weight:700;">Community</p>
-      <p style="color: #999999; font-size;14px;">
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
+        Community
+      </p>
+      <p class="text-ds-font-size-14" style="color: #999999; ">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
       </p>
     </div>
     <div class="feedback-section active">
-      <h3
-        class=""
-        style="font-size: 14px; font-weight : 700 line-height: 21px; "
-      >
+      <h3 class="text-ds-font-size-14 text-ds-font-weight-semi-bold">
         Share your feedback on our product!!
       </h3>
-      <p class="fw-light" style="font-size: 14px;">
+      <p class="fw-light text-ds-font-size-14" style="font-size: 14px;">
         Please let us know how we can make Sparrow the best product for you.
       </p>
     </div>
@@ -31,7 +30,8 @@
       <h2 class="" style="padding: 16px, 10px, 10px, 10px;">
         <LogoSymbol height="25px" width="25px" />
         <div
-          style="padding: 3px; padding-top:9px; padding-left:5px; display:inline; font-size: 16px;"
+          class="text-ds-font-size-16"
+          style="padding: 3px; padding-top:9px; padding-left:5px; display:inline; "
         >
           Welcome to Sparrow’s Community Hub!
         </div>

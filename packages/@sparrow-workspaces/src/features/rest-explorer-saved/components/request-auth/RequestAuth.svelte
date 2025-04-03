@@ -12,7 +12,7 @@
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
-  <div class="pb-2" style="font-size: 12px; font-weight:500;">
+  <div class="pb-2 text-ds-font-size-12 text-ds-font-weight-medium">
     <div class="">
       <span class="d-flex">
         <p class="mb-0">
@@ -52,7 +52,9 @@
     </div>
   </div>
   <div>
-    <p class="text-secondary-300 text-fs-12 fw-normal">
+    <p
+      class="text-secondary-300 text-ds-font-size-12 text-ds-font-weight-regular"
+    >
       The auth header will be automatically generated when you send the request.
     </p>
   </div>
@@ -81,7 +83,7 @@
         {onUpdateEnvironment}
       />
     {:else if requestStateAuth === HttpRequestSavedAuthModeBaseEnum.INHERIT_AUTH}
-      <p class="text-fs-12">
+      <p class="text-ds-font-size-12">
         Inherit Auth can't be shown on saved response, click "try" button to see
         the Inherit Auth.
       </p>

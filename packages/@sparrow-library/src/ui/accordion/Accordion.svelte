@@ -39,7 +39,11 @@
       style={position === "right" ? "margin-left: 6px;" : "margin-right:6px"}
     >
       {#if labelText !== ""}
-        <p class="label-text m-0">{labelText}</p>
+        <p
+          class="label-text m-0 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+        >
+          {labelText}
+        </p>
       {/if}
       <slot name="accordion-field" />
     </div>
@@ -136,9 +140,6 @@
 
   /* Label text Styles */
   .label-text {
-    font-family: "Inter", sans-serif;
-    font-weight: 500;
-    font-size: 14px;
     color: var(--text-ds-neutral-50);
   }
 </style>
