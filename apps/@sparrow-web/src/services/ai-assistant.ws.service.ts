@@ -92,13 +92,6 @@ export class AiAssistantWebSocketService {
     AiAssistantWebSocketService.instance = this;
     console.log("AiAssistantWebSocketService instance created!");
     // this.connectWebSocket();
-
-    // setInterval(() => {
-    //   console.log("events :>> ", this.eventListeners);
-    // }, 1000);
-    // setTimeout(() => {
-    //   this.closeWSConnection();
-    // }, 10000);
   }
 
   /**
