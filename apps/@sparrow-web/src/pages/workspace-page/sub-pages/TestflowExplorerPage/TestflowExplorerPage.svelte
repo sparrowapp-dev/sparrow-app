@@ -93,5 +93,6 @@
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={true}
+    onClearTestflow={_viewModel.clearTestFlowData}
   />
 {/if}

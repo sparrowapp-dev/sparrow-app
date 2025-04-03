@@ -82,6 +82,7 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onClearTestflow;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -676,8 +677,6 @@
       sampleApiData = onRunSampleApi();
     }, 0);
   });
-
-  const handleClearResponse = () => {};
 </script>
 
 <div
@@ -758,8 +757,9 @@
           <Button
             type="secondary"
             size="medium"
+            disable={testflowStore?.isTestFlowRunning}
             startIcon={BroomRegular}
-            onClick={handleClearResponse}
+            onClick={onClearTestflow}
           />
         </Tooltip>
       </div>

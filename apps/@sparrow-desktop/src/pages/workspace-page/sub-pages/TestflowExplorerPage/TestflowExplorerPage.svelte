@@ -92,6 +92,7 @@
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
+    onClearTestflow={_viewModel.clearTestFlowData}
     isWebApp={false}
   />
 {/if}

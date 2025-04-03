@@ -885,4 +885,15 @@ export class TestflowExplorerPageViewModel {
     }
     this.tab = progressiveTab;
   };
+
+  /**
+   * @description - This function will clear the test flow store data.
+   */
+  public clearTestFlowData = () => {
+    testFlowDataStore.set(new Map());
+    const currentTestflow = this._tab.getValue();
+    notifications.success(
+      `Cleared all Responses ${currentTestflow.name} testflow.`,
+    );
+  };
 }
