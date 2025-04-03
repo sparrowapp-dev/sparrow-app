@@ -78,8 +78,8 @@
 ></div>
 <div class="d-flex flex-column" style=" flex-grow:1 !important;">
   <div
-    class="ps-0"
-    style="color: var( --text-secondary-200); font-weight:700; font-size:12px; padding:8px; "
+    class="ps-0 text-ds-font-size-12 text-ds-font-weight-semi-bold"
+    style="color: var( --text-secondary-200); padding:8px; "
   >
     WORKSPACE UPDATES
   </div>
@@ -89,15 +89,16 @@
         {#each workspaceUpdatesList[0].updates as update}
           <div class="d-flex flex-column">
             <div
-              style="color: var(--text-secondary-100); font-weight:500; font-size:12px;"
+              class="text-ds-font-size-12 text-ds-font-weight-medium"
+              style="color: var(--text-secondary-100); "
             >
               {update.message}
             </div>
             <div
-              class="d-flex mt-1"
-              style="color: var( --text-secondary-200); font-weight:400; font-size:12px; justify-content:space-between"
+              class="d-flex mt-1 text-ds-font-size-12 text-ds-font-weight-regular"
+              style="color: var( --text-secondary-200); justify-content:space-between"
             >
-              <p  class="ellipsis w-50">{update.detailsUpdatedBy}</p>
+              <p class="ellipsis w-50">{update.detailsUpdatedBy}</p>
               <p>{timeAgo(update.createdAt)}</p>
             </div>
           </div>

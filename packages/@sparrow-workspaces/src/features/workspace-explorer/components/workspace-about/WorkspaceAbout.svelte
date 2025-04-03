@@ -34,7 +34,7 @@
     <textarea
       disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
       id="updateWorkspaceDescField"
-      class=" border-0 text-fs-12 input-outline shadow-none w-100 p-2"
+      class=" border-0 text-ds-font-size-12 input-outline shadow-none w-100 p-2"
       value={workspaceDescription || ""}
       placeholder="Describe this workspace's objectives or add links to generate API documentation. Start typing."
       on:blur={(event) => {

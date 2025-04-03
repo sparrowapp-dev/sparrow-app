@@ -259,8 +259,7 @@
               />
             {/if}
             <span
-              class="ms-3 my-auto ellipsis overflow-hidden heading"
-              style="font-size: 28px;"
+              class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
               >{openTeam?.name || ""}
             </span>
             <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
@@ -302,7 +301,9 @@
                   color={"var(--sparrow-text-color)"}
                   classProp="mx-2 my-auto d-flex"
                 />
-                <span class="my-auto">{openTeam?.users.length} Members</span>
+                <span class="my-auto" style="width: 66px;"
+                  >{openTeam?.users.length} Members</span
+                >
               </p>
             {/if}
             {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
