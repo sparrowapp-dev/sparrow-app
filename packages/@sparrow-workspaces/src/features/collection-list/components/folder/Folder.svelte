@@ -127,11 +127,11 @@
     if (searchData) {
       expand = true;
     }
-    if (activeTabPath) {
-      if (activeTabPath?.folderId === explorer.id) {
-        expand = true;
-      }
-    }
+    // if (activeTabPath) {
+    // if (activeTabPath?.folderId === explorer.id) {
+    //   expand = true;
+    // }
+    // }
     if (explorer) {
       requestIds = [];
       requestCount = 0;
