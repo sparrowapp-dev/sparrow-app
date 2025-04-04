@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
-  import MenuItemsV1 from "./menu-items/MenuItemsV1.svelte";
   import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
-  import { CaretDownFilled, CaretDownRegular } from "@sparrow/library/icons";
+  import { CaretDownFilled } from "@sparrow/library/icons";
 
   /**
    * Determines id of the menu item.
@@ -35,24 +34,20 @@
 
   export let iconColor = "grey";
 
-
   /**
    * Callback to parent component.
    */
   export let onclick: (tab: string) => void;
-
 
   /**
    * Determines unique id of Select.
    */
   export let id: string;
 
-
   /**
    * Determines unselected Select.
    */
   export let isError: boolean = false;
-
 
   /**
    * Determines the dimensions of a Select.
@@ -63,53 +58,19 @@
   export let maxHeaderWidth = "500px";
   export let minBodyWidth = "50px";
 
-
   /**
    * Determines search bar Select body.
    */
   export let search = false;
   export let searchText = "Search";
   export let searchErrorMessage = "No value found.";
- 
-  /**
-   * Determines the border positioning state for the Select header.
-   */
-  export let borderType: "all" | "bottom" | "none" = "all"; // normal case
-  export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
- 
-  /**
-   * Determines the icon state for the Select header.
-   */
-  export let isDropIconFilled: boolean = false; // normal case
- 
+
   /**
    * Determines the background state for the Select header.
    */
-  export let headerTheme:
-    | "dark"
-    | "transparent"
-    | "violet"
-    | "violet2"
-    | "dark-violet"
-    | "dark-violet2"
-    | "primary"
-    | "secondary" = "dark";
- 
-  /**
-   * Determines the background state for the Select body.
-   */
-  export let bodyTheme: "dark" | "blur" | "violet" | "surface" = "dark";
- 
-  /**
-   * Determines the background highlighting state for the Select header.
-   */
-  export let headerHighlight: "active" | "hover" | "hover-active" | "" =
-    "hover-active";
-  /**
-   * Determines the border highlighting state for the Select header.
-   */
-  export let borderHighlight: "active" | "hover" | "hover-active" | "" =
-    "hover-active";
+  export let variant: "primary" | "secondary" | "tertiary" | "light-violet" =
+    "primary";
+
   /**
    * Determines the border radius of Select header.
    */
@@ -121,18 +82,17 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3"  = "v1";
+  export let menuItem: "v1" | "v2" | "v3" = "v1";
   /**
    * Determines icons used in Select header.
    */
   export let iconRequired = false;
   export let icon = GitBranchIcon;
- 
+
   /**
    * typography
    */
   let headerFontSize: string = "12px";
-  let headerFontWeight: number = 600;
 
   /**
    * ticked state
@@ -147,10 +107,8 @@
   export let placeholderText = "";
   export let isHeaderCombined = false;
   export let showDescription = true;
- 
-  export let isArrowIconRequired = true;
 
-  export let bodyAlignment: 'right' | 'left' = 'right';
+  export let bodyAlignment: "right" | "left" = "right";
 
   export let size: "small" | "medium" | "large" | "extra-small" = "small";
 
@@ -171,7 +129,7 @@
   }
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
- 
+
   const Icon = icon;
   let searchData = "";
   let isOpen = false;
@@ -203,28 +161,10 @@
       selectBorderClass = "select-border-none";
     } else if (variant === "tertiary") {
       selectBorderClass = "select-border-all";
-      break;
-    case "bottom":
-      selectBorderClass = "select-border-bottom";
-      break;
+    }
   }
 
-  let selectActiveBorderClass = "";
-  let selectErrorBorderClass = "";
-  switch (borderActiveType) {
-    case "none":
-      selectActiveBorderClass = "select-active-border-none";
-      selectErrorBorderClass = "select-error-border-none";
-      break;
-    case "all":
-      selectActiveBorderClass = "select-active-border-all";
-      selectErrorBorderClass = "select-error-border-all";
-      break;
-    case "bottom":
-      selectActiveBorderClass = "select-active-border-bottom";
-      selectErrorBorderClass = "select-error-border-bottom";
-      break;
-  }
+  let selectErrorBorderClass = "select-error-border-all";
 
   let selectBackgroundClass = "";
   switch (variant) {
@@ -242,7 +182,6 @@
       break;
   }
 
-
   let selectBodyBackgroundClass = "";
   switch (variant) {
     case "primary":
@@ -259,6 +198,7 @@
   let bodyLeftDistance: number;
   let bodyRightDistance: number;
   let bodyTopDistance: number;
+
   const toggleSelect = () => {
     const bodyHeight =
       data.filter((element) => {
@@ -274,7 +214,6 @@
       window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
     isOpen = !isOpen;
   };
-
 
   $: {
     if (titleId) {
@@ -353,6 +292,8 @@
           return "";
         case "tertiary":
           return "select-active-border-all";
+        case "light-violet":
+          return "";
       }
     }
     if (_isHover) {
@@ -360,6 +301,8 @@
         case "primary":
           return "";
         case "secondary":
+          return "";
+        case "light-violet":
           return "";
         case "tertiary":
           // return "select-active-border-all";
@@ -436,7 +379,7 @@
       <p
         class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
       >
-        {#if icon}
+        {#if iconRequired}
           <span class="me-2" style="margin-top: -2px;">
             <svelte:component
               this={icon}
@@ -501,7 +444,8 @@
       : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
-  {isOpen   ? 'opacity: 1; transform: scale(1);'
+  {isOpen
+      ? 'opacity: 1; transform: scale(1);'
       : 'opacity: 0; transform: scale(0.8);'}
     
   min-width:{minBodyWidth}; 
@@ -558,7 +502,7 @@
     {/if}
     <div style="max-height:{maxBodyHeight}; overflow:auto;">
       {#each data.filter((element) => {
-        return element.name.toLowerCase().includes(searchData.toLowerCase());
+        return (element?.name?.toLowerCase?.() || "").includes(searchData?.toLowerCase?.() || "");
       }) as list}
         <div
           class="{list.hide ? 'd-none' : ''} {list?.disabled
@@ -593,7 +537,9 @@
       {/each}
     </div>
     {#if data.filter((element) => {
-      return element.name.toLowerCase().includes(searchData.toLowerCase());
+      return element?.name
+        ?.toLowerCase()
+        .includes(searchData?.toLowerCase?.() || "");
     }).length === 0 && search}
       <div class="p-2">
         <p class="sparrow-fs-12 mb-0 text-textColor text-center">
@@ -679,6 +625,9 @@
   .select-btn-state-active-tertiary {
     background-color: var(--bg-ds-surface-400);
   }
+  .select-btn-state-active-light-violet {
+    background-color: var(--bg-ds-surface-400);
+  }
 
   // clicked states
   .select-btn-state-clicked-transparent {
@@ -706,6 +655,9 @@
     background-color: var(--bg-ds-surface-500);
   }
   .select-btn-state-clicked-tertiary {
+    background-color: var(--bg-ds-surface-400);
+  }
+  .select-btn-state-clicked-light-violet {
     background-color: var(--bg-ds-surface-400);
   }
 
@@ -810,38 +762,38 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-  .select-btn:hover{
+  .select-btn:hover {
     background-color: var(--bg-ds-surface-400) !important;
   }
   .color-primary {
-  color: var(--text-ds-primary-300);
-}
- 
-.color-danger {
-  color: var(--text-ds-danger-300);
-}
- 
-.color-default {
-  color: var(--text-ds-surface-500);
-}
- 
-.color-white {
-  color: var(--text-ds-neutral-200);
-}
- 
-.color-get {
-  color: var(--text-ds-success-300);
-}
- 
-.color-post {
-  color: var(--text-ds-warning-300);
-}
- 
-.color-put {
-  color: var(--text-ds-secondary-300);
-}
- 
-.color-patch {
-  color: var(--bg-ds-accent-300);
-}
+    color: var(--text-ds-primary-300);
+  }
+
+  .color-danger {
+    color: var(--text-ds-danger-300);
+  }
+
+  .color-default {
+    color: var(--text-ds-surface-500);
+  }
+
+  .color-white {
+    color: var(--text-ds-neutral-200);
+  }
+
+  .color-get {
+    color: var(--text-ds-success-300);
+  }
+
+  .color-post {
+    color: var(--text-ds-warning-300);
+  }
+
+  .color-put {
+    color: var(--text-ds-secondary-300);
+  }
+
+  .color-patch {
+    color: var(--bg-ds-accent-300);
+  }
 </style>

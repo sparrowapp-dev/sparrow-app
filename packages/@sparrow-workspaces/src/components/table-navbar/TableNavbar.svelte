@@ -49,7 +49,7 @@
 <div class="header-container">
   <div class="request-name">
     <Select
-      headerTheme={"secondary"}
+      variant={"secondary"}
       id={"api-request"}
       size={"medium"}
       data={httpMethodData}

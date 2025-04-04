@@ -76,7 +76,7 @@
   <div class="input-request">
     <!-- HTTP URL Section -->
     <Select
-      headerTheme={"light-violet"}
+      variant={"light-violet"}
       id={"api-request"}
       size={"medium"}
       data={httpMethodData}
