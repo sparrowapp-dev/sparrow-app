@@ -375,31 +375,34 @@
 
         {#if placeholderText && !selectedRequest}
           <span
-            class="ellipsis"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; color:var(--text-ds-neutral-400)"
+            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+            style=" color:var(--text-ds-neutral-400)"
           >
             {placeholderText}
           </span>
         {:else if isHeaderCombined}
           <div class="d-flex ellipsis">
             <span
-              class="ellipsis {getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                selectedRequest?.color,
+              )}"
             >
               {selectedRequest?.description ?? ""}
             </span>
             <span
-              class="ellipsis me-3 {getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                selectedRequest?.color,
+              )}"
             >
               / {selectedRequest?.name ?? ""}
             </span>
           </div>
         {:else}
           <span
-            class="ellipsis me-3 {getTextColor(selectedRequest?.color)}"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
-            selectedRequest?.hide
+            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+              selectedRequest?.color,
+            )}"
+            style=" {disabled || selectedRequest?.hide
               ? 'opacity: 0.5 !important'
               : ''}"
           >
@@ -730,7 +733,6 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-
   .color-primary {
     color: var(--text-ds-primary-300);
   }

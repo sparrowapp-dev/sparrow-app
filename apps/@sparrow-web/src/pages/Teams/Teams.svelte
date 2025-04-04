@@ -245,8 +245,7 @@
                     />
 
                     <span
-                      class=""
-                      style="font-size: 12px; font-weight:500; line-height:18px;"
+                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                     >
                       {githubRepoData?.stargazers_count || ""}
                     </span>

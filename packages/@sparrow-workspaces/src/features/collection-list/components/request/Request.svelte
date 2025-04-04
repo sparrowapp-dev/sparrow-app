@@ -189,7 +189,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
+  <div class="text-lightGray mb-1 text-ds-font-size-14">
     <p>
       Are you sure you want to delete this Request? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
@@ -199,8 +199,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
@@ -371,8 +370,8 @@
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px); "
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style=" width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -386,9 +385,11 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style={`font-size: 12px; color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
+        style={`color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
-        <p class="ellipsis m-0 p-0">
+        <p
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        >
           {api.name}
         </p>
       </div>

@@ -102,7 +102,7 @@
         const res = onAddFeedback();
         isExposeFeedbackForm = res;
       }}
-      class="add-feedback w-100 outline-none border-0 border-radius-4 text-fs-14 fw-normal"
+      class="add-feedback w-100 outline-none border-0 border-radius-4 text-ds-font-size-14 text-ds-font-weight-regular"
     >
       <PlusIcon height={"20"} width={"20"} />
       <span class="px-2"> Add Feedback</span>
@@ -182,12 +182,12 @@
     {/if}
     <div style="">
       <p
-        class="text-fs-14 mb-0"
-        style="color: var(--text-secondary-1000); font-weight: 400;"
+        class="text-ds-font-size-14 text-ds-font-weight-regular mb-0"
+        style="color: var(--text-secondary-1000);"
       >
         Description
       </p>
-      <p class="text-fs-12 text-secondary-200 mb-1">
+      <p class="text-ds-font-size-12 text-secondary-200 mb-1">
         {feedbackDescription.length} / 200
       </p>
 
@@ -268,7 +268,7 @@
         <div class="d-flex justify-content-between">
           <div></div>
           <div>
-            <span class="text-fs-12 text-tertiary-100"
+            <span class="text-ds-font-size-12 text-tertiary-100"
               >{uploadFeedback.file.value.length || 0}/5</span
             >
           </div>
@@ -288,7 +288,9 @@
                 color={"var(--text-secondary-200)"}
               />
             </span>
-            <span class="mb-0 text-fs-12 px-2 ellipsis">{file.name}</span>
+            <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
+              >{file.name}</span
+            >
             <span
               on:click={() => {
                 removeFile(index);
