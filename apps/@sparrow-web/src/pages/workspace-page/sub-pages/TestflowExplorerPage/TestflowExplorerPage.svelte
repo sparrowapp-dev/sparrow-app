@@ -17,6 +17,7 @@
   let deleteNodeResponse = _viewModel.deleteNodesLessThanId;
 
   let render = false;
+  let isTestFlowEmpty: boolean = false;
   const sub = _viewModel.tab.subscribe((val) => {
     if (val?.tabId) {
       render = true;
@@ -26,6 +27,15 @@
   testFlowDataStore.subscribe((val) => {
     if (val) {
       testflowStore = val.get(tab?.tabId) as TFDataStoreType;
+    }
+    if (
+      !testflowStore ||
+      !testflowStore.nodes ||
+      testflowStore?.nodes.length === 0
+    ) {
+      isTestFlowEmpty = true;
+    } else {
+      isTestFlowEmpty = false;
     }
   });
 
@@ -94,5 +104,6 @@
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={true}
     onClearTestflow={_viewModel.clearTestFlowData}
+    {isTestFlowEmpty}
   />
 {/if}

@@ -83,6 +83,7 @@
   export let isWebApp;
   export let deleteNodeResponse;
   export let onClearTestflow;
+  export let isTestFlowEmpty;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -757,7 +758,7 @@
           <Button
             type="secondary"
             size="medium"
-            disable={testflowStore?.isTestFlowRunning}
+            disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
             startIcon={BroomRegular}
             onClick={onClearTestflow}
           />
