@@ -53,7 +53,7 @@ import {
   transformRequestData,
   extractAuthData,
 } from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
-
+let count = 0;
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
@@ -114,6 +114,8 @@ export class TestflowExplorerPageViewModel {
   private updateNodesDebounce = async (_nodes: TFNodeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const nodes = _nodes.map((elem) => {
+      console.log(count, elem);
+      count += 1;
       return {
         id: elem.id,
         blockName: elem.blockName,

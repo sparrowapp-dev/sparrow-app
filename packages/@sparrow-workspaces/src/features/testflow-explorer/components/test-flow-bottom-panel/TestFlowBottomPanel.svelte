@@ -135,7 +135,6 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-          console.log({ selectedNodeResponse });
         }
       });
     }
@@ -171,7 +170,7 @@
           <input
             type="text"
             placeholder="Enter Block Name"
-            bind:value={blockName}
+            value={selectedBlock?.blockName}
             bind:this={inputRef}
             class="input-box"
             style="outline: none;"
