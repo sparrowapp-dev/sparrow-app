@@ -243,7 +243,7 @@
       <span
         class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >"{openTeam?.name}"</span
-      > team.
+      > hub.
     </p>
   </div>
   <div
@@ -488,7 +488,7 @@
     class="confirm-header mb-0 sparrow-fs-14"
     style="color: var(--text-secondary-200);"
   >
-    Enter team name to confirm<span class="asterik ms-1">*</span>
+    Enter hub name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}
