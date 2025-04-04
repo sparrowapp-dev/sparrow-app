@@ -400,7 +400,7 @@
                       <div class="h-100 d-flex flex-column" style="gap:12px">
                         <div
                           class="d-flex"
-                          style="position:sticky; top:0; z-index:2; background-color:var(--bg-ds-surface-900)"
+                          style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                         >
                           <ResponseNavigator
                             requestStateSection={storeData?.response.navigation}
