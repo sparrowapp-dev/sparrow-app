@@ -101,7 +101,7 @@
     if (tag === UpdatesTagType.IMPROVED) return "tag-improved";
     return "";
   };
-   const getTagType = (tag) => {
+  const getTagType = (tag) => {
     if (tag === UpdatesTagType.NEW) return "cyan";
     if (tag === UpdatesTagType.FIXED) return "pink";
     if (tag === UpdatesTagType.IMPROVED) return "green";
@@ -185,8 +185,8 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p class="text-fs-20" style="font-weight:700;">Updates</p>
-      <p class="text-fs-14" style="color: var(--text-secondary-50); ">
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Updates</p>
+      <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
@@ -269,7 +269,7 @@
                     <div class=" d-flex gap-2">
                       <h3
                         style="cursor: pointer;"
-                        class="text-fs-18 mb-0"
+                        class="text-ds-font-size-16 text-ds-font-weight-semi-bold mb-0"
                         on:click={() => {
                           handleSeeMore(event);
                           MixpanelEvent(Events.Version_Updates);
@@ -303,17 +303,15 @@
                     </div>
                     <div class="tags" style="margin-top: 5px;">
                       {#each event.types as tag}
-                      <span class="mt-[6px]">  <Tag
-                          type={getTagType(tag)}
-                          text={tag || ""}/>
-                      </span>
-
+                        <span class="mt-[6px]">
+                          <Tag type={getTagType(tag)} text={tag || ""} />
+                        </span>
                       {/each}
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
                       <p
-                        style=" font-weight:400; line-height:24px; "
-                        class="text-fs-14"
+                        style=" line-height:24px; "
+                        class="text-ds-font-size-14 text-ds-font-weight-regular"
                       >
                         {truncateDescription(event.plaintextDetails)}
                         <span
@@ -322,13 +320,14 @@
                           on:click={() => {
                             handleSeeMore(event);
                             MixpanelEvent(Events.See_More_Updates);
-                          }}>see more</span
-                        >
+                          }}
+                          >see more
+                        </span>
                       </p>
                     {:else}
                       <p
-                        style=" font-weight:400; line-height:24px; "
-                        class="text-fs-14"
+                        style="line-height:24px; "
+                        class="text-ds-font-size-14 text-ds-font-weight-regular"
                       >
                         {event.description}
                       </p>
@@ -370,8 +369,8 @@
             </div>
           {:else}
             <div
-              class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 text-fs-14 mb-0 text-center"
-              style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
+              style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
             >
               <p>No result found.</p>
             </div>
@@ -392,8 +391,8 @@
                 </div>
               </div>
               <div
-                class="ms-2 text-fs-14"
-                style="margin-top:1.5px; color:var(--text-secondary-100); font-weight:500;"
+                class="ms-2 text-ds-font-size-14 text-ds-font-weight-medium"
+                style="margin-top:1.5px; color:var(--text-secondary-100); "
               >
                 {#if event.plaintextDetails}
                   {extractReleaseDate(selectedEvent.plaintextDetails)}
@@ -406,8 +405,8 @@
             <div class="ms-2 timeline-content">
               <div class="d-flex gap-2">
                 <p
-                  class="pb-0 mb-1 text-fs-18"
-                  style="font-weight: 700; line-height: 27px;"
+                  class="pb-0 mb-1 text-ds-font-size-18 text-ds-font-weight-semi-bold"
+                  style=" line-height: 27px;"
                 >
                   {selectedEvent.title}
                 </p>
@@ -437,14 +436,13 @@
               </div>
               <div class="tags">
                 {#each selectedEvent.types as tag}
-                  <span class="mt-[6px]">  <Tag
-                          type={getTagType(tag)}
-                          text={tag || ""}/>
-                    </span>
+                  <span class="mt-[6px]">
+                    <Tag type={getTagType(tag)} text={tag || ""} />
+                  </span>
                 {/each}
               </div>
 
-              <p style="font-weight:400; " class="mt-3 text-fs-14">
+              <p class="mt-3 text-ds-font-size-14 text-ds-font-weight-regular">
                 {@html marked(selectedEvent.markdownDetails)}
               </p>
 
@@ -598,8 +596,6 @@
   }
 
   .timeline-content h3 {
-    font-size: 18px;
-    font-weight: 700;
     line-height: 27px;
     color: var(--text-secondary-100);
   }

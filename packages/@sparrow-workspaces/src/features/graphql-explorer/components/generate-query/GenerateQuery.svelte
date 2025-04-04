@@ -549,17 +549,10 @@
     >
       <Select
         id={"hash9few99"}
-        menuItem={"v1"}
-        headerTheme={"primary"}
-        bodyTheme={"surface"}
-        borderRounded={"2px"}
-        headerHeight={"28px"}
-        headerFontSize={"12px"}
+        menuItem={"v2"}
+        variant={"primary"}
         position={"absolute"}
         minBodyWidth={"183px"}
-        borderType={"none"}
-        borderActiveType={"none"}
-        headerHighlight={"hover-active"}
         data={[
           {
             name: "Query",

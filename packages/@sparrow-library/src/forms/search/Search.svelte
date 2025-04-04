@@ -7,7 +7,7 @@
   export let placeholder = "Search";
   export let id = "";
   export let variant: "primary" | "secondary" = "primary";
-  export let size: "small" | "large" = "small";
+  export let size: "small" | "medium" | "large" = "small";
   export let customWidth = "";
   export let value = "";
   let color = "";
@@ -37,20 +37,29 @@
     case "small":
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
-      searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
+      searchTextProp =
+        "text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 28px; min-height: 28px; max-height: 28px;  gap: 8px; border-radius: 4px;`;
+      break;
+    case "medium":
+      iconSize = "12px";
+      imgStyleProp = "height:20px; width:20px;";
+      searchTextProp =
+        "text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium";
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 36px; min-height: 36px; max-height: 36px;   border-radius: 6px;`;
       break;
     case "large":
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
       searchTextProp =
         "font-weight: 400; font-size: 14px; line-height: 20.02px;";
-      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 36px; min-height: 36px; max-height: 36px;   border-radius: 6px;`;
+      searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 40px; min-height: 40px; max-height: 40px;   border-radius: 6px;`;
       break;
     default:
       iconSize = "12px";
       imgStyleProp = "height:20px; width:20px;";
-      searchTextProp = "font-weight: 400; font-size: 12px; line-height: 18px;";
+      searchTextProp =
+        "text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular";
       searchStyleProp = `width: ${customWidth.length > 0 ? `${customWidth}` : "100%"}; height: 28px; min-height: 28px; max-height: 28px;   gap: 8px; border-radius: 4px;`;
       break;
   }
@@ -117,8 +126,8 @@
     <input
       {id}
       type="text"
-      class={`${searchClassProp} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}`}
-      style={` ${searchStyleProp} ${searchTextProp} color:white; outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
+      class={`${searchClassProp} ${searchTextProp} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}`}
+      style={` ${searchStyleProp}  color:white; outline:none; ::placeholder { color: var(--text-ds-neutral-300);};`}
       {value}
       {placeholder}
       on:input={handleInput}

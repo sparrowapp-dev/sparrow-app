@@ -59,7 +59,10 @@
     </div>
   </div>
   <div>
-    <p class="text-fs-12 fw-normal" style="color:var(--text-ds-neutral-400)">
+    <p
+      class="text-ds-font-size-12 text-ds-font-weight-regular"
+      style="color:var(--text-ds-neutral-400)"
+    >
       The auth header will be automatically generated when you send the request.
     </p>
   </div>

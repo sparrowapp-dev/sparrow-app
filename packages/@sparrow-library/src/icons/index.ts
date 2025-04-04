@@ -223,3 +223,4 @@ export {default as CaretDownRegular} from "./CaretDownRegular.svelte";
 export {default as WarningFilled} from "./WarningFilled.svelte"
 export { default as DismissCircleRegular } from "./DismissCircleRegular.svelte"
 export { default as OpenRegular } from "./OpenRegular.svelte";
+export {default as BoardRegular} from "./BoardRegular.svelte";

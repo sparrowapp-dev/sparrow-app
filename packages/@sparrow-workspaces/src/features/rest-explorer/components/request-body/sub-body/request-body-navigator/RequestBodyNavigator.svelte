@@ -108,8 +108,6 @@
       onclick={handleDropdown}
       zIndex={499}
       disabled={false}
-      minHeaderWidth={"160px"}
-      headerHeight={"28px"}
     />
     <span style="padding-right:12px" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
@@ -141,8 +139,6 @@
         onclick={handleRawDropDown}
         zIndex={499}
         disabled={false}
-        minHeaderWidth={"160px"}
-        headerHeight={"28px"}
       />
     {/if}
   </div>

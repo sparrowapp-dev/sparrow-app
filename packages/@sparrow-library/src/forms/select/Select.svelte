@@ -6,6 +6,7 @@
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
   import { CaretDownFilled, CaretDownRegular } from "@sparrow/library/icons";
+
   /**
    * Determines id of the menu item.
    */
@@ -34,20 +35,24 @@
 
   export let iconColor = "grey";
 
+
   /**
    * Callback to parent component.
    */
   export let onclick: (tab: string) => void;
+
 
   /**
    * Determines unique id of Select.
    */
   export let id: string;
 
+
   /**
    * Determines unselected Select.
    */
   export let isError: boolean = false;
+
 
   /**
    * Determines the dimensions of a Select.
@@ -58,24 +63,25 @@
   export let maxHeaderWidth = "500px";
   export let minBodyWidth = "50px";
 
+
   /**
    * Determines search bar Select body.
    */
   export let search = false;
   export let searchText = "Search";
   export let searchErrorMessage = "No value found.";
-
+ 
   /**
    * Determines the border positioning state for the Select header.
    */
   export let borderType: "all" | "bottom" | "none" = "all"; // normal case
   export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
-
+ 
   /**
    * Determines the icon state for the Select header.
    */
   export let isDropIconFilled: boolean = false; // normal case
-
+ 
   /**
    * Determines the background state for the Select header.
    */
@@ -87,14 +93,13 @@
     | "dark-violet"
     | "dark-violet2"
     | "primary"
-    | "secondary"
-    | "light-violet" = "dark";
-
+    | "secondary" = "dark";
+ 
   /**
    * Determines the background state for the Select body.
    */
   export let bodyTheme: "dark" | "blur" | "violet" | "surface" = "dark";
-
+ 
   /**
    * Determines the background highlighting state for the Select header.
    */
@@ -108,7 +113,7 @@
   /**
    * Determines the border radius of Select header.
    */
-  let borderRounded = "2px";
+  let borderRounded = "4px";
   /**
    * Determines the z-index of Select.
    */
@@ -116,18 +121,18 @@
   /**
    * Determines versions of the Select menu.
    */
-  export let menuItem: "v1" | "v2" | "v3" = "v1";
+  export let menuItem: "v1" | "v2" | "v3"  = "v1";
   /**
    * Determines icons used in Select header.
    */
   export let iconRequired = false;
   export let icon = GitBranchIcon;
-
+ 
   /**
    * typography
    */
   let headerFontSize: string = "12px";
-  let headerFontWeight: number = 500;
+  let headerFontWeight: number = 600;
 
   /**
    * ticked state
@@ -142,10 +147,10 @@
   export let placeholderText = "";
   export let isHeaderCombined = false;
   export let showDescription = true;
-
+ 
   export let isArrowIconRequired = true;
 
-  export let bodyAlignment: "right" | "left" = "right";
+  export let bodyAlignment: 'right' | 'left' = 'right';
 
   export let size: "small" | "medium" | "large" | "extra-small" = "small";
 
@@ -158,7 +163,7 @@
       headerHeight = "36px";
     } else if (size === "large") {
       headerFontSize = "12px";
-      headerHeight = "36px";
+      headerHeight = "40px";
     } else {
       headerFontSize = "12px";
       headerHeight = "36px";
@@ -166,7 +171,7 @@
   }
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
-
+ 
   const Icon = icon;
   let searchData = "";
   let isOpen = false;
@@ -193,11 +198,10 @@
   };
 
   let selectBorderClass = "";
-  switch (borderType) {
-    case "none":
+  $: {
+    if (variant === "primary" || variant === "secondary") {
       selectBorderClass = "select-border-none";
-      break;
-    case "all":
+    } else if (variant === "tertiary") {
       selectBorderClass = "select-border-all";
       break;
     case "bottom":
@@ -223,49 +227,32 @@
   }
 
   let selectBackgroundClass = "";
-  switch (headerTheme) {
-    case "transparent":
-      selectBackgroundClass = "select-background-transparent";
-      break;
-    case "dark":
-      selectBackgroundClass = "select-background-dark";
-      break;
-    case "violet":
-      selectBackgroundClass = "select-background-violet";
-      break;
-    case "violet2":
-      selectBackgroundClass = "select-background-violet2";
-      break;
-    case "dark-violet":
-      selectBackgroundClass = "select-background-dark-violet";
-      break;
-    case "dark-violet2":
-      selectBackgroundClass = "select-background-dark-violet2";
-      break;
+  switch (variant) {
     case "primary":
       selectBackgroundClass = "select-background-primary";
       break;
     case "secondary":
       selectBackgroundClass = "select-background-secondary";
       break;
+    case "tertiary":
+      selectBackgroundClass = "select-background-violet2";
+      break;
     case "light-violet":
       selectBackgroundClass = "select-background-light-violet";
       break;
   }
 
+
   let selectBodyBackgroundClass = "";
-  switch (bodyTheme) {
-    case "blur":
-      selectBodyBackgroundClass = "select-body-background-blur";
-      break;
-    case "dark":
-      selectBodyBackgroundClass = "select-body-background-dark";
-      break;
-    case "violet":
-      selectBodyBackgroundClass = "select-body-background-violet";
-      break;
-    case "surface":
+  switch (variant) {
+    case "primary":
       selectBodyBackgroundClass = "select-body-background-surface";
+      break;
+    case "secondary":
+      selectBodyBackgroundClass = "select-body-background-surface";
+      break;
+    case "tertiary":
+      selectBodyBackgroundClass = "select-body-background-violet";
       break;
   }
 
@@ -287,6 +274,7 @@
       window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
     isOpen = !isOpen;
   };
+
 
   $: {
     if (titleId) {
@@ -314,37 +302,21 @@
   });
 
   const extractHeaderHighlight = (
-    _headerHighlight: string,
     _isOpen: boolean,
     _isHover: boolean,
     _isClicked: boolean,
   ) => {
-    if (_isClicked && _isHover && headerHighlight !== "") {
+    if (_isClicked && _isHover) {
       let x;
-      switch (headerTheme) {
-        case "transparent":
-          x = "transparent";
-          break;
-        case "dark":
-          x = "dark";
-          break;
-        case "violet":
-          x = "violet";
-          break;
-        case "violet2":
-          x = "violet2";
-          break;
-        case "dark-violet":
-          x = "dark-violet";
-          break;
-        case "dark-violet2":
-          x = "dark-violet2";
-          break;
+      switch (variant) {
         case "primary":
           x = "primary";
           break;
         case "secondary":
           x = "secondary";
+          break;
+        case "tertiary":
+          x = "tertiary";
           break;
         case "light-violet":
           x = "light-violet";
@@ -352,57 +324,47 @@
       }
       return `select-btn-state-clicked-${x}`;
     }
-    if (
-      (_headerHighlight === "hover" && isHover) ||
-      (_headerHighlight === "active" && _isOpen) ||
-      (_headerHighlight === "hover-active" && (_isOpen || isHover))
-    ) {
+    if (_isOpen || _isHover) {
       let x;
-      switch (headerTheme) {
-        case "transparent":
-          x = "transparent";
-          break;
-        case "dark":
-          x = "dark";
-          break;
-        case "violet":
-          x = "violet";
-          break;
-        case "violet2":
-          x = "violet2";
-          break;
-        case "dark-violet":
-          x = "dark-violet";
-          break;
-        case "dark-violet2":
-          x = "dark-violet2";
-          break;
+      switch (variant) {
         case "primary":
           x = "primary";
           break;
         case "secondary":
           x = "secondary";
           break;
+        case "tertiary":
+          x = "tertiary";
+          break;
         case "light-violet":
           x = "light-violet";
           break;
       }
       return `select-btn-state-active-${x}`;
-    } else {
-      return "";
     }
+    return "";
   };
-  const extractBorderHighlight = (
-    _borderHighlight: string,
-    _isHover: boolean,
-    _isOpen: boolean,
-  ) => {
-    if (
-      (_borderHighlight === "hover" && _isHover) ||
-      (_borderHighlight === "active" && _isOpen) ||
-      (_borderHighlight === "hover-active" && (_isOpen || _isHover))
-    ) {
-      return selectActiveBorderClass;
+  const extractBorderHighlight = (_isHover: boolean, _isOpen: boolean) => {
+    if (_isOpen) {
+      switch (variant) {
+        case "primary":
+          return "";
+        case "secondary":
+          return "";
+        case "tertiary":
+          return "select-active-border-all";
+      }
+    }
+    if (_isHover) {
+      switch (variant) {
+        case "primary":
+          return "";
+        case "secondary":
+          return "";
+        case "tertiary":
+          // return "select-active-border-all";
+          return "";
+      }
     } else {
       return "";
     }
@@ -426,7 +388,7 @@
     } else if (_color === "patch") {
       return "color-patch";
     } else {
-      return "color-grey";
+      return "color-white";
     }
   };
 </script>
@@ -464,9 +426,9 @@
       }}
       class="select-btn
       {selectBackgroundClass}
-      {extractHeaderHighlight(headerHighlight, isOpen, isHover, isClicked)}  
+      {extractHeaderHighlight(isOpen, isHover, isClicked)}  
       {selectBorderClass}
-      {extractBorderHighlight(borderHighlight, isHover, isOpen)}
+      {extractBorderHighlight(isHover, isOpen)}
       {isError ? selectErrorBorderClass : ''}
         d-flex align-items-center justify-content-between"
       style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight};"
@@ -474,46 +436,48 @@
       <p
         class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
       >
-        {#if iconRequired}
-          <span class="me-2" style="margin-top: -2px;"
-            ><Icon height={14} width={14} color={iconColor} /></span
-          >
+        {#if icon}
+          <span class="me-2" style="margin-top: -2px;">
+            <svelte:component
+              this={icon}
+              height={14}
+              width={14}
+              color={iconColor}
+            />
+          </span>
         {/if}
 
         {#if placeholderText && !selectedRequest}
           <span
-            class="ellipsis"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+            style=" color:var(--text-ds-neutral-400)"
           >
             {placeholderText}
           </span>
         {:else if isHeaderCombined}
           <div class="d-flex ellipsis">
             <span
-              class="ellipsis {selectedRequest?.default
-                ? 'text-textColor'
-                : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                selectedRequest?.color,
+              )}"
             >
               {selectedRequest?.description ?? ""}
             </span>
             <span
-              class="ellipsis me-3 {selectedRequest?.default
-                ? 'text-textColor'
-                : getTextColor(selectedRequest?.color)}"
-              style="font-weight: {headerFontWeight}; font-size: {headerFontSize};"
+              class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                selectedRequest?.color,
+              )}"
             >
-              /{selectedRequest?.name ?? ""}
+              / {selectedRequest?.name ?? ""}
             </span>
           </div>
         {:else}
           <span
-            class="ellipsis me-3 {selectedRequest?.default
-              ? 'text-textColor'
-              : getTextColor(selectedRequest?.color)}"
-            style="font-weight: {headerFontWeight}; font-size: {headerFontSize}; {disabled ||
-            selectedRequest?.hide
-              ? 'color:var(--bg-ds-nuetral-100) !important'
+            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+              selectedRequest?.color,
+            )}"
+            style=" {disabled || selectedRequest?.hide
+              ? 'opacity: 0.5 !important'
               : ''}"
           >
             {selectedRequest?.name}
@@ -521,10 +485,11 @@
         {/if}
       </p>
       <span
-        class="d-flex ps-2 {!isArrowIconRequired ? 'd-none' : ''}"
+        class="d-flex ps-2"
         class:select-logo-active={isOpen}
+        style={disabled ? "opacity: 0.5 !important" : ""}
       >
-        <CaretDownFilled size={"16px"} />
+        <CaretDownFilled size={"16px"} color={"var(--icon-ds-neutral-100)"} />
       </span>
     </div>
   </div>
@@ -536,9 +501,9 @@
       : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
     {isOpen ? 'visible' : 'invisible'}"
     style="
-  {isOpen
-      ? 'opacity: 1; transform: scale(1);'
+  {isOpen   ? 'opacity: 1; transform: scale(1);'
       : 'opacity: 0; transform: scale(0.8);'}
+    
   min-width:{minBodyWidth}; 
   left: {position === 'fixed'
       ? bodyAlignment === 'right'
@@ -606,19 +571,12 @@
           role="button"
           on:keydown={() => {}}
         >
-          {#if menuItem === "v1"}
-            <MenuItemsV1
-              {list}
-              fontSize={headerFontSize}
-              {selectedRequest}
-              {getTextColor}
-            />
-          {:else if menuItem === "v2"}
+          {#if menuItem === "v2"}
             <MenuItemsv2
               {list}
               fontSize={headerFontSize}
               {selectedRequest}
-              {bodyTheme}
+              {variant}
               {getTextColor}
               {highlightTickedItem}
               {showDescription}
@@ -675,7 +633,7 @@
     background-color: var(--bg-tertiary-400);
   }
   .select-background-violet2 {
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-400);
   }
   .select-background-dark-violet {
     background-color: var(--bg-secondary-600);
@@ -718,6 +676,9 @@
   .select-btn-state-active-secondary {
     background-color: var(--bg-ds-surface-600);
   }
+  .select-btn-state-active-tertiary {
+    background-color: var(--bg-ds-surface-400);
+  }
 
   // clicked states
   .select-btn-state-clicked-transparent {
@@ -743,6 +704,9 @@
   }
   .select-btn-state-clicked-secondary {
     background-color: var(--bg-ds-surface-500);
+  }
+  .select-btn-state-clicked-tertiary {
+    background-color: var(--bg-ds-surface-400);
   }
 
   // focused
@@ -783,8 +747,7 @@
   .select-data {
     background-color: var(--bg-ds-surface-600);
   }
-  .select-active {
-  }
+
   .select-logo-active {
     transform: rotateX(180deg) !important;
   }
@@ -847,38 +810,38 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-  .select-btn:hover {
+  .select-btn:hover{
     background-color: var(--bg-ds-surface-400) !important;
   }
   .color-primary {
-    color: var(--text-ds-primary-300);
-  }
-
-  .color-danger {
-    color: var(--text-ds-danger-300);
-  }
-
-  .color-default {
-    color: var(--text-ds-surface-500);
-  }
-
-  .color-white {
-    color: var(--text-ds-neutral-200);
-  }
-
-  .color-get {
-    color: var(--text-ds-success-300);
-  }
-
-  .color-post {
-    color: var(--text-ds-warning-300);
-  }
-
-  .color-put {
-    color: var(--text-ds-secondary-300);
-  }
-
-  .color-patch {
-    color: var(--bg-ds-accent-300);
-  }
+  color: var(--text-ds-primary-300);
+}
+ 
+.color-danger {
+  color: var(--text-ds-danger-300);
+}
+ 
+.color-default {
+  color: var(--text-ds-surface-500);
+}
+ 
+.color-white {
+  color: var(--text-ds-neutral-200);
+}
+ 
+.color-get {
+  color: var(--text-ds-success-300);
+}
+ 
+.color-post {
+  color: var(--text-ds-warning-300);
+}
+ 
+.color-put {
+  color: var(--text-ds-secondary-300);
+}
+ 
+.color-patch {
+  color: var(--bg-ds-accent-300);
+}
 </style>

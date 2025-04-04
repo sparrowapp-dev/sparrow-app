@@ -91,10 +91,14 @@
                 <span class="pb-3">
                   <SparkleFilled height={"28px"} width={"28px"} />
                 </span>
-                <p class="text-fs-16 mb-1 text-secondary-180">
+                <p
+                  class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-medium mb-1 text-secondary-180"
+                >
                   Ask anything or write with AI
                 </p>
-                <p class="text-fs-12 text-secondary-250">
+                <p
+                  class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-medium text-secondary-250"
+                >
                   Use AI to Quickly search for any Information
                 </p>
               </div>

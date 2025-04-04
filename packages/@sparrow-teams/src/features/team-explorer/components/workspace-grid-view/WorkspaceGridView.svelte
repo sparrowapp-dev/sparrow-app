@@ -137,7 +137,10 @@
                   <Spinner size={`16px`} />
                 </span>
               {:else}
-                <span>+ Add New Workspace</span>
+                <span
+                  class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                  >+ Add New Workspace</span
+                >
               {/if}
             </div>
           {/if}
