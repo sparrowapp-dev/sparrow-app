@@ -95,12 +95,50 @@
   export let checkRequestExistInNode;
   export let onUpdateResponseState;
 
+  let limitNodesChange = 0;
+  let deletedNodeId: string;
+  let deleteNodeName: string = "";
+  let customRequestName: string = "";
+  let customRequestURL: string = "";
+  let customHTTPRequestMethod: string = "GET";
+  let isCreatingCustomRequest: boolean = false;
+  let isDeleteNodeModalOpen = false;
+  let isSaveNodeModalOpen = false;
+  let isAddCustomRequestModalOpen = false;
+  let isSavingRequestLoader = false;
+
+  // API response UI states
+  let responseState: TFResponseStateType = {
+    responseBodyLanguage: "JSON",
+    responseBodyFormatter: "Pretty",
+  };
+  let divElement: HTMLElement;
+  let sampleApiData: TFNodeStoreType;
+  let deleteCount = 0; // Variable to store the count of nodes to be deleted
+  let selectedTab = "response";
+  let requestNavigation = "Request Body";
+  let responseNavigation = "Response";
+  let nodesValue = 1;
+  let selectedNodeName = "";
+  let selectedNodeId = "";
+  let selectedNode: TFNodeStoreType | undefined;
+  let selectedBlock: any | undefined;
+  let updateNodeId: string;
+  let updateNodeName: string;
+  let updateNodeRequestId: string;
+  let updateNodeCollectionId: string;
+  let updateNodeMethod: string;
+  let updateNodeFolderId: any;
+  // Flag to control whether nodes are draggable
+  let isNodesDraggable = false;
+  let blockName = "REST API Request";
+  // List to store collection documents and filtered collections
+  let collectionListDocument: CollectionDocument[];
+  let filteredCollections = writable<CollectionDto[]>([]);
+
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
-
-  // Flag to control whether nodes are draggable
-  let isNodesDraggable = false;
 
   /**
    * Checks if edges exist for the given node ID.
@@ -169,9 +207,37 @@
     });
   };
 
-  const handleUpdateRequestData = (field: string, value: any) => {
-    console.log($tab?.tabId, selectedNodeId, field, value);
-    onUpdateBlockData($tab?.tabId, selectedNodeId, field, value);
+  const handleUpdateRequestData = async (field: string, value: any) => {
+    if (!selectedBlock) {
+      console.warn("Invalid block data structure");
+      return;
+    }
+
+    const updatedBlock = JSON.parse(JSON.stringify(selectedBlock));
+
+    const updateMatchingKeys = (obj: any) => {
+      if (typeof obj !== "object" || obj === null) return;
+
+      for (const key in obj) {
+        if (key === field) {
+          obj[key] = value;
+        } else if (typeof obj[key] === "object") {
+          updateMatchingKeys(obj[key]);
+        }
+      }
+    };
+
+    updateMatchingKeys(updatedBlock);
+    selectedBlock = updatedBlock;
+    nodes.update((_nodes) => {
+      let dbNodes = _nodes;
+      for (let i = 0; i < dbNodes.length; i++) {
+        if (dbNodes[i].id === updatedBlock.id) {
+          dbNodes[i] = updatedBlock;
+        }
+      }
+      return dbNodes;
+    });
   };
 
   /**
@@ -196,10 +262,6 @@
     }
     return "";
   };
-
-  // List to store collection documents and filtered collections
-  let collectionListDocument: CollectionDocument[];
-  let filteredCollections = writable<CollectionDto[]>([]);
 
   // Sync the nodes with collection data
   const syncNodesWithCollectionList = () => {
@@ -252,7 +314,6 @@
     }
   });
 
-  let limitNodesChange = 0;
   nodes.subscribe((nodes) => {
     if (nodes?.length > 0) {
       if (!limitNodesChange) {
@@ -261,40 +322,6 @@
       }
     }
   });
-
-  let deletedNodeId: string;
-  let deleteNodeName: string = "";
-  let customRequestName: string = "";
-  let customRequestURL: string = "";
-  let customHTTPRequestMethod: string = "GET";
-  let isCreatingCustomRequest: boolean = false;
-  let isDeleteNodeModalOpen = false;
-  let isSaveNodeModalOpen = false;
-  let isAddCustomRequestModalOpen = false;
-  let isSavingRequestLoader = false;
-
-  // API response UI states
-  let responseState: TFResponseStateType = {
-    responseBodyLanguage: "JSON",
-    responseBodyFormatter: "Pretty",
-  };
-  let divElement: HTMLElement;
-  let sampleApiData: TFNodeStoreType;
-  let deleteCount = 0; // Variable to store the count of nodes to be deleted
-  let selectedTab = "response";
-  let requestNavigation = "Request Body";
-  let responseNavigation = "Response";
-  let nodesValue = 1;
-  let selectedNodeName = "";
-  let selectedNodeId = "";
-  let selectedNode: TFNodeStoreType | undefined;
-  let selectedBlock: any | undefined;
-  let updateNodeId: string;
-  let updateNodeName: string;
-  let updateNodeRequestId: string;
-  let updateNodeCollectionId: string;
-  let updateNodeMethod: string;
-  let updateNodeFolderId: any;
 
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
@@ -468,7 +495,7 @@
         {
           id: targetNode,
           type: "requestBlock",
-          blockName: "Rest API Request",
+          blockName: blockName,
           data: {
             blocks: nodes,
             connector: edges,
@@ -683,7 +710,9 @@
 
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
-    if (val && val.length) onUpdateNodes(val);
+    if (val && val.length) {
+      onUpdateNodes(val);
+    }
     nodesValue = val.length;
     // Find the node where selected is true
     let node = val.find((node: Node) => node.selected === true);

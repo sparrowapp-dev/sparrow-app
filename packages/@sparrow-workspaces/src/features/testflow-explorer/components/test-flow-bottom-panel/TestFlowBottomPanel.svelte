@@ -5,6 +5,7 @@
     CrossIcon,
     CheckmarkCircleRegular,
     ErrorCircleRegular,
+    ArrowSwapRegular,
   } from "@sparrow/library/icons";
   import {
     RequestDoc,
@@ -21,7 +22,6 @@
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { RequestDataset, ResponseStatusCode } from "@sparrow/common/enums";
   import { testFlowDataStore } from "../../store";
-  import { Input } from "@sparrow/library/forms";
   import ResponseHeaders from "../response-headers/ResponseHeaders.svelte";
   import ResponseBody from "../response-body/ResponseBody.svelte";
   import ResponseNavigator from "../response-navigator/ResponseNavigator.svelte";
@@ -38,7 +38,6 @@
   export let onUpdateResponseState;
   export let isWebApp = false;
 
-  let blockName = selectedBlock?.blockName ?? "";
   let height = 300;
   let minHeight = 100;
   let isResizing = false;
@@ -135,6 +134,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
+          console.log({ selectedNodeResponse });
         }
       });
     }
@@ -162,10 +162,20 @@
       style={`border: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; border-bottom: none;`}
     >
       <div style="display: flex; flex-direction: row;">
-        <CheckmarkCircleRegular
-          size="14px"
-          color={"var(--icon-ds-success-400)"}
-        />
+        {#if !selectedNodeResponse}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
+          />
+        {:else if selectedNodeResponse?.response?.status?.startsWith("2")}
+          <CheckmarkCircleRegular
+            size="14px"
+            color={"var(--icon-ds-success-400)"}
+          />
+        {:else}
+          <ErrorCircleRegular size="14px" color={"var(--icon-ds-danger-300)"} />
+        {/if}
+
         <div class="block-name">
           <input
             type="text"
@@ -174,7 +184,12 @@
             bind:this={inputRef}
             class="input-box"
             style="outline: none;"
-            on:input={(e) => {}}
+            on:input={(e) => {
+              handleUpdateRequestData(
+                "blockName",
+                e?.detail || e?.target?.value,
+              );
+            }}
           />
         </div>
       </div>

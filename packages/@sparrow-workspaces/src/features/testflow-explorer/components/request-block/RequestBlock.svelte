@@ -15,7 +15,6 @@
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { ArrowIcon } from "../../icons";
   import { ArrowSwapRegular } from "@sparrow/library/icons";
-
   import { InfoRegular } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
@@ -68,8 +67,21 @@
    */
   export let id;
 
+  let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
   let isRunTextVisible = false; // State to track visibility of run text
+  let isDropHereVisible = false; // state to track if there is drag in test flow screen
+  let dataBlocksSubscriber: Unsubscriber;
+  let dataConnectorSubscriber: Unsubscriber;
+  let req = {
+    name: "",
+    method: "",
+  };
+  let isCreateBlockArrowHovered = false;
+  let moreOptionsMenu: boolean = false;
+  let testflowStore: TFDataStoreType;
+  let currentBlock: TFNodeStoreType | undefined;
+  const parseTime = new ParseTime();
 
   /**
    * Updates the node when an API is selected.
@@ -86,6 +98,8 @@
     method: string,
     folderId?: string,
   ) => {
+    isRunTextVisible = true;
+
     data.onOpenSaveNodeRequestModal(
       id,
       name,
@@ -94,22 +108,7 @@
       method,
       folderId ?? "",
     );
-
-    isRunTextVisible = true;
-    // data.onUpdateSelectedAPI(
-    //   id,
-    //   name,
-    //   requestId,
-    //   collectionId,
-    //   method,
-    //   folderId ?? "",
-    // );
   };
-
-  let isCreateBlockArrowHovered = false;
-
-  let testflowStore: TFDataStoreType;
-  let currentBlock: TFNodeStoreType | undefined;
 
   /**
    * Testflow store subscriber to get current node status
@@ -133,13 +132,6 @@
       currentBlock = undefined;
     }
   });
-  let isDropHereVisible = false; // state to track if there is drag in test flow screen
-  let dataBlocksSubscriber: Unsubscriber;
-  let dataConnectorSubscriber: Unsubscriber;
-  let req = {
-    name: "",
-    method: "",
-  };
 
   onMount(() => {
     // Subscribe to changes in the blocks
@@ -149,6 +141,7 @@
           setTimeout(() => {
             req.name = _node?.data?.name;
             req.method = _node?.data?.method;
+            blockName = _node.blockName;
           }, 10);
         }
       });
@@ -165,14 +158,13 @@
       }, 10);
     });
   });
+
   onDestroy(() => {
     // Clean up the subscription on component destruction
     testFlowDataStoreSubscriber();
     dataBlocksSubscriber();
     dataConnectorSubscriber();
   });
-
-  const parseTime = new ParseTime();
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -187,8 +179,6 @@
       return true;
     return false;
   };
-
-  let moreOptionsMenu: boolean = false;
 
   const handleOpenModal = () => {
     moreOptionsMenu = !moreOptionsMenu;
@@ -243,7 +233,7 @@
         {/if}
       </div>
       <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
-        REST API Request
+        {blockName}
       </span>
     </div>
     <div

@@ -114,7 +114,6 @@ export class TestflowExplorerPageViewModel {
   private updateNodesDebounce = async (_nodes: TFNodeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const nodes = _nodes.map((elem) => {
-      if (elem?.data?.requestData) console.log(elem.data?.requestData);
       return {
         id: elem.id,
         blockName: elem.blockName,
@@ -947,20 +946,14 @@ export class TestflowExplorerPageViewModel {
 
   /**
    * @description
-   * Update a block name.
+   * Update a block data.
    */
   public updateBlockData = async (
     tabId: string,
     nodeId: string,
-    filed: string,
-    value: string,
+    requestData: object,
   ) => {
-    await this.collectionRepository.updateBlockData(
-      tabId,
-      nodeId,
-      filed,
-      value,
-    );
+    await this.collectionRepository.updateBlockData(tabId, nodeId, requestData);
   };
 
   /**

@@ -867,18 +867,22 @@ export class CollectionRepository {
       .toJSON()
       ?.property?.testflow?.nodes?.some(
         (element) =>
-          element.id === nodeId && element?.data?.requestData !== undefined,
+          element.id === nodeId && element?.data?.requestData?.url !== "",
       );
 
     return nodeExists;
   };
 
+  /**
+   * @description
+   * Updates a block data.
+   */
   public updateBlockData = async (
     tabId: string,
     nodeId: string,
-    fieldPath: string,
-    value: any,
+    requestData: object,
   ): Promise<void> => {
+    console.log("inside repo", tabId, nodeId, requestData);
     try {
       const tabData = await RxDB.getInstance()
         .rxdb.tab.findOne({ selector: { tabId } })
@@ -887,35 +891,22 @@ export class CollectionRepository {
       if (!tabData) return;
 
       const tabJson = tabData.toJSON();
-      const nodes = tabJson?.property?.testflow?.nodes;
-      if (!nodes) return;
+      const nodes = tabJson?.property?.testflow?.nodes ?? [];
 
-      // Find the node with the specified nodeId
-      const node = nodes.find((element) => element.id === nodeId);
-      if (!node) return;
+      // Find the node and update the entire node object
+      const updatedNodes = nodes.map((node) =>
+        node.id === nodeId ? { ...node, ...requestData } : node,
+      );
 
-      // Helper function to set nested properties dynamically at all occurrences
-      const setNestedProperty = (obj: any, path: string, value: any) => {
-        const keys = path.split(".");
-        const updateRecursively = (current: any) => {
-          if (typeof current !== "object" || current === null) return;
-          for (const key in current) {
-            if (key === keys[keys.length - 1]) {
-              current[key] = value;
-            } else if (typeof current[key] === "object") {
-              updateRecursively(current[key]);
-            }
-          }
-        };
-        updateRecursively(obj);
-      };
-
-      // Update all occurrences of the specified field dynamically
-      setNestedProperty(node, fieldPath, value);
-
-      // Save the updated data back to RxDB
+      // Update the database
       await tabData.patch({
-        property: { ...tabJson.property, testflow: { nodes } },
+        property: {
+          ...tabJson.property,
+          testflow: {
+            ...tabJson.property?.testflow,
+            nodes: updatedNodes,
+          },
+        },
       });
     } catch (error) {
       console.error("Error updating block data:", error);
