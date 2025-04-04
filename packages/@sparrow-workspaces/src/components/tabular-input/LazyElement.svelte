@@ -68,7 +68,7 @@
       class="d-flex"
       style="width: calc(100% - 64px); height:27px; margin-bottom:0px;"
     >
-      <div class="w-50 position-relative" style="font-weight: 500;">
+      <div class="w-50 position-relative text-ds-font-weight-medium">
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => {
@@ -82,8 +82,8 @@
         />
       </div>
       <div
-        class="w-50 position-relative"
-        style="font-weight: 500; margin-left:0.03px;"
+        class="w-50 position-relative text-ds-font-weight-medium"
+        style=" margin-left:0.03px;"
       >
         <CodeMirrorInput
           bind:value={element.value}
