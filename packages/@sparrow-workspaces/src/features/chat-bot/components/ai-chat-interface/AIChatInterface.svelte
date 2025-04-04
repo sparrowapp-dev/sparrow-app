@@ -63,7 +63,11 @@
         in:fade={{ duration: 200 }}
       >
         <div class="p-2">
-          <SparrowAIIcon height={"32px"} width={"32px"} />
+          <SparrowAIIcon
+            height={"32px"}
+            width={"32px"}
+            color="var(--primary-btn-color)"
+          />
           <span class="gradient-text">Sparrow</span>
         </div>
         <div
