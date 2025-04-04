@@ -203,43 +203,6 @@ const requestItems = {
   },
 };
 
-const itemsProperties = {
-  id: {
-    type: "number",
-  },
-  name: {
-    type: "string",
-  },
-  description: {
-    type: "string",
-  },
-  type: {
-    type: "string",
-  },
-  source: {
-    type: "string",
-  },
-  isDeleted: {
-    type: "boolean",
-  },
-  request: {
-    type: "object",
-    properties: requestItems,
-  },
-  createdAt: {
-    type: "date-time",
-  },
-  updatedAt: {
-    type: "date-time",
-  },
-  createdBy: {
-    type: "string",
-  },
-  updatedBy: {
-    type: "string",
-  },
-};
-
 const TestflowSchemaLiteral = {
   title: "Testflow",
   primaryKey: "_id",
@@ -296,7 +259,7 @@ const TestflowSchemaLiteral = {
               },
               requestData: {
                 type: "object",
-                properties: itemsProperties,
+                properties: requestItems,
               },
               isDeleted: {
                 type: "boolean",

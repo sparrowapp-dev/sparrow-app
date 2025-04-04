@@ -114,8 +114,7 @@ export class TestflowExplorerPageViewModel {
   private updateNodesDebounce = async (_nodes: TFNodeType[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const nodes = _nodes.map((elem) => {
-      console.log(count, elem);
-      count += 1;
+      if (elem?.data?.requestData) console.log(elem.data?.requestData);
       return {
         id: elem.id,
         blockName: elem.blockName,

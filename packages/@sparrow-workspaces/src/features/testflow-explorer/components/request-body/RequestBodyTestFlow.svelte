@@ -18,6 +18,7 @@
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
   };
+
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">

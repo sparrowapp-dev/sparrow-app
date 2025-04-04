@@ -43,7 +43,7 @@ class InitTestflowTab {
                 method: "",
                 workspaceId: "",
                 isDeleted: false,
-                requestData: undefined,
+                requestData: null,
               },
               position: { x: 100, y: 200 },
             },

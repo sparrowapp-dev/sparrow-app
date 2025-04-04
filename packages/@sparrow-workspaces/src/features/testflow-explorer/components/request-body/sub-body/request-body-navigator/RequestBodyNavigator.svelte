@@ -102,7 +102,7 @@
       titleId={requestState.requestBodyNavigation}
       onclick={handleDropdown}
       zIndex={499}
-      disabled={true}
+      disabled={false}
     />
     <span class="pe-3" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
@@ -133,7 +133,7 @@
         titleId={requestState.requestBodyLanguage}
         onclick={handleRawDropDown}
         zIndex={499}
-        disabled={true}
+        disabled={false}
       />
     {/if}
   </div>

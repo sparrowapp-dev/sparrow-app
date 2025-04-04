@@ -41,10 +41,9 @@
               },
             ]}
             zIndex={499}
-            titleId={requestStateAuth}
-            onclick={(id = "") => {
-              onUpdateRequestState({ requestAuthNavigation: id });
-            }}
+            titleId={requestStateAuth?.requestAuthNavigation ??
+              HttpRequestAuthTypeBaseEnum.NO_AUTH}
+            onclick={(id = "") => {}}
             disabled={false}
           />
         </p>
