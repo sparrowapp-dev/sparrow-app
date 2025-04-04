@@ -168,7 +168,7 @@
         >"{user.name}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{activeWorkspace.name}"</span> team.
+      <span class="text-whiteColor">"{activeWorkspace.name}"</span> hub.
     </p>
   </div>
   <div
@@ -202,11 +202,12 @@
   class="member-data-container d-flex align-items-center mb-2 w-100"
   style="height: 46px;"
 >
-   <Avatar
+  <Avatar
     type="letter"
     size="medium"
     letter={user?.name[0]}
-    bgColor="var(--bg-secondary-600)"/>
+    bgColor="var(--bg-secondary-600)"
+  />
   <div
     class="d-flex flex-column"
     style="width:calc(100% - 100px); font-size:12px; "

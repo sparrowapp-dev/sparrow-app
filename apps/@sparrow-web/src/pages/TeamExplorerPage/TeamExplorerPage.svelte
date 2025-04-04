@@ -279,7 +279,7 @@
 </Modal>
 
 <Modal
-  title={"Leave Team?"}
+  title={"Leave Hub?"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

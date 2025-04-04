@@ -82,7 +82,7 @@
     zIndex={200}
     position={"absolute"}
     onclick={(flag) => handleSelectTeam(flag)}
-    placeholderText="Select Team"
+    placeholderText="Select Hub"
   />
 
   <!-- 
