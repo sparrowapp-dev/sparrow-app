@@ -158,7 +158,7 @@
     <div class="input-parent">
       {#if conversations?.length && isResponseGenerating}
         <p
-          class="p-3 text-primary-300 generating-img"
+          class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
           in:fade={{ duration: 200 }}
         >
           <img src={generatingImage} style="width: 118px;" alt="" />
@@ -243,10 +243,11 @@
   }
 
   .generating-img {
-    position: absolute;
-    top: -70%;
+    /* position: absolute; */
+    /* top: -40%; */
     background-color: var(--bg-ds-surface-700);
     width: 100%;
+    margin-bottom: 10px;
   }
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-ds-surface-100);

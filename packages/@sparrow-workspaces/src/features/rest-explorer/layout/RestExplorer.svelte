@@ -271,9 +271,9 @@
       </div>
       <div class="pt-2"></div>
       <div style="flex:1; overflow:auto;">
-        {#if !isLoading}
-          <Splitpanes>
-            <Pane class="position-relative bg-transparent">
+        <Splitpanes>
+          <Pane class="position-relative bg-transparent">
+            {#if !isLoading}
               <Splitpanes
                 class="rest-splitter w-100 h-100"
                 id={"rest-splitter"}
@@ -470,31 +470,31 @@
                   </div>
                 </Pane>
               </Splitpanes>
-            </Pane>
-
-            <!-- AI Chatbot Interface -->
-            {#if $tab?.property?.request?.state?.isChatbotActive}
-              <Pane
-                class="position-relative bg-transparent"
-                minSize={30}
-                size={35}
-                maxSize={45}
-              >
-                <ChatBot
-                  {tab}
-                  {onUpdateAiPrompt}
-                  {onUpdateAiConversation}
-                  {onUpdateRequestState}
-                  {onGenerateAiResponse}
-                  {onToggleLike}
-                />
-              </Pane>
+            {:else}
+              <!-- loading state -->
+              <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
             {/if}
-          </Splitpanes>
-        {:else}
-          <!-- loading state -->
-          <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
-        {/if}
+          </Pane>
+
+          <!-- AI Chatbot Interface -->
+          {#if $tab?.property?.request?.state?.isChatbotActive}
+            <Pane
+              class="position-relative bg-transparent"
+              minSize={30}
+              size={35}
+              maxSize={45}
+            >
+              <ChatBot
+                {tab}
+                {onUpdateAiPrompt}
+                {onUpdateAiConversation}
+                {onUpdateRequestState}
+                {onGenerateAiResponse}
+                {onToggleLike}
+              />
+            </Pane>
+          {/if}
+        </Splitpanes>
       </div>
     </div>
     <!--

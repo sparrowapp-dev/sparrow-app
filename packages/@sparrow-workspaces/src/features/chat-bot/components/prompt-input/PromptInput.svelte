@@ -21,15 +21,22 @@
     isSendButtonHovered = false;
   };
 
-  function adjustTextareaHeight(textarea) {
-    textarea.style.height = "40px"; // Reset to initial height
-    textarea.style.height = textarea.scrollHeight + "px"; // Expand based on content
+  function adjustTextareaHeight() {
+    const textAreaInput = document.getElementById("input-prompt-text");
+    if (!textAreaInput) return;
+    textAreaInput.style.height = "40px"; // Reset to initial height
+    textAreaInput.style.height = textAreaInput.scrollHeight + "px"; // Expand based on content
   }
 
   let isPromptBoxFocused = false;
   let isTyping = false;
 
   const hanldeStartGenerating = async () => {
+    // allows the DOM to update first before resetting the height.
+    setTimeout(() => {
+      adjustTextareaHeight();
+    }, 0);
+
     if (prompt) {
       sendPrompt(prompt);
       onUpdateAiPrompt("");
@@ -90,9 +97,12 @@
 
         isTyping = false;
         isPromptBoxFocused = false;
-
-        // Remove focus from textarea
         event.target.blur();
+
+        // allows the DOM to update first before resetting the height.
+        setTimeout(() => {
+          adjustTextareaHeight();
+        }, 0);
       }
     }}
     on:focus={() => {
@@ -114,28 +124,28 @@
         data={[
           {
             name: "Azure AI",
-            id: "none1",
+            id: "azure-ai",
             type: null,
             hide: false,
           },
           {
             name: "Open AI 4.0",
-            id: "none2",
+            id: "open-AI-40",
             display: "none",
             type: null,
             disabled: true,
           },
           {
             name: "DeepSeek",
-            id: "none3",
+            id: "deepseek",
             display: "none",
             type: null,
             disabled: true,
           },
         ]}
-        titleId={"none1"}
+        titleId={"azure-ai"}
         onclick={() => {
-          console.log("AI Model Selected!!");
+          // Disabled Right Now
         }}
         maxHeaderWidth={"88px"}
         headerTheme={"transparent"}
@@ -232,7 +242,8 @@
   } */
 
   .prompt-input-container {
-    max-height: 228px;
+    /* max-height: 228px; */
+    max-height: 150px;
     background-color: #222630 !important;
     border-radius: 4px;
     padding: 8px;
