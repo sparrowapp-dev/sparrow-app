@@ -59,14 +59,18 @@
   >
     <div style="flex:1; overflow:auto;">
       <div class="d-flex h-100 flex-column">
-        <div class="heading">
+        <div class="chatbox-heading">
           <div
             class="d-flex"
             style="justify-content: space-between; align-items:center"
             in:fade={{ duration: 200 }}
           >
             <div class="">
-              <SparrowAIIcon height={"32px"} width={"32px"} />
+              <SparrowPrimaryIcon
+                height={"32px"}
+                width={"32px"}
+                color="var(--primary-btn-color)"
+              />
               <span class="gradient-text">Sparrow AI</span>
             </div>
             <div
@@ -99,10 +103,13 @@
                   <span class="pb-3">
                     <SparkleFilled height={"28px"} width={"28px"} />
                   </span>
-                  <p class="text-fs-16 mb-1">
+                  <p class="text-fs-16 mb-1" style="letter-spacing: -0.02em; ">
                     Ask AI anything and get instant insights
                   </p>
-                  <p class="text-fs-12 text-secondary-250">
+                  <p
+                    class="text-fs-12 text-secondary-250 mb-0"
+                    style="letter-spacing: -0.02em;"
+                  >
                     Generate mock data, debug errors, and explore solutions
                   </p>
                 </div>
@@ -190,8 +197,8 @@
     /* border-radius: 8px; */
   }
 
-  .heading {
-    border-bottom: 1px solid #31353f;
+  .chatbox-heading {
+    border-bottom: 1px solid var(--bg-ds-surface-100);
     padding-bottom: 6px;
   }
 

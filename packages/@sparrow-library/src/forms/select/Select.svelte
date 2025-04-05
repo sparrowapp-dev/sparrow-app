@@ -72,6 +72,11 @@
   export let borderActiveType: "all" | "bottom" | "none" = "all"; // active case
 
   /**
+   * Dropdown popup body border
+   */
+  export let isBodyBorderEnabled: boolean = false;
+
+  /**
    * Determines the icon state for the Select header.
    */
   export let isDropIconFilled: boolean = false; // normal case
@@ -107,7 +112,7 @@
   /**
    * Determines the border radius of Select header.
    */
-  let borderRounded = "2px";
+  export let borderRounded = "2px";
   /**
    * Determines the z-index of Select.
    */
@@ -127,8 +132,8 @@
   /**
    * typography
    */
-  let headerFontSize: string = "12px";
-  let headerFontWeight: number = 500;
+  export let headerFontSize: string = "12px";
+  export let headerFontWeight: number = 500;
 
   /**
    * ticked state
@@ -526,7 +531,9 @@
     class="select-data {position === 'fixed'
       ? 'position-fixed'
       : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
-    {isOpen ? 'visible' : 'invisible'}"
+    {isOpen ? 'visible' : 'invisible'} {isBodyBorderEnabled
+      ? 'body-border-enabled'
+      : ''}"
     style="
   {isOpen
       ? 'opacity: 1; transform: scale(1);'
@@ -768,6 +775,10 @@
   .select-body-background-blur {
     background: var(--background-hover) !important;
     backdrop-filter: blur(2px);
+  }
+  .body-border-enabled {
+    border: 1px solid var(--bg-ds-surface-100);
+    border-radius: 4px;
   }
   .select-btn p,
   .select-data p {

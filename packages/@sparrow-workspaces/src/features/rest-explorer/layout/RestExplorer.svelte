@@ -271,7 +271,7 @@
       </div>
       <div class="pt-2"></div>
       <div style="flex:1; overflow:auto;">
-        <Splitpanes>
+        <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
             {#if !isLoading}
               <Splitpanes
@@ -480,9 +480,9 @@
           {#if $tab?.property?.request?.state?.isChatbotActive}
             <Pane
               class="position-relative bg-transparent"
-              minSize={30}
+              minSize={35}
               size={35}
-              maxSize={45}
+              maxSize={53.3}
             >
               <ChatBot
                 {tab}
@@ -686,6 +686,27 @@
   ) {
     background-color: var(--bg-ds-primary-400) !important;
   }
+
+  /* Disabling the splitter for explorer and chatbot interface - only split dragger is allowed on hover */
+  :global(
+    .explorer-chatbot-splitter.splitpanes--vertical > .splitpanes__splitter
+  ) {
+    width: 8px !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  :global(
+    .explorer-chatbot-splitter.splitpanes--vertical
+      > .splitpanes__splitter:hover,
+    .explorer-chatbot-splitter.splitpanes--vertical
+      > .splitpanes__splitter:active
+  ) {
+    border: none !important;
+    border-right: 2px solid var(--border-ds-primary-300) !important;
+    background: transparent !important;
+  }
+
   .link {
     color: var(--text-primary-300);
     text-decoration: underline;

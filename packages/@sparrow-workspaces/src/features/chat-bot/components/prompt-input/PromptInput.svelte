@@ -24,7 +24,7 @@
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
     if (!textAreaInput) return;
-    textAreaInput.style.height = "40px"; // Reset to initial height
+    textAreaInput.style.height = "20px"; // Reset to initial height
     textAreaInput.style.height = textAreaInput.scrollHeight + "px"; // Expand based on content
   }
 
@@ -49,7 +49,7 @@
 
 <!-- <div class="d-flex prompt-input-container"> -->
 <div
-  class="prompt-input-container d-flex flex-column gap-1 {isPromptBoxFocused
+  class="prompt-input-container d-flex flex-column gap-3 {isPromptBoxFocused
     ? 'focused'
     : ''} {isTyping ? 'typing' : ''}"
 >
@@ -125,29 +125,24 @@
           {
             name: "Azure AI",
             id: "azure-ai",
-            type: null,
             hide: false,
           },
           {
             name: "Open AI 4.0",
             id: "open-AI-40",
-            display: "none",
-            type: null,
             disabled: true,
           },
           {
             name: "DeepSeek",
             id: "deepseek",
-            display: "none",
-            type: null,
             disabled: true,
           },
         ]}
         titleId={"azure-ai"}
         onclick={() => {
-          // Disabled Right Now
+          // Choose Different AI Models Feature Disabled Right Now
         }}
-        maxHeaderWidth={"88px"}
+        maxHeaderWidth={"100px"}
         headerTheme={"transparent"}
         minBodyWidth={"182px"}
         bodyTheme={"surface"}
@@ -156,8 +151,10 @@
         borderActiveType={"none"}
         headerHighlight={"hover-active"}
         menuItem={"v2"}
-        headerFontSize={"12px"}
         position={"absolute"}
+        isBodyBorderEnabled={true}
+        borderRounded={"4px"}
+        headerFontWeight={600}
       />
     </div>
 
@@ -243,7 +240,7 @@
 
   .prompt-input-container {
     /* max-height: 228px; */
-    max-height: 150px;
+    /* max-height: 160px; */
     background-color: #222630 !important;
     border-radius: 4px;
     padding: 8px;
@@ -264,13 +261,28 @@
 
   .prompt-text-field-area {
     width: 100%;
-    height: 40px;
+    height: 20px;
+    max-height: 160px !important;
     font-family: "inter", sans-serif;
     font-size: 14px;
     font-weight: 400;
+    line-height: 1.45; /* 145% */
+    letter-spacing: 0;
     border: none !important;
     outline: none;
     caret-color: #6894f9;
+  }
+
+  textarea::-webkit-scrollbar-thumb {
+    background-color: var(--bg-ds-surface-100);
+    border-radius: 8px;
+  }
+
+  /* pointer to default when hovering scrollbar */
+  textarea::-webkit-scrollbar,
+  textarea::-webkit-scrollbar-thumb,
+  textarea::-webkit-scrollbar-button {
+    cursor: default;
   }
 
   .actionBtn-outline {
