@@ -890,10 +890,24 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will clear the test flow store data.
    */
   public clearTestFlowData = () => {
-    testFlowDataStore.set(new Map());
     const currentTestflow = this._tab.getValue();
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData: TFDataStoreType | undefined = testFlowDataMap.get(
+        currentTestflow?.tabId as string,
+      );
+      if (wsData) {
+        const clearedNodes = wsData.nodes.map((node) => ({
+          ...node,
+          response: {},
+        }));
+        wsData.history = [];
+        wsData.nodes = [];
+        testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+      }
+      return testFlowDataMap;
+    });
     notifications.success(
-      `Cleared all Responses ${currentTestflow.name} testflow.`,
+      `Cleared all Responses for ${currentTestflow?.name ?? "unknown"} testflow.`,
     );
   };
 }
