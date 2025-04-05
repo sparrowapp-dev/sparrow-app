@@ -2377,6 +2377,7 @@ class RestExplorerViewModel {
             );
             break;
 
+          // Listening for "assistant-response" because initial "Limit Reached" msg is coming without tabId
           case `assistant-response`:
           case `assistant-response_${componentData.tabId}`:
             if (response.messages) {
@@ -2422,7 +2423,7 @@ class RestExplorerViewModel {
                   ...(componentData?.property?.request?.ai?.conversations ||
                     []),
                   {
-                    message: response.messages,
+                    message: "",
                     messageId: uuidv4(),
                     type: MessageTypeEnum.RECEIVER,
                     isLiked: false,
@@ -2430,8 +2431,6 @@ class RestExplorerViewModel {
                     status: true,
                   },
                 ]);
-
-                console.log("**** updating ******* !");
 
                 await this.displayDataInChunks(response.messages, 100, 300);
               }

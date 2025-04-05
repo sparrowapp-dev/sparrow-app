@@ -90,7 +90,7 @@ export class AiAssistantWebSocketService {
       );
     }
     AiAssistantWebSocketService.instance = this;
-    console.log("AiAssistantWebSocketService instance created!");
+    // console.log("AiAssistantWebSocketService instance created!");
     // this.connectWebSocket();
   }
 
@@ -155,7 +155,7 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleOpen = (event: Event) => {
-    console.log("WebSocket connected successfully");
+    // console.log("WebSocket connected successfully");
     this.isConnected = true;
     this.reconnectAttempts = 0;
     socketStore.set(this.webSocket);
@@ -171,7 +171,7 @@ export class AiAssistantWebSocketService {
   private handleMessage = (event: MessageEvent) => {
     try {
       const data = JSON.parse(event.data);
-      console.log("data received :>> ", data);
+      // console.log("data received :>> ", data);
       if (data.tab_id) {
         this.triggerEvent(`assistant-response_${data.tab_id}`, data);
       } else {
@@ -198,9 +198,9 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleClose = (event: CloseEvent) => {
-    console.log(
-      `WebSocket closed with code: ${event.code}, reason: ${event.reason}`,
-    );
+    // console.log(
+    //   `WebSocket closed with code: ${event.code}, reason: ${event.reason}`,
+    // );
     this.isConnected = false;
     this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
 
@@ -220,9 +220,9 @@ export class AiAssistantWebSocketService {
       !this.reconnectTimer
     ) {
       this.reconnectTimer = setTimeout(() => {
-        console.log(
-          `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})...`,
-        );
+        // console.log(
+        //   `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})...`,
+        // );
         this.reconnectAttempts++;
         this.connectWebSocket();
         this.reconnectTimer = null;
@@ -306,7 +306,6 @@ export class AiAssistantWebSocketService {
       userInput: prompt,
       apiData: apiContext,
     };
-    console.log("Inside sendMessage(): ");
 
     if (!this.webSocket || !this.isConnected) {
       console.error("WebSocket not connected, cannot send message");
@@ -315,7 +314,6 @@ export class AiAssistantWebSocketService {
 
     try {
       this.webSocket.send(JSON.stringify(message));
-      console.log("Sending Message To AI :>> ");
       return true;
     } catch (error) {
       console.error("Error sending message:", error);

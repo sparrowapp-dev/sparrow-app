@@ -2416,7 +2416,7 @@ class RestExplorerViewModel {
                   ...(componentData?.property?.request?.ai?.conversations ||
                     []),
                   {
-                    message: response.messages,
+                    message: "",
                     messageId: uuidv4(),
                     type: MessageTypeEnum.RECEIVER,
                     isLiked: false,
