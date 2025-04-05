@@ -180,6 +180,18 @@
     });
   }
   let isGuidePopup = false;
+
+  // Here we are closing the chatbot when user switches to vertical layout view.
+  // This can be handled with a better approach, as its not user friendly way
+  // that we are closing the Chatbot interface with respect to vertical layout switching
+  // $: {
+  //   if (!isLoading && $tabsSplitterDirection != "horizontal") {
+  //     console.log("not active chatbox!!");
+  //     onUpdateRequestState({
+  //       isChatbotActive: false,
+  //     });
+  //   }
+  // }
 </script>
 
 {#if $tab.tabId}
