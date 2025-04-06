@@ -87,7 +87,7 @@
 
         <div
           bind:this={chatContainer}
-          class="mb-1"
+          class="my-2"
           style="flex:1; overflow:auto;"
         >
           <div
