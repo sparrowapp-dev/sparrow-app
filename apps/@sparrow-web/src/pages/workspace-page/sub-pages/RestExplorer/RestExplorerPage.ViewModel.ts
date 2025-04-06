@@ -2267,9 +2267,16 @@ class RestExplorerViewModel {
     const sleep = (ms: number) =>
       new Promise((resolve) => setTimeout(resolve, ms));
     const displayNextChunk = async () => {
+      const componentData = this._tab.getValue();
+
+      // Check if generation should be stopped
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse) {
+        console.log("Chunk display stopped by user");
+        return;
+      }
+
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
-        const componentData = this._tab.getValue();
         const length =
           componentData?.property?.request?.ai?.conversations.length;
         componentData.property.request.ai.conversations[length - 1].message =
@@ -2370,10 +2377,15 @@ class RestExplorerViewModel {
         switch (event) {
           case "disconnect":
           case "connect_error":
+
+            // After getting response don't listen again for this the same request
+            events.forEach((event) =>
+              this.aiAssistentWebSocketService.removeListener(event),
+            );
             console.error(`Socket ${event}:`, response);
             await this.handleAIResponseError(
               componentData,
-              "Woops! Something went wrong. Please try again...",
+              "Something went wrong. Please try again...",
             );
             break;
 
@@ -2439,6 +2451,9 @@ class RestExplorerViewModel {
               isChatbotGeneratingResponse: false,
             });
             break;
+
+          // case `generation_stopped_${tabId}`:
+          //   break;
         }
       };
 
@@ -2454,6 +2469,30 @@ class RestExplorerViewModel {
     }
   };
   
+  /**
+   * Stops the response generation from the FE and sends stop generate event to server
+   * 
+   */
+  public stopGeneratingAIResponse = async () => {
+    console.log("in stop generating !!")
+    const componentData = this._tab.getValue();
+    
+    try {
+      // Send stop signal to the server
+      await this.aiAssistentWebSocketService.stopGeneration(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        getClientUser().email,
+      );
+      
+      await this.updateRequestState({ isChatbotGeneratingResponse: false });
+      
+      // Show error msg in the chat for stop generation
+      // this.handleAIResponseError(componentData, "Generation Stopped")
+    } catch (error) {
+      console.error("Error stopping AI response generation:", error);
+    }
+  };
   // AI WebSocket - End
 
 

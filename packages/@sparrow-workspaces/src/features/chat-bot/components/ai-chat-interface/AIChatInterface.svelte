@@ -19,6 +19,7 @@
   export let onToggleLike;
   export let regenerateAiResponse;
   export let onUpdateRequestState;
+  export let onStopGeneratingAIResponse;
   export let scrollList;
 
   let chatContainer: HTMLElement;
@@ -162,6 +163,7 @@
       {isResponseGenerating}
       placeholder={"How can I help you?"}
       {sendPrompt}
+      {onStopGeneratingAIResponse}
     />
   </div>
 </div>

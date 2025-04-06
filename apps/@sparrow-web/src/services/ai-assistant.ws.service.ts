@@ -321,6 +321,38 @@ export class AiAssistantWebSocketService {
     }
   };
 
+
+  /**
+   * Sends a stop generation signal to the server
+   * @param tabId - The tab ID for which to stop generation
+   * @returns {boolean} - Whether the signal was sent successfully
+   */
+  public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
+    if (!this.webSocket || !this.isConnected) {
+      console.error("WebSocket not connected, cannot send stop signal");
+      return false;
+    }
+
+    try {
+      
+      this.removeListener(`assistant-response_${tabId}`);
+
+      // this.webSocket.send(JSON.stringify({
+      //   type: "stopGeneration",
+      //   tabId,
+      //   threadId,
+      //   emailId: userEmail,
+      //   userInput: "stopGeneration",
+      //   apiData: "",
+      // }));
+
+      return true;
+    } catch (error) {
+      console.error("Error sending stop generation signal:", error);
+      return false;
+    }
+  };
+
   /**
    * Adds an event listener for a specific event
    * @param eventName - Name of the event to listen for
@@ -354,6 +386,10 @@ export class AiAssistantWebSocketService {
     if (listeners) {
       listeners.delete(callback);
     }
+  }
+
+  public cleanupAllListeners(): void {
+    this.eventListeners.clear(); 
   }
 
   /**
