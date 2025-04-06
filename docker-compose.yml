@@ -31,8 +31,6 @@ services:
       - "9000:9000"
       - "9001:9001"
       - "9002:9002"
-    volumes:
-      - ./:/src
     networks:
       - localnet
     depends_on:
@@ -46,8 +44,6 @@ services:
     image: sparrowapi/sparrow-auth:v1
     ports:
       - "1421:80"
-    volumes:
-      - ./:/src
     networks:
       - localnet
     depends_on:
@@ -55,7 +51,20 @@ services:
       - mongo
       - kafka
     env_file:
-      - .env.docker-setup
+        - .env.docker-setup
+    command:  >-
+      sh -c "
+        echo 'window.runtimeConfig = {
+          VITE_API_URL: \"${VITE_API_URL}\",
+          VITE_SPARROW_SUPPORT_EMAIL: \"${VITE_SPARROW_SUPPORT_EMAIL}\",
+          VITE_SPARROW_OAUTH: \"${VITE_SPARROW_OAUTH}\",
+          VITE_ENABLE_MIX_PANEL: \"${VITE_ENABLE_MIX_PANEL}\",
+          VITE_MIX_PANEL_TOKEN: \"${VITE_MIX_PANEL_TOKEN}\",
+          VITE_TERMS_OF_SERVICE: \"${VITE_TERMS_OF_SERVICE}\",
+          VITE_SPARROW_WEB_URL: \"${VITE_SPARROW_WEB_URL}\",
+          VITE_SPARROW_PRIVACY_POLICY: \"${VITE_SPARROW_PRIVACY_POLICY}\"
+        }' > /usr/share/nginx/html/runtime-config.js && nginx -g 'daemon off;'
+      "
 
   # Sparrow Proxy Service
   sparrow-proxy:
