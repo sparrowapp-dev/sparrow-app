@@ -2,13 +2,13 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@sparrow/library/ui";
-  import { copyIcon, tickIcon } from "../../assests";
+  import { copyIcon, tickIcon, ArrowExpand, CopyIcon2 } from "../../assests";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";
   import "highlight.js/styles/atom-one-dark.css";
   import {
-    CopyIcon2,
+    // CopyIcon2,
     DislikeIcon,
     LikeIcon,
     RefreshIcon,
@@ -35,6 +35,8 @@
   export let regenerateAiResponse;
   export let isLastRecieverMessage;
   export let status;
+
+  export let onClickCodeBlockPreview;
 
   let showTickIcon: boolean = false;
 
@@ -67,13 +69,18 @@
         hljs.highlightBlock(pre.querySelector("code"));
         // Add content or value to the container div
         container.innerHTML = `
-      <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
-        <span>${lang?.split("-")[1] ?? ""}</span>
-        <button role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${copyIcon}" id="${index}">
-          <button class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
-            <div class="copy-code-tooltip-square"></div>
-          </button>
+      <div class="code-header d-flex align-items-center justify-content-between">
+        <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+          <img src="${ArrowExpand}" id="${index}">
+          <div class="codeBlock-action-btns-tooltip">Preview
+            <div class="codeBlock-action-btns-tooltip-square"></div>
+          </div>
+        </button>
+        <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+          <img src="${CopyIcon2}" id="${index}">
+          <div class="codeBlock-action-btns-tooltip">Copy
+            <div class="codeBlock-action-btns-tooltip-square"></div>
+          </div>
         </button>
       </div>
         `;
@@ -83,6 +90,18 @@
       }
     });
 
+    /*
+    <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
+        <span>${lang?.split("-")[1] ?? ""}</span>
+        <button role="button" class="position-relative codeBlock-action-btns-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+          <img src="${copyIcon}" id="${index}">
+          <button class="codeBlock-action-btns-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
+            <div class="codeBlock-action-btns-tooltip-square"></div>
+          </button>
+        </button>
+      </div>
+
+    */
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   };
@@ -121,6 +140,7 @@
     const target = (event.target as HTMLElement).closest(
       ".wrapper",
     ) as HTMLElement | null;
+
     if (target) {
       const codeElement = target.querySelector(
         "pre code",
@@ -134,6 +154,22 @@
           console.error("Failed to copy code: ", err);
         }
       }
+    }
+  };
+
+  const handleCodePreview = async (event: MouseEvent) => {
+    const wrapper = (event.target as HTMLElement).closest(
+      ".wrapper",
+    ) as HTMLElement | null;
+
+    if (!wrapper) return;
+
+    const preElement = wrapper.querySelector("pre > code")
+      ?.parentElement as HTMLPreElement | null;
+
+    console.log("pre element >", preElement);
+    if (preElement) {
+      onClickCodeBlockPreview(preElement);
     }
   };
 
@@ -168,18 +204,30 @@
     // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
-      const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
+      const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);
+      const previewCodeBtns = document.querySelectorAll(
+        `.preview-code-${messageId}`,
+      );
 
       // Remove previous event listeners
       cleanUpListeners();
 
       cleanUpListeners = () => {
-        wrappers.forEach((wrapper) => {
+        copyCodeBtns.forEach((wrapper) => {
           wrapper.removeEventListener("click", handleCopyCode);
         });
       };
-      wrappers.forEach((wrapper) => {
+      copyCodeBtns.forEach((wrapper) => {
         wrapper.addEventListener("click", handleCopyCode);
+      });
+
+      cleanUpListeners = () => {
+        previewCodeBtns.forEach((wrapper) => {
+          wrapper.removeEventListener("click", handleCodePreview);
+        });
+      };
+      previewCodeBtns.forEach((wrapper) => {
+        wrapper.addEventListener("click", handleCodePreview);
       });
     }, 200);
   };
@@ -348,21 +396,45 @@
 
   :global(.message-wrapper .wrapper) {
     border-radius: 4px !important;
-    overflow: hidden !important;
+    /* overflow: hidden !important; */
     margin-bottom: 10px;
   }
+
+  :global(.message-wrapper) {
+    overflow: hidden !important;
+  }
+
+  :global(.wrapper) {
+    position: relative;
+  }
+
+  :global(.code-header) {
+    width: fit-content;
+    position: absolute;
+    top: -5%;
+    left: 85%;
+    border-radius: 4px;
+    background-color: var(--border-ds-surface-500);
+    border: 1px solid var(--border-ds-surface-300);
+    padding: 2px;
+    gap: 2px;
+  }
+
   :global(.message-wrapper .hljs) {
     background: #000 !important;
     border: 2px solid var(--border-ds-surface-400);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-radius: 8px;
+    height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
+
   :global(.action-button) {
-    height: 30px;
+    height: 28px;
+    width: 28px;
     background-color: transparent;
     box-shadow: none;
     border: none;
-    width: 30px;
   }
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
@@ -381,34 +453,41 @@
     height: 16px;
   }
 
-  :global(.copy-code-tooltip) {
+  :global(.codeBlock-action-btns-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;
+    font-size: 12px;
+    font: Inter, sans-serif;
     gap: 6px;
-    top: 40px;
-    border-radius: 2px;
+    bottom: 40px;
+    border-radius: 4px;
     left: 50%;
     transform: translateX(-50%);
     position: absolute;
     padding: 4px 8px;
-    background-color: var(--bg-tertiary-700);
+    /* background-color: var(--bg-tertiary-700); */
+    background-color: #31353f;
     opacity: 0;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    /* -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75); */
   }
-  :global(.copy-code-tooltip-square) {
-    z-index: 0;
+  :global(.codeBlock-action-btns-tooltip-square) {
+    /* z-index: 1000; */
     position: absolute;
-    top: -5px;
+    bottom: -5px;
     left: 50%;
     border-radius: 2px;
     height: 10px;
     width: 10px;
-    background-color: var(--bg-tertiary-700);
+    /* background-color: var(--bg-tertiary-700); */
+    background-color: #31353f;
+
     transform: translateX(-38%) rotate(45deg); /* Rotate 45 degrees */
   }
-  :global(.copy-code-selector:hover .copy-code-tooltip) {
+  :global(
+    .codeBlock-action-btns-selector:hover .codeBlock-action-btns-tooltip
+  ) {
     visibility: visible !important;
     opacity: 1;
   }

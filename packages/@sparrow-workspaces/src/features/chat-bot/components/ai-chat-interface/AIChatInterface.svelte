@@ -10,6 +10,8 @@
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
   import { SparrowPrimaryIcon } from "@sparrow/common/icons";
+  import { Modal } from "@sparrow/library/ui";
+  import { tick } from "svelte";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -47,9 +49,43 @@
     _pixels: number,
     _behaviour: ScrollBehavior,
   ) => scroll(_param, _pixels, _behaviour);
+
+  let isCodePreviewOpened = false;
+  let codeBlockHtml = ""; // will hold HTML string for preview
+
+  const handleCodePreview = async (codeBlock: HTMLElement) => {
+    codeBlockHtml = codeBlock.outerHTML; // get its full HTML
+    isCodePreviewOpened = true;
+
+    await tick(); // ensure modal renders
+  };
+
+  const handleCloseCodePreviewPopup = () => {
+    isCodePreviewOpened = false;
+    codeBlockHtml = ""; // clear after closing
+  };
+
+  export function innerHtml(node: HTMLElement, html: string) {
+    node.innerHTML = html;
+    return {
+      update(newHtml: string) {
+        node.innerHTML = newHtml;
+      },
+    };
+  }
 </script>
 
-<!-- <div class="d-flex flex-column h-100 chat-box"> -->
+<!-- Your modal -->
+<Modal
+  title="Code Preview"
+  type="dark"
+  zIndex={1000}
+  isOpen={isCodePreviewOpened}
+  width="35%"
+  handleModalState={handleCloseCodePreviewPopup}
+>
+  <div id="code-block-preview" use:innerHtml={codeBlockHtml}></div>
+</Modal>
 
 <div class="ai-chat-panel h-100">
   <div
@@ -148,6 +184,7 @@
                       status={chat.status}
                       isLiked={chat.isLiked}
                       isDisliked={chat.isDisliked}
+                      onClickCodeBlockPreview={handleCodePreview}
                       {onToggleLike}
                       {regenerateAiResponse}
                       isLastRecieverMessage={conversations.length - 1 === index
@@ -258,5 +295,16 @@
   }
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-ds-surface-100);
+  }
+
+  :global(.hljs) {
+    background: #000 !important;
+    border: 2px solid var(--border-ds-surface-400);
+    border-radius: 8px;
+    height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px;
+    text-wrap: inherit;
   }
 </style>
