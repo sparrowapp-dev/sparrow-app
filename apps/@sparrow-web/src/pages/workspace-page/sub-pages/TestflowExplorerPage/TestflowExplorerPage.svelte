@@ -28,11 +28,11 @@
     if (val) {
       testflowStore = val.get(tab?.tabId) as TFDataStoreType;
     }
-    if (
-      !testflowStore ||
-      !testflowStore.nodes ||
-      testflowStore?.nodes.length === 0
-    ) {
+    const nodes = testflowStore?.nodes ?? [];
+    const hasEmptyResponseStatus = nodes.some(
+      (node) => !node.response?.status || node.response?.status === "",
+    );
+    if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
       isTestFlowEmpty = true;
     } else {
       isTestFlowEmpty = false;

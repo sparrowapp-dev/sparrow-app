@@ -560,7 +560,6 @@ export class TestflowExplorerPageViewModel {
                   response: resData,
                   request: adaptedRequest,
                 });
-
                 testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
               }
               return testFlowDataMap;
@@ -908,12 +907,12 @@ export class TestflowExplorerPageViewModel {
         currentTestflow?.tabId as string,
       );
       if (wsData) {
-        const clearedNodes = wsData.nodes.map((node) => ({
+        const clearedResponse = wsData.nodes.map((node) => ({
           ...node,
-          response: {},
+          response: { body: "", headers: [], status: "", time: 0, size: 0 },
         }));
         wsData.history = [];
-        wsData.nodes = [];
+        wsData.nodes = clearedResponse;
         testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
       }
       return testFlowDataMap;

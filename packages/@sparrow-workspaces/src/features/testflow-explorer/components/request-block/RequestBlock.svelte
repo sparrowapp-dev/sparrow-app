@@ -176,11 +176,12 @@
     moreOptionsMenu = !moreOptionsMenu;
     data.onOpenDeleteModal(id);
   };
+  console.log();
 </script>
 
 <div
   class="request-block position-relative"
-  style={selected && !currentBlock
+  style={selected && !currentBlock?.response.status
     ? "border: 1px solid var(--border-ds-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
       ? "border: 1px solid var(--border-ds-success-300);"
@@ -203,7 +204,7 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock}
+        {#if !currentBlock?.response?.status}
           <ArrowSwapRegular
             size={"16px"}
             color={"var(--icon-ds-neutral-200)"}
@@ -272,7 +273,7 @@
         method={req.method}
       />
     </div>
-    {#if !currentBlock}
+    {#if !currentBlock?.response?.status}
       {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
           <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
@@ -283,7 +284,7 @@
   </div>
   <!-- ------------ -->
   <!-- Block footer -->
-  {#if currentBlock}
+  {#if currentBlock?.response?.status}
     <div class="px-2 d-flex response-status-container">
       <!-- Response status -->
       <div
