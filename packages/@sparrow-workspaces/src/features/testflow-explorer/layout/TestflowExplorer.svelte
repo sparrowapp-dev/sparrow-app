@@ -42,8 +42,9 @@
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
-  import { PlayFilled, RunIcon } from "@sparrow/library/icons";
-  import { Button, Modal } from "@sparrow/library/ui";
+  import { BroomRegular } from "@sparrow/library/icons";
+  import { Button, Modal, Tooltip } from "@sparrow/library/ui";
+  import { PlayFilled } from "@sparrow/library/icons";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
@@ -82,6 +83,8 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onClearTestflow;
+  export let isTestFlowEmpty;
 
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
@@ -753,6 +756,17 @@
             />
           </div>
         {/if}
+      </div>
+      <div style="margin-right: 5px;">
+        <Tooltip title="Clear Response" placement="top-center" size="small">
+          <Button
+            type="secondary"
+            size="medium"
+            disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
+            startIcon={BroomRegular}
+            onClick={onClearTestflow}
+          />
+        </Tooltip>
       </div>
       <div>
         <SaveTestflow

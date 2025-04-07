@@ -238,8 +238,8 @@
 
 <div
   class="request-block position-relative"
-  style={selected && !currentBlock
-    ? "outline: 1px solid var(--border-ds-primary-300); border:none;"
+  style={selected && !currentBlock?.response.status
+    ? "border: 1px solid var(--border-ds-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
@@ -261,7 +261,7 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock}
+        {#if !currentBlock?.response?.status}
           <ArrowSwapRegular
             size={"16px"}
             color={"var(--icon-ds-neutral-200)"}
@@ -361,7 +361,7 @@
         method={req.method}
       />
     </div>
-    {#if !currentBlock}
+    {#if !currentBlock?.response?.status}
       {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
           <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
@@ -372,7 +372,7 @@
   </div>
   <!-- ------------ -->
   <!-- Block footer -->
-  {#if currentBlock}
+  {#if currentBlock?.response?.status}
     <div class="px-2 d-flex response-status-container">
       <!-- Response status -->
       <div
