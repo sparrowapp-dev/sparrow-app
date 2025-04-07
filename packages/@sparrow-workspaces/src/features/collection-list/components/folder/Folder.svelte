@@ -127,11 +127,11 @@
     if (searchData) {
       expand = true;
     }
-    if (activeTabPath) {
-      if (activeTabPath?.folderId === explorer.id) {
-        expand = true;
-      }
-    }
+    // if (activeTabPath) {
+    // if (activeTabPath?.folderId === explorer.id) {
+    //   expand = true;
+    // }
+    // }
     if (explorer) {
       requestIds = [];
       requestCount = 0;
@@ -592,7 +592,7 @@
           {/each}
           {#if !explorer?.items?.length}
             <p
-              class="text-ds-font-size-10 my-2 text-secondary-300"
+              class="text-ds-font-size-12 my-2 text-secondary-300"
               style="padding-left: 90px;"
             >
               This folder is empty

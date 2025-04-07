@@ -685,7 +685,7 @@
         </div>
         {#if !collection?.items?.length}
           <p
-            class="text-ds-font-size-10 ps-5 ms-2 my-{collection.id ===
+            class="text-ds-font-size-12 ps-5 ms-2 my-{collection.id ===
             activeTabId
               ? '0'
               : '0'} text-secondary-300"

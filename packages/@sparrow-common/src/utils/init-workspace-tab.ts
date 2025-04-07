@@ -40,11 +40,8 @@ class InitWorkspaceTab {
       timestamp: new Date().toString(),
     };
   }
-  public getValue(): WorkspaceTab {
+  public getValue(): Tab {
     return this._tab;
-  }
-  public getSpacificValue(_value: string) {
-    return this._tab[_value];
   }
   public updateId(_id: string) {
     this._tab.id = _id;
