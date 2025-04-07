@@ -299,9 +299,8 @@ export class RxDB {
                     };
                     updatedItem = { ...item, blockName: "startBlock", data };
                   } else {
-                    debugger
                     const { folderId, collectionId, requestId, name, method } =
-                      item;
+                      item?.data;
                     let request;
 
                     // Reusable fetch logic
@@ -463,7 +462,7 @@ export class RxDB {
                     updatedItem = { ...item, blockName: "startBlock", data };
                   } else {
                     const { folderId, collectionId, requestId, name, method } =
-                      item;
+                      item?.data;
                     let request;
 
                     // Reusable fetch logic
