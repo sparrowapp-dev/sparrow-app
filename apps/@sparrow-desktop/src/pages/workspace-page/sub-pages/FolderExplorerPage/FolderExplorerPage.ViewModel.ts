@@ -13,25 +13,23 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { moveNavigation } from "@sparrow/common/utils";
-import { Events, ItemType } from "@sparrow/common/enums";
+import { createDeepCopy, Debounce, InitWebSocketTab, moveNavigation } from "@sparrow/common/utils";
+import { Events, ItemType, UntrackedItems } from "@sparrow/common/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
 
-// Stores
-import type {
-  CollectionDto,
-  CollectionItemsDto,
-  Folder,
-  Tab,
-} from "@sparrow/common/types/workspace";
-import type { CreateApiRequestPostBody } from "@sparrow/common/dto";
 import { InitRequestTab } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspace/tab";
+import { BehaviorSubject, type Observable } from "rxjs";
+import { FolderTabAdapter } from "@app/adapter";
+import { CollectionItemTypeBaseEnum, type CollectionBaseInterface, type CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+import type { GraphqlRequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
+import { InitTab } from "@sparrow/common/factory";
+import type { SocketIORequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
@@ -43,25 +41,79 @@ class FolderExplorerPage {
   // Private Services
   private collectionService = new CollectionService();
 
-  constructor() {}
+  private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
+
+  constructor(_tab: TabDocument) {
+    const t = createDeepCopy(_tab.toMutableJSON());
+    delete t.isActive;
+    delete t.index;
+    t.persistence = TabPersistenceTypeEnum.PERMANENT;
+    this.tab = t;
+  }
+
+  
+    public get tab(): Observable<Tab> {
+      return this._tab.asObservable();
+    }
+  
+    public set tab(value: Tab) {
+      this._tab.next(value);
+    }
+  
+
+     /**
+   * Compares the current collection tab with the server collection and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
+  private compareCollectionWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    const folder = await this.collectionRepository.readRequestOrFolderInCollection(
+      progressiveTab.path.collectionId,
+      progressiveTab.id,
+    );
+
+    const collectionTab = new FolderTabAdapter().adapt(
+      progressiveTab.id,
+      "",
+      folder,
+    );
+    
+    if (!folder) result = false;
+    // description
+    else if (collectionTab.description !== progressiveTab.description) {
+      result = false;
+    }
+    // name
+    else if (collectionTab.name !== progressiveTab.name) {
+      result = false;
+    }
+  
+    // result
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+      });
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+      });
+      progressiveTab.isSaved = false;
+      this.tab = progressiveTab;
+    }
+  };
 
   /**
-   *
-   * @param _id - Id of the tab going to be updated
-   * @param data - Data to be updated on tab
+   * Debounced method to compare the current collection tab with the server collection.
    */
-  private updateTab = async (_id: string, data: Tab) => {
-    const tabListData = await this.tabRepository.getTabList();
-    tabListData.subscribe((tabList) => {
-      if (tabList) {
-        tabList.forEach((tab) => {
-          if (tab.id === _id) {
-            this.tabRepository.updateTab(tab?.tabId as string, data);
-          }
-        });
-      }
-    });
-  };
+  private compareCollectionWithServer = new Debounce().debounce(
+    this.compareCollectionWithServerDebounced,
+    1000,
+  );
 
   /**
    *
@@ -70,6 +122,43 @@ class FolderExplorerPage {
    */
   public getCollection = async (collectionId: string) => {
     return await this.collectionRepository.readCollection(collectionId);
+  };
+
+   /**
+   * Handles renaming a folder
+   * @param _folderName - the new name of the folder.
+   * @param event - blur or input
+   */
+   public updateFolderName = async (_folderName: string, event = "") => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    // Trim the name to handle cases with only spaces
+    const trimmedName = _folderName.trim();
+
+    if (event === "blur" && trimmedName === "") {
+      const folderDoc = await this.collectionRepository.readRequestOrFolderInCollection(
+        progressiveTab.path.collectionId,
+        progressiveTab.id,
+      );
+      progressiveTab.name = folderDoc?.name;
+    } else if (event === "") {
+      progressiveTab.name = _folderName;
+    }
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareCollectionWithServer();
+  };
+
+  /**
+   * Handles updating description of a folder.
+   * @param _folderDescription - the updated description of the folder.
+   */
+  public updateFolderDescription = async (_folderDescription: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.description = _folderDescription;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareCollectionWithServer();
   };
 
   /**
@@ -82,9 +171,9 @@ class FolderExplorerPage {
     collection: CollectionDocument,
     folderId: string,
   ) => {
-    let folder: Folder | null = null;
+    let folder;
     if (collection) {
-      collection.items.forEach((_folder) => {
+      collection?.items?.forEach((_folder) => {
         if (_folder.id === folderId) {
           folder = _folder;
         }
@@ -102,265 +191,63 @@ class FolderExplorerPage {
   };
 
   /**
-   * Handles renaming a folder
-   * @param collection :CollectionDocument - the collection in which the folder is saved
-   * @param folder : - the folder going to be renamed
-   * @param newFolderName :string - the new name of the folder
+   * Updates collection tab name
+   * @param _name - updated collection name
    */
-  public handleRename = async (
-    collection: CollectionDocument,
-    folder: Folder,
-    newFolderName: string,
-    tab: TabDocument,
-  ) => {
-    if (newFolderName) {
-      await this.tabRepository.updateTab(tab.tabId, {
-        persistence: TabPersistenceTypeEnum.PERMANENT,
+  public updateNameWithCollectionList = async (_name: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (_name !== progressiveTab.name) {
+      progressiveTab.name = _name;
+    }
+    this.tab = progressiveTab;
+  };
+
+  /**
+   *
+   * Saves the folder
+   */
+  public saveFolder = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser == true) {
+      await this.collectionRepository.updateRequestOrFolderInCollection(progressiveTab.path.collectionId, progressiveTab.id, {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
       });
-      let userSource = {};
-      if (collection.activeSync && folder?.source === "USER") {
-        userSource = {
-          currentBranch: collection.currentBranch
-            ? collection.currentBranch
-            : collection.primaryBranch,
-          source: "USER",
-        };
-      }
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-      if (isGuestUser === true) {
-        this.tabRepository.updateTab(tab.tabId, { name: newFolderName });
-        const res =
-          await this.collectionRepository.readRequestOrFolderInCollection(
-            collection.id,
-            folder.id,
-          );
-        res.name = newFolderName;
-        this.collectionRepository.updateRequestOrFolderInCollection(
-          collection.id,
-          folder.id,
-          res,
-        );
-        // notifications.success("Folder renamed successfully!");
-        return;
-      }
-      const response = await this.collectionService.updateFolderInCollection(
-        collection.workspaceId,
-        collection.id,
-        folder.id,
-        {
-          ...userSource,
-          name: newFolderName,
-        },
+      notifications.success(
+        `The ‘${progressiveTab.name}’ folder saved successfully.`,
       );
-
-      if (response.isSuccessful) {
-        this.tabRepository.updateTab(tab.tabId, { name: newFolderName });
-        this.collectionRepository.updateRequestOrFolderInCollection(
-          collection.id,
-          folder.id,
-          response.data.data,
-        );
-        // notifications.success("Folder renamed successfully!");
-      }
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      return;
     }
-  };
-
-  /**
-   *
-   * @param collection - Collection in which request exists
-   * @param folder - Folder in which request exists
-   * @param request - Request going to be opened
-   */
-  public handleOpenRequest = (
-    collection: CollectionDocument,
-    folder: Folder,
-    request: Request,
-  ) => {
-    const req = new InitRequestTab(request.id, collection.workspaceId);
-    const path: Path = {
-      workspaceId: collection.workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: folder?.id,
-      folderName: folder?.name,
-    };
-    req.updateName(request.name);
-    req.updateDescription(request.description);
-    req.updateBody(request.request?.body);
-    req.updateMethod(request.request?.method);
-    req.updateUrl(request.request?.url);
-    req.updateQueryParams(request.request?.queryParams);
-    req.updateAuth(request.request?.auth);
-    req.updateHeaders(request.request?.headers);
-    req.updatePath(path);
-
-    this.tabRepository.createTab(req.getValue());
-    moveNavigation("right");
-  };
-
-  /**
-   *
-   * @param collection - Collection in which request going to be created
-   * @param folder - Folder in which request going to be created
-   * @returns
-   */
-  public handleCreateAPIRequest = async (
-    collection: CollectionDto,
-    folder: CollectionItemsDto,
-  ) => {
-    const initRequestTab = new InitRequestTab(
-      uuidv4(),
-      collection?.workspaceId,
-    );
-
-    let userSource = {};
-    if (collection.activeSync && folder?.source === "USER") {
-      userSource = {
-        currentBranch: collection.currentBranch
-          ? collection.currentBranch
-          : collection.primaryBranch,
-        source: "USER",
-      };
-    }
-
-    const requestObj: CreateApiRequestPostBody = {
-      collectionId: collection.id,
-      workspaceId: collection.workspaceId,
-      ...userSource,
-      folderId: folder.id,
-      items: {
-        name: folder.name,
-        type: ItemType.FOLDER,
-        items: {
-          name: initRequestTab.getValue().name,
-          type: initRequestTab.getValue().type,
-          description: "",
-          request: {
-            method: initRequestTab?.getValue()?.property.request.method,
-          },
-        },
+    const response = await this.collectionService.updateFolderInCollection(
+      progressiveTab.path.workspaceId as string,
+      progressiveTab.path.collectionId as string,
+      progressiveTab.id as string,
+      {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
       },
-    };
-
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    if (isGuestUser) {
-      // pushing http request to collection model
-      await this.collectionRepository.addRequestInFolder(
-        requestObj.collectionId as string,
-        requestObj.folderId as string,
-        {
-          ...requestObj?.items?.items,
-          id: initRequestTab.getValue().id,
-        },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        progressiveTab.path.collectionId as string,
+        progressiveTab.id as string,
+        response.data.data,
       );
-      // pushing http request to tab model
-      initRequestTab.updatePath({
-        workspaceId: collection.workspaceId,
-        collectionId: collection.id,
-        folderId: folder.id,
-      });
-      initRequestTab.updateIsSave(true);
-      await this.tabRepository.createTab(initRequestTab.getValue());
-      moveNavigation("right");
-      MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-        source: "Side Panel Dropdown",
-      });
-      return;
-    }
-
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
-    if (response.isSuccessful && response.data.data) {
-      const request = response.data.data;
-      // pushing http request to collection model
-      await this.collectionRepository.addRequestInFolder(
-        requestObj?.collectionId as string,
-        requestObj?.folderId as string,
-        {
-          ...request,
-        },
+      notifications.success(
+        `The ‘${progressiveTab.name}’ folder saved successfully.`,
       );
-      // pushing http request to tab model
-      initRequestTab.updateId(request.id);
-      initRequestTab.updatePath({
-        workspaceId: collection.workspaceId,
-        collectionId: collection.id,
-        folderId: folder.id,
-      });
-      initRequestTab.updateIsSave(true);
-      this.tabRepository.createTab(initRequestTab.getValue());
-      moveNavigation("right");
-      MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-        source: "Side Panel Dropdown",
-      });
-      return;
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } else {
-      notifications.error("Failed to create API request. Please try again.");
-    }
-  };
-
-  /**
-   *
-   * @param tab - Tab in which description will be updated
-   * @param newDescription - New description
-   */
-  public handleUpdateDescription = async (
-    tab: TabDocument,
-    newDescription: string,
-  ) => {
-    const updateObj = {};
-    this.tabRepository.updateTab(tab.tabId, {
-      persistence: TabPersistenceTypeEnum.PERMANENT,
-    });
-    updateObj["description"] = newDescription;
-    let userSource = {};
-    if (tab?.activeSync && tab?.source === "USER") {
-      userSource = {
-        currentBranch: tab?.currentBranch,
-        source: "USER",
-      };
-    }
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-    if (isGuestUser === true) {
-      const res =
-        await this.collectionRepository.readRequestOrFolderInCollection(
-          tab.path.collectionId,
-          tab.path.folderId,
-        );
-      res.description = newDescription;
-      await this.collectionRepository.updateRequestOrFolderInCollection(
-        tab.path.collectionId,
-        tab.path.folderId,
-        res,
-      );
-      notifications.success("Description updated successfully.");
-      return;
-    }
-
-    const updateFolderElement =
-      await this.collectionService.updateFolderInCollection(
-        tab.path.workspaceId,
-        tab.path.collectionId,
-        tab.path.folderId,
-        { ...updateObj, ...userSource },
-      );
-    if (updateFolderElement.isSuccessful) {
-      await this.collectionRepository.updateRequestOrFolderInCollection(
-        tab.path.collectionId,
-        tab.path.folderId,
-        updateFolderElement.data.data,
-      );
-      notifications.success("Description updated successfully.");
-    } else {
-      notifications.error("Failed to update description. Please try again.");
+      notifications.error("Failed to save folder. Please try again.");
     }
   };
 
@@ -380,7 +267,7 @@ class FolderExplorerPage {
     let totalSocketIo = 0;
     const folder = await this.getFolder(collection, tab.id);
     if (folder?.items) {
-      folder.items.forEach((item: CollectionItemsDto) => {
+      folder.items.forEach((item: any) => {
         if (item.type === ItemType.REQUEST) {
           totalRequests++;
         } else if (item.type === ItemType.SOCKET_IO) {
@@ -408,6 +295,504 @@ class FolderExplorerPage {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+  
+  /**
+   * Handles creating a new request in a folder
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param explorer : - the folder in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateRequestInFolder = async (
+    workspaceId: string,
+    collection: CollectionBaseInterface,
+    explorer: CollectionItemBaseInterface,
+  ) => {
+    const sampleRequest = new InitRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection.activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      folderId: explorer.id,
+      items: {
+        name: explorer.name,
+        type: ItemType.FOLDER,
+        id: explorer.id,
+        items: {
+          name: sampleRequest.getValue().name,
+          type: sampleRequest.getValue().type,
+          description: "",
+          request: {
+            method: sampleRequest.getValue().property.request?.method,
+          } ,
+        },
+      },
+    };
+
+    await this.collectionRepository.addRequestInFolder(
+      requestObj.collectionId,
+      requestObj.folderId,
+      {
+        ...requestObj.items.items,
+        id: sampleRequest.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res = (await this.collectionRepository.readRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+      )) as CollectionItemBaseInterface;
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+        res,
+      );
+
+      sampleRequest.updateId(res.id);
+      sampleRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      sampleRequest.updateIsSave(true);
+      this.tabRepository.createTab(sampleRequest.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response =
+      await this.collectionService.addRequestInCollection(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+        request,
+      );
+
+      sampleRequest.updateId(request.id);
+      sampleRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      sampleRequest.updateIsSave(true);
+      this.tabRepository.createTab(sampleRequest.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handles creating a new web socket in a folder
+   * @param workspaceId - the workspace id in which new web socket is going to be created
+   * @param collection - the collection in which new web socket is going to be created
+   * @param explorer - the folder in which new web socket is going to be created
+   */
+  private handleCreateWebSocketInFolder = async (
+    workspaceId: string,
+    collection: CollectionBaseInterface,
+    explorer: CollectionItemBaseInterface,
+  ) => {
+    const websocket = new InitWebSocketTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection.activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      folderId: explorer.id,
+      items: {
+        name: explorer.name,
+        type: ItemType.FOLDER,
+        id: explorer.id,
+        items: {
+          name: websocket.getValue().name,
+          type: websocket.getValue().type,
+          description: "",
+          websocket: {},
+        },
+      },
+    };
+
+    await this.collectionRepository.addRequestInFolder(
+      requestObj.collectionId,
+      requestObj.folderId,
+      {
+        ...requestObj.items.items,
+        id: websocket.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res = (await this.collectionRepository.readRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+      )) as CollectionItemBaseInterface;
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+        res,
+      );
+
+      websocket.updateId(res.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      websocket.updateIsSave(true);
+      this.tabRepository.createTab(websocket.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response =
+      await this.collectionService.addSocketInCollection(requestObj);
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+        request,
+      );
+
+      websocket.updateId(request.id);
+      websocket.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      websocket.updateIsSave(true);
+      this.tabRepository.createTab(websocket.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        websocket.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handles creating a new socket io in a folder
+   * @param _workspaceId - the workspace id in which new socket io is going to be created
+   * @param _collection - the collection in which new socket io is going to be created
+   * @param _folder - the folder in which new socket io is going to be created
+   */
+  private handleCreateSocketIoInFolder = async (
+    _workspaceId: string,
+    _collection: CollectionBaseInterface,
+    _folder: CollectionItemBaseInterface,
+  ) => {
+    const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+
+    const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch:
+          _collection.activeSync && _folder.source === "USER"
+            ? _collection.currentBranch
+            : undefined,
+        source:
+          _collection.activeSync && _folder.source === "USER"
+            ? _folder.source
+            : undefined,
+        folderId: _folder.id,
+        items: {
+          name: _folder.name,
+          type: CollectionItemTypeBaseEnum.FOLDER,
+          id: _folder.id,
+          items: {
+            name: socketIoTab.getValue().name,
+            type: CollectionItemTypeBaseEnum.SOCKETIO,
+            description: "",
+            socketio: {},
+          },
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        {
+          ...socketIoInFolderPayload?.items?.items,
+          id: socketIoTab.getValue().id,
+        },
+      );
+
+      socketIoTab
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(socketIoTab.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const response = await this.collectionService.addSocketIoInCollection(
+      socketIoInFolderPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      await this.collectionRepository.addRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        {
+          ...request,
+        },
+      );
+
+      socketIoTab
+        .updateId(request?.id as string)
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(socketIoTab.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        socketIoInFolderPayload.collectionId,
+        socketIoInFolderPayload.folderId as string,
+        socketIoTab.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handles creating a new GraphQL request in a folder
+   * @param _workspaceId - the workspace id in which new GraphQL request is going to be created
+   * @param _collection - the collection in which new GraphQL request is going to be created
+   * @param _folder - the folder in which new GraphQL request is going to be created
+   */
+  private handleCreateGraphqlInFolder = async (
+    _workspaceId: string,
+    _collection: CollectionBaseInterface,
+    _folder: CollectionItemBaseInterface,
+  ) => {
+    const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+
+    const graphqlInFolderPayload: GraphqlRequestCreateUpdateInFolderPayloadDtoInterface =
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch:
+          _collection.activeSync && _folder.source === "USER"
+            ? _collection.currentBranch
+            : undefined,
+        source:
+          _collection.activeSync && _folder.source === "USER"
+            ? _folder.source
+            : undefined,
+        folderId: _folder.id,
+        items: {
+          name: _folder.name,
+          type: CollectionItemTypeBaseEnum.FOLDER,
+          id: _folder.id,
+          items: {
+            name: graphqlTab.getValue().name,
+            type: CollectionItemTypeBaseEnum.GRAPHQL,
+            description: "",
+            graphql: {},
+          },
+        },
+      };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestInFolder(
+        graphqlInFolderPayload.collectionId,
+        graphqlInFolderPayload.folderId as string,
+        {
+          ...graphqlInFolderPayload?.items?.items,
+          id: graphqlTab.getValue().id,
+        },
+      );
+
+      graphqlTab
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(graphqlTab.getValue());
+
+      moveNavigation("right");
+
+      return;
+    }
+    const response = await this.collectionService.addGraphqlInCollection(
+      graphqlInFolderPayload,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      await this.collectionRepository.addRequestInFolder(
+        graphqlInFolderPayload.collectionId,
+        graphqlInFolderPayload.folderId as string,
+        {
+          ...request,
+        },
+      );
+
+      graphqlTab
+        .updateId(request?.id as string)
+        .updatePath({
+          workspaceId: _workspaceId,
+          collectionId: _collection.id,
+          folderId: _folder.id,
+        })
+        .updateIsSave(true);
+      this.tabRepository.createTab(graphqlTab.getValue());
+
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        graphqlInFolderPayload.collectionId,
+        graphqlInFolderPayload.folderId as string,
+        graphqlTab.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handle control of creating items
+   * @param entityType :string - type of entity, collection, folder or request
+   * @param args :object - arguments depending on entity type
+   */
+  public handleCreateItem = async (
+    entityType: string,
+    args: any,
+  ) => {
+    let response;
+    switch (entityType) {
+
+      case "requestFolder":
+        await this.handleCreateRequestInFolder(
+          args.workspaceId,
+          args.collection as CollectionBaseInterface,
+          args.folder as CollectionItemBaseInterface,
+        );
+        break;
+      case "websocketFolder":
+        await this.handleCreateWebSocketInFolder(
+          args.workspaceId,
+          args.collection as CollectionBaseInterface,
+          args.folder as CollectionItemBaseInterface,
+        );
+        break;
+      case "socketioFolder":
+        await this.handleCreateSocketIoInFolder(
+          args.workspaceId,
+          args.collection as CollectionBaseInterface,
+          args.folder as CollectionItemBaseInterface,
+        );
+        break;
+      case "graphqlFolder":
+        await this.handleCreateGraphqlInFolder(
+          args.workspaceId,
+          args.collection as CollectionBaseInterface,
+          args.folder as CollectionItemBaseInterface,
+        );
+        break;
+    }
+    return response;
+  };
 }
+
+ 
 
 export default FolderExplorerPage;

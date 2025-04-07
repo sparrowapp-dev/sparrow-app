@@ -544,9 +544,9 @@
       onClick={() => {
         confirmationText = confirmationText.replace(/’/g, "'");
         if (confirmationText === "") {
-          confirmationError = `Team name cannot be empty.`;
+          confirmationError = `Hub name cannot be empty.`;
         } else if (confirmationText !== openTeam?.name) {
-          confirmationError = `Team name does not match.`;
+          confirmationError = `Hub name does not match.`;
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
