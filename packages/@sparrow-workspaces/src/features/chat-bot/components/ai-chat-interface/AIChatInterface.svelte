@@ -81,10 +81,14 @@
   type="dark"
   zIndex={1000}
   isOpen={isCodePreviewOpened}
-  width="35%"
+  width="37.5%"
   handleModalState={handleCloseCodePreviewPopup}
 >
-  <div id="code-block-preview" use:innerHtml={codeBlockHtml}></div>
+  <div
+    class="message-wrapper mt-3"
+    id="code-block-preview"
+    use:innerHtml={codeBlockHtml}
+  ></div>
 </Modal>
 
 <div class="ai-chat-panel h-100">
@@ -297,14 +301,4 @@
     background-color: var(--bg-ds-surface-100);
   }
 
-  :global(.hljs) {
-    background: #000 !important;
-    border: 2px solid var(--border-ds-surface-400);
-    border-radius: 8px;
-    height: 150px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 8px;
-    text-wrap: inherit;
-  }
 </style>

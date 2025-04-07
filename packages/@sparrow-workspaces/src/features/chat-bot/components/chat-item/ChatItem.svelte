@@ -285,7 +285,7 @@
     -- RECIEVER
     -- 
     -->
-    <div class="recieve-item p-3">
+    <div class="recieve-item p-2">
       <div class="d-flex justify-content-between">
         <div class="d-flex gap-1 pb-2">
           {#if status}
@@ -421,12 +421,28 @@
   }
 
   :global(.message-wrapper .hljs) {
+    max-width: 496px;
+    min-width: 276px;
+    max-height: 400px;
+    min-height: 70px;
     background: #000 !important;
+    /* background: var(--sparrow-black) !important; */
     border: 2px solid var(--border-ds-surface-400);
     border-radius: 8px;
-    height: 150px;
     overflow-y: auto;
     overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  :global(.message-wrapper .hljs::-webkit-scrollbar-thumb) {
+    background-color: var(--bg-ds-surface-100);
+  }
+
+  :global(.message-wrapper .hljs::-webkit-scrollbar),
+  :global(.message-wrapper .hljs::-webkit-scrollbar-thumb),
+  :global(.message-wrapper .hljs::-webkit-scrollbar-button) {
+    cursor: pointer;
   }
 
   :global(.action-button) {

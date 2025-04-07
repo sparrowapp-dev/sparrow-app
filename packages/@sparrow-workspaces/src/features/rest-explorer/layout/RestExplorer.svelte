@@ -141,6 +141,31 @@
     isPopoverContainer = !isPopoverContainer;
   };
 
+  // Properties for chatbot pane resizing on runtime
+  let splitpaneContainer;
+  let splitpaneContainerWidth = 0;
+
+  // max, min and default size (in pixel) of chatbot pane as per figma design
+  const minPx = 343;
+  const maxPx = 525;
+  const defaultPx = 452;
+
+  // calculated max, min and default size (in %ge) of chatbot pane
+  let minSizePct = 0;
+  let maxSizePct = 0;
+  let defaultSizePct = 0;
+
+  function updateSplitpaneContSizes() {
+    if (!splitpaneContainer) return;
+
+    splitpaneContainerWidth = splitpaneContainer.clientWidth;
+    // console.log("cl :>> ", splitpaneContainerWidth);
+    // Convert px to percentage
+    minSizePct = (minPx / splitpaneContainerWidth) * 100;
+    maxSizePct = (maxPx / splitpaneContainerWidth) * 100;
+    defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
+  }
+
   onMount(async () => {
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
@@ -152,7 +177,18 @@
         isPopoverContainer = true;
       }
     });
+
+    // await tick() // wait for DOM updates
+    setTimeout(() => {
+      updateSplitpaneContSizes();
+      const resizeObserver = new ResizeObserver(() => {
+        updateSplitpaneContSizes();
+      });
+      resizeObserver.observe(splitpaneContainer);
+      return () => resizeObserver.disconnect();
+    }, 0);
   });
+
   export let onRenameCollection;
   export let onRenameFolder;
 
@@ -282,7 +318,8 @@
         {/if}
       </div>
       <div class="pt-2"></div>
-      <div style="flex:1; overflow:auto;">
+      <!-- class="h-full w-full" -->
+      <div bind:this={splitpaneContainer} style="flex:1; overflow:auto;">
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
             {#if !isLoading}
@@ -492,9 +529,9 @@
           {#if $tab?.property?.request?.state?.isChatbotActive}
             <Pane
               class="position-relative bg-transparent"
-              minSize={35}
-              size={35}
-              maxSize={53.3}
+              minSize={minSizePct}
+              size={defaultSizePct}
+              maxSize={maxSizePct}
             >
               <ChatBot
                 {tab}
