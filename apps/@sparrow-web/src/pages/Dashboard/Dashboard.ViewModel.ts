@@ -57,7 +57,8 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
-  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistantWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
 

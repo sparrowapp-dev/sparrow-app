@@ -8,6 +8,7 @@
   export let prompt: string = "";
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
+  export let onStopGeneratingAIResponse;
 
   let isSendButtonHovered = false;
 
@@ -66,18 +67,21 @@
       </div>
     {:else}
       <!--Disabling it for now, will take stop generation when data streaming will be enabled.-->
-      <!-- <div
+      <div
         style="position:absolute; right:12px ; top: 50%; 
     transform : translateY(-60%);
   "
-        on:click={() => {}}
+        on:click={() => {
+          console.log("on click stop generating!!!!");
+          onStopGeneratingAIResponse();
+        }}
       >
         <GenerateIcon
           height={"20px"}
           width={"20px"}
           color={"var(--icon-secondary-100)"}
         />
-      </div> -->
+      </div>
     {/if}
   </div>
 </div>
