@@ -4,3 +4,4 @@ export { SocketIoTabAdapter } from "./socket-io-tab";
 export { GraphqlTabAdapter } from "./graphql-tab";
 export { RequestSavedTabAdapter } from "./request-saved-tab";
 export { CollectionTabAdapter }from "./collection-tab";
+export { FolderTabAdapter } from "./folder-tab";

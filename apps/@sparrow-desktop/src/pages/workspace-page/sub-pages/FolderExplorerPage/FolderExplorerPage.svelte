@@ -14,6 +14,7 @@
   import { FolderExplorer } from "@sparrow/workspaces/features";
   import type { Folder } from "@sparrow/common/types/workspace";
   import { user } from "@app/store/auth.store";
+  import { Debounce } from "@sparrow/common/utils";
 
   /**
    * folder tab document
@@ -21,7 +22,7 @@
   export let tab: TabDocument;
 
   // ViewModel initialization
-  const _viewModel = new FolderExplorerPage();
+  const _viewModel = new FolderExplorerPage(tab);
 
   let userId = "";
   let userRole = "";
@@ -59,16 +60,39 @@
   onMount(() => {
     findUserRole();
   });
+
+  let prevTabName = "";
+
+  /**
+   * produces delay to update name of a collection.
+   */
+  const renameWithCollectionList = new Debounce().debounce(
+    _viewModel.updateNameWithCollectionList as any,
+    1000,
+  );
+
+  /**
+   * Reacts whenever the collection tab changes.
+   */
+  $: {
+    if (tab) {
+      if (prevTabName !== tab.name) {
+        renameWithCollectionList(tab.name);
+      }
+      prevTabName = tab.name;
+    }
+  }
 </script>
 
 <FolderExplorer
   isWebApp={false}
-  bind:userRole
-  bind:tab
+  {userRole}
+  tab={_viewModel.tab}
   bind:folder
   bind:collection
-  onRename={_viewModel.handleRename}
-  onCreateAPIRequest={_viewModel.handleCreateAPIRequest}
-  onUpdateDescription={_viewModel.handleUpdateDescription}
+  onUpdateName={_viewModel.updateFolderName}
+  onItemCreated={_viewModel.handleCreateItem}
+  onUpdateDescription={_viewModel.updateFolderDescription}
+  onSaveFolder={_viewModel.saveFolder}
   getTotalRequests={_viewModel.getTotalRequests}
 />
