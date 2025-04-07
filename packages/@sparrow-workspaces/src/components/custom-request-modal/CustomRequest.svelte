@@ -49,7 +49,7 @@
     <!-- HTTP URL Section -->
     <Select
       variant={"light-violet"}
-      id={"api-request"}
+      id={"custom-modal"}
       size={"medium"}
       data={httpMethodData}
       borderRounded={"4px"}

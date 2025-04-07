@@ -28,7 +28,7 @@
   <div class="request-name">
     <Select
       variant={"secondary"}
-      id={"api-request"}
+      id={"bottom-panel-navbar"}
       size={"medium"}
       data={httpMethodData}
       borderRounded={"4px"}

@@ -157,7 +157,11 @@
 
   let selectBorderClass = "";
   $: {
-    if (variant === "primary" || variant === "secondary") {
+    if (
+      variant === "primary" ||
+      variant === "secondary" ||
+      variant == "light-violet"
+    ) {
       selectBorderClass = "select-border-none";
     } else if (variant === "tertiary") {
       selectBorderClass = "select-border-all";
@@ -183,6 +187,7 @@
   }
 
   let selectBodyBackgroundClass = "";
+  let selectBodyBackgroundShadow = "";
   switch (variant) {
     case "primary":
       selectBodyBackgroundClass = "select-body-background-surface";
@@ -192,6 +197,11 @@
       break;
     case "tertiary":
       selectBodyBackgroundClass = "select-body-background-violet";
+      break;
+  }
+  switch (variant) {
+    case "light-violet":
+      selectBodyBackgroundShadow = "select-body-shadow";
       break;
   }
 
@@ -441,13 +451,12 @@
     bind:this={selectBodyWrapper}
     class="select-data {position === 'fixed'
       ? 'position-fixed'
-      : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2
+      : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2 {selectBodyBackgroundShadow}
     {isOpen ? 'visible' : 'invisible'}"
     style="
   {isOpen
       ? 'opacity: 1; transform: scale(1);'
       : 'opacity: 0; transform: scale(0.8);'}
-    
   min-width:{minBodyWidth}; 
   left: {position === 'fixed'
       ? bodyAlignment === 'right'
@@ -490,11 +499,7 @@
           placeholder={searchText}
           bind:value={searchData}
         />
-        <span
-          class="position-absolute"
-          style="top:5px;
-                  left: 10px"
-        >
+        <span class="position-absolute" style="top:5px; left: 10px">
           <SearchIcon height={16} width={16} color={"var(--defaultcolor)"} />
         </span>
         <hr class="my-2" />
@@ -795,5 +800,9 @@
 
   .color-patch {
     color: var(--bg-ds-accent-300);
+  }
+
+  .select-body-shadow {
+    box-shadow: inset 0px 16px 32px 0px rgba(0, 0, 0, 0.3);
   }
 </style>
