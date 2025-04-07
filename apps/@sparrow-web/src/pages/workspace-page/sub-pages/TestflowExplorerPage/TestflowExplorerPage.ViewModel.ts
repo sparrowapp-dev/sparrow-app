@@ -560,7 +560,6 @@ export class TestflowExplorerPageViewModel {
                   response: resData,
                   request: adaptedRequest,
                 });
-
                 testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
               }
               return testFlowDataMap;
@@ -896,5 +895,27 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
+  };
+
+  /**
+   * @description - This function will clear the test flow store data.
+   */
+  public clearTestFlowData = () => {
+    const currentTestflow = this._tab.getValue();
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData: TFDataStoreType | undefined = testFlowDataMap.get(
+        currentTestflow?.tabId as string,
+      );
+      if (wsData) {
+        const clearedResponse = wsData.nodes.map((node) => ({
+          ...node,
+          response: { body: "", headers: [], status: "", time: 0, size: 0 },
+        }));
+        wsData.nodes = clearedResponse;
+        testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+      }
+      return testFlowDataMap;
+    });
+    notifications.success(`Cleared all Responses for testflow.`);
   };
 }
