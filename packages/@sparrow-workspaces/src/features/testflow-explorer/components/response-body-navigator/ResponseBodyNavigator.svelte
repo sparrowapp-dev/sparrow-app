@@ -14,6 +14,7 @@
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
+  import { responseBodyDataFormatTypes } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
 
   export let response;
   export let apiState;
@@ -44,7 +45,7 @@
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
-  const handleTypeDropdown: (tab: string) => void = (tab) => {
+  const handleTypeDropdown = (tab: string) => {
     onUpdateResponseState("responseBodyLanguage", tab);
   };
 
@@ -164,28 +165,7 @@
         <span class="">
           <WithSelectV3
             id={"hash565"}
-            data={[
-              {
-                name: "JSON",
-                id: RequestDataType.JSON,
-              },
-              {
-                name: "XML",
-                id: RequestDataType.XML,
-              },
-              {
-                name: "HTML",
-                id: RequestDataType.HTML,
-              },
-              {
-                name: "Javascript",
-                id: RequestDataType.JAVASCRIPT,
-              },
-              {
-                name: "Text",
-                id: RequestDataType.TEXT,
-              },
-            ]}
+            data={responseBodyDataFormatTypes}
             titleId={apiState.responseBodyLanguage}
             onclick={handleTypeDropdown}
             zIndex={499}

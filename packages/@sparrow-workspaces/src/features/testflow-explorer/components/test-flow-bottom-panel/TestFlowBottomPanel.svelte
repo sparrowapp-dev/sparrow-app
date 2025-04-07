@@ -131,6 +131,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
+          console.log({ selectedNodeResponse });
         }
       });
     }
@@ -306,8 +307,8 @@
                   {#if responseState?.responseBodyLanguage !== "Image"}
                     <ResponseBodyNavigator
                       response={selectedNodeResponse?.response}
-                      apiState={responseState}
-                      {onUpdateResponseState}
+                      apiState={selectedBlock?.data?.requestData?.state}
+                      onUpdateResponseState={handleUpdateRequestData}
                       {onClearResponse}
                       {isWebApp}
                     />
@@ -318,7 +319,7 @@
                   >
                     <ResponseBody
                       response={selectedNodeResponse?.response}
-                      apiState={responseState}
+                      apiState={selectedBlock?.data?.requestData?.state}
                     />
                   </div>
                 {:else if responseNavigation === "Headers"}
