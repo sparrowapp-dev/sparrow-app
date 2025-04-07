@@ -299,6 +299,7 @@ export class RxDB {
                     };
                     updatedItem = { ...item, blockName: "startBlock", data };
                   } else {
+                    debugger
                     const { folderId, collectionId, requestId, name, method } =
                       item;
                     let request;
@@ -439,7 +440,7 @@ export class RxDB {
         migrationStrategies: {
           1: async function (oldDoc) {
             if (oldDoc && oldDoc?.nodes?.length > 0) {
-              const nodes = oldDoc?.nodes?.length ?? [];
+              const nodes = oldDoc?.nodes ?? [];
               const workspaceId = oldDoc?.workspaceId;
 
               if (nodes.length > 0) {

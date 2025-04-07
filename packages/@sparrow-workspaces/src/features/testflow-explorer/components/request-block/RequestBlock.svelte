@@ -64,7 +64,6 @@
     parentDrag: boolean;
   };
   export let selected;
-  export let blockName = "REST API Request";
   export let updateBlockName: (name: string) => void;
 
   /**

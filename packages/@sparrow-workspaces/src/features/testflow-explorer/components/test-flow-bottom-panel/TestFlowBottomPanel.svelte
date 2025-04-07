@@ -135,7 +135,7 @@
             (item) => item?.id === selectedBlock?.id,
           );
           
-          requestNavigation = "Parameters"
+          // requestNavigation = "Parameters"
           // Reset the response format
           responseState = {
             responseBodyLanguage: "JSON",
