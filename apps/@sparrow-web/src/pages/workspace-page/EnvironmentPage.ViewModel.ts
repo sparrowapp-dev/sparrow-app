@@ -124,6 +124,12 @@ export class EnvironmentViewModel {
     return null;
   };
 
+  public getEnvironmentByWorkspaceId = async (workspaceId: string) => {
+    const environments =
+      await this.environmentRepository.getEnvironmentByWorkspaceId(workspaceId);
+    return environments;
+  };
+
   /**
    * @description - creates new environment
    * @param localEnvironment - new environment data
