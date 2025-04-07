@@ -87,7 +87,7 @@
     }
     const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
     if (isEmailAlreadyExist) {
-      notifications.error("User already in team!");
+      notifications.error("User already in hub.");
     }
     const isUserExist = await onValidateEmail(email); // checks if user exist on server
     if (!isUserExist) {

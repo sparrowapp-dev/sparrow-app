@@ -724,7 +724,7 @@ export class TeamExplorerPageViewModel {
       setTimeout(async () => {
         await this.refreshTeams(userId);
         await this.refreshWorkspaces(userId);
-        notifications.success("You've left a team.");
+        notifications.success("You've left a hub.");
         resolve();
       }, 500),
     );

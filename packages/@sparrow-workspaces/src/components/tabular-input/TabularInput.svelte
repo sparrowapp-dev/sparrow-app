@@ -237,10 +237,7 @@
 
 <div>
   {#if !isBulkEditActive}
-    <section
-      class="mb-0 me-0 py-0 section-layout w-100"
-      style="overflow:hidden;"
-    >
+    <section class="mb-0 me-0 py-0 section-layout w-100" style="">
       <div
         class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
