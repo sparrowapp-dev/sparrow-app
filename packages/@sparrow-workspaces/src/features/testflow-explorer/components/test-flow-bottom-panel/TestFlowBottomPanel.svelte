@@ -134,7 +134,8 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-
+          
+          requestNavigation = "Parameters"
           // Reset the response format
           responseState = {
             responseBodyLanguage: "JSON",
