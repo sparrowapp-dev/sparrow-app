@@ -516,10 +516,9 @@ export class RxDB {
                 }
 
                 // Update testflow nodes
-                oldDoc.property.testflow.nodes = updatedNodes;
+                oldDoc.nodes = updatedNodes;
               }
             }
-
             return oldDoc;
           },
         },
