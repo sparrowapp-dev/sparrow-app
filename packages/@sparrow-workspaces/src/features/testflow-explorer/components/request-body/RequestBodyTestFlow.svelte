@@ -11,14 +11,23 @@
 
   export let environmentVariables;
   export let body;
-  export let requestState;
+  export let requestState: any = {};
   export let method;
+  export let onUpdateRequestState;
 
   let isBodyBeautified = false;
+
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
   };
 
+  const handleUpdateRequestBody = (
+    key: "requestBodyNavigation" | "requestBodyLanguage",
+    value: string,
+  ) => {
+    requestState = { ...requestState, [key]: value };
+    onUpdateRequestState(key, value);
+  };
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -26,13 +35,17 @@
     {method}
     {requestState}
     {updateBeautifiedState}
-    onUpdateRequestState={() => {}}
+    onUpdateRequestState={handleUpdateRequestBody}
+    onUpdateRequestBodyLanguage={handleUpdateRequestBody}
   />
   <div style="flex:1; overflow:auto;">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <Raw
-        lang={requestState.requestBodyLanguage}
-        value={body.raw}
+        onUpdateRequestBody={(e) => {
+          onUpdateRequestState("raw", e);
+        }}
+        lang={requestState?.requestBodyLanguage ?? "JSON"}
+        value={body?.raw}
         {isBodyBeautified}
         {updateBeautifiedState}
       />
@@ -42,11 +55,22 @@
       <UrlEncoded
         value={body.urlencoded}
         {environmentVariables}
+        onUpdateRequestBody={(pairs) => {
+          onUpdateRequestState("urlencoded", pairs);
+        }}
         onUpdateEnvironment={() => {}}
-        onUpdateRequestBody={() => {}}
       />
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
+    {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
+      <FormData
+        keyValue={body?.formdata?.text}
+        {environmentVariables}
+        onUpdateRequestBody={(pairs) => {
+          onUpdateRequestState("formdata", { text: pairs, file: [] });
+        }}
+        onUpdateEnvironment={() => {}}
+      />
     {/if}
   </div>
 </div>

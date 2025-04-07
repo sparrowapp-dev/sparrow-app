@@ -7,7 +7,7 @@
   export let onUpdateEnvironment;
 
   const handleUrlEncodeChange = (pairs) => {
-    onUpdateRequestBody({ urlencoded: pairs });
+    onUpdateRequestBody(pairs);
   };
 </script>
 
@@ -17,8 +17,8 @@
     callback={handleUrlEncodeChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    isInputBoxEditable={false}
-    isCheckBoxEditable={false}
+    isInputBoxEditable={true}
+    isCheckBoxEditable={true}
     onToggleBulkEdit={() => {}}
   />
 </section>

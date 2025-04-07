@@ -1,4 +1,4 @@
-import { RequestMethod } from "../enums";
+import { RequestDataset, RequestDataType, RequestMethod } from "../enums";
 import {
   CollectionAuthTypeBaseEnum,
   CollectionRequestAddToBaseEnum,
@@ -62,6 +62,53 @@ export const httpsAuthData = [
   {
     name: "Basic Auth",
     id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
+  },
+];
+
+export const requestBodyTypes = [
+  {
+    name: "none",
+    id: RequestDataset.NONE,
+  },
+  {
+    name: "form-data",
+    id: RequestDataset.FORMDATA,
+  },
+  {
+    name: "x-www-form-urlencoded",
+    id: RequestDataset.URLENCODED,
+  },
+  {
+    name: "raw",
+    id: RequestDataset.RAW,
+  },
+  {
+    name: "binary",
+    id: RequestDataset.BINARY,
+    disabled: true,
+  },
+];
+
+export const requestBodySubTypes = [
+  {
+    name: "HTML",
+    id: RequestDataType.HTML,
+  },
+  {
+    name: "JSON",
+    id: RequestDataType.JSON,
+  },
+  {
+    name: "JavaScript",
+    id: RequestDataType.JAVASCRIPT,
+  },
+  {
+    name: "Text",
+    id: RequestDataType.TEXT,
+  },
+  {
+    name: "XML",
+    id: RequestDataType.XML,
   },
 ];
 

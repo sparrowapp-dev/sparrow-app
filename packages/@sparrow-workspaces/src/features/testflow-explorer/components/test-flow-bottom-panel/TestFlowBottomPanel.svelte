@@ -1,16 +1,13 @@
 <script lang="ts">
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import TableNavbar from "../../../../components/test-flow-bottom-panel-navbar/TestFlowBottomPanelNavbar.svelte";
+  import { TableNavbar } from "../../../../components";
   import {
     CrossIcon,
     CheckmarkCircleRegular,
     ErrorCircleRegular,
     ArrowSwapRegular,
   } from "@sparrow/library/icons";
-  import {
-    RequestDoc,
-    ResponseErrorScreen,
-  } from "../../../rest-explorer-saved/components";
+  import { ResponseErrorScreen } from "../../../rest-explorer-saved/components";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import {
     RequestBodyTestFlow,
@@ -125,8 +122,6 @@
     }
     return responseNavigation;
   }
-
-  const handleUpdateRequestState = (field: string, value: any) => {};
 
   $: {
     if (selectedBlock && testFlowDataStore) {
@@ -245,6 +240,7 @@
               method={selectedBlock?.data?.method}
               requestState={selectedBlock?.data?.requestData?.state}
               {environmentVariables}
+              onUpdateRequestState={handleUpdateRequestData}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow

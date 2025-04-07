@@ -18,11 +18,10 @@
   export let method;
   export let isWebApp = false;
   let isBodyBeautified = false;
+
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
   };
-
-  console.log(requestState)
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
