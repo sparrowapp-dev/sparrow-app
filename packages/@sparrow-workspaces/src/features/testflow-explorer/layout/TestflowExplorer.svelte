@@ -1118,7 +1118,6 @@
         onRedirect={onRedrectRequest}
         {handleUpdateRequestData}
         {isWebApp}
-        {onUpdateResponseState}
         onClearResponse={() => {}}
       />
     </div>

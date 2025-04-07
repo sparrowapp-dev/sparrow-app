@@ -308,7 +308,7 @@ export const extractQueryParams = (url: string) => {
       ? result
       : [{ key: "", value: "", checked: false }];
   } catch (error) {
-    console.error("Invalid URL:", error);
+    // console.error("Invalid URL:", error);
     return [{ key: "", value: "", checked: false }];
   }
 };

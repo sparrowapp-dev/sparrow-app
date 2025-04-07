@@ -32,7 +32,6 @@
   export let environmentVariables;
   export let handleUpdateRequestData;
   export let onClearResponse;
-  export let onUpdateResponseState;
   export let isWebApp = false;
 
   let height = 300;
@@ -47,6 +46,10 @@
   let responseState: TFResponseStateType = {
     responseBodyLanguage: "JSON",
     responseBodyFormatter: "Pretty",
+  };
+
+  const handleResponseState = (key: string, value: any) => {
+    responseState = { ...responseState, [key]: value };
   };
 
   /**
@@ -131,7 +134,10 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-          console.log({ selectedNodeResponse });
+          responseState = {
+            responseBodyLanguage: "JSON",
+            responseBodyFormatter: "Pretty",
+          };
         }
       });
     }
@@ -307,8 +313,8 @@
                   {#if responseState?.responseBodyLanguage !== "Image"}
                     <ResponseBodyNavigator
                       response={selectedNodeResponse?.response}
-                      apiState={selectedBlock?.data?.requestData?.state}
-                      onUpdateResponseState={handleUpdateRequestData}
+                      apiState={responseState}
+                      onUpdateResponseState={handleResponseState}
                       {onClearResponse}
                       {isWebApp}
                     />
@@ -319,7 +325,7 @@
                   >
                     <ResponseBody
                       response={selectedNodeResponse?.response}
-                      apiState={selectedBlock?.data?.requestData?.state}
+                      apiState={responseState}
                     />
                   </div>
                 {:else if responseNavigation === "Headers"}

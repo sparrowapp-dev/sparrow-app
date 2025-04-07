@@ -17,7 +17,7 @@
   import { responseBodyDataFormatTypes } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
 
   export let response;
-  export let apiState;
+  export let apiState: any;
   export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp;
