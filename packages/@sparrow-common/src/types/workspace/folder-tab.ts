@@ -1,5 +1,5 @@
 export interface IdWrapper2 {
-  id: string;
+  
 }
 export interface Folder extends IdWrapper2 {}
 

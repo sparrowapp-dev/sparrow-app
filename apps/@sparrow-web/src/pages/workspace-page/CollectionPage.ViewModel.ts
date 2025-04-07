@@ -93,6 +93,7 @@ import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/ut
 import { createDeepCopy } from "@sparrow/common/utils";
 import {
   CollectionTabAdapter,
+  FolderTabAdapter,
   GraphqlTabAdapter,
   SocketIoTabAdapter,
 } from "../../adapter";
@@ -2395,23 +2396,8 @@ export default class CollectionsViewModel {
     collection: CollectionDto,
     folder: CollectionItemsDto,
   ) => {
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: folder?.id,
-      folderName: folder.name,
-    };
-
-    const sampleFolder = new InitFolderTab(
-      folder.id,
-      collection.workspaceId as string,
-    );
-    sampleFolder.updateName(folder.name);
-    sampleFolder.updatePath(path);
-    sampleFolder.updateIsSave(true);
-    sampleFolder.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
-
-    this.handleCreateTab(sampleFolder.getValue());
+    const folderTab = new FolderTabAdapter().adapt(workspaceId, collection.id, folder);
+    this.handleCreateTab(folderTab);
     moveNavigation("right");
   };
 
@@ -5906,6 +5892,51 @@ export default class CollectionsViewModel {
       notifications.error("Failed to save response. Please try again.");
       return false;
     }
+  };
+
+  /**
+   *
+   * @param componentData - saves the folder on tab close
+   */
+  public saveFolder = async (componentData: Tab) : Promise<boolean> => {
+    const progressiveTab = componentData;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser == true) {
+      await this.collectionRepository.updateRequestOrFolderInCollection(progressiveTab?.path?.collectionId as string, progressiveTab.id, {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
+      });
+      notifications.success(
+        `The ‘${progressiveTab.name}’ folder saved successfully.`,
+      );
+      return true;
+    }
+    const response = await this.collectionService.updateFolderInCollection(
+      progressiveTab.path.workspaceId as string,
+      progressiveTab.path.collectionId as string,
+      progressiveTab.id as string,
+      {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
+      },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        progressiveTab.path.collectionId as string,
+        progressiveTab.id as string,
+        response.data.data,
+      );
+      notifications.success(
+        `The ‘${progressiveTab.name}’ folder saved successfully.`,
+      );
+      return true;
+    } else {
+      notifications.error("Failed to save folder. Please try again.");
+    }
+    return false;
   };
 
   /**
