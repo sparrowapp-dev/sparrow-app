@@ -335,7 +335,9 @@
                     <span
                       class={"request-icon"}
                       style="font-size: 9px; font-weight: 600;"
-                      >{data?.request?.method === "DELETE" ? "DEL" : data?.request?.method || ""}</span
+                      >{data?.request?.method === "DELETE"
+                        ? "DEL"
+                        : data?.request?.method || ""}</span
                     >
                   </span>
                 {:else if data?.type === "FOLDER"}
