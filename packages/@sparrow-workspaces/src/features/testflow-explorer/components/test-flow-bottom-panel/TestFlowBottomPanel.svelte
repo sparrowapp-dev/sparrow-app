@@ -232,6 +232,7 @@
         <div style="flex:1; overflow:auto; margin-top: 12px;" class="p-0">
           {#if requestNavigation === RequestSectionEnum.PARAMETERS}
             <RequestParameterTestFlow
+              requestUrl={selectedBlock?.data?.requestData?.url ?? ""}
               params={selectedBlock?.data?.requestData?.queryParams ?? []}
               authParameter={{}}
               isBulkEditActive={false}

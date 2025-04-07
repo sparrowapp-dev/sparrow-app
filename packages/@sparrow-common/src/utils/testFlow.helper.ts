@@ -217,3 +217,28 @@ export const defaultRequestData = (method: string, url?: string) => {
     },
   };
 };
+
+export const extractQueryParams = (url: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    const searchParams = new URLSearchParams(parsedUrl.search);
+
+    const result = [];
+
+    for (const [key, value] of searchParams.entries()) {
+      result.push({
+        key,
+        value,
+        checked: true,
+      });
+    }
+
+    // If no params found, return one empty object
+    return result.length > 0
+      ? result
+      : [{ key: "", value: "", checked: false }];
+  } catch (error) {
+    console.error("Invalid URL:", error);
+    return [{ key: "", value: "", checked: false }];
+  }
+};
