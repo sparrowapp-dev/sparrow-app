@@ -911,14 +911,11 @@ export class TestflowExplorerPageViewModel {
           ...node,
           response: { body: "", headers: [], status: "", time: 0, size: 0 },
         }));
-        wsData.history = [];
         wsData.nodes = clearedResponse;
         testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
       }
       return testFlowDataMap;
     });
-    notifications.success(
-      `Cleared all Responses for ${currentTestflow?.name ?? "unknown"} testflow.`,
-    );
+    notifications.success(`Cleared all Responses for testflow.`);
   };
 }
