@@ -84,15 +84,12 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
-<<<<<<< HEAD
   export let onClickStop;
-=======
   export let onClearTestflow;
   export let isTestFlowEmpty;
 
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
->>>>>>> development
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);

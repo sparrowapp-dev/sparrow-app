@@ -103,11 +103,8 @@
     onUpdateTestFlowName={_viewModel.updateName}
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={true}
-<<<<<<< HEAD
     onClickStop={_viewModel.handleStopApis}
-=======
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
->>>>>>> development
   />
 {/if}
