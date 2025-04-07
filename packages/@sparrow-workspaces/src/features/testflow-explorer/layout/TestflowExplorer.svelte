@@ -82,6 +82,7 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onClickStop;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -720,9 +721,7 @@
               size="medium"
               startIcon={StopFilled}
               title={"Stop Flow"}
-              onClick={() => {
-                console.log("This is the button to stop");
-              }}
+              onClick={onClickStop}
             />
           {:else}
             <Button

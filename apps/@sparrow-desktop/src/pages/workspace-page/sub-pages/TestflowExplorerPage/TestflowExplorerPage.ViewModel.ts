@@ -59,6 +59,7 @@ export class TestflowExplorerPageViewModel {
    * Utils
    */
   private _decodeRequest = new DecodeRequest();
+  private _abortController: AbortController | null = null;
 
   /**
    * Constructor to initialize the TestflowExplorerPageViewModel class
@@ -373,6 +374,8 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+    this._abortController = new AbortController();
+    const { signal } = this._abortController;
 
     testFlowDataStore.update((testFlowDataMap) => {
       let wsData = testFlowDataMap.get(progressiveTab.tabId);
@@ -449,6 +452,7 @@ export class TestflowExplorerPageViewModel {
               decodeData[2],
               decodeData[3],
               decodeData[4],
+              signal,
             );
             const end = Date.now();
             const duration = end - start;
@@ -530,6 +534,9 @@ export class TestflowExplorerPageViewModel {
               return testFlowDataMap;
             });
           } catch (error) {
+            if (error?.name === "AbortError") {
+              break;
+            }
             testFlowDataStore.update((testFlowDataMap) => {
               const existingTestFlowData = testFlowDataMap.get(
                 progressiveTab.tabId,
@@ -884,5 +891,23 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
+  };
+  /**
+   * @description - This function stops the api calls in Testflow.
+   */
+  public handleStopApis = () => {
+    if (this._abortController) {
+      this._abortController.abort();
+      this._abortController = null;
+    }
+    testFlowDataStore.update((testFlowDataMap) => {
+      const currentTestflow = this._tab.getValue();
+      const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+      if (wsData) {
+        wsData.isTestFlowRunning = false;
+        testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+      }
+      return testFlowDataMap;
+    });
   };
 }
