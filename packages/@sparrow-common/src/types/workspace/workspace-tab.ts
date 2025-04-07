@@ -1,5 +1,4 @@
 export interface IdWrapper2 {
-  id: string;
 }
 
 export interface Workspace extends IdWrapper2 {}

@@ -7,6 +7,7 @@ import type { Observable } from "rxjs";
 import { CollectionRepository } from "./collection.repository";
 import { EnvironmentRepository } from "./environment.repository";
 import { TabRepository } from "./tab.repository";
+import { Sleep } from "@sparrow/common/utils";
 
 export class WorkspaceRepository {
   constructor() { }

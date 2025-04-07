@@ -8,7 +8,6 @@
     WorkspaceSetting,
     WorkspaceUpdates,
   } from "../components";
-  import type { UpdatesDocType } from "@app/models/updates.model";
 
   /**
    * The length of collections related to the workspace.
@@ -51,7 +50,7 @@
   /**
    * List of updates of a workspace
    */
-  export let workspaceUpdatesList: Observable<UpdatesDocType[]>;
+  export let workspaceUpdatesList: Observable<any[]>;
 
   /**
    * Function to be called on end of scroll
@@ -61,13 +60,13 @@
   /**
    * Role of user in active workspace
    */
-  export let userRole;
+  export let userRole: any;
 
-  let workspaceName = tab.name;
-  let workspaceDescription = tab.description;
-  let workspaceID = tab._data.path.workspaceId;
+  let workspaceID = $tab?.id;
 
   let workspaceNavigatorId: string = "about";
+
+  export let onSaveWorkspace;
 </script>
 
 <div class="d-flex h-100" style="width: 100%;">
@@ -76,24 +75,24 @@
     style="border-right:2px solid #000000; width: calc(100% - 280px);  padding:24px;"
   >
     <WorkspaceHeader
-      bind:userRole
+      {userRole}
       bind:isWorkspaceInviteModalOpen
       {onDeleteWorkspace}
       {onUpdateWorkspaceName}
-      workspaceName={currentWorkspace.name}
+      workspaceName={$tab?.name}
       {workspaceID}
+      {onSaveWorkspace}
+      isSaved={$tab?.isSaved}
     />
     <section style="flex:1; overflow:auto;">
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
-          bind:userRole
+          {userRole}
           {onUpdateWorkspaceDescription}
-          workspaceDescription={currentWorkspace.description}
-          {workspaceID}
+          workspaceDescription={$tab?.description}
         />
       {:else if workspaceNavigatorId === "settings"}
         <WorkspaceSetting
-          workspaceName={currentWorkspace.name}
           users={currentWorkspace?.users}
           {currentWorkspace}
           {onRemoveUserFromWorkspace}
@@ -107,7 +106,7 @@
     class="d-flex flex-column h-100"
     style=" width:280px; padding: 24px 16px 24px 16px ;"
   >
-    <WorkspaceNavigator bind:workspaceNavigatorId bind:userRole />
+    <WorkspaceNavigator bind:workspaceNavigatorId {userRole} />
     <WorkspaceUpdates
       workspaceUpdatesList={$workspaceUpdatesList}
       {onWorkspaceUpdateScroll}

@@ -51,20 +51,20 @@
     ) as HTMLInputElement;
     inputField.value = workspaceName;
   };
-  const handleInputName = (event) => {
-    if (event.key === "Enter") {
-      onRenameInputKeyPress();
-    }
+
+  const handleInputName = (event: Event) => {
+    // const target = event.target as HTMLInputElement;
+    // onRename(target.value, "");
+    onUpdateWorkspaceName(event.detail, "");
   };
-  const handleBlurName = () => {
-    const newValue = event.target.value;
-    const previousValue = workspaceName;
-    if (event.target.value?.trim() === "") {
-      resetInputField();
-    } else if (newValue !== previousValue) {
-      onUpdateWorkspaceName(workspaceID, newValue);
-    }
+  const handleBlurName = (event: Event) => {
+    // const target = event.target as HTMLInputElement;
+    // onRename(target.value, "blur");
+    onUpdateWorkspaceName(event.detail, "blur");
   };
+  export let onSaveWorkspace;
+
+  export let isSaved;
 </script>
 
 <section>
@@ -90,20 +90,31 @@
           on:blur={handleBlurName}
         />
       </div>
-      {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
-        <div class="d-flex gap-2 ms-3">
-          <Button
-            startIcon={PeopleRegular}
-            size={"medium"}
-            type={"primary"}
-            title={"Invite"}
-            onClick={() => {
-              isWorkspaceInviteModalOpen = true;
-            }}
-            disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          />
-        </div>
-      {/if}
+      <div class="d-flex gap-2">
+        {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
+          <div class="d-flex gap-2 ms-3">
+            <Button
+              startIcon={PeopleRegular}
+              size={"medium"}
+              type={"primary"}
+              title={"Invite"}
+              onClick={() => {
+                isWorkspaceInviteModalOpen = true;
+              }}
+              disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
+            />
+          </div>
+        {/if}
+
+        <Button
+          disable={isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          startIcon={SaveRegular}
+          type={"secondary"}
+          onClick={() => {
+            onSaveWorkspace();
+          }}
+        />
+      </div>
     </div>
   </div>
 </section>
