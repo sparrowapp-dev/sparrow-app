@@ -15,9 +15,11 @@
   // Example: userID: Sparrow12 `;
   let bulkEditParamsPlaceholder =
     "Usage - Manage multiple parameters.  Format - Key: Value";
+
   const handleParamsChange = (pairs: KeyValuePair[]): void => {
-    // onUpdateRequestParams(pairs);
+    onUpdateRequestState("queryParams", pairs);
   };
+
   const toggleBulkEdit = (value: boolean) => {
     MixpanelEvent(Events.Bulk_Edit_Parameters);
     onUpdateRequestState({ isParameterBulkEditActive: value });
@@ -26,8 +28,8 @@
 
 <section class="w-100" style="">
   <TabularInput
-    isInputBoxEditable={false}
-    isCheckBoxEditable={false}
+    isInputBoxEditable={true}
+    isCheckBoxEditable={true}
     isTopHeaderRequired={true}
     {isBulkEditRequired}
     bulkEditPlaceholder={bulkEditParamsPlaceholder}

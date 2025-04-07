@@ -72,6 +72,7 @@
   } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
   import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
+  import Arrow from "../icons/Arrow.svelte";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -229,13 +230,45 @@
 
     updateMatchingKeys(updatedBlock);
     selectedBlock = updatedBlock;
+
     nodes.update((_nodes) => {
-      let dbNodes = _nodes;
+      let dbNodes = [..._nodes];
+
       for (let i = 0; i < dbNodes.length; i++) {
         if (dbNodes[i].id === updatedBlock.id) {
-          dbNodes[i] = updatedBlock;
+          // Preserve only the specified keys from the original data
+          const preservedKeys: Array<string> = [
+            "blocks",
+            "collections",
+            "connector",
+            "onCheckEdges",
+            "onClick",
+            "onOpenAddCustomRequestModal",
+            "onOpenDeleteModal",
+            "onUpdateSelectAPI",
+          ];
+
+          const originalData = dbNodes[i].data || {};
+          const updatedData = updatedBlock.data || {};
+
+          const preservedData = {};
+          for (const key of preservedKeys) {
+            if (key in originalData) {
+              preservedData[key] = originalData[key];
+            }
+          }
+
+          dbNodes[i] = {
+            ...dbNodes[i],
+            ...updatedBlock,
+            data: {
+              ...updatedData,
+              ...preservedData,
+            },
+          };
         }
       }
+
       return dbNodes;
     });
   };

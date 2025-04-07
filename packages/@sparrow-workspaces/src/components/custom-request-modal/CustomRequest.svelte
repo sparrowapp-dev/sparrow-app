@@ -1,9 +1,9 @@
 <script>
-  import { RequestMethod } from "@sparrow/common/enums";
+  import { onMount } from "svelte";
   import { Select } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-  import Input from "../../../../@sparrow-library/src/forms/Input/Input.svelte";
-  import { onMount } from "svelte";
+  import { Input } from "@sparrow/library/forms";
+  import { httpMethodData } from "../../../../@sparrow-common/src/utils/testFlow.helper";
 
   export let handleModalState;
   export let handleCreateCustomRequest;
@@ -19,34 +19,6 @@
     httpRequestMethod = tabId;
     handleUpdateRequestMethod(tabId);
   };
-
-  const httpMethodData = [
-    {
-      name: "GET",
-      id: RequestMethod.GET,
-      color: "success",
-    },
-    {
-      name: "POST",
-      id: RequestMethod.POST,
-      color: "warning",
-    },
-    {
-      name: "PUT",
-      id: RequestMethod.PUT,
-      color: "secondary",
-    },
-    {
-      name: "DELETE",
-      id: RequestMethod.DELETE,
-      color: "danger",
-    },
-    {
-      name: "PATCH",
-      id: RequestMethod.PATCH,
-      color: "patch",
-    },
-  ];
 
   // Reset the fields on model open
   onMount(() => {

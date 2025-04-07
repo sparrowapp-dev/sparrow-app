@@ -4,15 +4,47 @@
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { Button } from "@sparrow/library/ui";
-  import { OpenRegular } from "@sparrow/library/icons";
+  import {
+    defaultAuthValue,
+    httpsAuthData,
+  } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
 
   export let auth;
   export let environmentVariables;
-  export let requestStateAuth;
-  export let onUpdateRequestAuth = () => {};
-  export let onUpdateRequestState = () => {};
+  export let requestStateAuth: any = {};
+  export let onUpdateRequestAuth;
   export let onUpdateEnvironment = () => {};
+
+  const onUpdateAuthType = (id = "") => {
+    requestStateAuth = {
+      ...requestStateAuth,
+      requestAuthNavigation: id,
+    };
+    onUpdateRequestAuth("requestAuthNavigation", id);
+
+    if (id === HttpRequestAuthTypeBaseEnum.NO_AUTH) {
+      onUpdateRequestAuth("auth", defaultAuthValue);
+    }
+  };
+
+  const onChangeRequestAuth = (data: any) => {
+    if (
+      requestStateAuth?.requestAuthNavigation ===
+      HttpRequestAuthTypeBaseEnum.API_KEY
+    ) {
+      onUpdateRequestAuth("apiKey", data?.apiKey);
+    } else if (
+      requestStateAuth?.requestAuthNavigation ===
+      HttpRequestAuthTypeBaseEnum.BASIC_AUTH
+    ) {
+      onUpdateRequestAuth("basicAuth", data?.basicAuth);
+    } else if (
+      requestStateAuth?.requestAuthNavigation ===
+      HttpRequestAuthTypeBaseEnum.BEARER_TOKEN
+    ) {
+      onUpdateRequestAuth("bearerToken", data?.bearerToken);
+    }
+  };
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -22,28 +54,11 @@
         <p class="mb-0">
           <WithSelect
             id={"hash999"}
-            data={[
-              {
-                name: "No Auth",
-                id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
-              },
-              {
-                name: "API Key",
-                id: HttpRequestAuthTypeBaseEnum.API_KEY,
-              },
-              {
-                name: "Bearer Token",
-                id: HttpRequestAuthTypeBaseEnum.BEARER_TOKEN,
-              },
-              {
-                name: "Basic Auth",
-                id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
-              },
-            ]}
+            data={httpsAuthData}
             zIndex={499}
             titleId={requestStateAuth?.requestAuthNavigation ??
               HttpRequestAuthTypeBaseEnum.NO_AUTH}
-            onclick={(id = "") => {}}
+            onclick={onUpdateAuthType}
             disabled={false}
           />
         </p>
@@ -56,26 +71,26 @@
     </p>
   </div>
   <section class="w-100" style="flex:1; overflow:auto;">
-    {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}
+    {#if requestStateAuth?.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
-    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.API_KEY}
+    {:else if requestStateAuth?.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.API_KEY}
       <ApiKey
-        apiData={auth.apiKey}
-        callback={onUpdateRequestAuth}
+        apiData={auth?.apiKey}
+        callback={onChangeRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.BEARER_TOKEN}
+    {:else if requestStateAuth?.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.BEARER_TOKEN}
       <BearerToken
-        bearerToken={auth.bearerToken}
-        callback={onUpdateRequestAuth}
+        bearerToken={auth?.bearerToken}
+        callback={onChangeRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
-    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.BASIC_AUTH}
+    {:else if requestStateAuth?.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.BASIC_AUTH}
       <BasicAuth
-        basicAuth={auth.basicAuth}
-        callback={onUpdateRequestAuth}
+        basicAuth={auth?.basicAuth}
+        callback={onChangeRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
       />
@@ -84,12 +99,4 @@
 </div>
 
 <style>
-  button:hover {
-    border-bottom: 2px solid red; /* Replace 'yourColor' with the desired color */
-  }
-
-  /* Add a border bottom when the button is pressed (active) */
-  button:active {
-    border-bottom: 2px solid red; /* Replace 'yourColor' with the desired color */
-  }
 </style>

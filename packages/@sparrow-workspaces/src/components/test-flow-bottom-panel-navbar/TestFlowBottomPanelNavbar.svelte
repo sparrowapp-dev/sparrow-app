@@ -4,9 +4,9 @@
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
   import { Select } from "@sparrow/library/forms";
-  import { RequestMethod } from "@sparrow/common/enums";
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
+  import { httpMethodData } from "../../../../@sparrow-common/src/utils/testFlow.helper";
 
   export let selectedBlock;
   export let onClose;
@@ -17,33 +17,11 @@
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
-  const httpMethodData = [
-    {
-      name: "GET",
-      id: RequestMethod.GET,
-      color: "success",
-    },
-    {
-      name: "POST",
-      id: RequestMethod.POST,
-      color: "warning",
-    },
-    {
-      name: "PUT",
-      id: RequestMethod.PUT,
-      color: "secondary",
-    },
-    {
-      name: "DELETE",
-      id: RequestMethod.DELETE,
-      color: "danger",
-    },
-    {
-      name: "PATCH",
-      id: RequestMethod.PATCH,
-      color: "patch",
-    },
-  ];
+  $: {
+    if (selectedBlock) {
+      requestUrl = selectedBlock?.data?.requestData?.url ?? "";
+    }
+  }
 </script>
 
 <div class="header-container">
@@ -57,7 +35,7 @@
       titleId={selectedBlock?.data?.method === ""
         ? "GET"
         : selectedBlock?.data?.method}
-      onclick={async (e) => await handleUpdateRequestData("method", e)}
+      onclick={(e) => handleUpdateRequestData("method", e)}
       borderHighlight={"active"}
       headerHighlight={"hover"}
       minHeaderWidth={"110px"}
@@ -85,12 +63,9 @@
   <div class="request-url">
     <Input
       variant="secondary"
-      value={selectedBlock?.data?.requestData?.url ?? ""}
+      value={requestUrl}
       width="100%"
-      on:input={async (e) => {
-        requestUrl = e?.detail;
-        await handleUpdateRequestData("url", e?.detail);
-      }}
+      on:input={(e) => handleUpdateRequestData("url", e?.detail)}
       placeholder="Enter Request URL"
     />
   </div>
