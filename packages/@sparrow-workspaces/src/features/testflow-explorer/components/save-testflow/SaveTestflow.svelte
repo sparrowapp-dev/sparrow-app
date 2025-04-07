@@ -2,7 +2,7 @@
   import { SaveRegular } from "@sparrow/library/icons";
 
   import { Tooltip } from "@sparrow/library/ui";
-  import Button from "../../../../../../@sparrow-library/src/ui/button/Button.svelte";
+  import { Button } from "@sparrow/library/ui";
   export let isSave;
   export let isTestflowEditable;
   export let onSaveTestflow;
