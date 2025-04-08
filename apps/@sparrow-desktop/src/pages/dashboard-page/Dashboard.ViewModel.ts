@@ -447,7 +447,6 @@ export class DashboardViewModel {
 
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, ws);
     await this.workspaceRepository.setActiveWorkspace(id);
-      // await new Sleep().setTime(2000).exec()
     await this.tabRepository.createTab(initWorkspaceTab, id);
     navigate("collections");
   };

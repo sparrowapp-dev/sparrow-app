@@ -5,7 +5,7 @@ import { InitTab } from "@sparrow/common/factory";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
   
   /**
-   * @class - this class makes collection tab compatible with collection server
+   * @class - this class makes workspace tab compatible with workspace server
    */
   export class WorkspaceTabAdapter {
     constructor() {}

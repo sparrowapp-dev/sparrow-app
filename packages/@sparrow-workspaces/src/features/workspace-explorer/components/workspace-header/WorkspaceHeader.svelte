@@ -38,28 +38,10 @@
    */
   export let userRole;
 
-  const onRenameInputKeyPress = () => {
-    const inputField = document.getElementById(
-      "renameInputFieldWorkspace",
-    ) as HTMLInputElement;
-    inputField.blur();
-  };
-
-  const resetInputField = () => {
-    const inputField = document.getElementById(
-      "renameInputFieldWorkspace",
-    ) as HTMLInputElement;
-    inputField.value = workspaceName;
-  };
-
   const handleInputName = (event: Event) => {
-    // const target = event.target as HTMLInputElement;
-    // onRename(target.value, "");
     onUpdateWorkspaceName(event.detail, "");
   };
   const handleBlurName = (event: Event) => {
-    // const target = event.target as HTMLInputElement;
-    // onRename(target.value, "blur");
     onUpdateWorkspaceName(event.detail, "blur");
   };
   export let onSaveWorkspace;

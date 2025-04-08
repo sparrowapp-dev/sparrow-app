@@ -58,7 +58,7 @@ export default class WorkspaceExplorerViewModel {
 
 
    /**
-  * Compares the current collection tab with the server collection and updates the saved status accordingly.
+  * Compares the current workspace tab with the server workspace and updates the saved status accordingly.
   * This method is debounced to reduce the number of server requests.
   * @return A promise that resolves when the comparison is complete.
   */
@@ -84,8 +84,7 @@ export default class WorkspaceExplorerViewModel {
      else if (workspaceTab.name !== progressiveTab.name) {
        result = false;
      }
-     // auth navigation
-          // result
+     // result
      if (result) {
        this.tabRepository.updateTab(progressiveTab.tabId, {
          isSaved: true,
@@ -102,7 +101,7 @@ export default class WorkspaceExplorerViewModel {
    };
  
    /**
-    * Debounced method to compare the current collection tab with the server collection.
+    * Debounced method to compare the current workspace tab with the server workspace.
     */
    private compareWorkspaceWithServer = new Debounce().debounce(
      this.compareWorkspaceWithServerDebounced,
@@ -110,24 +109,24 @@ export default class WorkspaceExplorerViewModel {
    );
 
    /**
-  * Handles renaming a collection
-  * @param newCollectionName - the new name of the collection
+  * Handles renaming a workspace
+  * @param _name - the new name of the workspace.
   * @param event - blur or input
   */
-   public handleUpdateName = async (_collectionName: string, event = "") => {
+   public handleUpdateName = async (_name: string, event = "") => {
      const progressiveTab = createDeepCopy(this._tab.getValue());
  
      // Trim the name to handle cases with only spaces
-     const trimmedName = _collectionName.trim();
+     const trimmedName = _name.trim();
  
      if (event === "blur" && trimmedName === "") {
-       const collectionRx = await this.workspaceRepository.readWorkspace(
+       const workspaceRx = await this.workspaceRepository.readWorkspace(
          progressiveTab.id,
        );
-       const collectionDoc = collectionRx?.toMutableJSON();
-       progressiveTab.name = collectionDoc?.name;
+       const workspaceDoc = workspaceRx?.toMutableJSON();
+       progressiveTab.name = workspaceDoc?.name;
      } else if (event === "") {
-       progressiveTab.name = _collectionName;
+       progressiveTab.name = _name;
      }
      this.tab = progressiveTab;
      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -135,12 +134,12 @@ export default class WorkspaceExplorerViewModel {
    };
  
    /**
-    * Handles updating description of a collection.
-    * @param _collectionDescription - the updated description of the collection.
+    * Handles updating description of a workspace.
+    * @param _description - the updated description of the workspace.
     */
-   public handleUpdateDescription = async (_collectionDescription: string) => {
+   public handleUpdateDescription = async (_description: string) => {
      const progressiveTab = createDeepCopy(this._tab.getValue());
-     progressiveTab.description = _collectionDescription;
+     progressiveTab.description = _description;
      this.tab = progressiveTab;
      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
      this.compareWorkspaceWithServer();
