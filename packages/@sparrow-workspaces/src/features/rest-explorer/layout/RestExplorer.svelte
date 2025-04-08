@@ -526,7 +526,7 @@
           </Pane>
 
           <!-- AI Chatbot Interface -->
-          {#if $tab?.property?.request?.state?.isChatbotActive}
+          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive}
             <Pane
               class="position-relative bg-transparent"
               minSize={minSizePct}
@@ -646,45 +646,47 @@
 </Modal>
 
 <!-- ChatBot Toggler -->
-<div
-  style="position: fixed;
+{#if !isGuestUser}
+  <div
+    style="position: fixed;
         bottom: 22px;
         right:70px;
         z-index: 200;"
->
-  <div
-    class="sparrow-ai-icon"
-    role="button"
-    on:click={() => {
-      if ($tabsSplitterDirection != "horizontal") {
-        tabsSplitterDirection.set("horizontal");
-      }
-      onUpdateRequestState({
-        isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
-      });
-      setTimeout(() => {
-        scrollList("bottom", -1, "auto");
-      }, 0);
-      MixpanelEvent(Events.AI_Chat_Initiation);
-    }}
   >
     <div
-      class="chatten-box"
-      tabindex="0"
-      style="display: {!$tab?.property?.request?.state?.isChatbotActive
-        ? 'flex'
-        : 'none'}"
+      class="sparrow-ai-icon"
+      role="button"
+      on:click={() => {
+        if ($tabsSplitterDirection != "horizontal") {
+          tabsSplitterDirection.set("horizontal");
+        }
+        onUpdateRequestState({
+          isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
+        });
+        setTimeout(() => {
+          scrollList("bottom", -1, "auto");
+        }, 0);
+        MixpanelEvent(Events.AI_Chat_Initiation);
+      }}
     >
-      <SparrowSecondaryIcon />
+      <div
+        class="chatten-box"
+        tabindex="0"
+        style="display: {!$tab?.property?.request?.state?.isChatbotActive
+          ? 'flex'
+          : 'none'}"
+      >
+        <SparrowSecondaryIcon />
 
-      <!-- {#if !$tab?.property?.request?.state?.isChatbotActive}
+        <!-- {#if !$tab?.property?.request?.state?.isChatbotActive}
         <SparrowSecondaryIcon />
       {:else}
         <CaretDownFilled /> -->
-      <!-- {/if} -->
+        <!-- {/if} -->
+      </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style>
   .chatten-box {
