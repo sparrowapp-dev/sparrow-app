@@ -14,12 +14,13 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { TeamService } from "../../../../services/team.service";
 import { UserService } from "../../../../services/user.service";
 import { WorkspaceService } from "../../../../services/workspace.service";
-import { InitWorkspaceTab, Sleep } from "@sparrow/common/utils";
+import { Sleep } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
 import { getClientUser } from "../../../../utils/jwt";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -286,9 +287,8 @@ export class TeamExplorerPageViewModel {
         await this.refreshWorkspaces(clientUserId);
       }
 
-      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
-      initWorkspaceTab.updateName(res.name);
-      await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(res._id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
@@ -330,10 +330,8 @@ export class TeamExplorerPageViewModel {
       await this.handleDisableWorkspaceInviteTag(id);
     }
     const res = await this.workspaceRepository.readWorkspace(id);
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateId(id);
-    initWorkspaceTab.updateName(res.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("collections");
   };

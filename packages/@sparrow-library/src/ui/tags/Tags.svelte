@@ -56,16 +56,14 @@ const colorPalette = {
     border-radius: 2px;
     padding: 0px 4px;
     height: 18px;
-    font-size: 12px;
-    line-height: 18px;
     text-align: center;
-    font-weight: 500;
     font-family: Inter, sans-serif;
     width: fit-content;
     max-width: 188px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;"
+    class="text-ds-font-weight-medium text-ds-line-height-150 text-ds-font-size-12"
     >
     {convertCasing(text)}
 </button>

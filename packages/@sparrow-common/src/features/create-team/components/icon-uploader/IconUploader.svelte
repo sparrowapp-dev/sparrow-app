@@ -71,7 +71,7 @@
         <div
           class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
         >
-          <span style="color: var(--text-ds-neutral-200);">Drag & drop or</span>
+          <span style="color: var(--text-ds-neutral-200); text-ds-font-weight-regular text-ds-line-height-143">Drag & drop or</span>
           <label
             for={inputId}
             class="sparrow-choose-file-label ps-2"
@@ -99,6 +99,7 @@
             <ImageRegular size="16px" color={"var(--bg-ds-neutral-400)"} />
             <p
               style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
+              class="text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
             >
               PNG
             </p>
@@ -113,6 +114,7 @@
             <ImageRegular size="16px" color={"var(--bg-ds-neutral-400"} />
             <p
               style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
+              class="text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
             >
               JPG
             </p>
@@ -127,6 +129,7 @@
             <ImageRegular size="16px" color={"var(--bg-ds-neutral-400"} />
             <p
               style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
+              class="text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
             >
               JPEG
             </p>

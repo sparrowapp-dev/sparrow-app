@@ -89,18 +89,19 @@
     border: none;
     color: var(--text-ds-neutral-200);
     font:
-      400 14px/1 Inter,
+      300 14px/1 Inter,
       sans-serif;
     outline: none;
     width: 100%;
     caret-color: var(--text-ds-primary-300);
+    line-height: 143%;;
   }
   .search-input::placeholder {
     color: var(--text-ds-neutral-500);
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 300;
     font: Inter, sans-serif;
-    line-height: 20px;
+    line-height: 143%;
   }
 
   .visually-hidden {
