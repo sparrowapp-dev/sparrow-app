@@ -17,7 +17,7 @@
     RequestAuthorizationTestFlow,
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
-  import { RequestDataset, ResponseStatusCode } from "@sparrow/common/enums";
+  import { ResponseStatusCode } from "@sparrow/common/enums";
   import { testFlowDataStore } from "../../store";
   import ResponseHeaders from "../response-headers/ResponseHeaders.svelte";
   import ResponseBody from "../response-body/ResponseBody.svelte";
@@ -139,10 +139,10 @@
 
           // requestNavigation = "Parameters"
           // Reset the response format
-          responseState = {
-            responseBodyLanguage: "JSON",
-            responseBodyFormatter: "Pretty",
-          };
+          // responseState = {
+          //   responseBodyLanguage: "JSON",
+          //   responseBodyFormatter: "Pretty",
+          // };
         }
       });
     }
