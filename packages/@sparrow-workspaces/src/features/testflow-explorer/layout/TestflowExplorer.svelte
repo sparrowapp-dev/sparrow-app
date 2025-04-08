@@ -350,14 +350,14 @@
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
-      syncNodesWithCollectionList();
+      // syncNodesWithCollectionList();
     }
   });
 
   nodes.subscribe((nodes) => {
     if (nodes?.length > 0) {
       if (!limitNodesChange) {
-        syncNodesWithCollectionList();
+        // syncNodesWithCollectionList();
         limitNodesChange = limitNodesChange + 1;
       }
     }
@@ -592,7 +592,6 @@
               method: string,
               folderId: string,
             ) {
-              debugger;
               handleOpenSaveNodeRequestModal(
                 $tab?.tabId,
                 nodeId,
@@ -686,7 +685,6 @@
               method: string,
               folderId: string,
             ) {
-              debugger;
               handleOpenSaveNodeRequestModal(
                 $tab?.tabId,
                 nodeId,
