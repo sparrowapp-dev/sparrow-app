@@ -26,6 +26,7 @@
     TreeIcon,
     DismissCircleRegular,
     CopyRegular,
+    BoardRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -307,14 +308,16 @@
         </span>
       {/if}
       <span
-        class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
+        class=" ms-1 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {!tab.isActive
+          ? 'request-text text-ds-font-weight-medium'
+          : ''}"
+        style={`color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
       >
         {tab.name}
       </span>
     </button>
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
@@ -422,7 +425,6 @@
     color: inherit !important;
   }
   .request-text {
-    font-weight: 500 !important;
     color: var(--text-ds-neutral-300) !important;
   }
   .individual-tab:hover .request-text {

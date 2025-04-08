@@ -241,7 +241,9 @@
     {#if searchQuery === ""}
       {#each recentSections as section (section.key)}
         {#if section.condition}
-          <TitleBar data={selectedTypeMapping[section.key]} />
+          {#if isGuestUser && section.key === "workspaces"}{:else}
+            <TitleBar data={selectedTypeMapping[section.key]} />
+          {/if}
           {#each section.items as item}
             {#if section.key === "requests"}
               {#if !(isWebApp && item.tree.request.method === "GRAPHQL")}

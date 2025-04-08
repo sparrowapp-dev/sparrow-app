@@ -237,10 +237,7 @@
 
 <div>
   {#if !isBulkEditActive}
-    <section
-      class="mb-0 me-0 py-0 section-layout w-100"
-      style="overflow:hidden;"
-    >
+    <section class="mb-0 me-0 py-0 section-layout w-100" style="">
       <div
         class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
@@ -279,7 +276,7 @@
                   label="Bulk Edit"
                   fontSize="12px"
                   textColor="var(--text-ds-neutral-200)"
-                  fontWeight="500"
+                  fontWeight="400"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
                 />
@@ -407,7 +404,7 @@
                   bind:isActive={bulkToggle}
                   label="Bulk Edit"
                   fontSize="12px"
-                  fontWeight="500"
+                  fontWeight="400"
                   onClick={handleBulkTextUpdate}
                   textColor="var(--text-ds-neutral-200)"
                   onChange={toggleBulkEdit}

@@ -162,7 +162,7 @@
     {#if value.length === 0 || value.size === 0}
       <!-- Icon Uploader description only shows when no file is uploaded -->
       <span
-        class="sparrow-input-label-desc sparrow-fs-18 ms-4"
+        class="sparrow-input-label-desc text-ds-font-size-18 ms-4"
         style="font-size:{labelDescriptionSize}; width: calc(100% - {width})"
         >{labelDescription}</span
       >
@@ -228,7 +228,7 @@
   }
   .sparrow-input-label-desc {
     color: var(--text-secondary-350);
-    font-size: var(--small-text);
+    // font-size: var(--small-text);
   }
   .sparrow-file-input-placeholder {
     color: var(--request-arc);

@@ -21,13 +21,15 @@
     ]}
   />
 
-  <span class="title-txt">{title}</span>
+  <span
+    class="title-txt text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
+    >{title}</span
+  >
 </div>
 
 <style>
   .title-txt {
     font-size: 12px;
-    font-weight: 400;
     color: var(--text-secondary-100);
     padding: 5px;
   }

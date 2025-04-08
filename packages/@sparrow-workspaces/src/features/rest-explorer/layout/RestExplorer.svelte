@@ -173,10 +173,7 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div
-      class="w-100 d-flex flex-column h-100 pt-3 pb-3"
-      style="padding:0px 12px"
-    >
+    <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
       <!-- 
         --
@@ -400,7 +397,7 @@
                       <div class="h-100 d-flex flex-column" style="gap:12px">
                         <div
                           class="d-flex"
-                          style="position:sticky; top:0; z-index:2; background-color:var(--bg-ds-surface-900)"
+                          style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                         >
                           <ResponseNavigator
                             requestStateSection={storeData?.response.navigation}

@@ -9,11 +9,6 @@
    */
   export let users = [];
 
-  /**
-   * Name of the current workspace.
-   */
-  export let workspaceName: string = "";
-
   export let currentWorkspace;
 
   export let onChangeUserRoleAtWorkspace;

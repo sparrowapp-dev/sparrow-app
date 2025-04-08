@@ -225,6 +225,7 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+    if (!guestUser) await _viewModel.connectWebSocket();
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
@@ -302,28 +303,28 @@
   let sidebarItems: SidebarItemBaseInterface[] = [
     {
       id: SidebarItemIdEnum.HOME,
-      route: !isGuestUser ? "/app/home" : "/guest/home",
+      route: "home",
       heading: "Home",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
       id: SidebarItemIdEnum.WORKSPACE,
-      route: !isGuestUser ? "/app/collections" : "/guest/collections",
+      route: "collections",
       heading: "Workspace",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
       id: SidebarItemIdEnum.COMMUNITY,
-      route: "/app/help",
+      route: "help",
       heading: "Community",
       disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
     {
       id: SidebarItemIdEnum.SETTING,
-      route: "/app/setting",
+      route: "setting",
       heading: "Setting",
       disabled: true,
       position: SidebarItemPositionBaseEnum.SECONDARY,

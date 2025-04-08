@@ -25,7 +25,6 @@
 
   /** @type {Function} Returns color based on status. @param {string} status - Status to determine color. @returns {{ fontColor: string, backgroundColor: string }} */
 
-
   let isLoading = false;
 
   let feedbackStatus = [];
@@ -57,18 +56,18 @@
     // Convert the statusMap object to an array suitable for rendering in Svelte
     feedbackStatus = Object.values(statusMap);
   }
-    
+
   const getFontColor = (status) => {
-    if ( status === "in progress") {
-      return { fontColor: "var(--text-primary-440)", };
+    if (status === "in progress") {
+      return { fontColor: "var(--text-primary-440)" };
     }
     if (status === "planned") {
-      return { fontColor: "#FFE47E",};
+      return { fontColor: "#FFE47E" };
     }
     if (status === "under review") {
-      return { fontColor: "#FBA574",};
+      return { fontColor: "#FBA574" };
     }
-    return { fontColor: "var(--text-ds-neutral-50)",};
+    return { fontColor: "var(--text-ds-neutral-50)" };
   };
 
   /**
@@ -119,8 +118,8 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p style="font-size: 20px; font-weight:700;">Roadmap</p>
-      <p class="text-fs-14" style="color: var(--text-secondary-50);">
+      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Roadmap</p>
+      <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
       </p>
@@ -203,7 +202,7 @@
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
                 .join(" ")}
             </div>
-            
+
             {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
               <div
                 class=" d-flex align-items-center justify-content-center"
@@ -220,8 +219,8 @@
                   />
 
                   <p
-                    class="mx-1 mt-3 text-fs-14 mb-0 text-center"
-                    style=" font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;  text-align:center;"
+                    class="mx-1 mt-3 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
+                    style="color: var(--text-secondary-550); letter-spacing: 0.5px;  text-align:center;"
                   >
                     Share your feedback and check back here for updates.
                   </p>
@@ -234,7 +233,7 @@
                 style="display: flex; align-items-center; justify-content:center;"
               >
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center mb-3"
+                  class="mx-1 text-ds-font-size-12 mb-0 text-center mb-3"
                   style="display:flex; align-items:center; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px; "
                 >
                   No result found.
