@@ -253,6 +253,7 @@
             "onOpenAddCustomRequestModal",
             "onOpenDeleteModal",
             "onUpdateSelectAPI",
+            "onOpenSaveNodeRequestModal",
           ];
 
           const originalData = dbNodes[i].data || {};
