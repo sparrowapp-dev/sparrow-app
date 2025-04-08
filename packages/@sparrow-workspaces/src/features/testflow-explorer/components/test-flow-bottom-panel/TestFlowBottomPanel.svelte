@@ -366,8 +366,8 @@
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     position: absolute;
-    min-height: 36px;
-    top: -45px;
+    height: 36px;
+    top: -36px;
     z-index: 0;
     display: flex;
     align-items: center;
@@ -376,6 +376,7 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 11px;
+    padding-bottom: 5px;
   }
 
   .block-name {
