@@ -177,7 +177,7 @@
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
-  <div class="my-collection d-flex flex-column w-100 z-3">
+  <div class="p-3 d-flex flex-column w-100 z-3">
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
         <Input

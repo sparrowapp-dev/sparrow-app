@@ -14,73 +14,77 @@
   export let closeQuickHelp;
 </script>
 
-<div class="pt-3 d-flex flex-column quick-container h-100 gap-3" style="padding: 0px 24px 40px 12px;">
-  <div class="d-flex justify-content-between" style="padding:12px 4px 4px 0px;">
+<div class="p-3 d-flex flex-column quick-container h-100 gap-3">
+  <div class="d-flex justify-content-between">
     <div>
       <h4 class="head-title">Quick help</h4>
     </div>
     <Button
-    type="outline-secondary"
-    startIcon={DismissRegular}
-    onClick={() => {
-      closeQuickHelp();
-    }}
-    size="small"
-    customWidth="28px"
-   />
+      type="outline-secondary"
+      startIcon={DismissRegular}
+      onClick={() => {
+        closeQuickHelp();
+      }}
+      size="small"
+      customWidth="28px"
+    />
   </div>
-  <div style="flex:1; overflow:auto;display:flex;flex-direction:column; gap: 16px;">
+  <div
+    style="flex:1; overflow:auto;display:flex;flex-direction:column; gap: 16px;"
+  >
     <div style="display:flex;flex-direction:column; gap: 4px;">
-      <h6 class="heading-title ">Environments</h6>
-    {#each QuickHelp.environments as env}
-      <p class="heading-para">
-        {env}
-      </p>
-    {/each}
+      <h6 class="heading-title">Environments</h6>
+      {#each QuickHelp.environments as env}
+        <p class="heading-para">
+          {env}
+        </p>
+      {/each}
     </div>
 
     <div style="display:flex;flex-direction:column; gap: 4px;">
-      <h6 class="heading-title ">Variables</h6>
-    {#each QuickHelp.variables as variables}
-      <p class="heading-para">
-        {variables}
-      </p>
-    {/each}
+      <h6 class="heading-title">Variables</h6>
+      {#each QuickHelp.variables as variables}
+        <p class="heading-para">
+          {variables}
+        </p>
+      {/each}
     </div>
 
     <div style="display:flex;flex-direction:column; gap: 4px;">
-      <h6 class="heading-title ">Variables Types</h6>
-    {#each QuickHelp.variablesTypes as types}
-      <p class="heading-para">
-        {types}
-      </p>
-    {/each}
-    </div>
-
-  <div style="display:flex;flex-direction:column; gap: 4px;">
-      <h6 class="heading-title ">Using Variables in REST API tool</h6>
-    <p class="heading-para">
-      {QuickHelp.usingVariables[0]}
-    </p>
-    <p><img class="w-100" src={inputField} alt="" /></p>
-    <p><img class="" src={variablesImg} alt="" /></p>
-    <p class="heading-para">
-      {@html QuickHelp.usingVariables[1]}
-    </p>
-    <p class="heading-para">
-      {QuickHelp.usingVariables[2]}
-    </p>
+      <h6 class="heading-title">Variables Types</h6>
+      {#each QuickHelp.variablesTypes as types}
+        <p class="heading-para">
+          {types}
+        </p>
+      {/each}
     </div>
 
     <div style="display:flex;flex-direction:column; gap: 4px;">
-      <h6 class="heading-title ">Switching Environments</h6>
-    {#each QuickHelp.switchingEnvironments as switchEnv}
+      <h6 class="heading-title">Using Variables in REST API tool</h6>
       <p class="heading-para">
-        {switchEnv}
+        {QuickHelp.usingVariables[0]}
       </p>
-    {/each}
+      <p><img class="w-100" src={inputField} alt="" /></p>
+      <p><img class="" src={variablesImg} alt="" /></p>
+      <p class="heading-para">
+        {@html QuickHelp.usingVariables[1]}
+      </p>
+      <p class="heading-para">
+        {QuickHelp.usingVariables[2]}
+      </p>
+    </div>
 
-    <p style="margin-left:-12px"><img class="" src={envSelection} alt="" /></p>
+    <div style="display:flex;flex-direction:column; gap: 4px;">
+      <h6 class="heading-title">Switching Environments</h6>
+      {#each QuickHelp.switchingEnvironments as switchEnv}
+        <p class="heading-para">
+          {switchEnv}
+        </p>
+      {/each}
+
+      <p style="margin-left:-12px">
+        <img class="" src={envSelection} alt="" />
+      </p>
     </div>
 
     <!-- <h6 class="heading-title">Protect Sensitive information</h6>
@@ -105,10 +109,9 @@
     }
     .heading-para {
       font-size: 12px;
-      color:var(--text-ds-neutral-400);
+      color: var(--text-ds-neutral-400);
       line-height: 18px;
-      margin-bottom: 0px ;
-   
+      margin-bottom: 0px;
     }
     .head-title {
       font-size: 20px;

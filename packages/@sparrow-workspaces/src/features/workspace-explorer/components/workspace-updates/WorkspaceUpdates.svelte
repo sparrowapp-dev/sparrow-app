@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Avatar } from "@sparrow/library/ui";
   import { onMount } from "svelte";
 
   /**
@@ -76,30 +77,37 @@
 <div
   style="border-bottom:1px solid #2A2C3C; margin-top:16px; margin-bottom:8px;"
 ></div>
-<div class="d-flex flex-column" style=" flex-grow:1 !important;">
+<div style="flex:1; overflow:auto;">
   <div
     class="ps-0 text-ds-font-size-12 text-ds-font-weight-semi-bold"
     style="color: var( --text-secondary-200); padding:8px; "
   >
-    WORKSPACE UPDATES
+    Workspace Updates
   </div>
-  <div style="overflow: auto; flex:1" bind:this={scrollableContainer}>
-    <div style="height:430px; flex-grow:1 !important; gap: 8px;">
+  <div style="flex:1; overflow:auto;" bind:this={scrollableContainer}>
+    <div class="h-100">
       {#if workspaceUpdatesList && workspaceUpdatesList[0]?.updates}
         {#each workspaceUpdatesList[0].updates as update}
-          <div class="d-flex flex-column">
+          <div class="d-flex">
+            <div class="me-2">
+              <Avatar
+                letter={update.detailsUpdatedBy.split("")[0][0]}
+                size="extra-small"
+                type="letter"
+                bgColor="background-color: var(--bg-ds-surface-600);"
+              />
+            </div>
             <div
               class="text-ds-font-size-12 text-ds-font-weight-medium"
               style="color: var(--text-secondary-100); "
             >
               {update.message}
-            </div>
-            <div
-              class="d-flex mt-1 text-ds-font-size-12 text-ds-font-weight-regular"
-              style="color: var( --text-secondary-200); justify-content:space-between"
-            >
-              <p class="ellipsis w-50">{update.detailsUpdatedBy}</p>
-              <p>{timeAgo(update.createdAt)}</p>
+              <div
+                class="d-flex mt-1 text-ds-font-size-12 text-ds-font-weight-regular"
+                style="color: var( --text-secondary-200); justify-content:space-between"
+              >
+                <p>{timeAgo(update.createdAt)}</p>
+              </div>
             </div>
           </div>
         {/each}

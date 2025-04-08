@@ -41,10 +41,10 @@ import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
-import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
 import { open } from "@tauri-apps/plugin-shell";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 
 export class DashboardViewModel {
   constructor() {}
@@ -423,9 +423,8 @@ export class DashboardViewModel {
         await this.refreshWorkspaces(clientUserId);
       }
 
-      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
-      initWorkspaceTab.updateName(res.name);
-      await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(res._id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
@@ -446,10 +445,9 @@ export class DashboardViewModel {
     const ws = await this.workspaceRepository.readWorkspace(id);
     if (!ws) return;
 
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateName(ws.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, ws);
     await this.workspaceRepository.setActiveWorkspace(id);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     navigate("collections");
   };
 
@@ -559,12 +557,11 @@ export class DashboardViewModel {
   };
 
   public switchAndCreateWorkspaceTab = async (workspace: any) => {
-    const initWorkspaceTab = new InitWorkspaceTab(workspace._id, workspace._id);
-    initWorkspaceTab.updateName(workspace.name);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(workspace._id, workspace);
 
     // Create tab and set active workspace
     await this.tabRepository.createTab(
-      initWorkspaceTab.getValue(),
+      initWorkspaceTab,
       workspace._id,
     );
     moveNavigation("right");
