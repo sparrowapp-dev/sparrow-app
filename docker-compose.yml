@@ -86,7 +86,9 @@ services:
         VITE_WEB_SPARROW_DOCS: https://docs.sparrowapp.dev/docs/intro
         VITE_WEB_PROXY_SERVICE: http://localhost:3000
         VITE_WEB_ENABLE_MIX_PANEL: false
-        VITE_WEB_MIX_PANEL_TOKEN: 
+        VITE_WEB_MIX_PANEL_TOKEN:
+        VITE_WEB_SPARROW_AI_WEBSOCKET: "ws://localhost:9000/ai-assistant"
+
     ports:
       - "1422:80"
     networks:
