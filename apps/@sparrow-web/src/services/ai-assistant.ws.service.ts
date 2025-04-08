@@ -31,9 +31,7 @@ export class AiAssistantWebSocketService {
    */
   private static instance: AiAssistantWebSocketService;
 
-  // private baseUrl: string = constants.BASE_URL;
-  private baseUrl: string = constants.API_URL;
-  // private baseUrl: string = "ws://localhost:5000";
+  private baseUrl: string = constants.VITE_WEB_SPARROW_AI_WEBSOCKET_URL;
 
   /**
    * WebSocket instance for communication.
@@ -90,8 +88,7 @@ export class AiAssistantWebSocketService {
       );
     }
     AiAssistantWebSocketService.instance = this;
-    // console.log("AiAssistantWebSocketService instance created!");
-    // this.connectWebSocket();
+    
   }
 
   /**
@@ -123,9 +120,8 @@ export class AiAssistantWebSocketService {
     }
 
     try {
-      // Create new WebSocket connection
-      this.webSocket = new WebSocket(
-        `${this.baseUrl}/ai-assistant`,
+      
+      this.webSocket = new WebSocket(this.baseUrl,
         // {
         // transports: ["websocket"],
         // auth: getAuthHeaders(),
@@ -140,7 +136,7 @@ export class AiAssistantWebSocketService {
 
       return this.webSocket;
     } catch (error) {
-      console.error("Failed to create WebSocket connection:", error);
+      // console.error("Failed to create WebSocket connection:", error);
       this.scheduleReconnect();
       return null;
     }
@@ -155,7 +151,6 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleOpen = (event: Event) => {
-    // console.log("WebSocket connected successfully");
     this.isConnected = true;
     this.reconnectAttempts = 0;
     socketStore.set(this.webSocket);
@@ -178,7 +173,7 @@ export class AiAssistantWebSocketService {
         this.triggerEvent(`assistant-response`, data);
       }
     } catch (error) {
-      console.error("Error parsing WebSocket message:", error);
+      // console.error("Error parsing WebSocket message:", error);
     }
   };
 
@@ -187,7 +182,7 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleError = (event: Event) => {
-    console.error("WebSocket error:", event);
+    // console.error("WebSocket error:", event);
     this.triggerEvent("connect_error", {
       message: "WebSocket connection error",
     });
@@ -228,9 +223,9 @@ export class AiAssistantWebSocketService {
         this.reconnectTimer = null;
       }, this.reconnectDelay);
     } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error(
-        `Maximum reconnect attempts (${this.maxReconnectAttempts}) reached`,
-      );
+      // console.error(
+      //   `Maximum reconnect attempts (${this.maxReconnectAttempts}) reached`,
+      // );
     }
   };
 
@@ -247,7 +242,7 @@ export class AiAssistantWebSocketService {
         try {
           callback(data);
         } catch (error) {
-          console.error(`Error in event listener for '${eventName}':`, error);
+          // console.error(`Error in event listener for '${eventName}':`, error);
         }
       });
     }
@@ -308,7 +303,7 @@ export class AiAssistantWebSocketService {
     };
 
     if (!this.webSocket || !this.isConnected) {
-      console.error("WebSocket not connected, cannot send message");
+      // console.error("WebSocket not connected, cannot send message");
       return false;
     }
 
@@ -316,7 +311,7 @@ export class AiAssistantWebSocketService {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
-      console.error("Error sending message:", error);
+      // console.error("Error sending message:", error);
       return false;
     }
   };
@@ -329,7 +324,7 @@ export class AiAssistantWebSocketService {
    */
   public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
     if (!this.webSocket || !this.isConnected) {
-      console.error("WebSocket not connected, cannot send stop signal");
+      // console.error("WebSocket not connected, cannot send stop signal");
       return false;
     }
 
@@ -348,7 +343,7 @@ export class AiAssistantWebSocketService {
 
       return true;
     } catch (error) {
-      console.error("Error sending stop generation signal:", error);
+      // console.error("Error sending stop generation signal:", error);
       return false;
     }
   };

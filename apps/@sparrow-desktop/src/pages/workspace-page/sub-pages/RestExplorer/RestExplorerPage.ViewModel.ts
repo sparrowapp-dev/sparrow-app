@@ -2261,9 +2261,16 @@ class RestExplorerViewModel {
     const sleep = (ms: number) =>
       new Promise((resolve) => setTimeout(resolve, ms));
     const displayNextChunk = async () => {
+      const componentData = this._tab.getValue();
+
+      // Check if generation should be stopped
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse) {
+        console.log("Chunk display stopped by user");
+        return;
+      }
+
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
-        const componentData = this._tab.getValue();
         const length =
           componentData?.property?.request?.ai?.conversations.length;
         componentData.property.request.ai.conversations[length - 1].message =
@@ -2304,7 +2311,7 @@ class RestExplorerViewModel {
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
         message:
-          errorMessage || "Woops! Something went wrong. Please try again...",
+          errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2345,7 +2352,7 @@ class RestExplorerViewModel {
       );
 
       if (!socketResponse) {
-        throw new Error("Woops! Something went wrong. Please try again...");
+        throw new Error("Something went wrong. Please try again");
       }
 
       // Remove existing listeners to prevent duplicates
@@ -2364,10 +2371,15 @@ class RestExplorerViewModel {
         switch (event) {
           case "disconnect":
           case "connect_error":
-            console.error(`Socket ${event}:`, response);
+
+            // After getting response don't listen again for this the same request
+            events.forEach((event) =>
+              this.aiAssistentWebSocketService.removeListener(event),
+            );
+            // console.error(`Socket ${event}:`, response);
             await this.handleAIResponseError(
               componentData,
-              "Woops! Something went wrong. Please try again...",
+              "Something went wrong. Please try again",
             );
             break;
 
@@ -2425,8 +2437,6 @@ class RestExplorerViewModel {
                   },
                 ]);
 
-                console.log("**** updating ******* !");
-
                 await this.displayDataInChunks(response.messages, 100, 300);
               }
             }
@@ -2444,8 +2454,33 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
-      console.error("Error in AI response generation:", error.message);
+      console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
+    }
+  };
+
+  /**
+   * Stops the response generation from the FE and sends stop generate event to server
+   * 
+   */
+  public stopGeneratingAIResponse = async () => {
+    console.log("in stop generating !!")
+    const componentData = this._tab.getValue();
+    
+    try {
+      // Send stop signal to the server
+      await this.aiAssistentWebSocketService.stopGeneration(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        getClientUser().email,
+      );
+      
+      await this.updateRequestState({ isChatbotGeneratingResponse: false });
+      
+      // Show error msg in the chat for stop generation
+      // this.handleAIResponseError(componentData, "Generation Stopped")
+    } catch (error) {
+      console.error("Error stopping AI response generation:", error);
     }
   };
 
