@@ -50,10 +50,7 @@
 </script>
 
 <section>
-  <div
-    class="About d-flex flex-column h-100"
-    style="padding-bottom:24px; gap:16px !important; "
-  >
+  <div class="About d-flex flex-column h-100" style="gap:16px !important; ">
     <div class="d-flex" style="justify-content: space-between;">
       <div
         class="ellipsis w-auto"

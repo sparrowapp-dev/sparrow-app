@@ -43,7 +43,7 @@
 <style>
   textarea {
     outline: none;
-    height: 300px;
+    height: 168px;
     border: 1px solid transparent !important;
     border-radius: 4px !important;
     background-color: var(--bg-ds-surface-600);

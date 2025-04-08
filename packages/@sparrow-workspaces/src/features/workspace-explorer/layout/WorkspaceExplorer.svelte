@@ -71,8 +71,8 @@
 
 <div class="d-flex h-100" style="width: 100%;">
   <div
-    class="h-100 d-flex flex-column"
-    style="border-right:2px solid #000000; width: calc(100% - 280px);  padding:24px;"
+    class="h-100 d-flex flex-column p-3"
+    style="border-right:2px solid #000000; width: calc(100% - 280px);"
   >
     <WorkspaceHeader
       {userRole}
@@ -84,6 +84,7 @@
       {onSaveWorkspace}
       isSaved={$tab?.isSaved}
     />
+    <hr />
     <section style="flex:1; overflow:auto;">
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
@@ -102,15 +103,13 @@
     </section>
   </div>
 
-  <div
-    class="d-flex flex-column h-100"
-    style=" width:280px; padding: 24px 16px 24px 16px ;"
-  >
+  <div class="d-flex flex-column h-100 p-3" style=" width:280px;">
     <WorkspaceNavigator bind:workspaceNavigatorId {userRole} />
     <WorkspaceUpdates
       workspaceUpdatesList={$workspaceUpdatesList}
       {onWorkspaceUpdateScroll}
     />
+    <hr />
     <CollectionCount {collectionLength} />
   </div>
 </div>
