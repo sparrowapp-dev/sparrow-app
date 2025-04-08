@@ -173,7 +173,7 @@ export class AiAssistantWebSocketService {
         this.triggerEvent(`assistant-response`, data);
       }
     } catch (error) {
-      // console.error("Error parsing WebSocket message:", error);
+      console.error("Error in parsing response:", error);
     }
   };
 
@@ -182,7 +182,6 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleError = (event: Event) => {
-    // console.error("WebSocket error:", event);
     this.triggerEvent("connect_error", {
       message: "WebSocket connection error",
     });
@@ -242,7 +241,7 @@ export class AiAssistantWebSocketService {
         try {
           callback(data);
         } catch (error) {
-          // console.error(`Error in event listener for '${eventName}':`, error);
+          console.error(`Error in event listener for '${eventName}':`, error);
         }
       });
     }
@@ -303,7 +302,7 @@ export class AiAssistantWebSocketService {
     };
 
     if (!this.webSocket || !this.isConnected) {
-      // console.error("WebSocket not connected, cannot send message");
+      console.error("WebSocket not connected, cannot send message");
       return false;
     }
 
@@ -311,7 +310,7 @@ export class AiAssistantWebSocketService {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
-      // console.error("Error sending message:", error);
+      console.error("Error sending message:", error);
       return false;
     }
   };
@@ -324,7 +323,7 @@ export class AiAssistantWebSocketService {
    */
   public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
     if (!this.webSocket || !this.isConnected) {
-      // console.error("WebSocket not connected, cannot send stop signal");
+      console.error("WebSocket not connected, cannot send stop signal");
       return false;
     }
 
@@ -332,6 +331,7 @@ export class AiAssistantWebSocketService {
       
       this.removeListener(`assistant-response_${tabId}`);
 
+      // Server is not handling stop generation event, so disabling it now will add it later.
       // this.webSocket.send(JSON.stringify({
       //   type: "stopGeneration",
       //   tabId,
@@ -343,7 +343,7 @@ export class AiAssistantWebSocketService {
 
       return true;
     } catch (error) {
-      // console.error("Error sending stop generation signal:", error);
+      console.error("Error sending stop generation signal:", error);
       return false;
     }
   };
