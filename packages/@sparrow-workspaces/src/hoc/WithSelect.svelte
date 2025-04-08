@@ -25,12 +25,6 @@
    */
   export let disabled;
 
-  export let minHeaderWidth;
-
-  export let minBodyWidth="150px";
- 
-
-  export let headerHeight="24px";
   $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>
 
@@ -45,13 +39,8 @@
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
-  minBodyWidth={minBodyWidth}
-  borderRounded={"4px"}
-  headerTheme={"secondary"}
-  bodyTheme={"surface"}
+  minBodyWidth={"150px"}
+  variant={"secondary"}
   menuItem={"v2"}
-  headerFontSize={"12px"}
-  isDropIconFilled={true}
-  minHeaderWidth={minHeaderWidth}
-  headerHeight={headerHeight}
+  minHeaderWidth={"160px"}
 />

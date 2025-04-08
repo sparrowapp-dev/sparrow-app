@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "../database/database";
 import type { Tab } from "@sparrow/common/types/workspace";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
@@ -798,10 +798,13 @@ export class TabRepository {
         }
         // Skip deletion if the tab type is not "COLLECTION", "FOLDER", "REQUEST", "WEBSOCKET".
         if (
-          tabJSON.type !== "COLLECTION" &&
-          tabJSON.type !== "FOLDER" &&
-          tabJSON.type !== "REQUEST" &&
-          tabJSON.type !== "WEBSOCKET"
+          tabJSON.type !== TabTypeEnum.COLLECTION &&
+          tabJSON.type !== TabTypeEnum.FOLDER &&
+          tabJSON.type !== TabTypeEnum.REQUEST &&
+          tabJSON.type !== TabTypeEnum.WEB_SOCKET &&
+          tabJSON.type !== TabTypeEnum.SOCKET_IO &&
+          tabJSON.type !== TabTypeEnum.GRAPHQL &&
+          tabJSON.type !== TabTypeEnum.SAVED_REQUEST
         ) {
           return false;
         }
@@ -850,7 +853,7 @@ export class TabRepository {
           return false;
         }
         // Skip deletion if the tab type is not "ENVIRONMENT".
-        if (tabJSON.type !== "ENVIRONMENT") {
+        if (tabJSON.type !== TabTypeEnum.ENVIRONMENT) {
           return false;
         }
         // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).
@@ -898,7 +901,7 @@ export class TabRepository {
           return false;
         }
         // Skip deletion if the tab type is not "TESTFLOW".
-        if (tabJSON.type !== "TESTFLOW") {
+        if (tabJSON.type !== TabTypeEnum.TESTFLOW) {
           return false;
         }
         // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).

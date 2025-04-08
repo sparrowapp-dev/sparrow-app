@@ -156,7 +156,7 @@
         >"{user.name}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{currentWorkspace.name}"</span> team.
+      <span class="text-whiteColor">"{currentWorkspace.name}"</span> hub.
     </p>
   </div>
   <div

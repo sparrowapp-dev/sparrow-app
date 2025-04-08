@@ -10,6 +10,7 @@
   export let prompt: string = "";
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
+  export let onStopGeneratingAIResponse;
 
   let isSendButtonHovered = false;
 
@@ -43,8 +44,6 @@
       MixpanelEvent(Events.AI_Initiate_Response);
     }
   };
-
-  const handleStopGenerating = () => {};
 </script>
 
 <!-- <div class="d-flex prompt-input-container"> -->
@@ -131,32 +130,20 @@
             name: "Open AI 4.0",
             id: "open-AI-40",
             disabled: true,
-            hide: true,
+            hide: false,
           },
           {
             name: "DeepSeek",
             id: "deepseek",
             disabled: true,
-            hide: true,
+            hide: false,
           },
         ]}
         titleId={"azure-ai"}
-        onclick={() => {
-          // Choose Different AI Models Feature Disabled Right Now
-        }}
+        headerHeight={"28px"}
         maxHeaderWidth={"110px"}
-        headerTheme={"transparent"}
         minBodyWidth={"182px"}
-        bodyTheme={"surface"}
-        bodyDirection={"up"}
-        borderType={"none"}
-        borderActiveType={"none"}
-        headerHighlight={"hover-active"}
         menuItem={"v2"}
-        position={"absolute"}
-        isBodyBorderEnabled={true}
-        borderRounded={"4px"}
-        headerFontWeight={600}
       />
     </div>
 
@@ -202,7 +189,7 @@
     {/if} -->
 
     <Tooltip
-      title={isResponseGenerating ? "Stop Generating" : "Start Generating"}
+      title={isResponseGenerating ? "Stop" : "Send"}
       placement={"top-center"}
       size={"small"}
     >
@@ -212,10 +199,12 @@
         size={"small"}
         startIcon={isResponseGenerating ? StopFilled : SendRegular}
         onClick={() => {
-          if (prompt.trim()) {
-            console.log("Action Button Called!");
-            if (isResponseGenerating) handleStopGenerating();
-            else hanldeStartGenerating();
+          if (isResponseGenerating) {
+            onStopGeneratingAIResponse();
+            return;
+          }
+          if (!isResponseGenerating && prompt.trim()) {
+            hanldeStartGenerating();
           }
         }}
       ></Button>

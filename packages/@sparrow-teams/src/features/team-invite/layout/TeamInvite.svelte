@@ -87,7 +87,7 @@
     }
     const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
     if (isEmailAlreadyExist) {
-      notifications.error("User already in team!");
+      notifications.error("User already in hub.");
     }
     const isUserExist = await onValidateEmail(email); // checks if user exist on server
     if (!isUserExist) {
@@ -300,20 +300,17 @@
       },
     ]}
     maxHeaderWidth={"100%"}
+    variant={"tertiary"}
+    size={"medium"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
-    bodyTheme={"violet"}
-    headerTheme={"violet2"}
-    borderRounded={"4px"}
-    headerFontWeight={400}
-    headerFontSize={"12px"}
     isError={roleError && selectedRole === defaultRole}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
   <p class="invite-subheader text-textColor mt-1 mb-1">
-    Admins will have access to all current and future team workspaces.
+    Admins will have access to all current and future hub workspaces.
   </p>
 {/if}
 {#if roleError && selectedRole === defaultRole}

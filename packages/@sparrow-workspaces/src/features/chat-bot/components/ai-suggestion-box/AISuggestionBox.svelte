@@ -21,7 +21,10 @@
     ]}
   />
 
-  <span class="title-txt">{title}</span>
+  <span
+    class="title-txt text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
+    >{title}</span
+  >
 </div>
 
 <style>

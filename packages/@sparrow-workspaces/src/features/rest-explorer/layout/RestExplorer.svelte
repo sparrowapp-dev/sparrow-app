@@ -123,6 +123,8 @@
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
   export let onGenerateDocumentation;
+  export let onStopGeneratingAIResponse;
+
   /**
    * Role of user in active workspace
    */
@@ -318,7 +320,6 @@
         {/if}
       </div>
       <div class="pt-2"></div>
-      <!-- class="h-full w-full" -->
       <div bind:this={splitpaneContainer} style="flex:1; overflow:auto;">
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
@@ -468,7 +469,7 @@
                           >
                             <div
                               class="d-flex"
-                              style="position:sticky; top:0; z-index:2; background-color:var(--bg-ds-surface-900)"
+                              style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                             >
                               <ResponseNavigator
                                 requestStateSection={storeData?.response
@@ -524,7 +525,6 @@
               <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
             {/if}
           </Pane>
-
           <!-- AI Chatbot Interface -->
           {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive}
             <Pane
@@ -539,6 +539,7 @@
                 {onUpdateAiConversation}
                 {onUpdateRequestState}
                 {onGenerateAiResponse}
+                {onStopGeneratingAIResponse}
                 {onToggleLike}
               />
             </Pane>

@@ -14,6 +14,7 @@
   export let index;
   export let pairs;
   export let theme;
+
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let updateParam;
@@ -63,9 +64,11 @@
       {/if}
     </div>
 
-    <div class="d-flex" style="width: calc(100% - 64px);">
-      <div class="w-50 position-relative"
-      style="font-weight: 500;">
+    <div
+      class="d-flex"
+      style="width: calc(100% - 64px); height:27px; margin-bottom:0px;"
+    >
+      <div class="w-50 position-relative text-ds-font-weight-medium">
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => {
@@ -76,11 +79,12 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-
         />
       </div>
-      <div class="w-50 position-relative"
-      style="font-weight: 500;">
+      <div
+        class="w-50 position-relative text-ds-font-weight-medium"
+        style=" margin-left:0.03px;"
+      >
         <CodeMirrorInput
           bind:value={element.value}
           onUpdateInput={() => {

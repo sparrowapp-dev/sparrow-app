@@ -66,13 +66,13 @@
   }
 </script>
 
-<div class="py-2 h-100 d-flex flex-column">
+<div class="h-100 d-flex flex-column">
   <section>
-    <div class={`d-flex  rounded mb-4 align-items-center`}>
+    <div class={`d-flex  rounded pb-3 align-items-center`}>
       <div>
         <Search
           variant="primary"
-          size="large"
+          size="medium"
           id="search-input-team-member"
           placeholder="Search people in {openTeam?.name}"
           bind:value={filterText}

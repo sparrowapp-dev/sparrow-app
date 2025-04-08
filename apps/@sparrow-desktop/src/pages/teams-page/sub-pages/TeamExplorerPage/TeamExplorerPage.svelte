@@ -91,7 +91,7 @@
 />
 
 <Modal
-  title={"Invite Team Members"}
+  title={"Add People to Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
@@ -142,7 +142,7 @@
 </Modal>
 
 <Modal
-  title={"Leave Team?"}
+  title={"Leave Hub?"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

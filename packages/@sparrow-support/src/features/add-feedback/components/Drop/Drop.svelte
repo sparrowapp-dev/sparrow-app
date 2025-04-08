@@ -90,7 +90,7 @@
         />
         {#if isInfoTooltipHovered}
           <div
-            class="p-2 position-absolute text-fs-12 bg-tertiary-650 border-radius-2"
+            class="p-2 position-absolute text-ds-font-size-12 bg-tertiary-650 border-radius-2"
             style="top:10px; right: 0; width: 243px; transform: translateY(-100%);"
           >
             <div class="pb-2">
@@ -101,7 +101,9 @@
                   color={"var(--text-primary-300)"}
                 /></span
               >
-              <span class="ps-2 text-fs-12 text-primary-300">Information</span>
+              <span class="ps-2 text-ds-font-size-12 text-primary-300"
+                >Information</span
+              >
             </div>
             <p class="mb-0">
               {@html infoMessage}

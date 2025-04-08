@@ -57,7 +57,8 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
-  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistantWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
 
@@ -510,9 +511,9 @@ export class DashboardViewModel {
       const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
-      notifications.success(`New team ${team.name} is created.`);
+      notifications.success(`New hub ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new team. Please try again.");
+      notifications.error("Failed to create a new hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -1023,19 +1024,19 @@ export class DashboardViewModel {
 
       environment = environment.map((_environment) => {
         const workspaceDetails = workspaceMap[_environment.workspaceId];
-        const path:string[] = [];
+        const path: string[] = [];
         if (workspaceDetails) {
           path.push(workspaceDetails.teamName);
           path.push(workspaceDetails.workspaceName);
         }
 
-        return ({
+        return {
           title: _environment.name,
           workspace: _environment.workspaceId,
           id: _environment.id,
           variable: _environment.variable,
-          path: this.createPath(path)
-        })
+          path: this.createPath(path),
+        };
       });
 
       let workspace = await this.getRecentWorkspace();
@@ -1044,7 +1045,7 @@ export class DashboardViewModel {
       let testflow = await this.getRecentTestflow();
       testflow = testflow.map((_value) => {
         const workspaceDetails = workspaceMap[_value._data.workspaceId];
-        const path:string[] = [];
+        const path: string[] = [];
         if (workspaceDetails) {
           path.push(workspaceDetails.teamName);
           path.push(workspaceDetails.workspaceName);
@@ -1052,7 +1053,7 @@ export class DashboardViewModel {
 
         return {
           ..._value._data,
-          path: this.createPath(path)
+          path: this.createPath(path),
         };
       });
 

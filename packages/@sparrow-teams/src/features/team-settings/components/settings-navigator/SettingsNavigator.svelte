@@ -7,7 +7,7 @@
 
   const settingsTabs = [
     {
-      name: "Teams",
+      name: "Profile",
       id: TeamSettingsTabsEnum.TEAM_PROFILE,
       visible: true,
       disabled: false,
@@ -74,7 +74,6 @@
 <style>
   .settings-list {
     height: 100%;
-    border-right: 1px solid var(--border-color);
   }
   .settings-tab {
     text-align: left;

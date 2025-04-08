@@ -203,6 +203,7 @@
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
@@ -217,7 +218,8 @@
     onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
     onUpdateAiConversation={_viewModel.updateRequestAIConversation}
     onUpdateRequestState={_viewModel.updateRequestState}
-    onGenerateAiResponse={_viewModel.generateAiResponse}
+    onGenerateAiResponse={_viewModel.generateAIResponseWS}
+    onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
     onToggleLike={_viewModel.toggleChatMessageLike}
   /> -->
 {/if}

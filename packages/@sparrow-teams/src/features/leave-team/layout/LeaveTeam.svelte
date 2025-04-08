@@ -37,10 +37,10 @@
   <div>
     <!-- Prompt message for the user to confirm leaving the team -->
     <p class="lightGray" style="color: lightGray;">
-      Are you sure you want to leave the team
+      Are you sure you want to leave the hub
       <span style="font-weight: 700;">
         "{teamName || ""}"
-      </span>? You will lose access to all the resources in this team.
+      </span>? You will lose access to all the resources in this hub.
     </p>
   </div>
 

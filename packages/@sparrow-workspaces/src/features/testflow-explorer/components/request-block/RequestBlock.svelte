@@ -9,6 +9,8 @@
     MoreHorizontalRegular,
     ErrorCircleRegular,
     ClockRegular,
+    DeleteRegular,
+    RenameRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
@@ -28,6 +30,7 @@
     TFNodeStoreType,
   } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
+  import { Button } from "@sparrow/library/ui";
 
   /**
    * The data object containing various handlers and data stores.
@@ -53,12 +56,16 @@
     parentDrag: boolean;
   };
   export let selected;
+  export let blockName = "REST API Request";
+  export let updateBlockName: (name: string) => void;
 
   /**
    * The unique identifier for the current block.
    */
   export let id;
 
+  let isEditing = false;
+  let inputfield: any;
   let isAddBlockVisible = false; // State to track visibility of add block button
   let isRunTextVisible = false; // State to track visibility of run text
 
@@ -176,16 +183,67 @@
     moreOptionsMenu = !moreOptionsMenu;
     data.onOpenDeleteModal(id);
   };
+
+  const handleClick = (item) => {
+    if (item.onClick) item.onClick();
+  };
+
+  const handleClickOutsideBlock = () => {
+    moreOptionsMenu = false;
+  };
+
+  onMount(() => {
+    document.addEventListener("click", handleClickOutsideBlock);
+  });
+
+  onDestroy(() => {
+    document.removeEventListener("click", handleClickOutsideBlock);
+  });
+
+  const enableEditing = () => {
+    isEditing = true;
+    $: if (isEditing) {
+      setTimeout(() => inputfield?.focus(), 0);
+    }
+  };
+
+  const disableEditing = () => {
+    isEditing = false;
+    updateBlockName(blockName);
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      disableEditing();
+    }
+  };
+
+  let moreOptions = [
+    // {
+    //   name: "Rename Block",
+    //   iconSize: "16px",
+    //   iconColor: "var(--icon-ds-neutral-50)",
+    //   Icon: RenameRegular,
+    //   onClick: enableEditing,
+    // },
+    {
+      name: "Delete",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-danger-300)",
+      Icon: DeleteRegular,
+      onClick: handleOpenModal,
+    },
+  ];
 </script>
 
 <div
   class="request-block position-relative"
-  style={selected && !currentBlock
+  style={selected && !currentBlock?.response.status
     ? "border: 1px solid var(--border-ds-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
-      ? "border: 1px solid var(--border-ds-success-300);"
+      ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
-        ? "border: 1px solid var(--border-ds-danger-300);"
+        ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
         : ""}
 >
   <Handle
@@ -203,7 +261,7 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock}
+        {#if !currentBlock?.response?.status}
           <ArrowSwapRegular
             size={"16px"}
             color={"var(--icon-ds-neutral-200)"}
@@ -220,41 +278,72 @@
           />
         {/if}
       </div>
-      <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
-        REST API Request
-      </span>
+      {#if !isEditing}
+        <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
+          REST API Request
+        </span>
+      {:else}
+        <input
+          bind:value={blockName}
+          bind:this={inputfield}
+          type="text"
+          class="rename-input"
+          on:blur={disableEditing}
+          on:keydown={handleKeyDown}
+        />
+      {/if}
     </div>
     <div
       style="position: relative;"
-      class="d-flex justify-content-center align-items-center moreOption-icon rounded"
+      class="d-flex justify-content-center align-items-center"
       tabindex="0"
-      on:click={() => {
-        moreOptionsMenu = !moreOptionsMenu;
-        event.stopPropagation();
-      }}
       on:blur={() => {
         moreOptionsMenu = false;
       }}
     >
-      <MoreHorizontalRegular
-        size={"16px"}
-        color={"var(--icon-ds-neutral-100)"}
+      <Button
+        type="teritiary-regular"
+        id="moreOpitonsButton"
+        size="small"
+        iconSize={16}
+        startIcon={MoreHorizontalRegular}
+        onClick={() => {
+          moreOptionsMenu = !moreOptionsMenu;
+          event.stopPropagation();
+        }}
       />
-
       {#if moreOptionsMenu}
         <div
-          class="d-flex align-items-center justify-content-center"
-          style="z-index:1000; border-radius:2px; height:29px; width:96px; background-color:#22232E; position:absolute; top:27px; right:-75px;"
+          class="menu-container"
+          style="background-color: var(--bg-ds-surface-600); z-index:1000; border-radius:4px; width:150px; position:absolute; top:30px; right:-123px;"
         >
-          <div
-            class="d-flex align-items-center justify-content-start"
-            style="color:#FF4646; background-color: #2E2F3D; height:23px; width:90px; border-radius:2px;"
-            on:click={() => {
-              handleOpenModal();
-            }}
-          >
-            <p class="pb-0 mb-0 ps-1">Delete</p>
-          </div>
+          {#each moreOptions as item}
+            <div
+              class="menu-item d-flex align-items-center justify-content-start gap-2"
+              style="color: {item.iconColor};"
+              on:click={() => handleClick(item)}
+              tabindex={0}
+            >
+              <svelte:component
+                this={item.Icon}
+                size={item.iconSize}
+                color={item.iconColor}
+              />
+              <p
+                class="menu-text"
+                style="
+              margin: 0;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              flex: 1;
+              max-width: 100px;
+            "
+              >
+                {item.name}
+              </p>
+            </div>
+          {/each}
         </div>
       {/if}
     </div>
@@ -272,7 +361,7 @@
         method={req.method}
       />
     </div>
-    {#if !currentBlock}
+    {#if !currentBlock?.response?.status}
       {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
           <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
@@ -283,7 +372,7 @@
   </div>
   <!-- ------------ -->
   <!-- Block footer -->
-  {#if currentBlock}
+  {#if currentBlock?.response?.status}
     <div class="px-2 d-flex response-status-container">
       <!-- Response status -->
       <div
@@ -429,7 +518,7 @@
         <hr class="my-0 base-line" />
         <div class="px-2 py-2">
           <p
-            class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-10 text-secondary-200"
+            class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-14 text-secondary-200"
           >
             <span> Select API Request </span>
             <span
@@ -455,6 +544,7 @@
     font-size: 0.7rem;
     width: 222px;
     border-radius: 8px;
+    outline: none;
   }
   .connecting-dot-left {
     background-color: var(--bg-ds-surface-600);
@@ -479,6 +569,7 @@
     width: 222px;
   }
   .dummy-dropdown {
+    height: 36px;
     background-color: var(--bg-ds-surface-400);
     padding-top: 6px;
     padding-bottom: 6px;
@@ -488,7 +579,7 @@
     color: var(--text-ds-neutral-400);
     font-family: "Inter", sans-serif;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 18px;
   }
   .add-block-btn {
@@ -501,6 +592,7 @@
     display: none;
   }
   .request-block:hover {
+    outline: 1px solid var(--text-ds-neutral-300);
     .add-block-btn {
       display: flex;
     }
@@ -546,6 +638,45 @@
   }
   .moreOption-icon:hover {
     background-color: var(--bg-tertiary-190);
+  }
+  .menu-container {
+    padding: 4px;
+  }
+  .menu-item {
+    background-color: var(--bg-ds-surface-600);
+    height: 28px;
+    border-radius: 4px;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: var(--text-ds-neutral-50);
+    border: none;
+  }
+  .menu-item:hover {
+    background-color: var(--bg-ds-surface-400);
+  }
+  .menu-item:active {
+    background-color: var(--bg-ds-surface-700);
+  }
+  .menu-item:focus-visible {
+    outline: 1px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+  }
+  .rename-input {
+    border: none;
+    background-color: transparent;
+    color: var(--bg-ds-neutral-50);
+    height: 24px;
+    width: 150px;
+    outline: none;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .rename-input:focus {
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
 
   .drop-here-box {

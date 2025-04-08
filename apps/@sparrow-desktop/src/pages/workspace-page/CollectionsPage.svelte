@@ -237,6 +237,7 @@
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
+        tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -373,7 +374,8 @@
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
-      removeTab.type === TabTypeEnum.GRAPHQL
+      removeTab.type === TabTypeEnum.GRAPHQL ||
+      removeTab.type === TabTypeEnum.FOLDER
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -389,6 +391,13 @@
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.FOLDER) {
+          const res = await _viewModel.saveFolder(removeTab);
           if (res) {
             loader = false;
             _viewModel.handleRemoveTab(id);
@@ -833,7 +842,6 @@
   >
     <Button
       title="Don't Close"
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       onClick={() => {
         "click dont save";
@@ -842,7 +850,6 @@
     ></Button>
     <Button
       title="Force Close"
-      textStyleProp={"font-size: var(--base-text)"}
       type={"danger"}
       onClick={() => {
         "click dont save";

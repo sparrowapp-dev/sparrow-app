@@ -10,6 +10,7 @@
   export let headingDataSortable = "false";
   export let headerContentClassProp = "";
   export let onSortToggle = (field: string) => {};
+  export let isSortDisabled = false;
 
   import { ArrowSortRegular } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
@@ -30,7 +31,7 @@
         {#if heading !== "Contributors" || (heading === "Contributors" && contributorsCount > 1)}
           <th
             data-sortable={headingDataSortable}
-            class="{headerContentClassProp} tab-head"
+            class="{headerContentClassProp} tab-head text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-semi-bold"
           >
             <div
               style="display: flex; gap: 4px; align-items: center; padding:8px;max-height:30px"
@@ -42,6 +43,7 @@
                   size={"small"}
                   type={"teritiary-regular"}
                   onClick={() => handleSortClick("updatedAt")}
+                  disable={isSortDisabled}
                 />
               {/if}
             </div>

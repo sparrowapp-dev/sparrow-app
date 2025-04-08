@@ -91,6 +91,8 @@ import {
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
+import { getClientUser } from "@app/utils/jwt";
+
 class RestExplorerViewModel {
   /**
    * Repository
@@ -109,7 +111,8 @@ class RestExplorerViewModel {
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
   private aiAssistentService = new AiAssistantService();
-  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistentWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   /**
    * Utils
    */
@@ -2286,6 +2289,167 @@ class RestExplorerViewModel {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+
+  // AI WebSocket - Start
+
+  /**
+   * Handles socket connection errors with a consistent approach
+   * @param componentData - The current component data
+   */
+  private async handleAIResponseError(
+    componentData: RequestTab,
+    errorMessage: string,
+  ) {
+    await this.updateRequestAIConversation([
+      ...(componentData?.property?.request?.ai?.conversations || []),
+      {
+        message:
+          errorMessage || "Woops! Something went wrong. Please try again...",
+        messageId: uuidv4(),
+        type: MessageTypeEnum.RECEIVER,
+        isLiked: false,
+        isDisliked: false,
+        status: false,
+      },
+    ]);
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
+  }
+
+  /**
+   * Generates the AI Response from server with websocket communication protocol
+   * @param Prompt - Prompt from the user
+   */
+  public generateAIResponseWS = async (prompt = "") => {
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
+    const componentData = this._tab.getValue();
+
+    // extraction of request API data for setting AI Context
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
+
+    try {
+      const userEmail = getClientUser().email;
+
+      const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        userEmail,
+        prompt,
+        JSON.stringify(apiData),
+      );
+
+      if (!socketResponse) {
+        throw new Error("Woops! Something went wrong. Please try again...");
+      }
+
+      // Remove existing listeners to prevent duplicates
+      const events = [
+        `assistant-response`,
+        `assistant-response_${componentData.tabId}`,
+        `disconnect`,
+        `connect_error`,
+      ];
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.removeListener(event),
+      );
+
+      // Unified event handler
+      const handleSocketEvent = async (event, response) => {
+        switch (event) {
+          case "disconnect":
+          case "connect_error":
+            console.error(`Socket ${event}:`, response);
+            await this.handleAIResponseError(
+              componentData,
+              "Woops! Something went wrong. Please try again...",
+            );
+            break;
+
+          case `assistant-response`:
+          case `assistant-response_${componentData.tabId}`:
+            if (response.messages) {
+              // After getting response don't listen again for this the same request
+              events.forEach((event) =>
+                this.aiAssistentWebSocketService.removeListener(event),
+              );
+
+              if (response.messages.includes("Limit Reached")) {
+                await this.updateRequestAIConversation([
+                  ...(componentData?.property?.request?.ai?.conversations ||
+                    []),
+                  {
+                    message:
+                      "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.",
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: false,
+                  },
+                ]);
+              } else if (response.messages.includes("Some Issue Occurred")) {
+                await this.updateRequestAIConversation([
+                  ...(componentData?.property?.request?.ai?.conversations ||
+                    []),
+                  {
+                    message: "Something went wrong! Please try again.",
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: false,
+                  },
+                ]);
+              } else {
+                const thisTabThreadId =
+                  componentData?.property?.request?.ai?.threadId;
+                if (!thisTabThreadId) {
+                  await this.updateRequestAIThread(response.thread_Id);
+                }
+                await this.updateRequestAIConversation([
+                  ...(componentData?.property?.request?.ai?.conversations ||
+                    []),
+                  {
+                    message: "",
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: true,
+                  },
+                ]);
+
+                console.log("**** updating ******* !");
+
+                await this.displayDataInChunks(response.messages, 100, 300);
+              }
+            }
+            await this.updateRequestState({
+              isChatbotGeneratingResponse: false,
+            });
+            break;
+        }
+      };
+
+      // Add new listeners
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.addListener(event, (response) =>
+          handleSocketEvent(event, response),
+        ),
+      );
+    } catch (error) {
+      console.error("Error in AI response generation:", error.message);
+      await this.handleAIResponseError(componentData, error.message);
+    }
+  };
+
+  // AI WebSocket - End
 
   /**
    * Generates an AI response based on the given prompt.
