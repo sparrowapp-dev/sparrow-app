@@ -299,7 +299,7 @@
     <!-- Response Pane -->
     <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
       <div class="response-pane-container">
-        {#if selectedNodeResponse === undefined}
+        {#if !responseLoader && selectedNodeResponse === undefined}
           <div class="dumy-response-container">
             <SparrowLogo />
             <div class="response-text-container">
