@@ -719,7 +719,7 @@
       {#if testflowStore?.isTestFlowRunning}
         <div class="d-flex testing-text-container">
           <div class="loader"></div>
-          <p class="testing-txt">Testing</p>
+          <p class="testing-txt">Running</p>
         </div>
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
@@ -773,6 +773,7 @@
           isSave={$tab.isSaved}
           {isTestflowEditable}
           {onSaveTestflow}
+          testFlowRunning={testflowStore?.isTestFlowRunning}
         />
       </div>
       <div class="position-relative">
@@ -1220,7 +1221,7 @@
     align-self: center;
     align-content: center;
     margin-top: 15%;
-    margin-right: 10px;
+    margin-right: 6px;
   }
   .testing-text-container {
     align-items: center;
@@ -1228,7 +1229,8 @@
     height: 36px;
     background-color: var(--bg-tertiary-750);
     width: 110px;
-    margin-right: 10px;
+    margin-right: 6px;
+    padding-left: 12px;
     border-radius: 4px;
   }
 </style>
