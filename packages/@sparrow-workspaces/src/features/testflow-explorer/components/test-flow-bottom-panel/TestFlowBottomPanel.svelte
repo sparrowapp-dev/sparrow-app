@@ -7,7 +7,6 @@
     ErrorCircleRegular,
     ArrowSwapRegular,
   } from "@sparrow/library/icons";
-  import { ResponseErrorScreen } from "../../../rest-explorer-saved/components";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import {
     RequestBodyTestFlow,
@@ -15,15 +14,16 @@
     RequestNavigatorTestFlow,
     RequestParameterTestFlow,
     RequestAuthorizationTestFlow,
+    ResponseErrorScreen,
+    ResponseHeaders,
+    ResponseNavigator,
+    ResponseBody,
+    ResponseBodyNavigator,
+    ResponseStatus,
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { testFlowDataStore } from "../../store";
-  import ResponseHeaders from "../response-headers/ResponseHeaders.svelte";
-  import ResponseBody from "../response-body/ResponseBody.svelte";
-  import ResponseNavigator from "../response-navigator/ResponseNavigator.svelte";
-  import ResponseBodyNavigator from "../response-body-navigator/ResponseBodyNavigator.svelte";
-  import ResponseStatus from "../response-status/ResponseStatus.svelte";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
 
   export let selectedBlock;
@@ -136,7 +136,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-
+          
           // requestNavigation = "Parameters"
           // Reset the response format
           // responseState = {
