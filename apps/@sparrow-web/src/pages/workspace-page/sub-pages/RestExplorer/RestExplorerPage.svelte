@@ -203,12 +203,12 @@
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
-  onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
   azureBlobCDN={constants.AZURE_CDN_URL}
   onSaveResponse={_viewModel.saveResponse}
-  onGenerateAiResponse={_viewModel.generateAiResponse}
+  onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
+  onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
 />
