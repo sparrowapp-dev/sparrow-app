@@ -520,7 +520,7 @@
           role="button"
           on:keydown={() => {}}
         >
-          {#if menuItem === "v2"}
+        {#if menuItem === "v2"}
             <MenuItemsv2
               {list}
               fontSize={headerFontSize}
@@ -603,6 +603,9 @@
   }
 
   // hover or open-body states
+  .select-btn-state-active-light-violet {
+    background-color: var(--bg-ds-surface-600);
+  }
   .select-btn-state-active-transparent {
     background-color: var(--bg-ds-surface-600);
   }
@@ -678,6 +681,12 @@
     background-color: transparent;
   }
   .select-background-secondary:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none !important;
+    border-radius: 4px !important;
+  }
+
+  .select-background-light-violet:focus-visible {
     border: 2px solid var(--border-ds-primary-300);
     outline: none !important;
     border-radius: 4px !important;
