@@ -276,7 +276,7 @@
                   label="Bulk Edit"
                   fontSize="12px"
                   textColor="var(--text-ds-neutral-200)"
-                  fontWeight="500"
+                  fontWeight="400"
                   onClick={handleBulkTextUpdate}
                   onChange={toggleBulkEdit}
                 />
@@ -404,7 +404,7 @@
                   bind:isActive={bulkToggle}
                   label="Bulk Edit"
                   fontSize="12px"
-                  fontWeight="500"
+                  fontWeight="400"
                   onClick={handleBulkTextUpdate}
                   textColor="var(--text-ds-neutral-200)"
                   onChange={toggleBulkEdit}
