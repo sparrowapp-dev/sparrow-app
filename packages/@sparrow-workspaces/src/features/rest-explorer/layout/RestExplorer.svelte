@@ -664,9 +664,7 @@
         onUpdateRequestState({
           isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
         });
-        setTimeout(() => {
-          scrollList("bottom", -1, "auto");
-        }, 0);
+
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}
     >
@@ -678,12 +676,6 @@
           : 'none'}"
       >
         <SparrowSecondaryIcon />
-
-        <!-- {#if !$tab?.property?.request?.state?.isChatbotActive}
-        <SparrowSecondaryIcon />
-      {:else}
-        <CaretDownFilled /> -->
-        <!-- {/if} -->
       </div>
     </div>
   </div>

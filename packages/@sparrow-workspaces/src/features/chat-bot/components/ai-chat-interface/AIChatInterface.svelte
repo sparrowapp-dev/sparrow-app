@@ -58,7 +58,7 @@
     codeBlockHtml = codeBlock.outerHTML; // get its full HTML
     isCodePreviewOpened = true;
 
-    await tick(); // ensure modal renders
+    await tick(); // ensure modal renders first
   };
 
   const handleCloseCodePreviewPopup = () => {
@@ -66,17 +66,17 @@
     codeBlockHtml = ""; // clear after closing
   };
 
-  export function innerHtml(node: HTMLElement, html: string) {
+  export const setupCodeBlockForPreview = (node: HTMLElement, html: string) => {
     node.innerHTML = html;
     return {
       update(newHtml: string) {
         node.innerHTML = newHtml;
       },
     };
-  }
+  };
 </script>
 
-<!-- Your modal -->
+<!-- Code Block Preview Modal -->
 <Modal
   title="Code Preview"
   type="dark"
@@ -87,8 +87,7 @@
 >
   <div
     class="message-wrapper mt-3"
-    id="code-block-preview"
-    use:innerHtml={codeBlockHtml}
+    use:setupCodeBlockForPreview={codeBlockHtml}
   ></div>
 </Modal>
 
@@ -230,17 +229,13 @@
 
 <style>
   .ai-chat-panel {
-    /* min-width: 340px;
-    max-width: 530px; */
     background-color: var(--bg-ds-surface-700);
     border-radius: 6px;
-    border: 1px solid #31353f;
+    border: 1px solid var(--bg-ds-surface-100);
     padding: 10px;
   }
   .chat-box {
     background-color: var(--bg-ds-surface-700);
-    /* border: 0.5px solid #5751fd; */
-    /* border-radius: 8px; */
   }
 
   .chatbox-heading {
@@ -254,33 +249,19 @@
     inset: 0;
     padding: 1px;
     border-radius: 8px;
-    /* background: linear-gradient(
-      90deg,
-      var(--border-ds-info-400) 0%,
-      var(--border-ds-primary-400) 50%,
-      var(--border-ds-secondary-400) 100%
-    );
-    -webkit-mask:
-      linear-gradient(white 0 0) content-box,
-      linear-gradient(white 0 0);
-    -webkit-mask-composite: destination-out;
-    mask-composite: exclude; */
     pointer-events: none;
   }
   .gradient-text {
-    /* background: linear-gradient(to right, #158ff1, #5751fd); */
     background: white;
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     font-size: 14px;
     font-weight: 400;
-    /* padding-left: 8px; */
   }
 
   .close-btn {
     cursor: pointer;
-    /* margin-right: 10px; */
     height: 30px;
     width: 30px;
     border-radius: 4px;
@@ -296,8 +277,6 @@
   }
 
   .generating-img {
-    /* position: absolute; */
-    /* top: -40%; */
     background-color: var(--bg-ds-surface-700);
     width: 100%;
     margin-bottom: 10px;

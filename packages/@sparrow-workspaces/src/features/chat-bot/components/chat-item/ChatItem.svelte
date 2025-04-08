@@ -2,18 +2,12 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@sparrow/library/ui";
-  import { copyIcon, tickIcon, ArrowExpand, CopyIcon2 } from "../../assests";
+  import { copyIcon, tickIcon, ArrowExpand } from "../../assests";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";
   import "highlight.js/styles/atom-one-dark.css";
-  import {
-    // CopyIcon2,
-    DislikeIcon,
-    LikeIcon,
-    RefreshIcon,
-    TickIcon,
-  } from "@sparrow/library/icons";
+  import { TickIcon } from "@sparrow/library/icons";
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -67,41 +61,29 @@
         container.className = "wrapper";
         const lang = pre.querySelector("code")?.getAttribute("class");
         hljs.highlightBlock(pre.querySelector("code"));
-        // Add content or value to the container div
+        // Adding code block action buttons like copy code and preview code
         container.innerHTML = `
-      <div class="code-header d-flex align-items-center justify-content-between">
-        <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${ArrowExpand}" id="${index}">
-          <div class="codeBlock-action-btns-tooltip">Preview
-            <div class="codeBlock-action-btns-tooltip-square"></div>
-          </div>
-        </button>
-        <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${CopyIcon2}" id="${index}">
-          <div class="codeBlock-action-btns-tooltip">Copy
-            <div class="codeBlock-action-btns-tooltip-square"></div>
-          </div>
-        </button>
-      </div>
-        `;
+            <div class="code-header d-flex align-items-center justify-content-between">
+              <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+                <img src="${ArrowExpand}" id="${index}">
+                <div class="codeBlock-action-btns-tooltip">Preview
+                  <div class="codeBlock-action-btns-tooltip-square"></div>
+                </div>
+              </button>
+              <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+                <img src="${copyIcon}" id="${index}">
+                <div class="codeBlock-action-btns-tooltip">Copy
+                  <div class="codeBlock-action-btns-tooltip-square"></div>
+                </div>
+              </button>
+            </div>
+          `;
 
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
       }
     });
 
-    /*
-    <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
-        <span>${lang?.split("-")[1] ?? ""}</span>
-        <button role="button" class="position-relative codeBlock-action-btns-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${copyIcon}" id="${index}">
-          <button class="codeBlock-action-btns-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
-            <div class="codeBlock-action-btns-tooltip-square"></div>
-          </button>
-        </button>
-      </div>
-
-    */
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
   };
@@ -112,12 +94,20 @@
    * @param event - The mouse event triggered by clicking on the wrapper.
    */
   const handleCopyCode = async (event: MouseEvent) => {
-    const id = (event.target as HTMLElement).id;
     const targetElement = event.target as
       | HTMLImageElement
       | HTMLButtonElement
       | any;
     const firstChild = targetElement.children[0];
+
+    // Prevent click if tick icon is already shown
+    if (
+      targetElement.classList.contains("tick-icon") ||
+      firstChild?.classList?.contains("tick-icon")
+    ) {
+      return;
+    }
+
     const tagName = targetElement.tagName;
     if (tagName === "IMG") {
       const originalSrc = targetElement?.src;
@@ -137,6 +127,7 @@
         firstChild.classList.remove("tick-icon");
       }, 5000);
     }
+
     const target = (event.target as HTMLElement).closest(
       ".wrapper",
     ) as HTMLElement | null;
@@ -157,6 +148,11 @@
     }
   };
 
+  /**
+   * Handles the click event to preview code from a specified wrapper to the modal popup.
+   *
+   * @param event - The mouse event triggered by clicking on the wrapper.
+   */
   const handleCodePreview = async (event: MouseEvent) => {
     const wrapper = (event.target as HTMLElement).closest(
       ".wrapper",
@@ -167,7 +163,6 @@
     const preElement = wrapper.querySelector("pre > code")
       ?.parentElement as HTMLPreElement | null;
 
-    console.log("pre element >", preElement);
     if (preElement) {
       onClickCodeBlockPreview(preElement);
     }
@@ -396,13 +391,12 @@
 
   :global(.message-wrapper .wrapper) {
     border-radius: 4px !important;
-    /* overflow: hidden !important; */
     margin-bottom: 10px;
   }
 
-  :global(.message-wrapper) {
+  /* :global(.message-wrapper) {
     overflow: hidden !important;
-  }
+  } */
 
   :global(.wrapper) {
     position: relative;
@@ -410,7 +404,6 @@
 
   :global(.code-header) {
     position: absolute;
-    top: 0;
     right: 0;
     transform: translate(-30%, -50%);
     border-radius: 4px;
@@ -418,7 +411,6 @@
     border: 1px solid var(--border-ds-surface-300);
     padding: 2px;
     gap: 2px;
-    z-index: 1; /* Make sure it stays above code block */
   }
 
   :global(.message-wrapper .hljs) {
@@ -426,21 +418,23 @@
     min-width: 276px;
     max-height: 400px;
     min-height: 70px;
-    background: #000 !important;
+
+    /* *sparrow black is not rendering, so using hardcode hexcode* */
     /* background: var(--sparrow-black) !important; */
+    background: #000 !important;
+
     border: 2px solid var(--border-ds-surface-400);
     border-radius: 8px;
     overflow-y: auto;
     overflow-x: hidden;
     white-space: pre-wrap;
     word-break: break-word;
-    /* padding-top: 10px; */
   }
 
+  /* Styling code block scroll bar */
   :global(.message-wrapper .hljs::-webkit-scrollbar-thumb) {
     background-color: var(--bg-ds-surface-100);
   }
-
   :global(.message-wrapper .hljs::-webkit-scrollbar),
   :global(.message-wrapper .hljs::-webkit-scrollbar-thumb),
   :global(.message-wrapper .hljs::-webkit-scrollbar-button) {
@@ -483,25 +477,20 @@
     transform: translateX(-50%);
     position: absolute;
     padding: 4px 8px;
-    /* background-color: var(--bg-tertiary-700); */
-    background-color: #31353f;
+    background-color: var(--bg-ds-surface-100);
     opacity: 0;
-    z-index: 9999;
     /* -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75); */
   }
   :global(.codeBlock-action-btns-tooltip-square) {
-    /* z-index: 1000; */
     position: absolute;
     bottom: -5px;
     left: 50%;
     border-radius: 2px;
     height: 10px;
     width: 10px;
-    /* background-color: var(--bg-tertiary-700); */
-    background-color: #31353f;
-    z-index: 9999;
+    background-color: var(--bg-ds-surface-100);
     transform: translateX(-38%) rotate(45deg); /* Rotate 45 degrees */
   }
   :global(

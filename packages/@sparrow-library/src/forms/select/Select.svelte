@@ -662,10 +662,6 @@
     background: var(--background-hover) !important;
     backdrop-filter: blur(2px);
   }
-  .body-border-enabled {
-    border: 1px solid var(--bg-ds-surface-100);
-    border-radius: 4px;
-  }
   .select-btn p,
   .select-data p {
     font-size: 12px;

@@ -58,7 +58,7 @@
   onMount(() => {
     setTimeout(() => {
       if (scrollList) scrollList("bottom", -1, "auto");
-    }, 10);
+    }, 100);
   });
 
   const regenerateAiResponse = async () => {
@@ -70,15 +70,6 @@
       MixpanelEvent(Events.AI_Regenerate_Response),
     );
   };
-
-  // $: {
-  //   if ($tab?.property?.request?.state?.isChatbotActive) {
-  //     console.log("Scrolling the list!");
-  //     setTimeout(() => {
-  //       scrollList("bottom", -1, "auto");
-  //     }, 1);
-  //   }
-  // }
 </script>
 
 {#if $tab?.property?.request?.state?.isChatbotActive}
