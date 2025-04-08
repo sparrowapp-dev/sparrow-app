@@ -59,7 +59,6 @@ export class TestflowExplorerPageViewModel {
    * Utils
    */
   private _decodeRequest = new DecodeRequest();
-  private _abortController: AbortController | null = null;
 
   /**
    * Constructor to initialize the TestflowExplorerPageViewModel class
@@ -374,16 +373,18 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
-    this._abortController = new AbortController();
-    const { signal } = this._abortController;
+    const abortController = new AbortController();
+    const { signal } = abortController;
 
     testFlowDataStore.update((testFlowDataMap) => {
       let wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
         wsData.nodes = [];
         wsData.isTestFlowRunning = true;
+        wsData.abortController = abortController;
       } else {
         wsData = {
+          abortController: abortController,
           nodes: [],
           history: [],
           isRunHistoryEnable: false,
@@ -921,18 +922,26 @@ export class TestflowExplorerPageViewModel {
    * @description - This function stops the api calls in Testflow.
    */
   public handleStopApis = () => {
-    if (this._abortController) {
-      this._abortController.abort();
-      this._abortController = null;
-    }
+    let abortController;
     testFlowDataStore.update((testFlowDataMap) => {
       const currentTestflow = this._tab.getValue();
       const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
       if (wsData) {
-        wsData.isTestFlowRunning = false;
-        testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+        abortController = wsData.abortController;
       }
       return testFlowDataMap;
     });
+    if (abortController) {
+      abortController.abort();
+      testFlowDataStore.update((testFlowDataMap) => {
+        const currentTestflow = this._tab.getValue();
+        const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+        if (wsData) {
+          wsData.isTestFlowRunning = false;
+          testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+        }
+        return testFlowDataMap;
+      });
+    }
   };
 }
