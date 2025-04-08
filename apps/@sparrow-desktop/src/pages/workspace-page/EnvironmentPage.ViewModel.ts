@@ -11,7 +11,8 @@ import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
 
-import { createDeepCopy } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -165,6 +166,8 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
+      // scroll the top tab bar to right 
+      moveNavigation("right")
       notifications.success("New Environment created successfully.");
       return;
     }
@@ -190,6 +193,8 @@ export class EnvironmentViewModel {
         workspaceId: currentWorkspace._id,
         id: res._id,
       });
+      // scroll the top tab bar to right 
+      moveNavigation("right")
       notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
@@ -215,6 +220,7 @@ export class EnvironmentViewModel {
       .setName(environment?.name)
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable);
+    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
   };
 
@@ -333,6 +339,7 @@ export class EnvironmentViewModel {
       currentWorkspace._id,
     );
     initEnvironmentTab.setName(env.name).setVariable(env.variable);
+    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.tabRepository.createTab(initEnvironmentTab.getValue());
   };

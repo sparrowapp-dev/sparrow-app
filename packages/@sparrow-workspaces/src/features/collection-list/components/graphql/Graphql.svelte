@@ -10,7 +10,11 @@
 
   // --- Icons
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
-  import { GraphIcon, SocketIoIcon } from "@sparrow/library/icons";
+  import {
+    GraphIcon,
+    MoreHorizontalRegular,
+    SocketIoIcon,
+  } from "@sparrow/library/icons";
 
   // --- Types
   import {
@@ -128,7 +132,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-12">
+  <div class="text-lightGray mb-1 text-ds-font-size-12">
     <p>
       Are you sure you want to delete this {GraphqlRequestDefaultAliasBaseEnum.NAME}?
       <span class="text-whiteColor fw-bold">"{graphql.name}"</span>
@@ -137,13 +141,11 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       loader={false}
       onClick={() => {
@@ -154,7 +156,6 @@
     <Button
       disable={deleteLoader}
       title={"Delete"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
@@ -173,7 +174,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -227,14 +228,16 @@
 {/if}
 
 <div
+  tabindex="0"
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {graphql.id ===
+  class="d-flex align-items-center justify-content-between my-button btn-primary {graphql.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px; padding-left:3px; margin-bottom: 2px;"
 >
   <button
+    tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -246,25 +249,31 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px; height:100%;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {graphql.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="height: 24px; width:24px !important; margin-right:4px;"
+    ></div>
     <span class="api-method">
       <GraphIcon
-        height={"14px"}
-        width={"14px"}
-        color={"var(--icon-danger-1100)"}
+        height={"12px"}
+        width={"12px"}
+        color={"var(--icon-ds-accent-400)"}
       />
     </span>
 
     {#if isRenaming}
       <input
-        class="py-0 rename-input-field-graphql"
-        style="font-size: 12px; width: calc(100% - 50px);"
+        class="py-0 rename-input-field-graphql text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style=" width: calc(100% - 50px);"
         id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
@@ -278,9 +287,13 @@
     {:else}
       <div
         class="api-name ellipsis {graphql?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
+        style=" color: var(--text-ds-neutral-200);"
       >
-        {graphql.name}
+        <p
+          class=" ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        >
+          {graphql.name}
+        </p>
       </div>
     {/if}
   </button>
@@ -295,18 +308,20 @@
       zIndex={701}
       distance={17}
     >
-      <button
-        id={`show-more-graphql-${graphql.id}`}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <span class="threedot-icon-container d-flex">
+        <Button
+          tabindex={"-1"}
+          id={`show-more-graphql-${graphql.id}`}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            e.stopPropagation();
+            rightClickContextMenu(e);
+          }}
+        />
+      </span>
     </Tooltip>
   {/if}
 </div>
@@ -314,23 +329,27 @@
 <style lang="scss">
   .delete-ticker {
     color: var(--error--color);
-    font-weight: 500;
+    font-weight: 400;
   }
   .api-method {
     font-size: 10px;
-    font-weight: 500;
-    width: 48px !important;
-    height: 30px;
-    padding-left: 6px;
-    padding-right: 4px;
+    font-weight: 400;
+    width: 30px !important;
+    height: 24px;
+
     border-radius: 8px;
     display: flex;
     align-items: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
-    font-weight: 400;
-    width: calc(100% - 48px);
+    font-weight: 500;
+    width: calc(100% - 58px);
     text-align: left;
+    font-size: 12px;
+    line-height: 18px;
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -367,23 +386,39 @@
 
   .threedot-active {
     visibility: visible;
-    background-color: var(--bg-tertiary-600);
-  }
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
+    // background-color: var(--bg-tertiary-600);
   }
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
 
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    outline: none;
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
   }
 
   .btn-primary:hover {
@@ -422,19 +457,23 @@
   .rename-input-field-graphql {
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--text-ds-neutral-50);
+    padding: 4px 2px;
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    height: 24px;
+    font-size: 12px;
+    line-height: 18px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .rename-input-field-graphql:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
-    background-color: var(--bg-tertiary-400) !important;
+    background-color: var(--bg-ds-surface-500) !important;
     .delete-ticker {
       background-color: var(--selected-active-sidebar) !important;
     }

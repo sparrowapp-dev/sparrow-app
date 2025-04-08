@@ -18,7 +18,7 @@ jobs:
               password: ${{ secrets.REGISTRY_PASSWORD }}
 
          - run: |
-              docker build -f ./Sparrowweb.Dockerfile \
+              docker build -f ./Sparrow-Web.Dockerfile \
                 --build-arg PORT=${{ vars.PORT }} \
                 --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
                 --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \

@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    GlobalSearch,
     LoginBanner,
     LoginSignupConfirmation,
     SwitchWorkspace,
@@ -32,6 +31,7 @@
   import { isGuestUserActive } from "@app/store/auth.store";
   import { OSDetector } from "@sparrow/common/utils";
   import { fade } from "svelte/transition";
+  import { GlobalSearch } from "@sparrow/common/features";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -148,6 +148,11 @@
     }
   };
   const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
+    if (isGlobalSearchOpen && event.key === "Escape") {
+      event.preventDefault();
+      setGlobalSearch(false);
+      return;
+    }
     if (
       decidingKey(event) &&
       event.key.toLowerCase() === "f" &&
@@ -219,6 +224,7 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+    if (!guestUser) await _viewModel.connectWebSocket();
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
@@ -512,6 +518,8 @@
     }}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    handleDocsRedirect={_viewModel.redirectDocs}
+    handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
 
   <!-- 
@@ -524,7 +532,7 @@
   />
 
   <Modal
-    title={"New Team"}
+    title={"New Hub"}
     type={"dark"}
     width={"35%"}
     zIndex={1000}

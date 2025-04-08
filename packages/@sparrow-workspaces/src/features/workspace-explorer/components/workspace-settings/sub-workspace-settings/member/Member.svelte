@@ -3,7 +3,7 @@
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
-  import {Avatar} from "@sparrow/library/ui";
+  import { Avatar } from "@sparrow/library/ui";
 
   export let onRemoveUserFromWorkspace;
 
@@ -156,7 +156,7 @@
         >"{user.name}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{currentWorkspace.name}"</span> team.
+      <span class="text-whiteColor">"{currentWorkspace.name}"</span> hub.
     </p>
   </div>
   <div
@@ -190,13 +190,14 @@
   class="member-data-container d-flex align-items-center mb-2 w-100"
   style="height: 46px;"
 >
- <div class="me-2">
-      <Avatar
-    type="letter"
-    size="medium"
-    letter={user?.name[0]}
-    bgColor="var(--bg-secondary-600)"/>
-    </div>
+  <div class="me-2">
+    <Avatar
+      type="letter"
+      size="medium"
+      letter={user?.name[0]}
+      bgColor="var(--bg-ds-secondary-400)"
+    />
+  </div>
   <div
     class="d-flex flex-column"
     style="width:calc(100% - 130px); font-size:12px; "
@@ -237,7 +238,7 @@
 
 <style>
   .member-data-container:hover {
-    background-color: var(--dropdown-option-hover);
+    background-color: var(--bg-ds-surface-500);
   }
 
   .member-data-container:hover .username-text {

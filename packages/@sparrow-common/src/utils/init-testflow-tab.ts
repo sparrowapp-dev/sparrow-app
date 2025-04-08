@@ -1,11 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
-import { type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
 import {
   TFDefaultEnum,
   type TFTabEdgeType,
   type TFTabNodeType,
 } from "@sparrow/common/types/workspace/testflow";
+import { CollectionItemTypeDtoEnum } from "../types/workspace/collection-dto";
 
 class InitTestflowTab {
   private _tab: Tab;
@@ -20,6 +24,7 @@ class InitTestflowTab {
       tabId: uuidv4(),
       name: TFDefaultEnum.NAME,
       type: TabTypeEnum.TESTFLOW,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
       description: "",
       source: "USER",
       activeSync: false,
@@ -29,12 +34,16 @@ class InitTestflowTab {
             {
               id: "1",
               type: "startBlock",
+              blockName: "startBlock",
               data: {
                 name: "",
                 collectionId: "",
                 folderId: "",
                 requestId: "",
                 method: "",
+                workspaceId: "",
+                isDeleted: false,
+                requestData: null,
               },
               position: { x: 100, y: 200 },
             },
@@ -62,6 +71,9 @@ class InitTestflowTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

@@ -1,7 +1,5 @@
 import { RequestDefault } from "@sparrow/common/enums";
 import {
-  AuthSectionEnum,
-  AuthTypeEnum,
   RequestDataTypeEnum,
   RequestDatasetEnum,
   RequestMethodEnum,
@@ -18,8 +16,11 @@ import {
   TabTypeEnum,
   type Tab,
   type Path,
+  TabPersistenceTypeEnum,
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
+import { HttpRequestAuthTypeBaseEnum } from "../types/workspace/http-request-base";
+import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
 
 class InitRequestTab {
   private _tab: Tab;
@@ -34,7 +35,8 @@ class InitRequestTab {
       tabId: uuidv4(),
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
-      description: "",
+      persistence: TabPersistenceTypeEnum.PERMANENT,
+      description: "[]",
       source: "USER",
       isDeleted: false,
       activeSync: false,
@@ -101,7 +103,7 @@ class InitRequestTab {
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
             requestBodyNavigation: RequestDatasetEnum.NONE,
-            requestAuthNavigation: AuthTypeEnum.NO_AUTH,
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
             requestNavigation: RequestSectionEnum.PARAMETERS,
             responseNavigation: ResponseSectionEnum.RESPONSE,
             responseBodyLanguage: RequestDataTypeEnum.TEXT,
@@ -130,7 +132,7 @@ class InitRequestTab {
             apiKey: {
               authKey: "",
               authValue: "",
-              addTo: AuthSectionEnum.HEADER,
+              addTo: CollectionRequestAddToBaseEnum.HEADER,
             },
           },
           ai: {
@@ -164,11 +166,11 @@ class InitRequestTab {
   public getValue(): Tab {
     return this._tab;
   }
-  public getSpacificValue(_value: string) {
-    return this._tab[_value];
-  }
   public updateId(_id: string) {
     this._tab.id = _id;
+  }
+  public updateTabType(type: TabPersistenceTypeEnum) {
+    this._tab.persistence = type;
   }
   public updateName(_name: string) {
     this._tab.name = _name;

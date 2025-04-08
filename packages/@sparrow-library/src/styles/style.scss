@@ -519,61 +519,81 @@ $theme-green-00A86B: #00a86b;
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
 
-$theme-colors: map-merge(
-  $theme-colors,
-  (
-    "primaryColor": $theme-blue-3670F7,
-    "recentApiText": $sparrow-recentApiText,
+$theme-colors: map-merge($theme-colors,
+    ("primaryColor": $theme-blue-3670F7,
+      "recentApiText": $sparrow-recentApiText,
 
-    "secondaryColor": $sparrow-yellow,
-    "blackColor": $sparrow-black,
-    "successColor": $sparrow-success,
-    "borderColor": $sparrow-error,
-    "defaultColor": $sparrow-default,
-    "dangerColor": $sparrow-danger,
-    "whiteColor": $sparrow-white,
-    "lightGray": $sparrow-light-gray,
-    "backgroundColor": $sparrow-background,
-    "backgroundLight": $sparrow-background-light,
-    "backgroundDark": $sparrow-background-dark,
-    "backgroundDropdown": $sparrow-background-dropdown,
-    "plusButton": $sparrow-plusbutton,
-    "lightBackground": $sparrow-border-color,
-    "requestBodyColor": $sparrow-request-body,
-    "labelColor": $sparrow-send-button,
-    "buttonBackColor": $sparrow-button-background,
-    "buttonColor": $sparrow-button-color,
-    "redColor": $sparrow-gradient,
-    "getColor": $sparrow-get,
-    "putColor": $sparrow-put,
-    "postColor": $sparrow-post,
-    "deleteColor": $sparrow-delete,
-    "headColor": $sparrow-head,
-    "patchColor": $sparrow-patc,
-    "optionsColor": $sparrow-opt,
-    "textColor": $sparrow-text-color,
-    "keyValuePairColor": $sparrow-key-value-pair,
-    "dullBackground": $sparrow-dull-background,
-    "sparrowBottomBorder": $sparrow-bottom-border,
-    "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
-    "dropdownBorderColor": $sparrow-dropdown-border-color,
-    "activeSyncBtn": $sparrow-active-sync,
-    "dropdownButton": $sparrow-dropdown,
-    "dropdownHover": $sparrow-dropdown-hover,
-    "dropdownContainer": $sparrow-dropdown-container,
-    "dropdownOptionHover": $sparrow-dropdown-option-hover,
-    "dropdownOptionActive": $sparrow-dropdown-option-active,
-    "saveButtonLine": $sparrow-send-button-line,
+      "secondaryColor": $sparrow-yellow,
+      "blackColor": $sparrow-black,
+      "successColor": $sparrow-success,
+      "borderColor": $sparrow-error,
+      "defaultColor": $sparrow-default,
+      "dangerColor": $sparrow-danger,
+      "whiteColor": $sparrow-white,
+      "lightGray": $sparrow-light-gray,
+      "backgroundColor": $sparrow-background,
+      "backgroundLight": $sparrow-background-light,
+      "backgroundDark": $sparrow-background-dark,
+      "backgroundDropdown": $sparrow-background-dropdown,
+      "plusButton": $sparrow-plusbutton,
+      "lightBackground": $sparrow-border-color,
+      "requestBodyColor": $sparrow-request-body,
+      "labelColor": $sparrow-send-button,
+      "buttonBackColor": $sparrow-button-background,
+      "buttonColor": $sparrow-button-color,
+      "redColor": $sparrow-gradient,
+      "getColor": $sparrow-get,
+      "putColor": $sparrow-put,
+      "postColor": $sparrow-post,
+      "deleteColor": $sparrow-delete,
+      "headColor": $sparrow-head,
+      "patchColor": $sparrow-patc,
+      "optionsColor": $sparrow-opt,
+      "textColor": $sparrow-text-color,
+      "keyValuePairColor": $sparrow-key-value-pair,
+      "dullBackground": $sparrow-dull-background,
+      "sparrowBottomBorder": $sparrow-bottom-border,
+      "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
+      "dropdownBorderColor": $sparrow-dropdown-border-color,
+      "activeSyncBtn": $sparrow-active-sync,
+      "dropdownButton": $sparrow-dropdown,
+      "dropdownHover": $sparrow-dropdown-hover,
+      "dropdownContainer": $sparrow-dropdown-container,
+      "dropdownOptionHover": $sparrow-dropdown-option-hover,
+      "dropdownOptionActive": $sparrow-dropdown-option-active,
+      "saveButtonLine": $sparrow-send-button-line,
 
-    "sparrowBgContainer": $sparrow-bg-container,
-    "sparrowBgContainerBorder": $sparrow-bg-container-border,
-    "sparrowBgContainerOne": $sparrow-bg-container-one,
-    "sparrowBgContainerTwo": $sparrow-bg-container-two,
-    "sparrowBgContainerThree": $sparrow-bg-container-three,
-    "sparrowBgContainerFour": $sparrow-bg-container-four,
-  )
+      "sparrowBgContainer": $sparrow-bg-container,
+      "sparrowBgContainerBorder": $sparrow-bg-container-border,
+      "sparrowBgContainerOne": $sparrow-bg-container-one,
+      "sparrowBgContainerTwo": $sparrow-bg-container-two,
+      "sparrowBgContainerThree": $sparrow-bg-container-three,
+      "sparrowBgContainerFour": $sparrow-bg-container-four,
+    ));
+
+$sparrow-ds-font-sizes: (
+  // px : rem  
+  12 : 0.75rem,
+  14 : 0.875rem,
+  16 : 1.000rem,
+  20 : 1.25rem,
+  24 : 1.5rem,
+  28 : 1.75rem,
+);
+$sparrow-ds-line-heights: (
+  // line-height : percentage line-height
+  120 : 120%,
+  130 : 130%,
+  143 : 143%,
+  150 : 150%,
 );
 
+$sparrow-ds-font-weights: (
+  // type : value
+  semi-bold :500,
+  medium : 400,
+  regular : 300,
+);
 // Define a map for font sizes in pixels
 $sparrow-font-sizes: (
   6: 0.4rem,
@@ -608,7 +628,8 @@ $sparrow-font-sizes: (
   // 24px in rem
   28: 1.75rem,
   // 28px in rem
-  36: 2.25rem, // 36px in rem,
+  36: 2.25rem,
+  // 36px in rem,
 );
 
 // Define a map for border radius in pixels
@@ -769,6 +790,24 @@ $sparrow-border-colors: (
   danger-1000: $theme-red-312325,
 );
 
+@each $size , $value in $sparrow-ds-font-sizes {
+  .text-ds-font-size-#{$size} {
+    font-size: $value;
+  }
+}
+
+@each $height , $value in $sparrow-ds-line-heights {
+  .text-ds-line-height-#{$height} {
+    line-height: $value;
+  }
+}
+
+@each $fontWeight , $value in $sparrow-ds-font-weights {
+  .text-ds-font-weight-#{$fontWeight} {
+    font-weight: $value;
+  }
+}
+
 // Generate utility classes
 @each $size, $value in $sparrow-font-sizes {
   .sparrow-fs-#{$size} {
@@ -913,7 +952,7 @@ span {
 
 .env-highlight {
   &.env-found {
-    color: var(--text-primary-400);
+    color: var(--text-ds-primary-400);
     cursor: pointer;
   }
 
@@ -923,7 +962,7 @@ span {
   }
 
   &.env-not-found {
-    color: var(--text-danger-200);
+    color: var(--text-ds-danger-400);
     cursor: pointer;
   }
 

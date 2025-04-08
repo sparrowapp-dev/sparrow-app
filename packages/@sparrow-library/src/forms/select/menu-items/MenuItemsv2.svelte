@@ -2,6 +2,7 @@
   /**
    * select option list
    */
+  import { CheckMarkIcon } from "@sparrow/library/icons";
   export let list: {
     name: string;
     id: string;
@@ -17,6 +18,8 @@
     description?: string;
     default?: boolean;
     hide?: boolean;
+    icon?: string;
+    iconProps?: Record<string, any>;
   };
   /**
    * selected option
@@ -24,11 +27,10 @@
   export let selectedRequest: {
     id: string;
   };
-  /**
-   * Ticked mark icon
-   */
-  export let tickIcon: any;
-  export let getTextColor: (color: any) => {};
+
+  export let showDescription = true;
+
+  export let getTextColor: (color: any) => string;
   /**
    * marks the tickmark is highlighted
    */
@@ -37,10 +39,12 @@
   /**
    * body theme - background
    */
-  export let bodyTheme: string;
+  export let variant: "primary" | "secondary" = "secondary";
 
   let isMenuItemHover = false;
   let isMenuItemClicked = false;
+
+  export let fontSize;
 
   /**
    * @description - adds CSS class to menu item when hovered or clicked according to the theme
@@ -53,23 +57,38 @@
     _isMenuItemHover: boolean,
     _isMenuItemClicked: boolean,
   ) => {
-    if (_bodyTheme === "violet" && _isMenuItemClicked && _isMenuItemHover) {
-      return `select-clicked-highlight-violet-btn`;
+    if (_bodyTheme === "primary" && _isMenuItemClicked && _isMenuItemHover) {
+      return `select-clicked-highlight-surface-btn`;
     } else if (
-      _bodyTheme === "dark" &&
+      _bodyTheme === "secondary" &&
       _isMenuItemClicked &&
       _isMenuItemHover
     ) {
-      return `select-clicked-highlight-dark-btn`;
-    } else if (_bodyTheme === "violet" && _isMenuItemHover) {
-      return `select-hover-highlight-violet-btn`;
-    } else if (_bodyTheme === "dark" && _isMenuItemHover) {
-      return `select-hover-highlight-dark-btn`;
+      return `select-clicked-highlight-surface-btn`;
+    } else if (
+      _bodyTheme === "tertiary" &&
+      _isMenuItemClicked &&
+      _isMenuItemHover
+    ) {
+      return `select-clicked-highlight-surface-btn`;
+    } else if (
+      _bodyTheme === "light-violet" &&
+      _isMenuItemClicked &&
+      _isMenuItemHover
+    ) {
+      return `select-clicked-highlight-surface-btn`;
+    } else if (_bodyTheme === "primary" && _isMenuItemHover) {
+      return `select-hover-highlight-surface-btn`;
+    } else if (_bodyTheme === "secondary" && _isMenuItemHover) {
+      return `select-hover-highlight-surface-btn`;
+    } else if (_bodyTheme === "tertiary" && _isMenuItemHover) {
+      return `select-hover-highlight-surface-btn`;
+    } else if (_bodyTheme === "light-violet" && _isMenuItemHover) {
+      return `select-hover-highlight-surface-btn`;
     } else {
       return "";
     }
   };
-
   /**
    * @description - add classes to ticked options
    * @param _id - item id (rows iteration)
@@ -96,28 +115,42 @@
     isMenuItemClicked = false;
   }}
   class="d-flex px-2 py-2 justify-content-between highlight border-radius-2 select-option-container {extractHeaderHighlight(
-    bodyTheme,
+    variant,
     isMenuItemHover,
     isMenuItemClicked,
   )}"
+  tabindex="0"
 >
+  {#if list.icon}
+    <div class="me-2">
+      <svelte:component
+        this={list.icon}
+        {...list.iconProps}
+        class="menu-icon"
+      />
+    </div>
+  {/if}
+
   <div class="content-wrapper">
     <p
-      class="m-0 p-0 option-name ellipsis {getTextColor(
+      style="font-size: {fontSize}"
+      class="m-0 p-0 ellipsis option-name {getTextColor(
         list?.color,
       )} {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
     >
       {list.name}
     </p>
-    {#if list.description}
+    {#if list.description && showDescription}
       <div class="description-wrapper">
-        <small class="text-textColor description">{list.description}</small>
+        <small class="text-textColor description" style="font-size: {fontSize}"
+          >{list.description}</small
+        >
       </div>
     {/if}
   </div>
   {#if selectedRequest?.id === list.id}
     <span class="d-flex align-items-center justify-content-center tick-icon">
-      <img src={tickIcon} alt="" />
+      <CheckMarkIcon color="var(--text-primary-300)" size="medium" />
     </span>
   {/if}
 </div>
@@ -126,6 +159,11 @@
   .select-option-container {
     width: 100%;
   }
+  .select-option-container:focus-visible {
+    outline: 2px solid var(--bg-ds-primary-300);
+    outline-offset: -2px;
+    border-radius: 4px;
+  }
 
   .content-wrapper {
     flex: 1;
@@ -133,7 +171,6 @@
   }
 
   .option-name {
-    font-size: 12px;
     margin-bottom: 4px;
   }
 
@@ -148,7 +185,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
-    font-size: 11px;
     line-height: 1.3;
     word-break: break-word;
   }
@@ -167,6 +203,9 @@
   .select-hover-highlight-violet-btn {
     background-color: var(--bg-tertiary-600);
   }
+  .select-hover-highlight-surface-btn {
+    background-color: var(--bg-ds-surface-400);
+  }
 
   /* clicked states */
   .select-clicked-highlight-dark-btn {
@@ -174,6 +213,9 @@
   }
   .select-clicked-highlight-violet-btn {
     background-color: var(--bg-tertiary-700);
+  }
+  .select-clicked-highlight-surface-btn {
+    background-color: var(--bg-ds-surface-500);
   }
 
   .select-ticked-highlight-text {
@@ -183,5 +225,37 @@
   /* others */
   .highlight {
     cursor: pointer;
+  }
+
+  .color-primary {
+    color: var(--text-ds-primary-300);
+  }
+
+  .color-danger {
+    color: var(--text-ds-danger-300);
+  }
+
+  .color-default {
+    color: var(--text-ds-surface-500);
+  }
+
+  .color-white {
+    color: var(--text-ds-neutral-50);
+  }
+
+  .color-get {
+    color: var(--text-ds-success-300);
+  }
+
+  .color-post {
+    color: var(--text-ds-warning-300);
+  }
+
+  .color-put {
+    color: var(--text-ds-secondary-300);
+  }
+
+  .color-patch {
+    color: var(--bg-ds-accent-300);
   }
 </style>

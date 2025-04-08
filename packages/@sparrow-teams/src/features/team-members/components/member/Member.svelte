@@ -5,6 +5,7 @@
     workspaceDocumentWithPosition,
   } from "@sparrow/common/interfaces";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
+
   import { AdminLevelPermission } from "@sparrow/common/constants/permissions.constant";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
@@ -231,13 +232,18 @@
     handlePopup(flag, "isMemberRemovePopup");
   }}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
-    <p style="font-size:12px;" class="text-textColor">
+  <div class="text-lightGray text-ds-font-size-14 mb-1">
+    <p
+      class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+    >
       Are you sure you want to remove <span class="text-whiteColor"
         >"{user.name}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{openTeam?.name}"</span> team.
+      <span
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >"{openTeam?.name}"</span
+      > hub.
     </p>
   </div>
   <div
@@ -247,7 +253,6 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       loader={false}
       onClick={() => {
@@ -258,7 +263,6 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Remove"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
@@ -283,17 +287,21 @@
       style=" margin-top:16px !important; margin-bottom:16px !important;"
     >
       <div class="d-flex align-items-center">
-          <Avatar
+        <Avatar
           type={"letter"}
           size={"large"}
           letter={user.name[0].toUpperCase() || ""}
-          bgColor={"var(--bg-tertiary-700)"}/>
+          bgColor={"var(--bg-tertiary-700)"}
+        />
 
         <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -321,25 +329,30 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-           <Avatar
-          type={"image"}
-          size={"large"}
-          image={base64ToURL(openTeam?.logo)}/>
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
-      <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
+      <p
+        class="mb-0 text-ds-font-size-16 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
+      >
+        {openTeam?.name}
+      </p>
     </div>
 
     <Button
       disable={memberPromotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberPromotePopupLoader}
@@ -363,16 +376,20 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1 mt-2">
     <div class="d-flex rounded mb-3">
       <div class=" d-flex align-items-center">
-         <Avatar
-            type={"letter"}
-            size={"large"}
-            letter={ user?.name[0]|| ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+        <Avatar
+          type={"letter"}
+          size={"large"}
+          letter={user?.name[0] || ""}
+          bgColor={"var(--bg-tertiary-700)"}
+        />
         <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -394,13 +411,15 @@
           <Avatar
             type={"image"}
             size={"large"}
-            image={base64ToURL(openTeam?.logo)}/>
+            image={base64ToURL(openTeam?.logo)}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -436,16 +455,20 @@
   <div style="font-size: 14px;" class="text-lightGray mb-1">
     <div class="d-flex rounded mb-3" style="padding-left: 0px !important;">
       <div class="d-flex align-items-center">
-           <Avatar
+        <Avatar
           type={"letter"}
           size={"large"}
           letter={user.name[0] || ""}
-          bgColor={"var(--bg-tertiary-700)"}/>
+          bgColor={"var(--bg-tertiary-700)"}
+        />
         <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.name}</span
           ><br />
-          <span style="font-size:12px;" class="text-textColor"
+          <span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -465,7 +488,7 @@
     class="confirm-header mb-0 sparrow-fs-14"
     style="color: var(--text-secondary-200);"
   >
-    Enter team name to confirm<span class="asterik ms-1">*</span>
+    Enter hub name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}
@@ -494,13 +517,19 @@
     <div class="d-flex align-items-center ellipsis gap-2">
       <div style="width: 36px;">
         {#if openTeam?.logo?.size}
-          <Avatar type={"image"} size={"large"} image={base64ToURL(openTeam?.logo)} bgColor={"var(--bg-secondary-600)"}/>
+          <Avatar
+            type={"image"}
+            size={"large"}
+            image={base64ToURL(openTeam?.logo)}
+            bgColor={"var(--bg-secondary-600)"}
+          />
         {:else}
-           <Avatar
+          <Avatar
             type={"letter"}
             size={"large"}
             letter={openTeam?.name[0] || ""}
-            bgColor={"var(--bg-tertiary-700)"}/>
+            bgColor={"var(--bg-tertiary-700)"}
+          />
         {/if}
       </div>
       <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
@@ -515,9 +544,9 @@
       onClick={() => {
         confirmationText = confirmationText.replace(/’/g, "'");
         if (confirmationText === "") {
-          confirmationError = `Team name cannot be empty.`;
+          confirmationError = `Hub name cannot be empty.`;
         } else if (confirmationText !== openTeam?.name) {
-          confirmationError = `Team name does not match.`;
+          confirmationError = `Hub name does not match.`;
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
@@ -560,23 +589,28 @@
   />
 </Modal>
 
-<div class="d-flex tile rounded align-items-center">
+<div class="d-flex tile rounded align-items-center custom-bd" tabindex="0">
   <div
     class="info d-flex align-items-center"
     on:click={() => {
       memberPopObj.isMemberInfoPopup = true;
     }}
   >
-     <Avatar
+    <Avatar
       type={"letter"}
       size={"large"}
       letter={user?.name?.charAt(0)}
-      bgColor={"var(--bg-secondary-600)"}/>
+      bgColor={""}
+    />
     <div class="name px-2">
-      <span style="font-size:12px;" class="text-whiteColor"
+      <span
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >{user.name} {owner ? "(You)" : ""}</span
       ><br />
-      <span style="font-size:12px;" class="text-textColor">{user.email}</span>
+      <span
+        class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >{user.email}</span
+      >
     </div>
   </div>
   <div class="position">
@@ -594,6 +628,7 @@
         disabled={owner}
         isArrowIconRequired={!owner}
         borderRounded={"4px"}
+        minHeaderWidth={"110px"}
       />
     {:else if (userType === TeamRole.TEAM_OWNER && user.role === TeamRole.TEAM_ADMIN) || (userType === TeamRole.TEAM_ADMIN && user.role === TeamRole.TEAM_ADMIN)}
       <Select
@@ -668,5 +703,9 @@
   }
   .error-border {
     border: 1px solid var(--error--color) !important;
+  }
+  .custom-bd:focus-visible {
+    border: 2px solid var(--bg-ds-primary-300) !important;
+    outline: none;
   }
 </style>

@@ -1,5 +1,4 @@
 import constants from "../constants/constants";
-import { notifications } from "@sparrow/library/ui";
 import { navigate } from "svelte-navigator";
 import { jwtDecode, setAuthJwt, getAuthJwt } from "../utils/jwt";
 import { isGuestUserActive, setUser } from "../store/auth.store";
@@ -71,7 +70,7 @@ const createGuestUserTeamWorkspace = async () => {
   const workspaceId = uuidv4();
   const dummyTeam = {
     teamId: teamId,
-    name: "Team",
+    name: "Hub",
     workspaces: [{ name: "My Workspace", workspaceId: workspaceId }],
     users: [{ id: user.id, name: user.name, email: "", role: "owner" }],
     owner: user.id,
@@ -90,7 +89,7 @@ const createGuestUserTeamWorkspace = async () => {
     name: "My Workspace",
     team: {
       teamId: teamId,
-      teamName: "Team",
+      teamName: "Hub",
     },
     admins: [{ id: user.id, name: user.name }],
     users: [{ id: user.id, name: user.name, email: "", role: "admin" }],
@@ -176,12 +175,12 @@ export async function handleLogin(url: string) {
   });
   // User login successfully
   if (event === "register") {
-    navigate("/app/collections");
+    navigate("/app/collections?first=true");
     _guideRepository.insert({ isActive: true, id: "environment-guide" });
     _guideRepository.insert({ isActive: true, id: "collection-guide" });
     isUserFirstSignUp.set(true);
   } else {
-    navigate("/app/collections");
+    navigate("/app/collections?first=false");
 
     _guideRepository.insert({ isActive: false, id: "environment-guide" });
     _guideRepository.insert({ isActive: false, id: "collection-guide" });

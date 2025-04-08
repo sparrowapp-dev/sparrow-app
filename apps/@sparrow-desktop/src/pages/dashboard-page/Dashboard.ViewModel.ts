@@ -31,6 +31,7 @@ import { FeatureSwitchRepository } from "../../repositories/feature-switch.repos
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import {
+  CollectionTabAdapter,
   GraphqlTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
@@ -42,6 +43,8 @@ import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import constants from "@app/constants/constants";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class DashboardViewModel {
   constructor() {}
@@ -55,7 +58,7 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
-  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistantWebSocketService = AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
 
@@ -114,6 +117,18 @@ export class DashboardViewModel {
       name: "guestUser",
     });
     return response?.getLatest().toMutableJSON().isGuestUser;
+  };
+
+  // redirects to Sparrow Docs.
+  public redirectDocs = async () => {
+    await open(constants.DOCS_URL);
+    return;
+  };
+
+  // redirects to Sparrow Feature Updates.
+  public redirectFeatureUpdates = async () => {
+    await open(constants.SPARROW_GITHUB + '/sparrow-app/releases');
+    return;
   };
 
   /**
@@ -515,43 +530,9 @@ export class DashboardViewModel {
     workspaceId: string,
     collection: any,
   ) => {
-    // Calculate collection stats
-    let totalFolder = 0;
-    let totalRequest = 0;
-
-    if (collection.items) {
-      collection.items.forEach((item: any) => {
-        if (
-          item.type === "REQUEST" ||
-          item.type === "GRAPHQL" ||
-          item.type === "SOCKETIO" ||
-          item.type === "WEBSOCKET"
-        ) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item?.items?.length || 0;
-        }
-      });
-    }
-
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id || "",
-      folderId: "",
-    };
-
-    const _collection = new InitCollectionTab(collection.id, workspaceId);
-    _collection.updateName(collection.name);
-    _collection.updateDescription(collection.description);
-    _collection.updatePath(path);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
-    _collection.updateIsSave(true);
-
+    const collectionTab = new CollectionTabAdapter().adapt(workspaceId,collection);
     // Create the tab with the new collection
-    await this.tabRepository.createTab(_collection.getValue(), workspaceId);
-
+    await this.tabRepository.createTab(collectionTab, workspaceId);
     // Update UI
     moveNavigation("right");
   };
@@ -989,18 +970,40 @@ export class DashboardViewModel {
       }
 
       let environment = await this.getRecentEnvironment();
-      environment = environment.map((_environment) => ({
-        title: _environment.name,
-        workspace: _environment.workspaceId,
-        id: _environment.id,
-        variable: _environment.variable,
-      }));
+      environment = environment.map((_environment) => {
+        const workspaceDetails = workspaceMap[_environment.workspaceId];
+        const path:string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+
+        return ({
+          title: _environment.name,
+          workspace: _environment.workspaceId,
+          id: _environment.id,
+          variable: _environment.variable,
+          path: this.createPath(path)
+        })
+      });
 
       let workspace = await this.getRecentWorkspace();
       workspace = workspace.map((_value) => _value._data);
 
       let testflow = await this.getRecentTestflow();
-      testflow = testflow.map((_value) => _value._data);
+      testflow = testflow.map((_value) => {
+        const workspaceDetails = workspaceMap[_value._data.workspaceId];
+        const path:string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+
+        return {
+          ..._value._data,
+          path: this.createPath(path)
+        };
+      });
 
       return { collection, folder, file, workspace, testflow, environment };
     }

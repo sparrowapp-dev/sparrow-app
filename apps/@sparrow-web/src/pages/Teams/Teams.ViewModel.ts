@@ -240,9 +240,9 @@ export class TeamsViewModel {
       const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
-      notifications.success(`New team ${team.name} is created.`);
+      notifications.success(`New hub ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new team. Please try again.");
+      notifications.error("Failed to create a new hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "../database/database";
 import type { Tab } from "@sparrow/common/types/workspace";
+import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
@@ -77,6 +78,22 @@ export class TabRepository {
         .exec()
     )?.length;
     tab.index = lastIndex;
+    if (tab.persistence === TabPersistenceTypeEnum.TEMPORARY) {
+      const tempTab = await this.rxdb
+        ?.findOne({
+          selector: {
+            "path.workspaceId": workspaceId,
+            persistence: TabPersistenceTypeEnum.TEMPORARY,
+          },
+        })
+        .exec();
+
+      if (tempTab) {
+        const tempTabIndex = tempTab.toMutableJSON().index;
+        await tempTab.remove(); // Remove the existing temporary tab
+        tab.index = tempTabIndex; // Assign the same index to the new tab
+      }
+    }
     await this.rxdb?.insert(tab);
   };
 
@@ -646,7 +663,6 @@ export class TabRepository {
       })
       .exec();
   };
-  z;
 
   /**
    * Retrieves a tab by its unique identifier.
@@ -781,10 +797,13 @@ export class TabRepository {
         }
         // Skip deletion if the tab type is not "COLLECTION", "FOLDER", "REQUEST", "WEBSOCKET".
         if (
-          tabJSON.type !== "COLLECTION" &&
-          tabJSON.type !== "FOLDER" &&
-          tabJSON.type !== "REQUEST" &&
-          tabJSON.type !== "WEBSOCKET"
+          tabJSON.type !== TabTypeEnum.COLLECTION &&
+          tabJSON.type !== TabTypeEnum.FOLDER &&
+          tabJSON.type !== TabTypeEnum.REQUEST &&
+          tabJSON.type !== TabTypeEnum.WEB_SOCKET &&
+          tabJSON.type !== TabTypeEnum.SOCKET_IO &&
+          tabJSON.type !== TabTypeEnum.GRAPHQL &&
+          tabJSON.type !== TabTypeEnum.SAVED_REQUEST
         ) {
           return false;
         }
@@ -833,7 +852,7 @@ export class TabRepository {
           return false;
         }
         // Skip deletion if the tab type is not "ENVIRONMENT".
-        if (tabJSON.type !== "ENVIRONMENT") {
+        if (tabJSON.type !== TabTypeEnum.ENVIRONMENT) {
           return false;
         }
         // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).
@@ -881,7 +900,7 @@ export class TabRepository {
           return false;
         }
         // Skip deletion if the tab type is not "TESTFLOW".
-        if (tabJSON.type !== "TESTFLOW") {
+        if (tabJSON.type !== TabTypeEnum.TESTFLOW) {
           return false;
         }
         // Skip deletion if the tab ID starts with "UNTRACKED" (That doesn't exist on backend server).
@@ -973,5 +992,68 @@ export class TabRepository {
     // Remove deletable tabs.
     await RxDB?.getInstance()?.rxdb?.tab?.bulkRemove(_deletabletabIds);
     return;
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific collection ID.
+   *
+   * @param {string} collectionId - The ID of the collection
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByCollectionId = async (
+    collectionId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.collectionId": collectionId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific folder ID.
+   *
+   * @param {string} folderId - The ID of the folder
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByFolderId = async (
+    folderId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.folderId": folderId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+  /**
+   * Retrieves all tabs associated with a specific request ID.
+   *
+   * @param {string} requestId - The ID of the request
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByRequestId = async (
+    requestId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.requestId": requestId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
   };
 }

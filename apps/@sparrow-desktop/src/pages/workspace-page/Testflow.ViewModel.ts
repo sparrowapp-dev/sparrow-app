@@ -8,9 +8,12 @@ import type { TFRxDocumentType } from "../../models/testflow.model";
 import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import type { Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 
-import { createDeepCopy } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   currentStep,
   isFirstTimeInTestFlow,
@@ -84,12 +87,16 @@ export class TestflowViewModel {
         {
           id: "1",
           type: "startBlock",
+          blockName: "startBlock",
           data: {
             collectionId: "",
             requestId: "",
             folderId: "",
             method: "",
             name: "",
+            workspaceId: currentWorkspace._id,
+            requestData: null,
+            isDeleted: false,
           },
           position: { x: 100, y: 200 },
         },
@@ -125,6 +132,7 @@ export class TestflowViewModel {
         {
           id: "1",
           type: "startBlock",
+          blockName: "startBlock",
           position: {
             x: 100,
             y: 200,
@@ -135,6 +143,9 @@ export class TestflowViewModel {
             folderId: "",
             method: "",
             name: "",
+            workspaceId: currentWorkspace._id,
+            requestData: null,
+            isDeleted: false,
           },
         },
       ],
@@ -153,6 +164,8 @@ export class TestflowViewModel {
         ...res,
         workspaceId: currentWorkspace._id,
       });
+      // scroll the top tab bar to right
+      moveNavigation("right");
       notifications.success("New Testflow created successfully.");
       // MixpanelEvent(Events.CREATE_TESTFLOW);
       let isFirstTimeUsingTestFlow = false;
@@ -296,6 +309,7 @@ export class TestflowViewModel {
     initTestflowTab.updateName(_testflow.name);
     initTestflowTab.setNodes(_testflow.nodes);
     initTestflowTab.setEdges(_testflow.edges);
+    initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initTestflowTab.getValue());
   };
 

@@ -1,13 +1,14 @@
 <script lang="ts">
   import { Events } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { GenerateIcon, SendIcon } from "@sparrow/library/icons";
+  import { GenerateIcon, SendRegular } from "@sparrow/library/icons";
 
   export let placeholder = "";
   export let sendPrompt;
   export let prompt: string = "";
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
+  export let onStopGeneratingAIResponse;
 
   let isSendButtonHovered = false;
 
@@ -30,7 +31,7 @@
       }}
       class="w-100 pe-5 py-2 ps-2 border-radius-6 text-fs-12"
       autofocus
-      style="border:1px solid grey; outline: none; background-color: var(--bg-secondary-1100); border: 1px solid var(--border-tertiary-190); "
+      style="border:1px solid grey; outline: none; background-color: var(--bg-ds-surface-400); border: 1px solid var(--border-tertiary-190); "
       {placeholder}
       on:keydown={(event) => {
         if (event.key === "Enter" && prompt && !isResponseGenerating) {
@@ -55,41 +56,48 @@
         on:mouseenter={handleMouseEnter}
         on:mouseleave={handleMouseLeave}
       >
-        <SendIcon
-          height={"16px"}
-          width={"16px"}
-          color={isSendButtonHovered
-            ? "var(--icon-primary-300)"
-            : "var(--icon-secondary-100)"}
+        <SendRegular
+          size={"14px"}
+          color={prompt.trim()
+            ? "var( --bg-ds-neutral-50)"
+            : isSendButtonHovered
+              ? "var(--icon-secondary-100)"
+              : "var(--border-ds-neutral-400)"}
         />
       </div>
     {:else}
       <!--Disabling it for now, will take stop generation when data streaming will be enabled.-->
-      <!-- <div
+      <div
         style="position:absolute; right:12px ; top: 50%; 
     transform : translateY(-60%);
   "
-        on:click={() => {}}
+        on:click={() => {
+          console.log("on click stop generating!!!!");
+          onStopGeneratingAIResponse();
+        }}
       >
         <GenerateIcon
           height={"20px"}
           width={"20px"}
           color={"var(--icon-secondary-100)"}
         />
-      </div> -->
+      </div>
     {/if}
   </div>
 </div>
 
 <style>
   input::placeholder {
-    color: var(--text-secondary-250);
+    color: var(--text-ds-neutral-400);
   }
   input {
     border: 1px solid transparent;
   }
   input:focus {
     outline: none;
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
+  }
+  input:hover {
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
 </style>

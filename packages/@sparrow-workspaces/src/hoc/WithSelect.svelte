@@ -24,6 +24,7 @@
    * identifies Select disabled or not
    */
   export let disabled;
+
   $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>
 
@@ -38,12 +39,8 @@
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
-  headerHeight={"24px"}
   minBodyWidth={"150px"}
-  borderRounded={"4px"}
-  headerTheme={"violet"}
-  bodyTheme={"violet"}
+  variant={"secondary"}
   menuItem={"v2"}
-  headerFontSize={"10px"}
-  isDropIconFilled={true}
+  minHeaderWidth={"160px"}
 />

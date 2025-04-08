@@ -1,23 +1,27 @@
 <script lang="ts">
   import { Handle, Position, type Node } from "@xyflow/svelte";
-  import { ArrowSolid, DropdownArrow } from "../../icons";
+  import { ArrowSolid } from "../../icons";
   import {
     ArrowRightIcon,
     DotIcon,
-    ClockIcon,
-    ExclamationIcon,
-    CheckIcon2,
     DropIcon,
+    CheckmarkCircleRegular,
+    MoreHorizontalRegular,
+    ErrorCircleRegular,
+    ClockRegular,
+    DeleteRegular,
+    RenameRegular,
   } from "@sparrow/library/icons";
+  import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import { InfoIcon, ArrowIcon } from "../../icons";
-  import { VectorIcon } from "@sparrow/library/icons";
+  import { ArrowIcon } from "../../icons";
+  import { ArrowSwapRegular } from "@sparrow/library/icons";
+  import { InfoRegular } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { testFlowDataStore } from "../../../../features/testflow-explorer/store/testflow";
-  import { ThreeDotIcon } from "@sparrow/library/assets";
   import { createDeepCopy } from "@sparrow/common/utils";
   import { ParseTime } from "@sparrow/common/utils";
   import type {
@@ -25,6 +29,7 @@
     TFNodeStoreType,
   } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
+  import { Button } from "@sparrow/library/ui";
 
   /**
    * The data object containing various handlers and data stores.
@@ -45,19 +50,44 @@
       folderId?: string,
     ) => void;
     onOpenDeleteModal: (id: string) => void;
+    onOpenAddCustomRequestModal: (id: string) => void;
+    onOpenSaveNodeRequestModal: (
+      nodeId: string,
+      name: string,
+      requestId: string,
+      collectionId: string,
+      method: string,
+      folderId?: string,
+    ) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
     parentDrag: boolean;
   };
   export let selected;
+  export let updateBlockName: (name: string) => void;
 
   /**
    * The unique identifier for the current block.
    */
   export let id;
 
+  let isEditing = false;
+  let inputfield: any;
+  let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
   let isRunTextVisible = false; // State to track visibility of run text
+  let isDropHereVisible = false; // state to track if there is drag in test flow screen
+  let dataBlocksSubscriber: Unsubscriber;
+  let dataConnectorSubscriber: Unsubscriber;
+  let req = {
+    name: "",
+    method: "",
+  };
+  let isCreateBlockArrowHovered = false;
+  let moreOptionsMenu: boolean = false;
+  let testflowStore: TFDataStoreType;
+  let currentBlock: TFNodeStoreType | undefined;
+  const parseTime = new ParseTime();
 
   /**
    * Updates the node when an API is selected.
@@ -75,7 +105,8 @@
     folderId?: string,
   ) => {
     isRunTextVisible = true;
-    data.onUpdateSelectedAPI(
+
+    data.onOpenSaveNodeRequestModal(
       id,
       name,
       requestId,
@@ -84,11 +115,6 @@
       folderId ?? "",
     );
   };
-
-  let isCreateBlockArrowHovered = false;
-
-  let testflowStore: TFDataStoreType;
-  let currentBlock: TFNodeStoreType | undefined;
 
   /**
    * Testflow store subscriber to get current node status
@@ -112,13 +138,6 @@
       currentBlock = undefined;
     }
   });
-  let isDropHereVisible = false; // state to track if there is drag in test flow screen
-  let dataBlocksSubscriber: Unsubscriber;
-  let dataConnectorSubscriber: Unsubscriber;
-  let req = {
-    name: "",
-    method: "",
-  };
 
   onMount(() => {
     // Subscribe to changes in the blocks
@@ -128,6 +147,7 @@
           setTimeout(() => {
             req.name = _node?.data?.name;
             req.method = _node?.data?.method;
+            blockName = _node.blockName;
           }, 10);
         }
       });
@@ -144,14 +164,13 @@
       }, 10);
     });
   });
+
   onDestroy(() => {
     // Clean up the subscription on component destruction
     testFlowDataStoreSubscriber();
     dataBlocksSubscriber();
     dataConnectorSubscriber();
   });
-
-  const parseTime = new ParseTime();
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -167,131 +186,238 @@
     return false;
   };
 
-  let moreOptionsMenu: boolean = false;
-
   const handleOpenModal = () => {
     moreOptionsMenu = !moreOptionsMenu;
     data.onOpenDeleteModal(id);
   };
+
+  const handleClick = (item) => {
+    if (item.onClick) item.onClick();
+  };
+
+  const handleClickOutsideBlock = () => {
+    moreOptionsMenu = false;
+  };
+
+  onMount(() => {
+    document.addEventListener("click", handleClickOutsideBlock);
+  });
+
+  onDestroy(() => {
+    document.removeEventListener("click", handleClickOutsideBlock);
+  });
+
+  const enableEditing = () => {
+    isEditing = true;
+    $: if (isEditing) {
+      setTimeout(() => inputfield?.focus(), 0);
+    }
+  };
+
+  const disableEditing = () => {
+    isEditing = false;
+    updateBlockName(blockName);
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      disableEditing();
+    }
+  };
+
+  let moreOptions = [
+    // {
+    //   name: "Rename Block",
+    //   iconSize: "16px",
+    //   iconColor: "var(--icon-ds-neutral-50)",
+    //   Icon: RenameRegular,
+    //   onClick: enableEditing,
+    // },
+    {
+      name: "Delete",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-danger-300)",
+      Icon: DeleteRegular,
+      onClick: handleOpenModal,
+    },
+  ];
+
+  const handleOpenAddCustomRequestModal = () => {
+    data.onOpenAddCustomRequestModal(id);
+  };
 </script>
 
 <div
-  class="request-block position-relative border-radius-4"
-  style={selected && !currentBlock
-    ? "border: 2px solid var(--border-primary-300);"
+  class="request-block position-relative"
+  style={selected && !currentBlock?.response.status
+    ? "border: 1px solid var(--border-ds-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
-      ? "border: 2px solid #69D696;"
+      ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
-        ? "border: 2px solid #FF7878;"
-        : !currentBlock
-          ? ""
-          : checkIfRequestSucceed(currentBlock)
-            ? "border-left: 2px solid #69D696;"
-            : "border-left: 2px solid #FF7878;"}
+        ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
+        : ""}
 >
-  <Handle type="target" position={Position.Left} />
-  <div class=" d-flex justify-content-between align-items-center px-3 py-2">
-    <span class="text-fs-12 text-fs-10">
-      {#if !currentBlock}
-        <VectorIcon
-          height={"12px"}
-          width={"12px"}
-          color={"var(--icon-primary-300)"}
-        />
-      {:else if checkIfRequestSucceed(currentBlock)}
-        <CheckIcon2 height={"12px"} width={"12px"} color={"#69D696"} />
+  <Handle
+    type="target"
+    position={Position.Left}
+    class="connecting-dot-left"
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+  />
+  <div
+    class="d-flex px-2 align-items-center"
+    style="padding-top: 6px; padding-bottom:6px; height:36px; gap:4px"
+  >
+    <div
+      class="text-fs-12 text-fs-10 d-flex col align-items-center"
+      style="gap: 4px;"
+    >
+      <div class="status-icon">
+        {#if !currentBlock?.response?.status}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
+          />
+        {:else if checkIfRequestSucceed(currentBlock)}
+          <CheckmarkCircleRegular
+            size={"16px"}
+            color={"var(--icon-ds-success-400)"}
+          />
+        {:else}
+          <ErrorCircleRegular
+            size={"16px"}
+            color={"var(--icon-ds-danger-300)"}
+          />
+        {/if}
+      </div>
+      {#if !isEditing}
+        <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
+          {blockName}
+        </span>
       {:else}
-        <ExclamationIcon height={"12px"} width={"12px"} color="#FF7878" />
+        <input
+          bind:value={blockName}
+          bind:this={inputfield}
+          type="text"
+          class="rename-input"
+          on:blur={disableEditing}
+          on:keydown={handleKeyDown}
+        />
       {/if}
-      <span class="ms-2">REST API Request</span>
-    </span>
-
+    </div>
     <div
       style="position: relative;"
-      class="ms-2 d-flex justify-content-center align-items-center moreOption-icon rounded"
+      class="d-flex justify-content-center align-items-center"
       tabindex="0"
-      on:click={() => {
-        moreOptionsMenu = !moreOptionsMenu;
-        event.stopPropagation();
-      }}
       on:blur={() => {
         moreOptionsMenu = false;
       }}
     >
-      <ThreeDotIcon />
-
+      <Button
+        type="teritiary-regular"
+        id="moreOpitonsButton"
+        size="small"
+        iconSize={16}
+        startIcon={MoreHorizontalRegular}
+        onClick={() => {
+          moreOptionsMenu = !moreOptionsMenu;
+          event.stopPropagation();
+        }}
+      />
       {#if moreOptionsMenu}
         <div
-          class="d-flex align-items-center justify-content-center"
-          style="z-index:1000; border-radius:2px; height:29px; width:96px; background-color:#22232E; position:absolute; top:27px; right:-75px;"
+          class="menu-container"
+          style="background-color: var(--bg-ds-surface-600); z-index:1000; border-radius:4px; width:150px; position:absolute; top:30px; right:-123px;"
         >
-          <div
-            class="d-flex align-items-center justify-content-start"
-            style="color:#FF4646; background-color: #2E2F3D; height:23px; width:90px; border-radius:2px;"
-            on:click={() => {
-              handleOpenModal();
-            }}
-          >
-            <p class="pb-0 mb-0 ps-1">Delete</p>
-          </div>
+          {#each moreOptions as item}
+            <div
+              class="menu-item d-flex align-items-center justify-content-start gap-2"
+              style="color: {item.iconColor};"
+              on:click={() => handleClick(item)}
+              tabindex={0}
+            >
+              <svelte:component
+                this={item.Icon}
+                size={item.iconSize}
+                color={item.iconColor}
+              />
+              <p
+                class="menu-text"
+                style="
+              margin: 0;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              flex: 1;
+              max-width: 100px;
+            "
+              >
+                {item.name}
+              </p>
+            </div>
+          {/each}
         </div>
       {/if}
     </div>
   </div>
+
   <!-- ------------ -->
-  <hr class="my-0" />
+  <hr class="my-0 base-line" />
   <!-- Select API option -->
-  <div class="px-3 py-2">
-    <SelectApiRequest
-      {updateNode}
-      collectionData={data.collections}
-      name={req.name}
-      method={req.method}
-    />
-    {#if !currentBlock}
+  <div class="py-2 dropdown-container px-2">
+    <div>
+      <SelectApiRequest
+        {updateNode}
+        collectionData={data.collections}
+        name={req.name}
+        method={req.method}
+        {handleOpenAddCustomRequestModal}
+      />
+    </div>
+    {#if !currentBlock?.response?.status}
       {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
-          <InfoIcon height="8px" width="8px" />
-          <p style="font-size: 8px;">Run the block to get response</p>
+          <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
+          <p style="basic-text-message">Run the block to get response</p>
         </div>
       {/if}
     {/if}
   </div>
   <!-- ------------ -->
   <!-- Block footer -->
-  {#if currentBlock}
-    <div class="px-3 pb-2 d-flex">
+  {#if currentBlock?.response?.status}
+    <div class="px-2 d-flex response-status-container">
       <!-- Response status -->
       <div
-        class="d-flex align-items-center gap-1 me-2 text-fs-8 text-{checkIfRequestSucceed(
+        class="d-flex align-items-center px-1 me-2 text-{checkIfRequestSucceed(
           currentBlock,
         )
           ? 'getColor'
           : 'deleteColor'}"
+        style="gap: 6px;"
       >
-        <DotIcon
-          color={checkIfRequestSucceed(currentBlock) ? "#69D696" : "#FF7878"}
-          height={"8px"}
-          width={"6px"}
-        />
-        <span class="">
+        <div class="d-flex justify-content-center alin-items-center">
+          <DotIcon
+            color={checkIfRequestSucceed(currentBlock)
+              ? "var(--text-ds-success-400)"
+              : "var(--text-ds-danger-300)"}
+            height={"6px"}
+            width={"6px"}
+          />
+        </div>
+        <span
+          class="response-text-{checkIfRequestSucceed(currentBlock)
+            ? 'success'
+            : 'fail'}"
+        >
           {currentBlock?.response?.status.split(" ")[0] || ""}
         </span>
       </div>
       <!-- Response time -->
-      <div
-        class="d-flex align-items-center gap-1 me-2 text-fs-8 text-{checkIfRequestSucceed(
-          currentBlock,
-        )
-          ? 'getColor'
-          : 'deleteColor'}"
-      >
-        <ClockIcon
-          color={checkIfRequestSucceed(currentBlock) ? "#69D696" : "#FF7878"}
-          height={"7px"}
-          width={"8px"}
-        />
-        <span>
+      <div class="d-flex align-items-center me-2" style="gap: 6px;">
+        <div class="d-flex justify-content-center alin-items-center clock-icon">
+          <ClockRegular size={"16px"} color={"var(--icon-ds-neutral-200)"} />
+        </div>
+        <span class="response-text">
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
         </span>
       </div>
@@ -342,7 +468,11 @@
       </div>
     {/if}
   </div>
-  <Handle type="source" position={Position.Right} />
+  <Handle
+    type="source"
+    position={Position.Right}
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+  />
   <!-- Circular arrow button by clicking this a new block adds -->
   {#if !isDropHereVisible && isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
@@ -364,11 +494,11 @@
             class="btnc position p-1 d-flex align-items-center justify-content-center"
           >
             <ArrowRightIcon
-              height={"8px"}
-              width={"8px"}
+              height={"10px"}
+              width={"10px"}
               color={isCreateBlockArrowHovered
-                ? "var(--icon-secondary-100)"
-                : "var(--icon-primary-300)"}
+                ? "black"
+                : "var(--icon-ds-primary-300)"}
             />
           </span>
         </span>
@@ -389,25 +519,26 @@
         <div
           class="d-flex justify-content-between align-items-center px-3 py-2"
         >
-          <span class="text-fs-12 text-fs-10">
-            <VectorIcon
-              height={"12px"}
-              width={"12px"}
-              color={"var(--icon-primary-300)"}
-            />
+          <span class="text-fs-12 text-fs-10 d-flex justify-content-center">
+            <ArrowSwapRegular />
             <span class="ms-2">REST API Request</span>
           </span>
           <div>
-            <ThreeDotIcon />
+            <MoreHorizontalRegular />
           </div>
         </div>
-        <hr class="my-0" />
-        <div class="px-3 py-3">
+        <hr class="my-0 base-line" />
+        <div class="px-2 py-2">
           <p
-            class="bg-tertiary-190 d-flex align-items-center justify-content-between py-2 px-2 border-radius-2 mb-0 text-fs-10 text-secondary-200"
+            class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-14 text-secondary-200"
           >
-            <span> Select an API Request </span>
-            <span><DropdownArrow height={"8px"} width={"8px"} /></span>
+            <span> Select API Request </span>
+            <span
+              ><ChevronDownRegular
+                size={"16px"}
+                color={"var(--icon-ds-neutral-100)"}
+              /></span
+            >
           </p>
         </div>
       </div>
@@ -419,22 +550,50 @@
 <style lang="scss">
   .request-block {
     background: #eee;
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-700);
     height: auto;
     border-radius: 0.125rem;
     font-size: 0.7rem;
-    width: 200px;
-    border: 2px solid transparent;
+    width: 222px;
+    border-radius: 8px;
+    outline: none;
+  }
+  .connecting-dot-left {
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid var(--border-ds-neutral-500);
+  }
+
+  .connecting-dot-left:hover {
+    border: 1px solid var(--border-ds-primary-300) !important;
+  }
+
+  .connecting-dot-left:active {
+    border: 1px solid var(--border-ds-primary-300) !important;
+  }
+  .base-line {
+    border: 1px solid var(--bg-ds-surface-400);
   }
   .request-block-dummy {
     background: #eee;
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-700);
     height: auto;
-    border-radius: 0.125rem;
-    font-size: 0.7rem;
-    width: 200px;
+    border-radius: 8px;
+    width: 222px;
   }
-
+  .dummy-dropdown {
+    height: 36px;
+    background-color: var(--bg-ds-surface-400);
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-radius: 4px;
+  }
+  .dummy-dropdown-text {
+    color: var(--text-ds-neutral-400);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 18px;
+  }
   .add-block-btn {
     color: var(--text-primary-300);
     width: max-content;
@@ -445,6 +604,7 @@
     display: none;
   }
   .request-block:hover {
+    outline: 1px solid var(--text-ds-neutral-300);
     .add-block-btn {
       display: flex;
     }
@@ -452,15 +612,15 @@
   .btnc {
     height: 18px;
     width: 18px;
-    border: 1px solid var(--border-primary-300);
+    border: 1px solid var(--border-ds-primary-300);
     border-radius: 50%;
   }
   .btnc:hover {
-    height: 18px;
-    width: 18px;
-    border: 1px solid var(--border-primary-300);
-    background-color: var(--bg-primary-300);
+    background-color: var(--bg-ds-primary-300);
     border-radius: 50%;
+  }
+  .btnc:active {
+    background-color: var(--bg-ds-primary-400);
   }
   .arrow {
     padding: 8px 4px;
@@ -469,11 +629,19 @@
   .run-txt-container {
     align-items: center;
     padding-top: 10px;
+    padding-right: 4px;
+    padding-left: 4px;
+    gap: 6px;
   }
   .run-txt-container p {
     margin-bottom: 0px;
-    color: #808080;
-    margin-left: 4px;
+    color: var(--text-ds-neutral-400);
+  }
+  .basic-text-message {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
   }
 
   .moreOption-icon {
@@ -482,6 +650,45 @@
   }
   .moreOption-icon:hover {
     background-color: var(--bg-tertiary-190);
+  }
+  .menu-container {
+    padding: 4px;
+  }
+  .menu-item {
+    background-color: var(--bg-ds-surface-600);
+    height: 28px;
+    border-radius: 4px;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: var(--text-ds-neutral-50);
+    border: none;
+  }
+  .menu-item:hover {
+    background-color: var(--bg-ds-surface-400);
+  }
+  .menu-item:active {
+    background-color: var(--bg-ds-surface-700);
+  }
+  .menu-item:focus-visible {
+    outline: 1px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+  }
+  .rename-input {
+    border: none;
+    background-color: transparent;
+    color: var(--bg-ds-neutral-50);
+    height: 24px;
+    width: 150px;
+    outline: none;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .rename-input:focus {
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
 
   .drop-here-box {
@@ -500,5 +707,32 @@
     top: 50%;
     transform: translateY(-50%) translateX(100%);
     color: var(--text-primary-300);
+  }
+  .response-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    line-height: 18px;
+    margin-bottom: 2px;
+  }
+  .response-status-container {
+    padding-bottom: 8px;
+    padding-top: 4px;
+  }
+  .clock-icon {
+    margin-bottom: 2px;
+  }
+  .status-icon {
+    padding-top: 2px;
+    padding-bottom: 1px;
+    padding-left: 4px;
+    padding-right: 2px;
+  }
+  .response-text-success {
+    color: var(--text-ds-success-400);
+  }
+  .response-text-fail {
+    color: var(--text-ds-danger-300);
   }
 </style>

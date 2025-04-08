@@ -1,2 +1,3 @@
-export { default as environmentDropdown } from "./environment-dropdown.png";
-export { default as environmentPicker } from "./environment-picker.png";
+export { default as inputField } from "./inputFields.svg";
+export { default as variablesImg } from "./variablesImg.svg";
+export { default as envSelection } from "./envSelection.svg";

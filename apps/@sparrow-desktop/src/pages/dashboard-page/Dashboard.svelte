@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    GlobalSearch,
     LoginBanner,
     LoginSignupConfirmation,
     SwitchWorkspace,
@@ -41,6 +40,7 @@
     SidebarItemPositionBaseEnum,
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
+  import { GlobalSearch } from "@sparrow/common/features";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -155,6 +155,11 @@
   };
 
   const handleGlobalKeyPress = (event, setGlobalSearch, setSelectedType) => {
+    if (isGlobalSearchOpen && event.key === "Escape") {
+      event.preventDefault();
+      setGlobalSearch(false);
+      return;
+    }
     if (
       decidingKey(event) &&
       event.key.toLowerCase() === "f" &&
@@ -220,6 +225,7 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
+    if (!guestUser) await _viewModel.connectWebSocket();
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
@@ -259,7 +265,7 @@
     try {
       updater = await check();
       if (updater?.available) {
-        notifications.info("Update Available");
+        notifications.warning("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
@@ -551,8 +557,7 @@
 <div
   class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
   style="height: 100vh;"
-> 
-
+>
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
@@ -574,6 +579,8 @@
     onLogout={_viewModel.handleLogout}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    handleDocsRedirect={_viewModel.redirectDocs}
+    handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
 
   <!--

@@ -4,6 +4,7 @@ import { ItemType } from "@sparrow/common/enums/item-type.enum";
 import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
+import type { RxDocument } from "rxdb";
 export class CollectionRepository {
   constructor() {}
 
@@ -40,6 +41,8 @@ export class CollectionRepository {
       if (data.activeSync) value.activeSync = data.activeSync;
       if (data.createdBy) value.createdBy = data.createdBy;
       if (data.items) value.items = data.items;
+      if (data.selectedAuthType) value.selectedAuthType = data.selectedAuthType;
+      if (data.auth) value.auth = data.auth;
       if (data.branches) value.branches = data.branches;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
       if (data.currentBranch) value.currentBranch = data.currentBranch;
@@ -61,9 +64,33 @@ export class CollectionRepository {
       .exec();
   };
 
+  public subscribeCollection = (
+    uuid: string,
+  ): Observable<RxDocument<CollectionDocument>> => {
+    return RxDB.getInstance().rxdb?.collection?.findOne({
+      selector: {
+        id: uuid,
+      },
+    }).$;
+  };
+
   public getCollection = (): Observable<CollectionDocument[]> => {
     return RxDB.getInstance().rxdb.collection.find().sort({ createdAt: "asc" })
       .$;
+  };
+
+  public getCollectionsByWorkspaceId = async (
+    _workspaceId: string,
+  ): Promise<CollectionDocument[]> => {
+    return (
+      (await RxDB.getInstance()
+        .rxdb?.collection.find({
+          selector: {
+            workspaceId: _workspaceId,
+          },
+        })
+        .exec()) || []
+    );
   };
 
   // public updateCollection = async (
@@ -260,7 +287,10 @@ export class CollectionRepository {
       .exec();
     const updatedItems = collection.toJSON().items.map((element) => {
       if (element.id.toString() === uuid) {
-        element = items;
+        element = {
+          ...element,
+          ...items,
+        };
       }
       return element;
     });
@@ -297,6 +327,36 @@ export class CollectionRepository {
 
   /**
    * @description
+   * Read an API request within a folder.
+   */
+  public readSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    uuid: string,
+  ): Promise<CollectionItemsDto | undefined> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response: CollectionItemsDto | undefined;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === requestId) {
+        for (let i = 0; i < element?.items?.length; i++) {
+          if (element.items[i].id === uuid) {
+            response = element.items[i];
+            break;
+          }
+        }
+      }
+    });
+    return response;
+  };
+
+  /**
+   * @description
    * Creates an API request within a folder.
    */
   public addRequestInFolder = async (
@@ -315,6 +375,233 @@ export class CollectionRepository {
     const updatedItems = items.map((element) => {
       if (element.id === folderId) {
         element.items.push(request);
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public addSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === folderId) {
+        element.items.map((request) => {
+          if (request.id === requestId) {
+            if (!request?.items) {
+              request.items = [];
+            }
+            request.items.push(savedRequest);
+          }
+        });
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public updateSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    savedRequestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === folderId) {
+        element.items.map((request) => {
+          if (request.id === requestId) {
+            for (let i = 0; i < request.items.length; i++) {
+              if (request.items[i].id === savedRequestId) {
+                request.items[i] = {
+                  ...request.items[i],
+                  ...savedRequest,
+                  requestResponse: {
+                    ...(request.items[i].requestResponse || {}), // Preserve existing fields
+                    ...(savedRequest?.requestResponse || {}), // Merge new data
+                  },
+                };
+                break;
+              }
+            }
+          }
+        });
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public deleteSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    savedRequestId: string,
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((folder) => {
+      if (folder.id === folderId) {
+        folder.items = folder.items.map((request) => {
+          if (request.id === requestId) {
+            request.items = request.items.filter(
+              (savedRequest) => savedRequest.id !== savedRequestId,
+            );
+          }
+          return request;
+        });
+      }
+      return folder;
+    });
+
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public updateSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    savedRequestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === requestId) {
+        for (let i = 0; i < element.items.length; i++) {
+          if (element.items[i].id === savedRequestId) {
+            element.items[i] = {
+              ...element.items[i],
+              ...savedRequest,
+              requestResponse: {
+                ...(element.items[i].requestResponse || {}), // Preserve existing fields
+                ...(savedRequest?.requestResponse || {}), // Merge new data
+              },
+            };
+            break;
+          }
+        }
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  public deleteSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    savedRequestId: string,
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((request) => {
+      if (request.id === requestId) {
+        const deletedElement = request.items.filter((e) => {
+          if (e.id !== savedRequestId) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+        request.items = deletedElement;
+      }
+      return request;
+    });
+
+    collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  /**
+   * @description
+   * Creates an API request within a folder.
+   */
+  public addSavedRequestInCollection = async (
+    collectionId: string,
+    requestId: string,
+    savedRequest: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((element) => {
+      if (element.id === requestId) {
+        if (!element?.items) {
+          element.items = [];
+        }
+        element.items.push(savedRequest);
       }
       return element;
     });
@@ -346,7 +633,10 @@ export class CollectionRepository {
       if (element.id === folderId) {
         for (let i = 0; i < element.items.length; i++) {
           if (element.items[i].id === uuid) {
-            element.items[i] = request;
+            element.items[i] = {
+              ...element.items[i],
+              ...request,
+            };
             break;
           }
         }
@@ -384,6 +674,41 @@ export class CollectionRepository {
             break;
           }
         }
+      }
+    });
+    return response;
+  };
+
+  /**
+   * @description
+   * Read an API request within a folder.
+   */
+  public readSavedRequestInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    uuid: string,
+  ): Promise<CollectionItemsDto | undefined> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response: CollectionItemsDto | undefined;
+    collection.toJSON().items.forEach((element) => {
+      if (element.id === folderId) {
+        element.items.forEach((request) => {
+          if (request.id === requestId) {
+            for (let i = 0; i < request?.items?.length; i++) {
+              if (request.items[i].id === uuid) {
+                response = request.items[i];
+                break;
+              }
+            }
+          }
+        });
       }
     });
     return response;
@@ -499,5 +824,87 @@ export class CollectionRepository {
 
   public getCollectionDocs = (): CollectionDocument[] => {
     return RxDB.getInstance().rxdb?.collection.find().exec();
+  };
+
+  /**
+   * @description
+   * Read an API request within a tab.
+   */
+  public readRequestInTab = async (tabId: string, requestId: string) => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return undefined;
+
+    return tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.find(
+        (element) => element.data.requestId === requestId,
+      );
+  };
+
+  /**
+   * @description
+   * Check if an API request exists within a node.
+   */
+  public readRequestExistInNode = async (
+    tabId: string,
+    nodeId: string,
+  ): Promise<boolean> => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return false;
+
+    const nodeExists = tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.some(
+        (element) =>
+          element.id === nodeId && element?.data?.requestData?.url !== "",
+      );
+
+    return nodeExists;
+  };
+
+  /**
+   * @description
+   * Updates a block data.
+   */
+  public updateBlockData = async (
+    tabId: string,
+    nodeId: string,
+    requestData: object,
+  ): Promise<void> => {
+    console.log("inside repo", tabId, nodeId, requestData);
+    try {
+      const tabData = await RxDB.getInstance()
+        .rxdb.tab.findOne({ selector: { tabId } })
+        .exec();
+
+      if (!tabData) return;
+
+      const tabJson = tabData.toJSON();
+      const nodes = tabJson?.property?.testflow?.nodes ?? [];
+
+      // Find the node and update the entire node object
+      const updatedNodes = nodes.map((node) =>
+        node.id === nodeId ? { ...node, ...requestData } : node,
+      );
+
+      // Update the database
+      await tabData.patch({
+        property: {
+          ...tabJson.property,
+          testflow: {
+            ...tabJson.property?.testflow,
+            nodes: updatedNodes,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error updating block data:", error);
+    }
   };
 }

@@ -8,6 +8,9 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
+    defaultCurrentStep,
+    isDefaultTourGuideOpen,
+    isDefaultTourGuideClose,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -29,7 +32,13 @@
     ImportCurl,
     WorkspaceDefault,
     SaveAsCollectionItem,
+    WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
+  import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "@sparrow/workspaces/stores";
   import { WithModal } from "@sparrow/workspaces/hoc";
   import { notifications } from "@sparrow/library/ui";
 
@@ -43,9 +52,8 @@
   // ---- helpers
   import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
   import type { TabDocument } from "@app/database/database";
-  import type { Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { onMount } from "svelte";
-  import { ItemType } from "@sparrow/common/enums";
 
   import type {
     CollectionDocument,
@@ -75,6 +83,10 @@
 
   import { open } from "@tauri-apps/plugin-shell";
   import constants from "@app/constants/constants";
+  import RestExplorerSavedPage from "./sub-pages/RestExplorerSavedPage/RestExplorerSavedPage.svelte";
+  import { remove } from "@tauri-apps/plugin-fs";
+  import { Checkbox } from "@sparrow/library/forms";
+  import { writable } from "svelte/store";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -86,8 +98,19 @@
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
 
+  let totalTeamCount: number | undefined = 0;
+
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
+
+  // Tab Controls Properties - st
+  let isForceCloseTabPopupOpen: boolean = false;
+  let tabsToForceClose: Tab[] = [];
+  let tabIdWhoRecivedForceClose: string;
+  let noOfNotSavedTabsWhileForClose = 0;
+  let isUserDontWantForceClosePopup: boolean = false;
+  // Tab Controls Properties - end
+
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
   let loader = false;
@@ -98,15 +121,14 @@
   let userId = "";
   let userRole = "";
 
-  let isExpandCollection = false;
-  let isExpandEnvironment = false;
-  let isExpandTestflow = false;
-  let isFirstCollectionExpand = false;
-
   let localEnvironment;
   let globalEnvironment;
+  // let hasSetInitialEnvironment = false;
+
+  let isFirstCollectionExpand;
 
   let environments = _viewModel2.environments;
+  let totalCollectionCount = writable(0);
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -153,11 +175,32 @@
     }
   }
 
+  // Rolling back the changes for auto select environment - Require Fix
+  ///////////////////////////////////////////////////////
+  // Auto select environment for the first time - st
+  //////////////////////////////////////////////////////
+  // $: {
+  //   // Set the first environment by default from the list if no env. already set.
+  //   if (!hasSetInitialEnvironment && localEnvironment?.length > 0) {
+  //     setInitialEnvironment();
+  //   }
+  // }
+
+  // // Function to handle default environment selection
+  // async function setInitialEnvironment() {
+  //   if (hasSetInitialEnvironment) return;
+  //   const currActiveEnv = currentWOrkspaceValue.environmentId;
+  //   if (!currActiveEnv)
+  //     await _viewModel2.onSelectEnvironment(localEnvironment[0]);
+  //   hasSetInitialEnvironment = true;
+  // }
+  // Auto select environment for the first time - End
+
   let onCreateEnvironment = _viewModel2.onCreateEnvironment;
 
   async function handleCreateEnvironment() {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
 
     await onCreateEnvironment(localEnvironment);
@@ -185,29 +228,104 @@
   /**
    * Handle close tab functionality in tab bar list
    */
-  const closeTab = (id: string, tab: Tab) => {
+  const closeTab = async (id: string, tab: Tab) => {
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
+        tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.COLLECTION ||
+        tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
       if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) {
         removeTab = tab;
         isPopupClosed = true;
+
+        // Wait for the popup to close before proceeding (check for user input)
+        await new Promise<void>((resolve) => {
+          const checkIfPopupClosed = setInterval(() => {
+            if (!isPopupClosed) {
+              clearInterval(checkIfPopupClosed);
+              resolve();
+            }
+          }, 300);
+        });
+
+        return;
       } else {
         _viewModel.handleRemoveTab(id);
+        return;
       }
     } else {
       _viewModel.handleRemoveTab(id);
     }
   };
+  const softCloseTabs = async (currentTabId: string) => {
+    const savedTabs = [];
+    const unSavedTabs = [];
+    for (const tab of $tabList) {
+      if (tab.id !== currentTabId) {
+        if (tab.isSaved) savedTabs.push(tab.tabId);
+        else unSavedTabs.push(tab);
+      }
+    }
+
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
+
+    for (let tab of unSavedTabs) {
+      // Wait for user confirmation before moving to the next tab
+      await closeTab(tab.id, tab);
+    }
+  };
+  // Methods for Tab Controls - start
+  const tabsForceCloseInitiator = (currentTabId: string) => {
+    tabsToForceClose = $tabList;
+    tabIdWhoRecivedForceClose = currentTabId;
+
+    noOfNotSavedTabsWhileForClose = 0;
+    $tabList?.forEach((tab: Tab) => {
+      if (tab.id !== currentTabId) {
+        if (!tab?.isSaved) {
+          noOfNotSavedTabsWhileForClose += 1;
+        }
+      }
+    });
+
+    if (noOfNotSavedTabsWhileForClose > 0) {
+      if (isUserDontWantForceClosePopup) {
+        forceCloseTabs(currentTabId);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+        return;
+      }
+      isForceCloseTabPopupOpen = true;
+    } else forceCloseTabs(currentTabId);
+  };
+  const forceCloseTabs = async (currentTabId: string) => {
+    const tabsToClose = [];
+    for (const tab of $tabList) {
+      if (tab.id !== currentTabId) tabsToClose.push(tab.tabId);
+    }
+    const wsId = currentWOrkspaceValue._id;
+    _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, tabsToClose);
+  };
+
+  const handleTabDuplication = (tabId: string) => {
+    _viewModel.createDuplicateTabByTabId(tabId);
+  };
+  // Methods for Tab Controls - start
 
   const handleClosePopupBackdrop = (flag: boolean) => {
     isPopupClosed = flag;
+  };
+
+  const handleForceClosePopupBackdrop = (flag: boolean) => {
+    isForceCloseTabPopupOpen = flag;
   };
 
   const handlePopupDiscard = () => {
@@ -221,7 +339,8 @@
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
-      removeTab.type === TabTypeEnum.TESTFLOW
+      removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.COLLECTION
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -240,6 +359,13 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.COLLECTION) {
+          const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
         loader = false;
       }
@@ -247,7 +373,9 @@
       removeTab.type === TabTypeEnum.REQUEST ||
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
-      removeTab.type === TabTypeEnum.GRAPHQL
+      removeTab.type === TabTypeEnum.SAVED_REQUEST ||
+      removeTab.type === TabTypeEnum.GRAPHQL ||
+      removeTab.type === TabTypeEnum.FOLDER
     ) {
       if (removeTab?.path.collectionId && removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -260,6 +388,20 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
+          const res = await _viewModel.saveSavedRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.FOLDER) {
+          const res = await _viewModel.saveFolder(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.WEB_SOCKET) {
           const res = await _viewModel.saveSocket(removeTab);
@@ -329,7 +471,8 @@
   let activeTab: Observable<TabDocument | null> | undefined;
   let prevWorkspaceId = "";
   let count = 0;
-
+  let autoRefreshEnable: boolean = true;
+  let refreshLoad: boolean = false;
   let isAccessDeniedModalOpen = false;
 
   // Add userValidation state
@@ -337,42 +480,44 @@
     isValid: true,
     checked: false,
   };
+  const handleRefreshApicalls = async (workspaceId: string) => {
+    try {
+      const [
+        fetchCollectionsResult,
+        refreshEnvironmentResult,
+        refreshTestflowResult,
+      ] = await Promise.all([
+        _viewModel.fetchCollections(workspaceId),
+        _viewModel2.refreshEnvironment(workspaceId),
+        _viewModel3.refreshTestflow(workspaceId),
+      ]);
+
+      const collectionTabsToBeDeleted =
+        fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+      const environmentTabsToBeDeleted =
+        refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+      const testflowTabsToBeDeleted =
+        refreshTestflowResult?.testflowTabsToBeDeleted || [];
+
+      const totalTabsToBeDeleted = [
+        ...collectionTabsToBeDeleted,
+        ...environmentTabsToBeDeleted,
+        ...testflowTabsToBeDeleted,
+      ];
+      _viewModel.deleteTabsWithTabIdInAWorkspace(
+        workspaceId,
+        totalTabsToBeDeleted,
+      );
+      refreshLoad = false;
+    } catch (error) {
+      refreshLoad = false;
+    }
+  };
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
-        Promise.all([
-          _viewModel.fetchCollections(value?._id),
-          _viewModel2.refreshEnvironment(value?._id),
-          _viewModel3.refreshTestflow(value?._id),
-          ,
-        ]).then(
-          ([
-            fetchCollectionsResult,
-            refreshEnvironmentResult,
-            refreshTestflowResult,
-          ]) => {
-            // Handle the results of each API call here
-
-            const collectionTabsToBeDeleted =
-              fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
-            const environmentTabsToBeDeleted =
-              refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-            const testflowTabsToBeDeleted =
-              refreshTestflowResult?.testflowTabsToBeDeleted || [];
-            const totalTabsToBeDeleted: string[] = [
-              ...collectionTabsToBeDeleted,
-              ...environmentTabsToBeDeleted,
-              ...testflowTabsToBeDeleted,
-            ];
-            _viewModel.deleteTabsWithTabIdInAWorkspace(
-              value?._id,
-              totalTabsToBeDeleted,
-            );
-            const userHasAccess = value.users?.some(
-              (user) => user.id === userId,
-            );
-          },
-        );
+        await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -382,6 +527,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
+        totalTeamCount = value._data?.users?.length;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -418,15 +564,67 @@
   isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
-      isExpandCollection = value;
-      isExpandEnvironment = value;
+      isExpandCollection.set(value);
+      isExpandEnvironment.set(value);
       isFirstCollectionExpand = value;
     }
   });
-
   onDestroy(() => {
     cw.unsubscribe();
   });
+
+  collectionList.subscribe((collections) => {
+    let count = 0;
+    collections.forEach((collection) => {
+      const collectionData = collection.toMutableJSON();
+      count += collectionData.items.length || 0;
+    });
+    totalCollectionCount.set(count);
+  });
+
+  let refreshInterval: NodeJS.Timeout | null = null;
+
+  //main handle function which performs refresh workspace API calls and This will refresh the workspace only if the user count is great than one.
+  const handleRefreshWorkspace = () => {
+    if (!currentWorkspace) return;
+    refreshLoad = true;
+    if (totalTeamCount > 1) {
+      handleRefreshApicalls($currentWorkspace?._id);
+    }
+  };
+
+  // It will autorefresh the handle function of refresh in 2 minutes interval Time.
+  const startAutoRefresh = (): void => {
+    if (!autoRefreshEnable) {
+      return;
+    }
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+    refreshInterval = setInterval(
+      () => {
+        handleRefreshWorkspace();
+      },
+      2 * 60 * 1000,
+    );
+  };
+
+  const refreshWorkspace = (): void => {
+    handleRefreshWorkspace();
+    startAutoRefresh();
+  };
+
+  onMount(() => {
+    startAutoRefresh();
+  });
+
+  // ToDo: Need to move the truncate functionality to `modal` component itself
+  const truncateTabName = (name, maxLength = 15) => {
+    if (!name) return "Untitled";
+    return name.length > maxLength
+      ? `${name.substring(0, maxLength)}...`
+      : name;
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -447,6 +645,9 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          userCount={totalTeamCount}
+          {refreshWorkspace}
+          {refreshLoad}
           {collectionList}
           {navigateToGithub}
           {currentWorkspace}
@@ -484,19 +685,15 @@
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
           onOpenTestflow={_viewModel3.handleOpenTestflow}
-          bind:isExpandCollection
-          bind:isExpandEnvironment
-          bind:isExpandTestflow
-          bind:isFirstCollectionExpand
           appVersion={version}
+          bind:isFirstCollectionExpand
         />
       </Pane>
-      <Pane
-        size={$leftPanelCollapse ? 100 : $rightPanelWidth}
-        minSize={60}
-        class="bg-secondary-800-important"
-      >
-        <section class="d-flex flex-column h-100">
+      <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
+        <section
+          class="d-flex flex-column h-100"
+          style="background-color:var(--bg-ds-surface-900)"
+        >
           <TabBar
             tabList={$tabList}
             {isGuestUser}
@@ -509,35 +706,39 @@
             onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
             onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
             onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+            onDoubleClick={_viewModel.handleTabTypeChange}
+            onClickCloseOtherTabs={softCloseTabs}
+            onClickForceCloseTabs={tabsForceCloseInitiator}
+            onClickDuplicateTab={handleTabDuplication}
           />
           <div style="flex:1; overflow: hidden;">
             <Route>
               {#if true}
-                {#if $activeTab?.type === ItemType.REQUEST}
+                {#if $activeTab?.type === TabTypeEnum.REQUEST}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.COLLECTION}
+                {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <CollectionExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.FOLDER}
+                {:else if $activeTab?.type === TabTypeEnum.FOLDER}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <FolderExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <EnvironmentExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WORKSPACE}
+                {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WorkspaceExplorerPage
@@ -546,28 +747,34 @@
                       />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <WebSocketExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.TESTFLOW}
+                {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <TestFlowExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.SOCKET_IO}
+                {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <SocketIoExplorerPage tab={$activeTab} />
                     </div>
                   </Motion>
-                {:else if $activeTab?.type === ItemType.GRAPHQL}
+                {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
                       <GraphqlExplorerPage tab={$activeTab} />
+                    </div>
+                  </Motion>
+                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerSavedPage tab={$activeTab} />
                     </div>
                   </Motion>
                 {:else if !$tabList?.length}
@@ -578,9 +785,8 @@
                         {handleCreateEnvironment}
                         onCreateTestflow={() => {
                           _viewModel3.handleCreateTestflow();
-                          isExpandTestflow = true;
+                          isExpandTestflow.set(true);
                         }}
-                        bind:isExpandCollection
                         showImportCollectionPopup={() =>
                           (isImportCollectionPopup = true)}
                         onItemCreated={_viewModel.handleCreateItem}
@@ -599,16 +805,106 @@
   </div>
 </Motion>
 
-<WithModal
+<!-- Force Close Popup -->
+<!-- {#if isForceCloseTabPopupOpen} -->
+<Modal
+  title={"Force Close!"}
+  type={"danger"}
+  zIndex={1000}
+  isOpen={isForceCloseTabPopupOpen}
+  width={"35%"}
+  handleModalState={handleForceClosePopupBackdrop}
+>
+  <div class="text-lightGray mb-1 sparrow-fs-14">
+    <p>
+      <span class="text-whiteColor fw-bold"
+        >{noOfNotSavedTabsWhileForClose} Tabs
+      </span>
+      have unsaved changes. Force closing will discard your edits, and you won’t
+      be able to recover them. Are you sure you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex align-items-center gap-1 sparrow-fs-14 mb-3">
+    <Checkbox
+      size={"large"}
+      bind:checked={isUserDontWantForceClosePopup}
+      on:input={() => {
+        isUserDontWantForceClosePopup = !isUserDontWantForceClosePopup;
+      }}
+      disabled={false}
+    />
+    <p class="m-0">I understand, don't show this agian.</p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      title="Don't Close"
+      type={"secondary"}
+      onClick={() => {
+        "click dont save";
+        handleForceClosePopupBackdrop(false);
+      }}
+    ></Button>
+    <Button
+      title="Force Close"
+      type={"danger"}
+      onClick={() => {
+        "click dont save";
+        forceCloseTabs(tabIdWhoRecivedForceClose);
+        isForceCloseTabPopupOpen = false;
+        noOfNotSavedTabsWhileForClose = 0;
+      }}
+    ></Button>
+  </div>
+</Modal>
+<!-- {/if} -->
+
+<!-- Save Changes for API Popup -- New -->
+<Modal
+  title={"Unsaved Changes!"}
+  type={"dark"}
+  zIndex={1000}
   isOpen={isPopupClosed}
-  onModalStateChanged={handleClosePopupBackdrop}
-  onSave={handlePopupSave}
-  onCancel={handleClosePopupBackdrop}
-  onDiscard={handlePopupDiscard}
-  isSaveDisabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-  {loader}
-  {isGuestUser}
-/>
+  width={"35%"}
+  handleModalState={() => handleClosePopupBackdrop(false)}
+>
+  <div class="mt-2 mb-4">
+    <p class="lightGray" style="color: lightGray;">
+      Do you want to save changes in this tab “<span
+        class="text-whiteColor fw-bold"
+      >
+        {!removeTab ? "Untitled" : truncateTabName(removeTab.name, 25)}</span
+      >”? Changes will be lost in case you choose not to save.
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Don't Save"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        handlePopupDiscard();
+      }}
+    ></Button>
+    <Button
+      title={"Save"}
+      size={"medium"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"95px"}
+      disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+      onClick={() => {
+        handlePopupSave();
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <Modal
   title={""}
@@ -622,17 +918,21 @@
   }}
 >
   <WelcomePopup
+    loader={$totalCollectionCount > 0 ? false : true}
     onClickExplore={() => {
       isUserFirstSignUp.set(false);
       isWelcomePopupOpen = false;
+      isDefaultTourGuideClose.set(true);
     }}
     onClickTour={() => {
       isUserFirstSignUp.set(false);
-      isTourGuideOpen = true;
       isWelcomePopupOpen = false;
+      defaultCurrentStep.set(1);
+      isDefaultTourGuideOpen.set(true);
     }}
   />
 </Modal>
+<WorkspaceTourGuide />
 {#if isAccessDeniedModalOpen}
   <Modal
     title="Access Denied"
@@ -652,26 +952,7 @@
 {/if}
 
 <svelte:window on:keydown={handleKeyPress} />
-<!-- <ImportCollection
-    {collectionList}
-    workspaceId={$currentWorkspace._id}
-    closeImportCollectionPopup={() => (isImportCollectionPopup = false)}
-    onItemCreated={async (entityType, args) => {
-      const response = await _viewModel.handleCreateItem(entityType, args);
-      if (response.isSuccessful) {
-        setTimeout(() => {
-          scrollList("bottom");
-        }, 1000);
-      }
-    }}
-    onItemImported={async (entityType, args) => {
-      await _viewModel.handleImportItem(entityType, args);
-      scrollList("bottom");
-    }}
-    onImportDataChange={_viewModel.handleImportDataChange}
-    onUploadFile={_viewModel.uploadFormFile}
-    onExtractGitBranch={_viewModel.extractGitBranch}
-  /> -->
+
 <Modal
   title={"New Collection"}
   type={"dark"}
@@ -683,7 +964,7 @@
   }}
 >
   <ImportCollection
-    onClick={() => {
+    onCloseModal={() => {
       isImportCollectionPopup = false;
     }}
     {collectionList}
@@ -692,12 +973,12 @@
       if (response.isSuccessful) {
         setTimeout(() => {
           scrollList("bottom");
-          isExpandCollection = true;
+          isExpandCollection.set(true);
         }, 1000);
       }
     }}
     currentWorkspaceId={$currentWorkspace?._id}
-    onImportJSONObject={async (currentWorkspaceId, importJSON, contentType) => {
+    onImportOapiText={async (currentWorkspaceId, importJSON, contentType) => {
       const response = await _viewModel.importJSONObject(
         currentWorkspaceId,
         importJSON,
@@ -710,7 +991,7 @@
       }
       return response;
     }}
-    onCollectionFileUpload={async (currentWorkspaceId, file, type) => {
+    onImportOapiFile={async (currentWorkspaceId, file, type) => {
       const response = await _viewModel.collectionFileUpload(
         currentWorkspaceId,
         file,
@@ -740,10 +1021,9 @@
       }
       return response;
     }}
-    onValidateLocalHostUrl={_viewModel.validateLocalHostURL}
-    onValidateDeployedURL={_viewModel.validateDeployedURL}
-    onValidateDeployedURLInput={_viewModel.validateURLInput}
-    onValidateLocalHostURLInput={_viewModel.validateURLInput}
+    onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
+    onValidateOapiText={_viewModel.validateOapiDataSyntax}
+    onValidateOapiFile={_viewModel.validateOapiFileSyntax}
   />
 </Modal>
 
@@ -866,9 +1146,10 @@
   :global(.collection-splitter .splitpanes__splitter) {
     width: 6px !important;
     height: auto !important;
-    background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-900) !important;
-    border-right: 0px solid var(--blackColor) !important;
+
+    background-color: var(--bg-ds-surface-900) !important;
+    border-left: 5px solid var(--bg-ds-surface-700) !important;
+    border-right: 0px solid var(--bg-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
@@ -876,7 +1157,7 @@
       .collection-splitter .splitpanes__splitter:active,
       .collection-splitter .splitpanes__splitter:hover
     ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .gradient-text {
     font-size: 18;
@@ -885,5 +1166,9 @@
     background: linear-gradient(270deg, #6147ff 2.55%, #1193f0 31.48%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .save-popup {
+    font-weight: 400;
   }
 </style>

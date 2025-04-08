@@ -4,6 +4,7 @@ import {
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -46,7 +47,11 @@ import { v4 as uuidv4 } from "uuid";
 import type { GuideQuery } from "../../../../types/user-guide";
 import { graphqlExplorerDataStore } from "@sparrow/workspaces/features/graphql-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
-import type { Path, Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import {
   GraphqlRequestOperationTabEnum,
   type GraphqlRequestAuthTabInterface,
@@ -61,6 +66,7 @@ import {
 } from "@sparrow/common/types/workspace/environment-base";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import { parse, GraphQLError } from "graphql";
+
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -98,6 +104,7 @@ class GraphqlExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property?.graphql
@@ -583,7 +590,8 @@ class GraphqlExplorerViewModel {
         inputType.inputFields,
         typeName,
         depth + 1,
-        "inputField",
+        "argument",
+        true,
       );
       processedTypes.delete(typeName);
       return result;
@@ -613,6 +621,7 @@ class GraphqlExplorerViewModel {
       parentName,
       depth = 0,
       defaultItemType = "field",
+      isInputField = false,
     ) {
       if (!fields || depth > maxDepthLength) return [];
 
@@ -621,12 +630,13 @@ class GraphqlExplorerViewModel {
         const typeName = resolveType(field.type);
         const isCustomType = !isScalarType(typeName);
 
-        let result = {
+        const result = {
           id: uuidv4(), // Add UUID to the top-level object
           name: fieldName,
           description: field.description,
           type: typeName,
           itemType: defaultItemType,
+          isInputField: isInputField,
           isSelected: false,
           isExpanded: false,
           value: getDefaultValue(typeName),
@@ -645,6 +655,7 @@ class GraphqlExplorerViewModel {
               type: argTypeName,
               description: arg.description,
               itemType: "argument",
+              isInputField: !isArgCustomType ? true : false,
               isSelected: false,
               isExpanded: false,
               defaultValue: arg.defaultValue,
@@ -727,12 +738,6 @@ class GraphqlExplorerViewModel {
           ? processFields(mutationType.fields, "Mutation").slice(0, 70)
           : [],
       },
-      // Disabling subscription for now as it's support is not provided
-      // Subscription: {
-      //   items: subscriptionType
-      //     ? processFields(subscriptionType.fields, "Subscription")
-      //     : [],
-      // },
     };
 
     return result;
@@ -812,6 +817,15 @@ class GraphqlExplorerViewModel {
               itemType: "argument",
               isSelected: true,
               value: arg.value.value, // Set value for StringValue
+              items: [], // No nested items
+            };
+          case "IntValue":
+            // For IntValue, set value directly
+            return {
+              name: arg.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: arg.value.value,
               items: [], // No nested items
             };
           case "ObjectValue":
@@ -1698,18 +1712,18 @@ class GraphqlExplorerViewModel {
           return;
         }
 
-        graphqlExplorerDataStore.update((restApiDataMap) => {
-          const data = restApiDataMap.get(progressiveTab?.tabId);
+        graphqlExplorerDataStore.update((graphqlDataMap) => {
+          const data = graphqlDataMap.get(progressiveTab?.tabId);
           if (data) {
-            data.response.body = "";
+            data.response.body = error.toString();
             data.response.headers = [];
             data.response.status = ResponseStatusCode.ERROR;
             data.response.time = 0;
             data.response.size = 0;
             data.isSendRequestInProgress = false;
-            restApiDataMap.set(progressiveTab.tabId, data);
+            graphqlDataMap.set(progressiveTab.tabId, data);
           }
-          return restApiDataMap;
+          return graphqlDataMap;
         });
       });
   };
@@ -1964,8 +1978,10 @@ class GraphqlExplorerViewModel {
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
-
+    const tabId = graphqlTabData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -2019,6 +2035,7 @@ class GraphqlExplorerViewModel {
           guestGraphqlRequest,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -2071,11 +2088,13 @@ class GraphqlExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,
@@ -2880,7 +2899,7 @@ class GraphqlExplorerViewModel {
     }
     await this.updateRequestQuery(query);
 
-    notifications.success("Cleared Query successfully.");
+    notifications.success("Cleared query successfully.");
   };
 }
 

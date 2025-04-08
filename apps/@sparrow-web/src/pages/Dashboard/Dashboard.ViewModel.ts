@@ -31,6 +31,7 @@ import { FeatureSwitchRepository } from "../../repositories/feature-switch.repos
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import {
+  CollectionTabAdapter,
   GraphqlTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
@@ -56,7 +57,8 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
-  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistantWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
 
@@ -363,6 +365,18 @@ export class DashboardViewModel {
     }
   };
 
+  // redirects to Sparrow Docs.
+  public redirectDocs = async () => {
+    window.open(constants.DOCS_URL, "_blank");
+    return;
+  };
+
+  // redirects to Sparrow Feature Updates.
+  public redirectFeatureUpdates = async () => {
+    window.open(constants.SPARROW_GITHUB + "/sparrow-app/releases");
+    return;
+  };
+
   /**
    * add guest user in local db
    */
@@ -497,9 +511,9 @@ export class DashboardViewModel {
       const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
-      notifications.success(`New team ${team.name} is created.`);
+      notifications.success(`New hub ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new team. Please try again.");
+      notifications.error("Failed to create a new hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -563,42 +577,12 @@ export class DashboardViewModel {
     workspaceId: string,
     collection: any,
   ) => {
-    // Calculate collection stats
-    let totalFolder = 0;
-    let totalRequest = 0;
-
-    if (collection.items) {
-      collection.items.forEach((item: any) => {
-        if (
-          item.type === "REQUEST" ||
-          item.type === "GRAPHQL" ||
-          item.type === "SOCKETIO" ||
-          item.type === "WEBSOCKET"
-        ) {
-          totalRequest++;
-        } else {
-          totalFolder++;
-          totalRequest += item?.items?.length || 0;
-        }
-      });
-    }
-
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id || "",
-      folderId: "",
-    };
-
-    const _collection = new InitCollectionTab(collection.id, workspaceId);
-    _collection.updateName(collection.name);
-    _collection.updateDescription(collection.description);
-    _collection.updatePath(path);
-    _collection.updateTotalRequests(totalRequest);
-    _collection.updateTotalFolder(totalFolder);
-    _collection.updateIsSave(true);
-
+    const collectionTab = new CollectionTabAdapter().adapt(
+      workspaceId,
+      collection,
+    );
     // Create the tab with the new collection
-    await this.tabRepository.createTab(_collection.getValue(), workspaceId);
+    await this.tabRepository.createTab(collectionTab, workspaceId);
 
     // Update UI
     moveNavigation("right");
@@ -1037,18 +1021,41 @@ export class DashboardViewModel {
       }
 
       let environment = await this.getRecentEnvironment();
-      environment = environment.map((_environment) => ({
-        title: _environment.name,
-        workspace: _environment.workspaceId,
-        id: _environment.id,
-        variable: _environment.variable,
-      }));
+
+      environment = environment.map((_environment) => {
+        const workspaceDetails = workspaceMap[_environment.workspaceId];
+        const path: string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+
+        return {
+          title: _environment.name,
+          workspace: _environment.workspaceId,
+          id: _environment.id,
+          variable: _environment.variable,
+          path: this.createPath(path),
+        };
+      });
 
       let workspace = await this.getRecentWorkspace();
       workspace = workspace.map((_value) => _value._data);
 
       let testflow = await this.getRecentTestflow();
-      testflow = testflow.map((_value) => _value._data);
+      testflow = testflow.map((_value) => {
+        const workspaceDetails = workspaceMap[_value._data.workspaceId];
+        const path: string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+
+        return {
+          ..._value._data,
+          path: this.createPath(path),
+        };
+      });
 
       return { collection, folder, file, workspace, testflow, environment };
     }

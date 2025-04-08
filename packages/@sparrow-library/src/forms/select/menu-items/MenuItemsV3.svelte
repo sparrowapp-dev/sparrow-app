@@ -26,6 +26,8 @@
 
   let isMenuItemHover = false;
 
+  export let fontSize;
+
   /**
    * @description - add classes to ticked options
    * @param _id - item id (rows iteration)
@@ -48,28 +50,23 @@
   }}
 >
   <div class="d-flex ellipsis align-items-center">
-    <div
-      class="img-logo-container me-2 overflow-hidden w-10 "
-      style="min-width: 20px;"
-    >
+    <div class="img-logo-container me-2 w-10" style="min-width: 20px;">
       {#if list.logo == "" || list.logo == undefined}
         <Avatar
           type="letter"
           size="small"
-          letter={list.name[0] ? list.name[0] : ""}/>
+          letter={list.name[0] ? list.name[0] : ""}
+        />
       {:else}
-        <Avatar
-          type="image"
-          size="small"
-          src={list.logo}/> 
+        <Avatar type="image" size="small" image={list.logo} />
       {/if}
     </div>
     <p
-      class="m-0 p-0 {getTextColor(list?.color)} ellipsis {isMenuItemHover &&
+      class="m-0 px-1 {getTextColor(list?.color)} ellipsis {isMenuItemHover &&
       !list?.color
         ? 'highlight-menu-item'
         : ''}  {extractBodyTextHighlight(list.id, selectedRequest?.id)}"
-      style="font-size: 12px;"
+      style="font-size: {fontSize}"
     >
       {list.name}<br />
       {#if list.description}

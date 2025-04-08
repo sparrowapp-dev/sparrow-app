@@ -9,10 +9,13 @@
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   import { WithButtonV6 } from "../../../../hoc";
   import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import { BoxIcon, ClockIcon, DotIcon } from "@sparrow/library/icons";
+  import { ArchiveRegular, ClockRegular } from "@sparrow/library/icons";
   import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
   export let onUpdateResponseState;
   export let responseHeadersLength = 0;
+  export let response;
 
   let tabs: {
     name: string;
@@ -43,8 +46,6 @@
       tabs = refreshTabs(responseHeadersLength);
     }
   }
-
-  export let response;
 
   let fileExtension = "json";
 
@@ -109,9 +110,18 @@
   const onTabClick = (tabId: ResponseSectionEnum) => {
     onUpdateResponseState("responseNavigation", tabId);
   };
+
+  const checkIfRequestSucceed = (_status: string) => {
+    if (
+      Number(_status.split(" ")[0]) >= 200 &&
+      Number(_status.split(" ")[0]) < 300
+    )
+      return true;
+    return false;
+  };
 </script>
 
-<div class="pb-2 d-flex">
+<div class="pb-2 d-flex" style="position: relative;">
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
   <div
     class="d-flex flex-column align-items-start justify-content-between w-100"
@@ -120,10 +130,8 @@
       class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
       style="top:55.4px;  margin-top: -1px;"
     >
-      <div class="d-flex gap-3 align-items-center justify-content-center"></div>
       <div class="d-flex align-items-center gap-2" style=" height: 32px;">
-        <!-- Copy button -->
-        <Tooltip title={"Copy"}>
+        <!-- <Tooltip title={"Copy"}>
           <WithButtonV6
             icon={CopyIcon}
             onClick={handleCopy}
@@ -131,7 +139,6 @@
             loader={false}
           />
         </Tooltip>
-        <!-- Download button -->
         <Tooltip title={"Export"}>
           <WithButtonV6
             icon={DownloadIcon2}
@@ -139,8 +146,116 @@
             disable={false}
             loader={false}
           />
-        </Tooltip>
+        </Tooltip> -->
+      </div>
+      <div class="d-flex gap-3 align-items-center justify-content-center">
+        {#if response && response?.status}
+          <div class="d-flex align-items-center gap-2">
+            <!-- insert controller here -->
+            <div class="d-flex align-items-center gap-2">
+              <Tooltip
+                title="HTTP Status - {response.status}"
+                placement={"bottom-center"}
+                zIndex={500}
+                distance={20}
+              >
+                <span
+                  class="statuscode gap-1 d-flex align-items-center position-relative cursor-pointer border-0"
+                  style="font-size: 12px;"
+                >
+                  <span
+                    class="ellipsis d-flex align-items-center"
+                    style="color:{checkIfRequestSucceed(response?.status)
+                      ? 'var(--icon-ds-success-300)'
+                      : 'var(--icon-ds-danger-300)'};"
+                  >
+                    <span class="me-2 d-flex">
+                      <DotIcon
+                        color={checkIfRequestSucceed(response?.status)
+                          ? "var(--icon-ds-success-300)"
+                          : "var(--icon-ds-danger-300)"}
+                        height={"6px"}
+                        width={"6px"}
+                      />
+                    </span>
+                    {response.status.split(" ")[0]}</span
+                  >
+                </span>
+              </Tooltip>
+              <Tooltip
+                title="Response Time"
+                placement={"bottom-center"}
+                zIndex={500}
+                distance={20}
+              >
+                <span
+                  class="text-fs-12 d-flex align-items-center ps-1 pe-1 border-0 justify-content-center rounded text-backgroundColor gap-1 time-primary1"
+                  style=" color:{checkIfRequestSucceed(response?.status)
+                    ? 'var(--icon-ds-success-300)'
+                    : 'var(--icon-ds-danger-300)'};"
+                >
+                  <span class="me-1 d-flex">
+                    <ClockRegular
+                      color={checkIfRequestSucceed(response?.status)
+                        ? "var(--icon-ds-success-300)"
+                        : "var(--icon-ds-danger-300)"}
+                      size={"12px"}
+                    />
+                  </span>
+                  <span
+                    class="text-fs-12"
+                    style=" color:{checkIfRequestSucceed(response?.status)
+                      ? 'var(--icon-ds-success-300)'
+                      : 'var(--icon-ds-danger-300)'};"
+                  >
+                    {response.time}
+                  </span>
+                  <p
+                    class="mb-0 text-fs-12"
+                    style=" font-size: 12px; color:{checkIfRequestSucceed(
+                      response?.status,
+                    )
+                      ? 'var(--icon-ds-success-300)'
+                      : 'var(--icon-ds-danger-300)'};"
+                  >
+                    ms
+                  </p>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title="Response Size"
+                placement={"bottom-center"}
+                zIndex={500}
+                distance={20}
+              >
+                <span
+                  class="d-flex align-items-center ps-1 pe-1 justify-content-center rounded border-0 text-backgroundColor gap-1 size-primary1"
+                  style="font-size: 12px;"
+                >
+                  <span class="me-1 d-flex">
+                    <ArchiveRegular
+                      color={"var(--icon-ds-neutral-50)"}
+                      size={"12px"}
+                    />
+                  </span>
+                  <p class="mb-0 response-time-text" style="font-size: 12px;">
+                    {response.size?.toFixed(2)} KB
+                  </p>
+                </span>
+              </Tooltip>
+            </div>
+          </div>
+        {/if}
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .response-time-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--bg-ds-neutral-50);
+  }
+</style>

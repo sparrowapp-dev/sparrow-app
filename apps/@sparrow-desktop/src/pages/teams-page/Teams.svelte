@@ -11,7 +11,7 @@
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import TeamExplorerPage from "./sub-pages/TeamExplorerPage/TeamExplorerPage.svelte";
   import { TeamsViewModel } from "./Teams.ViewModel";
-  import { Modal, Tooltip } from "@sparrow/library/ui";
+  import { Button, Modal, Tooltip } from "@sparrow/library/ui";
   import {
     RecentApis,
     RecentWorkspace,
@@ -24,7 +24,11 @@
   import { Motion } from "svelte-motion";
   import { user } from "../../store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
-  import { DoubleArrowIcon, GithubIcon } from "@sparrow/library/icons";
+  import {
+    ChevronDoubleRightRegular,
+    DoubleArrowIcon,
+    GithubIcon,
+  } from "@sparrow/library/icons";
   import constants from "../../constants/constants";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
@@ -85,16 +89,6 @@
     }
   }
 
-  let isGithubStarHover = false;
-
-  let activeIndex = "";
-
-  $: {
-    if ($openTeam) {
-      activeIndex = $openTeam.teamId;
-    }
-  }
-
   const formatVersion = (version) => {
     try {
       const parts = version.split(".");
@@ -126,34 +120,33 @@
       >
         {#if $leftPanelCollapse}
           <div>
-            <button
+            <span
               class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {$leftPanelCollapse
                 ? 'd-block'
                 : 'd-none'}"
-              style="left:52px; bottom: 20px; width: 20px; height:20px ; background-color:var(--blackColor); z-index: {$leftPanelCollapse
+              style="left:57px; bottom: 20px; width: 20px; height:20px ; background-color: transparent; z-index: {$leftPanelCollapse
                 ? '2'
                 : '0'}"
               on:click={() => {
                 handleCollapseCollectionList();
               }}
             >
-              <span
-                style="transform: rotate(180deg); "
-                class="position-relative d-flex align-items-center justify-content-center"
-              >
-                <DoubleArrowIcon
-                  height={"10px"}
-                  width={"10px"}
-                  color={"var(--text-primary-200)"}
+              <Tooltip title={"Expand"} placement={"right-center"}>
+                <Button
+                  type="teritiary-regular"
+                  size="extra-small"
+                  customWidth="24px"
+                  startIcon={ChevronDoubleRightRegular}
                 />
-              </span>
-            </button>
+              </Tooltip>
+            </span>
           </div>
         {/if}
 
         {#if !$leftPanelCollapse}
           <div
-            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between bg-secondary-900"
+            class="d-flex flex-column sidebar h-100 d-flex flex-column justify-content-between"
+            style="background-color: var(--bg-ds-surface-700);"
           >
             <div style="flex:1; overflow:auto;">
               <!--Teams list-->
@@ -164,7 +157,6 @@
                 teamList={$teamList}
                 {disableNewInviteTag}
                 {modifyTeam}
-                bind:activeIndex
               />
               <!-- Recent APIs-->
               {#if !isGuestUser}
@@ -196,16 +188,7 @@
               >
                 <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
                   <div
-                    class=" px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
-                      ? 'bg-secondary-600'
-                      : ''}"
-                    role="button"
-                    on:mouseenter={() => {
-                      isGithubStarHover = true;
-                    }}
-                    on:mouseleave={() => {
-                      isGithubStarHover = false;
-                    }}
+                    class="githubStar px-2 py-1 border-radius-2 d-flex align-items-center"
                     on:click={async () => {
                       await open(externalSparrowGithub);
                     }}
@@ -213,14 +196,10 @@
                     <GithubIcon
                       height={"18px"}
                       width={"18px"}
-                      color={isGithubStarHover
-                        ? "var(--bg-secondary-100)"
-                        : "var(--bg-secondary-200)"}
+                      color={"var(--bg-ds-neutral-50)"}
                     />
                     <span
-                      class="ps-2 text-fs-14 {isGithubStarHover
-                        ? 'text-secondary-100'
-                        : 'text-secondary-200'}"
+                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                     >
                       {githubRepoData?.stargazers_count || ""}
                     </span>
@@ -228,7 +207,7 @@
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
-                  <span class="text-fs-14 text-secondary-200 pe-2"
+                  <span class="text-ds-font-size-14 text-secondary-200 pe-2"
                     >v{formatVersion(version)}</span
                   >
                   <WithButton
@@ -257,7 +236,7 @@
 </Motion>
 
 <Modal
-  title={"New Team"}
+  title={"New Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
@@ -275,12 +254,36 @@
 </Modal>
 
 <style>
+  .githubStar {
+    background-color: transparent;
+    height: 28px;
+    gap: 4px;
+    padding: 4px;
+    padding-right: 8px;
+    color: var(--bg-ds-neutral-100);
+  }
+  .githubStar:hover {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-300);
+    color: var(--bg-ds-neutral-100);
+  }
+  .githubStar:active {
+    color: var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .githubStar:focus-visible {
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+  }
   :global(.team-splitter .splitpanes__splitter) {
     width: 6px !important;
     height: auto !important;
-    background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-900) !important;
-    border-right: 0px solid var(--blackColor) !important;
+    background-color: var(--bg-ds-surface-700) !important;
+    border-left: 5px solid var(--border-ds-surface-700) !important;
+    border-right: 0px solid var(--border-ds-surface-700) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
@@ -288,6 +291,6 @@
       .team-splitter .splitpanes__splitter:active,
       .team-splitter .splitpanes__splitter:hover
     ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-300) !important;
   }
 </style>

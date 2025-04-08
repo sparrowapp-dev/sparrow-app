@@ -5,6 +5,10 @@ import {
   DecodeSocketio,
 } from "@sparrow/workspaces/features/socketio-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  startLoading,
+  stopLoading,
+} from "../../../../../../../packages/@sparrow-common/src/store";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -37,7 +41,11 @@ import {
   type KeyValue,
   type StatePartial,
 } from "@sparrow/common/types/workspace";
-import { type Path, type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Path,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { notifications } from "@sparrow/library/ui";
 import { CollectionService } from "../../../../services/collection.service";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
@@ -86,6 +94,7 @@ class SocketIoExplorerPageViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
       }, 0);
     }
@@ -690,8 +699,11 @@ class SocketIoExplorerPageViewModel {
   public saveSocket = async () => {
     const componentData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path as Path;
+    const tabId = componentData?.tabId;
+    startLoading(tabId);
 
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -772,6 +784,7 @@ class SocketIoExplorerPageViewModel {
           data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -806,11 +819,13 @@ class SocketIoExplorerPageViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

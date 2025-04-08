@@ -10,7 +10,7 @@
 
   // --- Icons
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
-  import { SocketIoIcon } from "@sparrow/library/icons";
+  import { MoreHorizontalRegular, SocketIoIcon } from "@sparrow/library/icons";
 
   // --- Types
   import {
@@ -128,7 +128,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-12">
+  <div class="text-lightGray mb-1 text-ds-font-size-12">
     <p>
       Are you sure you want to delete this {SocketIORequestDefaultAliasBaseEnum.NAME}?
       <span class="text-whiteColor fw-bold">"{socketIo.name}"</span>
@@ -137,8 +137,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
@@ -173,7 +172,7 @@
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -227,14 +226,16 @@
 {/if}
 
 <div
+  tabindex="0"
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {socketIo.id ===
+  class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px; padding-left:3px; margin-bottom:2px;"
 >
   <button
+    tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -246,25 +247,31 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px; height:100%;  "}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="height: 24px; width:24px !important; margin-right:4px;"
+    ></div>
     <span class="api-method">
       <SocketIoIcon
-        height={"14px"}
-        width={"14px"}
-        color={"var(--icon-primary-300)"}
+        height={"12px"}
+        width={"12px"}
+        color={"var(--icon-ds-success-300)"}
       />
     </span>
 
     {#if isRenaming}
       <input
-        class="py-0 rename-input-field-socket-io"
-        style="font-size: 12px; width: calc(100% - 50px);"
+        class="py-0 rename-input-field-socket-io text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style="  width: calc(100% - 50px);"
         id="renameInputFieldSocketIo"
         type="text"
         maxlength={100}
@@ -278,9 +285,12 @@
     {:else}
       <div
         class="api-name ellipsis {socketIo?.isDeleted && 'api-name-deleted'} "
-        style="font-size: 12px;"
       >
-        {socketIo.name}
+        <p
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        >
+          {socketIo.name}
+        </p>
       </div>
     {/if}
   </button>
@@ -295,18 +305,20 @@
       zIndex={701}
       distance={17}
     >
-      <button
-        id={`show-more-socket-io-${socketIo.id}`}
-        class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <span class="threedot-icon-container d-flex">
+        <Button
+          tabindex={"-1"}
+          id={`show-more-socket-io-${socketIo.id}`}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            e.stopPropagation();
+            rightClickContextMenu(e);
+          }}
+        />
+      </span>
     </Tooltip>
   {/if}
 </div>
@@ -319,18 +331,26 @@
   .api-method {
     font-size: 10px;
     font-weight: 500;
-    width: 48px !important;
-    height: 30px;
-    padding-left: 6px;
-    padding-right: 4px;
-    border-radius: 8px;
+    width: 30px !important;
+    height: 24px;
+    line-height: 18px;
+    color: var(--bg-ds-neutral-50);
+    border-radius: 4px;
     display: flex;
     align-items: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
+    height: 24px;
+    line-height: 18px;
     font-weight: 400;
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
     text-align: left;
+    color: var(--bg-ds-neutral-200);
+    align-items: center;
+    caret-color: var(--bg-ds-primary-300);
+    padding: 2px 4px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -362,30 +382,44 @@
 
   .threedot-icon-container {
     visibility: hidden;
-    background-color: transparent;
   }
 
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-600);
   }
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
-  }
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--text-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
-
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+  }
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+    border-radius: 4px;
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
   }
 
+  .btn-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
   .btn-primary:hover {
     .delete-ticker {
       background-color: var(--border-color) !important;
@@ -420,18 +454,20 @@
     pointer-events: none;
   }
   .rename-input-field-socket-io {
+    height: 24px;
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--bg-ds-neutral-50);
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .rename-input-field-socket-io:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-tertiary-400) !important;

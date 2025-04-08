@@ -19,7 +19,7 @@
   });
 </script>
 
-<div class="container" on:click={onClick}>
+<div class="container" tabindex="0" on:click={onClick}>
   <div class="first">
     <div class="image-container">
       <SearchIcon
@@ -48,21 +48,24 @@
   }
   .container {
     width: 208px;
-    height: 30px;
+    height: 28px;
     border: 1px solid var(--border-ds-surface-100);
-    min-height: 30px;
-    padding: 8px;
+    min-height: 28px;
+    padding: 2px 4px;
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
-
     align-items: center;
     gap: 8px;
-    margin-right: 6px;
   }
   .container:hover {
     border: 1px solid var(--border-ds-neutral-200);
     background-color: var(--bg-ds-surface-500);
+  }
+  .container:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    background-color: transparent;
+    outline: none;
   }
   .input {
     border: none;

@@ -2,12 +2,13 @@
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
   import { SelectIcon } from "@sparrow/library/assets";
   import { UntrackedItems } from "@sparrow/common/enums/item-type.enum";
-  import { Spinner } from "@sparrow/library/ui";
+  import { RadioButton, Spinner } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { MoreHorizontalRegular } from "@sparrow/library/icons";
 
   /**
    * current workspace to identify the selected environment
@@ -158,8 +159,8 @@
   isOpen={isEnvironmentPopup}
   handleModalState={handleEnvironmentPopUpCancel}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p style="font-weight: 400;" class="text-fs-14">
+  <div class="text-lightGray mb-1">
+    <p class="text-ds-font-size-14 text-ds-font-weight-regular">
       Are you sure you want to delete this Environment? <span
         style="font-weight:700;"
         class="">"{env.name}"</span
@@ -218,43 +219,63 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-<div style="" class="environment-tab mb-1" bind:this={environmentTabWrapper}>
+<div
+  style="margin-bottom:2px;"
+  class="environment-tab"
+  bind:this={environmentTabWrapper}
+  on:click|preventDefault={() => {
+    if (!isRenaming) {
+      if (!env.id.includes(UntrackedItems.UNTRACKED)) {
+        openEnvironment();
+      }
+    }
+  }}
+>
   <button
-    style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
+    tabindex="0"
+    style="height:32px;gap:4px; padding-left:7px;  border-color: {showMenu
+      ? '#ff7878'
+      : ''}"
     class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {env?.id ===
     activeTabId
       ? 'active-collection-tab'
       : ''}"
   >
+    <div class="box" style="height: 24px; width:30px; margin-right:4px;"></div>
     <div
-      class="d-flex main-collection align-items-center ps-3"
+      class="d-flex main-collection align-items-center"
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
-      on:click|preventDefault={() => {
-        if (!isRenaming) {
-          if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-            openEnvironment();
-          }
-        }
-      }}
     >
       <button
-        class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent"
+        tabindex="-1"
+        class="border-0 bg-transparent"
+        style="width: 30px !important; height:24px; display:flex; align-items:center; justify-content:end; "
         on:click|stopPropagation={() => {
           handleSelectEnvironment();
         }}
       >
-        <SelectIcon
-          classProp={`my-auto`}
-          width={20}
-          height={20}
-          selected={currentWorkspace?.environmentId === env.id}
+        <RadioButton
+          name={"radio"}
+          buttonSize="small"
+          group={currentWorkspace?.environmentId}
+          value={env.id}
+          id={env.id}
+          handleChange={() => handleSelectEnvironment()}
+          singleSelect={true}
         />
       </button>
+      <!-- <RadioButton
+        class="p-0 m-0  ps-4 me-2"
+        buttonSize="medium"
+        selected={currentWorkspace?.environmentId === env.id}
+        handleChange={() => handleSelectEnvironment()}
+        singleSelect={true}
+        /> -->
       {#if isRenaming}
         <input
-          class="py-0 renameInputFieldCollection text-fs-12 w-100"
+          class="py-0 renameInputFieldCollection w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           id="renameInputFieldEnvironment"
           type="text"
           value={env.name}
@@ -268,9 +289,11 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 36px;"
+          style="height: 32px; font-size:12px; font-weight:400; line-height:18px; padding:2px 4px; "
         >
-          <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
+          <p
+            class="ellipsis w-100 me-4 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+          >
             {env.name}
           </p>
         </div>
@@ -285,20 +308,19 @@
         distance={17}
         show={!showMenu}
       >
-        <button
-          id={`show-more-environment-${env?.id}`}
-          class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          style=""
-          on:click={(e) => {
-            rightClickContextMenu(e);
-          }}
-          disabled={loggedUserRoleInWorkspace ===
-            WorkspaceRole.WORKSPACE_VIEWER}
-        >
-          <img class="threedot-icon" src={threedotIcon} alt="threedotIcon" />
-        </button>
+        <span class="threedot-icon-container d-flex">
+          <Button
+            id={`show-more-environment-${env?.id}`}
+            size="small"
+            type="teritiary-regular"
+            disable={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              rightClickContextMenu(e);
+            }}
+          />
+        </span>
       </Tooltip>
     {/if}
   </button>
@@ -323,51 +345,76 @@
       background-color: transparent;
     }
 
-    .threedot-active {
-      visibility: visible;
-      background-color: var(--bg-secondary-400);
-    }
-    .threedot-icon-container:hover {
-      background-color: var(--bg-tertiary-500);
-    }
-
     .btn-primary {
       background-color: transparent;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       padding-right: 5px;
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-tertiary-300);
+      background-color: var(--bg-ds-surface-400);
+      border-radius: 4px;
+      color: var(--text-ds-neutral-50);
     }
 
+    .btn-primary:hover .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:focus-visible {
+      background-color: var(--bg-ds-surface-400);
+      border: 2px solid var(--bg-ds-primary-300) !important;
+      outline: none;
+      border-radius: 4px;
+    }
+    .btn-primary:focus-visible .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:active {
+      background-color: var(--bg-ds-surface-500);
+      border-radius: 4px;
+    }
+    .btn-primary:active .threedot-icon-container {
+      visibility: visible;
+    }
     .renameInputFieldCollection {
+      height: 24px;
       border: none;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       background-color: transparent;
-      padding-left: 0;
-      border-radius: 2px !important;
+      padding: 4px 2px;
+      border-radius: 4px !important;
       outline: none !important;
+      caret-color: var(--bg-ds-primary-300);
     }
     .renameInputFieldCollection:focus {
-      border: 1px solid var(--border-primary-300);
+      border: 1px solid var(--border-ds-primary-300);
     }
     .sub-folders {
       border-left: 1px solid var(--border-color);
     }
     .main-collection {
-      width: calc(100% - 24px);
+      width: calc(100% - 71px);
     }
     .active-collection-tab {
-      background-color: var(--bg-tertiary-600) !important;
+      background-color: var(--bg-ds-surface-500) !important;
+      border-radius: 4px;
     }
     .collection-title {
+      color: var(--bg-ds-neutral-200);
       width: calc(100% - 30px);
       text-align: left;
+      display: flex;
+      align-items: center;
+      position: relative;
     }
-  }
+    .ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-  .threedot-icon {
-    transform: rotate(90deg);
+    .threedot-icon {
+      transform: rotate(90deg);
+    }
   }
 </style>

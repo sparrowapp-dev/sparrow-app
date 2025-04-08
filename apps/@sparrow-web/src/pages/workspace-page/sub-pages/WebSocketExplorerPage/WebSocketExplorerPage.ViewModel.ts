@@ -6,6 +6,10 @@ import {
 } from "@sparrow/workspaces/features/socket-explorer/utils";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
+  startLoading,
+  stopLoading,
+} from "../../../../../../../packages/@sparrow-common/src/store";
+import {
   CompareArray,
   Debounce,
   InitWebSocketTab,
@@ -54,6 +58,7 @@ import type { CollectionDocType } from "../../../../models/collection.model";
 // import { WebSocketService } from "../../../../services/web-socket.service";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 
 class RestExplorerViewModel {
   /**
@@ -85,6 +90,7 @@ class RestExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
+        t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
       }, 0);
     }
@@ -629,8 +635,11 @@ class RestExplorerViewModel {
   public saveSocket = async () => {
     const componentData: Tab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
+    const tabId = componentData?.tabId;
+    startLoading(tabId);
 
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -711,6 +720,7 @@ class RestExplorerViewModel {
           data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -743,11 +753,13 @@ class RestExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

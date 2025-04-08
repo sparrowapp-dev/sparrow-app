@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { CrossIcon } from "@sparrow/library/icons";
+  import { CrossIcon, DismissRegular } from "@sparrow/library/icons";
 
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
+  import { Button } from "../button";
 
   export let isOpen = false;
   export let title: string;
@@ -23,6 +24,9 @@
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
       event.preventDefault();
+    } else if (event.key === "Escape" && canClose) {
+      event.preventDefault();
+      handleModalState(false);
     }
   };
 
@@ -70,7 +74,11 @@
           {/if}
           <div class="flex-column">
             {#if title}
-              <h3 class="sparrow-modal-heading fw-normal ellipsis">{title}</h3>
+              <h3
+                class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium ellipsis"
+              >
+                {title}
+              </h3>
             {/if}
             {#if description}
               <h3 class="sparrow-modal-description fw-normal ellipsis">
@@ -80,13 +88,14 @@
           </div>
         </div>
         {#if canClose}
-          <button
-            class="sparrow-modal-close-icon-btn border-0 d-flex justify-content-center align-items-center"
-            style="height: 30px; width:30px; "
-            on:click={handleModalState(false)}
-          >
-            <CrossIcon width="17px" height="17px" />
-          </button>
+          <Button
+            size="extra-small"
+            startIcon={DismissRegular}
+            type="teritiary-regular"
+            onClick={() => {
+              handleModalState(false);
+            }}
+          />
         {/if}
       </div>
 
@@ -130,6 +139,7 @@
   }
 
   .sparrow-modal-container-data {
+    height: auto;
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
     padding: 30px 30px 20px 30px;

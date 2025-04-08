@@ -9,7 +9,11 @@
     Modal as Modal,
   } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { TreeIcon } from "@sparrow/library/icons";
+  import {
+    FlowChartRegular,
+    MoreHorizontalRegular,
+    TreeIcon,
+  } from "@sparrow/library/icons";
   import {
     TFDefaultEnum,
     type TFDocumentType,
@@ -153,8 +157,10 @@
   isOpen={isTestflowPopup}
   handleModalState={handleTestflowPopUpCancel}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p style="font-weight: 400;" class="text-fs-14">
+  <div class="text-lightGray mb-1">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-regular"
+    >
       Are you sure you want to delete this Flow?
       <span style="font-weight:700;" class="">"{flow.name}"</span>
       and all its blocks will be removed and cannot be restored.
@@ -162,8 +168,8 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 rounded"
+    style="font-size: 16px; margin-bottom:2px;"
   >
     <Button
       disable={deleteTestflowLoader}
@@ -212,14 +218,17 @@
 
 <div style="" class="testflow-tab mb-1" bind:this={testflowTabWrapper}>
   <button
-    style="height:32px; border-color: {showMenu ? '#ff7878' : ''}"
-    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between border-0 my-button {flow?._id ===
+    tabindex="0"
+    style="height:32px; gap:4px; border-color: {showMenu ? '#ff7878' : ''}"
+    class="btn-primary border-radius-2 d-flex w-100 align-items-center justify-content-between my-button {flow?._id ===
     activeTabId
       ? 'active-collection-tab'
       : ''}"
   >
+    <!-- <div style="height: 32px; width:14px ;border-left:1px solid blue;"></div> -->
     <div
-      class="d-flex main-collection align-items-center ps-3"
+      class="d-flex main-collection align-items-center"
+      style=" padding-left:22px; "
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
       }}
@@ -231,16 +240,15 @@
         }
       }}
     >
-      <button class="p-0 m-0 ms-1 ps-4 me-2 border-0 bg-transparent">
-        <TreeIcon
-          width={"12px"}
-          height={"12px"}
-          color={"var(--icon-secondary-130)"}
-        />
-      </button>
+      <span class="box" style="width: 24px; height:24px;"></span>
+      <span
+        style="display: flex; flex-direction:row; align-items:center; justify-content:end; height:24px; width:30px; padding:4px;"
+      >
+        <FlowChartRegular size={"16px"} color={"var(--bg-ds-neutral-300"} />
+      </span>
       {#if isRenaming}
         <input
-          class="py-0 renameInputFieldCollection text-fs-12 w-100"
+          class="py-0 renameInputFieldCollection w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           id="renameInputFieldTestflow"
           type="text"
           value={flow.name}
@@ -254,9 +262,11 @@
       {:else}
         <div
           class="collection-title d-flex align-items-center py-1 mb-0"
-          style="height: 36px;"
+          style="height: 32px;"
         >
-          <p class="ellipsis w-100 me-4 mb-0 text-fs-12">
+          <p
+            class="ellipsis w-100 me-4 mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+          >
             {flow.name}
           </p>
         </div>
@@ -271,20 +281,20 @@
         distance={17}
         show={!showMenu}
       >
-        <button
-          id={`show-more-testflow-${flow?._id}`}
-          class="threedot-icon-container p-0 border-0 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          style="transform: rotate(90deg);"
-          on:click={(e) => {
-            rightClickContextMenu();
-          }}
-          disabled={loggedUserRoleInWorkspace ===
-            WorkspaceRole.WORKSPACE_VIEWER}
-        >
-          <img src={threedotIcon} alt="threedotIcon" />
-        </button>
+        <span class="threedot-icon-container d-flex">
+          <Button
+            id={`show-more-testflow-${flow?._id}`}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              rightClickContextMenu();
+            }}
+            disable={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+          />
+        </span>
       </Tooltip>
     {/if}
   </button>
@@ -319,24 +329,54 @@
 
     .btn-primary {
       background-color: transparent;
-      color: var(--white-color);
+      color: var(--text-ds-neutral-50);
       padding-right: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+      border: 0;
     }
 
     .btn-primary:hover {
-      background-color: var(--bg-tertiary-300);
+      background-color: var(--bg-ds-surface-400) !important;
+      border-radius: 4px;
+    }
+
+    .btn-primary:hover .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:focus-visible {
+      background-color: var(--bg-ds-surface-400);
+      border-radius: 4px;
+      border: 2px solid var(--bg-ds-primary-300);
+      outline: none;
+    }
+    .btn-primary:focus-visible .threedot-icon-container {
+      visibility: visible;
+    }
+    .btn-primary:active {
+      background-color: var(--bg-ds-surface-500);
+      border-radius: 4px;
+    }
+    .btn-primary:active .threedot-icon-container {
+      visibility: visible;
     }
 
     .renameInputFieldCollection {
       border: none;
-      color: var(--white-color);
+      height: 24px;
+      color: var(--text-ds-neutral-50);
       background-color: transparent;
-      padding-left: 0;
-      border-radius: 2px !important;
+      padding: 4px 2px;
+      border-radius: 4px !important;
       outline: none !important;
+      font-size: 12px;
+      line-height: 18px;
+      font-weight: 500;
+      caret-color: var(--bg-ds-primary-300);
     }
     .renameInputFieldCollection:focus {
-      border: 1px solid var(--border-primary-300);
+      border: 1px solid var(--border-ds-primary-300);
     }
     .sub-folders {
       border-left: 1px solid var(--border-color);
@@ -345,10 +385,12 @@
       width: calc(100% - 24px);
     }
     .active-collection-tab {
-      background-color: var(--bg-tertiary-600) !important;
+      background-color: var(--bg-ds-surface-500) !important;
     }
     .collection-title {
-      width: calc(100% - 30px);
+      color: var(--bg-ds-neutral-200);
+      padding: 2px 4px;
+      width: calc(100% - 54px);
       text-align: left;
     }
   }

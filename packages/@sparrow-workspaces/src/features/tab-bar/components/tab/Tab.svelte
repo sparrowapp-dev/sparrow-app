@@ -24,10 +24,16 @@
     SocketIoIcon,
     StackIcon,
     TreeIcon,
+    DismissCircleRegular,
+    CopyRegular,
+    BoardRegular,
   } from "@sparrow/library/icons";
-  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import {
+    TabPersistenceTypeEnum,
+    TabTypeEnum,
+  } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge, Spinner } from "@sparrow/library/ui";
+  import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
 
@@ -70,6 +76,13 @@
   export let onDropOver: (index: number) => void;
 
   export let listLength;
+  export let onDoubleClick: (tab: Tab) => void;
+  export let onRightClick: (tab: Tab) => void;
+  export let onClickCloseOtherTabs: (tabId: string) => void;
+  export let onClickForceCloseTabs: (tabId: string) => void;
+  export let onClickDuplicateTab: (tabId: string) => void;
+  let noOfColumns = 200;
+  let showTabControlMenu = false;
 
   function handleMouseDown(event: MouseEvent) {
     if (event.button === 1) {
@@ -77,6 +90,29 @@
       onTabClosed(tab.id, tab);
     }
   }
+  const handleDoubleClick = (tab: Tab) => {
+    onDoubleClick(tab);
+  };
+
+  let mouseX = 0;
+  let mouseY = 0;
+  const handleRightClick = (event: MouseEvent, tab: Tab) => {
+    showTabControlMenu = !showTabControlMenu;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+    const tabbarElement = document.querySelector(".tabbar") as HTMLElement;
+
+    if (tabbarElement) {
+      const navbarElement = tabbarElement.querySelector(".navbar");
+      if (navbarElement) {
+        navbarElement.remove();
+        // showTabControlMenu = true;
+      } else {
+        showTabControlMenu = true;
+      }
+    }
+  };
 </script>
 
 <button
@@ -93,23 +129,89 @@
     ? '4px'
     : ''}"
   on:mousedown={handleMouseDown}
+  on:dblclick={() => handleDoubleClick(tab)}
+  on:contextmenu|preventDefault={(event) => handleRightClick(event, tab)}
 >
+  <!-- <Dropdown>
+  </Dropdown> -->
+  {#if showTabControlMenu}
+    <Options
+      isTabMenu={true}
+      xAxis={mouseX}
+      yAxis={[mouseY, mouseY + 20]}
+      zIndex={500}
+      menuItems={[
+        {
+          onClick: () => {
+            onTabClosed(tab.id, tab);
+          },
+          displayText: "Close Tab",
+          disabled: false,
+          hidden: false,
+          icon: DismissCircleRegular,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs(tab.id);
+          },
+          displayText: "Close Other Tabs",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickCloseOtherTabs("");
+          },
+          displayText: "Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickForceCloseTabs(tab.id);
+          },
+          displayText: "Force Close Other Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickForceCloseTabs("");
+          },
+          displayText: "Force Close All Tabs",
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            onClickDuplicateTab(tab.id);
+          },
+          displayText: "Duplicate Tab",
+          hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
+            tab.type,
+          ),
+          icon: CopyRegular,
+        },
+      ]}
+      {noOfColumns}
+    />
+  {/if}
+
   <div
+    on:click={() => {
+      if (!tab.isActive) {
+        onTabSelected(tab.id);
+      }
+    }}
     tabindex="-1"
     class="tab-item w-100 d-flex justify-content-between px-2 border-upper-radius h-100 align-items-center"
     style="   background-color: {tab.isActive
-      ? 'var(--bg-secondary-850) !important'
+      ? 'var(--bg-ds-surface-900) !important'
       : 'transparent'};  border-top : {tab.isActive
-      ? '2px solid var(--bg-primary-400)'
+      ? tab?.persistence === TabPersistenceTypeEnum.TEMPORARY
+        ? '2px solid var(--bg-ds-neutral-300)'
+        : '2px solid var(--bg-primary-400)'
       : '2px solid transparent'};"
   >
     <button
       tabindex="-1"
-      on:click={() => {
-        if (!tab.isActive) {
-          onTabSelected(tab.id);
-        }
-      }}
       class="position-relative p-0 border-0 ellipsis"
       style="width: 100%;
         text-align: left; font-weight:700; background-color:transparent;"
@@ -173,7 +275,7 @@
           <SocketIoIcon
             height={"14px"}
             width={"14px"}
-            color={"var(--icon-primary-300)"}
+            color={"var(--icon-ds-success-300)"}
           />
         </span>
       {:else if tab.type === TabTypeEnum.GRAPHQL}
@@ -184,16 +286,38 @@
             color={"var(--icon-danger-1100)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
+        <span>
+          <!-- <GraphIcon
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-danger-1100)"}
+          /> -->
+          <span
+            class="text-fs-12"
+            style={Number(
+              tab?.property?.savedRequest?.responseStatus.split(" ")[0],
+            ) >= 200 &&
+            Number(tab?.property?.savedRequest?.responseStatus.split(" ")[0]) <
+              300
+              ? "color:var(--text-ds-success-300);"
+              : "color:var(--text-ds-danger-300);"}
+          >
+            {tab?.property?.savedRequest?.responseStatus.split(" ")[0]}
+          </span>
+        </span>
       {/if}
       <span
-        class=" ms-1 text-fs-12 {!tab.isActive ? 'request-text' : ''}"
-        style={`font-weight:500; font-size:12px; line-height:18px;  color:  var(--text-ds-neutral-300)`}
+        class=" ms-1 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {!tab.isActive
+          ? 'request-text text-ds-font-weight-medium'
+          : ''}"
+        style={`color:  var(--text-ds-neutral-300); font-style: ${tab?.persistence === TabPersistenceTypeEnum.TEMPORARY ? "italic" : ""};`}
       >
         {tab.name}
       </span>
     </button>
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
@@ -207,7 +331,8 @@
       <button
         class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
         !tab.isActive ? 'inactive-close-btn' : ''} btn"
-        on:click={() => {
+        on:click={(e) => {
+          e.stopPropagation();
           onTabClosed(tab.id, tab);
         }}
         style="overflow:hidden; height: 18px; width:18px;"
@@ -227,6 +352,11 @@
     {/if}
   </div></button
 >
+<svelte:window
+  on:click={() => {
+    showTabControlMenu = false;
+  }}
+/>
 
 <style>
   * {
@@ -295,7 +425,6 @@
     color: inherit !important;
   }
   .request-text {
-    font-weight: 500 !important;
     color: var(--text-ds-neutral-300) !important;
   }
   .individual-tab:hover .request-text {
@@ -307,9 +436,7 @@
     /* border-radius: 2px; */
   }
   .ellipsis {
-    color: var(--text-secondary-100);
-  }
-  .ellipsis:hover {
-    color: var(--text-secondary-100);
+    color: var(--text-ds-neutral-300);
+    font-size: 12px;
   }
 </style>

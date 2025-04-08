@@ -5,12 +5,11 @@
     SaveRequestType,
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/type";
-  import { notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/components";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiskIcon } from "@sparrow/library/icons";
+  import { SaveRegular } from "@sparrow/library/icons";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   let componentClass = "";
@@ -27,6 +26,7 @@
   export let onConnect;
   export let webSocket;
   export let onDisconnect;
+  export let isSaveLoad = false;
   /**
    * Role of user in active workspace
    */
@@ -47,23 +47,13 @@
       notifications.success("WebSocket request saved successfully.");
     }
   };
-
-  let isHovered = false;
-
-  function handleMouseEnter() {
-    isHovered = true;
-  }
-
-  function handleMouseLeave() {
-    isHovered = false;
-  }
 </script>
 
-<div class={`d-flex ${componentClass}`}>
+<div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
   <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter a URL"}
+    placeholder={"Enter URL here"}
     {theme}
     {onUpdateEnvironment}
     {environmentVariables}
@@ -73,14 +63,16 @@
   />
 
   <!-- Send button -->
-  <span class="ps-2"></span>
-  <DropButton
-    title={webSocket?.status === "connected" ? "Disconnect" : "Connect"}
-    type="default"
-    loader={webSocket?.status === "connecting" ||
-      webSocket?.status === "disconnecting"}
-    disable={webSocket?.status === "connecting" ||
-      webSocket?.status === "disconnecting"}
+  <Button
+    title={webSocket?.status === "connected"
+      ? "Disconnect"
+      : webSocket?.status === "connecting"
+        ? "Cancel"
+        : "Connect"}
+    type={webSocket?.status === "connecting" ? "secondary" : "primary"}
+    customWidth={"96px"}
+    loader={webSocket?.status === "disconnecting"}
+    disable={webSocket?.status === "disconnecting"}
     onClick={() => {
       if (requestUrl === "") {
         const codeMirrorElement = document.querySelector(
@@ -90,7 +82,10 @@
           codeMirrorElement.classList.add("url-red-border");
         }
       } else {
-        if (webSocket?.status === "connected") {
+        if (
+          webSocket?.status === "connected" ||
+          webSocket?.status === "connecting"
+        ) {
           onDisconnect();
           MixpanelEvent(Events.WebSocket_Disconnected);
         } else if (webSocket?.status === "disconnected" || !webSocket?.status) {
@@ -101,29 +96,16 @@
     }}
   />
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <button
-      class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-      on:click={handleSaveRequest}
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+    <Button
+      type="secondary"
+      size="medium"
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
+      onClick={handleSaveRequest}
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-      style="background-color: {isSave ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? 'var(--icon-secondary-550)'
-        : 'var(--bg-secondary-400)'}; color: white;"
-    >
-      <DiskIcon
-        height={22}
-        width={22}
-        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-          ? "var(--icon-secondary-380)"
-          : isHovered
-            ? "var(--icon-primary-200)"
-            : "var(--icon-secondary-100)"}
-      />
-    </button>
+    />
   </Tooltip>
 </div>
 

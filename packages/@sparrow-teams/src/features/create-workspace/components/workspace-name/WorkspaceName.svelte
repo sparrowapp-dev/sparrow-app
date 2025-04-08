@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { Input } from "@sparrow/library/forms";
+  import { Input, LabelField } from "@sparrow/library/forms";
 
   /**
    * Types
@@ -27,49 +27,30 @@
 
 <div class="pb-4 mt-3">
   <!-- 
-      -- Title 
+      -- Input with Label Text 
     -->
-  <label for={inputId} class="text-fs-14 pb-1 text-secondary-1000"
-    >{NAME_CONFIG.TITLE}</label
+  <LabelField
+    inputLabelId={inputId}
+    inputValueRequired={true}
+    headerLabelText={NAME_CONFIG.TITLE}
+    helpLabel={true}
+    isError={!workspaceForm.name.value.trim() && workspaceForm.name.isTouched}
+    errorMessage={NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
   >
-  <span class="text-danger-200">*</span>
-
-  <!-- 
-      -- Input 
-    -->
-  <Input
-    bind:value={workspaceForm.name.value}
-    on:blur={() => {
-      workspaceForm.name.isTouched = true;
-    }}
-    height={"36px"}
-    id={inputId}
-    placeholder={NAME_CONFIG.PLACEHOLDER}
-    class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
-    style="outline:none;"
-    defaultBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    hoveredBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    focusedBorderColor={!workspaceForm.name.value.trim() &&
-    workspaceForm.name.isTouched
-      ? "var(--border-danger-200)"
-      : "transparent"}
-    isEditIconRequired={false}
-    type={"text"}
-    placeholderColor={"var(--text-secondary-200)"}
-  />
-
-  <!-- 
-      -- Error Messages 
-    -->
-  {#if !workspaceForm.name.value.trim() && workspaceForm.name.isTouched}
-    <p class="mb-0 mt-1 text-fs-12 text-danger-200">
-      {NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
-    </p>
-  {/if}
+    <Input
+      bind:value={workspaceForm.name.value}
+      on:blur={() => {
+        workspaceForm.name.isTouched = true;
+      }}
+      height={"36px"}
+      id={inputId}
+      placeholder={NAME_CONFIG.PLACEHOLDER}
+      class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
+      style="outline:none;"
+      isError={!workspaceForm.name.value.trim() && workspaceForm.name.isTouched}
+      isEditIconRequired={false}
+      type={"text"}
+      placeholderColor={"var(--text-secondary-200)"}
+    />
+  </LabelField>
 </div>

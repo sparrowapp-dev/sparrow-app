@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { downloadIcon } from "@sparrow/library/assets";
+  import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
   import {
     copyToClipBoard,
     handleDownloadResponse,
   } from "@sparrow/common/utils";
-  import { notifications, Tooltip } from "@sparrow/library/ui";
+  import { Button, notifications, Tooltip } from "@sparrow/library/ui";
   import {
     RequestDataType,
     ResponseFormatter,
@@ -19,13 +19,21 @@
   import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import {
+    ArrowDownloadRegular,
+    CopyRegular,
+    SaveRegular,
+  } from "@sparrow/library/icons";
+  import { Select } from "@sparrow/library/forms";
 
   export let response;
   export let apiState;
   export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp = false;
+  export let isGuestUser;
+  export let onSaveResponse;
+  export let path;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -117,12 +125,14 @@
   };
 </script>
 
-<div class="d-flex flex-column align-items-start justify-content-between w-100">
+<div
+  class="d-flex flex-column align-items-center justify-content-between w-100"
+>
   <div
-    class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-0 position-sticky"
+    class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
-    <div class="d-flex gap-3 align-items-center justify-content-center">
+    <div class="d-flex gap-1 align-items-center justify-content-center">
       <div class="d-flex align-items-center rounded mb-0 py-1">
         <span
           role="button"
@@ -132,10 +142,10 @@
               ResponseFormatter.PRETTY,
             );
           }}
-          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.bodyFormatter ===
-          ResponseFormatter.PRETTY
-            ? 'bg-tertiary-500 text-secondary-100'
-            : ''}"
+          class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
+          style={apiState.bodyFormatter === ResponseFormatter.PRETTY
+            ? "background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);"
+            : ""}
         >
           Text
         </span>
@@ -168,7 +178,10 @@
           class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.bodyFormatter ===
           ResponseFormatterEnum.PREVIEW
             ? 'bg-tertiary-500 text-secondary-100'
-            : ''}">Preview</span
+            : ''}"
+          style={apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW
+            ? "background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);"
+            : ""}>Preview</span
         >
       </div>
 
@@ -222,10 +235,22 @@
             Clear
           </button>
         </div>
+        {#if path?.collectionId}
+          <!-- Save button -->
+          <Button
+            startIcon={SaveRegular}
+            onClick={onSaveResponse}
+            disable={false}
+            loader={false}
+            size={"small"}
+            title={"Save Response"}
+            type={"teritiary-regular"}
+          />
+        {/if}
         <!-- Copy button -->
-        <Tooltip title={"Copy"}>
+        <Tooltip title={"Copy"} placement={"bottom-center"}>
           <WithButtonV6
-            icon={CopyIcon}
+            icon={CopyRegular}
             onClick={handleCopy}
             disable={false}
             loader={false}
@@ -233,18 +258,18 @@
         </Tooltip>
         <!-- Download button -->
         {#if !isWebApp}
-          <Tooltip title={"Export"}>
+          <Tooltip title={"Export"} placement={"bottom-center"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={handleDownloaded}
               disable={false}
               loader={false}
             />
           </Tooltip>
         {:else}
-          <Tooltip title={"Export"}>
+          <Tooltip title={"Export"} placement={"bottom-center"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={() =>
                 handleDownloadResponse(
                   formatedBody,

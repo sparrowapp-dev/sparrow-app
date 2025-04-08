@@ -43,6 +43,8 @@
   import { WarningIcon } from "@sparrow/library/icons";
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
   import { onMount } from "svelte";
+  import { writable } from "svelte/store";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
 
   export let tab;
   export let collections;
@@ -74,6 +76,9 @@
   export let onUpdateVariables;
   export let updateOperationSearch;
   export let checkQueryErrorStatus;
+
+  export let isWebApp;
+  const loading = writable<boolean>(false);
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -160,11 +165,23 @@
     await updateSchema(data);
     await handleQueryErrorStatus();
   };
+
+  loadingState.subscribe((tab) => {
+    const tabIdValue = tab.get($tab.tabId);
+    if (tabIdValue === undefined) {
+      loading.set(false);
+    } else {
+      loading.set(tabIdValue);
+    }
+  });
 </script>
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
+    <div
+      class="w-100 d-flex flex-column h-100 pb-2"
+      style="padding-top: 24px; padding-right:12px; padding-left:12px"
+    >
       <!-- Request Name Header -->
       <!-- 
         --
@@ -208,6 +225,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$loading}
         isSave={$tab.isSaved}
         {isGraphqlEditable}
         requestUrl={$tab.property.graphql.url}
@@ -221,8 +239,7 @@
         {onSaveRequest}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 10px;"></div>
-      <div class="pt-2"></div>
+      <div class="" style="margin-top: 12px;"></div>
       <div style="flex:1; overflow:auto;">
         {#if !isLoading}
           <Splitpanes
@@ -243,7 +260,7 @@
               minSize={30}
               size={$tab.property.graphql?.state
                 ?.requestBuilderLeftSplitterWidthPercentage}
-              class="position-relative bg-secondary-850-important"
+              class="position-relative bg-transparent"
             >
               <div class="h-100">
                 <Splitpanes
@@ -264,7 +281,7 @@
                     minSize={30}
                     size={$tab.property.graphql?.state
                       ?.requestLeftSplitterWidthPercentage}
-                    class="position-relative bg-secondary-850-important"
+                    class="position-relative bg-transparent"
                   >
                     <!-- Request Pane -->
                     <div
@@ -295,11 +312,13 @@
                             errorMessage={queryErrorMessage}
                             {errorStartIndex}
                             {errorEndIndex}
+                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
                           <RequestVariables
                             value={$tab.property.graphql.variables}
                             onUpdateRequestVariable={onUpdateVariables}
+                            {onClearQuery}
                           />
                         {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                           <RequestHeaders
@@ -333,7 +352,7 @@
                     minSize={30}
                     size={$tab.property.graphql?.state
                       ?.requestRightSplitterWidthPercentage}
-                    class="bg-secondary-850-important position-relative"
+                    class="bg-transparent position-relative"
                   >
                     <!-- Response Pane -->
                     <div
@@ -343,16 +362,18 @@
                       <div class="h-100 d-flex flex-column">
                         <div style="flex:1; overflow:auto;">
                           {#if storeData?.isSendRequestInProgress}
-                            <ResponseDefaultScreen />
+                            <ResponseDefaultScreen {isWebApp} />
                             <div
                               style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
                             >
                               <Loader loaderSize={"20px"} />
                             </div>
                           {:else if !storeData?.response.status}
-                            <ResponseDefaultScreen />
+                            <ResponseDefaultScreen {isWebApp} />
                           {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                            <ResponseErrorScreen />
+                            <ResponseErrorScreen
+                              response={storeData.response}
+                            />
                           {:else if storeData?.response.status}
                             <div class="h-100 d-flex flex-column">
                               <ResponseNavigator
@@ -367,6 +388,7 @@
                                 <div style="flex:1; overflow:auto;">
                                   <ResponseBody
                                     response={storeData?.response}
+                                    {isWebApp}
                                   />
                                 </div>
                               {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
@@ -389,10 +411,10 @@
               minSize={30}
               size={$tab.property.graphql?.state
                 ?.requestBuilderRightSplitterWidthPercentage}
-              class="position-relative bg-secondary-850-important"
+              class="position-relative bg-transparent"
             >
               <div class="h-100 d-flex flex-column">
-                <div class="mb-2 pt-1">
+                <!-- <div class="mb-2 pt-1">
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
@@ -401,7 +423,7 @@
                       ? $tab.property.graphql.mutation
                       : $tab.property.graphql.query}
                   />
-                </div>
+                </div> -->
                 <div style="flex:1; overflow: auto;">
                   {#if $tab.property.graphql.state.isRequestSchemaFetched}
                     <GenerateQuery
@@ -412,6 +434,8 @@
                       onUpdateRequestState={handleUpdateRequestState}
                       operationSearch={$tab.property.graphql?.operationSearch}
                       {updateOperationSearch}
+                      onRefreshSchema={handleFetchSchema}
+                      {isSchemaFetching}
                     />
                   {:else}
                     <div style="flex: 1;">
@@ -436,7 +460,7 @@
           </Splitpanes>
         {:else}
           <!-- loading state -->
-          <ResponseDefaultScreen isMainScreen={true} />
+          <ResponseDefaultScreen {isWebApp} isMainScreen={true} />
         {/if}
       </div>
     </div>
@@ -473,24 +497,24 @@
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-900);
   }
 
   :global(.graph-rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-800) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-left: 5px solid var(--border-ds-surface-900) !important;
+    border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
   :global(.graph-rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10.5px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-top: 5px solid var(--border-secondary-800) !important;
-    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-top: 5px solid var(--border-ds-surface-900) !important;
+    border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
     border-right: 0 !important;
   }
@@ -501,20 +525,20 @@
     background-color: var(--bg-primary-200) !important;
   }
   :global(.graph-ql-splitter.splitpanes--vertical > .splitpanes__splitter) {
-    width: 10.5px !important;
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-800) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-left: 5px solid var(--border-ds-surface-900) !important;
+    border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
   :global(.graph-ql-splitter.splitpanes--horizontal > .splitpanes__splitter) {
-    height: 10.5px !important;
+    height: 11px !important;
     width: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-top: 5px solid var(--border-secondary-800) !important;
-    border-bottom: 5px solid var(--border-secondary-800) !important;
+    border-top: 5px solid var(--border-ds-surface-900) !important;
+    border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
     border-right: 0 !important;
   }

@@ -54,7 +54,7 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { requestSplitterDirection } from "../store";
+  import { tabsSplitterDirection } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
@@ -69,6 +69,12 @@
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import {
+    CheckmarkCircleFilled,
+    ErrorCircleFilled,
+  } from "@sparrow/library/icons";
+  import { loadingState } from "../../../../../@sparrow-common/src/store";
+  import { writable } from "svelte/store";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -98,6 +104,7 @@
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
+  export let onOpenCollection;
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -113,6 +120,10 @@
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
+  export let onSaveResponse;
+  export let collectionAuth;
+  export let collection;
+  const loading = writable<boolean>(false);
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -136,6 +147,8 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
+  let isErrorMsgOpen = false;
+
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
@@ -149,12 +162,21 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+
+  $: {
+    loadingState.subscribe((tab) => {
+      loading.set(tab.get($tab.tabId));
+    });
+  }
   let isGuidePopup = false;
 </script>
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
+    <div
+      class="w-100 d-flex flex-column h-100 pt-3 pb-3"
+      style="padding:0px 12px"
+    >
       <!-- Request Name Header -->
       <!-- 
         --
@@ -183,9 +205,7 @@
                 notifications.success("API request saved successfully.");
               }
             }}
-          />
-
-          <span class="position-relative" style="width:35px;"> </span>
+          /> <span class="position-relative" style="width:35px;"> </span>
           <Button
             title="Share"
             type={"secondary"}
@@ -198,6 +218,7 @@
       <!-- HTTP URL Section -->
       <HttpUrlSection
         class=""
+        isSaveLoad={$loading}
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={$tab.property.request?.url}
@@ -214,7 +235,7 @@
         {isGuestUser}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 10px;">
+      <div class="" style="margin-top: 8px;">
         {#if isPopoverContainer}
           <Popover
             onClose={closeCollectionHelpText}
@@ -243,9 +264,7 @@
           <Splitpanes
             class="rest-splitter w-100 h-100"
             id={"rest-splitter"}
-            horizontal={$requestSplitterDirection === "horizontal"
-              ? true
-              : false}
+            horizontal={$tabsSplitterDirection === "horizontal" ? true : false}
             dblClickSplitter={false}
             on:resize={(e) => {
               onUpdateRequestState({
@@ -260,11 +279,11 @@
               minSize={30}
               size={$tab.property.request?.state
                 ?.requestLeftSplitterWidthPercentage}
-              class="position-relative bg-secondary-850-important"
+              class="position-relative bg-transparent"
             >
               <!-- Request Pane -->
               <div
-                class="h-100 d-flex flex-column position-relative {$requestSplitterDirection ===
+                class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pb-1'
                   : 'pe-2'}"
@@ -325,9 +344,12 @@
                         .requestAuthNavigation}
                       {onUpdateRequestState}
                       auth={$tab.property.request.auth}
+                      collectionAuth={$collectionAuth}
                       {onUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
                     />
                   {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                     <RequestDoc
@@ -348,71 +370,89 @@
               minSize={30}
               size={$tab.property.request?.state
                 ?.requestRightSplitterWidthPercentage}
-              class="bg-secondary-850-important position-relative"
+              class="bg-transparent position-relative"
             >
               <!-- Response Pane -->
               <div
-                class="d-flex flex-column h-100 {$requestSplitterDirection ===
+                class="d-flex flex-column h-100 {$tabsSplitterDirection ===
                 'horizontal'
                   ? 'pt-1'
                   : 'ps-2'}"
-                style="overflow:auto;"
               >
                 <div class="h-100 d-flex flex-column">
                   <div style="flex:1; overflow:auto;">
                     {#if storeData?.isSendRequestInProgress}
-                      <ResponseDefaultScreen />
+                      <ResponseDefaultScreen {isWebApp} />
                       <div
                         style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
                       >
                         <Loader loaderSize={"20px"} />
                       </div>
                     {:else if !storeData?.response.status}
-                      <ResponseDefaultScreen />
+                      <ResponseDefaultScreen {isWebApp} />
                     {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen />
+                      <ResponseErrorScreen
+                        onSendButtonClicked={onSendRequest}
+                        response={storeData.response}
+                        {environmentVariables}
+                      />
                     {:else if storeData?.response.status}
-                      <div class="h-100 d-flex flex-column">
-                        <ResponseStatus response={storeData.response} />
-                        <ResponseNavigator
-                          requestStateSection={storeData?.response.navigation}
-                          {onUpdateResponseState}
-                          responseHeadersLength={storeData?.response.headers
-                            ?.length || 0}
-                        />
-                        {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
-                          {#if storeData?.response.bodyLanguage !== "Image"}
-                            <ResponseBodyNavigator
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                              {onUpdateResponseState}
-                              {onClearResponse}
-                              {isWebApp}
-                            />
+                      <div class="h-100 d-flex flex-column" style="gap:12px">
+                        <div
+                          class="d-flex"
+                          style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
+                        >
+                          <ResponseNavigator
+                            requestStateSection={storeData?.response.navigation}
+                            {onUpdateResponseState}
+                            responseHeadersLength={storeData?.response.headers
+                              ?.length || 0}
+                          />
+                          <ResponseStatus response={storeData.response} />
+                        </div>
+                        <div
+                          class="flex-grow-1 d-flex flex-column"
+                          style="overflow:auto; min-height:0;"
+                        >
+                          {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
+                            {#if storeData?.response.bodyLanguage !== "Image"}
+                              <ResponseBodyNavigator
+                                response={storeData?.response}
+                                apiState={storeData?.response}
+                                path={$tab.path}
+                                {onUpdateResponseState}
+                                {onClearResponse}
+                                {onSaveResponse}
+                                {isWebApp}
+                                {isGuestUser}
+                              />
+                            {/if}
+                            <div
+                              style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                            >
+                              <ResponseBody
+                                response={storeData?.response}
+                                apiState={storeData?.response}
+                              />
+                            </div>
+                          {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
+                            <div style="overflow:auto;">
+                              <ResponseHeaders
+                                responseHeader={storeData.response?.headers}
+                              />
+                            </div>
                           {/if}
-                          <div style="flex:1; overflow:auto;">
-                            <ResponseBody
-                              response={storeData?.response}
-                              apiState={storeData?.response}
-                            />
-                          </div>
-                        {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                          <div style="flex:1; overflow:auto;">
-                            <ResponseHeaders
-                              responseHeader={storeData.response?.headers}
-                            />
-                          </div>
-                        {/if}
+                        </div>
                       </div>
                     {/if}
                   </div>
                 </div>
-              </div></Pane
-            >
+              </div>
+            </Pane>
           </Splitpanes>
         {:else}
           <!-- loading state -->
-          <ResponseDefaultScreen isMainScreen={true} />
+          <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
         {/if}
       </div>
     </div>
@@ -517,32 +557,32 @@
 
 <style>
   .rest-explorer-layout {
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-900);
   }
 
-  :global(.rest-splitter.splitpanes--vertical .splitpanes__splitter) {
-    width: 10.5px !important;
+  :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
+    width: 11px !important;
     height: 100% !important;
     background-color: var(--bg-secondary-500) !important;
-    border-left: 5px solid var(--border-secondary-800) !important;
-    border-right: 5px solid var(--border-secondary-800) !important;
+    border-left: 5px solid var(--border-ds-surface-900) !important;
+    border-right: 5px solid var(--border-ds-surface-900) !important;
     border-top: 0 !important;
     border-bottom: 0 !important;
   }
-  :global(.rest-splitter.splitpanes--horizontal .splitpanes__splitter) {
-    height: 10.5px !important;
+  :global(.rest-splitter.splitpanes--horizontal > .splitpanes__splitter) {
+    height: 11px !important;
     width: 100% !important;
-    background-color: var(--bg-secondary-500) !important;
-    border-top: 5px solid var(--border-secondary-800) !important;
-    border-bottom: 5px solid var(--border-secondary-800) !important;
+    background-color: var(--bg-ds-surface-100) !important;
+    border-top: 5px solid var(--border-ds-surface-900) !important;
+    border-bottom: 5px solid var(--border-ds-surface-900) !important;
     border-left: 0 !important;
     border-right: 0 !important;
   }
   :global(
-    .rest-splitter .splitpanes__splitter:active,
-    .rest-splitter .splitpanes__splitter:hover
+    .rest-splitter > .splitpanes__splitter:active,
+    .rest-splitter > .splitpanes__splitter:hover
   ) {
-    background-color: var(--bg-primary-200) !important;
+    background-color: var(--bg-ds-primary-400) !important;
   }
   .link {
     color: var(--text-primary-300);

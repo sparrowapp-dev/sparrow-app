@@ -3,6 +3,7 @@
   import type { Observable } from "rxjs";
   import { PeopleIcon } from "@sparrow/library/assets";
   import { List } from "@sparrow/library/ui";
+  import { PeopleRegular } from "@sparrow/library/icons";
 
   export let data: Observable<any[]>;
   export let openTeam: any | null = null;
@@ -39,8 +40,12 @@
   $: topFiveWorkspaces = workspaces.slice(0, 5);
 </script>
 
-<div class="d-flex justify-content-between p-3 pb-0">
-  <h6 class="workspace-heading">Recent Workspaces</h6>
+<div class="d-flex justify-content-between pb-0">
+  <h6
+    class="workspace-heading text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
+  >
+    Recent Workspaces
+  </h6>
 </div>
 
 <div class="sidebar-workspace-list" style="flex:1; overflow:auto;">
@@ -51,6 +56,7 @@
       {#each topFiveWorkspaces as list, index}
         {#if index < 5}
           <div
+            tabindex="0"
             class="recentWorkspace-tab"
             on:click={() => OnWorkspaceSwitch(list._id)}
           >
@@ -58,28 +64,26 @@
               class="w-100 py-2 px-3 overflow-hidden rounded justify-content-between d-flex workspace-list-data"
             >
               <div
-                class="overflow-hidden ellipsis rounded"
-                style="width: 100%;"
+                class="overflow-hidden ellipsis"
+                style="width: 100%; height:35px"
               >
                 <p
-                  class="list-name mb-0 ellipsis overflow-hidden ellipsis"
-                  style="font-size: 12px; font-weight:700"
+                  class="list-name mb-0 ellipsis overflow-hidden ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                  style=" color:var(--text-ds-neutral-50);"
                 >
                   {list?.name || ""}
                 </p>
                 <p
-                  class="team-name mb-0 title fw-bold ellipsis overflow-hidden"
-                  style="font-size: 12px; color:var(--sparrow-text-color)"
+                  class="team-name mb-0 title ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+                  style=" border-radius:0; line-height:18px;"
                 >
                   {list?.team?.teamName || ""}
                 </p>
               </div>
-              <PeopleIcon
-                color={openTeam?.teamId !== list.team.teamId
-                  ? "var(--sparrow-text-color)"
-                  : "var(--defaultcolor)"}
-                classProp={`${list.users.length <= 1 && "d-none"} my-2 me-1`}
-              />
+
+              <span class={`${list.users.length <= 1 && "d-none"} my-2 me-1`}>
+                <PeopleRegular size={"16px"} />
+              </span>
             </div>
           </div>
         {/if}
@@ -87,6 +91,10 @@
     </List>
   {/if}
 </div>
+<hr
+  class=" pb-0"
+  style="margin-left: 10px; margin-top:12px; margin-bottom:12px;"
+/>
 
 <style>
   /* Previous styles remain the same */
@@ -98,30 +106,56 @@
     color: var(--bg-secondary-330);
   }
 
-  .workspace-heading {
-    margin-left: 5px;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 21px;
+  .recentWorkspace-tab {
+    background-color: transparent;
+    border: 2px solid transparent;
+  }
+  .recentWorkspace-tab:hover {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .recentWorkspace-tab:focus-visible {
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .recentWorkspace-tab:active {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
   }
 
+  .workspace-heading {
+    padding: 6px;
+    padding-left: 15px;
+    color: var(--text-ds-neutral-300);
+    margin-bottom: 0;
+  }
+  .workspace-list-data {
+    height: 48px;
+    border-radius: 4px;
+    padding: 4px;
+    padding-left: 10px;
+    margin-bottom: 2px;
+  }
   .workspace-list-data:hover {
-    background-color: var(--bg-tertiary-750);
+    background-color: var(--bg-ds-surface-400);
     cursor: pointer;
   }
 
   .workspace-list-data:active {
-    background-color: var(--bg-secondary-320);
+    background-color: var(--bg-ds-surface-500);
     cursor: pointer;
   }
 
   .title {
     width: calc(100% - 40px);
     text-align: left;
+    color: red;
   }
 
   .team-name {
     align-self: stretch !important;
-    font-weight: 400 !important;
+    color: var(--text-ds-neutral-200);
   }
 </style>

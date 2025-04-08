@@ -6,7 +6,17 @@
   import { Search } from "@sparrow/library/forms";
   import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import { Dropdown, Button } from "@sparrow/library/ui";
-  import { PlusIcon2 } from "@sparrow/library/icons";
+  import {
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "../../../stores/recent-left-panel";
+  import {
+    AddRegular,
+    ArrowClockWiseRegular,
+    ChevronDoubleRightRegular,
+    PlusIcon2,
+  } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -25,6 +35,7 @@
     StackIcon,
     SocketIoIcon,
     GraphIcon,
+    ChevronDoubleLeftRegular,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -121,6 +132,9 @@
   export let onOpenTestflow;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+  export let refreshLoad = false;
+  export let refreshWorkspace: () => void;
+  export let userCount = 0;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -135,9 +149,36 @@
     }
   });
 
-  export let isExpandCollection = false;
-  export let isExpandEnvironment = false;
-  export let isExpandTestflow = false;
+  // export let isExpandCollection = false;
+  // export let isExpandEnvironment = false;
+  // export let isExpandTestflow = false;
+
+  let isExpandCollectionLine = false;
+  let isExpandEnviromentLine = false;
+  let isExpandTestflowLine = false;
+
+  const handleExpandCollectionLine = () => {
+    isExpandCollectionLine = !isExpandCollectionLine;
+    // console.log(isExpandCollectionLine);
+  };
+  const handleExpandEnviromentLine = () => {
+    isExpandEnviromentLine = !isExpandEnviromentLine;
+  };
+  const handleTestflowLine = () => {
+    isExpandTestflowLine = !isExpandTestflow;
+  };
+
+  // $: {
+  //   if (isExpandCollectionLine) {
+  //     isExpandCollectionLine = false;
+  //   }
+  //   if (isExpandEnviromentLine) {
+  //     isExpandEnviromentLine = false;
+  //   }
+  //   if (isExpandTestflowLine) {
+  //     isExpandTestflowLine = false;
+  //   }
+  // }
 
   let isGithubStarHover = false;
 
@@ -246,90 +287,7 @@
             } else {
               showImportCollectionPopup();
             }
-            isExpandCollection = true;
-          },
-        },
-        {
-          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-          icon: VectorIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "12px",
-          onclick: () => onItemCreated("request", {}),
-        },
-        {
-          name: "Import cURL",
-          icon: BubbleIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            MixpanelEvent(Events.IMPORT_CURL, {
-              source: "curl import popup",
-            });
-            showImportCurlPopup();
-          },
-        },
-        {
-          name: "Add WebSocket",
-          icon: SocketIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onItemCreated("web-socket", {});
-            MixpanelEvent(Events.Add_WebSocket);
-          },
-        },
-        {
-          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-          icon: SocketIoIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "14px",
-          onclick: () => {
-            onItemCreated("socket-io", {});
-            MixpanelEvent(Events.Add_SocketIO, {
-              description: "Add Socket.IO From + Icon in Left Panel",
-            });
-          },
-        },
-        {
-          name: "Add Environment",
-          icon: StackIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            isExpandEnvironment = true;
-            onCreateEnvironment();
-          },
-        },
-
-        {
-          name: `Add ${TFDefaultEnum.FULL_NAME}`,
-          icon: TreeIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "15px",
-          onclick: () => {
-            onCreateTestflow();
-            MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
-          },
-          isHoverConstant: false,
-        },
-      ]
-    : [
-        {
-          name: "Add Collection",
-          icon: CollectionIcon,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            if (isGuestUser) {
-              onItemCreated("collection", {
-                workspaceId: currentWorkspaceId,
-                collection: collectionList,
-              });
-            } else {
-              showImportCollectionPopup();
-            }
-            isExpandCollection = true;
+            isExpandCollection.set(true);
           },
         },
         {
@@ -391,7 +349,102 @@
           iconColor: "var(--icon-secondary-130)",
           iconSize: "15px",
           onclick: () => {
-            isExpandEnvironment = true;
+            isExpandEnvironment.set(true);
+            onCreateEnvironment();
+          },
+        },
+
+        {
+          name: `Add ${TFDefaultEnum.FULL_NAME}`,
+          icon: TreeIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onCreateTestflow();
+            MixpanelEvent(Events.LeftPanel_Plus_Icon);
+            isExpandTestflow.set(true);
+          },
+          isHoverConstant: false,
+        },
+      ]
+    : [
+        {
+          name: "Add Collection",
+          icon: CollectionIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
+          onclick: () => {
+            if (isGuestUser) {
+              onItemCreated("collection", {
+                workspaceId: currentWorkspaceId,
+                collection: collectionList,
+              });
+            } else {
+              showImportCollectionPopup();
+            }
+            isExpandCollection.set(true);
+          },
+        },
+        {
+          name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+          icon: VectorIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "12px",
+          onclick: () => onItemCreated("request", {}),
+        },
+        {
+          name: "Import cURL",
+          icon: BubbleIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            MixpanelEvent(Events.IMPORT_CURL, {
+              source: "curl import popup",
+            });
+            showImportCurlPopup();
+          },
+        },
+        {
+          name: "Add WebSocket",
+          icon: SocketIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            onItemCreated("web-socket", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
+          name: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+          icon: SocketIoIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("socket-io", {});
+            MixpanelEvent(Events.Add_SocketIO, {
+              description: "Add Socket.IO From + Icon in Left Panel",
+            });
+          },
+        },
+        {
+          name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          icon: GraphIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "14px",
+          onclick: () => {
+            onItemCreated("graphql", {});
+            MixpanelEvent(Events.Add_GraphQL, {
+              description: "Add GraphQL From + Icon in Left Panel",
+            });
+          },
+        },
+        {
+          name: "Add Environment",
+          icon: StackIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "15px",
+          onclick: () => {
+            isExpandEnvironment.set(true);
             onCreateEnvironment();
           },
         },
@@ -403,21 +456,21 @@
           onclick: () => {
             onCreateTestflow();
             MixpanelEvent(Events.LeftPanel_Plus_Icon);
-            isExpandTestflow = true;
+            isExpandTestflow.set(true);
           },
           isHoverConstant: false,
         },
       ];
 
   const toggleExpandCollection = () => {
-    isExpandCollection = !isExpandCollection;
+    isExpandCollection.update((value) => !value);
   };
 
   const toggleExpandEnvironment = () => {
-    isExpandEnvironment = !isExpandEnvironment;
+    isExpandEnvironment.update((value) => !value);
   };
   const toggleExpandTestflow = () => {
-    isExpandTestflow = !isExpandTestflow;
+    isExpandTestflow.update((value) => !value);
   };
 
   const toggleTourGuideActive = () => {
@@ -440,15 +493,21 @@
       return version;
     }
   };
+
+  let ActiveTab = "";
+
+  const handleTabUpdate = (tabName: string) => {
+    ActiveTab = tabName;
+  };
 </script>
 
 {#if leftPanelController.leftPanelCollapse}
   <div>
-    <button
+    <span
       class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {leftPanelController.leftPanelCollapse
         ? 'd-block'
         : 'd-none'}"
-      style="left:52px; bottom: 15px; width: 20px; height:20px; z-index: {leftPanelController.leftPanelCollapse
+      style="left:57px; bottom: 15px; width: 20px; height:20px; background-color:transparent; z-index: {leftPanelController.leftPanelCollapse
         ? '2'
         : '0'}"
       on:click={() => {
@@ -457,23 +516,21 @@
         leftPanelController.handleCollapseCollectionList();
       }}
     >
-      <span
-        style="transform: rotate(180deg);"
-        class="position-relative d-flex align-items-center justify-content-center"
-      >
-        <DoubleArrowIcon
-          height={"10px"}
-          width={"10px"}
-          color={"var(--text-primary-200)"}
+      <Tooltip title={"Expand"} placement={"right-center"}>
+        <Button
+          type="teritiary-regular"
+          size="extra-small"
+          customWidth="24px"
+          startIcon={ChevronDoubleRightRegular}
         />
-      </span>
-    </button>
+      </Tooltip>
+    </span>
   </div>
 {/if}
 {#if !leftPanelController.leftPanelCollapse}
   <div
-    style="overflow-x: auto; overflow-y: auto ; position:relative"
-    class={`sidebar h-100 d-flex flex-column bg-secondary-900 scroll`}
+    style="overflow-x: auto; overflow-y: auto ; position:relative; background-color:var(--bg-ds-surface-700); "
+    class={`sidebar h-100 d-flex flex-column  scroll`}
   >
     <div
       class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
@@ -495,7 +552,7 @@
     </div>
 
     <div
-      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-1"
+      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-2"
     >
       <Search
         id="collection-list-search"
@@ -504,12 +561,23 @@
         bind:value={searchData}
         on:input={() => {
           handleSearch();
-          isExpandCollection = true;
-          isExpandEnvironment = true;
-          isExpandTestflow = true;
+          isExpandCollection.set(true);
+          isExpandEnvironment.set(true);
+          isExpandTestflow.set(true);
         }}
         placeholder={"Search"}
       />
+      {#if userCount > 1}
+        <Tooltip title={"Refresh"} placement={"bottom-center"}>
+          <Button
+            type="secondary"
+            startIcon={refreshLoad ? "" : ArrowClockWiseRegular}
+            size="small"
+            loader={refreshLoad}
+            onClick={refreshWorkspace}
+          />
+        </Tooltip>
+      {/if}
       <div class="d-flex align-items-center justify-content-center d-none">
         <button
           id="filter-btn"
@@ -530,43 +598,45 @@
       <!--  
         New dropdown button for adding new api, collection and import Curl
       -->
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-        <Dropdown
-          zIndex={600}
-          buttonId="addButton"
-          bind:isBackgroundClickable
-          bind:isMenuOpen={addButtonMenu}
-          options={addButtonData}
-        >
-          <Tooltip
-            title={"Add Options"}
-            placement={"bottom-center"}
-            distance={12}
-            show={!addButtonMenu}
-            zIndex={10}
+      <div id="options-container">
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+          <Dropdown
+            zIndex={600}
+            buttonId="addButton"
+            bind:isBackgroundClickable
+            bind:isMenuOpen={addButtonMenu}
+            options={addButtonData}
           >
-            <!-- <button
+            <Tooltip
+              title={"Add Options"}
+              placement={"bottom-center"}
+              distance={12}
+              show={!addButtonMenu}
+              zIndex={10}
+            >
+              <!-- <button
               id="addButton"
               class="border-0 p-1 border-radius-2 add-button"
               on:click={() => {
                 addButtonMenu = !addButtonMenu;
               }}
             > -->
-            <!--               
+              <!--               
               <img src={plusIcon} alt="" />
             </button> -->
-            <Button
-              type="primary"
-              id="addButton"
-              size={"small"}
-              startIcon={PlusIcon2}
-              onClick={() => {
-                addButtonMenu = !addButtonMenu;
-              }}
-            />
-          </Tooltip>
-        </Dropdown>
-      {/if}
+              <Button
+                type="primary"
+                id="addButton"
+                size={"small"}
+                startIcon={AddRegular}
+                onClick={() => {
+                  addButtonMenu = !addButtonMenu;
+                }}
+              />
+            </Tooltip>
+          </Dropdown>
+        {/if}
+      </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
@@ -589,7 +659,11 @@
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div style="position:fixed; top:234px; left:220px; z-index:9999;">
+        <div
+          style="position:fixed; top:{isWebApp
+            ? '234px'
+            : '266px'}; left:220px; z-index:9999;"
+        >
           <TestFlowTourGuide
             targetId="addButton"
             title="Add Your Flow 🌊"
@@ -599,7 +673,7 @@
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
-              isExpandTestflow = true;
+              isExpandTestflow.set(true);
               toggleTourGuideActive();
             }}
             onClose={() => {
@@ -618,11 +692,12 @@
       <!-----Collection Section------>
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandCollection ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandCollection ? 'flex:2;' : ''}"
       >
         <CollectionList
           bind:scrollList
           bind:userRole
+          bind:isFirstCollectionExpand
           {onRefetchCollection}
           {showImportCurlPopup}
           {collectionList}
@@ -640,19 +715,21 @@
           {onBranchSwitched}
           {searchData}
           {toggleExpandCollection}
-          bind:isExpandCollection
-          bind:isFirstCollectionExpand
+          {isExpandCollectionLine}
+          {handleExpandCollectionLine}
           {isWebApp}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
-      <hr class="my-1 ms-1 me-0" />
+      <hr class="my-1 ms-1 me-1" />
 
       <!-- Environment Section -->
 
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandEnvironment ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandEnvironment ? 'flex:1;' : ''}"
       >
         <EnvironmentList
           loggedUserRoleInWorkspace={userRole}
@@ -666,18 +743,20 @@
           environments={$environments}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandEnvironment}
-          bind:isExpandEnvironment
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
-      <hr class="my-1 ms-1 me-0" />
+      <hr class="my-1 ms-1 me-1" />
 
       <!-- Testflow Section -->
 
       <div
         class="ps-1"
-        style=" overflow:auto; {isExpandTestflow ? 'flex:1;' : ''}"
+        style=" overflow:auto; {$isExpandTestflow ? 'flex:1;' : ''}"
       >
         <TestflowList
           testflows={$testflows}
@@ -689,12 +768,16 @@
           currentWorkspace={activeWorkspace}
           {searchData}
           {activeTabId}
+          {activeTabType}
           {toggleExpandTestflow}
-          bind:isExpandTestflow
+          {isExpandTestflowLine}
+          {handleTestflowLine}
+          {ActiveTab}
+          {handleTabUpdate}
         />
       </div>
 
-      <hr class="my-1 ms-1 me-0" />
+      <hr class="my-1 ms-1 me-1" />
 
       <!-- <hr class="mt-1 mb-0 ms-1 me-0" /> -->
     </div>
@@ -747,8 +830,10 @@
         {/if}
 
         <!-- {/if} -->
-        <WithButton
-          icon={DoubleArrowIcon}
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={ChevronDoubleLeftRegular}
           onClick={() => {
             leftPanelController.leftPanelCollapse =
               !leftPanelController.leftPanelCollapse;

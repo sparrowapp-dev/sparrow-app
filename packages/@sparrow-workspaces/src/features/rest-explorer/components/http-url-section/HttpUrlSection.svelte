@@ -1,40 +1,29 @@
 <script lang="ts">
   import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
-
   import { Select } from "@sparrow/library/forms";
-  import type {
-    SaveRequestType,
-    SendRequestType,
-    UpdateRequestMethodType,
-    UpdateRequestUrlType,
-  } from "@sparrow/workspaces/type";
-  import { notifications } from "@sparrow/library/ui";
-  import { DropButton } from "@sparrow/workspaces/components";
+  import { notifications, Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { DiskIcon } from "@sparrow/library/icons";
-  // import type { CancelRequestType } from "@workspaces/common/type/actions";
+  import { SaveRegular } from "@sparrow/library/icons";
+
   let componentClass = "";
   export { componentClass as class };
 
-  export let requestUrl: string;
-  export let httpMethod: string;
-  export let isSendRequestInProgress: boolean;
-  export let onSendButtonClicked: SendRequestType;
-  export let onCancelButtonClicked: CancelRequestType;
-  export let onUpdateRequestUrl: UpdateRequestUrlType;
-  export let onUpdateRequestMethod: UpdateRequestMethodType;
-  export let toggleSaveRequest: (flag: boolean) => void;
-  export let onSaveRequest: SaveRequestType;
+  export let requestUrl;
+  export let httpMethod;
+  export let isSendRequestInProgress;
+  export let onSendButtonClicked;
+  export let onCancelButtonClicked;
+  export let onUpdateRequestUrl;
+  export let onUpdateRequestMethod;
+  export let toggleSaveRequest;
+  export let onSaveRequest;
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isSave;
-  export let isGuestUser = false;
-  /**
-   * Role of user in active workspace
-   */
   export let userRole;
+  export let isSaveLoad = false;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -88,59 +77,53 @@
   }
 </script>
 
-<div class={`d-flex ${componentClass}`}>
+<div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
   <!-- Http Method Dropdown -->
-  <div class="" style="">
-    <Select
-      id={"api-request"}
-      data={[
-        {
-          name: "GET",
-          id: RequestMethod.GET,
-          color: "success",
-        },
-        {
-          name: "POST",
-          id: RequestMethod.POST,
-          color: "warning",
-        },
-        {
-          name: "PUT",
-          id: RequestMethod.PUT,
-          color: "secondary",
-        },
-        {
-          name: "DELETE",
-          id: RequestMethod.DELETE,
-          color: "danger",
-        },
-        {
-          name: "PATCH",
-          id: RequestMethod.PATCH,
-          color: "patch",
-        },
-      ]}
-      borderRounded={"0px"}
-      titleId={httpMethod}
-      onclick={handleDropdown}
-      borderHighlight={"active"}
-      headerHighlight={"hover"}
-      minHeaderWidth={"100px"}
-      borderActiveType={"none"}
-      headerTheme={"violet"}
-      zIndex={500}
-      borderType={"none"}
-      menuItem={"v2"}
-      bodyTheme={"violet"}
-      isDropIconFilled={true}
-      highlightTickedItem={false}
-      headerFontSize={"12px"}
-      headerHeight={"36px"}
-    />
-  </div>
+  <Select
+    variant={"secondary"}
+    id={"api-request"}
+    size={"medium"}
+    data={[
+      {
+        name: "GET",
+        id: RequestMethod.GET,
+        color: "success",
+      },
+      {
+        name: "POST",
+        id: RequestMethod.POST,
+        color: "warning",
+      },
+      {
+        name: "PUT",
+        id: RequestMethod.PUT,
+        color: "secondary",
+      },
+      {
+        name: "DELETE",
+        id: RequestMethod.DELETE,
+        color: "danger",
+      },
+      {
+        name: "PATCH",
+        id: RequestMethod.PATCH,
+        color: "patch",
+      },
+    ]}
+    titleId={httpMethod}
+    onclick={handleDropdown}
+    borderHighlight={"active"}
+    headerHighlight={"hover"}
+    minHeaderWidth={"100px"}
+    borderActiveType={"none"}
+    zIndex={500}
+    borderType={"none"}
+    menuItem={"v2"}
+    highlightTickedItem={false}
+  />
 
   <CodeMirrorInput
-    bind:value={requestUrl}
+    value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
     placeholder={"Enter a URL"}
     {theme}
@@ -153,11 +136,11 @@
   />
 
   <!-- Send button -->
-  <span class="ps-2"></span>
   {#if !isSendRequestInProgress}
-    <DropButton
+    <Button
       title="Send"
-      type="default"
+      type="primary"
+      customWidth={"96px"}
       onClick={() => {
         if (requestUrl === "") {
           const codeMirrorElement = document.querySelector(
@@ -172,9 +155,10 @@
       }}
     />
   {:else}
-    <DropButton
+    <Button
+      type="secondary"
+      customWidth={"96px"}
       title="Cancel"
-      type="dark"
       onClick={() => {
         onCancelButtonClicked();
       }}
@@ -201,29 +185,16 @@
     }}
   /> -->
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <button
-      class="ms-2 save-disk d-flex align-items-center justify-content-center border-radius-2 border-0"
-      on:click={handleSaveRequest}
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-      disabled={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+    <Button
+      type="secondary"
+      size="medium"
+      loader={isSaveLoad}
+      startIcon={isSaveLoad ? "" : SaveRegular}
+      onClick={handleSaveRequest}
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
         : false}
-      style="background-color: {isSave ||
-      userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? 'var(--icon-secondary-550)'
-        : 'var(--bg-secondary-400)'}; color: white;"
-    >
-      <DiskIcon
-        height={22}
-        width={22}
-        color={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-          ? "var(--icon-secondary-380)"
-          : isHovered
-            ? "var(--icon-primary-200)"
-            : "var(--icon-secondary-100)"}
-      />
-    </button>
+    />
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

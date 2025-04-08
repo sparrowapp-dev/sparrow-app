@@ -10,7 +10,13 @@
     MessageTypeEnum,
     type RequestTab,
   } from "@sparrow/common/types/workspace";
-  import { CrossIcon } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/common/icons";
+  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
+  import {
+    CrossIcon,
+    DismissRegular,
+    CaretDownFilled,
+  } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
@@ -21,6 +27,7 @@
   export let onUpdateAiConversation;
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
+  export let onStopGeneratingAIResponse;
   export let onToggleLike;
 
   let scrollList: ScrollList;
@@ -68,7 +75,7 @@
 {#if $tab?.property?.request?.state?.isChatbotActive}
   <div
     style="position: fixed;
-    top:200px;
+    top: 150px;
     bottom: 80px;
     right:28px;
     z-index: 200;
@@ -85,6 +92,7 @@
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
+      {onStopGeneratingAIResponse}
       bind:scrollList
     />
   </div>
@@ -175,10 +183,34 @@
       MixpanelEvent(Events.AI_Chat_Initiation);
     }}
   >
-    <AiChatToggler
-      height="42px"
-      width="42px"
-      isChatBoxOpen={$tab?.property?.request?.state?.isChatbotActive}
-    />
+    <div class="chatten-box" tabindex="0">
+      {#if !$tab?.property?.request?.state?.isChatbotActive}
+        <SparrowSecondaryIcon />
+      {:else}
+        <CaretDownFilled />
+      {/if}
+    </div>
   </div>
 </div>
+
+<style lang="scss">
+  .chatten-box {
+    background-color: var(--bg-ds-primary-400);
+    height: 40px;
+    width: 40px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .chatten-box:hover {
+    background-color: var(--bg-ds-primary-500);
+  }
+  .chatten-box:focus-visible {
+    height: 40px;
+    width: 40px;
+    border-radius: 10px;
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+  }
+</style>

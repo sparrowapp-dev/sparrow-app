@@ -12,16 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  enforce-issue-link:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Verify Linked Issue
-        uses: hattan/verify-linked-issue-action@v1.1.5
-        env:
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-        with:
-          message: 'Please attach the issue link'
-
   main:
     name: Validate Pull Request title
     runs-on: ubuntu-latest

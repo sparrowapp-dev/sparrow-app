@@ -22,7 +22,7 @@
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
 
   // ---- DB
-  import { SocketIcon } from "@sparrow/library/icons";
+  import { MoreHorizontalRegular, SocketIcon } from "@sparrow/library/icons";
   import type {
     CollectionBaseInterface,
     CollectionItemBaseInterface,
@@ -136,18 +136,19 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-12">
+  <div
+    class="mb-1 mt-2 text-ds-font-size-14 text-ds-font-weight-regular"
+    style="color: var(--text-ds-nuetral-100); line-height:20px;"
+  >
     <p>
-      Are you sure you want to delete this WebSocket? <span
-        class="text-whiteColor fw-bold">"{api.name}"</span
-      >
+      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+    style="gap:12px"
   >
     <Button
       disable={deleteLoader}
@@ -158,6 +159,7 @@
       onClick={() => {
         isDeletePopup = false;
       }}
+      customWidth={"96px"}
     />
 
     <Button
@@ -178,11 +180,12 @@
         deleteLoader = false;
         isDeletePopup = false;
       }}
+      customWidth={"96px"}
     />
   </div></Modal
 >
 
-{#if showMenu}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -236,14 +239,16 @@
 {/if}
 
 <div
+  tabindex="0"
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center mb-1 mt-1 justify-content-between my-button btn-primary {api.id ===
+  class="d-flex align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px;"
+  style="height:32px; padding-left:3px; margin-bottom:2px; "
 >
   <button
+    tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
@@ -255,25 +260,31 @@
         });
       }
     }}
-    style={folder?.id ? "padding-left: 46px;" : "padding-left: 30px;"}
+    style={folder?.id
+      ? "padding-left: 41.5px; height:100%;"
+      : "padding-left: 29px;  height:100%;"}
     class="main-file d-flex align-items-center position-relative bg-transparent border-0 {api.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
       : ''}"
   >
+    <div
+      class="api-method"
+      style="width: 24px!important; height:24px; margin-right:4px;"
+    ></div>
     <span class="api-method"
       ><SocketIcon
         height={"12px"}
         width={"16px"}
-        color={"var(--icon-primary-300)"}
+        color={"var(--icon-ds-primary-400)"}
       /></span
     >
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px);"
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style=" width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -285,11 +296,12 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
-      >
-        {api.name}
+      <div class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}">
+        <p
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        >
+          {api.name}
+        </p>
       </div>
     {/if}
   </button>
@@ -304,18 +316,20 @@
       zIndex={701}
       distance={17}
     >
-      <button
-        id={`show-more-websocket-${api.id}`}
-        class="threedot-icon-container border-0 rounded d-flex p-0 justify-content-center align-items-center {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="transform: rotate(90deg);"
-        on:click={(e) => {
-          rightClickContextMenu(e);
-        }}
-      >
-        <img src={threedotIcon} alt="threedotIcon" />
-      </button>
+      <span class="threedot-icon-container d-flex">
+        <Button
+          tabindex={"-1"}
+          id={`show-more-websocket-${api.id}`}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            e.stopPropagation();
+            rightClickContextMenu(e);
+          }}
+        />
+      </span>
     </Tooltip>
   {/if}
 </div>
@@ -326,20 +340,26 @@
     font-weight: 500;
   }
   .api-method {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
-    width: 48px !important;
-    height: 30px;
-    padding-left: 6px;
-    padding-right: 4px;
-    border-radius: 8px;
+    width: 30px !important;
+    height: 24px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
+    justify-content: end;
+    padding: 4px;
   }
   .api-name {
-    font-weight: 400;
-    width: calc(100% - 48px);
+    font-weight: 500;
+    font-size: 12px;
+    height: 24px;
+    line-height: 18px;
+    width: calc(100% - 58px);
     text-align: left;
+    align-items: center;
+    padding: 2px 4px;
+    color: var(--text-ds-neutral-200);
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
@@ -378,21 +398,20 @@
     visibility: visible;
     background-color: var(--bg-tertiary-600);
   }
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500);
-  }
 
   .btn-primary {
     background-color: transparent;
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
     padding-right: 5px;
     border-radius: 2px;
   }
-
   .btn-primary:hover {
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+  }
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
   }
 
   .btn-primary:hover {
@@ -401,6 +420,24 @@
     }
   }
 
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    border-radius: 4px;
+    border: 2px solid var(--bg-ds-primary-300);
+    outline: none;
+  }
+
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
+  }
+  .border-primary:active {
+    background-color: var(--bg-ds-surface-500);
+    color: var(--bg-ds-surface-500);
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
   .navbar {
     width: 180px;
     height: auto;
@@ -429,18 +466,20 @@
     pointer-events: none;
   }
   .renameInputFieldFile {
+    height: 24px;
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--text-ds-neutral-50);
+    padding: 4px 2px;
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldFile:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
-    width: calc(100% - 24px);
+    width: calc(100% - 28px);
   }
   .active-request-tab {
     background-color: var(--bg-tertiary-400) !important;

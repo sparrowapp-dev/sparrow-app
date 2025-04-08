@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AISparkle } from "@sparrow/library/icons";
+  import { SparkleFilled } from "@sparrow/common/icons";
 
   export let title = "";
   export let onClick: (text: string) => void = () => {};
@@ -11,14 +11,25 @@
     onClick(title);
   }}
 >
-  <AISparkle height={"20px"} width={"20px"} color={"var(--icon-primary-300)"} />
-  <span class="title-txt">{title}</span>
+  <SparkleFilled
+    height="20px"
+    width="20px"
+    colors={[
+      "var(--icon-ds-info-400)",
+      "var(--icon-ds-primary-400)",
+      "var(--icon-ds-secondary-300)",
+    ]}
+  />
+
+  <span
+    class="title-txt text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
+    >{title}</span
+  >
 </div>
 
 <style>
   .title-txt {
     font-size: 12px;
-    font-weight: 400;
     color: var(--text-secondary-100);
     padding: 5px;
   }
@@ -26,8 +37,8 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    background-color: var(--bg-primary-700);
-    border: 1px solid var(--border-primary-300);
+    background-color: var(--bg-ds-surface-700);
+    border: 1px solid var(--border-ds-surface-100);
     border-radius: 4px;
     padding: 5px;
     height: 28px;
@@ -41,7 +52,6 @@
   }
 
   .suggestion-button:hover {
-    background-color: var(--bg-primary-800);
     box-shadow: 0px 0px 6px 0px var(--bg-primary-300);
   }
 </style>

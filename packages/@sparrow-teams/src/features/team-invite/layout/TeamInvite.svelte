@@ -87,7 +87,7 @@
     }
     const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
     if (isEmailAlreadyExist) {
-      notifications.error("User already in team!");
+      notifications.error("User already in hub.");
     }
     const isUserExist = await onValidateEmail(email); // checks if user exist on server
     if (!isUserExist) {
@@ -197,12 +197,16 @@
   };
 </script>
 
-<div class="d-flex flex-column pt-2">
-  <p class="invite-header text-secondary-1000 mb-0">
-    Invite by Email<span class="asterik">*</span>
+<div class="d-flex flex-column">
+  <p class="invite-header mb-0" style="color: var(--text-ds-neutral-200);">
+    Invite by email<span class="asterik">*</span>
   </p>
-  <p class="invite-subheader text-secondary-200 mt-0 mb-1">
-    Use comma to separate emails.
+
+  <p
+    style="padding: 2px 0px; font-size: 12px; color: var(--text-ds-neutral-400);"
+    class="invite-subheader mt-0 mb-1"
+  >
+    You can add multiple emails.
   </p>
   <div
     class="email-container rounded {(emailError && invalidEmails.length) ||
@@ -273,7 +277,7 @@
     titleId={selectedRole ? selectedRole : ""}
     data={[
       {
-        name: "Select",
+        name: "Select the role",
         id: defaultRole,
         description: "Select role",
         hide: true,
@@ -282,34 +286,31 @@
         name: "Admin",
         id: WorkspaceRole.WORKSPACE_ADMIN,
         description:
-          "Add & edit resources within a workspace, add & remove members to a workspace.",
+          "Manage workspace resources and members. Add, edit, and remove resources, as well as invite or remove members.",
       },
       {
         name: "Editor",
         id: WorkspaceRole.WORKSPACE_EDITOR,
-        description: "Add & edit resources within a workspace.",
+        description: "Create and modify resources within a workspace.",
       },
       {
         name: "Viewer",
         id: WorkspaceRole.WORKSPACE_VIEWER,
-        description: "View Resources within a workspace.",
+        description: "View resources in a workspace without making changes.",
       },
     ]}
     maxHeaderWidth={"100%"}
+    variant={"tertiary"}
+    size={"medium"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
-    bodyTheme={"violet"}
-    headerTheme={"violet2"}
-    borderRounded={"4px"}
-    headerFontWeight={400}
-    headerFontSize={"12px"}
     isError={roleError && selectedRole === defaultRole}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
   <p class="invite-subheader text-textColor mt-1 mb-1">
-    Admins will have access to all current and future team workspaces.
+    Admins will have access to all current and future hub workspaces.
   </p>
 {/if}
 {#if roleError && selectedRole === defaultRole}
@@ -344,7 +345,7 @@
     </p>
   {/if}
 {/if}
-<div class="d-flex align-items-center justify-content-between mt-4">
+<div class="mt-3">
   <div class="d-flex align-items-center description ellipsis gap-2">
     <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
@@ -360,14 +361,23 @@
         </span>
       {/if}
     </div>
-    <p style="font-size:16px;" class="mb-0 ellipsis me-1">{teamName}</p>
+    <p style="font-size:12px; font-weight:500" class="mb-0 ellipsis me-1">
+      {teamName}
+    </p>
   </div>
-  <div>
+  <div style="margin-top: 1.8rem; display: flex; justify-content: flex-end;">
+    <div style="padding-right:5px;">
+      <Button
+        title={"Cancel"}
+        type={"secondary"}
+        onClick={() => {
+          handleModalState(false);
+        }}
+      />
+    </div>
     <Button
       disable={loader}
       title={"Send Invite"}
-      loaderSize={19}
-      textStyleProp={"font-size: var(--base-text); min-width:80px;"}
       type={"primary"}
       {loader}
       onClick={() => {
@@ -405,7 +415,7 @@
     flex-wrap: wrap;
     background-color: var(--bg-ds-surface-400);
     border: 1px solid;
-    padding: 4px 8px;
+    padding: 3px 8px;
     border: 1px solid var(--border-color);
     max-height: 100px;
     overflow-y: auto;
@@ -464,5 +474,9 @@
     height: 22px;
     width: 22px;
     cursor: pointer;
+  }
+  #invite-team .dropdown-item:first-child {
+    color: red !important;
+    font-weight: bold;
   }
 </style>

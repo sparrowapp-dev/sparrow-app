@@ -1,6 +1,15 @@
 <script lang="ts">
-  import { PlusIcon, StackIcon, StackFilled } from "@sparrow/library/icons";
-  import { List } from "@sparrow/library/ui";
+  import {
+    PlusIcon,
+    StackIcon,
+    StackFilled,
+    ChevronRightRegular,
+    ChevronDownRegular,
+    AddRegular,
+    LayerRegular,
+    GlobeRegular,
+  } from "@sparrow/library/icons";
+  import { Button, List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import {
     PERMISSION_NOT_FOUND_TEXT,
@@ -10,6 +19,7 @@
   import { ListItem } from "../components";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandEnvironment } from "../../../stores/recent-left-panel";
 
   /**
    * current workspace
@@ -55,11 +65,26 @@
 
   export let searchData;
 
-  export let isExpandEnvironment = false;
+  // export let isExpandEnvironment = false;
 
   export let toggleExpandEnvironment;
 
   export let activeTabId;
+  export let ActiveTab;
+  export let handleTabUpdate;
+
+  let isExpandEnviromentLine = false;
+  export let activeTabType;
+
+  $: {
+    // console.log(activeTabId);
+
+    if (environments?.find((item) => item._data.id === activeTabId)) {
+      isExpandEnviromentLine = true;
+    } else {
+      isExpandEnviromentLine = false;
+    }
+  }
 
   let scrollList;
   let localEnvironment;
@@ -104,8 +129,8 @@
   }
 
   const handleCreateEnvironment = async () => {
-    if (!isExpandEnvironment) {
-      isExpandEnvironment = !isExpandEnvironment;
+    if (!$isExpandEnvironment) {
+      isExpandEnvironment.update((value) => !value);
     }
     await onCreateEnvironment(localEnvironment);
     setTimeout(() => {
@@ -138,41 +163,49 @@
 </script>
 
 <div
-  class={`d-flex flex-column  h-100 env-sidebar bg-secondary-900   pt-0 px-1`}
+  class={`d-flex flex-column  h-100     pt-0 px-1`}
   style="font-weight: 500;"
+  id="Environment-container"
 >
   <div
-    class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2"
-    style="cursor:pointer; justify-content: space-between; height:32px;
-      background-color: {isHovered
-      ? 'var(--dropdown-option-hover)'
-      : 'transparent'}; "
+    tabindex="0"
+    class=" env-sidebar d-flex align-items-center border-radius-2 me-0 mb-0 pe-2"
+    style="cursor:pointer; justify-content: space-between; height:32px ;gap:4px;"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={toggleExpandEnvironment}
+    on:click={() => {
+      toggleExpandEnvironment();
+      handleTabUpdate("enviroment");
+    }}
   >
     <div
-      class="d-flex align-items-center ps-3 pe-1 py-1"
-      style="width: calc(100% - 30px);"
+      class="d-flex align-items-center"
+      style="width: calc(100% - 30px);  padding:4px 2px;"
     >
-      <img
-        src={angleRight}
-        class="me-3"
-        style="height:8px; width:4px; margin-right:8px; {isExpandEnvironment
-          ? 'transform:rotate(90deg);'
-          : 'transform:rotate(0deg);'}"
-        alt="angleRight"
-      />
+      <span style="  display: flex; margin-right:4px; ">
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={!$isExpandEnvironment
+            ? ChevronRightRegular
+            : ChevronDownRegular}
+        />
+      </span>
 
-      <StackIcon
-        height={"12px"}
-        width={"12px"}
-        color={"var(--icon-secondary-130)"}
-      />
-
-      <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-        Environments
-      </p>
+      <span
+        style="   display: flex; width:30px; height:24px; align-items:center; justify-content:end; padding:4px;  "
+      >
+        <LayerRegular size={"16px"} color="var(--bg-ds-neutral-300)" />
+      </span>
+      <span style="padding:2px 4px;">
+        <p
+          class=" mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+          style=" color:var(--bg-ds-neutral-50);"
+        >
+          Environments
+        </p>
+      </span>
     </div>
     {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
       <Tooltip
@@ -182,56 +215,69 @@
         show={isHovered}
         zIndex={701}
       >
-        <button
-          style="height: 24px; width:24px;"
-          disabled={loggedUserRoleInWorkspace ===
-            WorkspaceRole.WORKSPACE_VIEWER}
-          class="add-icon-container border-0 p-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
-            ? 'environment-active'
-            : 'environment-inactive'}"
-          on:click|stopPropagation={handleCreateEnvironment}
-        >
-          <PlusIcon
-            height={"22px"}
-            width={"22px"}
-            color={"var( --white-color)"}
+        <span class="add-icon-container d-flex">
+          <Button
+            disabled={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCreateEnvironment(e);
+            }}
+            startIcon={AddRegular}
           />
-        </button>
+        </span>
       </Tooltip>
     {/if}
   </div>
 
-  {#if isExpandEnvironment}
-    <div style="flex:1;" class="overflow-auto h-100 ps-2" bind:this={scrollDiv}>
+  {#if $isExpandEnvironment}
+    <div
+      style="flex: 1; height: 32px; background-color: {ActiveTab ===
+      'enviroment'
+        ? 'var(--bg-ds-surface-600)'
+        : 'transparent'};"
+      class="overflow-auto"
+      bind:this={scrollDiv}
+    >
       {#if filteredGlobalEnvironment?.length}
-        <div class="mb-0">
+        <div class="mb-0 env-Global">
           <p
+            tabindex="0"
             role="button"
-            class={`fw-normal mb-1  ps-5 env-item text-fs-12 border-radius-2 my-1 ${
+            class={`fw-normal env-item text-fs-12 border-radius-2  ${
               globalEnvironment[0]?.id === activeTabId && "active"
             }`}
+            style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
             on:click={() => {
               onOpenGlobalEnvironment(globalEnvironment[0]);
             }}
           >
+            <span
+              class="icon-default"
+              style="width: 24px; height:24px; margin-right:4px;"
+            >
+            </span>
             <span class="icon-default">
-              <StackIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
+              <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
             </span>
-            <span class="icon-hover">
-              <StackFilled
-                height={"12px"}
-                width={"12px"}
-                color={"var(--icon-secondary-130)"}
-              />
+
+            <span
+              class="box-line1"
+              style="background-color: {isExpandEnviromentLine
+                ? 'var(--bg-ds-neutral-500)'
+                : 'var(--bg-ds-surface-100)'}"
+            ></span>
+            <span
+              class=""
+              style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
+              >{globalEnvironment[0]?.name}
             </span>
-            <span class="ms-1">{globalEnvironment[0]?.name}</span>
           </p>
         </div>
-        <hr class="mb-1 mt-1 ms-5 me-2" />
+        <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" />
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
         <div class={`pb-2 px-1`}>
@@ -242,53 +288,54 @@
             Add Environments in your Workspace for precise API testing with
             relevant resources and constraints.
           </p>
-          <button
+          <Button
+            title="Add Environment"
+            startIcon={AddRegular}
+            type="secondary"
+            size="small"
+            customWidth="100%"
             disabled={loggedUserRoleInWorkspace ===
               WorkspaceRole.WORKSPACE_VIEWER}
-            class="bg-transparent w-100 add-environment d-flex justify-content-center align-items-center border-radius-2"
-            style="color: var(--text-secondary-100);"
-            role="button"
-            on:click={() => {
+            onClick={() => {
               onCreateEnvironment(localEnvironment);
             }}
           >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--text-secondary-200)"}
-            />
-            <span
-              style="color: var(--text-secondary-200)"
-              class="ps-2 fw-bold text-fs-12">Add Environment</span
-            >
-          </button>
+            startIcon = {AddRegular}
+          </Button>
         </div>
       {/if}
 
-      {#if filteredLocalEnvironment?.length}
-        <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
-
-        <List
-          bind:scrollList
-          height={"auto"}
-          overflowY={"auto"}
-          classProps={"pe-0"}
-          style={"flex:1;"}
-        >
-          {#each filteredLocalEnvironment as env}
-            <ListItem
-              bind:loggedUserRoleInWorkspace
-              {env}
-              {currentWorkspace}
-              {onDeleteEnvironment}
-              {onUpdateEnvironment}
-              {onOpenEnvironment}
-              {onSelectEnvironment}
-              {activeTabId}
-            />
-          {/each}
-        </List>
-      {/if}
+      <div class="position-relative">
+        {#if filteredLocalEnvironment?.length}
+          <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
+          <div
+            class="box-line"
+            style="background-color: {isExpandEnviromentLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
+          <List
+            bind:scrollList
+            height={"auto"}
+            overflowY={"auto"}
+            classProps={"pe-0"}
+            style={"flex:1;"}
+          >
+            {#each filteredLocalEnvironment as env}
+              <ListItem
+                bind:loggedUserRoleInWorkspace
+                {env}
+                {currentWorkspace}
+                {onDeleteEnvironment}
+                {onUpdateEnvironment}
+                {onOpenEnvironment}
+                {onSelectEnvironment}
+                {activeTabId}
+              />
+            {/each}
+          </List>
+        {/if}
+      </div>
       {#if !filteredGlobalEnvironment?.length && !filteredLocalEnvironment?.length && searchData}
         <p
           class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
@@ -302,28 +349,81 @@
 </div>
 
 <style lang="scss">
+  .env-Global {
+    height: 32px;
+    background-color: transparent;
+    color: var(--text-ds-neutral-50);
+    border-radius: 2px;
+  }
+
+  .env-Global:hover {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400) !important;
+  }
+  .add-icon-container {
+    visibility: hidden;
+  }
+
+  .env-Global:focus-visible {
+    background-color: var(--bg-ds-surface-400) !important;
+    border-radius: 4px;
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  .env-Global:focus-visible .add-icon-container {
+    visibility: visible;
+  }
+  .env-Global:active {
+    background-color: var(--bg-ds-surface-500) !important;
+    border-radius: 4px;
+    color: var(--text-ds-neutral-50);
+  }
+  .env-Global:active .add-icon-container {
+    visibility: visible;
+  }
+  .env-sidebar:hover {
+    background-color: var(--bg-ds-surface-400) !important;
+    border-radius: 4px;
+    color: var(--text-ds-neutral-50);
+  }
+  .env-sidebar:hover .add-icon-container {
+    visibility: visible;
+  }
+  .env-sidebar:active {
+    background-color: var(--bg-ds-surface-500) !important;
+    border-radius: 4px;
+    color: var(--text-ds-neutral-50);
+  }
+  .env-sidebar:active .add-icon-container {
+    visibility: visible;
+  }
+  .env-sidebar:focus-visible {
+    background-color: var(--bg-ds-surface-400) !important;
+    border-radius: 4px;
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  .env-sidebar:focus-visible .add-icon-container {
+    visibility: visible;
+  }
   .icon-default {
     display: inline;
+    height: 24px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 4px;
   }
 
   .icon-hover {
     display: none;
-  }
-
-  .env-item:hover .icon-default {
-    display: none;
-  }
-
-  .env-item:hover .icon-hover {
-    display: inline;
-  }
-
-  .env-item.active .icon-default {
-    display: none;
-  }
-
-  .env-item.active .icon-hover {
-    display: inline;
+    height: 24px;
+    width: 30px;
+    align-items: center;
+    justify-content: center;
   }
 
   .environment-inactive {
@@ -355,13 +455,27 @@
     background: var(--workspace-hover-color);
   }
   .env-item {
-    padding: 6px 6px 6px 12px;
+    // gap: 4px;
   }
   .env-item:hover {
-    background-color: var(--bg-secondary-320);
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .env-item:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
   }
   .env-item.active {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+  .env-item.active:focus-visible {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
   }
 
   .env-side-tab-list {
@@ -398,5 +512,25 @@
   .add-environment:hover {
     border: 1px solid var(--border-primary-300);
     border-radius: 2px;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 14.6px;
+    width: 1px;
+    // background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    /* height: 100px; */
+  }
+  .box-line1 {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 14.6px;
+    width: 1px;
+    // background-color: var(--bg-ds-surface-100);
+    z-index: 10;
+    height: 45px;
   }
 </style>

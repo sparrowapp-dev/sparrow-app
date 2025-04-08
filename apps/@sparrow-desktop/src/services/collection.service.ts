@@ -2,6 +2,7 @@ import {
   connectSocketIo,
   disconnectSocketIo,
   getAuthHeaders,
+  makeHttpRequestV2,
   makeRequest,
   sendSocketIoMessage,
 } from "@app/containers/api/api.common";
@@ -16,7 +17,7 @@ import type {
   UpdateCollectionName,
 } from "@sparrow/common/dto";
 import { ContentTypeEnum } from "@sparrow/common/enums/request.enum";
-import { createApiRequest } from "./rest-api.service";
+
 import type {
   HttpClientBackendResponseInterface,
   HttpClientResponseInterface,
@@ -39,7 +40,13 @@ import type {
   GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
-import type { HttpRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+import type {
+  HttpRequestSavedCreateUpdateInFolderPayloadDtoInterface,
+  HttpRequestSavedCreateUpdatePayloadDtoInterface,
+  HttpRequestSavedDeletePayloadDtoInterface,
+  HttpRequestSavedUpdatePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/http-request-saved-dto";
 
 export class CollectionService {
   constructor() {}
@@ -266,16 +273,7 @@ export class CollectionService {
   };
 
   public validateImportCollectionURL = async (url = "") => {
-    return createApiRequest(
-      [
-        url,
-        `GET`,
-        `Accept[SPARROW_EQUALS]*/*[SPARROW_AMPERSAND]Connection[SPARROW_EQUALS]keep-alive`,
-        ``,
-        `TEXT`,
-      ],
-      ``,
-    );
+    return makeHttpRequestV2(url, 'GET', '[{"key":"Accept-Encoding","value":"gzip, br","checked":true},{"key":"User-Agent","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","checked":true},{"key":"Connection","value":"keep-alive","checked":true},{"key":"Accept","value":"*/*","checked":true}]', '', 'text/plain');
   };
 
   public importCollection = async (
@@ -497,7 +495,7 @@ export class CollectionService {
       variables?: string;
       headers?: GraphqlRequestKeyValueDtoInterface[];
       auth?: GraphqlRequestAuthDtoInterface;
-      selectedGraphqlAuthType: HttpRequestAuthModeBaseEnum;
+      selectedGraphqlAuthType: GraphqlRequestAuthModeBaseEnum;
     },
     _folderId?: string,
   ): Promise<
@@ -581,6 +579,58 @@ export class CollectionService {
       `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
       {
         body: _graphql,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public createSavedRequestInCollection = async (
+    _savedRequest: HttpRequestSavedCreateUpdatePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/collection/response`,
+      {
+        body: _savedRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateSavedRequestInCollection = async (
+    _savedRequestId: string,
+    _savedRequest: HttpRequestSavedUpdatePayloadDtoInterface,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      {
+        body: _savedRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteSavedRequestInCollection = async (
+    _savedRequestId: string,
+    _savedRequest: HttpRequestSavedDeletePayloadDtoInterface,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      {
+        body: _savedRequest,
         headers: getAuthHeaders(),
       },
     );

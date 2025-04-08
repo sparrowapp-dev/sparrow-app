@@ -6,7 +6,15 @@
     dot3Icon as threedotIcon,
     angleRightV2Icon as angleRight,
   } from "@sparrow/library/assets";
-  import { RequestIcon } from "@sparrow/library/icons";
+  import {
+    ArrowSwapRegular,
+    ChevronDownRegular,
+    ChevronRightRegular,
+    FolderOpenRegular,
+    FolderRegular,
+    MoreHorizontalRegular,
+    RequestIcon,
+  } from "@sparrow/library/icons";
 
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
@@ -33,7 +41,13 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { afterUpdate } from "svelte";
 
+  import {
+    openedComponent,
+    addCollectionItem,
+    removeCollectionItem,
+  } from "../../../../stores/recent-left-panel";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -97,15 +111,27 @@
   let requestIds: string[] = [];
   let folderTabWrapper: HTMLElement;
 
+  let verticalFolderLine = false;
+
+  $: {
+    if (explorer.type === "FOLDER") {
+      if (explorer.items.find((item) => item.id === activeTabId)) {
+        verticalFolderLine = true;
+      } else {
+        verticalFolderLine = false;
+      }
+    }
+  }
+
   $: {
     if (searchData) {
       expand = true;
     }
-    if (activeTabPath) {
-      if (activeTabPath?.folderId === explorer.id) {
-        expand = true;
-      }
-    }
+    // if (activeTabPath) {
+    // if (activeTabPath?.folderId === explorer.id) {
+    //   expand = true;
+    // }
+    // }
     if (explorer) {
       requestIds = [];
       requestCount = 0;
@@ -185,6 +211,12 @@
       inputField.blur();
     }
   };
+
+  $: {
+    if ($openedComponent.has(explorer.id)) {
+      expand = true;
+    }
+  }
 </script>
 
 <svelte:window
@@ -200,7 +232,7 @@
     isOpen={isFolderPopup}
     handleModalState={(flag = false) => (isFolderPopup = flag)}
   >
-    <div class="text-lightGray mb-1 sparrow-fs-14">
+    <div class="text-lightGray mb-1 text-ds-font-size-14">
       <p>
         Are you sure you want to delete this Folder? Everything in <span
           class="text-whiteColor fw-bold">"{explorer.name}"</span
@@ -208,17 +240,15 @@
         will be removed.
       </p>
     </div>
-    <div class="d-flex gap-3 sparrow-fs-12">
+    <div class="d-flex gap-3 text-ds-font-size-12">
       <div class="d-flex gap-1">
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
-      {#if !isWebApp}
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{graghQlCount}</span>
-          <p>GraphQL</p>
-        </div>
-      {/if}
+      <div class="d-flex gap-1">
+        <span class="text-plusButton">{graghQlCount}</span>
+        <p>GraphQL</p>
+      </div>
       <div class="d-flex gap-1">
         <span class="text-plusButton">{webSocketCount}</span>
         <p>WebSocket</p>
@@ -264,7 +294,7 @@
     </div></Modal
   >
 
-  {#if showMenu}
+  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
@@ -360,7 +390,7 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            (!isWebApp && !collection.activeSync) ||
+            !collection.activeSync ||
             (explorer?.source === "USER" && collection.activeSync)
               ? false
               : true,
@@ -385,15 +415,20 @@
   {#if explorer}
     {#if explorer.type === "FOLDER"}
       <div
+        tabindex="0"
         bind:this={folderTabWrapper}
-        style="height:32px;"
-        class="d-flex ps-3 align-items-center mb-1 justify-content-between my-button btn-primary {explorer.id ===
+        style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
+        activeTabId
+          ? '0px'
+          : '2px'} ; "
+        class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
           : ''}"
       >
         <button
-          style="padding-left: 30px;"
+          tabindex="-1"
+          style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
           on:click|preventDefault={() => {
@@ -401,50 +436,52 @@
               if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
                 expand = !expand;
                 if (expand) {
+                  addCollectionItem(explorer.id, "Folder");
                   onItemOpened("folder", {
                     workspaceId: collection.workspaceId,
                     collection,
                     folder: explorer,
                   });
+                } else {
+                  removeCollectionItem(explorer.id);
                 }
               }
             }
           }}
         >
-          <img
-            src={angleRight}
-            class="me-3"
-            style="height:8px; width:4px; margin-right:8px; {expand
-              ? 'transform:rotate(90deg);'
-              : 'transform:rotate(0deg);'}"
-            alt="angleRight"
-            on:click|stopPropagation={() => {
-              expand = !expand;
-            }}
-          />
+          <span on:click={() => {}} style="  display: flex; margin-right:4px; ">
+            <Button
+              startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+            />
+          </span>
+
           {#if expand}
             <div
-              style="height:16px; width:16px;"
-              class="d-flex align-items-center justify-content-center me-2"
+              style="height:24px; width:30px; padding:4px;"
+              class="d-flex align-items-center justify-content-end"
             >
-              <img src={folderOpenIcon} alt="" class="pe-0 folder-icon" />
+              <FolderOpenRegular
+                size={"16px"}
+                color="var(--icon-ds-neutral-300)"
+              />
             </div>
           {:else}
-            <div class="d-flex me-2" style="height:16px; width:16px;">
-              <img
-                src={folderCloseIcon}
-                alt=""
-                style="height:16px; width:16px;"
-                class="folder-icon"
-              />
+            <div
+              class="d-flex align-items-center justify-content-end"
+              style="height:24px; width:30px; padding:4px;"
+            >
+              <FolderRegular size={"16px"} color="var(--icon-ds-neutral-300)" />
             </div>
           {/if}
           {#if isRenaming}
             <input
-              class="py-0 renameInputFieldFolder w-100"
+              class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px;"
+              style=" padding-left:5px;  color : var(--text-ds-neutral-50); "
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -457,11 +494,18 @@
             <div
               class="folder-title d-flex align-items-center"
               style="cursor:pointer; font-size:12px;
-                      height: 36px;
+                      height: 32px;
                       font-weight:400;
-                      margin-left:0px"
+                      margin-left:0px;
+                      font-size:12px;
+                      color:var(--text-ds-neutral-50);
+                      line-height:18px;
+                      padding:2px 4px;
+                      "
             >
-              <p class="ellipsis mb-0" style="font-size: 12px;">
+              <p
+                class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+              >
                 {explorer.name}
               </p>
             </div>
@@ -477,23 +521,23 @@
             zIndex={701}
             distance={13}
           >
-            <button
-              class="add-icon-container border-0 rounded d-flex justify-content-center align-items-center"
-              on:click|preventDefault={() => {
-                expand = true;
-                onItemCreated("requestFolder", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                  folder: explorer,
-                });
-              }}
-            >
-              <RequestIcon
-                height="16px"
-                width="16px"
-                color="var(--white-color)"
+            <span class="threedot-icon-container d-flex">
+              <Button
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                startIcon={ArrowSwapRegular}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  expand = true;
+                  onItemCreated("requestFolder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                }}
               />
-            </button>
+            </span>
           </Tooltip>
 
           <Tooltip
@@ -503,21 +547,32 @@
             distance={17}
             show={!showMenu}
           >
-            <button
-              id={`show-more-folder-${explorer.id}`}
-              class="threedot-icon-container border-0 p-0 rounded d-flex justify-content-center align-items-center {showMenu
-                ? 'threedot-active'
-                : ''}"
-              style="transform: rotate(90deg);"
-              on:click={rightClickContextMenu}
-            >
-              <img src={threedotIcon} alt="threedotIcon" />
-            </button>
+            <span class="threedot-icon-container rounded d-flex">
+              <Button
+                id={`show-more-folder-${explorer.id}`}
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                startIcon={MoreHorizontalRegular}
+                onClick={rightClickContextMenu}
+              />
+            </span>
           </Tooltip>
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div class="sub-files">
+        <div
+          class="sub-files position-relative"
+          style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+        >
+          {#if explorer?.items?.length > 0}
+            <div
+              class="box-line"
+              style="background-color: {verticalFolderLine
+                ? 'var(--bg-ds-neutral-500)'
+                : 'var(--bg-ds-surface-100)'}"
+            ></div>
+          {/if}
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
@@ -536,7 +591,10 @@
             />
           {/each}
           {#if !explorer?.items?.length}
-            <p class="text-fs-10 ps-5 my-2 text-secondary-300">
+            <p
+              class="text-ds-font-size-12 my-2 text-secondary-300"
+              style="padding-left: 90px;"
+            >
               This folder is empty
             </p>
           {/if}
@@ -571,17 +629,20 @@
         </div>
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style="cursor:pointer;">
+      <div style={`cursor: pointer; `}>
         <Request
           {userRole}
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
+          {activeTabPath}
+          {searchData}
           {activeTabType}
           {folder}
           {collection}
           {activeTabId}
+          {isWebApp}
         />
       </div>
     {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
@@ -610,7 +671,7 @@
           {activeTabId}
         />
       </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL && !isWebApp}
+    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
       <div style="cursor:pointer;">
         <Graphql
           {userRole}
@@ -629,14 +690,20 @@
 
 <style>
   .btn-primary {
-    color: var(--white-color);
+    color: var(--bg-ds-neutral-50);
     padding-right: 5px;
     border-radius: 8px;
   }
 
   .btn-primary:hover {
-    background-color: var(--border-color);
-    color: var(--white-color);
+    background-color: var(--bg-ds-surface-500) !important;
+    color: var(--bg-ds-neutral-50);
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--bg-ds-surface-500);
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+    border-radius: 4px;
   }
   .list-icons {
     width: 16px;
@@ -697,11 +764,6 @@
     border-radius: 4px;
   }
 
-  .threedot-icon-container:hover {
-    background-color: var(--bg-tertiary-500) !important;
-    border-radius: 4px;
-  }
-
   .add-icon-container:hover {
     background-color: var(--bg-tertiary-500) !important;
     border-radius: 4px;
@@ -709,26 +771,57 @@
   }
 
   .btn-primary:hover {
-    border-radius: 2px;
-    background-color: var(--bg-tertiary-600);
-    color: var(--white-color);
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
   }
+
+  .btn-primary:hover .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:active {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-500);
+    color: var(--text-ds-neutral-50);
+  }
+  .btn-primary:active .threedot-icon-container {
+    visibility: visible;
+  }
+  .btn-primary:focus-visible {
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+    outline: none;
+    border: 2px solid var(--bg-ds-primary-300);
+  }
+  .btn-primary:focus-visible .threedot-icon-container {
+    visibility: visible;
+  }
+
   .renameInputFieldFolder {
+    height: 24px;
     border: none;
     background-color: transparent;
-    color: var(--white-color);
-    padding-left: 0;
+    color: var(--text-ds-neutral-50);
     outline: none;
-    border-radius: 2px !important;
+    border-radius: 4px !important;
+    padding: 4px 2px;
+    caret-color: var(--bg-ds-primary-300);
   }
   .renameInputFieldFolder:focus {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-primary-300) !important;
   }
-  .sub-files {
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 41.2px;
+    width: 1px;
+    z-index: 200;
   }
 
   .main-folder {
-    width: calc(100% - 48px);
+    width: calc(100% - 58px);
   }
   .active-folder-tab {
     background-color: var(--bg-tertiary-400) !important;
@@ -737,7 +830,7 @@
     border-radius: 2px;
   }
   .folder-title {
-    width: calc(100% - 40px);
+    width: calc(100% - 58px);
   }
   .folder-icon {
     width: 16px;

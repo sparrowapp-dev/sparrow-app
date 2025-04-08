@@ -1,9 +1,12 @@
 <script lang="ts">
   import { Collection, EmptyCollection, SearchTree } from "../components";
-  import { doubleAngleLeftIcon as doubleangleLeft } from "@sparrow/library/assets";
+  import {
+    angleDownIcon,
+    doubleAngleLeftIcon as doubleangleLeft,
+  } from "@sparrow/library/assets";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { List } from "@sparrow/library/ui";
+  import { Button, List } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -16,12 +19,21 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { onDestroy } from "svelte";
-  import { CollectionIcon } from "@sparrow/library/icons";
+  import { onDestroy, onMount } from "svelte";
+  import {
+    AddRegular,
+    AngleLeftIcon,
+    AngleRightIcon,
+    ChevronDownRegular,
+    ChevronRightRegular,
+    CollectionIcon,
+    StackRegular,
+  } from "@sparrow/library/icons";
   import { createDeepCopy } from "@sparrow/common/utils";
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import { isExpandCollection } from "../../../stores/recent-left-panel";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -72,13 +84,28 @@
 
   export let searchData: string = "";
 
-  export let isExpandCollection: boolean;
-
   export let toggleExpandCollection;
 
   export let isWebApp = false;
   export let activeTabType;
   export let isFirstCollectionExpand = false;
+
+  export let ActiveTab;
+  export let handleTabUpdate;
+
+  let isExpandCollectionLine = false;
+  // export let handleExpandCollectionLine;
+
+  $: {
+    if (activeTabType !== "Collection") {
+      handleTabUpdate("");
+    }
+    if (collectionFilter.find((item) => item?._data?.id === activeTabId)) {
+      isExpandCollectionLine = true;
+    } else {
+      isExpandCollectionLine = false;
+    }
+  }
 
   let collectionListDocument: CollectionDocument[];
 
@@ -91,6 +118,11 @@
   });
 
   let isHovered = false;
+  let collectionActive = false;
+
+  const handleCollection = () => {
+    collectionActive = false;
+  };
 
   let collectionFilter: any = [];
   /**
@@ -180,7 +212,8 @@
 
 <div
   style="height:100%; overflow:hidden"
-  class={`sidebar d-flex flex-column bg-secondary-900 scroll px-1`}
+  class={`sidebar d-flex flex-column  scroll px-1`}
+  id="collection-container"
 >
   <div
     class="d-flex justify-content-between align-items-center align-self-stretch px-0 pt-3 d-none"
@@ -206,37 +239,46 @@
     style="margin-top:5px; flex:1;"
   >
     <div
-      class="d-flex align-items-center pe-2 border-radius-2"
-      style="cursor:pointer; justify-content: space-between; height:32px;
-      background-color: {isHovered
-        ? 'var(--dropdown-option-hover)'
-        : 'transparent'};"
+      tabindex="0"
+      class="collection-container d-flex align-items-center pe-2 border-radius-2"
+      style="cursor:pointer; justify-content: space-between; height:32px; margin-bottom:0;"
       on:mouseover={handleMouseOver}
       on:mouseout={handleMouseOut}
-      on:click={toggleExpandCollection}
+      on:click={() => {
+        toggleExpandCollection();
+        handleTabUpdate("collection");
+      }}
     >
       <div
-        class="d-flex align-items-center ps-3 p-2"
-        style="width: calc(100% - 30px);"
+        class=" d-flex align-items-center"
+        style="width: calc(100% - 30px);  padding: 4px 2px; height:32px; "
       >
-        <img
-          src={angleRight}
-          class="me-3"
-          style="height:8px; width:4px; margin-right:8px; {isExpandCollection
-            ? 'transform:rotate(90deg);'
-            : 'transform:rotate(0deg);'}"
-          alt="angleRight"
-        />
+        <span style=" display: flex; margin-right:4px;">
+          <Button
+            size="extra-small"
+            type="teritiary-regular"
+            customWidth="24px"
+            startIcon={!$isExpandCollection
+              ? ChevronRightRegular
+              : ChevronDownRegular}
+          />
+        </span>
 
-        <CollectionIcon
-          height={"12px"}
-          width={"12px"}
-          color={"var(--icon-secondary-130)"}
-        />
-
-        <p class="ms-2 mb-0 sparrow-fs-13" style="font-weight: 500;">
-          Collections
-        </p>
+        <span
+          style="display: flex; align-items:center; justify-content:end; height:24px; width:30px; padding:4px; "
+        >
+          <StackRegular size="16px" color="var(--bg-ds-neutral-300)" />
+        </span>
+        <span
+          style="display: flex; height:24px; gap:4px; align-items:center; padding:2px 4px; "
+        >
+          <p
+            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-0"
+            style=" color:var(--text-ds-neutral-50); "
+          >
+            Collections
+          </p>
+        </span>
       </div>
 
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
@@ -247,34 +289,42 @@
           show={isHovered}
           zIndex={701}
         >
-          <button
-            style="height: 24px; width:24px;"
-            class="add-icon-container border-0 p-0 rounded-1 d-flex justify-content-center align-items-center {isHovered
-              ? 'collections-active'
-              : 'collections-inactive'}"
-            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-            on:click|stopPropagation={() => {
-              isExpandCollection = true;
-              isGuestUser
-                ? onItemCreated("collection", {
-                    workspaceId: currentWorkspaceId,
-                    collection: collectionList,
-                  })
-                : showImportCollectionPopup();
-            }}
-          >
-            <PlusIcon
-              height={"22px"}
-              width={"22px"}
-              color={"var(--white-color)"}
+          <span style="display:flex;" class="add-icon-container">
+            <Button
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+              startIcon={AddRegular}
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+              onClick={(e) => {
+                e.stopPropagation();
+                isExpandCollection.set(true);
+                isGuestUser
+                  ? onItemCreated("collection", {
+                      workspaceId: currentWorkspaceId,
+                      collection: collectionList,
+                    })
+                  : showImportCollectionPopup();
+              }}
             />
-          </button>
+          </span>
         </Tooltip>
       {/if}
     </div>
 
-    {#if isExpandCollection}
-      <div class="overflow-auto d-flex flex-column ms-2 me-0 pt-1 mb-2">
+    {#if $isExpandCollection}
+      <div
+        class="overflow-auto position-relative d-flex flex-column me-0 pt-1"
+        style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
+      >
+        {#if collectionListDocument?.length > 0 && searchData.length === 0}
+          <div
+            class="box-line"
+            style="background-color: {isExpandCollectionLine
+              ? 'var(--bg-ds-neutral-500)'
+              : 'var(--bg-ds-surface-100)'}"
+          ></div>
+        {/if}
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
             {#if collectionFilter.length > 0}
@@ -311,8 +361,8 @@
                 classProps={"pe-0"}
               >
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  class="mx-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular mb-0 text-center"
+                  style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
                   It seems we couldn't find the result matching your search
                   query.
@@ -338,10 +388,10 @@
                   {userRoleInWorkspace}
                   {activeTabPath}
                   {activeTabType}
-                  collection={col}
+                  collection={col?.toMutableJSON()}
                   {activeTabId}
-                  {isWebApp}
                   bind:isFirstCollectionExpand
+                  {isWebApp}
                 />
               {/each}
             </List>
@@ -364,8 +414,8 @@
 
           {#if searchData.length !== 0}
             <p
-              class="mx-1 text-fs-12 mb-0 text-center"
-              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              class="mx-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular mb-0 text-center"
+              style="color: var(--text-ds-neutral-400); letter-spacing: 0.5px;"
             >
               It seems we couldn't find the result matching your search query.
             </p>
@@ -377,6 +427,36 @@
 </div>
 
 <style>
+  .collection-container {
+    background-color: transparent;
+    margin-bottom: 2px;
+    border-radius: 2px;
+  }
+  .collection-container:hover {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+  .collection-container:hover .add-icon-container {
+    visibility: visible;
+  }
+  .collection-container:focus-visible {
+    background-color: var(--bg-ds-surface-500);
+    outline: none;
+    border-radius: 4px;
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  .collection-container.active {
+    background-color: var(--bg-ds-surface-500);
+  }
+  .collection-container:focus-visible .add-icon-container {
+    visibility: visible;
+  }
+  .add-icon-container {
+    visibility: hidden;
+  }
+  .add-icon-container:hover {
+    visibility: visible;
+  }
   .collections-inactive {
     visibility: hidden;
   }
@@ -472,15 +552,19 @@
     height: 70vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
-  .searchField {
-  }
-  .filter-btn {
     /* border: 1px solid var(--border-color) !important; */
   }
   .filter-active {
     background-color: var(--send-button) !important;
+  }
+  .box-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 13.6px;
+    width: 1px;
+    /* background-color: var(--bg-ds-surface-100); */
+    z-index: 10;
+    /* height: 100px; */
   }
 </style>
