@@ -57,7 +57,7 @@
       requestId: string,
       collectionId: string,
       method: string,
-      folderId?: string,
+      folderId: string,
     ) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
@@ -105,7 +105,7 @@
     folderId?: string,
   ) => {
     isRunTextVisible = true;
-
+    
     data.onOpenSaveNodeRequestModal(
       id,
       name,

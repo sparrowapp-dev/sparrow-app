@@ -25,6 +25,7 @@
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { testFlowDataStore } from "../../store";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
+  import { Loader } from "@sparrow/library/ui";
 
   export let selectedBlock;
   export let onClose;
@@ -37,6 +38,7 @@
   export let isWebApp = false;
   export let runSingleNode;
 
+  let responseLoader = false;
   let height = 300;
   let minHeight = 100;
   let isResizing = false;
@@ -129,8 +131,15 @@
     return responseNavigation;
   }
 
-  const handleClickTestButton = () => {
-    runSingleNode(selectedBlock?.id);
+  const handleClickTestButton = async () => {
+    try {
+      responseLoader = true;
+      await runSingleNode(selectedBlock?.id);
+    } catch (err) {
+      console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
+    } finally {
+      responseLoader = false;
+    }
   };
 
   $: {
@@ -138,16 +147,19 @@
       testFlowDataStore.subscribe((val) => {
         if (val) {
           testflowStore = val.get(selectedBlock?.data?.tabId);
-          selectedNodeResponse = testflowStore?.nodes.find(
+          const nodes = testflowStore?.nodes ?? [];
+          const hasEmptyResponseStatus = nodes.some(
+            (node) => !node.response?.status || node.response?.status === "",
+          );
+          const nodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
 
-          // requestNavigation = "Parameters"
-          // Reset the response format
-          // responseState = {
-          //   responseBodyLanguage: "JSON",
-          //   responseBodyFormatter: "Pretty",
-          // };
+          if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
+            selectedNodeResponse = undefined;
+          } else {
+            selectedNodeResponse = nodeResponse;
+          }
         }
       });
     }
@@ -305,9 +317,12 @@
             class="h-100 d-flex flex-column position-relative"
             style="overflow:auto; flex:1;"
           >
-            {#if selectedNodeResponse?.response?.status === ResponseStatusCode.ERROR}
+            {#if responseLoader}
+              <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+            {/if}
+            {#if !responseLoader && selectedNodeResponse?.response?.status === ResponseStatusCode.ERROR}
               <ResponseErrorScreen />
-            {:else if selectedNodeResponse?.response?.status}
+            {:else if !responseLoader && selectedNodeResponse?.response?.status}
               <div
                 class="d-flex flex-column"
                 style="height: 100%; padding-bottom: 12px;"

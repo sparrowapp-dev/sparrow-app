@@ -186,6 +186,8 @@
       collectionId,
       requestId,
       folderId,
+      id,
+      $tab?.tabId,
     );
 
     if (requestData?.request) {
@@ -410,13 +412,28 @@
   const handleCreateCustomRequest = async () => {
     try {
       isCreatingCustomRequest = true;
-      await updateSelectedAPI(
+      const isExist = await checkRequestExistInNode(
+        selectedBlock?.data?.tabId,
         selectedNodeId,
-        customRequestName,
-        uuidv4(),
-        "",
-        customHTTPRequestMethod,
       );
+
+      updateNodeId = selectedNodeId;
+      updateNodeName = customRequestName;
+      updateNodeRequestId = uuidv4();
+      updateNodeCollectionId = "";
+      updateNodeMethod = customHTTPRequestMethod;
+
+      if (isExist) {
+        isSaveNodeModalOpen = true;
+      } else {
+        await updateSelectedAPI(
+          selectedNodeId,
+          customRequestName,
+          uuidv4(),
+          "",
+          customHTTPRequestMethod,
+        );
+      }
       isAddCustomRequestModalOpen = false;
     } catch (error) {
       console.error("Error creating custom request:", error);
@@ -471,7 +488,7 @@
     requestId: string,
     collectionId: string,
     method: string,
-    folderId?: string,
+    folderId: string,
   ) => {
     const isExist = await checkRequestExistInNode(tabId, nodeId);
 
@@ -573,8 +590,9 @@
               requestId: string,
               collectionId: string,
               method: string,
-              folderId?: string,
+              folderId: string,
             ) {
+              debugger;
               handleOpenSaveNodeRequestModal(
                 $tab?.tabId,
                 nodeId,
@@ -666,8 +684,9 @@
               requestId: string,
               collectionId: string,
               method: string,
-              folderId?: string,
+              folderId: string,
             ) {
+              debugger;
               handleOpenSaveNodeRequestModal(
                 $tab?.tabId,
                 nodeId,
@@ -1125,7 +1144,8 @@
       </div>
     {/if}
   </div>
-  {#if selectedBlock}
+  <!-- Open the bottom panel when it contains the data -->
+  {#if selectedBlock && selectedBlock?.data?.requestId}
     <div style=" background-color: transparent; margin: 0px 13px 7px 13px;">
       <TestFlowBottomPanel
         {selectedBlock}

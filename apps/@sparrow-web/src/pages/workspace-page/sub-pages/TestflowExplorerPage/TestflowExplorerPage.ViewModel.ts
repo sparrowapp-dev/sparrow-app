@@ -631,6 +631,24 @@ export class TestflowExplorerPageViewModel {
 
     if (node && node?.type !== "requestBlock") return;
 
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(tab.tabId);
+      if (wsData) {
+        wsData.nodes = [];
+        wsData.isTestFlowRunning = false;
+      } else {
+        wsData = {
+          nodes: [],
+          history: [],
+          isRunHistoryEnable: false,
+          isTestFlowRunning: false,
+          isTestFlowSaveInProgress: false,
+        };
+      }
+      testFlowDataMap.set(tab.tabId, wsData);
+      return testFlowDataMap;
+    });
+
     // Read the API request data
     const requestData = await this.collectionRepository.readRequestInTab(
       tab.tabId,
@@ -1052,8 +1070,17 @@ export class TestflowExplorerPageViewModel {
     collectionId: string,
     requestId: string,
     folderId: string,
+    nodeId?: string,
+    tabId?: string,
   ) => {
     let request;
+    if (!collectionId) {
+      request = await this.collectionRepository.readRequestDataInNode(
+        tabId,
+        nodeId,
+      );
+      return request;
+    }
     if (folderId) {
       request = await this.collectionRepository.readRequestInFolder(
         collectionId,
