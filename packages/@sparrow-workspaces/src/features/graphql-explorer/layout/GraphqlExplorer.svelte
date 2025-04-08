@@ -178,10 +178,7 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div
-      class="w-100 d-flex flex-column h-100 pb-2"
-      style="padding-top: 24px; padding-right:12px; padding-left:12px"
-    >
+    <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
       <!-- 
         --

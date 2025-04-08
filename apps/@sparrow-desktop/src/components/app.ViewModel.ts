@@ -4,18 +4,14 @@ import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-p
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Modal } from "@sparrow/library/ui";
 import { userValidationStore } from "@app/store/deviceSync.store";
 import { getAuthJwt, jwtDecode } from "../utils/jwt";
 import constants from "@app/constants/constants";
 import { EnvironmentRepository } from "../repositories/environment.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
-import { EnvironmentService } from "../services/environment.service";
-import { InitTab } from "@sparrow/common/factory";
 import { GuestUserRepository } from "../repositories/guest-user.repository";
 import { TabRepository } from "../repositories/tab.repository";
 import { navigate } from "svelte-navigator";
-import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { platform } from "@tauri-apps/plugin-os";
 import { v4 as uuidv4 } from "uuid";
 import { isGuestUserActive } from "@app/store/auth.store";
@@ -23,18 +19,11 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { GuideRepository } from "@app/repositories/guide.repository";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 interface DeepLinkHandlerWindowsPayload {
   payload: {
     url: string;
   };
-}
-
-interface JwtPayload {
-  _id: string;
-  email: string;
-  name: string;
-  exp: number;
-  iat: number;
 }
 
 export class AppViewModel {
@@ -52,10 +41,8 @@ export class AppViewModel {
       console.error("workspace doesn't exist to switch!");
       return;
     }
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateId(id);
-    initWorkspaceTab.updateName(res.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("collections");
   };

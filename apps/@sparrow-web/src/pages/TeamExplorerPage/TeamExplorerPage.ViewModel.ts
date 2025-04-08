@@ -14,12 +14,12 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { TeamService } from "../../services/team.service";
 import { UserService } from "../../services/user.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { InitWorkspaceTab, Sleep } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
 import { getClientUser } from "../../utils/jwt";
+import { WorkspaceTabAdapter } from "src/adapter";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -296,9 +296,8 @@ export class TeamExplorerPageViewModel {
         await this.refreshWorkspaces(clientUserId);
       }
 
-      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
-      initWorkspaceTab.updateName(res.name);
-      await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(res._id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       // this will be removed when we unlock collection in web app.
       navigate("collections");
@@ -341,13 +340,11 @@ export class TeamExplorerPageViewModel {
       await this.handleDisableWorkspaceInviteTag(id);
     }
     const res = await this.workspaceRepository.readWorkspace(id);
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateId(id);
-    initWorkspaceTab.updateName(res.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     // Disabling the switching of workspace in web
-    navigate("/app/collections");
+    navigate("collections");
   };
 
   /**
