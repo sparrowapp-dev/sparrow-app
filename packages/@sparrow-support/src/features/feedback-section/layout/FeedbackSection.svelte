@@ -467,7 +467,7 @@
         <div>
           <SortIcon width={"12px"} height={"8px"} />
           <span
-            class="text-fs-13"
+            class="text-ds-font-size-14"
             style="padding-left: 8px; padding-top:4px ; font-weight:500;"
           >
             Sort By</span
@@ -498,7 +498,7 @@
             class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <div><span class="text-fs-13">Trending</span></div>
+            <div><span class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130">Trending</span></div>
             {#if currentSort === "trending"}
               <div class="d-flex align-items-center">
                 <TickIcon
@@ -531,7 +531,7 @@
             class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <span class="text-fs-13">New</span>
+            <span class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130">New</span>
             {#if currentSort === "newest"}
               <div class="d-flex align-items-center">
                 <TickIcon
@@ -564,7 +564,7 @@
             class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "score"}
           >
-            <span class="text-fs-13">Top</span>
+            <span class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130">Top</span>
             {#if currentSort === "score"}
               <div class="d-flex align-items-center">
                 <TickIcon
@@ -593,7 +593,7 @@
               >
                 <div style="flex: 1;">
                   <div
-                    class="title"
+                    class="title text-ds-font-size-18 text-ds-font-weight-medium"
                     on:click={async () => {
                       postId = post?.id;
                       isPostopen = true;
@@ -631,7 +631,7 @@
 
               <div style="margin-top: 10px; flex: 1;">
                 <p
-                  class="text-fs-14"
+                  class="text-ds-font-size-14"
                   style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
                 >
                   {post?.details}
@@ -648,7 +648,7 @@
                     color={"var(--icon-secondary-950)"}
                   />
                 </span>
-                <span style=" font-size: 13px;">{post?.commentCount}</span>
+                <span style="font-size: 13px;">{post?.commentCount}</span>
               </div>
             </div>
           {/each}
@@ -656,7 +656,7 @@
       {:else}
         <div class="w-100">
           <p
-            class=" text-fs-12 mb-0 text-center"
+            class="text-ds-font-size-12 mb-0 text-center"
             style="  margin-top:45px; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
           >
             No result found.
@@ -711,8 +711,6 @@
     box-shadow: none;
   }
   .title {
-    font-size: 18px;
-    font-weight: 500;
     margin-bottom: 5px;
     color: var(--text-secondary-100);
   }

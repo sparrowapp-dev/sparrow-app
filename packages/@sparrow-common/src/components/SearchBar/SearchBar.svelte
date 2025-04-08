@@ -27,10 +27,9 @@
         class="image-container-img"
       />
     </div>
-
     <input
       type="text"
-      class="input"
+      class="input text-ds-font-weight-regular text-ds-font-size-12 text-ds-line-height-150"
       {placeholder}
       bind:value={searchQuery}
       maxlength="0"
@@ -71,10 +70,7 @@
     border: none;
     outline: none;
     color: var(--text-ds-neutral-400);
-    font:
-      400 12px Inter,
-      sans-serif;
-    line-height: 18px;
+    font: Inter,sans-serif;
     background: transparent;
     width: 90px;
     height: 16px;
