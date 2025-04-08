@@ -10,7 +10,6 @@
   import HttpUrlSection from "../../features/testflow-explorer/components/http-url-section/HttpUrlSection.svelte";
 
   export let selectedBlock;
-  export let onClose;
   export let onRedirect;
   export let handleUpdateRequestData;
   export let showRedirectButton = false;
@@ -18,6 +17,7 @@
   export let environmentVariables;
   export let userRole;
   export let onUpdateEnvironment;
+  export let handleClickTestButton;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -81,7 +81,7 @@
     title={"Test"}
     textClassProp={"fs-6"}
     type={"primary"}
-    onClick={() => {}}
+    onClick={handleClickTestButton}
     loader={false}
   />
 

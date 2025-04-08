@@ -109,29 +109,27 @@
     }
   });
 
-  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
-    (_workspace) => {
-      const workspaceDoc = _workspace?.toMutableJSON();
+  const activeWorkspaceSubscriber = activeWorkspace.subscribe((_workspace) => {
+    const workspaceDoc = _workspace?.toMutableJSON();
 
-      if (workspaceDoc) {
-        currentWorkspace = _workspace;
-        currentWorkspaceId = _workspace.get("_id");
-        environmentId = _workspace.get("environmentId");
-      }
+    if (workspaceDoc) {
+      currentWorkspace = _workspace;
+      currentWorkspaceId = _workspace.get("_id");
+      environmentId = _workspace.get("environmentId");
+    }
 
-      if (workspaceDoc) {
-        workspaceDoc.users?.forEach((_user) => {
-          if (_user.id === userId) {
-            if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
-              isTestflowEditable = true;
-            } else {
-              isTestflowEditable = false;
-            }
+    if (workspaceDoc) {
+      workspaceDoc.users?.forEach((_user) => {
+        if (_user.id === userId) {
+          if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
+            isTestflowEditable = true;
+          } else {
+            isTestflowEditable = false;
           }
-        });
-      }
-    },
-  );
+        }
+      });
+    }
+  });
 
   /**
    * Find the role of user in active workspace
@@ -199,5 +197,6 @@
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
+    runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
   />
 {/if}

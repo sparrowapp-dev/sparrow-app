@@ -37,8 +37,6 @@
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import {
-    DropButton,
-    TableNavbar,
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
@@ -99,6 +97,7 @@
   export let checkRequestExistInNode;
   export let userRole;
   export let onUpdateEnvironment;
+  export let runSingleNode;
 
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
@@ -1138,6 +1137,7 @@
         onClearResponse={() => {}}
         {userRole}
         {onUpdateEnvironment}
+        {runSingleNode}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}

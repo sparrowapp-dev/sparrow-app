@@ -35,6 +35,7 @@
   export let onUpdateEnvironment;
   export let userRole;
   export let isWebApp = false;
+  export let runSingleNode;
 
   let height = 300;
   let minHeight = 100;
@@ -128,6 +129,10 @@
     return responseNavigation;
   }
 
+  const handleClickTestButton = () => {
+    runSingleNode(selectedBlock?.id);
+  };
+
   $: {
     if (selectedBlock && testFlowDataStore) {
       testFlowDataStore.subscribe((val) => {
@@ -136,7 +141,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-          
+
           // requestNavigation = "Parameters"
           // Reset the response format
           // responseState = {
@@ -209,7 +214,6 @@
 
     <TableNavbar
       {selectedBlock}
-      {onClose}
       onRedirect={handleRedirect}
       {handleUpdateRequestData}
       showRedirectButton={!!selectedBlock?.data?.collectionId &&
@@ -218,6 +222,7 @@
       {environmentVariables}
       {userRole}
       {onUpdateEnvironment}
+      {handleClickTestButton}
     />
   </div>
 

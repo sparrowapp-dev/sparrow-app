@@ -55,6 +55,7 @@ import {
 } from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
+import type { EnvironmentDocType } from "@app/models/environment.model";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -606,6 +607,116 @@ export class TestflowExplorerPageViewModel {
         `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
       );
     }
+  };
+
+  /**
+   * Runs a single test flow node and updates the testFlowDataStore
+   * @param nodeId - The id of the node to be executed
+   */
+  public handleSingleTestFlowNodeRun = async (nodeId: string) => {
+    const tab = createDeepCopy(this._tab.getValue());
+    const environments = await this.getActiveEnvironments(tab.path.workspaceId);
+
+    const node = tab?.property?.testflow?.nodes.find(
+      (item) => item.id === nodeId,
+    );
+
+    if (node && node?.type !== "requestBlock") return;
+
+    // Read the API request data
+    const requestData = await this.collectionRepository.readRequestInTab(
+      tab.tabId,
+      node.data.requestId,
+    );
+
+    const request = transformRequestData(requestData);
+    const requestTabAdapter = new RequestTabAdapter();
+
+    const adaptedRequest: Tab = requestTabAdapter.adapt(
+      tab.path.workspaceId ?? "",
+      node?.data?.collectionId ?? "",
+      node?.data?.folderId ?? "",
+      request,
+    );
+
+    const collectionAuth = extractAuthData(request);
+    const decodeData = this._decodeRequest.init(
+      adaptedRequest.property.request,
+      environments?.filtered || [],
+      collectionAuth,
+    );
+
+    const start = Date.now();
+    let resData: TFHistoryAPIResponseStoreType;
+    let status: string;
+    let duration = 0;
+
+    try {
+      const response = await makeHttpRequestV2(
+        decodeData[0],
+        decodeData[1],
+        decodeData[2],
+        decodeData[3],
+        decodeData[4],
+      );
+      const end = Date.now();
+      duration = end - start;
+
+      if (response.isSuccessful) {
+        const byteLength = new TextEncoder().encode(
+          JSON.stringify(response),
+        ).length;
+        const responseSizeKB = byteLength / 1024;
+        const responseData: TFAPIResponseType = response.data;
+        const formattedHeaders = Object.entries(
+          responseData?.headers || {},
+        ).map(([key, value]) => ({ key, value })) as TFKeyValueStoreType[];
+
+        resData = {
+          body: responseData.body,
+          headers: formattedHeaders,
+          status: responseData.status,
+          time: duration,
+          size: responseSizeKB,
+          responseContentType:
+            this._decodeRequest.setResponseContentType(formattedHeaders),
+        };
+      } else {
+        resData = {
+          body: "",
+          headers: [],
+          status: ResponseStatusCode.ERROR,
+          time: duration,
+          size: 0,
+        };
+      }
+      status = resData.status;
+    } catch (error) {
+      resData = {
+        body: "",
+        headers: [],
+        status: ResponseStatusCode.ERROR,
+        time: 0,
+        size: 0,
+      };
+      status = ResponseStatusCode.ERROR;
+    }
+
+    // Update testFlowDataStore with this single result
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(tab.tabId);
+      if (wsData) {
+        const updatedNodes = wsData.nodes.filter((n) => n.id !== node.id);
+        updatedNodes.push({
+          id: node.id,
+          response: resData,
+          request: adaptedRequest,
+        });
+        wsData.nodes = updatedNodes;
+        testFlowDataMap.set(tab.tabId, wsData);
+      }
+      return testFlowDataMap;
+    });
   };
 
   /**
