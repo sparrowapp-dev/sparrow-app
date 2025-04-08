@@ -136,7 +136,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-          
+
           // requestNavigation = "Parameters"
           // Reset the response format
           // responseState = {
@@ -170,7 +170,7 @@
       style={`border: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; border-bottom: none;`}
     >
       <div style="display: flex; flex-direction: row;">
-        {#if !selectedNodeResponse}
+        {#if !selectedNodeResponse || selectedNodeResponse?.response?.status === ""}
           <ArrowSwapRegular
             size={"16px"}
             color={"var(--icon-ds-neutral-200)"}
@@ -282,7 +282,7 @@
     <!-- Response Pane -->
     <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
       <div class="response-pane-container">
-        {#if selectedNodeResponse === undefined}
+        {#if selectedNodeResponse === undefined || selectedNodeResponse?.response?.status === ""}
           <div class="dumy-response-container">
             <SparrowLogo />
             <div class="response-text-container">

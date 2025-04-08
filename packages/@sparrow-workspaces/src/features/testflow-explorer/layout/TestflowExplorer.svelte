@@ -503,6 +503,7 @@
    */
   const createNewNode = async (_id: string, _requestData = undefined) => {
     if (!_id) return;
+    console.log("--------main-request", _requestData);
 
     // handles run from from start button click
     if (_id === "0") {
