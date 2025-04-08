@@ -104,6 +104,10 @@ export class TestflowExplorerPageViewModel {
     return this.workspaceRepository.getActiveWorkspace();
   }
 
+  public get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
+
   /**
    * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
@@ -917,5 +921,304 @@ export class TestflowExplorerPageViewModel {
       return testFlowDataMap;
     });
     notifications.success(`Cleared all Responses for testflow.`);
+  };
+
+  /**
+   * @description - Fetches request data based on collection, request, and folder IDs.
+   * @param {string} collectionId - The ID of the collection containing the request.
+   * @param {string} requestId - The ID of the specific request to retrieve.
+   * @param {string} folderId - The ID of the folder containing the request.
+   * @returns {Promise<any>} - Returns the request data asynchronously.
+   */
+  public getRequestdata = async (
+    collectionId: string,
+    requestId: string,
+    folderId: string,
+  ) => {
+    let request;
+    if (folderId) {
+      request = await this.collectionRepository.readRequestInFolder(
+        collectionId,
+        folderId,
+        requestId,
+      );
+      return request;
+    } else {
+      request = await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        requestId,
+      );
+      return request;
+    }
+  };
+
+  /**
+   * @description
+   * Read an API request data within a tab.
+   */
+  public getRequestDataFromTab = async (tabId: string, requestId: string) => {
+    let request = await this.collectionRepository.readRequestInTab(
+      tabId,
+      requestId,
+    );
+    return request;
+  };
+
+  /**
+   * @description
+   * Read an API request data within a node.
+   */
+  public checkRequestExistInNode = async (tabId: string, nodeId: string) => {
+    let request = await this.collectionRepository.readRequestExistInNode(
+      tabId,
+      nodeId,
+    );
+    return request;
+  };
+
+  /**
+   * @description
+   * Update a block data.
+   */
+  public updateBlockData = async (
+    tabId: string,
+    nodeId: string,
+    requestData: object,
+  ) => {
+    await this.collectionRepository.updateBlockData(tabId, nodeId, requestData);
+  };
+
+  /**
+   *
+   * @param  - response state
+   */
+  public updateResponseState = async (key, val) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (key === "responseNavigation") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.navigation = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyLanguage") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyLanguage = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyFormatter") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyFormatter = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    }
+  };
+
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  /**
+   *
+   * @param isGlobalVariable - defines to save local or global
+   * @param environmentVariables - pre existing environment data
+   * @param newVariableObj - new entry to be extended
+   * @returns
+   */
+  public updateEnvironment = async (
+    isGlobalVariable: boolean,
+    environmentVariables,
+    newVariableObj: KeyValue,
+  ) => {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGlobalVariable) {
+      // api payload
+      let payload = {
+        name: environmentVariables.global.name,
+        variable: [
+          ...environmentVariables.global.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+
+      if (isGuestUser === true) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          environmentVariables.global.id,
+          payload,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          environmentVariables.global.id,
+        );
+        if (currentTab) {
+          let currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+        return {
+          isSuccessful: true,
+        };
+      }
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path.workspaceId,
+        environmentVariables.global.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          response.data.data._id,
+        );
+
+        if (currentTab) {
+          let currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+      } else {
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
+      }
+      return response;
+    } else {
+      // api payload
+      const payload = {
+        name: environmentVariables.local.name,
+        variable: [
+          ...environmentVariables.local.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      if (isGuestUser) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          environmentVariables.local.id,
+          payload,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          environmentVariables.local.id,
+        );
+
+        if (currentTab) {
+          let currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+        return {
+          isSuccessful: true,
+        };
+      }
+      // api response
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path.workspaceId,
+        environmentVariables.local.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          response.data.data._id,
+        );
+        if (currentTab) {
+          const currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+      } else {
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
+      }
+      return response;
+    }
   };
 }

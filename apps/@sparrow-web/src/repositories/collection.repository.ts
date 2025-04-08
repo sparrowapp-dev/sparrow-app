@@ -825,4 +825,86 @@ export class CollectionRepository {
   public getCollectionDocs = (): CollectionDocument[] => {
     return RxDB.getInstance().rxdb?.collection.find().exec();
   };
+
+  /**
+   * @description
+   * Read an API request within a tab.
+   */
+  public readRequestInTab = async (tabId: string, requestId: string) => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return undefined;
+
+    return tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.find(
+        (element) => element.data.requestId === requestId,
+      );
+  };
+
+  /**
+   * @description
+   * Check if an API request exists within a node.
+   */
+  public readRequestExistInNode = async (
+    tabId: string,
+    nodeId: string,
+  ): Promise<boolean> => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return false;
+
+    const nodeExists = tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.some(
+        (element) =>
+          element.id === nodeId && element?.data?.requestData?.url !== "",
+      );
+
+    return nodeExists;
+  };
+
+  /**
+   * @description
+   * Updates a block data.
+   */
+  public updateBlockData = async (
+    tabId: string,
+    nodeId: string,
+    requestData: object,
+  ): Promise<void> => {
+    console.log("inside repo", tabId, nodeId, requestData);
+    try {
+      const tabData = await RxDB.getInstance()
+        .rxdb.tab.findOne({ selector: { tabId } })
+        .exec();
+
+      if (!tabData) return;
+
+      const tabJson = tabData.toJSON();
+      const nodes = tabJson?.property?.testflow?.nodes ?? [];
+
+      // Find the node and update the entire node object
+      const updatedNodes = nodes.map((node) =>
+        node.id === nodeId ? { ...node, ...requestData } : node,
+      );
+
+      // Update the database
+      await tabData.patch({
+        property: {
+          ...tabJson.property,
+          testflow: {
+            ...tabJson.property?.testflow,
+            nodes: updatedNodes,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error updating block data:", error);
+    }
+  };
 }

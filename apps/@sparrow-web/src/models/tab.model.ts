@@ -88,19 +88,47 @@ const stateItems = {
   requestExtensionNavigation: {
     type: "string",
   },
-  requestLeftSplitterWidthPercentage: "number",
-  requestRightSplitterWidthPercentage: "number",
-  isExposeEditDescription: "boolean",
-  isSendRequestInProgress: "boolean",
-  isSaveDescriptionInProgress: "boolean",
-  isSaveRequestInProgress: "boolean",
-  isParameterBulkEditActive: "boolean",
-  isHeaderBulkEditActive: "boolean",
-  isChatbotActive: "boolean",
-  isChatbotSuggestionsActive: "boolean",
-  isChatbotGeneratingResponse: "boolean",
-  isDocGenerating: "boolean",
-  isDocAlreadyGenerated: "boolean",
+  requestLeftSplitterWidthPercentage: {
+    type: "number",
+  },
+  requestRightSplitterWidthPercentage: {
+    type: "number",
+  },
+  isExposeEditDescription: {
+    type: "boolean",
+  },
+  isSendRequestInProgress: {
+    type: "boolean",
+    default: false,
+  },
+  isSaveDescriptionInProgress: {
+    type: "boolean",
+    default: false,
+  },
+  isSaveRequestInProgress: {
+    type: "boolean",
+  },
+  isParameterBulkEditActive: {
+    type: "boolean",
+  },
+  isHeaderBulkEditActive: {
+    type: "boolean",
+  },
+  isChatbotActive: {
+    type: "boolean",
+  },
+  isChatbotSuggestionsActive: {
+    type: "boolean",
+  },
+  isChatbotGeneratingResponse: {
+    type: "boolean",
+  },
+  isDocAlreadyGenerated: {
+    type: "boolean",
+  },
+  isDocGenerating: {
+    type: "boolean",
+  },
 };
 
 const params = {
