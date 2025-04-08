@@ -55,7 +55,7 @@ import {
 } from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
-let count = 0;
+
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();

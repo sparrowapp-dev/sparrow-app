@@ -50,6 +50,12 @@ import {
   CollectionAuthTypeBaseEnum,
   CollectionRequestAddToBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
+import {
+  transformRequestData,
+  extractAuthData,
+} from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
+import { isGuestUserActive } from "src/store/auth.store";
+import { EnvironmentService } from "@app/services/environment.service";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -62,6 +68,7 @@ export class TestflowExplorerPageViewModel {
   private guestUserRepository = new GuestUserRepository();
   private testflowService = new TestflowService();
   private compareArray = new CompareArray();
+  private environmentService = new EnvironmentService();
   /**
    * Utils
    */
@@ -117,13 +124,17 @@ export class TestflowExplorerPageViewModel {
     const nodes = _nodes.map((elem) => {
       return {
         id: elem.id,
+        blockName: elem.blockName,
         type: elem.type,
         data: {
           name: elem.data.name, // not required to save in db
           requestId: elem.data.requestId,
+          workspaceId: elem.data.workspaceId,
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
           method: elem.data.method, // not required to save in db
+          requestData: elem.data.requestData,
+          isDeleted: elem.data.isDeleted,
         },
         position: { x: elem.position.x, y: elem.position.y },
       };
@@ -374,6 +385,7 @@ export class TestflowExplorerPageViewModel {
     }
     return collectionAuth;
   };
+
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -420,164 +432,153 @@ export class TestflowExplorerPageViewModel {
 
     // Sequential execution
     for (const element of nodes) {
-      if (
-        element?.type === "requestBlock" &&
-        element?.data?.collectionId?.length > 0
-      ) {
-        let request;
-        if (element?.data?.folderId?.length > 0) {
-          request = await this.collectionRepository.readRequestInFolder(
-            element.data.collectionId,
-            element.data.folderId,
-            element.data.requestId,
+      if (element?.type === "requestBlock") {
+        // Read the API request data from the tab
+        const requestData = await this.collectionRepository.readRequestInTab(
+          progressiveTab.tabId,
+          element.data.requestId,
+        );
+
+        const request = transformRequestData(requestData);
+
+        const requestTabAdapter = new RequestTabAdapter();
+        const adaptedRequest: Tab = requestTabAdapter.adapt(
+          progressiveTab.path.workspaceId ?? "",
+          element?.data?.collectionId ?? "",
+          element?.data?.folderId ?? "",
+          request,
+        );
+
+        // Extract the auth data from the API request
+        const collectionAuth = extractAuthData(request);
+
+        const decodeData = this._decodeRequest.init(
+          adaptedRequest.property.request,
+          environments?.filtered || [],
+          collectionAuth,
+        );
+        const start = Date.now();
+
+        try {
+          const response = await makeHttpRequestV2(
+            decodeData[0],
+            decodeData[1],
+            decodeData[2],
+            decodeData[3],
+            decodeData[4],
+            selectedAgent,
           );
-        } else {
-          request =
-            await this.collectionRepository.readRequestOrFolderInCollection(
-              element.data.collectionId,
-              element.data.requestId,
+          const end = Date.now();
+          const duration = end - start;
+
+          testFlowDataStore.update((testFlowDataMap) => {
+            const existingTestFlowData = testFlowDataMap.get(
+              progressiveTab.tabId,
             );
-        }
+            if (existingTestFlowData) {
+              let resData: TFHistoryAPIResponseStoreType;
+              if (response.isSuccessful) {
+                const byteLength = new TextEncoder().encode(
+                  JSON.stringify(response),
+                ).length;
+                const responseSizeKB = byteLength / 1024;
+                const responseData: TFAPIResponseType = response.data;
+                const responseBody = responseData.body;
+                const formattedHeaders = Object.entries(
+                  response?.data?.headers || {},
+                ).map(([key, value]) => ({
+                  key,
+                  value,
+                })) as TFKeyValueStoreType[];
+                const responseStatus = response?.data?.status;
+                resData = {
+                  body: responseBody,
+                  headers: formattedHeaders,
+                  status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
+                  responseContentType:
+                    this._decodeRequest.setResponseContentType(
+                      formattedHeaders,
+                    ),
+                };
 
-        if (request) {
-          const requestTabAdapter = new RequestTabAdapter();
-          const adaptedRequest = requestTabAdapter.adapt(
-            progressiveTab.path.workspaceId,
-            element.data.collectionId,
-            element.data.folderId,
-            request,
-          );
-          const collectionAuth = await this.fetchCollectionAuth(
-            element.data.collectionId,
-          );
-          const decodeData = this._decodeRequest.init(
-            adaptedRequest.property.request,
-            environments?.filtered,
-            collectionAuth,
-          );
-          const start = Date.now();
-
-          try {
-            const response = await makeHttpRequestV2(
-              decodeData[0],
-              decodeData[1],
-              decodeData[2],
-              decodeData[3],
-              decodeData[4],
-              selectedAgent,
-            );
-            const end = Date.now();
-            const duration = end - start;
-
-            testFlowDataStore.update((testFlowDataMap) => {
-              const existingTestFlowData = testFlowDataMap.get(
-                progressiveTab.tabId,
-              );
-              if (existingTestFlowData) {
-                let resData: TFHistoryAPIResponseStoreType;
-                if (response.isSuccessful) {
-                  const byteLength = new TextEncoder().encode(
-                    JSON.stringify(response),
-                  ).length;
-                  const responseSizeKB = byteLength / 1024;
-                  const responseData: TFAPIResponseType = response.data;
-                  const responseBody = responseData.body;
-                  const formattedHeaders = Object.entries(
-                    response?.data?.headers || {},
-                  ).map(([key, value]) => ({
-                    key,
-                    value,
-                  })) as TFKeyValueStoreType[];
-                  const responseStatus = response?.data?.status;
-                  resData = {
-                    body: responseBody,
-                    headers: formattedHeaders,
-                    status: responseStatus,
-                    time: duration,
-                    size: responseSizeKB,
-                    responseContentType:
-                      this._decodeRequest.setResponseContentType(
-                        formattedHeaders,
-                      ),
-                  };
-
-                  if (
-                    Number(resData.status.split(" ")[0]) >= 200 &&
-                    Number(resData.status.split(" ")[0]) < 300
-                  ) {
-                    successRequests++;
-                  } else {
-                    failedRequests++;
-                  }
-                  totalTime += duration;
-                  const req = {
-                    method: request?.request?.method as string,
-                    name: request?.name as string,
-                    status: resData.status,
-                    time: new ParseTime().convertMilliseconds(duration),
-                  };
-                  history.requests.push(req);
+                if (
+                  Number(resData.status.split(" ")[0]) >= 200 &&
+                  Number(resData.status.split(" ")[0]) < 300
+                ) {
+                  successRequests++;
                 } else {
-                  resData = {
-                    body: "",
-                    headers: [],
-                    status: ResponseStatusCode.ERROR,
-                    time: duration,
-                    size: 0,
-                  };
                   failedRequests++;
-                  totalTime += duration;
-                  const req = {
-                    method: request?.request?.method as string,
-                    name: request?.name as string,
-                    status: ResponseStatusCode.ERROR,
-                    time: new ParseTime().convertMilliseconds(duration),
-                  };
-                  history.requests.push(req);
                 }
-                existingTestFlowData.nodes.push({
-                  id: element.id,
-                  response: resData,
-                  request: adaptedRequest,
-                });
-
-                testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
-              }
-              return testFlowDataMap;
-            });
-          } catch (error) {
-            testFlowDataStore.update((testFlowDataMap) => {
-              const existingTestFlowData = testFlowDataMap.get(
-                progressiveTab.tabId,
-              );
-              if (existingTestFlowData) {
-                const resData = {
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: resData.status,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
+              } else {
+                resData = {
                   body: "",
                   headers: [],
                   status: ResponseStatusCode.ERROR,
-                  time: 0,
+                  time: duration,
                   size: 0,
                 };
-
-                existingTestFlowData.nodes.push({
-                  id: element.id,
-                  response: resData,
-                  request: adaptedRequest,
-                });
-                testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+                failedRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: ResponseStatusCode.ERROR,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
               }
-              return testFlowDataMap;
-            });
-            failedRequests++;
-            totalTime += 0;
-            const req = {
-              method: request?.request?.method as string,
-              name: request?.name as string,
-              status: ResponseStatusCode.ERROR,
-              time: 0 + " ms",
-            };
-            history.requests.push(req);
-          }
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+
+              testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+            }
+            return testFlowDataMap;
+          });
+        } catch (error) {
+          testFlowDataStore.update((testFlowDataMap) => {
+            const existingTestFlowData = testFlowDataMap.get(
+              progressiveTab.tabId,
+            );
+            if (existingTestFlowData) {
+              const resData = {
+                body: "",
+                headers: [],
+                status: ResponseStatusCode.ERROR,
+                time: 0,
+                size: 0,
+              };
+
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+              testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+            }
+            return testFlowDataMap;
+          });
+          failedRequests++;
+          totalTime += 0;
+          const req = {
+            method: request?.request?.method as string,
+            name: request?.name as string,
+            status: ResponseStatusCode.ERROR,
+            time: 0 + " ms",
+          };
+          history.requests.push(req);
         }
       }
     }
