@@ -11,7 +11,6 @@ import { GithubRepoReposistory } from "../../repositories/github-repo.repository
 import { GithubService } from "../../services/github.service";
 import { moveNavigation } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
-import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
 import type { Team } from "@sparrow/common/interfaces";
@@ -19,6 +18,7 @@ import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { WorkspaceService } from "@app/services/workspace.service";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 
 export class TeamsViewModel {
   constructor() {}
@@ -179,10 +179,8 @@ export class TeamsViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     const res = await this.workspaceRepository.readWorkspace(id);
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateId(id);
-    initWorkspaceTab.updateName(res.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("collections");
   };

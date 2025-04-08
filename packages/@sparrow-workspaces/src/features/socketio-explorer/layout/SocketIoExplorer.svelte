@@ -90,7 +90,7 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 pt-3 pb-2" style="padding:0px 12px;">
+    <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- HTTP URL Section -->
       <HttpUrlSection
         isSaveLoad={$loading}

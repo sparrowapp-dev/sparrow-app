@@ -238,6 +238,7 @@
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
+        tab?.type === TabTypeEnum.WORKSPACE ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -340,7 +341,8 @@
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
       removeTab.type === TabTypeEnum.TESTFLOW ||
-      removeTab.type === TabTypeEnum.COLLECTION
+      removeTab.type === TabTypeEnum.COLLECTION ||
+      removeTab.type === TabTypeEnum.WORKSPACE
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -361,6 +363,13 @@
           }
         } else if (removeTab.type === TabTypeEnum.COLLECTION) {
           const res = await _viewModel.saveCollection(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.WORKSPACE) {
+          const res = await _viewModel.saveWorkspace(removeTab);
           if (res) {
             loader = false;
             _viewModel.handleRemoveTab(id);
@@ -517,6 +526,7 @@
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
+        activeTab = undefined;
         await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {

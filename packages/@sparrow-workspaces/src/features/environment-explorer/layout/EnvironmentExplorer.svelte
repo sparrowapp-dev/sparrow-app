@@ -87,7 +87,7 @@
 {#if $currentEnvironment?.tabId}
   <div class={`h-100 env-panel d-flex`}>
     <div
-      class="d-flex flex-column h-100 env-parent w-100 {quickHelp
+      class="d-flex flex-column h-100 env-parent p-3 w-100 {quickHelp
         ? 'quick-help-active'
         : ''}"
     >
@@ -170,6 +170,7 @@
             <Search
               id={"environment-search"}
               variant={"primary"}
+              size={"medium"}
               bind:value={search}
               on:input={() => {}}
               customWidth={"220px"}
@@ -182,10 +183,9 @@
               <Button
                 type="primary"
                 startIcon={SaveRegular}
-                title="Save"
                 onClick={onSaveEnvironment}
-                customWidth="72px"
-                size="small"
+                title="Save"
+                size="medium"
                 disable={$currentEnvironment?.property?.environment?.state
                   ?.isSaveInProgress ||
                   $currentEnvironment?.isSaved ||
@@ -200,7 +200,7 @@
               <Button
                 type="secondary"
                 startIcon={QuestionCirlceReqular}
-                size="small"
+                size="medium"
                 customWidth="28px"
                 onClick={() => {
                   quickHelp = true;
@@ -362,10 +362,6 @@
   }
   .quick-help {
     width: 360px;
-  }
-  .env-parent {
-    padding: 0px 12px;
-    margin-top: 24px;
   }
   .quick-help-active {
     width: calc(100% - 280px) !important;

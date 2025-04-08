@@ -9,7 +9,7 @@ import {
   InitWebSocketTab,
 } from "@sparrow/common/utils";
 import { InitSocketIoTab } from "../utils/init-socket-io-tab";
-// import { InitWorkspaceTab } from "@sparrow/common/utils/init-workspace-tab";
+import { InitWorkspaceTab } from "../utils/init-workspace-tab";
 
 class InitTab {
   constructor() {}
@@ -83,9 +83,8 @@ class InitTab {
   /**
    * @param _id - workspace mongo document id
    */
-  public workspace = (_id: string) => {
-    //   return new InitWorkspaceTab(_id);
-    console.error(_id, "workspace tab not impemented yet!");
+  public workspace = (_id: string, _workspaceId : string) => {
+      return new InitWorkspaceTab(_id, _workspaceId);
   };
 }
 
