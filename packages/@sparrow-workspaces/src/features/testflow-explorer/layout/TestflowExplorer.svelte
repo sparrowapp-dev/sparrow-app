@@ -42,8 +42,9 @@
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
-  import { RunIcon } from "@sparrow/library/icons";
-  import { Modal } from "@sparrow/library/ui";
+  import { BroomRegular } from "@sparrow/library/icons";
+  import { Button, Modal, Tooltip } from "@sparrow/library/ui";
+  import { PlayFilled } from "@sparrow/library/icons";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import type {
@@ -57,7 +58,7 @@
   } from "@sparrow/common/types/workspace/testflow";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Debounce } from "@sparrow/common/utils";
+  import { Debounce, OSDetector } from "@sparrow/common/utils";
 
   import {
     currentStep,
@@ -82,6 +83,11 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onClearTestflow;
+  export let isTestFlowEmpty;
+
+  const osDetector = new OSDetector();
+  let userOS = osDetector.getOS();
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -275,8 +281,9 @@
       // Find the next node position based on the current node's position
       for (let i = 0; i < _nodes?.length; i++) {
         if (_nodes[i].id === _id) {
+          const additionValue = i === 0 ? 0 : 50;
           nextNodePosition = {
-            x: _nodes[i].position.x + 300,
+            x: _nodes[i].position.x + 300 + additionValue,
             y: _nodes[i].position.y,
           };
         }
@@ -563,10 +570,13 @@
    */
   const handleKeyPress = async (event: KeyboardEvent) => {
     if (event.key === "Backspace") {
-      event.preventDefault();
-      const platform = await getPlatform();
-      if (platform === "macos") {
-        handleDeleteModal(selectedNodeId);
+      try {
+        if (userOS === "macos") {
+          event.preventDefault();
+          handleDeleteModal(selectedNodeId);
+        }
+      } catch (error) {
+        console.error("Failed to determine platform:", error);
       }
     }
     if (event.key === "Delete") {
@@ -714,16 +724,12 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         {#if nodesValue > 1}
-          <DropButton
-            title="Run"
-            type="default"
-            iconRequired={true}
-            icon={RunIcon}
-            iconHeight={"14px"}
-            iconWidth={"14px"}
-            style="height: 36px;"
+          <Button
+            type="primary"
+            size="medium"
+            startIcon={PlayFilled}
             disable={testflowStore?.isTestFlowRunning}
-            iconColor={"var(--icon-secondary-100)"}
+            title="Run"
             onClick={async () => {
               unselectNodes();
               await onClickRun();
@@ -751,6 +757,17 @@
           </div>
         {/if}
       </div>
+      <div style="margin-right: 5px;">
+        <Tooltip title="Clear Response" placement="top-center" size="small">
+          <Button
+            type="secondary"
+            size="medium"
+            disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
+            startIcon={BroomRegular}
+            onClick={onClearTestflow}
+          />
+        </Tooltip>
+      </div>
       <div>
         <SaveTestflow
           isSave={$tab.isSaved}
@@ -777,8 +794,8 @@
   >
     <SvelteFlow {nodes} {edges} {nodeTypes}>
       <Background
-        bgColor={"var(--bg-secondary-850)"}
-        patternColor={"var(--bg-secondary-500)"}
+        bgColor={"var(--bg-ds-surface-900)"}
+        patternColor={"var(--bg-ds-surface-500)"}
         size={4}
         gap={20}
       />
