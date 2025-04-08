@@ -2264,10 +2264,7 @@ class RestExplorerViewModel {
       const componentData = this._tab.getValue();
 
       // Check if generation should be stopped
-      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse) {
-        console.log("Chunk display stopped by user");
-        return;
-      }
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse) return;
 
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
@@ -2376,7 +2373,6 @@ class RestExplorerViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
-            // console.error(`Socket ${event}:`, response);
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",
@@ -2464,7 +2460,6 @@ class RestExplorerViewModel {
    * 
    */
   public stopGeneratingAIResponse = async () => {
-    console.log("in stop generating !!")
     const componentData = this._tab.getValue();
     
     try {
