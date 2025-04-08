@@ -131,18 +131,20 @@
             name: "Open AI 4.0",
             id: "open-AI-40",
             disabled: true,
+            hide: true,
           },
           {
             name: "DeepSeek",
             id: "deepseek",
             disabled: true,
+            hide: true,
           },
         ]}
         titleId={"azure-ai"}
         onclick={() => {
           // Choose Different AI Models Feature Disabled Right Now
         }}
-        maxHeaderWidth={"100px"}
+        maxHeaderWidth={"110px"}
         headerTheme={"transparent"}
         minBodyWidth={"182px"}
         bodyTheme={"surface"}

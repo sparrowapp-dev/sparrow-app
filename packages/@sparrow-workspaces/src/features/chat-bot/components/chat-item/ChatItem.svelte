@@ -409,15 +409,16 @@
   }
 
   :global(.code-header) {
-    width: fit-content;
     position: absolute;
-    top: -5%;
-    left: 85%;
+    top: 0;
+    right: 0;
+    transform: translate(-30%, -50%);
     border-radius: 4px;
     background-color: var(--border-ds-surface-500);
     border: 1px solid var(--border-ds-surface-300);
     padding: 2px;
     gap: 2px;
+    z-index: 1; /* Make sure it stays above code block */
   }
 
   :global(.message-wrapper .hljs) {
@@ -433,6 +434,7 @@
     overflow-x: hidden;
     white-space: pre-wrap;
     word-break: break-word;
+    /* padding-top: 10px; */
   }
 
   :global(.message-wrapper .hljs::-webkit-scrollbar-thumb) {
@@ -484,6 +486,7 @@
     /* background-color: var(--bg-tertiary-700); */
     background-color: #31353f;
     opacity: 0;
+    z-index: 9999;
     /* -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75); */
@@ -498,7 +501,7 @@
     width: 10px;
     /* background-color: var(--bg-tertiary-700); */
     background-color: #31353f;
-
+    z-index: 9999;
     transform: translateX(-38%) rotate(45deg); /* Rotate 45 degrees */
   }
   :global(
