@@ -7,6 +7,7 @@
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { httpMethodData } from "../../../../@sparrow-common/src/utils/testFlow.helper";
+  import HttpUrlSection from "../../features/testflow-explorer/components/http-url-section/HttpUrlSection.svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -14,6 +15,9 @@
   export let handleUpdateRequestData;
   export let showRedirectButton = false;
   export let truncateName;
+  export let environmentVariables;
+  export let userRole;
+  export let onUpdateEnvironment;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -61,12 +65,14 @@
   </div>
 
   <div class="request-url">
-    <Input
-      variant="secondary"
-      value={requestUrl}
-      width="100%"
-      on:input={(e) => handleUpdateRequestData("url", e?.detail)}
-      placeholder="Enter Request URL"
+    <HttpUrlSection
+      {requestUrl}
+      onUpdateRequestUrl={(e) => {
+        handleUpdateRequestData("url", e);
+      }}
+      {onUpdateEnvironment}
+      {userRole}
+      {environmentVariables}
     />
   </div>
 

@@ -97,7 +97,8 @@
   export let isTestFlowEmpty;
   export let onSelectRequest;
   export let checkRequestExistInNode;
-  export let onUpdateResponseState;
+  export let userRole;
+  export let onUpdateEnvironment;
 
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
@@ -1135,6 +1136,8 @@
         {handleUpdateRequestData}
         {isWebApp}
         onClearResponse={() => {}}
+        {userRole}
+        {onUpdateEnvironment}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -1144,12 +1147,16 @@
         style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; height:350px;"
       >
         <!-- Request Response Nav -->
-        <TableNavbar
-          bind:selectedNode={sampleApiData}
-          onClose={() => {
-            unselectNodes();
-          }}
+        <TestFlowBottomPanel
+          {selectedBlock}
+          {environmentVariables}
+          onClose={() => unselectNodes()}
           onRedirect={onRedrectRequest}
+          {handleUpdateRequestData}
+          {isWebApp}
+          onClearResponse={() => {}}
+          {userRole}
+          {onUpdateEnvironment}
         />
 
         <!-- Request Respone Body -->

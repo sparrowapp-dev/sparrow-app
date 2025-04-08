@@ -32,6 +32,8 @@
   export let environmentVariables;
   export let handleUpdateRequestData;
   export let onClearResponse;
+  export let onUpdateEnvironment;
+  export let userRole;
   export let isWebApp = false;
 
   let height = 300;
@@ -134,7 +136,7 @@
           selectedNodeResponse = testflowStore?.nodes.find(
             (item) => item?.id === selectedBlock?.id,
           );
-          
+
           // requestNavigation = "Parameters"
           // Reset the response format
           responseState = {
@@ -213,6 +215,9 @@
       showRedirectButton={!!selectedBlock?.data?.collectionId &&
         !!selectedBlock?.data?.requestId}
       {truncateName}
+      {environmentVariables}
+      {userRole}
+      {onUpdateEnvironment}
     />
   </div>
 

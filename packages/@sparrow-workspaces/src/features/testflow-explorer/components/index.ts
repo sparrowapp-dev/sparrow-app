@@ -16,3 +16,4 @@ export { default as ResponseStatus } from "./response-status/ResponseStatus.svel
 export { default as TestFlowName } from "./test-flow-name/TestFlowName.svelte";
 export { default as SaveTestflow } from "./save-testflow/SaveTestflow.svelte";
 export { default as TestFlowBottomPanel } from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
+export { default as HttpUrlSection } from "./http-url-section/HttpUrlSection.svelte";
