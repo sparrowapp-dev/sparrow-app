@@ -284,7 +284,7 @@
 
           <div class="d-flex gap-0" style="width: calc(100% - 86px);">
             <div class="w-50 d-flex align-items-center" >
-              <div class="position-absolute top-0" style="width: calc(50% - 43px);">
+              <div class="position-absolute top-0" style="width: calc(50% - 48px);">
                 <CodeMirrorInput
                 bind:value={element.key}
                 onUpdateInput={() => {
@@ -326,7 +326,7 @@
               </div>
             {:else}
               <div class="w-50 d-flex align-items-center">
-                <div class="position-absolute top-0 left-6" style="width: calc(50% - 43px);">
+                <div class="position-absolute top-0 left-6" style="width: calc(50% - 48px);">
                       <CodeMirrorInput
                   bind:value={element.value}
                   onUpdateInput={() => {
