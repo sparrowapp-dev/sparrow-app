@@ -33,7 +33,7 @@
   };
 
   const truncateName = (name: string, charLimit: number = 12): string => {
-    if (name.length > charLimit) {
+    if (name?.length > charLimit) {
       return name.slice(0, charLimit) + "...";
     }
     return name;

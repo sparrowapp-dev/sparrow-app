@@ -92,7 +92,7 @@
   const parseTime = new ParseTime();
 
   const truncateName = (name: string, charLimit: number) => {
-    return name.length > charLimit
+    return name?.length > charLimit
       ? name.substring(0, charLimit) + "..."
       : name;
   };
@@ -328,6 +328,11 @@
             data.updateBlockName("blockName", e?.target?.value);
           }}
           value={blockName}
+          on:blur={() => {
+            if (blockName.trim().length == 0) {
+              data.updateBlockName("blockName", "Untitled");
+            }
+          }}
         />
       {/if}
     </div>

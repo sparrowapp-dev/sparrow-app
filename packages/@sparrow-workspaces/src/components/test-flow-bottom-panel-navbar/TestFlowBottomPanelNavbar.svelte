@@ -20,6 +20,7 @@
   export let userRole;
   export let onUpdateEnvironment;
   export let handleClickTestButton;
+  export let isTestFlowRuning = false;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -66,7 +67,7 @@
     </div>
   </div>
 
-  <div class="request-url w-100">
+  <div class="request-url">
     <HttpUrlSection
       {requestUrl}
       onUpdateRequestUrl={(e) => {
@@ -79,7 +80,7 @@
   </div>
 
   <Button
-    disable={false}
+    disable={isTestFlowRuning}
     title={"Test"}
     textClassProp={"fs-6"}
     type={"primary"}
@@ -131,7 +132,8 @@
     flex-direction: row;
     background-color: var(--bg-ds-surface-300);
     position: relative;
-    height: 57px;
+    height: 60px;
+    flex-grow: inherit;
   }
 
   .request-name {
@@ -156,8 +158,12 @@
   }
 
   .request-url {
+    padding: 1px;
     margin: 0px 10px;
-    width: 100%;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    border-radius: 4px;
   }
 
   .arrow-icon-container {

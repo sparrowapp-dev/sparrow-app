@@ -23,8 +23,6 @@
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import { testFlowDataStore } from "../../store";
-  import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
   import { Loader } from "@sparrow/library/ui";
 
   export let selectedBlock;
@@ -37,24 +35,21 @@
   export let userRole;
   export let isWebApp = false;
   export let runSingleNode;
+  export let testflowStore;
 
   let responseLoader = false;
   let height = 300;
   let minHeight = 100;
   let isResizing = false;
   let isResizingActive = false;
-  let requestNavigation = "Parameters";
   let inputRef;
-  let testflowStore = undefined;
   let selectedNodeResponse: any = undefined;
   let responseNavigation = "Response";
-  let responseState: TFResponseStateType = {
-    responseBodyLanguage: "JSON",
-    responseBodyFormatter: "Pretty",
-  };
+  let requestNavigation = "Parameters";
+  let apiState;
 
   const handleResponseState = (key: string, value: any) => {
-    responseState = { ...responseState, [key]: value };
+    handleUpdateRequestData(key, value);
   };
 
   /**
@@ -72,12 +67,12 @@
     } else {
       requestNavigation = "Parameters";
     }
-
+    handleUpdateRequestData("requestNavigation", requestNavigation);
     return requestNavigation;
   };
 
   const truncateName = (name: string, charLimit: number) => {
-    return name.length > charLimit
+    return name?.length > charLimit
       ? name.substring(0, charLimit) + "..."
       : name;
   };
@@ -122,19 +117,29 @@
    * @param tab - The tab to update.
    * @returns - The updated response navigation.
    */
-  function updateResponseNavigation(tab: string) {
+  const updateResponseNavigation = (tab: string) => {
     if (tab === "Response") {
       responseNavigation = "Response";
     } else if (tab === "Headers") {
       responseNavigation = "Headers";
     }
+
+    handleUpdateRequestData("responseNavigation", tab);
     return responseNavigation;
-  }
+  };
 
   const handleClickTestButton = async () => {
     try {
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
+
+      if (selectedNodeResponse) {
+        apiState = {
+          ...apiState,
+          responseBodyLanguage:
+            selectedNodeResponse?.response?.responseContentType,
+        };
+      }
     } catch (err) {
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
@@ -143,32 +148,39 @@
   };
 
   $: {
-    if (selectedBlock && testFlowDataStore) {
-      testFlowDataStore.subscribe((val) => {
-        if (val) {
-          testflowStore = val.get(selectedBlock?.data?.tabId);
-          const nodes = testflowStore?.nodes ?? [];
-          const hasEmptyResponseStatus = nodes.some(
-            (node) => !node.response?.status || node.response?.status === "",
-          );
-          const nodeResponse = testflowStore?.nodes.find(
-            (item) => item?.id === selectedBlock?.id,
-          );
+    if (selectedBlock) {
+      apiState = selectedBlock?.data?.requestData?.state;
+      requestNavigation =
+        selectedBlock?.data?.requestData?.state?.requestNavigation;
+      responseNavigation =
+        selectedBlock?.data?.requestData?.state?.responseNavigation;
 
-          if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
-            selectedNodeResponse = undefined;
-          } else {
-            selectedNodeResponse = nodeResponse;
-          }
+      if (testflowStore) {
+        const nodes = testflowStore?.nodes ?? [];
+        const hasEmptyResponseStatus = nodes.some(
+          (node) => !node.response?.status || node.response?.status === "",
+        );
+        const nodeResponse = testflowStore?.nodes.find(
+          (item) => item?.id === selectedBlock?.id,
+        );
+
+        if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
+          selectedNodeResponse = undefined;
+        } else {
+          selectedNodeResponse = nodeResponse;
+          // handleUpdateRequestData(
+          //   "responseBodyLanguage",
+          //   selectedNodeResponse?.response?.responseContentType,
+          // );
         }
-      });
+      }
     }
   }
 </script>
 
 <section
   class="section"
-  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"}`}
+  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"};`}
 >
   <div
     on:mousedown={startResize}
@@ -210,10 +222,12 @@
             class="input-box"
             style="outline: none;"
             on:input={(e) => {
-              handleUpdateRequestData(
-                "blockName",
-                e?.detail || e?.target?.value,
-              );
+              handleUpdateRequestData("blockName", e?.target?.value);
+            }}
+            on:blur={() => {
+              if (selectedBlock?.blockName.length === 0) {
+                handleUpdateRequestData("blockName", "Untitled");
+              }
             }}
           />
         </div>
@@ -235,6 +249,7 @@
       {userRole}
       {onUpdateEnvironment}
       {handleClickTestButton}
+      isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
   </div>
 
@@ -338,10 +353,10 @@
                 </div>
 
                 {#if responseNavigation === "Response"}
-                  {#if responseState?.responseBodyLanguage !== "Image"}
+                  {#if selectedNodeResponse?.response?.responseContentType !== "Image"}
                     <ResponseBodyNavigator
                       response={selectedNodeResponse?.response}
-                      apiState={responseState}
+                      {apiState}
                       onUpdateResponseState={handleResponseState}
                       {onClearResponse}
                       {isWebApp}
@@ -353,7 +368,7 @@
                   >
                     <ResponseBody
                       response={selectedNodeResponse?.response}
-                      apiState={responseState}
+                      {apiState}
                     />
                   </div>
                 {:else if responseNavigation === "Headers"}
@@ -378,6 +393,7 @@
     max-height: 464px;
     position: relative;
     background-color: transparent;
+    margin-bottom: 70px;
   }
 
   .tab-container {
@@ -433,7 +449,7 @@
   .response-pane-container {
     padding-left: 12px;
     overflow: auto;
-    height: 85%;
+    height: 100%;
   }
 
   .dumy-response-container {
