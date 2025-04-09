@@ -139,6 +139,7 @@
       requestId: api.id,
       name: api.name,
       method: api?.request?.method,
+      requestData: api?.request,
     };
     event.dataTransfer?.setData("text/plain", JSON.stringify(data));
   };

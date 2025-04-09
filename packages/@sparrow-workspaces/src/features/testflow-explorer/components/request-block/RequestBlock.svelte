@@ -463,6 +463,7 @@
                 collectionId: requestEvent.collectionId,
                 name: requestEvent.name,
                 method: requestEvent.method,
+                requestData: requestEvent.requestData,
               };
               data.onClick(id, requestData);
             }}
