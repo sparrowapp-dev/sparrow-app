@@ -328,6 +328,11 @@
             data.updateBlockName("blockName", e?.target?.value);
           }}
           value={blockName}
+          on:blur={() => {
+            if (blockName.trim().length == 0) {
+              data.updateBlockName("blockName", "Untitled");
+            }
+          }}
         />
       {/if}
     </div>

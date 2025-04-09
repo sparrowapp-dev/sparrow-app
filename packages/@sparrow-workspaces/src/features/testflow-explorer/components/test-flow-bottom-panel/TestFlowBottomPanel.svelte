@@ -222,10 +222,12 @@
             class="input-box"
             style="outline: none;"
             on:input={(e) => {
-              handleUpdateRequestData(
-                "blockName",
-                e?.detail || e?.target?.value,
-              );
+              handleUpdateRequestData("blockName", e?.target?.value);
+            }}
+            on:blur={() => {
+              if (selectedBlock?.blockName.length === 0) {
+                handleUpdateRequestData("blockName", "Untitled");
+              }
             }}
           />
         </div>
