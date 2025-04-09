@@ -306,25 +306,28 @@
                 >
               </p>
             {/if}
-            {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
-              <Button
-                title={`Invite`}
-                type={"secondary"}
-                onClick={() => {
-                  isTeamInviteModalOpen = true;
-                }}
-                disable={isGuestUser}
-              />
-              <Button
-                title={`New Workspace`}
-                type={`primary`}
-                onClick={async () => {
-                  await handleCreateNewWorkspace();
-                }}
-                loader={isWorkspaceCreationInProgress}
-                disable={isGuestUser || isWorkspaceCreationInProgress}
-              />
-            {/if}
+            <Button
+              title={`Invite`}
+              type={"secondary"}
+              onClick={() => {
+                isTeamInviteModalOpen = true;
+              }}
+              disable={isGuestUser ||
+                (userRole !== TeamRole.TEAM_ADMIN &&
+                  userRole !== TeamRole.TEAM_OWNER)}
+            />
+            <Button
+              title={`New Workspace`}
+              type={`primary`}
+              onClick={async () => {
+                await handleCreateNewWorkspace();
+              }}
+              loader={isWorkspaceCreationInProgress}
+              disable={isGuestUser ||
+                isWorkspaceCreationInProgress ||
+                (userRole !== TeamRole.TEAM_ADMIN &&
+                  userRole !== TeamRole.TEAM_OWNER)}
+            />
           </div>
         </div>
 
@@ -341,7 +344,7 @@
             />
           </div>
           <div class="teams-menu__right">
-            {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
+            {#if activeTeamTab === TeamTabsEnum.WORKSPACES && !isGuestUser}
               <span class="mx-3" style="cursor:pointer;">
                 <img
                   on:click={() => {

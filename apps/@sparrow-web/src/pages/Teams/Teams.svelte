@@ -253,17 +253,6 @@
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
-                  <!-- <span class="text-fs-14 text-secondary-200 pe-2"
-                    >v{version}</span
-                  > -->
-                  <!-- <WithButton
-                    icon={DoubleArrowIcon}
-                    onClick={() => {
-                      handleCollapseCollectionList();
-                    }}
-                    disable={false}
-                    loader={false}
-                  /> -->
                   <Button
                     type="teritiary-regular"
                     size="extra-small"
