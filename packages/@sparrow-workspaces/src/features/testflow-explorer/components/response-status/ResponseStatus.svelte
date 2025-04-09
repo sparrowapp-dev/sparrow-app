@@ -1,9 +1,6 @@
 <script lang="ts">
-  import { ResponseStatusCode } from "@sparrow/common/enums/request.enum";
   import {
     ArchiveRegular,
-    BoxIcon,
-    ClockIcon,
     ClockRegular,
     DotIcon,
   } from "@sparrow/library/icons";
@@ -102,7 +99,7 @@
             </p>
           </span>
         </Tooltip>
-        <Tooltip title="Size" placement={"bottom-center"} zIndex={500}>
+        <Tooltip title="Size" placement={"bottom-center"} zIndex={1000}>
           <span
             class="d-flex align-items-center justify-content-center rounded border-0 text-backgroundColor size-primary1 response-text"
             style="font-size: 12px;"

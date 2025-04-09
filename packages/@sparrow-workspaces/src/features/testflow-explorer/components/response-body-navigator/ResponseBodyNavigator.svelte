@@ -15,6 +15,7 @@
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
   import { responseBodyDataFormatTypes } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import { onMount } from "svelte";
 
   export let response;
   export let apiState: any;
@@ -104,6 +105,13 @@
       console.error("Save dialog was canceled or no path was selected.");
     }
   };
+
+  onMount(() => {
+    onUpdateResponseState(
+      "responseBodyLanguage",
+      response?.responseContentType,
+    );
+  });
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">

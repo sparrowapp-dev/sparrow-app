@@ -23,8 +23,6 @@
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import { testFlowDataStore } from "../../store";
-  import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
   import { Loader } from "@sparrow/library/ui";
 
   export let selectedBlock;
@@ -119,14 +117,16 @@
    * @param tab - The tab to update.
    * @returns - The updated response navigation.
    */
-  function updateResponseNavigation(tab: string) {
+  const updateResponseNavigation = (tab: string) => {
     if (tab === "Response") {
       responseNavigation = "Response";
     } else if (tab === "Headers") {
       responseNavigation = "Headers";
     }
+
+    handleUpdateRequestData("responseNavigation", tab);
     return responseNavigation;
-  }
+  };
 
   const handleClickTestButton = async () => {
     try {
@@ -144,6 +144,8 @@
       apiState = selectedBlock?.data?.requestData?.state;
       requestNavigation =
         selectedBlock?.data?.requestData?.state?.requestNavigation;
+      responseNavigation =
+        selectedBlock?.data?.requestData?.state?.responseNavigation;
       if (testflowStore) {
         const nodes = testflowStore?.nodes ?? [];
         const hasEmptyResponseStatus = nodes.some(
