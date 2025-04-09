@@ -197,5 +197,6 @@
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
+    runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
   />
 {/if}

@@ -265,7 +265,7 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-3"
+    class="my-collection d-flex flex-column w-100 z-3 p-3"
     style=" min-width: 450px"
   >
     <div class="d-flex gap-2 mb-4">
@@ -582,10 +582,6 @@
 </div>
 
 <style>
-  .my-collection {
-    padding: 24px;
-  }
-
   .input-outline {
     border-radius: 0%;
   }

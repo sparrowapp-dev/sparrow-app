@@ -57,7 +57,7 @@
       requestId: string,
       collectionId: string,
       method: string,
-      folderId?: string,
+      folderId: string,
     ) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
@@ -105,7 +105,7 @@
     folderId?: string,
   ) => {
     isRunTextVisible = true;
-
+    
     data.onOpenSaveNodeRequestModal(
       id,
       name,
@@ -250,7 +250,7 @@
 <div
   class="request-block position-relative"
   style={selected && !currentBlock?.response.status
-    ? "border: 1px solid var(--border-ds-primary-300);"
+    ? "outline: 1px solid var(--border-ds-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)

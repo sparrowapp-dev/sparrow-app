@@ -37,8 +37,6 @@
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
   import {
-    DropButton,
-    TableNavbar,
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
@@ -99,6 +97,7 @@
   export let checkRequestExistInNode;
   export let userRole;
   export let onUpdateEnvironment;
+  export let runSingleNode;
 
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
@@ -187,6 +186,8 @@
       collectionId,
       requestId,
       folderId,
+      id,
+      $tab?.tabId,
     );
 
     if (requestData?.request) {
@@ -252,6 +253,7 @@
             "onOpenAddCustomRequestModal",
             "onOpenDeleteModal",
             "onUpdateSelectAPI",
+            "onOpenSaveNodeRequestModal",
           ];
 
           const originalData = dbNodes[i].data || {};
@@ -349,14 +351,14 @@
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
-      syncNodesWithCollectionList();
+      // syncNodesWithCollectionList();
     }
   });
 
   nodes.subscribe((nodes) => {
     if (nodes?.length > 0) {
       if (!limitNodesChange) {
-        syncNodesWithCollectionList();
+        // syncNodesWithCollectionList();
         limitNodesChange = limitNodesChange + 1;
       }
     }
@@ -411,13 +413,28 @@
   const handleCreateCustomRequest = async () => {
     try {
       isCreatingCustomRequest = true;
-      await updateSelectedAPI(
+      const isExist = await checkRequestExistInNode(
+        selectedBlock?.data?.tabId,
         selectedNodeId,
-        customRequestName,
-        uuidv4(),
-        "",
-        customHTTPRequestMethod,
       );
+
+      updateNodeId = selectedNodeId;
+      updateNodeName = customRequestName;
+      updateNodeRequestId = uuidv4();
+      updateNodeCollectionId = "";
+      updateNodeMethod = customHTTPRequestMethod;
+
+      if (isExist) {
+        isSaveNodeModalOpen = true;
+      } else {
+        await updateSelectedAPI(
+          selectedNodeId,
+          customRequestName,
+          uuidv4(),
+          "",
+          customHTTPRequestMethod,
+        );
+      }
       isAddCustomRequestModalOpen = false;
     } catch (error) {
       console.error("Error creating custom request:", error);
@@ -472,7 +489,7 @@
     requestId: string,
     collectionId: string,
     method: string,
-    folderId?: string,
+    folderId: string,
   ) => {
     const isExist = await checkRequestExistInNode(tabId, nodeId);
 
@@ -575,7 +592,7 @@
               requestId: string,
               collectionId: string,
               method: string,
-              folderId?: string,
+              folderId: string,
             ) {
               handleOpenSaveNodeRequestModal(
                 $tab?.tabId,
@@ -668,7 +685,7 @@
               requestId: string,
               collectionId: string,
               method: string,
-              folderId?: string,
+              folderId: string,
             ) {
               handleOpenSaveNodeRequestModal(
                 $tab?.tabId,
@@ -993,7 +1010,7 @@
       {#if testflowStore?.isTestFlowRunning}
         <div class="d-flex testing-text-container">
           <div class="loader"></div>
-          <p class="testing-txt">Testing</p>
+          <p class="testing-txt">Running</p>
         </div>
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
@@ -1047,6 +1064,7 @@
           isSave={$tab.isSaved}
           {isTestflowEditable}
           {onSaveTestflow}
+          testFlowRunning={testflowStore?.isTestFlowRunning}
         />
       </div>
       <div class="position-relative">
@@ -1127,7 +1145,8 @@
       </div>
     {/if}
   </div>
-  {#if selectedBlock}
+  <!-- Open the bottom panel when it contains the data -->
+  {#if selectedBlock && selectedBlock?.data?.requestId}
     <div style=" background-color: transparent; margin: 0px 13px 7px 13px;">
       <TestFlowBottomPanel
         {selectedBlock}
@@ -1139,6 +1158,7 @@
         onClearResponse={() => {}}
         {userRole}
         {onUpdateEnvironment}
+        {runSingleNode}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -1410,7 +1430,7 @@
     align-self: center;
     align-content: center;
     margin-top: 15%;
-    margin-right: 10px;
+    margin-right: 6px;
   }
   .testing-text-container {
     align-items: center;
@@ -1418,7 +1438,8 @@
     height: 36px;
     background-color: var(--bg-tertiary-750);
     width: 110px;
-    margin-right: 10px;
+    margin-right: 6px;
+    padding-left: 12px;
     border-radius: 4px;
   }
 </style>
