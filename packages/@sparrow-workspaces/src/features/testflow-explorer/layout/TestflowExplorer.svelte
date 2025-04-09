@@ -473,7 +473,8 @@
       isSaveNodeModalOpen = false;
     } catch (error) {
       console.error("Error in saving the request:", error);
-      isSaveNodeModalOpen = false;
+    } finally {
+      isSavingRequestLoader = false;
     }
   };
 
