@@ -468,6 +468,7 @@ export class TestflowExplorerPageViewModel {
             decodeData[2],
             decodeData[3],
             decodeData[4],
+            signal
           );
           const end = Date.now();
           const duration = end - start;
