@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-         - run: |
+      - run: |
               docker build -f ./Sparrow-Web.Dockerfile \
                 --build-arg PORT=${{ vars.PORT }} \
                 --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
@@ -41,7 +41,7 @@ jobs:
                 --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
                 -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
-          docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
+               docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
 
   deploy:
     needs: build
