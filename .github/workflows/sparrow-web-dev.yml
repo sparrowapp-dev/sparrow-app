@@ -17,29 +17,29 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - run: |
-          docker build -f ./Sparrow-Web.Dockerfile \
-            --build-arg PORT=${{ vars.PORT }} \
-            --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
-            --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \
-            --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
-            --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
-            --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
-            --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
-            --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
-            --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
-            --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
-            --build-arg VITE_WEB_AZURE_CDN_URL=${{ vars.VITE_WEB_AZURE_CDN_URL }} \
-            --build-arg VITE_WEB_BASE_URL=${{ vars.VITE_WEB_BASE_URL }} \
-            --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
-            --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
-            --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
-            --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
-            --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
-            --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
-            --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
-            --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
-            -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
+         - run: |
+              docker build -f ./Sparrow-Web.Dockerfile \
+                --build-arg PORT=${{ vars.PORT }} \
+                --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
+                --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \
+                --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
+                --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
+                --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
+                --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
+                --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
+                --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
+                --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
+                --build-arg VITE_WEB_AZURE_CDN_URL=${{ vars.VITE_WEB_AZURE_CDN_URL }} \
+                --build-arg VITE_WEB_BASE_URL=${{ vars.VITE_WEB_BASE_URL }} \
+                --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
+                --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
+                --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
+                --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
+                --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
+                --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
+                --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET=${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
+                --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
+                -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
           docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
 

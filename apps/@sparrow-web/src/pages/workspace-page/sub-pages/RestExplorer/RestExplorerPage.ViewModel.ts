@@ -2290,12 +2290,8 @@ class RestExplorerViewModel {
       const componentData = this._tab.getValue();
 
       // Check if generation should be stopped
-      if (
-        !componentData?.property?.request?.state?.isChatbotGeneratingResponse
-      ) {
-        console.log("Chunk display stopped by user");
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse)
         return;
-      }
 
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
@@ -2338,8 +2334,7 @@ class RestExplorerViewModel {
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
-        message:
-          errorMessage || "Woops! Something went wrong. Please try again...",
+        message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2380,7 +2375,7 @@ class RestExplorerViewModel {
       );
 
       if (!socketResponse) {
-        throw new Error("Woops! Something went wrong. Please try again...");
+        throw new Error("Something went wrong. Please try again");
       }
 
       // Remove existing listeners to prevent duplicates
@@ -2403,10 +2398,9 @@ class RestExplorerViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
-            console.error(`Socket ${event}:`, response);
             await this.handleAIResponseError(
               componentData,
-              "Something went wrong. Please try again...",
+              "Something went wrong. Please try again",
             );
             break;
 
@@ -2485,7 +2479,7 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
-      console.error("Error in AI response generation:", error.message);
+      console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }
   };
@@ -2495,7 +2489,6 @@ class RestExplorerViewModel {
    *
    */
   public stopGeneratingAIResponse = async () => {
-    console.log("in stop generating !!");
     const componentData = this._tab.getValue();
 
     try {

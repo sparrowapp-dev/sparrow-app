@@ -77,10 +77,10 @@
       />
 
       <div class="name px-2 ellipsis" style="width:80%">
-        <span class="text-whiteColor sparrow-fs-12"
-          >{user.name} {owner ? "(You)" : ""}</span
+        <span class="text-whiteColor sparrow-fs-12 text-ds-line-height-130">
+          {user.name} {owner ? "(You)" : ""}</span
         ><br />
-        <span class="text-textColor sparrow-fs-12">{user.email}</span>
+        <span class="text-textColor sparrow-fs-12 text-ds-font-weight-regular text-ds-line-height-150">{user.email}</span>
       </div>
     </div>
 
@@ -138,8 +138,8 @@
 
 <hr style="background-color: var(--border-ds-surface-100); margin-bottom:4px" />
 <div
-  class="team-workspace mb-1 sparrow-fs-14"
-  style=" color:var(--text-ds-neutral-600);"
+  class="team-workspace mb-1 sparrow-fs-14 text-ds-font-weight-medium text-ds-line-height-150"
+  style="color:var(--text-ds-neutral-600);"
 >
   {#each workspaces as workspace}
     {#if workspace.position}
