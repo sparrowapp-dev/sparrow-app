@@ -141,35 +141,41 @@
   export let collection;
   const loading = writable<boolean>(false);
 
-  const closeCollectionHelpText = () => {
-    onUpdateCollectionGuide({ id: "collection-guide" }, false);
-    isPopoverContainer = !isPopoverContainer;
-  };
-
-  // Properties for chatbot pane resizing on runtime
+  // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
 
-  // max, min and default size (in pixel) of chatbot pane as per figma design
+  // Chatbot pane size constraints in pixels (based on Figma design)
   const minPx = 343;
   const maxPx = 525;
   const defaultPx = 452;
 
-  // calculated max, min and default size (in %ge) of chatbot pane
+  // Chatbot pane size constraints in percentage (calculated at runtime)
   let minSizePct = 0;
   let maxSizePct = 0;
   let defaultSizePct = 0;
 
+  /**
+   * Converts the pixel-based min, max, and default sizes
+   * of the chatbot pane into percentages relative to the
+   * current width of the splitpane container.
+   *
+   * Required because `svelte-splitpane` accepts sizes in percentages.
+   */
   function updateSplitpaneContSizes() {
     if (!splitpaneContainer) return;
 
     splitpaneContainerWidth = splitpaneContainer.clientWidth;
-    // console.log("cl :>> ", splitpaneContainerWidth);
-    // Convert px to percentage
+
     minSizePct = (minPx / splitpaneContainerWidth) * 100;
     maxSizePct = (maxPx / splitpaneContainerWidth) * 100;
     defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
   }
+
+  const closeCollectionHelpText = () => {
+    onUpdateCollectionGuide({ id: "collection-guide" }, false);
+    isPopoverContainer = !isPopoverContainer;
+  };
 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
@@ -183,14 +189,15 @@
       }
     });
 
-    // await tick() // wait for DOM updates
+    // Delay to ensure DOM is ready before measuring container width
     setTimeout(() => {
       updateSplitpaneContSizes();
+      // Watch for container size changes and update pane size percentages
       const resizeObserver = new ResizeObserver(() => {
         updateSplitpaneContSizes();
       });
       resizeObserver.observe(splitpaneContainer);
-      return () => resizeObserver.disconnect();
+      return () => resizeObserver.disconnect(); // Cleanup on component unmount
     }, 0);
   });
 

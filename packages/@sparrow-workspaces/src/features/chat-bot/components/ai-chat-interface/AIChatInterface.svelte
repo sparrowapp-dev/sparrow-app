@@ -145,14 +145,14 @@
                     <SparkleFilled height={"28px"} width={"28px"} />
                   </span>
                   <p
-                    class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-500 mb-1"
-                    style="letter-spacing: -0.02em; color: var(--text-ds-neutral-100); font-weight: 500;"
+                    class="text-ds-font-size-16 text-ds-line-height-150 text-ds-font-weight-semi-bold mb-1"
+                    style="letter-spacing: -0.02em; color: var(--text-ds-neutral-100);"
                   >
                     Ask AI anything and get instant insights
                   </p>
                   <p
-                    class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-500 text-secondary-250 mb-0"
-                    style="letter-spacing: -0.02em; color: var(--text-ds-neutral-500); font-weight: 500;"
+                    class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold text-secondary-250 mb-0"
+                    style="letter-spacing: -0.02em; color: var(--text-ds-neutral-500);"
                   >
                     Generate mock data, debug errors, and explore solutions
                   </p>
