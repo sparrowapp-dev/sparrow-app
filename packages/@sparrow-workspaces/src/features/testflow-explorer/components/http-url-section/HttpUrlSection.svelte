@@ -11,7 +11,7 @@
   const theme = new UrlInputTheme().build();
 </script>
 
-<div style="">
+<div style="position:relative; width:100%">
   <CodeMirrorInput
     value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}

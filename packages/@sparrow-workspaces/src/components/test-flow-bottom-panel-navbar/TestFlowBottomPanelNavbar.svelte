@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <div class="request-url w-100">
+  <div class="request-url">
     <HttpUrlSection
       {requestUrl}
       onUpdateRequestUrl={(e) => {
@@ -132,7 +132,8 @@
     flex-direction: row;
     background-color: var(--bg-ds-surface-300);
     position: relative;
-    height: 57px;
+    height: 60px;
+    flex-grow: inherit;
   }
 
   .request-name {
@@ -157,8 +158,12 @@
   }
 
   .request-url {
+    padding: 1px;
     margin: 0px 10px;
-    width: 100%;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    border-radius: 4px;
   }
 
   .arrow-icon-container {
