@@ -52,6 +52,7 @@
         type="secondary"
         size="medium"
         startIcon={HistoryRegular}
+        disable={testflowStore?.isTestFlowRunning}
         onClick={() => {
           toggleHistoryContainer(!testflowStore?.isRunHistoryEnable);
           MixpanelEvent(Events.Run_History);

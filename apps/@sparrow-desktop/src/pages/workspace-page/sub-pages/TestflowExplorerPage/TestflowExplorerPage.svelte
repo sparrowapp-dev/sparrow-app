@@ -190,6 +190,7 @@
     onUpdateTestFlowName={_viewModel.updateName}
     onUpdateBlockData={_viewModel.updateBlockData}
     onSaveTestflow={_viewModel.saveTestflow}
+    onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
     isWebApp={false}
@@ -197,5 +198,6 @@
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
+    runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
   />
 {/if}

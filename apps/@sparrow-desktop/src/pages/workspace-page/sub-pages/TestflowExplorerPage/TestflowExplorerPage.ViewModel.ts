@@ -55,6 +55,7 @@ import {
 } from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
+import type { EnvironmentDocType } from "@app/models/environment.model";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -395,6 +396,8 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+    const abortController = new AbortController();
+    const { signal } = abortController;
 
     let runningNodes : any[] = [];
 
@@ -420,8 +423,10 @@ export class TestflowExplorerPageViewModel {
       if (wsData) {
         wsData.nodes = [];
         wsData.isTestFlowRunning = true;
+        wsData.abortController = abortController;
       } else {
         wsData = {
+          abortController: abortController,
           nodes: [],
           history: [],
           isRunHistoryEnable: false,
@@ -482,6 +487,7 @@ export class TestflowExplorerPageViewModel {
             decodeData[2],
             decodeData[3],
             decodeData[4],
+            signal
           );
           const end = Date.now();
           const duration = end - start;
@@ -563,6 +569,9 @@ export class TestflowExplorerPageViewModel {
             return testFlowDataMap;
           });
         } catch (error) {
+          if (error?.name === "AbortError") {
+            break;
+          }
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
@@ -625,6 +634,134 @@ export class TestflowExplorerPageViewModel {
         `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
       );
     }
+  };
+
+  /**
+   * Runs a single test flow node and updates the testFlowDataStore
+   * @param nodeId - The id of the node to be executed
+   */
+  public handleSingleTestFlowNodeRun = async (nodeId: string) => {
+    const tab = createDeepCopy(this._tab.getValue());
+    const environments = await this.getActiveEnvironments(tab.path.workspaceId);
+
+    const node = tab?.property?.testflow?.nodes.find(
+      (item) => item.id === nodeId,
+    );
+
+    if (node && node?.type !== "requestBlock") return;
+
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(tab.tabId);
+      if (wsData) {
+        wsData.nodes = [];
+        wsData.isTestFlowRunning = false;
+      } else {
+        wsData = {
+          nodes: [],
+          history: [],
+          isRunHistoryEnable: false,
+          isTestFlowRunning: false,
+          isTestFlowSaveInProgress: false,
+        };
+      }
+      testFlowDataMap.set(tab.tabId, wsData);
+      return testFlowDataMap;
+    });
+
+    // Read the API request data
+    const requestData = await this.collectionRepository.readRequestInTab(
+      tab.tabId,
+      node.data.requestId,
+    );
+
+    const request = transformRequestData(requestData);
+    const requestTabAdapter = new RequestTabAdapter();
+
+    const adaptedRequest: Tab = requestTabAdapter.adapt(
+      tab.path.workspaceId ?? "",
+      node?.data?.collectionId ?? "",
+      node?.data?.folderId ?? "",
+      request,
+    );
+
+    const collectionAuth = extractAuthData(request);
+    const decodeData = this._decodeRequest.init(
+      adaptedRequest.property.request,
+      environments?.filtered || [],
+      collectionAuth,
+    );
+
+    const start = Date.now();
+    let resData: TFHistoryAPIResponseStoreType;
+    let status: string;
+    let duration = 0;
+
+    try {
+      const response = await makeHttpRequestV2(
+        decodeData[0],
+        decodeData[1],
+        decodeData[2],
+        decodeData[3],
+        decodeData[4],
+      );
+      const end = Date.now();
+      duration = end - start;
+
+      if (response.isSuccessful) {
+        const byteLength = new TextEncoder().encode(
+          JSON.stringify(response),
+        ).length;
+        const responseSizeKB = byteLength / 1024;
+        const responseData: TFAPIResponseType = response.data;
+        const formattedHeaders = Object.entries(
+          responseData?.headers || {},
+        ).map(([key, value]) => ({ key, value })) as TFKeyValueStoreType[];
+
+        resData = {
+          body: responseData.body,
+          headers: formattedHeaders,
+          status: responseData.status,
+          time: duration,
+          size: responseSizeKB,
+          responseContentType:
+            this._decodeRequest.setResponseContentType(formattedHeaders),
+        };
+      } else {
+        resData = {
+          body: "",
+          headers: [],
+          status: ResponseStatusCode.ERROR,
+          time: duration,
+          size: 0,
+        };
+      }
+      status = resData.status;
+    } catch (error) {
+      resData = {
+        body: "",
+        headers: [],
+        status: ResponseStatusCode.ERROR,
+        time: 0,
+        size: 0,
+      };
+      status = ResponseStatusCode.ERROR;
+    }
+
+    // Update testFlowDataStore with this single result
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(tab.tabId);
+      if (wsData) {
+        const updatedNodes = wsData.nodes.filter((n) => n.id !== node.id);
+        updatedNodes.push({
+          id: node.id,
+          response: resData,
+          request: adaptedRequest,
+        });
+        wsData.nodes = updatedNodes;
+        testFlowDataMap.set(tab.tabId, wsData);
+      }
+      return testFlowDataMap;
+    });
   };
 
   /**
@@ -951,8 +1088,17 @@ export class TestflowExplorerPageViewModel {
     collectionId: string,
     requestId: string,
     folderId: string,
+    nodeId?: string,
+    tabId?: string,
   ) => {
     let request;
+    if (!collectionId) {
+      request = await this.collectionRepository.readRequestDataInNode(
+        tabId,
+        nodeId,
+      );
+      return request;
+    }
     if (folderId) {
       request = await this.collectionRepository.readRequestInFolder(
         collectionId,
@@ -1236,6 +1382,33 @@ export class TestflowExplorerPageViewModel {
         );
       }
       return response;
+    }
+  };
+  
+  /**
+   * @description - This function stops the api calls in Testflow.
+   */
+  public handleStopApis = () => {
+    let abortController;
+    testFlowDataStore.update((testFlowDataMap) => {
+      const currentTestflow = this._tab.getValue();
+      const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+      if (wsData) {
+        abortController = wsData.abortController;
+      }
+      return testFlowDataMap;
+    });
+    if (abortController) {
+      abortController.abort();
+      testFlowDataStore.update((testFlowDataMap) => {
+        const currentTestflow = this._tab.getValue();
+        const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+        if (wsData) {
+          wsData.isTestFlowRunning = false;
+          testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+        }
+        return testFlowDataMap;
+      });
     }
   };
 }

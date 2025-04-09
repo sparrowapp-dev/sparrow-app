@@ -907,4 +907,25 @@ export class CollectionRepository {
       console.error("Error updating block data:", error);
     }
   };
+
+  /**
+   * @description
+   * Get the API request node data if it exists.
+   */
+  public readRequestDataInNode = async (tabId?: string, nodeId?: string) => {
+    const tabData = await RxDB.getInstance()
+      .rxdb.tab.findOne({ selector: { tabId: tabId } })
+      .exec();
+
+    if (!tabData) return false;
+
+    const node = tabData
+      .toJSON()
+      ?.property?.testflow?.nodes?.find(
+        (element) =>
+          element.id === nodeId && element?.data?.requestData?.url !== "",
+      );
+
+    return node ?? null;
+  };
 }

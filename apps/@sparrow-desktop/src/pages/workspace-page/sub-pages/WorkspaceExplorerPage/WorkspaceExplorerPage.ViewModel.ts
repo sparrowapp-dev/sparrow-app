@@ -2,8 +2,9 @@ import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 import { Events, WorkspaceRole } from "@sparrow/common/enums";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { throttle } from "@sparrow/common/utils";
+import { createDeepCopy, Debounce, throttle } from "@sparrow/common/utils";
 import type {
+  TabDocument,
   TeamDocument,
   WorkspaceDocument,
 } from "../../../../database/database";
@@ -14,11 +15,12 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TeamRepository } from "../../../../repositories/team.repository";
 import { UpdatesRepository } from "../../../../repositories/updates.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
-import { CollectionService } from "../../../../services/collection.service";
 import { UpdatesService } from "../../../../services/updates.service";
 import { WorkspaceService } from "../../../../services/workspace.service";
 import { notifications } from "@sparrow/library/ui";
-import type { Observable } from "rxjs";
+import { BehaviorSubject, type Observable } from "rxjs";
+import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspace/tab";
+import { WorkspaceTabAdapter } from "@app/adapter";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -29,11 +31,115 @@ export default class WorkspaceExplorerViewModel {
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
 
-  // Private Services
-  private collectionService = new CollectionService();
   private workspaceService = new WorkspaceService();
   private updatesService = new UpdatesService();
-  constructor() {}
+
+   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
+
+   constructor(_tab: TabDocument) {
+    const t = createDeepCopy(_tab.toMutableJSON());
+    delete t.isActive;
+    delete t.index;
+    t.persistence = TabPersistenceTypeEnum.PERMANENT
+    this.tab = t;
+  }
+
+  public get tab(): Observable<Tab> {
+    return this._tab.asObservable();
+  }
+
+  public set tab(value: Tab) {
+    this._tab.next(value);
+  }
+
+
+    /**
+   * Compares the current workspace tab with the server workspace and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
+    private compareWorkspaceWithServerDebounced = async () => {
+      let result = true;
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+  
+      const rxWorkspace = await this.workspaceRepository.readWorkspace(
+        progressiveTab.id,
+      );
+  
+      const workspace = rxWorkspace?.toMutableJSON();
+      const workspaceTab = new WorkspaceTabAdapter().adapt(
+        progressiveTab.id,
+        workspace,
+      );
+      if (!workspace) result = false;
+      // description
+      else if (workspaceTab.description !== progressiveTab.description) {
+        result = false;
+      }
+      // name
+      else if (workspaceTab.name !== progressiveTab.name) {
+        result = false;
+      }
+      // result
+      if (result) {
+        this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: true,
+        });
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+      } else {
+        this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: false,
+        });
+        progressiveTab.isSaved = false;
+        this.tab = progressiveTab;
+      }
+    };
+  
+    /**
+     * Debounced method to compare the current workspace tab with the server workspace.
+     */
+    private compareWorkspaceWithServer = new Debounce().debounce(
+      this.compareWorkspaceWithServerDebounced,
+      1000,
+    );
+
+    /**
+   * Handles renaming a workspace
+   * @param _name - the new name of the workspace.
+   * @param event - blur or input
+   */
+    public handleUpdateName = async (_name: string, event = "") => {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+  
+      // Trim the name to handle cases with only spaces
+      const trimmedName = _name.trim();
+  
+      if (event === "blur" && trimmedName === "") {
+        const workspaceRx = await this.workspaceRepository.readWorkspace(
+          progressiveTab.id,
+        );
+        const workspaceDoc = workspaceRx?.toMutableJSON();
+        progressiveTab.name = workspaceDoc?.name;
+      } else if (event === "") {
+        progressiveTab.name = _name;
+      }
+      this.tab = progressiveTab;
+      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      this.compareWorkspaceWithServer();
+    };
+  
+    /**
+     * Handles updating description of a workspace.
+     * @param _description - the updated description of the workspace.
+     */
+    public handleUpdateDescription = async (_description: string) => {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      progressiveTab.description = _description;
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      this.compareWorkspaceWithServer();
+    };
 
   /**
    * Get active tab(if any)
@@ -61,55 +167,37 @@ export default class WorkspaceExplorerViewModel {
   public readTeam = async (teamId: string) => {
     return await this.teamRepository.getTeamDoc(teamId);
   };
+
   /**
-   * Updates the name of a workspace and reflects the changes in the associated tab.
-   * @param - The ID of the workspace to be updated.
-   * @param - The new name for the workspace.
-   * @returns  A promise that resolves when the workspace name is updated.
+   * Saves the workspace tab.
    */
-  public updateWorkspaceName = async (workspaceId: string, newName: string) => {
-    if (!newName) return;
-    const response = await this.workspaceService.updateWorkspace(workspaceId, {
-      name: newName,
+  public handleSaveWorkspace = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.workspaceService.updateWorkspace( progressiveTab.id, {
+      name: progressiveTab.name,
+      description: progressiveTab.description,
     });
 
     if (response.isSuccessful) {
       const updatedata = {
-        name: newName,
+        name: progressiveTab.name,
+        description: progressiveTab.description,
         updatedAt: response.data.data.updatedAt,
       };
-      await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
-      await this.tabRepository.updateTabByMongoId(workspaceId, updatedata);
-      // notifications.success("Workspace renamed successfully!");
+      await this.workspaceRepository.updateWorkspace(progressiveTab.id, updatedata);
+      notifications.success(
+        `The ‘${progressiveTab.name}’ workspace saved successfully.`,
+      );
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+      this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       return;
+    }
+    else{
+      notifications.error("Failed to save workspace. Please try again.");
     }
   };
 
-  /**
-   * Updates the description of a workspace and synchronizes the change with the relevant repositories.
-   *
-   * @param - The ID of the workspace to be updated.
-   * @param  - The new description to be set for the workspace.
-   * @returns - A promise that resolves when the description update is complete.
-   */
-
-  public updateWorkspaceDescription = async (
-    workspaceId: string,
-    newDescription: string,
-  ) => {
-    const response = await this.workspaceService.updateWorkspace(workspaceId, {
-      description: newDescription,
-    });
-
-    if (response.isSuccessful) {
-      const updatedata = {
-        description: newDescription,
-      };
-      notifications.success("Description updated successfully.");
-      await this.workspaceRepository.updateWorkspace(workspaceId, updatedata);
-      return;
-    }
-  };
 
   /**
    * Returns a workspace document

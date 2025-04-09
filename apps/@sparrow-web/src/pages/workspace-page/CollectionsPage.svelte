@@ -129,7 +129,7 @@
 
   let environments = _viewModel2.environments;
   let totalCollectionCount = writable(0);
-  let totalTeamCount: number | undefined = 0;
+  let totalTeamCount = 0;
 
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
@@ -239,6 +239,7 @@
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
+        tab?.type === TabTypeEnum.WORKSPACE ||
         tab?.type === TabTypeEnum.GRAPHQL) &&
       !tab?.isSaved
     ) {
@@ -341,7 +342,8 @@
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
       removeTab.type === TabTypeEnum.TESTFLOW ||
-      removeTab.type === TabTypeEnum.COLLECTION
+      removeTab.type === TabTypeEnum.COLLECTION ||
+      removeTab.type === TabTypeEnum.WORKSPACE
     ) {
       if (removeTab?.path.workspaceId) {
         const id = removeTab?.id;
@@ -367,8 +369,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
           }
+        } else if (removeTab.type === TabTypeEnum.WORKSPACE) {
+          const res = await _viewModel.saveWorkspace(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
         }
-
         loader = false;
       }
     } else if (
@@ -523,6 +531,7 @@
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
+        activeTab = undefined;
         await handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
@@ -533,7 +542,7 @@
         });
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
-        totalTeamCount = value._data?.users?.length;
+        totalTeamCount = value._data?.users?.length || 0;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -652,7 +661,7 @@
     startAutoRefresh();
   });
 
-  const truncateTabName = (name, maxLength = 15) => {
+  const truncateTabName = (name: string, maxLength = 15) => {
     if (!name) return "Untitled";
     return name.length > maxLength
       ? `${name.substring(0, maxLength)}...`

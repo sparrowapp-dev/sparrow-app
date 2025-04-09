@@ -5,3 +5,4 @@ export { GraphqlTabAdapter } from "./graphql-tab";
 export { RequestSavedTabAdapter } from "./request-saved-tab";
 export { CollectionTabAdapter }from "./collection-tab";
 export { FolderTabAdapter } from "./folder-tab";
+export { WorkspaceTabAdapter } from "./workspace-tab";
