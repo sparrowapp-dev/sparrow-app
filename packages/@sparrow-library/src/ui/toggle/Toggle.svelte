@@ -44,7 +44,7 @@
   <label class="switch-label" class:disabled>
     {#if label.length > 0}
       <span
-        class="label-text"
+        class="label-text text-ds-line-height-130"
         style="font-size: {fontSize}; font-weight: {fontWeight}; color: {textColor}"
       >
         {convertCasing(label)}

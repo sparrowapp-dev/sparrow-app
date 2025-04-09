@@ -92,6 +92,7 @@ import {
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 import { getClientUser } from "@app/utils/jwt";
+import constants from "@app/constants/constants";
 
 class RestExplorerViewModel {
   /**
@@ -1909,6 +1910,17 @@ class RestExplorerViewModel {
     }
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -1976,10 +1988,14 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2061,11 +2077,15 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2261,9 +2281,13 @@ class RestExplorerViewModel {
     const sleep = (ms: number) =>
       new Promise((resolve) => setTimeout(resolve, ms));
     const displayNextChunk = async () => {
+      const componentData = this._tab.getValue();
+
+      // Check if generation should be stopped
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse) return;
+
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
-        const componentData = this._tab.getValue();
         const length =
           componentData?.property?.request?.ai?.conversations.length;
         componentData.property.request.ai.conversations[length - 1].message =
@@ -2304,7 +2328,7 @@ class RestExplorerViewModel {
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
         message:
-          errorMessage || "Woops! Something went wrong. Please try again...",
+          errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2345,7 +2369,7 @@ class RestExplorerViewModel {
       );
 
       if (!socketResponse) {
-        throw new Error("Woops! Something went wrong. Please try again...");
+        throw new Error("Something went wrong. Please try again");
       }
 
       // Remove existing listeners to prevent duplicates
@@ -2364,10 +2388,14 @@ class RestExplorerViewModel {
         switch (event) {
           case "disconnect":
           case "connect_error":
-            console.error(`Socket ${event}:`, response);
+
+            // After getting response don't listen again for this the same request
+            events.forEach((event) =>
+              this.aiAssistentWebSocketService.removeListener(event),
+            );
             await this.handleAIResponseError(
               componentData,
-              "Woops! Something went wrong. Please try again...",
+              "Something went wrong. Please try again",
             );
             break;
 
@@ -2425,8 +2453,6 @@ class RestExplorerViewModel {
                   },
                 ]);
 
-                console.log("**** updating ******* !");
-
                 await this.displayDataInChunks(response.messages, 100, 300);
               }
             }
@@ -2444,8 +2470,32 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
-      console.error("Error in AI response generation:", error.message);
+      console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
+    }
+  };
+
+  /**
+   * Stops the response generation from the FE and sends stop generate event to server
+   * 
+   */
+  public stopGeneratingAIResponse = async () => {
+    const componentData = this._tab.getValue();
+    
+    try {
+      // Send stop signal to the server
+      await this.aiAssistentWebSocketService.stopGeneration(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        getClientUser().email,
+      );
+      
+      await this.updateRequestState({ isChatbotGeneratingResponse: false });
+      
+      // Show error msg in the chat for stop generation
+      // this.handleAIResponseError(componentData, "Generation Stopped")
+    } catch (error) {
+      console.error("Error stopping AI response generation:", error);
     }
   };
 

@@ -46,7 +46,7 @@
       height={"36px"}
       id={inputId}
       placeholder={"Workspace name"}
-      class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
+      class="text-ds-font-size-14 bg-tertiary-300 text-ds-font-weight-medium px-2 border-radius-4"
       style="outline:none;"
       isError={inputNameError ? true : false}
       isEditIconRequired={false}
@@ -57,8 +57,7 @@
   <br />
 
   <div
-    class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded ellipsis"
-    style="font-size: 16px;`"
+    class="d-flex align-items-center justify-content-between gap-3 mt-2 pb-3 mb-0 rounded ellipsis text-ds-font-size-16"
   >
     <div class="d-flex ellipsis">
       {#if openTeam?.logo?.size}
@@ -81,8 +80,8 @@
       {/if}
       <div class="d-flex align-items-center ellipsis">
         <p
-          style="font-size:16px; color: var(--text-secondary-100); "
-          class="mb-0 ellipsis"
+          style="color: var(--text-secondary-100); "
+          class="mb-0 ellipsis text-ds-font-size-12 text-ds-line-height-130"
         >
           {workspace.team?.teamName}
         </p>

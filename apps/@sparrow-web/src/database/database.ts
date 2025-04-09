@@ -130,6 +130,11 @@ export class RxDB {
     await this.rxdb.addCollections({
       workspace: {
         schema: workspaceSchema,
+        migrationStrategies: {
+          1: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
+        },
       },
       tab: {
         schema: tabSchema,
@@ -270,6 +275,11 @@ export class RxDB {
       },
       team: {
         schema: teamSchema,
+        migrationStrategies: {
+          1: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+        },
       },
       environment: {
         schema: environmentSchema,

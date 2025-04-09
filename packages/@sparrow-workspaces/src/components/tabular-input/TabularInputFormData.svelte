@@ -249,7 +249,7 @@
             style=""
           >
             <p
-              class="text-nowrap text-primary-300 mb-0 me-0"
+              class="text-nowrap text-primary-300 mb-0 me-0 "
               style="font-size: 10px; font-weight:400;"
             >
               Bulk Edit

@@ -301,7 +301,7 @@
           ><br />
           <span
             style="display: inline-block;"
-            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
             >{user.email}</span
           >
         </div>
@@ -309,14 +309,15 @@
     </div>
 
     <p
-      style="font-size:12px; color:var( --text-secondary-1000); font-weight:400;"
+      style="color:var( --text-secondary-1000);"
+      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
     >
       You are assigning the role of an '<span
         class="text-whiteColor"
         style=" font-weight:700;">Admin</span
       >' to {user.name}. Following access will be provided to {user.name}:
     </p>
-    <ul class="ps-4" style="font-size:12px; color:var( --text-secondary-1000);">
+    <ul class="ps-4 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular" style="color:var( --text-secondary-1000);">
       {#each AdminLevelPermission as permission}
         <li>{permission}</li>
       {/each}
@@ -344,8 +345,8 @@
         {/if}
       </div>
       <p
-        class="mb-0 text-ds-font-size-16 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
-      >
+        class="mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
+      >d
         {openTeam?.name}
       </p>
     </div>

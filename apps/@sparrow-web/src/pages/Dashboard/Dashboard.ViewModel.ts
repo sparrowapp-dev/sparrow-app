@@ -35,7 +35,7 @@ import {
   GraphqlTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
-  WorkspaceTabAdapter
+  WorkspaceTabAdapter,
 } from "../../adapter";
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
@@ -160,6 +160,7 @@ export class DashboardViewModel {
         const {
           _id,
           name,
+          hubUrl,
           users,
           description,
           logo,
@@ -181,6 +182,7 @@ export class DashboardViewModel {
         const item = {
           teamId: _id,
           name,
+          hubUrl,
           users,
           description,
           logo,
@@ -247,6 +249,7 @@ export class DashboardViewModel {
         const {
           _id,
           name,
+          hubUrl,
           description,
           users,
           admins,
@@ -264,6 +267,7 @@ export class DashboardViewModel {
         const item = {
           _id,
           name,
+          hubUrl,
           description,
           users,
           collections: collection ? collection : [],
@@ -271,6 +275,7 @@ export class DashboardViewModel {
           team: {
             teamId: team.id,
             teamName: team.name,
+            hubUrl: team?.hubUrl || "",
           },
           environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
@@ -399,6 +404,17 @@ export class DashboardViewModel {
     return res;
   };
 
+  public constructBaseUrl = async (_teamId: string) => {
+    const teamData = await this.teamRepository.getTeamDoc(_teamId);
+    const hubUrl = teamData?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * Create workspace in the team
    * @param teamId ID of team where workspace need to be created
@@ -407,10 +423,14 @@ export class DashboardViewModel {
     workspaceName: string,
     teamId: string,
   ) => {
-    const response = await this.workspaceService.createWorkspace({
-      name: workspaceName,
-      id: teamId,
-    });
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.workspaceService.createWorkspace(
+      {
+        name: workspaceName,
+        id: teamId,
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await this.workspaceRepository.addWorkspace({
@@ -608,13 +628,13 @@ export class DashboardViewModel {
   };
 
   public switchAndCreateWorkspaceTab = async (workspace: any) => {
-    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(workspace._id, workspace);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(
+      workspace._id,
+      workspace,
+    );
 
     // Create tab and set active workspace
-    await this.tabRepository.createTab(
-      initWorkspaceTab,
-      workspace._id,
-    );
+    await this.tabRepository.createTab(initWorkspaceTab, workspace._id);
     moveNavigation("right");
   };
 

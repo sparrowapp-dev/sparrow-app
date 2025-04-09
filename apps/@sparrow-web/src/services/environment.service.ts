@@ -31,10 +31,13 @@ export class EnvironmentService {
     return response;
   };
 
-  public addEnvironment = async (environment: CreateEnvironmentPostBody) => {
+  public addEnvironment = async (
+    environment: CreateEnvironmentPostBody,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/workspace/environment`,
+      `${baseUrl}/api/workspace/environment`,
       {
         body: environment,
         headers: getAuthHeaders(),
@@ -48,10 +51,11 @@ export class EnvironmentService {
     workspaceId: string,
     environmentId: string,
     environment: UpdateEnvironmentPostBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
+      `${baseUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
       {
         body: environment,
         headers: getAuthHeaders(),
@@ -62,10 +66,11 @@ export class EnvironmentService {
   public deleteEnvironment = async (
     workspaceId: string,
     environmentId: string,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
+      `${baseUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
       { headers: getAuthHeaders() },
     );
     return response;
