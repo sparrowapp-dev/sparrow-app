@@ -12,6 +12,7 @@ import { GuestUserRepository } from "../../../../repositories/guest-user.reposit
 import { TabRepository } from "../../../../repositories/tab.repository";
 import { Debounce, CompareArray } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import constants from "@app/constants/constants";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -164,6 +165,17 @@ export class EnvironmentExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * @description - saves environment to the mongo server
    */
@@ -199,7 +211,7 @@ export class EnvironmentExplorerViewModel {
 
       return;
     }
-
+    const baseUrl = await this.constructBaseUrl(activeWorkspace._id);
     const response = await this.environmentService.updateEnvironment(
       activeWorkspace._id,
       currentEnvironment.id,
@@ -207,6 +219,7 @@ export class EnvironmentExplorerViewModel {
         name: currentEnvironment.name,
         variable: currentEnvironment?.property?.environment?.variable,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.environmentRepository.updateEnvironment(

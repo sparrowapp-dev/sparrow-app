@@ -95,6 +95,7 @@ export class TeamsViewModel {
           _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces,
@@ -116,6 +117,7 @@ export class TeamsViewModel {
           teamId: _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces: updatedWorkspaces,
@@ -185,6 +187,7 @@ export class TeamsViewModel {
           team: {
             teamId: team.id,
             teamName: team.name,
+            hubUrl: team?.hubUrl || "",
           },
           environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
