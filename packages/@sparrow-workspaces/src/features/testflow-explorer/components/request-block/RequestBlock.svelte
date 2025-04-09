@@ -92,7 +92,7 @@
   const parseTime = new ParseTime();
 
   const truncateName = (name: string, charLimit: number) => {
-    return name.length > charLimit
+    return name?.length > charLimit
       ? name.substring(0, charLimit) + "..."
       : name;
   };

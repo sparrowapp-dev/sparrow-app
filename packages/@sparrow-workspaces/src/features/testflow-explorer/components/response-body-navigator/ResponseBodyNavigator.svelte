@@ -105,17 +105,6 @@
       console.error("Save dialog was canceled or no path was selected.");
     }
   };
-
-  onMount(() => {
-    apiState = {
-      ...apiState,
-      responseBodyLanguage: response?.responseContentType,
-    };
-    onUpdateResponseState(
-      "responseBodyLanguage",
-      response?.responseContentType,
-    );
-  });
 </script>
 
 <div class="d-flex flex-column align-items-start justify-content-between w-100">

@@ -72,7 +72,7 @@
   };
 
   const truncateName = (name: string, charLimit: number) => {
-    return name.length > charLimit
+    return name?.length > charLimit
       ? name.substring(0, charLimit) + "..."
       : name;
   };
@@ -132,6 +132,7 @@
     try {
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
+
       if (selectedNodeResponse) {
         apiState = {
           ...apiState,
@@ -153,6 +154,7 @@
         selectedBlock?.data?.requestData?.state?.requestNavigation;
       responseNavigation =
         selectedBlock?.data?.requestData?.state?.responseNavigation;
+
       if (testflowStore) {
         const nodes = testflowStore?.nodes ?? [];
         const hasEmptyResponseStatus = nodes.some(
@@ -166,6 +168,10 @@
           selectedNodeResponse = undefined;
         } else {
           selectedNodeResponse = nodeResponse;
+          // handleUpdateRequestData(
+          //   "responseBodyLanguage",
+          //   selectedNodeResponse?.response?.responseContentType,
+          // );
         }
       }
     }
@@ -345,7 +351,7 @@
                 </div>
 
                 {#if responseNavigation === "Response"}
-                  {#if apiState?.responseBodyLanguage !== "Image"}
+                  {#if selectedNodeResponse?.response?.responseContentType !== "Image"}
                     <ResponseBodyNavigator
                       response={selectedNodeResponse?.response}
                       {apiState}

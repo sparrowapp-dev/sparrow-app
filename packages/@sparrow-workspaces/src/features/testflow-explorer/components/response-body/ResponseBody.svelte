@@ -28,7 +28,7 @@
       ? 'h-100'
       : ''}"
   >
-    {#if apiState.responseBodyLanguage === RequestDataTypeEnum.IMAGE}
+    {#if response.responseContentType === RequestDataTypeEnum.IMAGE}
       <!-- 
         --
         -- Reponse content-type set to image,
@@ -67,7 +67,7 @@
   }
 
   .response-body {
-    overflow-y: hidden;
+    overflow-y: auto;
     transition: overflow 0.3s ease-in-out;
   }
 
