@@ -209,7 +209,7 @@
 
 <div
   class="mb-0 me-0 py-0 section-layout w-100"
-  style="overflow:hidden; border-radius:4px;"
+  style="overflow:visible; border-radius:4px;"
 >
   <div
     class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired

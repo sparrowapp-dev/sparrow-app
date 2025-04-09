@@ -30,7 +30,7 @@
     {requestState}
     {updateBeautifiedState}
   />
-  <div style="flex:1; overflow:auto;">
+  <div style="flex:1; overflow:visible;">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <Raw
         {onUpdateRequestBody}
