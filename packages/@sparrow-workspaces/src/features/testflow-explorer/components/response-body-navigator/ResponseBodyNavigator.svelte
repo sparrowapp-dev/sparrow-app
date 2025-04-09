@@ -15,6 +15,7 @@
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
   import { responseBodyDataFormatTypes } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import { onMount } from "svelte";
 
   export let response;
   export let apiState: any;

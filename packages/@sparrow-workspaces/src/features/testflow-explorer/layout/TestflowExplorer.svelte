@@ -41,7 +41,7 @@
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
   import { PlayFilled, RunIcon, StopFilled } from "@sparrow/library/icons";
-  import { Button, Modal } from "@sparrow/library/ui";
+  import { Button, Modal, notifications } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
@@ -139,7 +139,7 @@
   let updateNodeFolderId: any;
   // Flag to control whether nodes are draggable
   let isNodesDraggable = false;
-  let blockName = "REST API Request";
+  let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let collectionListDocument: CollectionDocument[];
   let filteredCollections = writable<CollectionDto[]>([]);
@@ -415,6 +415,11 @@
    */
   const handleCreateCustomRequest = async () => {
     try {
+      if (!customRequestName) {
+        notifications.error(`Request name is required.`);
+        return;
+      }
+
       isCreatingCustomRequest = true;
       const isExist = await checkRequestExistInNode(
         selectedBlock?.data?.tabId,
@@ -468,8 +473,7 @@
       isSaveNodeModalOpen = false;
     } catch (error) {
       console.error("Error in saving the request:", error);
-    } finally {
-      isSavingRequestLoader = false;
+      isSaveNodeModalOpen = false;
     }
   };
 
@@ -555,7 +559,7 @@
         {
           id: targetNode,
           type: "requestBlock",
-          blockName: blockName,
+          blockName: `block ${targetNode - 1}`,
           data: {
             blocks: nodes,
             connector: edges,
@@ -1199,6 +1203,7 @@
         {userRole}
         {onUpdateEnvironment}
         {runSingleNode}
+        {testflowStore}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}

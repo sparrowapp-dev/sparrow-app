@@ -179,9 +179,9 @@
     isFolder: boolean = false,
   ) => {
     if (isFolder) {
-      return name.length > charLimit ? name.substring(0, 4) + "..." : name;
+      return name?.length > charLimit ? name.substring(0, 4) + "..." : name;
     }
-    return name.length > charLimit + 2
+    return name?.length > charLimit + 2
       ? name.substring(0, charLimit) + "..."
       : name;
   };
