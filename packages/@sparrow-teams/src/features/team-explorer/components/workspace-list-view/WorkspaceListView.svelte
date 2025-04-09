@@ -138,8 +138,8 @@
       {#if searchQuery == "" && data && data?.length === 0}
         <p class="not-found-text mt-3">
           {isAdminOrOwner
-            ? "Add Workspaces to this team."
-            : "You don't have access to any workspace in this team."}
+            ? "Add Workspaces to this hub."
+            : "You don't have access to any workspace in this hub."}
         </p>
       {:else if searchQuery !== "" && data
           .slice()
