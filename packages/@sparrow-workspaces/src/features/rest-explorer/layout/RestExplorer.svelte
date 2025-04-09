@@ -56,9 +56,12 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { tabsSplitterDirection } from "../../../stores";
+  import {
+    tabsSplitterDirection,
+    isChatbotOpenInCurrTab,
+  } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
   import {
@@ -230,6 +233,12 @@
   //     });
   //   }
   // }
+  $: if (!isGuestUser && $tab?.property?.request?.state?.isChatbotActive) {
+    isChatbotOpenInCurrTab.set(true);
+  }
+  onDestroy(() => {
+    isChatbotOpenInCurrTab.set(false);
+  });
 </script>
 
 {#if $tab.tabId}
@@ -657,6 +666,7 @@
       on:click={() => {
         if ($tabsSplitterDirection != "horizontal") {
           tabsSplitterDirection.set("horizontal");
+          isChatbotOpenInCurrTab.set(true);
         }
         onUpdateRequestState({
           isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,

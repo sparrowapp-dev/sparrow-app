@@ -12,6 +12,7 @@
   import { SparrowPrimaryIcon } from "@sparrow/common/icons";
   import { Modal } from "@sparrow/library/ui";
   import { tick } from "svelte";
+  import { isChatbotOpenInCurrTab } from "../../../../stores";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -114,10 +115,10 @@
               <span class="gradient-text">Sparrow AI</span>
             </div>
             <div
-              on:click={() =>
-                onUpdateRequestState({
-                  isChatbotActive: false,
-                })}
+              on:click={() => {
+                onUpdateRequestState({ isChatbotActive: false });
+                isChatbotOpenInCurrTab.set(false);
+              }}
               class="close-btn d-flex align-items-center justify-content-center"
             >
               <CrossIcon height={"18px"} width={"18px"} color={"#8A9299"} />
