@@ -256,6 +256,7 @@
             "onContextMenu",
             "onUpdateSelectAPI",
             "onOpenSaveNodeRequestModal",
+            "updateBlockName",
           ];
 
           const originalData = dbNodes[i].data || {};
@@ -612,6 +613,9 @@
                 folderId,
               );
             },
+            updateBlockName: function (field: string, value: string) {
+              handleUpdateRequestData(field, value);
+            },
             name: _requestData?.name,
             method: _requestData?.method,
             collectionId: _requestData?.collectionId,
@@ -712,6 +716,9 @@
                 method,
                 folderId,
               );
+            },
+            updateBlockName: function (field: string, value: string) {
+              handleUpdateRequestData(field, value);
             },
             name: dbNodes[i].data?.name,
             method: dbNodes[i].data?.method,

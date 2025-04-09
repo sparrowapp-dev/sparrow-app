@@ -46,7 +46,7 @@
       height={"36px"}
       id={inputId}
       placeholder={NAME_CONFIG.PLACEHOLDER}
-      class="text-fs-14 bg-tertiary-300 fw-normal px-2 border-radius-4"
+      class="text-ds-font-size-14 bg-tertiary-300 px-2 border-radius-4 text-ds-font-weight-regular text-ds-line-height-143" 
       style="outline:none;"
       isError={!teamForm.name.value && teamForm.name.isTouched}
       isEditIconRequired={false}

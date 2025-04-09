@@ -67,6 +67,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { InitTab } from "@sparrow/common/factory";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
+import constants from "@app/constants/constants";
 
 export class RestExplorerSavedViewModel {
   /**
@@ -1011,6 +1012,17 @@ export class RestExplorerSavedViewModel {
     );
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -1078,10 +1090,14 @@ export class RestExplorerSavedViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -1163,11 +1179,15 @@ export class RestExplorerSavedViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list

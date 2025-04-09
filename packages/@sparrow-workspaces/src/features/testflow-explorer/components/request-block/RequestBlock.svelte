@@ -61,12 +61,12 @@
       method: string,
       folderId: string,
     ) => void;
+    updateBlockName: (field: string, value: string) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
     parentDrag: boolean;
   };
   export let selected;
-  export let updateBlockName: (name: string) => void;
 
   /**
    * The unique identifier for the current block.
@@ -91,6 +91,12 @@
   let currentBlock: TFNodeStoreType | undefined;
   const parseTime = new ParseTime();
 
+  const truncateName = (name: string, charLimit: number) => {
+    return name.length > charLimit
+      ? name.substring(0, charLimit) + "..."
+      : name;
+  };
+
   /**
    * Updates the node when an API is selected.
    * @param name - The name of the API.
@@ -107,7 +113,7 @@
     folderId?: string,
   ) => {
     isRunTextVisible = true;
-    
+
     data.onOpenSaveNodeRequestModal(
       id,
       name,
@@ -211,25 +217,25 @@
     }
   };
 
-  const disableEditing = () => {
-    isEditing = false;
-    updateBlockName(blockName);
-  };
+  // const disableEditing = () => {
+  //   isEditing = false;
+  //   data.updateBlockName("blockName", blockName);
+  // };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      disableEditing();
-    }
-  };
+  // const handleKeyDown = (event: any) => {
+  //   if (event.key === "Enter") {
+  //     disableEditing();
+  //   }
+  // };
 
   let moreOptions = [
-    // {
-    //   name: "Rename Block",
-    //   iconSize: "16px",
-    //   iconColor: "var(--icon-ds-neutral-50)",
-    //   Icon: RenameRegular,
-    //   onClick: enableEditing,
-    // },
+    {
+      name: "Rename Block",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: RenameRegular,
+      onClick: enableEditing,
+    },
     {
       name: "Run From Here",
       iconSize: "16px",
@@ -311,16 +317,17 @@
       </div>
       {#if !isEditing}
         <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
-          {blockName}
+          {truncateName(blockName, 20)}
         </span>
       {:else}
         <input
-          bind:value={blockName}
           bind:this={inputfield}
           type="text"
           class="rename-input"
-          on:blur={disableEditing}
-          on:keydown={handleKeyDown}
+          on:input={(e) => {
+            data.updateBlockName("blockName", e?.target?.value);
+          }}
+          value={blockName}
         />
       {/if}
     </div>

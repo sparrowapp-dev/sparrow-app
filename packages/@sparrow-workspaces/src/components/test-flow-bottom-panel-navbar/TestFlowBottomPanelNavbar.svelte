@@ -4,9 +4,11 @@
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
   import { Select } from "@sparrow/library/forms";
-  import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-  import { httpMethodData } from "../../../../@sparrow-common/src/utils/testFlow.helper";
+  import {
+    extractQueryParams,
+    httpMethodData,
+  } from "../../../../@sparrow-common/src/utils/testFlow.helper";
   import HttpUrlSection from "../../features/testflow-explorer/components/http-url-section/HttpUrlSection.svelte";
 
   export let selectedBlock;
@@ -64,7 +66,7 @@
     </div>
   </div>
 
-  <div class="request-url">
+  <div class="request-url w-100">
     <HttpUrlSection
       {requestUrl}
       onUpdateRequestUrl={(e) => {
