@@ -1199,6 +1199,7 @@
         {userRole}
         {onUpdateEnvironment}
         {runSingleNode}
+        {testflowStore}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}

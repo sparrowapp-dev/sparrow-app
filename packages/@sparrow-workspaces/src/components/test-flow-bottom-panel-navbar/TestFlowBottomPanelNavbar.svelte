@@ -20,6 +20,7 @@
   export let userRole;
   export let onUpdateEnvironment;
   export let handleClickTestButton;
+  export let isTestFlowRuning = false;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -79,7 +80,7 @@
   </div>
 
   <Button
-    disable={false}
+    disable={isTestFlowRuning}
     title={"Test"}
     textClassProp={"fs-6"}
     type={"primary"}

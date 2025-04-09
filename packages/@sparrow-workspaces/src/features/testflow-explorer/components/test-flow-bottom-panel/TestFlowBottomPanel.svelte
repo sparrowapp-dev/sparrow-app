@@ -37,6 +37,7 @@
   export let userRole;
   export let isWebApp = false;
   export let runSingleNode;
+  export let testflowStore;
 
   let responseLoader = false;
   let height = 300;
@@ -45,7 +46,6 @@
   let isResizingActive = false;
   let requestNavigation = "Parameters";
   let inputRef;
-  let testflowStore = undefined;
   let selectedNodeResponse: any = undefined;
   let responseNavigation = "Response";
   let responseState: TFResponseStateType = {
@@ -143,32 +143,28 @@
   };
 
   $: {
-    if (selectedBlock && testFlowDataStore) {
-      testFlowDataStore.subscribe((val) => {
-        if (val) {
-          testflowStore = val.get(selectedBlock?.data?.tabId);
-          const nodes = testflowStore?.nodes ?? [];
-          const hasEmptyResponseStatus = nodes.some(
-            (node) => !node.response?.status || node.response?.status === "",
-          );
-          const nodeResponse = testflowStore?.nodes.find(
-            (item) => item?.id === selectedBlock?.id,
-          );
+    if (selectedBlock && testflowStore) {
+      const nodes = testflowStore?.nodes ?? [];
+      const hasEmptyResponseStatus = nodes.some(
+        (node) => !node.response?.status || node.response?.status === "",
+      );
+      const nodeResponse = testflowStore?.nodes.find(
+        (item) => item?.id === selectedBlock?.id,
+      );
 
-          if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
-            selectedNodeResponse = undefined;
-          } else {
-            selectedNodeResponse = nodeResponse;
-          }
-        }
-      });
+      if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
+        selectedNodeResponse = undefined;
+      } else {
+        selectedNodeResponse = nodeResponse;
+        console.log({ testflowStore });
+      }
     }
   }
 </script>
 
 <section
   class="section"
-  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"}`}
+  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"}; margin-bottom: 70px;`}
 >
   <div
     on:mousedown={startResize}
@@ -235,6 +231,7 @@
       {userRole}
       {onUpdateEnvironment}
       {handleClickTestButton}
+      isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
   </div>
 
@@ -433,7 +430,7 @@
   .response-pane-container {
     padding-left: 12px;
     overflow: auto;
-    height: 85%;
+    height: 100%;
   }
 
   .dumy-response-container {
