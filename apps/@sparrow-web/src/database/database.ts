@@ -173,7 +173,7 @@ export class RxDB {
       collection: {
         schema: collectionSchema,
         migrationStrategies: {
-          1: function (oldDoc: TeamDocument) {
+          1: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },
@@ -187,7 +187,7 @@ export class RxDB {
       team: {
         schema: teamSchema,
         migrationStrategies: {
-          1: function (oldDoc: CollectionDocument) {
+          1: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },
