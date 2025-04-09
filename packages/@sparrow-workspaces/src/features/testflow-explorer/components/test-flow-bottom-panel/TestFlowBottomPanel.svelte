@@ -44,17 +44,14 @@
   let minHeight = 100;
   let isResizing = false;
   let isResizingActive = false;
-  let requestNavigation = "Parameters";
   let inputRef;
   let selectedNodeResponse: any = undefined;
   let responseNavigation = "Response";
-  let responseState: TFResponseStateType = {
-    responseBodyLanguage: "JSON",
-    responseBodyFormatter: "Pretty",
-  };
+  let requestNavigation = "Parameters";
+  let apiState;
 
   const handleResponseState = (key: string, value: any) => {
-    responseState = { ...responseState, [key]: value };
+    handleUpdateRequestData(key, value);
   };
 
   /**
@@ -72,7 +69,7 @@
     } else {
       requestNavigation = "Parameters";
     }
-
+    handleUpdateRequestData("requestNavigation", requestNavigation);
     return requestNavigation;
   };
 
@@ -143,19 +140,24 @@
   };
 
   $: {
-    if (selectedBlock && testflowStore) {
-      const nodes = testflowStore?.nodes ?? [];
-      const hasEmptyResponseStatus = nodes.some(
-        (node) => !node.response?.status || node.response?.status === "",
-      );
-      const nodeResponse = testflowStore?.nodes.find(
-        (item) => item?.id === selectedBlock?.id,
-      );
+    if (selectedBlock) {
+      apiState = selectedBlock?.data?.requestData?.state;
+      requestNavigation =
+        selectedBlock?.data?.requestData?.state?.requestNavigation;
+      if (testflowStore) {
+        const nodes = testflowStore?.nodes ?? [];
+        const hasEmptyResponseStatus = nodes.some(
+          (node) => !node.response?.status || node.response?.status === "",
+        );
+        const nodeResponse = testflowStore?.nodes.find(
+          (item) => item?.id === selectedBlock?.id,
+        );
 
-      if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
-        selectedNodeResponse = undefined;
-      } else {
-        selectedNodeResponse = nodeResponse;
+        if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
+          selectedNodeResponse = undefined;
+        } else {
+          selectedNodeResponse = nodeResponse;
+        }
       }
     }
   }
@@ -334,10 +336,10 @@
                 </div>
 
                 {#if responseNavigation === "Response"}
-                  {#if responseState?.responseBodyLanguage !== "Image"}
+                  {#if apiState?.responseBodyLanguage !== "Image"}
                     <ResponseBodyNavigator
                       response={selectedNodeResponse?.response}
-                      apiState={responseState}
+                      {apiState}
                       onUpdateResponseState={handleResponseState}
                       {onClearResponse}
                       {isWebApp}
@@ -349,7 +351,7 @@
                   >
                     <ResponseBody
                       response={selectedNodeResponse?.response}
-                      apiState={responseState}
+                      {apiState}
                     />
                   </div>
                 {:else if responseNavigation === "Headers"}
