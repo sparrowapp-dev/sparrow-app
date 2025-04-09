@@ -226,6 +226,7 @@ export type TFHistoryStoreType = {
 };
 
 export type TFDataStoreType = {
+  abortController: AbortController;
   nodes: TFNodeStoreType[];
   history: TFHistoryStoreType[];
   isRunHistoryEnable: boolean;

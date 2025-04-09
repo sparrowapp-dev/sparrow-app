@@ -40,9 +40,10 @@
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
+  import { PlayFilled, RunIcon, StopFilled } from "@sparrow/library/icons";
+  import { Button, Modal } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
-  import { Button, Modal, Tooltip } from "@sparrow/library/ui";
-  import { PlayFilled } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import CustomRequest from "../../../components/custom-request-modal/CustomRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
@@ -91,6 +92,7 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onClickStop;
   export let onClearTestflow;
   export let isTestFlowEmpty;
   export let onSelectRequest;
@@ -1014,19 +1016,28 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         {#if nodesValue > 1}
-          <Button
-            type="primary"
-            size="medium"
-            startIcon={PlayFilled}
-            disable={testflowStore?.isTestFlowRunning}
-            title="Run"
-            onClick={async () => {
-              unselectNodes();
-              await onClickRun();
-              selectFirstNode();
-              MixpanelEvent(Events.Run_TestFlows);
-            }}
-          />
+          {#if testflowStore?.isTestFlowRunning}
+            <Button
+              type="secondary"
+              size="medium"
+              startIcon={StopFilled}
+              title={"Stop Flow"}
+              onClick={onClickStop}
+            />
+          {:else}
+            <Button
+              type="primary"
+              size="medium"
+              startIcon={PlayFilled}
+              title="Run"
+              onClick={async () => {
+                unselectNodes();
+                await onClickRun();
+                selectFirstNode();
+                MixpanelEvent(Events.Run_TestFlows);
+              }}
+            />
+          {/if}
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
