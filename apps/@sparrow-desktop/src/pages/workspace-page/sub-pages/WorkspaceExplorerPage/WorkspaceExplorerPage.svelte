@@ -15,7 +15,7 @@
   export let collectionList;
   export let tab;
 
-  const _viewModel = new WorkspaceExplorerViewModel();
+  const _viewModel = new WorkspaceExplorerViewModel(tab);
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
 
@@ -110,16 +110,17 @@
 
 <WorkspaceExplorer
   bind:userRole
-  {tab}
+  tab={_viewModel.tab}
   {workspaceUpdatesList}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,
   )?.length}
   bind:isWorkspaceInviteModalOpen
   onDeleteWorkspace={handleDeleteWorkspace}
-  onUpdateWorkspaceDescription={_viewModel.updateWorkspaceDescription}
-  onUpdateWorkspaceName={_viewModel.updateWorkspaceName}
+  onUpdateWorkspaceDescription={_viewModel.handleUpdateDescription}
+  onUpdateWorkspaceName={_viewModel.handleUpdateName}
   onWorkspaceUpdateScroll={handleWorkspaceUpdatesScroll}
+  onSaveWorkspace={_viewModel.handleSaveWorkspace}
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}

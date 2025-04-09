@@ -19,6 +19,7 @@
   export let onToggleLike;
   export let regenerateAiResponse;
   export let onUpdateRequestState;
+  export let onStopGeneratingAIResponse;
   export let scrollList;
 
   let chatContainer: HTMLElement;
@@ -63,7 +64,11 @@
         in:fade={{ duration: 200 }}
       >
         <div class="p-2">
-          <SparrowAIIcon height={"32px"} width={"32px"} />
+          <SparrowAIIcon
+            height={"32px"}
+            width={"32px"}
+            color="var(--primary-btn-color)"
+          />
           <span class="gradient-text">Sparrow</span>
         </div>
         <div
@@ -166,6 +171,7 @@
       {isResponseGenerating}
       placeholder={"How can I help you?"}
       {sendPrompt}
+      {onStopGeneratingAIResponse}
     />
   </div>
 </div>

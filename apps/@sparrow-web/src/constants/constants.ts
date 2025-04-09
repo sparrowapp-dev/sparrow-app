@@ -26,6 +26,7 @@ const constants = {
   DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS,
   PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
   SOCKET_IO_API_URL: import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
+  VITE_WEB_SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_WEB_SPARROW_AI_WEBSOCKET
 };
 
 export default constants;

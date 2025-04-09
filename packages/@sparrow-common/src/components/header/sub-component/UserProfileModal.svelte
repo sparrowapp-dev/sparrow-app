@@ -104,18 +104,18 @@
 
     <div
       bind:this={modalElement}
-      class=" position-fixed d-flex flex-column modal-background p-1 {showProfileModal
+      class=" position-fixed d-flex flex-column modal-background text-ds-font-size-12 text-ds-font-weight-regular p-1 {showProfileModal
         ? ''
         : 'd-none'}"
-      style="right:10px; top:47px; font-size: 12px; font-weight: 400; min-width: 200px; z-index: 500; display:flex; flex-direction:column;gap:4px; background-color:var(--bg-ds-surface-600);"
+      style="right:10px; top:47px; min-width: 200px; z-index: 500; display:flex; flex-direction:column;gap:4px; background-color:var(--bg-ds-surface-600);"
     >
       <div class="align-items-center py-1 px-2 profile-item" style="display: flex; gap:8px">
         <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
         <div class="d-flex flex-column ms-1">
-          <div class="ellipsis" style="max-width: 200px; font-weight: 500;">
+          <div class="ellipsis text-ds-font-weight-medium text-ds-line-height-130" style="max-width: 200px;">
             {user?.name}
           </div>
-          <div style="max-width: 200px;color:var(--text-ds-neutral-300)" class="ellipsis">
+          <div style="max-width: 200px;color:var(--text-ds-neutral-300) " class="ellipsis text-ds-font-weight-regular text-ds-line-height-150">
             {user?.email}
           </div>
         </div>
@@ -127,7 +127,7 @@
         on:click={onLogout}
         >
         <SignOutIconRegular size={"16px"} color="var(--icon-ds-nuetral-50)" />
-         <span class="ms-3">Sign Out</span></button
+         <span class="ms-3 text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12 ">Sign Out</span></button
       >
     </div>
   </Tooltip>

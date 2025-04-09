@@ -12,3 +12,4 @@ export { default as WithButtonV6 } from "./WithButtonV6.svelte";
 
 // Modal
 export { default as WithModal } from "./WithModal.svelte";
+export { default as WithOutlet} from "./WithOutlet.svelte";

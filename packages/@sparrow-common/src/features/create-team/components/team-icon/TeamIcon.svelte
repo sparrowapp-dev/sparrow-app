@@ -129,7 +129,7 @@
     -- Title 
   -->
   <span
-    class="text-fs-14 text-secondary-1000"
+    class="text-ds-font-size-14 text-secondary-1000 text-ds-font-weight-regular text-ds-line-height-143"
     style="color:var(--text-ds-neutral-200);">{ICON_CONFIG.TITLE}</span
   >
   <!-- <span style="padding-left:4px;color:var(--bg-ds-danger-400);">*</span> -->
@@ -138,7 +138,7 @@
     -- Description 
   -->
   {#if !(!Array.isArray(teamForm.file.value) && teamForm.file.value.size > 0)}
-    <p class="mb-2 text-fs-12 text-secondary-200">
+    <p class="mb-2 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150 text-secondary-200">
       {ICON_CONFIG.DESCRIPTION}
     </p>
   {/if}
@@ -163,11 +163,11 @@
   -->
   <div>
     {#if teamForm.file.showFileSizeError}
-      <p class="mb-2 mt-1 text-fs-12 text-danger-200">
+      <p class="mb-2 mt-1 text-ds-font-size-12 text-danger-200">
         {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
       </p>
     {:else if teamForm.file.showFileTypeError}
-      <p class="mb-2 mt-1 text-fs-12 text-danger-200">
+      <p class="mb-2 mt-1 text-ds-font-size-12 text-danger-200">
         {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
       </p>
       <!-- 

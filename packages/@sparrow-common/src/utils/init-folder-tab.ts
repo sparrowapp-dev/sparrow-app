@@ -20,16 +20,13 @@ class InitFolderTab {
       tabId: uuidv4(),
       name: FolderDefault.NAME,
       type: TabTypeEnum.FOLDER,
-      persistence: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.TEMPORARY,
       description: "",
       source: "USER",
       isDeleted: false,
       activeSync: false,
       property: {
-        folder: {
-          id: "",
-        },
-        totalRequests: 0,
+        folder: {}
       },
       path: {
         workspaceId: _workspaceId,
@@ -45,11 +42,8 @@ class InitFolderTab {
       console.error("invalid id or workspace id on create new tab request!");
     }
   }
-  public getValue(): FolderTab {
+  public getValue(): Tab {
     return this._tab;
-  }
-  public getSpacificValue(_value: string) {
-    return this._tab[_value];
   }
   public updateId(_id: string) {
     this._tab.id = _id;

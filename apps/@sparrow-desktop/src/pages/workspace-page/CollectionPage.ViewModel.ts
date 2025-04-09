@@ -93,6 +93,7 @@ import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/ut
 import { createDeepCopy } from "@sparrow/common/utils";
 import {
   CollectionTabAdapter,
+  FolderTabAdapter,
   GraphqlTabAdapter,
   RequestSavedTabAdapter,
   SocketIoTabAdapter,
@@ -124,6 +125,7 @@ import {
   type State,
 } from "@sparrow/common/types/workspace";
 import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
+import { WorkspaceService } from "@app/services/workspace.service";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -132,6 +134,7 @@ export default class CollectionsViewModel {
   private environmentRepository = new EnvironmentRepository();
   private githhubRepoRepository = new GithubRepoReposistory();
   private collectionService = new CollectionService();
+  private workspaceService = new WorkspaceService();
   private githubService = new GithubService();
   private guideRepository = new GuideRepository();
   private initTab = new InitTab();
@@ -496,7 +499,7 @@ export default class CollectionsViewModel {
       newSocketIOTab.updateDescription(restOfData.description);
       newSocketIOTab.updateUrl(restOfData.property.socketio.url);
       newSocketIOTab.updateHeaders(
-        restOfData.property.socketio.headers as KeyValueChecked[],
+        restOfData?.property?.socketio?.headers as KeyValueChecked[],
       );
       newSocketIOTab.updateQueryParams(
         restOfData.property.socketio.queryParams as KeyValueChecked[],
@@ -1140,7 +1143,6 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
-
     let userSource = {};
     if (collection?.activeSync) {
       userSource = {
@@ -2383,23 +2385,8 @@ export default class CollectionsViewModel {
     collection: CollectionDto,
     folder: CollectionItemsDto,
   ) => {
-    const path = {
-      workspaceId: workspaceId,
-      collectionId: collection.id ?? "",
-      folderId: folder?.id,
-      folderName: folder.name,
-    };
-
-    const sampleFolder = new InitFolderTab(
-      folder.id,
-      collection.workspaceId as string,
-    );
-    sampleFolder.updateName(folder.name);
-    sampleFolder.updatePath(path);
-    sampleFolder.updateIsSave(true);
-    sampleFolder.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
-
-    this.handleCreateTab(sampleFolder.getValue());
+    const folderTab = new FolderTabAdapter().adapt(workspaceId, collection.id, folder);
+    this.handleCreateTab(folderTab);
     moveNavigation("right");
   };
 
@@ -5861,6 +5848,51 @@ export default class CollectionsViewModel {
   };
 
   /**
+   *
+   * @param componentData - saves the folder on tab close.
+   */
+  public saveFolder = async (componentData: Tab) : Promise<boolean> => {
+    const progressiveTab = componentData;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser == true) {
+      await this.collectionRepository.updateRequestOrFolderInCollection(progressiveTab?.path?.collectionId as string, progressiveTab.id, {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
+      });
+      notifications.success(
+        `The ‘${progressiveTab.name}’ folder saved successfully.`,
+      );
+      return true;
+    }
+    const response = await this.collectionService.updateFolderInCollection(
+      progressiveTab.path.workspaceId as string,
+      progressiveTab.path.collectionId as string,
+      progressiveTab.id as string,
+      {
+        description: progressiveTab.description,
+        name: progressiveTab.name,
+      },
+    );
+    if (response.isSuccessful) {
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        progressiveTab.path.collectionId as string,
+        progressiveTab.id as string,
+        response.data.data,
+      );
+      notifications.success(
+        `The ‘${progressiveTab.name}’ folder saved successfully.`,
+      );
+      return true;
+    } else {
+      notifications.error("Failed to save folder. Please try again.");
+    }
+    return false;
+  };
+
+  /**
    * Handles saving a collection
    */
   public saveCollection = async (componentData: Tab) => {
@@ -5907,6 +5939,35 @@ export default class CollectionsViewModel {
     }
     return false;
   };
+
+   /**
+     * Saves and closes the workspace tab.
+     * @param _tab - The tab that is going to be removed.
+     */
+    public saveWorkspace = async (_tab: Tab)  : Promise<boolean> => {
+      const progressiveTab = createDeepCopy(_tab);
+      const response = await this.workspaceService.updateWorkspace( progressiveTab.id, {
+        name: progressiveTab.name,
+        description: progressiveTab.description,
+      });
+  
+      if (response.isSuccessful) {
+        const updatedata = {
+          name: progressiveTab.name,
+          description: progressiveTab.description,
+          updatedAt: response.data.data.updatedAt,
+        };
+        await this.workspaceRepository.updateWorkspace(progressiveTab.id, updatedata);
+        notifications.success(
+          `The ‘${progressiveTab.name}’ workspace saved successfully.`,
+        );
+        return true;
+      }
+      else{
+        notifications.error("Failed to save workspace. Please try again.");
+      }
+      return false;
+    };
 
   /**
    * Update the tab type to permanent on double click

@@ -11,7 +11,7 @@ class InitWorkspaceTab {
   /**
    *
    * @param _id - Workspace mongo id
-   * @param _workspaceId - Workspace Id to which Collection belongs to
+   * @param _workspaceId - Workspace Id to which Workspace belongs to
    */
   constructor(_id: string, _workspaceId: string) {
     this._tab = {
@@ -19,14 +19,12 @@ class InitWorkspaceTab {
       tabId: uuidv4(),
       name: "My Workspace",
       type: TabTypeEnum.WORKSPACE,
-      persistence: TabPersistenceTypeEnum.PERMANENT,
+      persistence: TabPersistenceTypeEnum.TEMPORARY,
       description: "",
       source: "USER",
       activeSync: false,
       property: {
-        collection: {
-          id: "",
-        },
+        workspace: {},
       },
       path: {
         workspaceId: _workspaceId,
@@ -40,11 +38,8 @@ class InitWorkspaceTab {
       timestamp: new Date().toString(),
     };
   }
-  public getValue(): WorkspaceTab {
+  public getValue(): Tab {
     return this._tab;
-  }
-  public getSpacificValue(_value: string) {
-    return this._tab[_value];
   }
   public updateId(_id: string) {
     this._tab.id = _id;
