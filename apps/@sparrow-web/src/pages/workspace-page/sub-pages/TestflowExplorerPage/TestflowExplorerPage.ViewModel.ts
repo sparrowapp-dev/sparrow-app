@@ -399,14 +399,18 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+    const abortController = new AbortController();
+    const { signal } = abortController;
 
     testFlowDataStore.update((testFlowDataMap) => {
       let wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
         wsData.nodes = [];
         wsData.isTestFlowRunning = true;
+        wsData.abortController = abortController;
       } else {
         wsData = {
+          abortController: abortController,
           nodes: [],
           history: [],
           isRunHistoryEnable: false,
@@ -468,6 +472,7 @@ export class TestflowExplorerPageViewModel {
             decodeData[3],
             decodeData[4],
             selectedAgent,
+            signal,
           );
           const end = Date.now();
           const duration = end - start;
@@ -549,6 +554,9 @@ export class TestflowExplorerPageViewModel {
             return testFlowDataMap;
           });
         } catch (error) {
+          if (error?.name === "AbortError") {
+            break;
+          }
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
@@ -1057,6 +1065,33 @@ export class TestflowExplorerPageViewModel {
       return testFlowDataMap;
     });
     notifications.success(`Cleared all Responses for testflow.`);
+  };
+
+  /**
+   * @description - This function stops the api calls in Testflow.
+   */
+  public handleStopApis = () => {
+    let abortController;
+    testFlowDataStore.update((testFlowDataMap) => {
+      const currentTestflow = this._tab.getValue();
+      const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+      if (wsData) {
+        abortController = wsData.abortController;
+      }
+      return testFlowDataMap;
+    });
+    if (abortController) {
+      abortController.abort();
+      testFlowDataStore.update((testFlowDataMap) => {
+        const currentTestflow = this._tab.getValue();
+        const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+        if (wsData) {
+          wsData.isTestFlowRunning = false;
+          testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+        }
+        return testFlowDataMap;
+      });
+    }
   };
 
   /**
