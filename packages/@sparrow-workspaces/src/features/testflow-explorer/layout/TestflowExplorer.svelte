@@ -520,7 +520,6 @@
    */
   const createNewNode = async (_id: string, _requestData = undefined) => {
     if (!_id) return;
-    console.log("--------main-request", _requestData);
 
     // handles run from from start button click
     if (_id === "0") {
@@ -604,16 +603,17 @@
                 folderId,
               );
             },
-            name: _requestData ? _requestData?.name : "",
-            method: _requestData ? _requestData?.method : "",
-            collectionId: _requestData ? _requestData?.collectionId : "",
-            folderId: _requestData?.folderId ? _requestData?.folderId : "",
-            requestId: _requestData ? _requestData?.requestId : "",
+            name: _requestData?.name,
+            method: _requestData?.method,
+            collectionId: _requestData?.collectionId,
+            folderId: _requestData?.folderId,
+            requestId: _requestData?.requestId,
             collections: filteredCollections,
             tabId: $tab.tabId,
-            workspaceId: _requestData ? _requestData?.workspaceId : "",
-            isDeleted: _requestData ? _requestData?.isDeleted : false,
-            requestData: defaultRequestData("", ""),
+            workspaceId: _requestData?.workspaceId,
+            isDeleted: _requestData?.isDeleted,
+            requestData:
+              _requestData?.requestData || defaultRequestData("", ""),
           },
           position: nextNodePosition,
           deletable: false,
