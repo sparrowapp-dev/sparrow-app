@@ -2432,7 +2432,7 @@ class RestExplorerViewModel {
                   ...(componentData?.property?.request?.ai?.conversations ||
                     []),
                   {
-                    message: "Something went wrong! Please try again.",
+                    message: "Something went wrong! Please try again in some time.",
                     messageId: uuidv4(),
                     type: MessageTypeEnum.RECEIVER,
                     isLiked: false,

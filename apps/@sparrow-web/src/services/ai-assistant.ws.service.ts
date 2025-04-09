@@ -49,7 +49,7 @@ export class AiAssistantWebSocketService {
    * Connection status
    * @private
    */
-  private isConnected: boolean = false;
+  private _isConnected: boolean = false;
 
   /**
    * Reconnection timer
@@ -109,18 +109,31 @@ export class AiAssistantWebSocketService {
     return AiAssistantWebSocketService.instance;
   }
 
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  //                         **** Connection Management Methods ****
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
   /**
    * Connects to the AI Assistant WebSocket server.
    * Initializes the WebSocket connection and sets up event handlers.
    */
   public connectWebSocket = () => {
-    // Close existing connection if any
-    if (this.webSocket) {
-      this.webSocket.close();
-    }
 
     try {
-      
+
+      // If already connected or connecting, no need to create a new connection
+      if (
+        this.webSocket && 
+        (this.webSocket.readyState === WebSocket.OPEN || 
+        this.webSocket.readyState === WebSocket.CONNECTING)
+      ) { return true; }
+
+      // Clean up any existing connection
+      this.cleanup();
+
+      // Create new WebSocket connection
+      // ToDo: Need to add autentication to avoid absure of ai socket url
       this.webSocket = new WebSocket(this.baseUrl,
         // {
         // transports: ["websocket"],
@@ -136,13 +149,17 @@ export class AiAssistantWebSocketService {
 
       return this.webSocket;
     } catch (error) {
-      // console.error("Failed to create WebSocket connection:", error);
+      console.error("Failed to create WebSocket connection:", error);
       this.scheduleReconnect();
       return null;
     }
   };
 
-  private isWsConnected = (): boolean => {
+  /**
+   * Returns the current connection status 
+   * @returns {boolean} - Whether the WebSocket is currently connected or not
+   */
+  public isWsConnected = (): boolean => {
     return this.webSocket?.readyState === WebSocket.OPEN;
   };
 
@@ -151,7 +168,7 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleOpen = (event: Event) => {
-    this.isConnected = true;
+    this._isConnected = true;
     this.reconnectAttempts = 0;
     socketStore.set(this.webSocket);
 
@@ -160,20 +177,17 @@ export class AiAssistantWebSocketService {
   };
 
   /**
-   * Handles WebSocket message event
+   * Handles WebSocket close event
    * @private
    */
-  private handleMessage = (event: MessageEvent) => {
-    try {
-      const data = JSON.parse(event.data);
-      // console.log("data received :>> ", data);
-      if (data.tab_id) {
-        this.triggerEvent(`assistant-response_${data.tab_id}`, data);
-      } else {
-        this.triggerEvent(`assistant-response`, data);
-      }
-    } catch (error) {
-      console.error("Error in parsing response:", error);
+  private handleClose = (event: CloseEvent) => {
+    
+    this._isConnected = false;
+    this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
+
+    // Attempt to reconnect if the connection wasn't closed intentionally
+    if (event.code !== 1000) {
+      this.scheduleReconnect();
     }
   };
 
@@ -188,19 +202,19 @@ export class AiAssistantWebSocketService {
   };
 
   /**
-   * Handles WebSocket close event
+   * Handles WebSocket message event
    * @private
    */
-  private handleClose = (event: CloseEvent) => {
-    // console.log(
-    //   `WebSocket closed with code: ${event.code}, reason: ${event.reason}`,
-    // );
-    this.isConnected = false;
-    this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
-
-    // Attempt to reconnect if the connection wasn't closed intentionally
-    if (event.code !== 1000) {
-      this.scheduleReconnect();
+  private handleMessage = (event: MessageEvent) => {
+    try {
+      const data = JSON.parse(event.data);
+      if (data.tab_id) {
+        this.triggerEvent(`assistant-response_${data.tab_id}`, data);
+      } else {
+        this.triggerEvent(`assistant-response`, data);
+      }
+    } catch (error) {
+      console.error("Error in parsing response:", error);
     }
   };
 
@@ -209,25 +223,76 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private scheduleReconnect = () => {
+
+    // Clear any existing reconnect timer
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
     if (
       this.reconnectAttempts < this.maxReconnectAttempts &&
       !this.reconnectTimer
     ) {
       this.reconnectTimer = setTimeout(() => {
         // console.log(
-        //   `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})...`,
+        //   `Attempting to reconnect (${this.reconnectAttempts + 1}/${
+        //     this.maxReconnectAttempts
+        //   })...`,
         // );
         this.reconnectAttempts++;
         this.connectWebSocket();
         this.reconnectTimer = null;
       }, this.reconnectDelay);
     } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      // console.error(
-      //   `Maximum reconnect attempts (${this.maxReconnectAttempts}) reached`,
-      // );
+      console.error(
+        `Maximum reconnect attempts (${this.maxReconnectAttempts}) reached`,
+      );
     }
   };
 
+  /**
+   * Closes the WebSocket connection and cleans up resources
+   */
+  public closeWSConnection(): void {
+    this.cleanup();
+    this._isConnected = false;
+  }
+    
+  /**
+   * Cleans up all resources used by the service
+   * @private
+   */
+  private cleanup(): void {
+    // Clear timers
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    
+    // Close WebSocket if it exists
+    if (this.webSocket) {
+      // Remove event handlers to avoid memory leaks and redundant calls on disconnection
+      this.webSocket.onopen = null;
+      this.webSocket.onmessage = null;
+      this.webSocket.onerror = null;
+      this.webSocket.onclose = null;
+      
+      // Close the connection if it's not already closed
+      if (this.webSocket.readyState === WebSocket.OPEN || 
+          this.webSocket.readyState === WebSocket.CONNECTING) {
+        this.webSocket.close(1000, "Closed by client");
+      }
+      
+      this.webSocket = null;
+    }
+  }
+  
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  //                         **** Service Application Methods ****
+  /////////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * Triggers an event and calls all registered callbacks
    * @param eventName - Name of the event to trigger
@@ -247,35 +312,7 @@ export class AiAssistantWebSocketService {
     }
   };
 
-  /**
-   * Sends a prompt message to the AI Assistant server via WebSocket.
-   *
-   * @param prompt - The prompt data to send.
-   */
-  // public sendPromptMessage = async (
-  //   prompt: StreamPromptDto,
-  // ): Promise<WebSocket | null> => {
-  //   console.log("Inside sendPromptMessage() :>>");
-
-  //   if (!this.webSocket || !this.isConnected) {
-  //     console.error("WebSocket not connected, cannot send prompt");
-  //     return null;
-  //   }
-
-  //   try {
-  //     this.webSocket.send(
-  //       JSON.stringify({
-  //         type: "sendPrompt",
-  //         payload: prompt,
-  //       }),
-  //     );
-  //     return this.webSocket;
-  //   } catch (error) {
-  //     console.error("Error sending prompt message:", error);
-  //     return null;
-  //   }
-  // };
-
+  
   /**
    * Sends a message to the AI Assistant server via WebSocket.
    *
@@ -301,7 +338,8 @@ export class AiAssistantWebSocketService {
       apiData: apiContext,
     };
 
-    if (!this.webSocket || !this.isConnected) {
+    if (!this.webSocket || !this.isWsConnected()) {
+      console.log("re cont :> ", this.reconnectAttempts/this.maxReconnectAttempts)
       console.error("WebSocket not connected, cannot send message");
       return false;
     }
@@ -311,39 +349,6 @@ export class AiAssistantWebSocketService {
       return true;
     } catch (error) {
       console.error("Error sending message:", error);
-      return false;
-    }
-  };
-
-
-  /**
-   * Sends a stop generation signal to the server
-   * @param tabId - The tab ID for which to stop generation
-   * @returns {boolean} - Whether the signal was sent successfully
-   */
-  public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
-    if (!this.webSocket || !this.isConnected) {
-      console.error("WebSocket not connected, cannot send stop signal");
-      return false;
-    }
-
-    try {
-      
-      this.removeListener(`assistant-response_${tabId}`);
-
-      // Server is not handling stop generation event, so disabling it now will add it later.
-      // this.webSocket.send(JSON.stringify({
-      //   type: "stopGeneration",
-      //   tabId,
-      //   threadId,
-      //   emailId: userEmail,
-      //   userInput: "stopGeneration",
-      //   apiData: "",
-      // }));
-
-      return true;
-    } catch (error) {
-      console.error("Error sending stop generation signal:", error);
       return false;
     }
   };
@@ -388,19 +393,36 @@ export class AiAssistantWebSocketService {
   }
 
   /**
-   * Closes the WebSocket connection
+   * Sends a stop generation signal to the server
+   * @param tabId - The tab ID for which to stop generation
+   * @returns {boolean} - Whether the signal was sent successfully
    */
-  public closeWSConnection(): void {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
+  public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
+    if (!this.webSocket || !this.isWsConnected()) {
+      console.error("WebSocket not connected, cannot send stop signal");
+      return false;
     }
 
-    if (this.webSocket) {
-      this.webSocket.close(1000, "Closed by client");
-      this.webSocket = null;
-    }
+    try {
+      
+      this.removeListener(`assistant-response_${tabId}`);
+      
+    // Server is not handling stop generation event, so disabling it now will add it later.
+      // this.webSocket.send(JSON.stringify({
+      //   type: "stopGeneration",
+      //   tabId,
+      //   threadId,
+      //   emailId: userEmail,
+      //   userInput: "stopGeneration",
+      //   apiData: "",
+      // }));
 
-    this.isConnected = false;
-  }
+      return true;
+    } catch (error) {
+      console.error("Error sending stop generation signal:", error);
+      return false;
+    }
+  };
+
+    
 }
