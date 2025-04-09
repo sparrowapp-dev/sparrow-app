@@ -4,8 +4,11 @@ import {
   ReduceQueryParams,
   DecodeSocketio,
 } from "@sparrow/workspaces/features/socketio-explorer/utils";
-import { createDeepCopy, moveNavigation,} from "@sparrow/common/utils";
-import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  startLoading,
+  stopLoading,
+} from "../../../../../../../packages/@sparrow-common/src/store";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 
 // ---- DB
@@ -63,6 +66,7 @@ import type {
   SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import constants from "@app/constants/constants";
 
 class SocketIoExplorerPageViewModel {
   /**
@@ -1200,6 +1204,17 @@ class SocketIoExplorerPageViewModel {
     }
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -1267,10 +1282,14 @@ class SocketIoExplorerPageViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -1353,10 +1372,14 @@ class SocketIoExplorerPageViewModel {
         };
       }
       // api response
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list

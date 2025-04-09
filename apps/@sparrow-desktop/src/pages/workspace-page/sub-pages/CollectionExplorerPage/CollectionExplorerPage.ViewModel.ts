@@ -59,6 +59,7 @@ import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/h
 import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import { InitTab } from "@sparrow/common/factory";
 import type { GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
+import constants from "@app/constants/constants";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -219,6 +220,17 @@ class CollectionExplorerPage {
     return this.environmentRepository.getEnvironment();
   }
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -287,10 +299,15 @@ class CollectionExplorerPage {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
+
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -372,11 +389,15 @@ class CollectionExplorerPage {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list

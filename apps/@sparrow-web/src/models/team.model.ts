@@ -8,7 +8,7 @@ export const teamSchemaLiteral = {
   title: "team",
   primaryKey: "teamId",
   type: "object",
-  version: 0,
+  version: 1,
   properties: {
     teamId: {
       type: "string",
@@ -19,6 +19,9 @@ export const teamSchemaLiteral = {
     },
     logo: {
       type: "object",
+    },
+    hubUrl: {
+      type: "string",
     },
     workspaces: {
       type: "array",

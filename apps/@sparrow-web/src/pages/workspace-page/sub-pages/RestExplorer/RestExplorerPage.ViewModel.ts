@@ -94,6 +94,7 @@ import { InitTab } from "@sparrow/common/factory";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
 import { getClientUser } from "src/utils/jwt";
+import constants from "src/constants/constants";
 
 class RestExplorerViewModel {
   /**
@@ -1915,6 +1916,17 @@ class RestExplorerViewModel {
     }
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -1982,10 +1994,14 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2067,11 +2083,15 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2270,7 +2290,8 @@ class RestExplorerViewModel {
       const componentData = this._tab.getValue();
 
       // Check if generation should be stopped
-      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse) return;
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse)
+        return;
 
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
@@ -2313,8 +2334,7 @@ class RestExplorerViewModel {
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
-        message:
-          errorMessage || "Something went wrong. Please try again",
+        message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2374,7 +2394,6 @@ class RestExplorerViewModel {
         switch (event) {
           case "disconnect":
           case "connect_error":
-
             // After getting response don't listen again for this the same request
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
@@ -2464,14 +2483,14 @@ class RestExplorerViewModel {
       await this.handleAIResponseError(componentData, error.message);
     }
   };
-  
+
   /**
    * Stops the response generation from the FE and sends stop generate event to server
-   * 
+   *
    */
   public stopGeneratingAIResponse = async () => {
     const componentData = this._tab.getValue();
-    
+
     try {
       // Send stop signal to the server
       await this.aiAssistentWebSocketService.stopGeneration(
@@ -2479,9 +2498,9 @@ class RestExplorerViewModel {
         componentData?.property?.request?.ai?.threadId || null,
         getClientUser().email,
       );
-      
+
       await this.updateRequestState({ isChatbotGeneratingResponse: false });
-      
+
       // Show error msg in the chat for stop generation
       // this.handleAIResponseError(componentData, "Generation Stopped")
     } catch (error) {
@@ -2489,7 +2508,6 @@ class RestExplorerViewModel {
     }
   };
   // AI WebSocket - End
-
 
   /**
    * Generates an AI response based on the given prompt.

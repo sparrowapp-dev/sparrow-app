@@ -126,6 +126,7 @@ import {
 } from "@sparrow/common/types/workspace";
 import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 import { WorkspaceService } from "@app/services/workspace.service";
+import constants from "@app/constants/constants";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -2385,7 +2386,11 @@ export default class CollectionsViewModel {
     collection: CollectionDto,
     folder: CollectionItemsDto,
   ) => {
-    const folderTab = new FolderTabAdapter().adapt(workspaceId, collection.id, folder);
+    const folderTab = new FolderTabAdapter().adapt(
+      workspaceId,
+      collection.id,
+      folder,
+    );
     this.handleCreateTab(folderTab);
     moveNavigation("right");
   };
@@ -5851,17 +5856,21 @@ export default class CollectionsViewModel {
    *
    * @param componentData - saves the folder on tab close.
    */
-  public saveFolder = async (componentData: Tab) : Promise<boolean> => {
+  public saveFolder = async (componentData: Tab): Promise<boolean> => {
     const progressiveTab = componentData;
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
     if (isGuestUser == true) {
-      await this.collectionRepository.updateRequestOrFolderInCollection(progressiveTab?.path?.collectionId as string, progressiveTab.id, {
-        description: progressiveTab.description,
-        name: progressiveTab.name,
-      });
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        progressiveTab?.path?.collectionId as string,
+        progressiveTab.id,
+        {
+          description: progressiveTab.description,
+          name: progressiveTab.name,
+        },
+      );
       notifications.success(
         `The ‘${progressiveTab.name}’ folder saved successfully.`,
       );
@@ -5940,34 +5949,52 @@ export default class CollectionsViewModel {
     return false;
   };
 
-   /**
-     * Saves and closes the workspace tab.
-     * @param _tab - The tab that is going to be removed.
-     */
-    public saveWorkspace = async (_tab: Tab)  : Promise<boolean> => {
-      const progressiveTab = createDeepCopy(_tab);
-      const response = await this.workspaceService.updateWorkspace( progressiveTab.id, {
+  public constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
+  /**
+   * Saves and closes the workspace tab.
+   * @param _tab - The tab that is going to be removed.
+   */
+  public saveWorkspace = async (_tab: Tab): Promise<boolean> => {
+    const progressiveTab = createDeepCopy(_tab);
+    const baseUrl = await this.constructBaseUrl(progressiveTab.id);
+    const response = await this.workspaceService.updateWorkspace(
+      progressiveTab.id,
+      {
         name: progressiveTab.name,
         description: progressiveTab.description,
-      });
-  
-      if (response.isSuccessful) {
-        const updatedata = {
-          name: progressiveTab.name,
-          description: progressiveTab.description,
-          updatedAt: response.data.data.updatedAt,
-        };
-        await this.workspaceRepository.updateWorkspace(progressiveTab.id, updatedata);
-        notifications.success(
-          `The ‘${progressiveTab.name}’ workspace saved successfully.`,
-        );
-        return true;
-      }
-      else{
-        notifications.error("Failed to save workspace. Please try again.");
-      }
-      return false;
-    };
+      },
+      baseUrl,
+    );
+
+    if (response.isSuccessful) {
+      const updatedata = {
+        name: progressiveTab.name,
+        description: progressiveTab.description,
+        updatedAt: response.data.data.updatedAt,
+      };
+      await this.workspaceRepository.updateWorkspace(
+        progressiveTab.id,
+        updatedata,
+      );
+      notifications.success(
+        `The ‘${progressiveTab.name}’ workspace saved successfully.`,
+      );
+      return true;
+    } else {
+      notifications.error("Failed to save workspace. Please try again.");
+    }
+    return false;
+  };
 
   /**
    * Update the tab type to permanent on double click
