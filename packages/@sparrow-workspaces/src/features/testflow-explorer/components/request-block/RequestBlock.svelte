@@ -11,6 +11,8 @@
     ClockRegular,
     DeleteRegular,
     RenameRegular,
+    ArrowExportRegular,
+    ArrowImportRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
@@ -49,7 +51,7 @@
       method: string,
       folderId?: string,
     ) => void;
-    onOpenDeleteModal: (id: string) => void;
+    onContextMenu: (id: string, event: string) => void;
     onOpenAddCustomRequestModal: (id: string) => void;
     onOpenSaveNodeRequestModal: (
       nodeId: string,
@@ -186,11 +188,6 @@
     return false;
   };
 
-  const handleOpenModal = () => {
-    moreOptionsMenu = !moreOptionsMenu;
-    data.onOpenDeleteModal(id);
-  };
-
   const handleClick = (item) => {
     if (item.onClick) item.onClick();
   };
@@ -234,11 +231,34 @@
     //   onClick: enableEditing,
     // },
     {
+      name: "Run From Here",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-100)",
+      Icon: ArrowExportRegular,
+      onClick: () => {
+        moreOptionsMenu = !moreOptionsMenu;
+        data.onContextMenu(id, "run-from-here");
+      },
+    },
+    {
+      name: "Run Till Here",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-100)",
+      Icon: ArrowImportRegular,
+      onClick: () => {
+        moreOptionsMenu = !moreOptionsMenu;
+        data.onContextMenu(id, "run-till-here");
+      },
+    },
+    {
       name: "Delete",
       iconSize: "16px",
       iconColor: "var(--icon-ds-danger-300)",
       Icon: DeleteRegular,
-      onClick: handleOpenModal,
+      onClick: () => {
+        moreOptionsMenu = !moreOptionsMenu;
+        data.onContextMenu(id, "delete");
+      },
     },
   ];
 

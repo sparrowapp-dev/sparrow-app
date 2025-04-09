@@ -389,12 +389,31 @@ export class TestflowExplorerPageViewModel {
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
-  public handleTestFlowRun = async () => {
+  public handleTestFlowRun = async (_id: string, _event: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const environments = await this.getActiveEnvironments(
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+
+    let runningNodes : any[] = [];
+
+    if(_event === "run-from-here"){
+      nodes.forEach((node: any)=>{
+        if(node.id >= _id){
+          runningNodes.push(node);
+        }
+      });
+    }
+    else if (_event === "run-till-here") {
+        nodes.forEach((node: any)=>{
+          if(node.id <= _id){
+            runningNodes.push(node);
+          }
+        });
+    }else{
+      runningNodes = [...nodes];
+    }
 
     testFlowDataStore.update((testFlowDataMap) => {
       let wsData = testFlowDataMap.get(progressiveTab.tabId);
@@ -428,7 +447,7 @@ export class TestflowExplorerPageViewModel {
     };
 
     // Sequential execution
-    for (const element of nodes) {
+    for (const element of runningNodes) {
       if (element?.type === "requestBlock") {
         // Read the API request data from the tab
         const requestData = await this.collectionRepository.readRequestInTab(

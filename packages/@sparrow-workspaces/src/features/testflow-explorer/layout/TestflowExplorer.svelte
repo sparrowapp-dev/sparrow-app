@@ -250,7 +250,7 @@
             "onCheckEdges",
             "onClick",
             "onOpenAddCustomRequestModal",
-            "onOpenDeleteModal",
+            "onContextMenu",
             "onUpdateSelectAPI",
           ];
 
@@ -507,7 +507,7 @@
     // handles run from from start button click
     if (_id === "0") {
       await onClickRun();
-      selectFirstNode();
+      selectNode("2");
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
@@ -562,8 +562,15 @@
                 folderId,
               );
             },
-            onOpenDeleteModal: function (id: string) {
-              handleDeleteModal(id);
+            onContextMenu: function (id: string, _event: string) {
+              if (_event === "delete") {
+                handleDeleteModal(id);
+              } else if (
+                _event === "run-from-here" ||
+                _event === "run-till-here"
+              ) {
+                partialRun(id, _event);
+              }
             },
             onOpenAddCustomRequestModal: function (id: string) {
               handleOpenAddCustomRequestModal();
@@ -655,8 +662,15 @@
                 folderId,
               );
             },
-            onOpenDeleteModal: function (id: string) {
-              handleDeleteModal(id);
+            onContextMenu: function (id: string, _event: string) {
+              if (_event === "delete") {
+                handleDeleteModal(id);
+              } else if (
+                _event === "run-from-here" ||
+                _event === "run-till-here"
+              ) {
+                partialRun(id, _event);
+              }
             },
             onOpenAddCustomRequestModal: function (id: string) {
               handleOpenAddCustomRequestModal();
@@ -892,10 +906,10 @@
   /**
    * Select all the existing nodes
    */
-  const selectFirstNode = () => {
+  const selectNode = (_id: string) => {
     nodes.update((_nodes: Node[] | any[]) => {
-      _nodes.forEach((_nodeItem, index) => {
-        if (index === 1) {
+      _nodes.forEach((_nodeItem) => {
+        if (_nodeItem.id === _id) {
           _nodeItem.selected = true;
         } else {
           _nodeItem.selected = false;
@@ -959,6 +973,14 @@
       sampleApiData = onRunSampleApi();
     }, 0);
   });
+
+  const partialRun = async (_id: string, _event: string) => {
+    if (!testflowStore?.isTestFlowRunning) {
+      unselectNodes();
+      await onClickRun(_id, _event);
+      selectNode(_id);
+    }
+  };
 </script>
 
 <div
@@ -1006,7 +1028,7 @@
             onClick={async () => {
               unselectNodes();
               await onClickRun();
-              selectFirstNode();
+              selectNode("2");
               MixpanelEvent(Events.Run_TestFlows);
             }}
           />

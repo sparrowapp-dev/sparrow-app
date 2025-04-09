@@ -226,3 +226,5 @@ export { default as OpenRegular } from "./OpenRegular.svelte";
 export { default as RenameRegular } from "./RenameRegular.svelte";
 export { default as PlayFilled } from "./PlayFilled.svelte";
 export { default as BoardRegular } from "./BoardRegular.svelte";
+export { default as ArrowExportRegular} from "./ArrowExportRegular.svelte";
+export { default as ArrowImportRegular } from "./ArrowImportRegular.svelte";
