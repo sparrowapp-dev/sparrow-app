@@ -32,6 +32,7 @@
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
+  import { defaultState } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
 
   let expand = false;
   /**
@@ -132,6 +133,7 @@
   };
 
   const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
+    const requestState = defaultState;
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
@@ -139,7 +141,10 @@
       requestId: api.id,
       name: api.name,
       method: api?.request?.method,
-      requestData: api?.request,
+      requestData: {
+        ...api?.request,
+        state: requestState,
+      },
     };
     event.dataTransfer?.setData("text/plain", JSON.stringify(data));
   };

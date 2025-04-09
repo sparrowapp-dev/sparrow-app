@@ -1089,7 +1089,7 @@
         {/if}
       </div>
       <div style="margin-right: 5px;">
-        <Tooltip title="Clear Response" placement="top-center" size="small">
+        <Tooltip title="Clear Response" placement="bottom-center" size="small">
           <Button
             type="secondary"
             size="medium"
