@@ -40,9 +40,10 @@
     TableSidebar,
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
+  import { PlayFilled, RunIcon, StopFilled } from "@sparrow/library/icons";
+  import { Button, Modal } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
-  import { Button, Modal, Tooltip } from "@sparrow/library/ui";
-  import { PlayFilled } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import CustomRequest from "../../../components/custom-request-modal/CustomRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
@@ -91,6 +92,7 @@
   export let onSaveTestflow;
   export let isWebApp;
   export let deleteNodeResponse;
+  export let onClickStop;
   export let onClearTestflow;
   export let isTestFlowEmpty;
   export let onSelectRequest;
@@ -251,7 +253,7 @@
             "onCheckEdges",
             "onClick",
             "onOpenAddCustomRequestModal",
-            "onOpenDeleteModal",
+            "onContextMenu",
             "onUpdateSelectAPI",
             "onOpenSaveNodeRequestModal",
             "updateBlockName",
@@ -525,7 +527,7 @@
     // handles run from from start button click
     if (_id === "0") {
       await onClickRun();
-      selectFirstNode();
+      selectNode("2");
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
@@ -580,8 +582,15 @@
                 folderId,
               );
             },
-            onOpenDeleteModal: function (id: string) {
-              handleDeleteModal(id);
+            onContextMenu: function (id: string, _event: string) {
+              if (_event === "delete") {
+                handleDeleteModal(id);
+              } else if (
+                _event === "run-from-here" ||
+                _event === "run-till-here"
+              ) {
+                partialRun(id, _event);
+              }
             },
             onOpenAddCustomRequestModal: function (id: string) {
               handleOpenAddCustomRequestModal();
@@ -607,16 +616,17 @@
             updateBlockName: function (field: string, value: string) {
               handleUpdateRequestData(field, value);
             },
-            name: _requestData ? _requestData?.name : "",
-            method: _requestData ? _requestData?.method : "",
-            collectionId: _requestData ? _requestData?.collectionId : "",
-            folderId: _requestData?.folderId ? _requestData?.folderId : "",
-            requestId: _requestData ? _requestData?.requestId : "",
+            name: _requestData?.name,
+            method: _requestData?.method,
+            collectionId: _requestData?.collectionId,
+            folderId: _requestData?.folderId,
+            requestId: _requestData?.requestId,
             collections: filteredCollections,
             tabId: $tab.tabId,
-            workspaceId: _requestData ? _requestData?.workspaceId : "",
-            isDeleted: _requestData ? _requestData?.isDeleted : false,
-            requestData: defaultRequestData("", ""),
+            workspaceId: _requestData?.workspaceId,
+            isDeleted: _requestData?.isDeleted,
+            requestData:
+              _requestData?.requestData || defaultRequestData("", ""),
           },
           position: nextNodePosition,
           deletable: false,
@@ -676,8 +686,15 @@
                 folderId,
               );
             },
-            onOpenDeleteModal: function (id: string) {
-              handleDeleteModal(id);
+            onContextMenu: function (id: string, _event: string) {
+              if (_event === "delete") {
+                handleDeleteModal(id);
+              } else if (
+                _event === "run-from-here" ||
+                _event === "run-till-here"
+              ) {
+                partialRun(id, _event);
+              }
             },
             onOpenAddCustomRequestModal: function (id: string) {
               handleOpenAddCustomRequestModal();
@@ -916,10 +933,10 @@
   /**
    * Select all the existing nodes
    */
-  const selectFirstNode = () => {
+  const selectNode = (_id: string) => {
     nodes.update((_nodes: Node[] | any[]) => {
-      _nodes.forEach((_nodeItem, index) => {
-        if (index === 1) {
+      _nodes.forEach((_nodeItem) => {
+        if (_nodeItem.id === _id) {
           _nodeItem.selected = true;
         } else {
           _nodeItem.selected = false;
@@ -983,6 +1000,14 @@
       sampleApiData = onRunSampleApi();
     }, 0);
   });
+
+  const partialRun = async (_id: string, _event: string) => {
+    if (!testflowStore?.isTestFlowRunning) {
+      unselectNodes();
+      await onClickRun(_id, _event);
+      selectNode(_id);
+    }
+  };
 </script>
 
 <div
@@ -1021,19 +1046,28 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         {#if nodesValue > 1}
-          <Button
-            type="primary"
-            size="medium"
-            startIcon={PlayFilled}
-            disable={testflowStore?.isTestFlowRunning}
-            title="Run"
-            onClick={async () => {
-              unselectNodes();
-              await onClickRun();
-              selectFirstNode();
-              MixpanelEvent(Events.Run_TestFlows);
-            }}
-          />
+          {#if testflowStore?.isTestFlowRunning}
+            <Button
+              type="secondary"
+              size="medium"
+              startIcon={StopFilled}
+              title={"Stop Flow"}
+              onClick={onClickStop}
+            />
+          {:else}
+            <Button
+              type="primary"
+              size="medium"
+              startIcon={PlayFilled}
+              title="Run"
+              onClick={async () => {
+                unselectNodes();
+                await onClickRun();
+                selectNode("2");
+                MixpanelEvent(Events.Run_TestFlows);
+              }}
+            />
+          {/if}
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}

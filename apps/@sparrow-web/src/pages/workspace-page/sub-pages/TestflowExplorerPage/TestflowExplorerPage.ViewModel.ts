@@ -390,7 +390,7 @@ export class TestflowExplorerPageViewModel {
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
-  public handleTestFlowRun = async () => {
+  public handleTestFlowRun = async (_id: string, _event: string) => {
     const selectedAgent = localStorage.getItem(
       "selectedAgent",
     ) as WorkspaceUserAgentBaseEnum;
@@ -399,14 +399,37 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+    const abortController = new AbortController();
+    const { signal } = abortController;
+
+    let runningNodes : any[] = [];
+
+    if(_event === "run-from-here"){
+      nodes.forEach((node: any)=>{
+        if(node.id >= _id){
+          runningNodes.push(node);
+        }
+      });
+    }
+    else if (_event === "run-till-here") {
+        nodes.forEach((node: any)=>{
+          if(node.id <= _id){
+            runningNodes.push(node);
+          }
+        });
+    }else{
+      runningNodes = [...nodes];
+    }
 
     testFlowDataStore.update((testFlowDataMap) => {
       let wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
         wsData.nodes = [];
         wsData.isTestFlowRunning = true;
+        wsData.abortController = abortController;
       } else {
         wsData = {
+          abortController: abortController,
           nodes: [],
           history: [],
           isRunHistoryEnable: false,
@@ -432,7 +455,7 @@ export class TestflowExplorerPageViewModel {
     };
 
     // Sequential execution
-    for (const element of nodes) {
+    for (const element of runningNodes) {
       if (element?.type === "requestBlock" && element?.data?.requestId) {
         // Read the API request data from the tab
         const requestData = await this.collectionRepository.readRequestInTab(
@@ -468,6 +491,7 @@ export class TestflowExplorerPageViewModel {
             decodeData[3],
             decodeData[4],
             selectedAgent,
+            signal,
           );
           const end = Date.now();
           const duration = end - start;
@@ -549,6 +573,9 @@ export class TestflowExplorerPageViewModel {
             return testFlowDataMap;
           });
         } catch (error) {
+          if (error?.name === "AbortError") {
+            break;
+          }
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
@@ -1057,6 +1084,33 @@ export class TestflowExplorerPageViewModel {
       return testFlowDataMap;
     });
     notifications.success(`Cleared all Responses for testflow.`);
+  };
+
+  /**
+   * @description - This function stops the api calls in Testflow.
+   */
+  public handleStopApis = () => {
+    let abortController;
+    testFlowDataStore.update((testFlowDataMap) => {
+      const currentTestflow = this._tab.getValue();
+      const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+      if (wsData) {
+        abortController = wsData.abortController;
+      }
+      return testFlowDataMap;
+    });
+    if (abortController) {
+      abortController.abort();
+      testFlowDataStore.update((testFlowDataMap) => {
+        const currentTestflow = this._tab.getValue();
+        const wsData = testFlowDataMap.get(currentTestflow?.tabId as string);
+        if (wsData) {
+          wsData.isTestFlowRunning = false;
+          testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+        }
+        return testFlowDataMap;
+      });
+    }
   };
 
   /**

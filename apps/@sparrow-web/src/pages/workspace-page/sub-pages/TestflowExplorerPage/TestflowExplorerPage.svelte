@@ -191,6 +191,7 @@
     onUpdateBlockData={_viewModel.updateBlockData}
     onSaveTestflow={_viewModel.saveTestflow}
     isWebApp={true}
+    onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
     onSelectRequest={_viewModel.getRequestdata}
