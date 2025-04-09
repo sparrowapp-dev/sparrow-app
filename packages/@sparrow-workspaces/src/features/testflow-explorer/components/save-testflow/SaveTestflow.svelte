@@ -6,6 +6,7 @@
   export let isSave;
   export let isTestflowEditable;
   export let onSaveTestflow;
+  export let testFlowRunning = false;
 </script>
 
 <div class="pe-1">
@@ -13,7 +14,7 @@
     <Button
       type="secondary"
       startIcon={SaveRegular}
-      disable={isSave || !isTestflowEditable ? true : false}
+      disable={isSave || !isTestflowEditable ? true : false || testFlowRunning}
       size="medium"
       onClick={onSaveTestflow}
       iconSize={20}

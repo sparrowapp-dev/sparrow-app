@@ -34,6 +34,7 @@ export class TestflowService {
     }[];
     nodes: {
       id: string;
+      blockName: string;
       type: string;
       position: {
         x: number;
@@ -45,6 +46,9 @@ export class TestflowService {
         folderId: string;
         method: string;
         name: String;
+        workspaceId: string;
+        isDeleted: boolean;
+        requestData: object;
       };
     }[];
   }) => {

@@ -5,8 +5,9 @@
     CollectionIcon,
     ChevronUpRegular,
     FolderRegular,
+    AddRegular,
   } from "@sparrow/library/icons";
-  import type { Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { ChevronLeftRegular } from "@sparrow/library/icons";
@@ -16,11 +17,14 @@
     isTestFlowTourGuideOpen,
   } from "../../../../stores/guide.tour";
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
+
   export let name;
   export let method;
   export let collections = [];
   export let updateNode;
   export let collectionData: Observable<CollectionDocument[]>;
+  export let handleOpenAddCustomRequestModal;
+
   collectionData.subscribe((value) => {
     if (value) {
       collections = value;
@@ -28,6 +32,7 @@
   });
 
   let arrayData = collections;
+  let filteredArrayData = collections;
   let selectedRequest = null;
   let isOpen = false;
   let previousItem;
@@ -35,18 +40,24 @@
   let selectedFolder;
   let selectedItem = "COLLECTION";
   let ignoreClickOutside = false;
+  let searchQuery = "";
+  let searchInputRef;
+  let dropdownRef: HTMLElement;
+  let showSampleApi = false;
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
       selectedCollection = data;
       selectedItem = "COLLECTION";
-      arrayData = data.items;
+      // arrayData = data.items;
+      filteredArrayData = data.items;
       previousItem = data;
     }
     if (data?.type === "FOLDER") {
       selectedFolder = data;
       selectedItem = "FOLDER";
-      arrayData = data.items;
+      // arrayData = data.items;
+      filteredArrayData = data.items;
       previousItem = data;
     }
     if (data?.type === "REQUEST") {
@@ -69,12 +80,12 @@
           data.request.method,
         );
       }
-      arrayData = collections;
+      // arrayData = collections;
+      filteredArrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
     }
   };
-  let dropdownRef: HTMLElement;
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -88,6 +99,9 @@
         isOpen = false;
       }
       arrayData = collections;
+      filteredArrayData = arrayData.filter((item) =>
+        item.name?.toLowerCase().includes(searchQuery),
+      );
       selectedCollection = null;
       selectedFolder = null;
     }
@@ -141,8 +155,6 @@
     },
   ];
 
-  let showSampleApi = false;
-
   $: {
     if (($currentStep >= 4 || $currentStep <= 6) && $isTestFlowTourGuideOpen) {
       showSampleApi = true;
@@ -173,6 +185,43 @@
       ? name.substring(0, charLimit) + "..."
       : name;
   };
+
+  // Update search query manually
+  const handleInputChange = (event) => {
+    searchQuery = event.target.value.toLowerCase();
+    selectedCollection = null;
+    selectedFolder = null;
+    isOpen = true;
+    filteredArrayData = arrayData.filter(
+      (item) =>
+        item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.items?.some((subItem: any) =>
+          subItem.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+    );
+  };
+
+  const handleInputClick = () => {
+    isOpen = true;
+  };
+
+  const handleClickBackInList = () => {
+    if (selectedFolder) {
+      filteredArrayData = selectedCollection.items;
+      selectedFolder = null;
+    } else if (selectedCollection) {
+      filteredArrayData = arrayData.filter((item) =>
+        item.name?.toLowerCase().includes(searchQuery),
+      );
+      selectedCollection = null;
+      ignoreClickOutside = true;
+    }
+  };
+
+  // Reactive statement to focus input when isOpen changes
+  $: if (isOpen && searchInputRef) {
+    searchInputRef.focus();
+  }
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -185,7 +234,7 @@
     tabindex="0"
   >
     <div
-      style="display: flex; align-items: center; padding: 5px 8px; gap: 6px;"
+      style="display: flex; align-items: center; padding: 5px 0px; gap: 6px;"
     >
       {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
         <div style="display: flex; align-items: center; gap: 6px;">
@@ -197,18 +246,29 @@
           </span>
           <span class="select-txt">Sample API</span>
         </div>
-      {:else if name || method}
-        <div style="display: flex; align-items: center; gap: 6px;">
+      {:else if (name || method) && !isOpen}
+        <div
+          on:click={(e) => (e.stopPropagation(), (isOpen = !isOpen))}
+          style="display: flex; align-items: center; gap: 6px; padding:0px 8px;"
+        >
           <span
             class="request-icon text-{getMethodStyle(method)}"
             style="font-size: 9px; font-weight: 600; text-align: center;"
           >
             {method}
           </span>
-          <span class="select-txt">{truncateName(name, 21)}</span>
+          <span class="select-txt">{truncateName(name, 17)}</span>
         </div>
       {:else}
-        <span class="select-txt-new">Select API Request</span>
+        <input
+          class="search-box"
+          type="text"
+          placeholder="Select API Request"
+          value={searchQuery}
+          on:input={handleInputChange}
+          on:click|stopPropagation={handleInputClick}
+          bind:this={searchInputRef}
+        />
       {/if}
     </div>
     <div
@@ -224,8 +284,9 @@
       {/if}
     </div>
   </div>
+
   <div
-    class="dropdown-options"
+    class="dropdown-options px-1"
     style="overflow:auto; display: {isOpen
       ? 'block'
       : 'none'}; position:absolute"
@@ -237,16 +298,7 @@
             size="extra-small"
             type="teritiary-regular"
             startIcon={ChevronLeftRegular}
-            onClick={() => {
-              if (selectedFolder) {
-                arrayData = selectedCollection.items;
-                selectedFolder = null;
-              } else if (selectedCollection) {
-                arrayData = collections;
-                selectedCollection = null;
-                ignoreClickOutside = true;
-              }
-            }}
+            onClick={handleClickBackInList}
           />
         </Tooltip>
         <div
@@ -261,7 +313,7 @@
             {truncateName(selectedCollection.name, 12)}
           </p>
         </div>
-        {#if selectedFolder}
+        {#if selectedFolder && !isOpen}
           <p style="margin-bottom: 0px; margin-top:4px;">
             <span class="ms-1"></span>/
           </p>
@@ -280,7 +332,7 @@
         {/if}
       </div>
     {/if}
-    <div class="scrollable-list">
+    <div class="scrollable-list" style="max-height: 288px;">
       {#if showSampleApi}
         {#each dummyCollection as data}
           {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
@@ -314,11 +366,11 @@
             </div>
           {/if}
         {/each}
-      {:else if arrayData?.filter((data) => {
+      {:else if filteredArrayData?.filter((data) => {
         if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
         return false;
       })?.length > 0}
-        {#each arrayData as data}
+        {#each filteredArrayData as data}
           {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
             <div
               class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
@@ -354,14 +406,19 @@
         {/each}
       {:else}
         <div
-          style="width:170px; align-items:center; justify-content:center;"
+          style="align-items:center; justify-content:center; padding-top:12px;"
           class="d-flex"
         >
-          <p style="color: #808080; font-size: 10px; margin-top: 10px; ">
-            No APIs Present.
-          </p>
+          <p class="empty-text">No results found.</p>
         </div>
       {/if}
+    </div>
+
+    <div on:click={handleOpenAddCustomRequestModal} class="custom-component">
+      <AddRegular size={"12px"} color={"var(--icon-ds-neutral-100)"} />
+      <div class="label-text" style="margin-left: 18px;">
+        Add Custom Request
+      </div>
     </div>
   </div>
 </div>
@@ -377,6 +434,7 @@
     cursor: pointer;
     outline: none;
   }
+
   .dropdown-header:hover {
     border: 1px solid var(--border-ds-neutral-300);
   }
@@ -477,5 +535,49 @@
     font-weight: 500;
     font-size: 12px;
     color: var(--text-ds-neutral-50);
+  }
+
+  .custom-component {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    padding-left: 13px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border-ds-surface-100);
+  }
+
+  .search-box {
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding-left: 8px;
+    font-size: 12px;
+  }
+
+  .search-box:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: white;
+  }
+
+  .search-box::placeholder {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+  }
+
+  .empty-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-ds-neutral-400);
   }
 </style>

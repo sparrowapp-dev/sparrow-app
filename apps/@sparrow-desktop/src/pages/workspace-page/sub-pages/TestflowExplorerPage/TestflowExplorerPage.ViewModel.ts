@@ -18,7 +18,10 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
-import { RequestDataTypeEnum, type HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
+import {
+  RequestDataTypeEnum,
+  type HttpRequestCollectionLevelAuthTabInterface,
+} from "@sparrow/common/types/workspace";
 import {
   TabPersistenceTypeEnum,
   type Tab,
@@ -42,7 +45,17 @@ import { notifications } from "@sparrow/library/ui";
 import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
-import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionAuthTypeBaseEnum,
+  CollectionRequestAddToBaseEnum,
+} from "@sparrow/common/types/workspace/collection-base";
+import {
+  transformRequestData,
+  extractAuthData,
+} from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
+import { isGuestUserActive } from "@app/store/auth.store";
+import { EnvironmentService } from "@app/services/environment.service";
+import type { EnvironmentDocType } from "@app/models/environment.model";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -55,6 +68,8 @@ export class TestflowExplorerPageViewModel {
   private guestUserRepository = new GuestUserRepository();
   private testflowService = new TestflowService();
   private compareArray = new CompareArray();
+  private environmentService = new EnvironmentService();
+
   /**
    * Utils
    */
@@ -97,6 +112,10 @@ export class TestflowExplorerPageViewModel {
     return this.workspaceRepository.getActiveWorkspace();
   }
 
+  public get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
+
   /**
    * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
@@ -106,13 +125,17 @@ export class TestflowExplorerPageViewModel {
     const nodes = _nodes.map((elem) => {
       return {
         id: elem.id,
+        blockName: elem.blockName,
         type: elem.type,
         data: {
           name: elem.data.name, // not required to save in db
           requestId: elem.data.requestId,
+          workspaceId: elem.data.workspaceId,
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
           method: elem.data.method, // not required to save in db
+          requestData: elem.data.requestData,
+          isDeleted: elem.data.isDeleted,
         },
         position: { x: elem.position.x, y: elem.position.y },
       };
@@ -334,18 +357,17 @@ export class TestflowExplorerPageViewModel {
     return nodes;
   };
 
-
-  private fetchCollectionAuth = async(_collectionId: string)=>{
-      const collectionRx = await this.collectionRepository.readCollection(_collectionId);
+  private fetchCollectionAuth = async (_collectionId: string) => {
+    const collectionRx =
+      await this.collectionRepository.readCollection(_collectionId);
     const collectionDoc = collectionRx?.toMutableJSON();
     let collectionAuth;
-      if(collectionDoc?.auth){
+    if (collectionDoc?.auth) {
       collectionAuth = {
-          auth : collectionDoc?.auth,
-          collectionAuthNavigation: collectionDoc?.selectedAuthType
-        } as HttpRequestCollectionLevelAuthTabInterface
-      }
-      else{
+        auth: collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType,
+      } as HttpRequestCollectionLevelAuthTabInterface;
+    } else {
       collectionAuth = {
         auth: {
           bearerToken: "",
@@ -359,11 +381,12 @@ export class TestflowExplorerPageViewModel {
             addTo: CollectionRequestAddToBaseEnum.HEADER,
           },
         },
-          collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
-        }
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+      };
     }
     return collectionAuth;
-    }
+  };
+
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -411,166 +434,156 @@ export class TestflowExplorerPageViewModel {
 
     // Sequential execution
     for (const element of nodes) {
-      if (
-        element?.type === "requestBlock" &&
-        element?.data?.collectionId?.length > 0
-      ) {
-        let request;
-        if (element?.data?.folderId?.length > 0) {
-          request = await this.collectionRepository.readRequestInFolder(
-            element.data.collectionId,
-            element.data.folderId,
-            element.data.requestId,
+      if (element?.type === "requestBlock") {
+        // Read the API request data from the tab
+        const requestData = await this.collectionRepository.readRequestInTab(
+          progressiveTab.tabId,
+          element.data.requestId,
+        );
+
+        const request = transformRequestData(requestData);
+
+        const requestTabAdapter = new RequestTabAdapter();
+        const adaptedRequest: Tab = requestTabAdapter.adapt(
+          progressiveTab.path.workspaceId ?? "",
+          element?.data?.collectionId ?? "",
+          element?.data?.folderId ?? "",
+          request,
+        );
+
+        // Extract the auth data from the API request
+        const collectionAuth = extractAuthData(request);
+
+        const decodeData = this._decodeRequest.init(
+          adaptedRequest.property.request,
+          environments?.filtered || [],
+          collectionAuth,
+        );
+        const start = Date.now();
+
+        try {
+          const response = await makeHttpRequestV2(
+            decodeData[0],
+            decodeData[1],
+            decodeData[2],
+            decodeData[3],
+            decodeData[4],
           );
-        } else {
-          request =
-            await this.collectionRepository.readRequestOrFolderInCollection(
-              element.data.collectionId,
-              element.data.requestId,
+          const end = Date.now();
+          const duration = end - start;
+
+          testFlowDataStore.update((testFlowDataMap) => {
+            const existingTestFlowData = testFlowDataMap.get(
+              progressiveTab.tabId,
             );
-        }
+            if (existingTestFlowData) {
+              let resData: TFHistoryAPIResponseStoreType;
+              if (response.isSuccessful) {
+                const byteLength = new TextEncoder().encode(
+                  JSON.stringify(response),
+                ).length;
+                const responseSizeKB = byteLength / 1024;
+                const responseData: TFAPIResponseType = response.data;
+                const responseBody = responseData.body;
+                const formattedHeaders = Object.entries(
+                  response?.data?.headers || {},
+                ).map(([key, value]) => ({
+                  key,
+                  value,
+                })) as TFKeyValueStoreType[];
+                const responseStatus = response?.data?.status;
+                resData = {
+                  body: responseBody,
+                  headers: formattedHeaders,
+                  status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
+                  responseContentType:
+                    this._decodeRequest.setResponseContentType(
+                      formattedHeaders,
+                    ),
+                };
 
-        if (request) {
-          const requestTabAdapter = new RequestTabAdapter();
-          const adaptedRequest = requestTabAdapter.adapt(
-            progressiveTab.path.workspaceId,
-            element.data.collectionId,
-            element.data.folderId,
-            request,
-          );
-          const collectionAuth = await this.fetchCollectionAuth(element.data.collectionId);
-          const decodeData = this._decodeRequest.init(
-            adaptedRequest.property.request,
-            environments?.filtered || [],
-            collectionAuth
-          );
-          const start = Date.now();
-
-          try {
-            const response = await makeHttpRequestV2(
-              decodeData[0],
-              decodeData[1],
-              decodeData[2],
-              decodeData[3],
-              decodeData[4],
-              signal,
-            );
-            const end = Date.now();
-            const duration = end - start;
-
-            testFlowDataStore.update((testFlowDataMap) => {
-              const existingTestFlowData = testFlowDataMap.get(
-                progressiveTab.tabId,
-              );
-              if (existingTestFlowData) {
-                let resData: TFHistoryAPIResponseStoreType;
-                if (response.isSuccessful) {
-                  const byteLength = new TextEncoder().encode(
-                    JSON.stringify(response),
-                  ).length;
-                  const responseSizeKB = byteLength / 1024;
-                  const responseData: TFAPIResponseType = response.data;
-                  const responseBody = responseData.body;
-                  const formattedHeaders = Object.entries(
-                    response?.data?.headers || {},
-                  ).map(([key, value]) => ({
-                    key,
-                    value,
-                  })) as TFKeyValueStoreType[];
-                  const responseStatus = response?.data?.status;
-                  resData = {
-                    body: responseBody,
-                    headers: formattedHeaders,
-                    status: responseStatus,
-                    time: duration,
-                    size: responseSizeKB,
-                    responseContentType:
-                      this._decodeRequest.setResponseContentType(
-                        formattedHeaders,
-                      ),
-                  };
-
-                  if (
-                    Number(resData.status.split(" ")[0]) >= 200 &&
-                    Number(resData.status.split(" ")[0]) < 300
-                  ) {
-                    successRequests++;
-                  } else {
-                    failedRequests++;
-                  }
-                  totalTime += duration;
-                  const req = {
-                    method: request?.request?.method as string,
-                    name: request?.name as string,
-                    status: resData.status,
-                    time: new ParseTime().convertMilliseconds(duration),
-                  };
-                  history.requests.push(req);
+                if (
+                  Number(resData.status.split(" ")[0]) >= 200 &&
+                  Number(resData.status.split(" ")[0]) < 300
+                ) {
+                  successRequests++;
                 } else {
-                  resData = {
-                    body: "",
-                    headers: [],
-                    status: ResponseStatusCode.ERROR,
-                    time: duration,
-                    size: 0,
-                  };
                   failedRequests++;
-                  totalTime += duration;
-                  const req = {
-                    method: request?.request?.method as string,
-                    name: request?.name as string,
-                    status: ResponseStatusCode.ERROR,
-                    time: new ParseTime().convertMilliseconds(duration),
-                  };
-                  history.requests.push(req);
                 }
-                existingTestFlowData.nodes.push({
-                  id: element.id,
-                  response: resData,
-                  request: adaptedRequest,
-                });
-
-                testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
-              }
-              return testFlowDataMap;
-            });
-          } catch (error) {
-            if (error?.name === "AbortError") {
-              break;
-            }
-            testFlowDataStore.update((testFlowDataMap) => {
-              const existingTestFlowData = testFlowDataMap.get(
-                progressiveTab.tabId,
-              );
-              if (existingTestFlowData) {
-                const resData = {
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: resData.status,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
+              } else {
+                resData = {
                   body: "",
                   headers: [],
                   status: ResponseStatusCode.ERROR,
-                  time: 0,
+                  time: duration,
                   size: 0,
                 };
-
-                existingTestFlowData.nodes.push({
-                  id: element.id,
-                  response: resData,
-                  request: adaptedRequest,
-                });
-
-                testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+                failedRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: ResponseStatusCode.ERROR,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
               }
-              return testFlowDataMap;
-            });
-            failedRequests++;
-            totalTime += 0;
-            const req = {
-              method: request?.request?.method as string,
-              name: request?.name as string,
-              status: ResponseStatusCode.ERROR,
-              time: 0 + " ms",
-            };
-            history.requests.push(req);
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+
+              testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+            }
+            return testFlowDataMap;
+          });
+        } catch (error) {
+          if (error?.name === "AbortError") {
+            break;
           }
+          testFlowDataStore.update((testFlowDataMap) => {
+            const existingTestFlowData = testFlowDataMap.get(
+              progressiveTab.tabId,
+            );
+            if (existingTestFlowData) {
+              const resData = {
+                body: "",
+                headers: [],
+                status: ResponseStatusCode.ERROR,
+                time: 0,
+                size: 0,
+              };
+
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+
+              testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
+            }
+            return testFlowDataMap;
+          });
+          failedRequests++;
+          totalTime += 0;
+          const req = {
+            method: request?.request?.method as string,
+            name: request?.name as string,
+            status: ResponseStatusCode.ERROR,
+            time: 0 + " ms",
+          };
+          history.requests.push(req);
         }
       }
     }
@@ -601,6 +614,134 @@ export class TestflowExplorerPageViewModel {
         `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
       );
     }
+  };
+
+  /**
+   * Runs a single test flow node and updates the testFlowDataStore
+   * @param nodeId - The id of the node to be executed
+   */
+  public handleSingleTestFlowNodeRun = async (nodeId: string) => {
+    const tab = createDeepCopy(this._tab.getValue());
+    const environments = await this.getActiveEnvironments(tab.path.workspaceId);
+
+    const node = tab?.property?.testflow?.nodes.find(
+      (item) => item.id === nodeId,
+    );
+
+    if (node && node?.type !== "requestBlock") return;
+
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(tab.tabId);
+      if (wsData) {
+        wsData.nodes = [];
+        wsData.isTestFlowRunning = false;
+      } else {
+        wsData = {
+          nodes: [],
+          history: [],
+          isRunHistoryEnable: false,
+          isTestFlowRunning: false,
+          isTestFlowSaveInProgress: false,
+        };
+      }
+      testFlowDataMap.set(tab.tabId, wsData);
+      return testFlowDataMap;
+    });
+
+    // Read the API request data
+    const requestData = await this.collectionRepository.readRequestInTab(
+      tab.tabId,
+      node.data.requestId,
+    );
+
+    const request = transformRequestData(requestData);
+    const requestTabAdapter = new RequestTabAdapter();
+
+    const adaptedRequest: Tab = requestTabAdapter.adapt(
+      tab.path.workspaceId ?? "",
+      node?.data?.collectionId ?? "",
+      node?.data?.folderId ?? "",
+      request,
+    );
+
+    const collectionAuth = extractAuthData(request);
+    const decodeData = this._decodeRequest.init(
+      adaptedRequest.property.request,
+      environments?.filtered || [],
+      collectionAuth,
+    );
+
+    const start = Date.now();
+    let resData: TFHistoryAPIResponseStoreType;
+    let status: string;
+    let duration = 0;
+
+    try {
+      const response = await makeHttpRequestV2(
+        decodeData[0],
+        decodeData[1],
+        decodeData[2],
+        decodeData[3],
+        decodeData[4],
+      );
+      const end = Date.now();
+      duration = end - start;
+
+      if (response.isSuccessful) {
+        const byteLength = new TextEncoder().encode(
+          JSON.stringify(response),
+        ).length;
+        const responseSizeKB = byteLength / 1024;
+        const responseData: TFAPIResponseType = response.data;
+        const formattedHeaders = Object.entries(
+          responseData?.headers || {},
+        ).map(([key, value]) => ({ key, value })) as TFKeyValueStoreType[];
+
+        resData = {
+          body: responseData.body,
+          headers: formattedHeaders,
+          status: responseData.status,
+          time: duration,
+          size: responseSizeKB,
+          responseContentType:
+            this._decodeRequest.setResponseContentType(formattedHeaders),
+        };
+      } else {
+        resData = {
+          body: "",
+          headers: [],
+          status: ResponseStatusCode.ERROR,
+          time: duration,
+          size: 0,
+        };
+      }
+      status = resData.status;
+    } catch (error) {
+      resData = {
+        body: "",
+        headers: [],
+        status: ResponseStatusCode.ERROR,
+        time: 0,
+        size: 0,
+      };
+      status = ResponseStatusCode.ERROR;
+    }
+
+    // Update testFlowDataStore with this single result
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData = testFlowDataMap.get(tab.tabId);
+      if (wsData) {
+        const updatedNodes = wsData.nodes.filter((n) => n.id !== node.id);
+        updatedNodes.push({
+          id: node.id,
+          response: resData,
+          request: adaptedRequest,
+        });
+        wsData.nodes = updatedNodes;
+        testFlowDataMap.set(tab.tabId, wsData);
+      }
+      return testFlowDataMap;
+    });
   };
 
   /**
@@ -913,9 +1054,315 @@ export class TestflowExplorerPageViewModel {
       }
       return testFlowDataMap;
     });
-    notifications.success(
-      `Cleared all Responses for testflow.`,
+    notifications.success(`Cleared all Responses for testflow.`);
+  };
+
+  /**
+   * @description - Fetches request data based on collection, request, and folder IDs.
+   * @param {string} collectionId - The ID of the collection containing the request.
+   * @param {string} requestId - The ID of the specific request to retrieve.
+   * @param {string} folderId - The ID of the folder containing the request.
+   * @returns {Promise<any>} - Returns the request data asynchronously.
+   */
+  public getRequestdata = async (
+    collectionId: string,
+    requestId: string,
+    folderId: string,
+    nodeId?: string,
+    tabId?: string,
+  ) => {
+    let request;
+    if (!collectionId) {
+      request = await this.collectionRepository.readRequestDataInNode(
+        tabId,
+        nodeId,
+      );
+      return request;
+    }
+    if (folderId) {
+      request = await this.collectionRepository.readRequestInFolder(
+        collectionId,
+        folderId,
+        requestId,
+      );
+      return request;
+    } else {
+      request = await this.collectionRepository.readRequestOrFolderInCollection(
+        collectionId,
+        requestId,
+      );
+      return request;
+    }
+  };
+
+  /**
+   * @description
+   * Read an API request data within a tab.
+   */
+  public getRequestDataFromTab = async (tabId: string, requestId: string) => {
+    let request = await this.collectionRepository.readRequestInTab(
+      tabId,
+      requestId,
     );
+    return request;
+  };
+
+  /**
+   * @description
+   * Read an API request data within a node.
+   */
+  public checkRequestExistInNode = async (tabId: string, nodeId: string) => {
+    let request = await this.collectionRepository.readRequestExistInNode(
+      tabId,
+      nodeId,
+    );
+    return request;
+  };
+
+  /**
+   * @description
+   * Update a block data.
+   */
+  public updateBlockData = async (
+    tabId: string,
+    nodeId: string,
+    requestData: object,
+  ) => {
+    await this.collectionRepository.updateBlockData(tabId, nodeId, requestData);
+  };
+
+  /**
+   *
+   * @param  - response state
+   */
+  public updateResponseState = async (key, val) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (key === "responseNavigation") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.navigation = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyLanguage") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyLanguage = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    } else if (key === "responseBodyFormatter") {
+      testFlowDataStore.update((restApiDataMap) => {
+        const data = restApiDataMap.get(progressiveTab?.tabId);
+        if (data) {
+          data.response.bodyFormatter = val;
+        }
+        restApiDataMap.set(progressiveTab.tabId, data);
+        return restApiDataMap;
+      });
+    }
+  };
+
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  /**
+   *
+   * @param isGlobalVariable - defines to save local or global
+   * @param environmentVariables - pre existing environment data
+   * @param newVariableObj - new entry to be extended
+   * @returns
+   */
+  public updateEnvironment = async (
+    isGlobalVariable: boolean,
+    environmentVariables,
+    newVariableObj: KeyValue,
+  ) => {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGlobalVariable) {
+      // api payload
+      let payload = {
+        name: environmentVariables.global.name,
+        variable: [
+          ...environmentVariables.global.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+
+      if (isGuestUser === true) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          environmentVariables.global.id,
+          payload,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          environmentVariables.global.id,
+        );
+        if (currentTab) {
+          let currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+        return {
+          isSuccessful: true,
+        };
+      }
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path.workspaceId,
+        environmentVariables.global.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          response.data.data._id,
+        );
+
+        if (currentTab) {
+          let currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+      } else {
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
+      }
+      return response;
+    } else {
+      // api payload
+      const payload = {
+        name: environmentVariables.local.name,
+        variable: [
+          ...environmentVariables.local.variable,
+          {
+            key: newVariableObj.key,
+            value: newVariableObj.value,
+            checked: true,
+          },
+        ],
+      };
+      // removes blank key value pairs
+      payload.variable = [
+        ...payload.variable.filter((variable) => {
+          return variable.key.length > 0;
+        }),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ];
+      if (isGuestUser) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          environmentVariables.local.id,
+          payload,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          environmentVariables.local.id,
+        );
+
+        if (currentTab) {
+          let currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = payload.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+        return {
+          isSuccessful: true,
+        };
+      }
+      // api response
+      const response = await this.environmentService.updateEnvironment(
+        this._tab.getValue().path.workspaceId,
+        environmentVariables.local.id,
+        payload,
+      );
+      if (response.isSuccessful) {
+        // updates environment list
+        this.environmentRepository.updateEnvironment(
+          response.data.data._id,
+          response.data.data,
+        );
+
+        let currentTab = await this.tabRepository.getTabById(
+          response.data.data._id,
+        );
+        if (currentTab) {
+          const currentTabId = currentTab.tabId;
+          const envTab = createDeepCopy(currentTab);
+          envTab.property.environment.variable = response.data.data.variable;
+          envTab.isSaved = true;
+          await this.tabRepository.updateTab(currentTabId as string, {
+            property: envTab.property,
+            isSaved: envTab.isSaved,
+          });
+        }
+
+        notifications.success("Environment variable added successfully.");
+      } else {
+        notifications.error(
+          "Failed to add environment variable. Please try again.",
+        );
+      }
+      return response;
+    }
   };
   
   /**
