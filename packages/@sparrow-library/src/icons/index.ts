@@ -224,6 +224,8 @@ export { default as WarningFilled } from "./WarningFilled.svelte";
 export { default as DismissCircleRegular } from "./DismissCircleRegular.svelte";
 export { default as OpenRegular } from "./OpenRegular.svelte";
 export { default as BoardRegular } from "./BoardRegular.svelte";
+export { default as ArrowExportRegular} from "./ArrowExportRegular.svelte";
+export { default as ArrowImportRegular } from "./ArrowImportRegular.svelte";
 export { default as PlayFilled } from "./PlayFilled.svelte";
 export { default as StopFilled } from "./StopFilled.svelte";
 export { default as RenameRegular } from "./RenameRegular.svelte";
