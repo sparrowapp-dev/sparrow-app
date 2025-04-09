@@ -156,7 +156,6 @@
         selectedNodeResponse = undefined;
       } else {
         selectedNodeResponse = nodeResponse;
-        console.log({ testflowStore });
       }
     }
   }
@@ -164,7 +163,7 @@
 
 <section
   class="section"
-  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"}; margin-bottom: 70px;`}
+  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"};`}
 >
   <div
     on:mousedown={startResize}
@@ -375,6 +374,7 @@
     max-height: 464px;
     position: relative;
     background-color: transparent;
+    margin-bottom: 70px;
   }
 
   .tab-container {
