@@ -243,6 +243,7 @@
                       disabled={disabled}
                       placeholder={"Add Variable"}
                       {theme}
+                      enableEnvironmentHighlighting={false}
                     />
                   </div>
                 </div>
@@ -257,6 +258,7 @@
                       disabled={disabled}
                       placeholder={"Add Value"}
                       {theme}
+                      enableEnvironmentHighlighting={false}
                     />
                   </div>
                 </div>
