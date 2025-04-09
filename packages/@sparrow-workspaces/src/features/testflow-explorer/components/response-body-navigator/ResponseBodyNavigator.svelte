@@ -107,6 +107,10 @@
   };
 
   onMount(() => {
+    apiState = {
+      ...apiState,
+      responseBodyLanguage: response?.responseContentType,
+    };
     onUpdateResponseState(
       "responseBodyLanguage",
       response?.responseContentType,

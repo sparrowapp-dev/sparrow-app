@@ -34,7 +34,7 @@
         -- Reponse content-type set to image,
         -- 
       -->
-      <!-- <SparrowLogo /> -->
+      <img src={response.body} alt="" />
     {:else if apiState.responseBodyFormatter === ResponseFormatterEnum.PREVIEW}
       <!-- 
         --

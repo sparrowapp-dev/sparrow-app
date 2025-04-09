@@ -132,6 +132,13 @@
     try {
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
+      if (selectedNodeResponse) {
+        apiState = {
+          ...apiState,
+          responseBodyLanguage:
+            selectedNodeResponse?.response?.responseContentType,
+        };
+      }
     } catch (err) {
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
