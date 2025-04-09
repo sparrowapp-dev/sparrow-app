@@ -479,9 +479,9 @@
     padding: 4px 8px;
     background-color: var(--bg-ds-surface-100);
     opacity: 0;
-    /* -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75); */
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
   }
   :global(.codeBlock-action-btns-tooltip-square) {
     position: absolute;
