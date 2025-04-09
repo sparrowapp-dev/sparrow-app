@@ -430,7 +430,7 @@ export class TestflowExplorerPageViewModel {
 
     // Sequential execution
     for (const element of nodes) {
-      if (element?.type === "requestBlock") {
+      if (element?.type === "requestBlock" && element?.data?.requestId) {
         // Read the API request data from the tab
         const requestData = await this.collectionRepository.readRequestInTab(
           progressiveTab.tabId,

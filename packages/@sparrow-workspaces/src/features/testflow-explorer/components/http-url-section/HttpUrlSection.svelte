@@ -2,9 +2,6 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
 
-  let componentClass = "";
-  export { componentClass as class };
-
   export let requestUrl;
   export let onUpdateRequestUrl;
   export let environmentVariables;
@@ -14,7 +11,7 @@
   const theme = new UrlInputTheme().build();
 </script>
 
-<div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
+<div style="">
   <CodeMirrorInput
     value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
@@ -23,14 +20,15 @@
     {onUpdateEnvironment}
     {environmentVariables}
     codeId={"url"}
-    class={"input-url"}
+    class={"testflow-input-url"}
     {userRole}
     isFocusedOnMount={true}
   />
 </div>
 
 <style>
-  :global(.url-red-border) {
-    border: 1px solid var(--border-danger-200) !important;
+  :global(.testflow-input-url) {
+    width: 100%;
+    flex: 1;
   }
 </style>
