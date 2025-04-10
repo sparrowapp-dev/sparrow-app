@@ -33,12 +33,12 @@
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
-  let trackCursor: number;
+  let trackCursor: number | undefined;
   let environmentAxisY: number;
   let environmentAxisX: number;
   let dialogType = "";
   let localEnvKey: string;
-  let filterData = [];
+  let filterData: any[] = [];
   let id = uuidv4() + codeId;
 
   $: {
@@ -68,7 +68,7 @@
   };
 
   let handleFocusValue = () => {
-    handleInputValue();
+    // handleInputValue();
   };
   let handleBlurValue = () => {
     setTimeout(() => {
@@ -77,8 +77,10 @@
       filterData = [];
     }, 300);
   };
+
   let handleInputChange = (text: string) => {
     value = text;
+    handleInputValue();
   };
   let handleKeyUpValue = (e: EditorSelection) => {
     trackCursor = e.main.head;
@@ -98,7 +100,6 @@
 
 <CodeMirrorHandler
   rawValue={value}
-  handleRawChange={handleInputValue}
   handleFocusChange={handleFocusValue}
   handleBlurChange={handleBlurValue}
   {handleInputChange}
