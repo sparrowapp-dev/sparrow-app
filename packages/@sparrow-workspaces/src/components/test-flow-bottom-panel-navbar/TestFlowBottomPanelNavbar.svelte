@@ -27,7 +27,6 @@
   $: {
     if (selectedBlock) {
       requestUrl = selectedBlock?.data?.requestData?.url ?? "";
-      console.log({ selectedBlock });
     }
   }
 </script>
