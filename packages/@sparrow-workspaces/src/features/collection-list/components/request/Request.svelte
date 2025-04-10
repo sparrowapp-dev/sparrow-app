@@ -86,6 +86,7 @@
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
+  let isDragging: boolean = false;
 
   let requestTabWrapper: HTMLElement;
 
@@ -133,6 +134,7 @@
   };
 
   const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
+    isDragging = true;
     const requestState = defaultState;
     const data = {
       workspaceId: collection.workspaceId,
@@ -180,6 +182,9 @@
     //   }
     // }
   }
+  const dragStop = () => {
+    isDragging = false;
+  };
 </script>
 
 <svelte:window
@@ -299,6 +304,7 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
+  on:dragleave={dragStop}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -405,13 +411,7 @@
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-    <Tooltip
-      title={"More"}
-      show={!showMenu}
-      placement={"bottom-center"}
-      zIndex={701}
-      distance={17}
-    >
+    {#if isDragging}
       <span class="threedot-icon-container d-flex">
         <Button
           tabindex={-1}
@@ -425,7 +425,29 @@
           }}
         />
       </span>
-    </Tooltip>
+    {:else}
+      <Tooltip
+        title={"More"}
+        show={!showMenu}
+        placement={"bottom-center"}
+        zIndex={701}
+        distance={17}
+      >
+        <span class="threedot-icon-container d-flex">
+          <Button
+            tabindex={-1}
+            id={`show-more-api-${api.id}`}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              rightClickContextMenu(e);
+            }}
+          />
+        </span>
+      </Tooltip>
+    {/if}
   {/if}
 </div>
 <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
