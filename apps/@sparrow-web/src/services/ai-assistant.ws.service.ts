@@ -235,11 +235,12 @@ export class AiAssistantWebSocketService {
       !this.reconnectTimer
     ) {
       this.reconnectTimer = setTimeout(() => {
-        // console.log(
-        //   `Attempting to reconnect (${this.reconnectAttempts + 1}/${
-        //     this.maxReconnectAttempts
-        //   })...`,
-        // );
+        // Adding this console info, to debug in deployed environments
+        console.info(
+          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
+            this.maxReconnectAttempts
+          })...`,
+        );
         this.reconnectAttempts++;
         this.connectWebSocket();
         this.reconnectTimer = null;
@@ -339,7 +340,6 @@ export class AiAssistantWebSocketService {
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
-      console.log("re cont :> ", this.reconnectAttempts/this.maxReconnectAttempts)
       console.error("WebSocket not connected, cannot send message");
       return false;
     }
