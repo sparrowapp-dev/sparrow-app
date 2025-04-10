@@ -1,16 +1,17 @@
 <script lang="ts">
   import { ICON_CONFIG } from "../../../../constants";
-  import { IconUploader } from "..";
   import { TeamPropertyEnum } from "../../../../types";
   import type { UpdateTeamIcon as IUpdateTeamIcon } from "../../../../types";
   import { OSDetector } from "@sparrow/common/utils";
+  import { UploadArea } from "@sparrow/library/ui";
+  import { IconUploader } from "@sparrow/library/forms";
+  import { ImageRegular } from "@sparrow/library/icons";
+  import { CloudArrowUpRegular } from "@sparrow/library/icons";
 
   export let uploadTeamIcon: IUpdateTeamIcon;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
-  import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
-  import { FileType } from "../../../../../../compopnents";
   let os = "";
   const osDetector = new OSDetector();
   onMount(() => {
@@ -107,45 +108,118 @@
     );
     uploadFileInput?.click();
   };
+  const handleExtraDot = (value: string) => {
+    if (value.length > 0) {
+      value = value.charAt(0) === "." ? value.slice(1) : value;
+      return value.toUpperCase();
+    }
+    return value.toUpperCase();
+  };
 </script>
 
-<div class="pb-3">
+<div class="">
   <div>
-    <!-- IconUploader component for uploading team icons -->
-    <IconUploader
-      value={uploadTeamIcon.file.value}
-      maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
-      onChange={handleLogoInputChange}
-      iconHeight={30}
-      iconWidth={30}
-      resetValue={handleLogoReset}
-      editValue={handleLogoEdit}
-      labelDescription={ICON_CONFIG.DESCRIPTION}
-      labelDescriptionSize={"14px"}
-      inputId="upload-team-icon-file-input"
-      supportedFileTypes={ICON_CONFIG.FILE_TYPES}
-      showFileSizeError={uploadTeamIcon.file.showFileSizeError}
-      showFileTypeError={uploadTeamIcon.file.showFileTypeError}
-      width={"80px"}
-      height={"80px"}
-    />
+    <UploadArea
+      descriptionName={ICON_CONFIG.DESCRIPTION}
+      maxFileSizeText={"2"}
+      fileTypes={ICON_CONFIG.FILE_TYPES}
+      fileSizeError={uploadTeamIcon.file.showFileSizeError}
+      fileSizeErrorMessage={ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
+      fileTypeErrorMessage={ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
+      fileTypeError={uploadTeamIcon.file.showFileTypeError}
+    >
+      <IconUploader
+        value={uploadTeamIcon.file.value}
+        supportedFileTypes={ICON_CONFIG.FILE_TYPES}
+        onChange={handleLogoInputChange}
+        resetValue={handleLogoReset}
+        editValue={handleLogoEdit}
+        inputId={"upload-team-icon-file-input"}
+        maxFileSize={ICON_CONFIG.MAX_FILE_SIZE_KB}
+        fileName={"Profile"}
+        isError={uploadTeamIcon.file.showFileSizeError ||
+          uploadTeamIcon.file.showFileTypeError}
+      >
+        <div>
+          <label
+            for={"upload-team-icon-file-input"}
+            class="d-flex justify-content-center"
+          >
+            <CloudArrowUpRegular
+              size={"28px"}
+              color={"var(--icon-ds-neutral-400)"}
+            />
+          </label>
+          <label
+            for={"upload-team-icon-file-input"}
+            class="sparrow-choose-file-label my-2 ps-2"
+            >Drag & Drop or <span class="sparrow-upload-text text-fs-14"
+              >Upload File</span
+            > here</label
+          >
+          <div class="d-flex justify-content-center text-fs-12">
+            <div
+              class="file-type-container-one d-flex align-items-center pe-2 pt-1 pb-1"
+            >
+              <ImageRegular
+                size={"16px"}
+                color={"var(--icon-ds-neutral-400)"}
+              />
+              <span class="file-type-text ms-1">
+                {handleExtraDot(ICON_CONFIG.FILE_TYPES[0])}
+              </span>
+            </div>
+            {#each ICON_CONFIG.FILE_TYPES.slice(1, -1) as fileType, index}
+              <div
+                class="file-type-container-two d-flex align-items-center px-2 pt-1 pb-1"
+                key={index}
+              >
+                <ImageRegular
+                  size={"16px"}
+                  color={"var(--icon-ds-neutral-400)"}
+                />
+                <span class="file-type-text ms-1"
+                  >{handleExtraDot(fileType)}</span
+                >
+              </div>
+            {/each}
+            <div class="d-flex align-items-center ps-2 pt-1 pb-1">
+              <ImageRegular
+                size={"16px"}
+                color={"var(--icon-ds-neutral-400)"}
+              />
+              <span class="file-type-text ms-1">
+                {handleExtraDot(
+                  ICON_CONFIG.FILE_TYPES[ICON_CONFIG.FILE_TYPES.length - 1],
+                )}
+              </span>
+            </div>
+          </div>
+        </div>
+      </IconUploader>
+    </UploadArea>
   </div>
-  {#if uploadTeamIcon.file.showFileTypeError}
-    <!-- Error message for unsupported file type -->
-    <p class=" text-danger-200 mt-2 text-fs-12">
-      {ICON_CONFIG.WRONG_FILE_ERROR_MESSAGE}
-    </p>
-    <div class="d-flex">
-      {#each ICON_CONFIG.FILE_TYPES as fileType (fileType)}
-        <span class="me-4">
-          <FileType {fileType} />
-        </span>
-      {/each}
-    </div>
-  {:else if uploadTeamIcon.file.showFileSizeError}
-    <!-- Error message for file size exceeding the limit -->
-    <p class=" text-danger-200 mt-2 text-fs-12">
-      {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
-    </p>
-  {/if}
 </div>
+
+<style>
+  .sparrow-upload-text {
+    color: var(--text-ds-primary-300);
+    font-family: "Inter", sans-serif;
+    text-align: center;
+    cursor: pointer;
+  }
+  .file-type-text {
+    color: var(--text-ds-neutral-400);
+    font-family: "Inter", sans-serif;
+    text-align: left;
+  }
+  .file-type-container-one {
+    border-right: 1px solid var(--border-ds-surface-100);
+  }
+  .file-type-container-two {
+    border-right: 1px solid var(--border-ds-surface-100);
+  }
+  .sparrow-choose-file-label {
+    color: var(--text-ds-neutral-400);
+  }
+</style>

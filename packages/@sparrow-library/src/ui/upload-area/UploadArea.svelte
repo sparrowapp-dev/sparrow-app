@@ -5,24 +5,33 @@
 
   export let titleName: string = "";
   export let descriptionName: string = "";
-  export let fileValue: File | File[] | null = null;
-  export let fileSize: number = 0;
   export let fileSizeError: boolean = false;
   export let fileSizeErrorMessage: string = "";
   export let iconComponent: typeof SvelteComponent;
   export let fileTypeError: boolean = false;
   export let fileTypeErrorMessage: string = "";
   export let fileTypes: string[] = [];
-  export let maxFileSizeText: number = "";
+  export let maxFileSizeText: string = "";
+  export let isUploadRequired: boolean = false;
+  export let helpingText: string = "";
 </script>
 
 <div>
-  <div class="pb-1">
+  <div class="pb-1 upload-container">
     <!-- Title -->
-    <span class="text-fs-14 upload-file-title">{titleName}</span>
+    {#if titleName}
+      <div class="d-flex align-items-center gap-1">
+        <span class="upload-file-title">
+          {titleName}
+        </span>
+        {#if isUploadRequired}
+          <span class="text-danger" style="margin: 0;">*</span>
+        {/if}
+      </div>
+    {/if}
 
     <!-- Description -->
-    {#if !(Array.isArray(fileValue) && fileSize > 0)}
+    {#if descriptionName}
       <p class="mb-2 text-fs-12 upload-file-description">
         {descriptionName}
       </p>
@@ -68,25 +77,36 @@
               </span>
             {/each}
           </div>
+        {:else if helpingText}
+          <div>
+            <p style="margin:0px;" class="help-label-text">{helpingText}</p>
+          </div>
         {/if}
       </div>
 
       <div class="upload-max-file-content">
-        <p
-          class={`mb-2 text-fs-12 ${fileSizeError ? "upload-max-file-text-error" : "upload-max-file-text"}`}
-        >
-          Max file size: {maxFileSizeText}MB
-        </p>
+        {#if maxFileSizeText}
+          <p
+            class={`mb-2 text-fs-12 ${fileSizeError ? "upload-max-file-text-error" : "upload-max-file-text"}`}
+          >
+            Max file size: {maxFileSizeText}MB
+          </p>
+        {/if}
       </div>
     </div>
   </div>
 </div>
 
 <style>
+  .upload-container {
+    max-width: 540px;
+    min-width: 240px;
+  }
   .upload-file-title {
     font-family: "Inter", sans-serif;
     font-weight: 400;
     line-height: 20.02px;
+    font-size: 14px;
     text-align: left;
     color: var(--text-ds-neutral-200);
   }
@@ -109,5 +129,9 @@
   }
   .upload-max-file-text-error {
     color: var(--text-ds-danger-300);
+  }
+  .help-label-text {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
   }
 </style>

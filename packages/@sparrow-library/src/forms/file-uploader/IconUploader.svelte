@@ -19,16 +19,6 @@
   export let width = "100%";
   export let height = "auto";
   export let disabled = false;
-  export let headerLabel: boolean = false;
-  export let varient: "primary" = "primary";
-  export let inputLadelId: string = "";
-  export let headerLabelText: string = "Label";
-  export let helpLabel: boolean = false;
-  export let inputValueRequired: boolean = false;
-  export let helpIcon;
-  export let errorMessage: string = "ErrorMessage";
-  export let helpLabelText: string = "help";
-  export let supportLabelText: string = "supportText";
   export let fileName: string = "";
   export let loading: boolean = false;
   export let handleCancel: () => void;
@@ -45,32 +35,32 @@
     maxFileSize: number,
     supportedFileTypes: string[],
   ) => {
+    const input = event.target as HTMLInputElement;
+    const files = input?.files;
+    if (!files || files.length === 0) return;
+    const selectedFile = files[0];
+    const name = selectedFile.name;
+    fileName = name;
     onChange(event, maxFileSize, supportedFileTypes);
   };
   const truncateFileName = (name: string, length: number): string => {
     return name.length > length ? name.substring(0, length) + ".." : name;
   };
+  const handleFileChange = (
+    e: Event,
+    maxFileSize: number,
+    supportedFileTypes: string[],
+  ) => {
+    const input = e.target as HTMLInputElement;
+    const files = input?.files;
+    if (!files || files.length === 0) return;
+    const selectedFile = files[0];
+    const name = selectedFile.name;
+    fileName = name;
+    onChange(e, maxFileSize, supportedFileTypes);
+  };
 </script>
 
-{#if headerLabel}
-  <div class="">
-    <div style="width: {width}; padding-bottom: 2px;">
-      <label for={inputLadelId} class="label-header-text"
-        >{headerLabelText}</label
-      >
-      {#if inputValueRequired}
-        <span style="color:var(--text-ds-danger-400)">*</span>
-      {/if}
-    </div>
-    {#if supportLabelText !== ""}
-      <div class="pb-2">
-        <p style="margin: 0px;" class="support-label-text">
-          {supportLabelText}
-        </p>
-      </div>
-    {/if}
-  </div>
-{/if}
 <div class="sparrow-text-input-container mb-2">
   <div class="d-flex flex-column">
     {#if value.length == 0 || value.size === 0}
@@ -87,7 +77,7 @@
             : 'transparent'
           : 'var(--bg-ds-surface-600)'};
     "
-        class="sparrow-file-input-{varient} text-fs-14 p-2 w-100 px-auto bg-ds-surface-400 {isDragOver
+        class="sparrow-file-input text-fs-14 p-2 w-100 px-auto {isDragOver
           ? 'drag-over'
           : ''}"
         tabindex="0"
@@ -148,7 +138,7 @@
                 accept={generateAcceptString()}
                 {disabled}
                 on:change={(e) => {
-                  onChange(e, maxFileSize, supportedFileTypes);
+                  handleFileChange(e, maxFileSize, supportedFileTypes);
                 }}
               />
             </div>
@@ -160,7 +150,7 @@
 
   {#if !Array.isArray(value) && value.size > 0}
     <div
-      class="sparrow-input-image-preview-{varient} d-flex gap-2 border-radius-4 align-items-center justify-content-center"
+      class="sparrow-input-image-preview d-flex gap-2 border-radius-4 align-items-center justify-content-center"
       style="border: {isError ? '2px' : '1px'} dashed {isError
         ? 'var(--border-ds-danger-300)'
         : 'var(--border-ds-surface-100)'};
@@ -193,7 +183,7 @@
           style="color: {isError
             ? 'var(--text-ds-danger-300)'
             : 'var(--text-ds-neutral-50)'};"
-          >{truncateFileName(fileName, 6)}</span
+          >{truncateFileName(fileName, 8)}</span
         >
         <div class="ms-auto d-flex justify-content-center pe-1">
           <Button
@@ -224,44 +214,17 @@
     />
   {/if}
 </div>
-<div>
-  {#if helpLabel}
-    <div
-      class="d-flex justify-content-normal align-items-center"
-      style={helpIcon !== ""
-        ? "margin-left: 2px;"
-        : "gap: 4px; margin-left: 2px;"}
-    >
-      <div>
-        <svelte:component
-          this={helpIcon}
-          size={"16px"}
-          useParentColor={true}
-          color={isError
-            ? "var(--icon-ds-danger-300)"
-            : "var(--icon-ds-neutral-400)"}
-        />
-      </div>
-      {#if isError}
-        <p style="margin:0px;" class="help-label-error">
-          {errorMessage}
-        </p>
-      {:else if helpLabelText !== ""}
-        <p style="margin:0px;" class="help-label-text">{helpLabelText}</p>
-      {/if}
-    </div>
-  {/if}
-</div>
 
 <style lang="scss">
   .sparrow-choose-file-input-button {
     margin-top: 22px;
     margin-bottom: 22px;
   }
-  .sparrow-file-input-primary {
+  .sparrow-file-input {
     height: 164px;
     min-width: 240px;
     max-width: 540px;
+    background-color: var(--bg-ds-surface-400);
     border-radius: 4px;
     outline: none;
     transition:
@@ -279,16 +242,22 @@
       cursor: pointer;
     }
 
+    &:active {
+      border: 1px dashed var(--border-ds-primary-300) !important;
+      background-color: var(--bg-ds-surface-500);
+      cursor: pointer;
+    }
+
     &:focus-visible {
       border: 2px dashed var(--border-ds-primary-300) !important;
     }
   }
 
-  .sparrow-file-input-primary.drag-over {
+  .sparrow-file-input.drag-over {
     border: 1px dashed var(--border-ds-primary-300) !important;
     background-color: var(--bg-ds-surface-500);
   }
-  .sparrow-file-input-primary:hover {
+  .sparrow-file-input:hover {
     border: 1px solid var(--border-ds-neutral-300);
     cursor: pointer;
   }
@@ -298,13 +267,13 @@
     border: 0;
   }
 
-  .sparrow-input-image-preview-primary > img {
+  .sparrow-input-image-preview > img {
     width: 80px;
     border: 1px solid #313233;
     height: 80px;
     background-color: var(--bg-ds-surface-400);
   }
-  .sparrow-input-image-preview-primary {
+  .sparrow-input-image-preview {
     height: 164px;
     min-width: 240px;
     max-width: 540px;
@@ -318,6 +287,11 @@
       background-color 0.2s ease-in-out;
     &:hover {
       border: 1px dashed var(--border-ds-neutral-300) !important;
+      cursor: pointer;
+    }
+    &:active {
+      border: 1px dashed var(--border-ds-primary-300) !important;
+      background-color: var(--bg-ds-surface-500);
       cursor: pointer;
     }
     &:focus {
