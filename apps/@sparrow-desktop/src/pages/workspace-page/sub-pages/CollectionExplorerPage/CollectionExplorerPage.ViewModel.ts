@@ -533,6 +533,9 @@ class CollectionExplorerPage {
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       return;
     }
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
     const response = await this.collectionService.updateCollectionData(
       progressiveTab.id as string,
       progressiveTab.path.workspaceId as string,
@@ -543,6 +546,7 @@ class CollectionExplorerPage {
         selectedAuthType:
           progressiveTab.property.collection.state.collectionAuthNavigation,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
@@ -925,8 +929,11 @@ class CollectionExplorerPage {
       moveNavigation("right");
       return;
     } else {
-      response =
-        await this.collectionService.addRequestInCollection(requestObj);
+      const baseUrl = await this.constructBaseUrl(collection.workspaceId);
+      response = await this.collectionService.addRequestInCollection(
+        requestObj,
+        baseUrl,
+      );
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
         this.collectionRepository.addRequestOrFolderInCollection(
@@ -1072,8 +1079,11 @@ class CollectionExplorerPage {
       moveNavigation("right");
       return;
     }
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -1178,6 +1188,7 @@ class CollectionExplorerPage {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     // Add the folder in the collection on the Database
     const response = await this.collectionService.addFolderInCollection(
       workspaceId,
@@ -1187,6 +1198,7 @@ class CollectionExplorerPage {
         name: folder.name,
         description: folder.description,
       },
+      baseUrl,
     );
 
     // Update UI elements and handle navigation on success
@@ -1299,8 +1311,11 @@ class CollectionExplorerPage {
       moveNavigation("right");
       return;
     }
-    const response =
-      await this.collectionService.addSocketInCollection(websocketObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addSocketInCollection(
+      websocketObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -1380,8 +1395,10 @@ class CollectionExplorerPage {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addSocketIoInCollection(
       socketIoOfCollectionPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
@@ -1463,8 +1480,10 @@ class CollectionExplorerPage {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addGraphqlInCollection(
       graphqlOfCollectionPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
