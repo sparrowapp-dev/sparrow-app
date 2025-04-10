@@ -123,10 +123,13 @@ import {
   RequestMethodEnum,
   type Auth,
   type StatePartial,
+  RequestDataTypeEnum,
+  RequestDatasetEnum,
 } from "@sparrow/common/types/workspace";
 import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 import { WorkspaceService } from "src/services/workspace.service";
 import constants from "src/constants/constants";
+import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -5827,6 +5830,30 @@ export default class CollectionsViewModel {
    * @param componentData - refers overall saved request tab data.
    * @returns status of the operation performed.
    */
+  private getResponseBodyType = (
+    bodyType: RequestDataTypeEnum | RequestDatasetEnum,
+  ) => {
+    let contentType = HttpResponseSavedBodyModeBaseEnum.TEXT;
+    switch (bodyType) {
+      case RequestDataTypeEnum.JSON:
+        contentType = HttpResponseSavedBodyModeBaseEnum.JSON;
+        break;
+      case RequestDataTypeEnum.XML:
+        contentType = HttpResponseSavedBodyModeBaseEnum.XML;
+        break;
+      case RequestDataTypeEnum.HTML:
+        contentType = HttpResponseSavedBodyModeBaseEnum.HTML;
+        break;
+      case RequestDataTypeEnum.JAVASCRIPT:
+        contentType = HttpResponseSavedBodyModeBaseEnum.JAVASCRIPT;
+        break;
+      case RequestDataTypeEnum.TEXT:
+        contentType = HttpResponseSavedBodyModeBaseEnum.TEXT;
+        break;
+    }
+    return contentType;
+  };
+
   public saveSavedRequest = async (componentData: Tab): Promise<boolean> => {
     const { folderId, collectionId, workspaceId, requestId } =
       componentData.path;
@@ -5834,6 +5861,10 @@ export default class CollectionsViewModel {
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
+
+    const responeBodyType = this.getResponseBodyType(
+      componentData.property.savedRequest.state.responseBodyLanguage,
+    );
 
     if (isGuestUser === true) {
       if (folderId) {
@@ -5844,6 +5875,9 @@ export default class CollectionsViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       } else {
@@ -5853,6 +5887,9 @@ export default class CollectionsViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       }
@@ -5867,6 +5904,7 @@ export default class CollectionsViewModel {
         requestId: requestId,
         folderId: folderId,
         description: componentData.description,
+        selectedResponseBodyType: responeBodyType,
       },
     );
 
@@ -5879,6 +5917,9 @@ export default class CollectionsViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       } else {
@@ -5888,6 +5929,9 @@ export default class CollectionsViewModel {
           componentData.id,
           {
             description: componentData.description,
+            requestResponse: {
+              selectedResponseBodyType: responeBodyType,
+            },
           },
         );
       }
