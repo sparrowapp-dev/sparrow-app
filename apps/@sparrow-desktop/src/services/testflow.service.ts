@@ -34,18 +34,16 @@ export class TestflowService {
     }[];
     nodes: {
       id: string;
-      blockName: string;
       type: string;
       position: {
         x: number;
         y: number;
       };
       data: {
+        blockName: string;
         requestId: string;
         collectionId: string;
         folderId: string;
-        method: string;
-        name: string;
         workspaceId: string;
         isDeleted: boolean;
         requestData: object;

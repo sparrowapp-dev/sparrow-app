@@ -125,15 +125,13 @@ export class TestflowExplorerPageViewModel {
     const nodes = _nodes.map((elem) => {
       return {
         id: elem.id,
-        blockName: elem.blockName,
         type: elem.type,
         data: {
-          name: elem.data.name, // not required to save in db
+          blockName: elem.data.blockName,
           requestId: elem.data.requestId,
           workspaceId: elem.data.workspaceId,
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
-          method: elem.data.method, // not required to save in db
           requestData: elem.data.requestData,
           isDeleted: elem.data.isDeleted,
         },
@@ -399,22 +397,21 @@ export class TestflowExplorerPageViewModel {
     const abortController = new AbortController();
     const { signal } = abortController;
 
-    let runningNodes : any[] = [];
+    let runningNodes: any[] = [];
 
-    if(_event === "run-from-here"){
-      nodes.forEach((node: any)=>{
-        if(node.id >= _id){
+    if (_event === "run-from-here") {
+      nodes.forEach((node: any) => {
+        if (node.id >= _id) {
           runningNodes.push(node);
         }
       });
-    }
-    else if (_event === "run-till-here") {
-        nodes.forEach((node: any)=>{
-          if(node.id <= _id){
-            runningNodes.push(node);
-          }
-        });
-    }else{
+    } else if (_event === "run-till-here") {
+      nodes.forEach((node: any) => {
+        if (node.id <= _id) {
+          runningNodes.push(node);
+        }
+      });
+    } else {
       runningNodes = [...nodes];
     }
 
@@ -487,7 +484,7 @@ export class TestflowExplorerPageViewModel {
             decodeData[2],
             decodeData[3],
             decodeData[4],
-            signal
+            signal,
           );
           const end = Date.now();
           const duration = end - start;
@@ -1384,7 +1381,7 @@ export class TestflowExplorerPageViewModel {
       return response;
     }
   };
-  
+
   /**
    * @description - This function stops the api calls in Testflow.
    */

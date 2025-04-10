@@ -153,9 +153,9 @@
       _nodes.forEach((_node) => {
         if (_node.id === id) {
           setTimeout(() => {
-            req.name = _node?.data?.name;
-            req.method = _node?.data?.method;
-            blockName = _node.blockName;
+            req.name = _node?.data?.requestData?.name;
+            req.method = _node?.data?.requestData?.method;
+            blockName = _node?.data?.blockName;
           }, 10);
         }
       });
@@ -216,17 +216,6 @@
       setTimeout(() => inputfield?.focus(), 0);
     }
   };
-
-  // const disableEditing = () => {
-  //   isEditing = false;
-  //   data.updateBlockName("blockName", blockName);
-  // };
-
-  // const handleKeyDown = (event: any) => {
-  //   if (event.key === "Enter") {
-  //     disableEditing();
-  //   }
-  // };
 
   let moreOptions = [
     {

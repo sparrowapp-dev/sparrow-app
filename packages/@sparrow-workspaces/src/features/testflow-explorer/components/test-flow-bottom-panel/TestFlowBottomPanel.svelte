@@ -217,7 +217,7 @@
           <input
             type="text"
             placeholder="Enter Block Name"
-            value={selectedBlock?.blockName}
+            value={selectedBlock?.data?.blockName}
             bind:this={inputRef}
             class="input-box"
             style="outline: none;"
@@ -225,7 +225,7 @@
               handleUpdateRequestData("blockName", e?.target?.value);
             }}
             on:blur={() => {
-              if (selectedBlock?.blockName.length === 0) {
+              if (selectedBlock?.data?.blockName?.length === 0) {
                 handleUpdateRequestData("blockName", "Untitled");
               }
             }}

@@ -34,13 +34,11 @@ class InitTestflowTab {
             {
               id: "1",
               type: "startBlock",
-              blockName: "startBlock",
               data: {
-                name: "",
+                blockName: "startBlock",
                 collectionId: "",
                 folderId: "",
                 requestId: "",
-                method: "",
                 workspaceId: "",
                 isDeleted: false,
                 requestData: null,

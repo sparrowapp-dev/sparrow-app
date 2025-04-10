@@ -175,6 +175,9 @@ const httpRequestAuth = {
 };
 
 const requestItems = {
+  name: {
+    type: "string",
+  },
   method: {
     type: "string",
   },
@@ -1212,16 +1215,13 @@ export const tabSchemaLiteral = {
                   id: {
                     type: "string",
                   },
-                  blockName: {
-                    type: "string",
-                  },
                   type: {
                     type: "string",
                   },
                   data: {
                     type: "object",
                     properties: {
-                      name: {
+                      blockName: {
                         type: "string",
                       },
                       workspaceId: {
@@ -1235,9 +1235,6 @@ export const tabSchemaLiteral = {
                       },
                       requestId: {
                         type: "string",
-                      },
-                      method: {
-                        type: " string",
                       },
                       requestData: {
                         type: "object",
