@@ -87,13 +87,11 @@ export class TestflowViewModel {
         {
           id: "1",
           type: "startBlock",
-          blockName: "startBlock",
           data: {
+            blockName: "startBlock",
             collectionId: "",
             requestId: "",
             folderId: "",
-            method: "",
-            name: "",
             workspaceId: currentWorkspace._id,
             requestData: null,
             isDeleted: false,
@@ -132,17 +130,15 @@ export class TestflowViewModel {
         {
           id: "1",
           type: "startBlock",
-          blockName: "startBlock",
           position: {
             x: 100,
             y: 200,
           },
           data: {
+            blockName: "startBlock",
             requestId: "",
             collectionId: "",
             folderId: "",
-            method: "",
-            name: "",
             workspaceId: currentWorkspace._id,
             requestData: null,
             isDeleted: false,

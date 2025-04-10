@@ -106,17 +106,6 @@
       </Table>
     {/if}
     {#if isGuestUser}
-      <Table
-        tableClassProps="table p-0 table-responsive w-100"
-        tableStyleProp="max-height: 100%; "
-        dataSearch="true"
-        tableHeaderClassProp="position-sticky top-0 z-2"
-        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);"
-        contributorsCount={2}
-        headerObject={tableHeaderContent}
-        onSortToggle={handleSortToggle}
-        isSortDisabled={true}
-      ></Table>
       <div class="container">
         <div class="sparrow-logo">
           <SparrowLogo />
@@ -138,8 +127,8 @@
       {#if searchQuery == "" && data && data?.length === 0}
         <p class="not-found-text mt-3">
           {isAdminOrOwner
-            ? "Add Workspaces to this team."
-            : "You don't have access to any workspace in this team."}
+            ? "Add Workspaces to this hub."
+            : "You don't have access to any workspace in this hub."}
         </p>
       {:else if searchQuery !== "" && data
           .slice()

@@ -45,6 +45,7 @@ export interface HttpRequestMetaDataTestFlowDtoInterface {
   body?: HttpRequestBodyDtoInterface;
   headers?: HttpRequestKeyValueDtoInterface[];
   method: HttpRequestMethodsDtoInterface;
+  name: string;
   queryParams?: HttpRequestKeyValueDtoInterface[];
   selectedRequestAuthType?: HttpRequestAuthModeDtoEnum;
   selectedRequestBodyType?: HttpRequestBodyModeDtoEnum;
@@ -57,14 +58,12 @@ export interface HttpRequestMetaDataTestFlowDtoInterface {
  */
 export interface TFNodeType {
   id: string;
-  blockName: string;
   type: string;
   data: {
+    blockName: string;
     requestId: string;
     folderId: string;
     collectionId: string;
-    name: string;
-    method: string;
     workspaceId: string;
     requestData: HttpRequestMetaDataTestFlowDtoInterface;
     isDeleted: boolean;
@@ -147,14 +146,12 @@ export interface TFResponseStateType {
 
 export interface TFTabNodeType {
   id: string;
-  blockName: string;
   type: string;
   data: {
+    blockName: string;
     requestId: string;
     folderId: string;
     collectionId: string;
-    name: string;
-    method: string;
     workspaceId: string;
     requestData?: HttpRequestMetaDataTestFlowDtoInterface;
     isDeleted: boolean;

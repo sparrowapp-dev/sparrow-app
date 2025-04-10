@@ -14,7 +14,10 @@
 
   // ---- Helper
   import { tabBarScroller } from "@sparrow/common/utils/navigation";
-  import { tabsSplitterDirection } from "../../../stores";
+  import {
+    tabsSplitterDirection,
+    isChatbotOpenInCurrTab,
+  } from "../../../stores";
   import { HelpIcon } from "@sparrow/library/assets";
   import {
     HorizontalGridIcon,
@@ -261,7 +264,7 @@
           </Tooltip>
         </div>
       {/if}
-      {#if activeTabType === TabTypeEnum.REQUEST || activeTabType === TabTypeEnum.SAVED_REQUEST}
+      {#if !$isChatbotOpenInCurrTab && (activeTabType === TabTypeEnum.REQUEST || activeTabType === TabTypeEnum.SAVED_REQUEST)}
         <!-- Split button -->
         <div
           class="d-flex align-items-center ms-auto ps-1"

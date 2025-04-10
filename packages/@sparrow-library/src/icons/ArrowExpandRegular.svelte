@@ -5,7 +5,7 @@
 </script>
 
 <i
-  class="icon-ic_fluent_stop_20_filled"
+  class="icon-ic_fluent_arrow_expand_regular"
   style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
 ></i>
 

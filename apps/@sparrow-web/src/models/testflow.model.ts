@@ -149,6 +149,9 @@ const stateItems = {
 };
 
 const requestItems = {
+  name: {
+    type: "string",
+  },
   method: {
     type: "string",
   },
@@ -230,16 +233,13 @@ const TestflowSchemaLiteral = {
           id: {
             type: "string",
           },
-          blockName: {
-            type: "string",
-          },
           type: {
             type: "string",
           },
           data: {
             type: "object",
             properties: {
-              name: {
+              blockName: {
                 type: "string",
               },
               workspaceId: {
@@ -252,9 +252,6 @@ const TestflowSchemaLiteral = {
                 type: "string",
               },
               requestId: {
-                type: "string",
-              },
-              method: {
                 type: "string",
               },
               requestData: {

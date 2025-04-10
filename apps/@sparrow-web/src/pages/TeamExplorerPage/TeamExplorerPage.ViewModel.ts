@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getClientUser } from "../../utils/jwt";
 import { WorkspaceTabAdapter } from "src/adapter";
 import constants from "src/constants/constants";
+import { Sleep } from "@sparrow/common/utils";
 
 export class TeamExplorerPageViewModel {
   constructor() {}

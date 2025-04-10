@@ -39,9 +39,9 @@
       size={"medium"}
       data={httpMethodData}
       borderRounded={"4px"}
-      titleId={selectedBlock?.data?.method === ""
+      titleId={selectedBlock?.data?.requestData?.method === ""
         ? "GET"
-        : selectedBlock?.data?.method}
+        : selectedBlock?.data?.requestData?.method}
       onclick={(e) => handleUpdateRequestData("method", e)}
       borderHighlight={"active"}
       headerHighlight={"hover"}
@@ -59,9 +59,9 @@
     />
     <div class="request-name-text">
       {truncateName(
-        selectedBlock?.data?.name === ""
+        selectedBlock?.data?.requestData?.name === ""
           ? "Select API Request"
-          : selectedBlock?.data?.name,
+          : selectedBlock?.data?.requestData?.name,
         10,
       )}
     </div>

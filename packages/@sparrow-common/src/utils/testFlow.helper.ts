@@ -209,8 +209,13 @@ export const extractAuthData = (requestData: any) => {
   };
 };
 
-export const defaultRequestData = (method: string, url?: string) => {
+export const defaultRequestData = (
+  name: string,
+  method: string,
+  url?: string,
+) => {
   return {
+    name: name || "",
     method: method || "",
     url: url || "",
     body: {

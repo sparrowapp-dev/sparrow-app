@@ -2,7 +2,6 @@
   import { getMethodStyle } from "@sparrow/common/utils";
   import type { CollectionDocument } from "@app/database/database";
   import {
-    CollectionIcon,
     ChevronUpRegular,
     FolderRegular,
     AddRegular,
@@ -16,72 +15,129 @@
     currentStep,
     isTestFlowTourGuideOpen,
   } from "../../../../stores/guide.tour";
-  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
 
   export let name;
   export let method;
-  export let collections = [];
+  export let collections: any = [];
   export let updateNode;
   export let collectionData: Observable<CollectionDocument[]>;
   export let handleOpenAddCustomRequestModal;
 
-  collectionData.subscribe((value) => {
-    if (value) {
-      collections = value;
-    }
-  });
-
   let arrayData = collections;
-  let filteredArrayData = collections;
-  let selectedRequest = null;
   let isOpen = false;
   let previousItem;
   let selectedCollection;
   let selectedFolder;
   let selectedItem = "COLLECTION";
   let ignoreClickOutside = false;
-  let searchQuery = "";
   let searchInputRef;
   let dropdownRef: HTMLElement;
   let showSampleApi = false;
+  let previousValue: string = "";
+  let itemIdToCollectionIdMap = new Map();
+  let selectApiName = name;
+  let allApis: any = [];
+  let filteredApis = [];
+
+  const initializeMap = (collections: any) => {
+    itemIdToCollectionIdMap.clear();
+
+    collections.forEach(function mapItems(collection: any) {
+      if (collection.items && collection.items.length > 0) {
+        collection.items.forEach(function mapNestedItems(item: any) {
+          if (item.id) {
+            itemIdToCollectionIdMap.set(item.id, collection.id);
+          }
+          if (item.items && item.items.length > 0) {
+            item.items.forEach(mapNestedItems);
+          }
+        });
+      }
+    });
+  };
+
+  // Function to divide all the apis of it.
+  const handleSearchApis = () => {
+    let apis: any[] = [];
+    for (let i = 0; i < collections.length; i++) {
+      if (collections[i]?._data) {
+        apis.push(collections[i]._data);
+      }
+      if (collections[i]?._data?.items?.length) {
+        for (let item of collections[i]._data.items) {
+          apis.push(item);
+          if (item?.items?.length) {
+            apis = [...apis, ...item.items];
+          }
+        }
+      }
+    }
+    return apis;
+  };
+
+  collectionData.subscribe((value) => {
+    if (value) {
+      collections = value;
+      allApis = handleSearchApis();
+      filteredApis = allApis;
+      initializeMap(collections);
+    }
+  });
+
+  // Function to search and filter APIs
+  const searchApis = () => {
+    isOpen = true;
+    filteredApis = allApis.filter((api: any) =>
+      api.name.toLowerCase().includes(selectApiName.toLowerCase()),
+    );
+  };
+
+  const findCollectionIdForItem = (itemId: string) => {
+    return itemIdToCollectionIdMap.get(itemId) || null;
+  };
 
   const handleSelectApi = (data) => {
     if (data?.totalRequests !== undefined) {
       selectedCollection = data;
       selectedItem = "COLLECTION";
-      // arrayData = data.items;
-      filteredArrayData = data.items;
+      arrayData = data.items;
       previousItem = data;
+      selectApiName = "";
     }
     if (data?.type === "FOLDER") {
       selectedFolder = data;
       selectedItem = "FOLDER";
-      // arrayData = data.items;
-      filteredArrayData = data.items;
+      arrayData = data.items;
       previousItem = data;
+      selectApiName = "";
     }
     if (data?.type === "REQUEST") {
       selectedItem = "REQUEST";
       isOpen = false;
-      selectedRequest = data;
       if (previousItem?.type === "FOLDER") {
+        const currentCollectionId = findCollectionIdForItem(data.id);
         updateNode(
           data.name,
           data.id,
-          selectedCollection.id,
+          currentCollectionId,
           data.request.method,
           previousItem.id,
         );
+        if (data.name == name) {
+          selectApiName = name;
+        }
       } else {
+        const currentCollectionId = findCollectionIdForItem(data.id);
         updateNode(
           data.name,
           data.id,
-          selectedCollection.id,
+          currentCollectionId,
           data.request.method,
         );
+        selectApiName = data.name;
       }
-      // arrayData = collections;
-      filteredArrayData = collections;
+      arrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
     }
@@ -99,9 +155,6 @@
         isOpen = false;
       }
       arrayData = collections;
-      filteredArrayData = arrayData.filter((item) =>
-        item.name?.toLowerCase().includes(searchQuery),
-      );
       selectedCollection = null;
       selectedFolder = null;
     }
@@ -113,6 +166,10 @@
       isOpen = true;
     } else {
       isOpen = false;
+    }
+
+    if (name) {
+      selectApiName = name;
     }
   }
 
@@ -162,16 +219,6 @@
       showSampleApi = false;
     }
   }
-  let options = [
-    {
-      name: "collection",
-      icon: CollectionIcon,
-      color: "var(--bg-ds-neutral-300)",
-      onclick: () => {
-        handleSelectApi("SomeData");
-      },
-    },
-  ];
 
   const truncateName = (
     name: string,
@@ -186,35 +233,24 @@
       : name;
   };
 
-  // Update search query manually
-  const handleInputChange = (event) => {
-    searchQuery = event.target.value.toLowerCase();
-    selectedCollection = null;
-    selectedFolder = null;
-    isOpen = true;
-    filteredArrayData = arrayData.filter(
-      (item) =>
-        item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.items?.some((subItem: any) =>
-          subItem.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-        ),
-    );
-  };
-
   const handleInputClick = () => {
     isOpen = true;
   };
 
   const handleClickBackInList = () => {
     if (selectedFolder) {
-      filteredArrayData = selectedCollection.items;
+      arrayData = selectedCollection.items;
       selectedFolder = null;
     } else if (selectedCollection) {
-      filteredArrayData = arrayData.filter((item) =>
-        item.name?.toLowerCase().includes(searchQuery),
-      );
+      arrayData = collections;
       selectedCollection = null;
       ignoreClickOutside = true;
+    }
+  };
+
+  const handleBlur = () => {
+    if (selectApiName?.trim() === "") {
+      selectApiName = previousValue;
     }
   };
 
@@ -264,9 +300,10 @@
           class="search-box"
           type="text"
           placeholder="Select API Request"
-          value={searchQuery}
-          on:input={handleInputChange}
+          bind:value={selectApiName}
+          on:input={searchApis}
           on:click|stopPropagation={handleInputClick}
+          on:blur={handleBlur}
           bind:this={searchInputRef}
         />
       {/if}
@@ -291,128 +328,171 @@
       ? 'block'
       : 'none'}; position:absolute"
   >
-    {#if selectedCollection}
-      <div class="d-flex ellipsis back-header px-1">
-        <Tooltip title={"Back"} placement={"top-center"} size="medium">
-          <Button
-            size="extra-small"
-            type="teritiary-regular"
-            startIcon={ChevronLeftRegular}
-            onClick={handleClickBackInList}
-          />
-        </Tooltip>
-        <div
-          class="d-flex"
-          style="margin-left: 2px; align-items:center; margin-right:2px;"
-        >
-          <StackRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
-          <p
-            class="ellipsis label-text"
-            style="margin-left: 4px; margin-bottom:0px"
-          >
-            {truncateName(selectedCollection.name, 12)}
-          </p>
-        </div>
-        {#if selectedFolder && !isOpen}
-          <p style="margin-bottom: 0px; margin-top:4px;">
-            <span class="ms-1"></span>/
-          </p>
+    {#if !selectApiName}
+      {#if selectedCollection}
+        <div class="d-flex ellipsis back-header px-1">
+          <Tooltip title={"Back"} placement={"top-center"} size="medium">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={ChevronLeftRegular}
+              onClick={handleClickBackInList}
+            />
+          </Tooltip>
           <div
             class="d-flex"
-            style="margin-left: 2px; align-items:center; margin-right:3px;"
+            style="margin-left: 2px; align-items:center; margin-right:2px;"
           >
-            <FolderRegular size={"16px"} />
+            <StackRegular size={"16px"} color={"var(--icon-ds-neutral-50)"} />
             <p
               class="ellipsis label-text"
-              style="margin-left: 4px; margin-bottom:0px;"
+              style="margin-left: 4px; margin-bottom:0px"
             >
-              {truncateName(selectedFolder.name, 6, true)}
+              {truncateName(selectedCollection.name, 12)}
+            </p>
+          </div>
+          {#if selectedFolder}
+            <p style="margin-bottom: 0px; margin-top:4px;">
+              <span class="ms-1"></span>/
+            </p>
+            <div
+              class="d-flex"
+              style="margin-left: 2px; align-items:center; margin-right:3px;"
+            >
+              <FolderRegular size={"16px"} />
+              <p
+                class="ellipsis label-text"
+                style="margin-left: 4px; margin-bottom:0px;"
+              >
+                {truncateName(selectedFolder.name, 6, true)}
+              </p>
+            </div>
+          {/if}
+        </div>
+      {/if}
+      <div class="scrollable-list">
+        {#if showSampleApi}
+          {#each dummyCollection as data}
+            {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
+              <div
+                class="d-flex align-items-center dropdown-single-option px-2 py-1 gap-1"
+                on:click|stopPropagation={() => {
+                  handleSelectApi(data);
+                }}
+              >
+                <div
+                  style="margin-left: 5px;"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  {#if data?.type === "REQUEST"}
+                    <span class="text-{getMethodStyle(data?.request?.method)}">
+                      <span
+                        class={"request-icon"}
+                        style="font-size: 10px; font-weight: 500;"
+                        >{data?.request?.method || ""}</span
+                      >
+                    </span>
+                  {:else if data?.type === "FOLDER"}
+                    <FolderRegular size={"16px"} />
+                  {:else}
+                    <StackRegular />
+                  {/if}
+                </div>
+                <p class="options-txt ellipsis label-text">
+                  {data.name}
+                </p>
+              </div>
+            {/if}
+          {/each}
+        {:else if arrayData?.some((data) => data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER")}
+          {#each arrayData as data}
+            {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
+              <div
+                class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
+                on:click|stopPropagation={() => {
+                  handleSelectApi(data);
+                }}
+              >
+                <div
+                  style="margin-left: 5px;min-width: 28px;"
+                  class="d-flex align-items-center justify-content-center"
+                >
+                  {#if data?.type === "REQUEST"}
+                    <span class="text-{getMethodStyle(data?.request?.method)}">
+                      <span
+                        class={"request-icon"}
+                        style="font-size: 9px; font-weight: 600;"
+                        >{data?.request?.method === "DELETE"
+                          ? "DEL"
+                          : data?.request?.method || ""}</span
+                      >
+                    </span>
+                  {:else if data?.type === "FOLDER"}
+                    <FolderRegular size={"16px"} />
+                  {:else}
+                    <StackRegular />
+                  {/if}
+                </div>
+                <p class="options-txt ellipsis label-text">
+                  {data.name}
+                </p>
+              </div>
+            {/if}
+          {/each}
+        {:else}
+          <div
+            style="align-items:center; justify-content:center;"
+            class="d-flex"
+          >
+            <p style="margin: 0px;" class="search-notfound-text">
+              No results found.
             </p>
           </div>
         {/if}
       </div>
-    {/if}
-    <div class="scrollable-list" style="max-height: 288px;">
-      {#if showSampleApi}
-        {#each dummyCollection as data}
-          {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
+    {:else if filteredApis.length > 0}
+      <div class="scrollable-list">
+        {#each filteredApis as api}
+          {#if api?.type === "REQUEST" || api?.items}
             <div
               class="d-flex align-items-center dropdown-single-option px-2 py-1 gap-1"
+              style="gap: 6px;"
               on:click|stopPropagation={() => {
-                handleSelectApi(data);
+                handleSelectApi(api);
               }}
             >
-              <div
-                style="margin-left: 5px;"
-                class="d-flex align-items-center justify-content-center"
-              >
-                {#if data?.type === "REQUEST"}
-                  <span class="text-{getMethodStyle(data?.request?.method)}">
-                    <span
-                      class={"request-icon"}
-                      style="font-size: 10px; font-weight: 500;"
-                      >{data?.request?.method || ""}</span
-                    >
-                  </span>
-                {:else if data?.type === "FOLDER"}
-                  <FolderRegular size={"16px"} />
-                {:else}
-                  <StackRegular />
-                {/if}
-              </div>
-              <p class="options-txt ellipsis label-text">
-                {data.name}
-              </p>
+              {#if api?.request?.method}
+                <span
+                  class="text-{getMethodStyle(
+                    api?.request?.method,
+                  )} text-center"
+                >
+                  <span
+                    class={"request-icon"}
+                    style="font-size: 9px; font-weight: 600;"
+                    >{api?.request?.method === "DELETE"
+                      ? "DEL"
+                      : api?.request?.method || ""}</span
+                  >
+                </span>
+              {:else}
+                <StackRegular
+                  size={"16px"}
+                  color={"var(--icon-ds-neutral-50)"}
+                />
+              {/if}
+              <span class="select-txt">{truncateName(api.name, 21)}</span>
             </div>
           {/if}
         {/each}
-      {:else if filteredArrayData?.filter((data) => {
-        if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
-        return false;
-      })?.length > 0}
-        {#each filteredArrayData as data}
-          {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
-            <div
-              class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
-              on:click|stopPropagation={() => {
-                handleSelectApi(data);
-              }}
-            >
-              <div
-                style="margin-left: 5px;min-width: 28px;"
-                class="d-flex align-items-center justify-content-center"
-              >
-                {#if data?.type === "REQUEST"}
-                  <span class="text-{getMethodStyle(data?.request?.method)}">
-                    <span
-                      class={"request-icon"}
-                      style="font-size: 9px; font-weight: 600;"
-                      >{data?.request?.method === "DELETE"
-                        ? "DEL"
-                        : data?.request?.method || ""}</span
-                    >
-                  </span>
-                {:else if data?.type === "FOLDER"}
-                  <FolderRegular size={"16px"} />
-                {:else}
-                  <StackRegular />
-                {/if}
-              </div>
-              <p class="options-txt ellipsis label-text">
-                {data.name}
-              </p>
-            </div>
-          {/if}
-        {/each}
-      {:else}
-        <div
-          style="align-items:center; justify-content:center; padding-top:12px;"
-          class="d-flex"
-        >
-          <p class="empty-text">No results found.</p>
-        </div>
-      {/if}
-    </div>
+      </div>
+    {:else}
+      <div style="align-items:center; justify-content:center;" class="d-flex">
+        <p style="margin: 0px;" class="search-notfound-text">
+          No results found.
+        </p>
+      </div>
+    {/if}
 
     <div on:click={handleOpenAddCustomRequestModal} class="custom-component">
       <AddRegular size={"12px"} color={"var(--icon-ds-neutral-100)"} />
@@ -550,16 +630,17 @@
   }
 
   .search-box {
-    border: none;
+    border: 1px solid transparent;
     background: transparent;
     width: 100%;
     padding-left: 8px;
     font-size: 12px;
+    border-radius: 4px;
   }
 
   .search-box:focus {
     outline: none;
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
 
     font-family: "Inter", sans-serif;
