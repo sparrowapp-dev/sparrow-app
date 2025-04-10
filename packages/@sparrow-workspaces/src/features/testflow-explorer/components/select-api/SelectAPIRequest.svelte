@@ -2,7 +2,6 @@
   import { getMethodStyle } from "@sparrow/common/utils";
   import type { CollectionDocument } from "@app/database/database";
   import {
-    CollectionIcon,
     ChevronUpRegular,
     FolderRegular,
     AddRegular,
@@ -16,7 +15,7 @@
     currentStep,
     isTestFlowTourGuideOpen,
   } from "../../../../stores/guide.tour";
-  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
 
   export let name;
   export let method;
@@ -26,7 +25,6 @@
   export let handleOpenAddCustomRequestModal;
 
   let arrayData = collections;
-  let selectedRequest = null;
   let isOpen = false;
   let previousItem;
   let selectedCollection;
@@ -117,7 +115,6 @@
     if (data?.type === "REQUEST") {
       selectedItem = "REQUEST";
       isOpen = false;
-      selectedRequest = data;
       if (previousItem?.type === "FOLDER") {
         const currentCollectionId = findCollectionIdForItem(data.id);
         updateNode(
@@ -127,7 +124,7 @@
           data.request.method,
           previousItem.id,
         );
-        if ((data.name = name)) {
+        if (data.name == name) {
           selectApiName = name;
         }
       } else {
@@ -222,16 +219,6 @@
       showSampleApi = false;
     }
   }
-  let options = [
-    {
-      name: "collection",
-      icon: CollectionIcon,
-      color: "var(--bg-ds-neutral-300)",
-      onclick: () => {
-        handleSelectApi("SomeData");
-      },
-    },
-  ];
 
   const truncateName = (
     name: string,
@@ -262,7 +249,7 @@
   };
 
   const handleBlur = () => {
-    if (selectApiName.trim() === "") {
+    if (selectApiName?.trim() === "") {
       selectApiName = previousValue;
     }
   };
@@ -417,10 +404,7 @@
               </div>
             {/if}
           {/each}
-        {:else if arrayData?.filter((data) => {
-          if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") return true;
-          return false;
-        })?.length > 0}
+        {:else if arrayData?.some((data) => data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER")}
           {#each arrayData as data}
             {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
               <div
@@ -646,16 +630,17 @@
   }
 
   .search-box {
-    border: none;
+    border: 1px solid transparent;
     background: transparent;
     width: 100%;
     padding-left: 8px;
     font-size: 12px;
+    border-radius: 4px;
   }
 
   .search-box:focus {
     outline: none;
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
 
     font-family: "Inter", sans-serif;
