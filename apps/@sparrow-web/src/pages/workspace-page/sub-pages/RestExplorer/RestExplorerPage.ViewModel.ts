@@ -512,19 +512,23 @@ class RestExplorerViewModel {
         notifications.success("Response saved successfully.");
         return savedRequestId || "";
       }
-      const res = await this.collectionService.createSavedRequestInCollection({
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        requestId: requestId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: componentData.name,
-          description: componentData.description,
-          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
-          requestResponse: unadaptedRequest,
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const res = await this.collectionService.createSavedRequestInCollection(
+        {
+          collectionId: collectionId,
+          workspaceId: workspaceId,
+          requestId: requestId,
+          folderId: folderId,
+          ...userSource,
+          items: {
+            name: componentData.name,
+            description: componentData.description,
+            type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+            requestResponse: unadaptedRequest,
+          },
         },
-      });
+        baseUrl,
+      );
       if (res.isSuccessful) {
         if (folderId) {
           this.collectionRepository.addSavedRequestInFolder(
@@ -2174,10 +2178,12 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -2247,6 +2253,7 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -2255,6 +2262,7 @@ class RestExplorerViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(
