@@ -96,23 +96,19 @@
           {
             name: "Azure AI",
             id: "azure-ai",
-            hide: false,
           },
           {
             name: "Open AI 4.0",
             id: "open-AI-40",
             disabled: true,
-            hide: false,
           },
           {
             name: "DeepSeek",
             id: "deepseek",
             disabled: true,
-            hide: false,
           },
         ]}
         titleId={"azure-ai"}
-        headerHeight={"28px"}
         maxHeaderWidth={"110px"}
         minBodyWidth={"182px"}
         menuItem={"v2"}
