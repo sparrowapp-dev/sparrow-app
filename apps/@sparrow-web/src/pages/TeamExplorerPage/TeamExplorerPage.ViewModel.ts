@@ -746,7 +746,8 @@ export class TeamExplorerPageViewModel {
 **/
 
   public leaveTeam = async (userId: string, teamId: string) => {
-    const response = await this.teamService.leaveTeam(teamId);
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.leaveTeam(teamId, baseUrl);
 
     if (!response.isSuccessful) {
       notifications.error(
