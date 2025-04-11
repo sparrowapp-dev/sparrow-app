@@ -276,7 +276,7 @@
 <style>
   /* Scrollbar Styling */
   .scroll-container {
-    overflow-y: auto;
+    /* overflow-y: auto; */
     padding-right: 5px;
     scroll-behavior: smooth;
   }
