@@ -55,6 +55,7 @@
   const handleSelectTeam = (flag: string) => {
     selectedTeam = flag;
     onSelectTeam(flag);
+    isTeamError = false;
   };
 </script>
 
