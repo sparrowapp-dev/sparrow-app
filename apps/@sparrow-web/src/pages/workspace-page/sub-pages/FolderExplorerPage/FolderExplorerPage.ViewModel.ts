@@ -13,7 +13,12 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce, InitWebSocketTab, moveNavigation } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  Debounce,
+  InitWebSocketTab,
+  moveNavigation,
+} from "@sparrow/common/utils";
 import { Events, ItemType, UntrackedItems } from "@sparrow/common/enums";
 // import { invoke } from "@tauri-apps/api/core";
 import { v4 as uuidv4 } from "uuid";
@@ -23,13 +28,21 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { notifications } from "@sparrow/library/ui";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { isGuestUserActive } from "@app/store/auth.store";
-import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { FolderTabAdapter } from "@app/adapter";
-import { CollectionItemTypeBaseEnum, type CollectionBaseInterface, type CollectionItemBaseInterface } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionItemTypeBaseEnum,
+  type CollectionBaseInterface,
+  type CollectionItemBaseInterface,
+} from "@sparrow/common/types/workspace/collection-base";
 import type { GraphqlRequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
 import { InitTab } from "@sparrow/common/factory";
 import type { SocketIORequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
+import constants from "src/constants/constants";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
@@ -51,17 +64,15 @@ class FolderExplorerPage {
     this.tab = t;
   }
 
-  
-    public get tab(): Observable<Tab> {
-      return this._tab.asObservable();
-    }
-  
-    public set tab(value: Tab) {
-      this._tab.next(value);
-    }
-  
+  public get tab(): Observable<Tab> {
+    return this._tab.asObservable();
+  }
 
-     /**
+  public set tab(value: Tab) {
+    this._tab.next(value);
+  }
+
+  /**
    * Compares the current collection tab with the server collection and updates the saved status accordingly.
    * This method is debounced to reduce the number of server requests.
    * @return A promise that resolves when the comparison is complete.
@@ -70,17 +81,18 @@ class FolderExplorerPage {
     let result = true;
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
-    const folder = await this.collectionRepository.readRequestOrFolderInCollection(
-      progressiveTab.path.collectionId,
-      progressiveTab.id,
-    );
+    const folder =
+      await this.collectionRepository.readRequestOrFolderInCollection(
+        progressiveTab.path.collectionId,
+        progressiveTab.id,
+      );
 
     const collectionTab = new FolderTabAdapter().adapt(
       progressiveTab.id,
       "",
       folder,
     );
-    
+
     if (!folder) result = false;
     // description
     else if (collectionTab.description !== progressiveTab.description) {
@@ -90,7 +102,7 @@ class FolderExplorerPage {
     else if (collectionTab.name !== progressiveTab.name) {
       result = false;
     }
-  
+
     // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
@@ -124,22 +136,23 @@ class FolderExplorerPage {
     return await this.collectionRepository.readCollection(collectionId);
   };
 
-   /**
+  /**
    * Handles renaming a folder
    * @param _folderName - the new name of the folder.
    * @param event - blur or input
    */
-   public updateFolderName = async (_folderName: string, event = "") => {
+  public updateFolderName = async (_folderName: string, event = "") => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
     // Trim the name to handle cases with only spaces
     const trimmedName = _folderName.trim();
 
     if (event === "blur" && trimmedName === "") {
-      const folderDoc = await this.collectionRepository.readRequestOrFolderInCollection(
-        progressiveTab.path.collectionId,
-        progressiveTab.id,
-      );
+      const folderDoc =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          progressiveTab.path.collectionId,
+          progressiveTab.id,
+        );
       progressiveTab.name = folderDoc?.name;
     } else if (event === "") {
       progressiveTab.name = _folderName;
@@ -202,6 +215,17 @@ class FolderExplorerPage {
     this.tab = progressiveTab;
   };
 
+  public constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * Saves the folder
@@ -213,10 +237,14 @@ class FolderExplorerPage {
       isGuestUser = value;
     });
     if (isGuestUser == true) {
-      await this.collectionRepository.updateRequestOrFolderInCollection(progressiveTab.path.collectionId, progressiveTab.id, {
-        description: progressiveTab.description,
-        name: progressiveTab.name,
-      });
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        progressiveTab.path.collectionId,
+        progressiveTab.id,
+        {
+          description: progressiveTab.description,
+          name: progressiveTab.name,
+        },
+      );
       notifications.success(
         `The ‘${progressiveTab.name}’ folder saved successfully.`,
       );
@@ -225,6 +253,9 @@ class FolderExplorerPage {
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       return;
     }
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
     const response = await this.collectionService.updateFolderInCollection(
       progressiveTab.path.workspaceId as string,
       progressiveTab.path.collectionId as string,
@@ -233,6 +264,7 @@ class FolderExplorerPage {
         description: progressiveTab.description,
         name: progressiveTab.name,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.collectionRepository.updateRequestOrFolderInCollection(
@@ -295,7 +327,7 @@ class FolderExplorerPage {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
-  
+
   /**
    * Handles creating a new request in a folder
    * @param workspaceId :string
@@ -337,7 +369,7 @@ class FolderExplorerPage {
           description: "",
           request: {
             method: sampleRequest.getValue().property.request?.method,
-          } ,
+          },
         },
       },
     };
@@ -384,8 +416,11 @@ class FolderExplorerPage {
       });
       return;
     }
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
 
@@ -504,8 +539,11 @@ class FolderExplorerPage {
       });
       return;
     }
-    const response =
-      await this.collectionService.addSocketInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addSocketInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
 
@@ -608,8 +646,10 @@ class FolderExplorerPage {
       });
       return;
     }
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addSocketIoInCollection(
       socketIoInFolderPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
@@ -713,8 +753,10 @@ class FolderExplorerPage {
 
       return;
     }
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addGraphqlInCollection(
       graphqlInFolderPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
@@ -753,13 +795,9 @@ class FolderExplorerPage {
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
    */
-  public handleCreateItem = async (
-    entityType: string,
-    args: any,
-  ) => {
+  public handleCreateItem = async (entityType: string, args: any) => {
     let response;
     switch (entityType) {
-
       case "requestFolder":
         await this.handleCreateRequestInFolder(
           args.workspaceId,
@@ -792,7 +830,5 @@ class FolderExplorerPage {
     return response;
   };
 }
-
- 
 
 export default FolderExplorerPage;

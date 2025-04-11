@@ -793,15 +793,20 @@ class SocketIoExplorerPageViewModel {
         message: "",
       };
     }
-    const res = await this.collectionService.updateSocketIoInCollection(_id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
-    } as
-      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
-      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const res = await this.collectionService.updateSocketIoInCollection(
+      _id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...folderSource,
+        ...userSource,
+        items: itemSource,
+      } as
+        | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+        | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+      baseUrl,
+    );
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
@@ -999,17 +1004,21 @@ class SocketIoExplorerPageViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketIoInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: CollectionItemTypeBaseEnum.SOCKETIO,
-            socketio: unadaptedSocket,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketIoInCollection(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.SOCKETIO,
+              socketio: unadaptedSocket,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -1130,23 +1139,27 @@ class SocketIoExplorerPageViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketIoInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: CollectionItemTypeBaseEnum.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketIoInCollection(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: CollectionItemTypeBaseEnum.SOCKETIO,
-              socketio: unadaptedSocket,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: CollectionItemTypeBaseEnum.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: CollectionItemTypeBaseEnum.SOCKETIO,
+                socketio: unadaptedSocket,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestInFolder(
             path[0].id,
@@ -1439,10 +1452,12 @@ class SocketIoExplorerPageViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -1514,6 +1529,7 @@ class SocketIoExplorerPageViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -1522,6 +1538,7 @@ class SocketIoExplorerPageViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(
