@@ -23,6 +23,11 @@
    * Data
    */
   const inputId: string = "team-name-input";
+
+  const isOnlySpecialCharacters = (teamName: string) => {
+    // This regex checks if the string contains ONLY non-alphanumeric characters
+    return /^[^a-zA-Z0-9]+$/.test(teamName);
+  };
 </script>
 
 <div class="pb-4 mt-3">
@@ -34,19 +39,27 @@
     inputValueRequired={true}
     headerLabelText={NAME_CONFIG.TITLE}
     helpLabel={true}
-    isError={!teamForm.name.value && teamForm.name.isTouched}
-    errorMessage={NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
+    isError={(!teamForm.name.value && teamForm.name.isTouched) ||
+      teamForm.name.invalid}
+    errorMessage={teamForm.name.invalid
+      ? NAME_CONFIG.INVALID_ERROR_MESSAGE
+      : NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
   >
     <Input
       bind:value={teamForm.name.value}
       on:blur={() => {
         teamForm.name.isTouched = true;
         teamForm.name.value = teamForm.name.value.trim(); // Trim the value on blur
+        if (isOnlySpecialCharacters(teamForm.name.value)) {
+          teamForm.name.invalid = true;
+        } else {
+          teamForm.name.invalid = false;
+        }
       }}
       height={"36px"}
       id={inputId}
       placeholder={NAME_CONFIG.PLACEHOLDER}
-      class="text-ds-font-size-14 bg-tertiary-300 px-2 border-radius-4 text-ds-font-weight-regular text-ds-line-height-143" 
+      class="text-ds-font-size-14 bg-tertiary-300 px-2 border-radius-4 text-ds-font-weight-regular text-ds-line-height-143"
       style="outline:none;"
       isError={!teamForm.name.value && teamForm.name.isTouched}
       isEditIconRequired={false}
