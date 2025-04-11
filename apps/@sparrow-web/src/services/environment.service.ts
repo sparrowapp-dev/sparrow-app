@@ -10,10 +10,13 @@ export class EnvironmentService {
 
   private apiUrl: string = constants.API_URL;
 
-  public fetchAllEnvironments = async (workspaceId: string) => {
+  public fetchAllEnvironments = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/workspace/${workspaceId}/environment`,
+      `${baseUrl}/api/workspace/${workspaceId}/environment`,
       { headers: getAuthHeaders() },
     );
     return response;

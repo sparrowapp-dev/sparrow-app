@@ -54,10 +54,10 @@ export class CollectionService {
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
 
-  public fetchCollection = async (workspaceId: string) => {
+  public fetchCollection = async (workspaceId: string, baseUrl: string) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/collection/${workspaceId}`,
+      `${baseUrl}/api/collection/${workspaceId}`,
       {
         headers: getAuthHeaders(),
       },

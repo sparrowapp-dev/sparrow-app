@@ -196,7 +196,11 @@ export default class CollectionsViewModel {
       return;
     };
 
-    const res = await this.collectionService.fetchCollection(workspaceId);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const res = await this.collectionService.fetchCollection(
+      workspaceId,
+      baseUrl,
+    );
     if (res?.isSuccessful && res?.data?.data) {
       const collections = res.data.data;
       await this.collectionRepository.bulkInsertData(
@@ -6104,7 +6108,7 @@ export default class CollectionsViewModel {
     return false;
   };
 
-  public constructBaseUrl = async (_id: string) => {
+  private constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
