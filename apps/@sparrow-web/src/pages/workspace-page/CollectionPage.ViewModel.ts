@@ -976,10 +976,15 @@ export default class CollectionsViewModel {
       isGuestUser = value;
     });
     if (isGuestUser !== true) {
-      response = await this.collectionService.addCollection({
-        name: newCollection.name,
-        workspaceId: workspaceId,
-      });
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      response = await this.collectionService.addCollection(
+        {
+          name: newCollection.name,
+          workspaceId: workspaceId,
+          description: "",
+        },
+        baseUrl,
+      );
 
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
@@ -1221,8 +1226,11 @@ export default class CollectionsViewModel {
       });
       return;
     }
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -1343,8 +1351,11 @@ export default class CollectionsViewModel {
       });
       return;
     }
-    const response =
-      await this.collectionService.addSocketInCollection(websocketObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addSocketInCollection(
+      websocketObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -1430,8 +1441,10 @@ export default class CollectionsViewModel {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addSocketIoInCollection(
       socketIoOfCollectionPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
@@ -1516,8 +1529,10 @@ export default class CollectionsViewModel {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addGraphqlInCollection(
       graphqlOfCollectionPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
@@ -1638,8 +1653,11 @@ export default class CollectionsViewModel {
       });
       return;
     }
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
 
@@ -1758,8 +1776,11 @@ export default class CollectionsViewModel {
       });
       return;
     }
-    const response =
-      await this.collectionService.addSocketInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addSocketInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
 
@@ -1862,8 +1883,10 @@ export default class CollectionsViewModel {
       });
       return;
     }
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addSocketIoInCollection(
       socketIoInFolderPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
@@ -1967,8 +1990,10 @@ export default class CollectionsViewModel {
 
       return;
     }
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addGraphqlInCollection(
       graphqlInFolderPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const request = response.data.data;
@@ -2083,6 +2108,7 @@ export default class CollectionsViewModel {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     // Add the folder in the collection on the Database
     const response = await this.collectionService.addFolderInCollection(
       workspaceId,
@@ -2092,6 +2118,7 @@ export default class CollectionsViewModel {
         name: folder.name,
         description: folder.description,
       },
+      baseUrl,
     );
 
     // Update UI elements and handle navigation on success
@@ -2154,10 +2181,12 @@ export default class CollectionsViewModel {
 
     if (isGuestUser !== true) {
       if (newCollectionName) {
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response = await this.collectionService.updateCollectionData(
           collection.id,
           workspaceId,
           { name: newCollectionName },
+          baseUrl,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateCollection(
@@ -2225,6 +2254,7 @@ export default class CollectionsViewModel {
       });
 
       if (isGuestUser !== true) {
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response = await this.collectionService.updateFolderInCollection(
           workspaceId,
           collection.id,
@@ -2233,6 +2263,7 @@ export default class CollectionsViewModel {
             ...userSource,
             name: newFolderName,
           },
+          baseUrl,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestOrFolderInCollection(
@@ -2502,6 +2533,7 @@ export default class CollectionsViewModel {
       if (collection.id && workspaceId && !folder.id) {
         const storage = request;
         storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response = await this.collectionService.updateRequestInCollection(
           request.id,
           {
@@ -2510,6 +2542,7 @@ export default class CollectionsViewModel {
             ...userSource,
             items: storage,
           },
+          baseUrl,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestOrFolderInCollection(
@@ -2527,6 +2560,7 @@ export default class CollectionsViewModel {
       } else if (collection.id && workspaceId && folder.id) {
         const storage = request;
         storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response = await this.collectionService.updateRequestInCollection(
           request.id,
           {
@@ -2541,6 +2575,7 @@ export default class CollectionsViewModel {
               items: storage,
             },
           } as CreateApiRequestPostBody,
+          baseUrl,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestInFolder(
@@ -2627,6 +2662,7 @@ export default class CollectionsViewModel {
       if (collection.id && workspaceId && !folder.id) {
         // const storage = request;
         // storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response =
           await this.collectionService.updateSavedRequestInCollection(
             requestResponse.id,
@@ -2636,6 +2672,7 @@ export default class CollectionsViewModel {
               requestId: request.id,
               name: newRequestName,
             },
+            baseUrl,
           );
         if (response.isSuccessful) {
           this.collectionRepository.updateSavedRequestInCollection(
@@ -2652,6 +2689,7 @@ export default class CollectionsViewModel {
           });
         }
       } else if (collection.id && workspaceId && folder.id) {
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response =
           await this.collectionService.updateSavedRequestInCollection(
             requestResponse.id,
@@ -2662,6 +2700,7 @@ export default class CollectionsViewModel {
               requestId: request.id,
               name: newRequestName,
             } as CreateApiRequestPostBody,
+            baseUrl,
           );
         if (response.isSuccessful) {
           this.collectionRepository.updateSavedRequestInFolder(
@@ -2759,6 +2798,7 @@ export default class CollectionsViewModel {
       if (collection.id && workspaceId && !folder.id) {
         const storage = websocket;
         storage.name = newWebSocketName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response = await this.collectionService.updateSocketInCollection(
           websocket.id,
           {
@@ -2767,6 +2807,7 @@ export default class CollectionsViewModel {
             ...userSource,
             items: storage,
           },
+          baseUrl,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestOrFolderInCollection(
@@ -2784,6 +2825,7 @@ export default class CollectionsViewModel {
       } else if (collection.id && workspaceId && folder.id) {
         const storage = websocket;
         storage.name = newWebSocketName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
         const response = await this.collectionService.updateSocketInCollection(
           websocket.id,
           {
@@ -2798,6 +2840,7 @@ export default class CollectionsViewModel {
               items: storage,
             },
           },
+          baseUrl,
         );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestInFolder(
@@ -2889,6 +2932,7 @@ export default class CollectionsViewModel {
       return;
     }
     if (_collection.id && _workspaceId && !_folder.id) {
+      const baseUrl = await this.constructBaseUrl(_workspaceId);
       const response = await this.collectionService.updateSocketIoInCollection(
         _socketIo.id,
         {
@@ -2916,6 +2960,7 @@ export default class CollectionsViewModel {
             updatedBy: _socketIo.updatedBy,
           },
         } as SocketIORequestCreateUpdateInCollectionPayloadDtoInterface,
+        baseUrl,
       );
       if (!response?.isSuccessful) {
         return;
@@ -2934,6 +2979,7 @@ export default class CollectionsViewModel {
       return;
     }
     if (_collection.id && _workspaceId && _folder.id) {
+      const baseUrl = await this.constructBaseUrl(_workspaceId);
       const response = await this.collectionService.updateSocketIoInCollection(
         _socketIo.id,
         {
@@ -2967,6 +3013,7 @@ export default class CollectionsViewModel {
             },
           },
         } as SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+        baseUrl,
       );
       if (!response?.isSuccessful) {
         return;
@@ -3073,11 +3120,13 @@ export default class CollectionsViewModel {
     };
 
     if (_collection.id && _workspaceId && !_folder.id) {
+      const baseUrl = await this.constructBaseUrl(_workspaceId);
       const response = await this.collectionService.updateGraphqlInCollection(
         _graphql.id,
         _collection.id,
         _workspaceId,
         graphqlPayload,
+        baseUrl,
       );
       if (!response?.isSuccessful) {
         return;
@@ -3096,11 +3145,13 @@ export default class CollectionsViewModel {
       return;
     }
     if (_collection.id && _workspaceId && _folder.id) {
+      const baseUrl = await this.constructBaseUrl(_workspaceId);
       const response = await this.collectionService.updateGraphqlInCollection(
         _graphql.id,
         _collection.id,
         _workspaceId,
         graphqlPayload,
+        baseUrl,
         _folder.id,
       );
       if (!response?.isSuccessful) {
@@ -3197,9 +3248,11 @@ export default class CollectionsViewModel {
       });
       return;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const response = await this.collectionService.deleteCollection(
       workspaceId,
       collection.id,
+      baseUrl,
     );
 
     if (response.isSuccessful) {
@@ -3265,6 +3318,7 @@ export default class CollectionsViewModel {
       });
       return;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const response = await this.collectionService.deleteFolderInCollection(
       workspaceId,
       collection.id,
@@ -3272,6 +3326,7 @@ export default class CollectionsViewModel {
       {
         ...userSource,
       },
+      baseUrl,
     );
 
     if (response.isSuccessful) {
@@ -3349,9 +3404,11 @@ export default class CollectionsViewModel {
 
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const response = await this.collectionService.deleteRequestInCollection(
       request.id,
       requestObject,
+      baseUrl,
     );
 
     if (response.isSuccessful) {
@@ -3543,9 +3600,11 @@ export default class CollectionsViewModel {
 
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const response = await this.collectionService.deleteSocketInCollection(
       websocket.id,
       requestObject,
+      baseUrl,
     );
 
     if (response.isSuccessful) {
@@ -3624,6 +3683,7 @@ export default class CollectionsViewModel {
 
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.deleteSocketIoInCollection(
       _socketIo.id,
       {
@@ -3635,6 +3695,7 @@ export default class CollectionsViewModel {
           ? _collection.currentBranch
           : undefined,
       } as SocketIORequestDeletePayloadDtoInterface,
+      baseUrl,
     );
 
     if (!response?.isSuccessful) {
@@ -3712,6 +3773,7 @@ export default class CollectionsViewModel {
 
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.deleteGraphqlInCollection(
       _graphql.id,
       {
@@ -3723,6 +3785,7 @@ export default class CollectionsViewModel {
           ? _collection.currentBranch
           : undefined,
       } as GraphqlRequestDeletePayloadDtoInterface,
+      baseUrl,
     );
 
     if (!response?.isSuccessful) {
@@ -4760,10 +4823,12 @@ export default class CollectionsViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -4835,6 +4900,7 @@ export default class CollectionsViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -4843,6 +4909,7 @@ export default class CollectionsViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(
@@ -4931,17 +4998,21 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.WEB_SOCKET,
-            websocket: unadaptedSocket,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketInCollection(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.WEB_SOCKET,
+              websocket: unadaptedSocket,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -4991,23 +5062,27 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketInCollection(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.WEB_SOCKET,
-              websocket: unadaptedSocket,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.WEB_SOCKET,
+                websocket: unadaptedSocket,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.collectionRepository.addRequestInFolder(
             path[0].id,
@@ -5128,12 +5203,14 @@ export default class CollectionsViewModel {
         message: "",
       };
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const res = await this.collectionService.updateSocketInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
       items: itemSource,
+      baseUrl,
     });
 
     if (res.isSuccessful) {
@@ -5257,15 +5334,20 @@ export default class CollectionsViewModel {
         message: "",
       };
     }
-    const res = await this.collectionService.updateSocketIoInCollection(_id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
-    } as
-      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
-      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const res = await this.collectionService.updateSocketIoInCollection(
+      _id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...folderSource,
+        ...userSource,
+        items: itemSource,
+      } as
+        | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+        | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+      baseUrl,
+    );
 
     if (res.isSuccessful) {
       if (!folderId) {
@@ -5361,26 +5443,30 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketIoInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: CollectionItemTypeBaseEnum.SOCKETIO,
-            socketio: {
-              url: unadaptedSocket.url,
-              message: unadaptedSocket.message,
-              eventName: unadaptedSocket.eventName,
-              events: unadaptedSocket.events,
-              queryParams: unadaptedSocket.queryParams,
-              headers: unadaptedSocket.headers,
-              selectedSocketIOBodyType:
-                unadaptedSocket.selectedSocketIOBodyType,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketIoInCollection(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.SOCKETIO,
+              socketio: {
+                url: unadaptedSocket.url,
+                message: unadaptedSocket.message,
+                eventName: unadaptedSocket.eventName,
+                events: unadaptedSocket.events,
+                queryParams: unadaptedSocket.queryParams,
+                headers: unadaptedSocket.headers,
+                selectedSocketIOBodyType:
+                  unadaptedSocket.selectedSocketIOBodyType,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -5430,32 +5516,36 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketIoInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: CollectionItemTypeBaseEnum.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketIoInCollection(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: CollectionItemTypeBaseEnum.SOCKETIO,
-              socketio: {
-                url: unadaptedSocket.url,
-                message: unadaptedSocket.message,
-                eventName: unadaptedSocket.eventName,
-                events: unadaptedSocket.events,
-                queryParams: unadaptedSocket.queryParams,
-                headers: unadaptedSocket.headers,
-                selectedSocketIOBodyType:
-                  unadaptedSocket.selectedSocketIOBodyType,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: CollectionItemTypeBaseEnum.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: CollectionItemTypeBaseEnum.SOCKETIO,
+                socketio: {
+                  url: unadaptedSocket.url,
+                  message: unadaptedSocket.message,
+                  eventName: unadaptedSocket.eventName,
+                  events: unadaptedSocket.events,
+                  queryParams: unadaptedSocket.queryParams,
+                  headers: unadaptedSocket.headers,
+                  selectedSocketIOBodyType:
+                    unadaptedSocket.selectedSocketIOBodyType,
+                },
               },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.collectionRepository.addRequestInFolder(
             path[0].id,
@@ -5542,17 +5632,21 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await this.collectionService.addGraphqlInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: CollectionItemTypeBaseEnum.GRAPHQL,
-            graphql: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addGraphqlInCollection(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.GRAPHQL,
+              graphql: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -5598,23 +5692,27 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await this.collectionService.addGraphqlInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            type: CollectionItemTypeBaseEnum.FOLDER,
-            name: path[path.length - 1].name,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addGraphqlInCollection(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: CollectionItemTypeBaseEnum.GRAPHQL,
-              graphql: unadaptedRequest,
+              id: path[path.length - 1].id,
+              type: CollectionItemTypeBaseEnum.FOLDER,
+              name: path[path.length - 1].name,
+              items: {
+                name: tabName,
+                description,
+                type: CollectionItemTypeBaseEnum.GRAPHQL,
+                graphql: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.collectionRepository.addRequestInFolder(
             path[0].id,
@@ -5716,11 +5814,13 @@ export default class CollectionsViewModel {
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
     };
 
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const res = await this.collectionService.updateGraphqlInCollection(
       graphqlTabData.id as string,
       collectionId,
       workspaceId,
       graphqlPayload,
+      baseUrl,
       folderId,
     );
 
@@ -5896,6 +5996,7 @@ export default class CollectionsViewModel {
       notifications.success("Response saved successfully.");
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const res = await this.collectionService.updateSavedRequestInCollection(
       componentData.id,
       {
@@ -5906,6 +6007,7 @@ export default class CollectionsViewModel {
         description: componentData.description,
         selectedResponseBodyType: responeBodyType,
       },
+      baseUrl,
     );
 
     if (res.isSuccessful) {
@@ -5967,6 +6069,9 @@ export default class CollectionsViewModel {
       );
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
     const response = await this.collectionService.updateFolderInCollection(
       progressiveTab.path.workspaceId as string,
       progressiveTab.path.collectionId as string,
@@ -5975,6 +6080,7 @@ export default class CollectionsViewModel {
         description: progressiveTab.description,
         name: progressiveTab.name,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.collectionRepository.updateRequestOrFolderInCollection(
@@ -6016,7 +6122,9 @@ export default class CollectionsViewModel {
       );
       return true;
     }
-
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
     const response = await this.collectionService.updateCollectionData(
       progressiveTab.id as string,
       progressiveTab.path.workspaceId as string,
@@ -6027,6 +6135,7 @@ export default class CollectionsViewModel {
         selectedAuthType:
           progressiveTab.property.collection.state.collectionAuthNavigation,
       },
+      baseUrl,
     );
 
     if (response.isSuccessful) {

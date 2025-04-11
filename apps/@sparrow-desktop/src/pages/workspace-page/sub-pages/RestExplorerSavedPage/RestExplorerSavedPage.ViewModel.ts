@@ -903,6 +903,7 @@ export class RestExplorerSavedViewModel {
       notifications.success("Response saved successfully.");
       return;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const res = await this.collectionService.updateSavedRequestInCollection(
       componentData.id,
       {
@@ -913,6 +914,7 @@ export class RestExplorerSavedViewModel {
         description: componentData.description,
         selectedResponseBodyType: responeBodyType,
       },
+      baseUrl,
     );
 
     if (res.isSuccessful) {
@@ -1270,10 +1272,12 @@ export class RestExplorerSavedViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -1343,6 +1347,7 @@ export class RestExplorerSavedViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -1351,6 +1356,7 @@ export class RestExplorerSavedViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(
