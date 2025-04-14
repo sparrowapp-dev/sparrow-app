@@ -130,7 +130,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 text-ds-font-size-14">
+  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
     <p>
       Are you sure you want to delete this response? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
