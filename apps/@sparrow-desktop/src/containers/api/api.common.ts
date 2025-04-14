@@ -20,7 +20,6 @@ import { appInsights } from "@app/logger";
 import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explorer/store";
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 import { TabRepository } from "@app/repositories/tab.repository";
-import { version } from "../../../src-tauri/tauri.conf.json";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const tabRepository = new TabRepository();
@@ -50,7 +49,6 @@ const success = (data: any): HttpClientResponseInterface<any> => {
 const getAuthHeaders = () => {
   return {
     Authorization: `Bearer ${getUserToken()}`,
-    "x-app-version": version,
   };
 };
 
@@ -310,7 +308,7 @@ const disconnectWebSocket = async (tab_id: string) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
       url = wsData.url;
-      if (wsData?.status === "connecting") {
+      if(wsData?.status === "connecting"){
         wsData.status = "disconnected";
         abortController = wsData?.abortController;
         isRequestCancelled = true;
@@ -320,7 +318,8 @@ const disconnectWebSocket = async (tab_id: string) => {
           timestamp: formatTime(new Date()),
           uuid: uuidv4(),
         });
-      } else {
+      }
+      else{
         wsData.status = "disconnecting";
         isRequestCancelled = false;
       }
@@ -329,11 +328,11 @@ const disconnectWebSocket = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-  if (isRequestCancelled) {
+  if(isRequestCancelled){
     if (abortController) {
-      abortController.abort(); // Abort the request using the stored controller
+        abortController.abort(); // Abort the request using the stored controller
     }
-    return;
+   return;
   }
   await invoke("disconnect_websocket", { tabid: tab_id })
     .then(async (data: string) => {
@@ -515,7 +514,7 @@ const disconnectSocketIo = async (tab_id: string) => {
 
     if (wsData) {
       url = wsData.url;
-      if (wsData?.status === "connecting") {
+      if(wsData?.status === "connecting"){
         wsData.status = "disconnected";
         abortController = wsData?.abortController;
         isRequestCancelled = true;
@@ -525,7 +524,8 @@ const disconnectSocketIo = async (tab_id: string) => {
           "disconnector",
           "disconnected",
         );
-      } else {
+      }
+      else{
         wsData.status = "disconnecting";
         isRequestCancelled = false;
       }
@@ -534,11 +534,11 @@ const disconnectSocketIo = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-  if (isRequestCancelled) {
+  if(isRequestCancelled){
     if (abortController) {
-      abortController.abort(); // Abort the request using the stored controller
+        abortController.abort(); // Abort the request using the stored controller
     }
-    return;
+   return;
   }
   await invoke("disconnect_socket_io", { tabid: tab_id })
     .then(async (data: string) => {
@@ -630,8 +630,7 @@ const connectWebSocket = async (
   })
     .then(async () => {
       try {
-        if (signal?.aborted) {
-          // Ignore response if request was cancelled
+        if (signal?.aborted) { // Ignore response if request was cancelled
           return;
         }
         // Store the WebSocket and initialize data
@@ -782,6 +781,8 @@ const connectSocketIo = async (
     return;
   }
 
+  
+
   await invoke("connect_socket_io", {
     url: urlObject.origin || "",
     namespace: urlObject.pathname || "/",
@@ -792,15 +793,12 @@ const connectSocketIo = async (
       try {
         // All the response of particular web socket can be listened here. (Can be shifted to another place)
         // Connect Listener
-        const connectListener = await listen(
-          `socket-connect-${tabId}`,
-          async () => {
-            if (signal?.aborted) {
-              return;
-            }
-            return addSocketDataToMap(tabId, url);
-          },
-        );
+        const connectListener = await listen(`socket-connect-${tabId}`, async () => {
+          if (signal?.aborted) {
+            return;
+          }
+          return addSocketDataToMap(tabId, url);
+        });
         // Disconnect listener
         const disconnectListener = await listen(
           `socket-disconnect-${tabId}`,
@@ -814,14 +812,12 @@ const connectSocketIo = async (
           },
         );
         // Handle message listener
-        const messageListener = await listen(
-          `socket-message-${tabId}`,
-          (event) => {
-            if (signal?.aborted) {
-              return;
-            }
-            processMessageEvent(tabId, event);
-          },
+        const messageListener = await listen(`socket-message-${tabId}`, (event) =>{
+          if (signal?.aborted) {
+            return;
+          }
+          processMessageEvent(tabId, event);
+        }
         );
 
         // store listeners inside map against tab id for future removal
