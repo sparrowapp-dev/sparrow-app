@@ -2346,6 +2346,38 @@ class RestExplorerViewModel {
   }
 
   /**
+ * Appends a new chunk to an existing AI message by its messageId
+ * @param messageId - ID of the message to update
+ * @param chunk - New chunk to append to the message
+ */
+  private async updateAIResponseByChunk(messageId: string, chunk: string) {
+    const componentData = this._tab.getValue();
+    const conversations = componentData?.property?.request?.ai?.conversations || [];
+
+    let foundIndex = -1;
+    // Find the index of the message we need to update
+    for (let i = 0; i < conversations.length; i++) {
+      if (conversations[i].messageId === messageId) {
+        foundIndex = i;
+        break;
+      }
+    }
+
+    if (foundIndex !== -1) {
+      // Create a shallow clone of the conversations array
+      const updatedConversations = [...conversations];
+
+      // Update only the specific message by appending the new chunk
+      updatedConversations[foundIndex] = {
+        ...updatedConversations[foundIndex],
+        message: updatedConversations[foundIndex].message + chunk
+      };
+      await this.updateRequestAIConversation(updatedConversations);
+    }
+    else console.error("chunk not found!")
+  }
+
+  /**
    * Generates the AI Response from server with websocket communication protocol
    * @param Prompt - Prompt from the user
    */
@@ -2365,6 +2397,9 @@ class RestExplorerViewModel {
 
     try {
       const userEmail = getClientUser().email;
+      let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
+      let accumulatedMessage = ""; // Track the accumulated message content
+      let messageCreated = false; // Flag to track if we've created the initial message
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
@@ -2379,6 +2414,11 @@ class RestExplorerViewModel {
       }
 
       // Remove existing listeners to prevent duplicates
+      const STREAMING_STATES = {
+        START: "start",
+        STREAMING: "streaming",
+        END: "end"
+      }
       const events = [
         `assistant-response`,
         `assistant-response_${componentData.tabId}`,
@@ -2407,68 +2447,86 @@ class RestExplorerViewModel {
           // Listening for "assistant-response" because initial "Limit Reached" msg is coming without tabId
           case `assistant-response`:
           case `assistant-response_${componentData.tabId}`:
-            if (response.messages) {
-              // After getting response don't listen again for this the same request
+            // Handle special error messages
+            if (response.messages &&
+              (response.messages.includes("Limit Reached") ||
+                response.messages.includes("Some Issue Occurred"))) {
+
+              // After getting error response remove all listeners
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
               );
 
-              if (response.messages.includes("Limit Reached")) {
-                await this.updateRequestAIConversation([
-                  ...(componentData?.property?.request?.ai?.conversations ||
-                    []),
-                  {
-                    message:
-                      "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.",
-                    messageId: uuidv4(),
-                    type: MessageTypeEnum.RECEIVER,
-                    isLiked: false,
-                    isDisliked: false,
-                    status: false,
-                  },
-                ]);
-              } else if (response.messages.includes("Some Issue Occurred")) {
-                await this.updateRequestAIConversation([
-                  ...(componentData?.property?.request?.ai?.conversations ||
-                    []),
-                  {
-                  message: "Some issue occurred while processing your request, please try again.",
-                    messageId: uuidv4(),
-                    type: MessageTypeEnum.RECEIVER,
-                    isLiked: false,
-                    isDisliked: false,
-                    status: false,
-                  },
-                ]);
-              } else {
-                const thisTabThreadId =
-                  componentData?.property?.request?.ai?.threadId;
-                if (!thisTabThreadId) {
-                  await this.updateRequestAIThread(response.thread_Id);
-                }
-                await this.updateRequestAIConversation([
-                  ...(componentData?.property?.request?.ai?.conversations ||
-                    []),
-                  {
-                    message: "",
-                    messageId: uuidv4(),
-                    type: MessageTypeEnum.RECEIVER,
-                    isLiked: false,
-                    isDisliked: false,
-                    status: true,
-                  },
-                ]);
+              const errorMessage = response.messages.includes("Limit Reached")
+                ? "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section."
+                : "Some issue occurred while processing your request, please try again.";
 
-                await this.displayDataInChunks(response.messages, 100, 300);
+              await this.updateRequestAIConversation([
+                ...(componentData?.property?.request?.ai?.conversations || []),
+                {
+                  message: errorMessage,
+                  messageId: uuidv4(),
+                  type: MessageTypeEnum.RECEIVER,
+                  isLiked: false,
+                  isDisliked: false,
+                  status: false,
+                },
+              ]);
+              await this.updateRequestState({ isChatbotGeneratingResponse: false });
+              return;
+            }
+
+            // Handle streaming responses
+            if (response.stream_status) {
+              const { stream_status, messages, thread_id } = response;
+
+              // Handle thread ID on stream start if not already set
+              if (stream_status === STREAMING_STATES.START) {
+                // console.log("** stream started ** ");
+                const thisTabThreadId = componentData?.property?.request?.ai?.threadId;
+                if (!thisTabThreadId && thread_id) {
+                  await this.updateRequestAIThread(thread_id);
+                }
+
+                // Create empty message container that will be updated with chunks
+                if (!messageCreated) {
+                  await this.updateRequestAIConversation([
+                    ...(componentData?.property?.request?.ai?.conversations || []),
+                    {
+                      message: "",
+                      messageId: responseMessageId,
+                      type: MessageTypeEnum.RECEIVER,
+                      isLiked: false,
+                      isDisliked: false,
+                      status: true,
+                    },
+                  ]);
+                  messageCreated = true;
+                }
+
+              }
+
+              // Handle incoming message chunk
+              else if (stream_status === STREAMING_STATES.STREAMING && messages) {
+                accumulatedMessage += messages;
+
+                // Append only the new chunk to the existing message
+                await this.updateAIResponseByChunk(responseMessageId, messages);
+              }
+
+              // Handle end of stream
+              else if (stream_status === STREAMING_STATES.END) {
+
+                // Cleanup listeners as stream is complete
+                events.forEach((event) =>
+                  this.aiAssistentWebSocketService.removeListener(event),
+                );
+
+                // Update state to indicate response generation is complete
+                await this.updateRequestState({ isChatbotGeneratingResponse: false });
               }
             }
-            await this.updateRequestState({
-              isChatbotGeneratingResponse: false,
-            });
             break;
-
-          // case `generation_stopped_${tabId}`:
-          //   break;
         }
       };
 
@@ -2500,6 +2558,17 @@ class RestExplorerViewModel {
       );
 
       await this.updateRequestState({ isChatbotGeneratingResponse: false });
+
+      // Remove all event listeners to prevent further updates
+      const events = [
+        `assistant-response`,
+        `assistant-response_${componentData.tabId}`,
+        `disconnect`,
+        `connect_error`,
+      ];
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.removeListener(event),
+      );
 
       // Show error msg in the chat for stop generation
       // this.handleAIResponseError(componentData, "Generation Stopped")

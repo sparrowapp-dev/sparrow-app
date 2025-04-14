@@ -88,7 +88,7 @@ export class AiAssistantWebSocketService {
       );
     }
     AiAssistantWebSocketService.instance = this;
-    
+
   }
 
   /**
@@ -124,9 +124,9 @@ export class AiAssistantWebSocketService {
 
       // If already connected or connecting, no need to create a new connection
       if (
-        this.webSocket && 
-        (this.webSocket.readyState === WebSocket.OPEN || 
-        this.webSocket.readyState === WebSocket.CONNECTING)
+        this.webSocket &&
+        (this.webSocket.readyState === WebSocket.OPEN ||
+          this.webSocket.readyState === WebSocket.CONNECTING)
       ) { return true; }
 
       // Clean up any existing connection
@@ -181,7 +181,7 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleClose = (event: CloseEvent) => {
-    
+
     this._isConnected = false;
     this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
 
@@ -236,9 +236,8 @@ export class AiAssistantWebSocketService {
     ) {
       this.reconnectTimer = setTimeout(() => {
         // Adding this console info, to debug in deployed environments
-        console.info(
-          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
-            this.maxReconnectAttempts
+        console.debug(
+          `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts
           })...`,
         );
         this.reconnectAttempts++;
@@ -259,7 +258,7 @@ export class AiAssistantWebSocketService {
     this.cleanup();
     this._isConnected = false;
   }
-    
+
   /**
    * Cleans up all resources used by the service
    * @private
@@ -270,7 +269,7 @@ export class AiAssistantWebSocketService {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
-    
+
     // Close WebSocket if it exists
     if (this.webSocket) {
       // Remove event handlers to avoid memory leaks and redundant calls on disconnection
@@ -278,17 +277,17 @@ export class AiAssistantWebSocketService {
       this.webSocket.onmessage = null;
       this.webSocket.onerror = null;
       this.webSocket.onclose = null;
-      
+
       // Close the connection if it's not already closed
-      if (this.webSocket.readyState === WebSocket.OPEN || 
-          this.webSocket.readyState === WebSocket.CONNECTING) {
+      if (this.webSocket.readyState === WebSocket.OPEN ||
+        this.webSocket.readyState === WebSocket.CONNECTING) {
         this.webSocket.close(1000, "Closed by client");
       }
-      
+
       this.webSocket = null;
     }
   }
-  
+
 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -313,7 +312,7 @@ export class AiAssistantWebSocketService {
     }
   };
 
-  
+
   /**
    * Sends a message to the AI Assistant server via WebSocket.
    *
@@ -389,7 +388,7 @@ export class AiAssistantWebSocketService {
   }
 
   public cleanupAllListeners(): void {
-    this.eventListeners.clear(); 
+    this.eventListeners.clear();
   }
 
   /**
@@ -404,10 +403,10 @@ export class AiAssistantWebSocketService {
     }
 
     try {
-      
+
       this.removeListener(`assistant-response_${tabId}`);
-      
-    // Server is not handling stop generation event, so disabling it now will add it later.
+
+      // Server is not handling stop generation event, so disabling it now will add it later.
       // this.webSocket.send(JSON.stringify({
       //   type: "stopGeneration",
       //   tabId,
@@ -424,5 +423,5 @@ export class AiAssistantWebSocketService {
     }
   };
 
-    
+
 }
