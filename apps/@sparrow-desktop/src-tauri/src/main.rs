@@ -1270,7 +1270,7 @@ fn main() {
                     args: argv.clone(),
                     cwd: _cwd,
                 },
-            );
+            ).unwrap();
 
             if argv.len() > 1 {
                 let _ = app.emit(
@@ -1278,8 +1278,9 @@ fn main() {
                     Payload {
                         url: argv[1].to_string(),
                     },
-                );
+                ).unwrap();
             } else {
+                // Handle the case where argv is empty or doesn't have enough elements
                 println!("No URL provided in command line arguments.");
             }
         }))
