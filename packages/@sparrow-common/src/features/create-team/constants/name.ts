@@ -3,4 +3,5 @@ export const NAME_CONFIG = {
   MAX_TEXT_SIZE: 500,
   REQUIRED_ERROR_MESSAGE: `Hub name cannot be empty.`,
   PLACEHOLDER: `Please enter your hub name`,
+  INVALID_ERROR_MESSAGE: `Hub name cannot contain only special characters.`,
 };

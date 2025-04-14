@@ -72,7 +72,7 @@
               <div class="" style="height: 24px; width:24px;">
                 <Avatar
                   type={"letter"}
-                  size={"small"}
+                  size={"extra-small"}
                   letter={team.name[0]}
                   bgColor={"var(--bg-ds-secondary-400)"}
                 />
@@ -80,7 +80,7 @@
             {:else}
               <Avatar
                 type={"image"}
-                size={"small"}
+                size={"extra-small"}
                 image={base64ToURL(team.logo)}
               />
             {/if}

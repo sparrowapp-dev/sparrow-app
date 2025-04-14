@@ -18,7 +18,7 @@
     on:click={() => {
       workspaceNavigatorId = "about";
     }}
-    class="side-bar-btn d-flex gap-2 text-ds-font-size-12 text-ds-font-weight-medium"
+    class="side-bar-btn d-flex align-items-center gap-2 text-ds-font-size-12 text-ds-font-weight-medium"
     style="height:32px; padding:5px; padding-left:12px; border-radius:4px;  background-color: {workspaceNavigatorId ===
     'about'
       ? 'var(--bg-tertiary-300)'
@@ -26,14 +26,14 @@
   >
     <div>
       <InformationIcon
-        height={"13.33px"}
-        width={"13.33px"}
+        height={"14px"}
+        width={"14px"}
         color={"var(--icon-secondary-200)"}
       />
     </div>
     <div
       class="active text-ds-font-size-12 text-ds-font-weight-semi-bold"
-      style="padding-top:0.5px;"
+      style="padding-top:1px;"
     >
       About
     </div>
@@ -43,7 +43,7 @@
       on:click={() => {
         workspaceNavigatorId = "settings";
       }}
-      class="side-bar-btn d-flex gap-1"
+      class="side-bar-btn d-flex align-items-center gap-1"
       style="padding:5px; padding-left:9px; border-radius:4px; font-size:12px; font-weight:700; background-color: {workspaceNavigatorId ===
       'settings'
         ? 'var(--bg-tertiary-300)'

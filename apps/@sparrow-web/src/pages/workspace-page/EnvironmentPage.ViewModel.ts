@@ -13,6 +13,7 @@ import { TabRepository } from "../../repositories/tab.repository";
 
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import constants from "src/constants/constants";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -56,8 +57,11 @@ export class EnvironmentViewModel {
     if (isGuestUser) {
       return {};
     }
-    const response =
-      await this.environmentService.fetchAllEnvironments(workspaceId);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.environmentService.fetchAllEnvironments(
+      workspaceId,
+      baseUrl,
+    );
     if (response?.isSuccessful && response?.data?.data) {
       const environments = response.data.data;
       await this.environmentRepository.refreshEnvironment(
@@ -124,6 +128,17 @@ export class EnvironmentViewModel {
     return null;
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * @description - creates new environment
    * @param localEnvironment - new environment data
@@ -166,17 +181,21 @@ export class EnvironmentViewModel {
       );
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
-      // scroll the top tab bar to right 
-      moveNavigation("right")
+      // scroll the top tab bar to right
+      moveNavigation("right");
       notifications.success("New Environment created successfully.");
       return;
     }
     this.environmentRepository.addEnvironment(newEnvironment);
-    const response = await this.environmentService.addEnvironment({
-      name: newEnvironment.name,
-      workspaceId: currentWorkspace._id,
-      variable: newEnvironment.variable,
-    });
+    const baseUrl = await this.constructBaseUrl(currentWorkspace._id);
+    const response = await this.environmentService.addEnvironment(
+      {
+        name: newEnvironment.name,
+        workspaceId: currentWorkspace._id,
+        variable: newEnvironment.variable,
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -193,8 +212,8 @@ export class EnvironmentViewModel {
         workspaceId: currentWorkspace._id,
         id: res._id,
       });
-      // scroll the top tab bar to right 
-      moveNavigation("right")
+      // scroll the top tab bar to right
+      moveNavigation("right");
       notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;
@@ -251,9 +270,11 @@ export class EnvironmentViewModel {
         isSuccessful: true,
       };
     }
+    const baseUrl = await this.constructBaseUrl(currentWorkspace._id);
     const response = await this.environmentService.deleteEnvironment(
       currentWorkspace._id,
       env.id,
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.environmentRepository.removeEnvironment(env.id);
@@ -300,12 +321,14 @@ export class EnvironmentViewModel {
       }
       return;
     }
+    const baseUrl = await this.constructBaseUrl(currentWorkspace._id);
     const response = await this.environmentService.updateEnvironment(
       currentWorkspace._id,
       env.id,
       {
         name: newEnvironmentName,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.environmentRepository.updateEnvironment(env.id, {
@@ -389,6 +412,7 @@ export class EnvironmentViewModel {
 
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(activeWorkspace._id);
 
     const response = await this.environmentService.updateEnvironment(
       activeWorkspace._id,
@@ -397,6 +421,7 @@ export class EnvironmentViewModel {
         name: currentEnvironment.name,
         variable: currentEnvironment?.property?.environment?.variable,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.environmentRepository.updateEnvironment(

@@ -16,7 +16,7 @@
   export let maxTextLength: number = 300;
   export let type: "input" | "textarea" = "input";
 
-  let fontSize = size === "small" ? "12px" : "14px";
+  let fontSize = size === "small" ? "text-ds-font-size-12" : "text-ds-font-size-14";
 </script>
 
 <div class="input-container d-flex flex-column">
@@ -25,8 +25,7 @@
     <div class="label-wrapper d-flex gap-1" style="width: {width};">
       <label
         for={inputLabelId}
-        class="label-header-text-{variant}"
-        style="font-size: {fontSize};"
+        class="label-header-text-{variant} {fontSize} text-ds-font-weight-regular text-ds-line-height-143"
       >
         {headerLabelText}
       </label>
@@ -35,7 +34,7 @@
       {/if}
     </div>
     {#if supportLabelText}
-      <p class="support-label-text-{variant}" style="font-size: 12px;">
+      <p class="support-label-text-{variant} text-ds-font-size-12">
         {supportLabelText}
       </p>
     {/if}
@@ -105,7 +104,6 @@
   }
   .label-header-text-primary {
     font-family: "Inter", sans-serif;
-    font-weight: 400;
     color: var(--text-ds-neutral-200);
   }
 

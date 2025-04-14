@@ -6,7 +6,7 @@
 </script>
 
 <div class="d-flex align-items-center gap-1">
-  <span style="color: var(--text-ds-primary-300) ;" class="me-1"
+  <span style="color: var(--text-ds-primary-300) ;" class="me-1 text-ds-font-size-20 "
     >{collectionLength}</span
   ><span
     class="text-ds-font-size-12 text-ds-font-weight-semi-bold"

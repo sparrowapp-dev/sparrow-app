@@ -72,6 +72,7 @@ export class TeamsViewModel {
           _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces,
@@ -92,6 +93,7 @@ export class TeamsViewModel {
         const item = {
           teamId: _id,
           name,
+          hubUrl,
           users,
           description,
           logo,
@@ -328,6 +330,7 @@ export class TeamsViewModel {
           team: {
             teamId: team.id,
             teamName: team.name,
+            hubUrl: team?.hubUrl || "",
           },
           environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
