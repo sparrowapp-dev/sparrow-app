@@ -91,22 +91,17 @@
           color: "patch",
         },
       ]}
-      borderRounded={"4px"}
       titleId={httpMethod}
       onclick={handleDropdown}
       borderHighlight={"active"}
       headerHighlight={"hover"}
       minHeaderWidth={"100px"}
       borderActiveType={"none"}
-      headerTheme={"violet"}
+      variant={"secondary"}
       zIndex={500}
       borderType={"none"}
       menuItem={"v2"}
-      bodyTheme={"violet"}
-      isDropIconFilled={true}
       highlightTickedItem={false}
-      headerFontSize={"12px"}
-      headerHeight={"36px"}
       disabled={true}
     />
   </div>

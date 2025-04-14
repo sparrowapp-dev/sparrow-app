@@ -25,6 +25,7 @@
   import { user } from "../../store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import {
+    ChevronDoubleLeftRegular,
     ChevronDoubleRightRegular,
     DoubleArrowIcon,
     GithubIcon,
@@ -86,16 +87,6 @@
     }
     if (splitter && $leftPanelCollapse === false) {
       splitter.style.display = "unset";
-    }
-  }
-
-  let isGithubStarHover = false;
-
-  let activeIndex = "";
-
-  $: {
-    if ($openTeam) {
-      activeIndex = $openTeam.teamId;
     }
   }
 
@@ -167,7 +158,6 @@
                 teamList={$teamList}
                 {disableNewInviteTag}
                 {modifyTeam}
-                bind:activeIndex
               />
               <!-- Recent APIs-->
               {#if !isGuestUser}
@@ -210,8 +200,7 @@
                       color={"var(--bg-ds-neutral-50)"}
                     />
                     <span
-                      class=""
-                      style="font-size:12px; font-weight:500; line-height:18px;"
+                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                     >
                       {githubRepoData?.stargazers_count || ""}
                     </span>
@@ -219,11 +208,13 @@
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
-                  <span class="text-fs-14 text-secondary-200 pe-2"
+                  <span class="text-ds-font-size-14 text-secondary-200 pe-2"
                     >v{formatVersion(version)}</span
                   >
-                  <WithButton
-                    icon={DoubleArrowIcon}
+                  <Button
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={ChevronDoubleLeftRegular}
                     onClick={() => {
                       handleCollapseCollectionList();
                     }}
@@ -248,7 +239,7 @@
 </Motion>
 
 <Modal
-  title={"New Team"}
+  title={"New Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

@@ -10,6 +10,7 @@
   import { Table } from "@sparrow/teams/components";
   import { Rows } from "@sparrow/teams/components";
   import { TeamSkeleton } from "../../images";
+  import { SparrowLogo } from "@sparrow/common/images";
 
   export let data: any;
   export let openTeam: TeamDocument;
@@ -68,7 +69,7 @@
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage);
 </script>
 
-<div class="h-100 d-flex flex-column pb-2">
+<div class="h-100 d-flex flex-column">
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
     style="flex:1; overflow:auto;"
@@ -76,9 +77,10 @@
     {#if !isGuestUser}
       <Table
         tableClassProps="table p-0 table-responsive w-100"
-        tableStyleProp="max-height: 100%; border-top:1px solid var(--border-ds-surface-100);"
+        tableStyleProp="max-height: 100%; "
         dataSearch="true"
         tableHeaderClassProp="position-sticky top-0 z-2"
+        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);"
         contributorsCount={openTeam?.users?.length}
         headerObject={tableHeaderContent}
         onSortToggle={handleSortToggle}
@@ -104,26 +106,20 @@
       </Table>
     {/if}
     {#if isGuestUser}
-      <table
-        class={`table p-0 table-responsive w-100`}
-        style={`max-height: 100%;`}
-      >
-        <thead class={`position-sticky top-0 z-2`}>
-          <tr>
-            {#each tableHeaderContent as heading}
-              <th class={`tab-head`}>{heading}</th>
-            {/each}
-          </tr>
-        </thead>
-      </table>
-      <div>
-        <img
-          src={TeamSkeleton}
-          alt="Team-Skelton"
-          width="100%"
-          height="100%"
-          style=""
-        />
+      <div class="container">
+        <div class="sparrow-logo">
+          <SparrowLogo />
+        </div>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+        >
+          Welcome to Sparrow – where teamwork flows effortlessly.
+        </p>
+        <p
+          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+        >
+          Sign up or log in to unlock powerful tools and stay organized!
+        </p>
       </div>
     {/if}
 
@@ -131,8 +127,8 @@
       {#if searchQuery == "" && data && data?.length === 0}
         <p class="not-found-text mt-3">
           {isAdminOrOwner
-            ? "Add Workspaces to this team."
-            : "You don't have access to any workspace in this team."}
+            ? "Add Workspaces to this hub."
+            : "You don't have access to any workspace in this hub."}
         </p>
       {:else if searchQuery !== "" && data
           .slice()
@@ -243,6 +239,13 @@
 </div>
 
 <style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 80%;
+    padding: 130px 35px 24px;
+  }
   .not-found-text {
     color: var(--text-secondary-200);
     font-size: 16px;

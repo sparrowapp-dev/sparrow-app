@@ -161,6 +161,9 @@ export class RxDB {
           9: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
+          10: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -250,7 +253,7 @@ export class RxDB {
             return oldDoc;
           },
           20: function (oldDoc: TabDocument) {
-            if(oldDoc?.property?.collection){
+            if (oldDoc?.property?.collection) {
               oldDoc.property.collection.auth = {
                 bearerToken: "",
                 basicAuth: {
@@ -262,11 +265,11 @@ export class RxDB {
                   authValue: "",
                   addTo: "Header",
                 },
-              }
+              };
               oldDoc.property.collection.state = {
                 collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
                 collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
-              }
+              };
             }
             return oldDoc;
           },
@@ -325,6 +328,9 @@ export class RxDB {
             return oldDoc;
           },
           3: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },

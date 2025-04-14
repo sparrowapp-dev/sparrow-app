@@ -91,6 +91,9 @@ import {
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
+import { getClientUser } from "@app/utils/jwt";
+import constants from "@app/constants/constants";
+
 class RestExplorerViewModel {
   /**
    * Repository
@@ -109,7 +112,8 @@ class RestExplorerViewModel {
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
   private aiAssistentService = new AiAssistantService();
-  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistentWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   /**
    * Utils
    */
@@ -506,19 +510,23 @@ class RestExplorerViewModel {
         notifications.success("Response saved successfully.");
         return savedRequestId || "";
       }
-      const res = await this.collectionService.createSavedRequestInCollection({
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        requestId: requestId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: componentData.name,
-          description: componentData.description,
-          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
-          requestResponse: unadaptedRequest,
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const res = await this.collectionService.createSavedRequestInCollection(
+        {
+          collectionId: collectionId,
+          workspaceId: workspaceId,
+          requestId: requestId,
+          folderId: folderId,
+          ...userSource,
+          items: {
+            name: componentData.name,
+            description: componentData.description,
+            type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+            requestResponse: unadaptedRequest,
+          },
         },
-      });
+        baseUrl,
+      );
       if (res.isSuccessful) {
         if (folderId) {
           this.collectionRepository.addSavedRequestInFolder(
@@ -1906,6 +1914,17 @@ class RestExplorerViewModel {
     }
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -1973,10 +1992,14 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2058,11 +2081,15 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2145,10 +2172,12 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -2218,6 +2247,7 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -2226,6 +2256,7 @@ class RestExplorerViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(
@@ -2258,9 +2289,14 @@ class RestExplorerViewModel {
     const sleep = (ms: number) =>
       new Promise((resolve) => setTimeout(resolve, ms));
     const displayNextChunk = async () => {
+      const componentData = this._tab.getValue();
+
+      // Check if generation should be stopped
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse)
+        return;
+
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
-        const componentData = this._tab.getValue();
         const length =
           componentData?.property?.request?.ai?.conversations.length;
         componentData.property.request.ai.conversations[length - 1].message =
@@ -2286,6 +2322,191 @@ class RestExplorerViewModel {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+
+  // AI WebSocket - Start
+
+  /**
+   * Handles socket connection errors with a consistent approach
+   * @param componentData - The current component data
+   */
+  private async handleAIResponseError(
+    componentData: RequestTab,
+    errorMessage: string,
+  ) {
+    await this.updateRequestAIConversation([
+      ...(componentData?.property?.request?.ai?.conversations || []),
+      {
+        message: errorMessage || "Something went wrong. Please try again",
+        messageId: uuidv4(),
+        type: MessageTypeEnum.RECEIVER,
+        isLiked: false,
+        isDisliked: false,
+        status: false,
+      },
+    ]);
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
+  }
+
+  /**
+   * Generates the AI Response from server with websocket communication protocol
+   * @param Prompt - Prompt from the user
+   */
+  public generateAIResponseWS = async (prompt = "") => {
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
+    const componentData = this._tab.getValue();
+
+    // extraction of request API data for setting AI Context
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
+
+    try {
+      const userEmail = getClientUser().email;
+
+      const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        userEmail,
+        prompt,
+        JSON.stringify(apiData),
+      );
+
+      if (!socketResponse) {
+        throw new Error("Something went wrong. Please try again");
+      }
+
+      // Remove existing listeners to prevent duplicates
+      const events = [
+        `assistant-response`,
+        `assistant-response_${componentData.tabId}`,
+        `disconnect`,
+        `connect_error`,
+      ];
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.removeListener(event),
+      );
+
+      // Unified event handler
+      const handleSocketEvent = async (event, response) => {
+        switch (event) {
+          case "disconnect":
+          case "connect_error":
+            // After getting response don't listen again for this the same request
+            events.forEach((event) =>
+              this.aiAssistentWebSocketService.removeListener(event),
+            );
+            await this.handleAIResponseError(
+              componentData,
+              "Something went wrong. Please try again",
+            );
+            break;
+
+          case `assistant-response`:
+          case `assistant-response_${componentData.tabId}`:
+            if (response.messages) {
+              // After getting response don't listen again for this the same request
+              events.forEach((event) =>
+                this.aiAssistentWebSocketService.removeListener(event),
+              );
+
+              if (response.messages.includes("Limit Reached")) {
+                await this.updateRequestAIConversation([
+                  ...(componentData?.property?.request?.ai?.conversations ||
+                    []),
+                  {
+                    message:
+                      "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.",
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: false,
+                  },
+                ]);
+              } else if (response.messages.includes("Some Issue Occurred")) {
+                await this.updateRequestAIConversation([
+                  ...(componentData?.property?.request?.ai?.conversations ||
+                    []),
+                  {
+                    message: "Some issue occurred while processing your request, please try again.",
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: false,
+                  },
+                ]);
+              } else {
+                const thisTabThreadId =
+                  componentData?.property?.request?.ai?.threadId;
+                if (!thisTabThreadId) {
+                  await this.updateRequestAIThread(response.thread_Id);
+                }
+                await this.updateRequestAIConversation([
+                  ...(componentData?.property?.request?.ai?.conversations ||
+                    []),
+                  {
+                    message: "",
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: true,
+                  },
+                ]);
+
+                await this.displayDataInChunks(response.messages, 100, 300);
+              }
+            }
+            await this.updateRequestState({
+              isChatbotGeneratingResponse: false,
+            });
+            break;
+        }
+      };
+
+      // Add new listeners
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.addListener(event, (response) =>
+          handleSocketEvent(event, response),
+        ),
+      );
+    } catch (error) {
+      console.error("Something went wrong!:", error.message);
+      await this.handleAIResponseError(componentData, error.message);
+    }
+  };
+
+  /**
+   * Stops the response generation from the FE and sends stop generate event to server
+   *
+   */
+  public stopGeneratingAIResponse = async () => {
+    const componentData = this._tab.getValue();
+
+    try {
+      // Send stop signal to the server
+      await this.aiAssistentWebSocketService.stopGeneration(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        getClientUser().email,
+      );
+
+      await this.updateRequestState({ isChatbotGeneratingResponse: false });
+
+      // Show error msg in the chat for stop generation
+      // this.handleAIResponseError(componentData, "Generation Stopped")
+    } catch (error) {
+      console.error("Error stopping AI response generation:", error);
+    }
+  };
+
+  // AI WebSocket - End
 
   /**
    * Generates an AI response based on the given prompt.

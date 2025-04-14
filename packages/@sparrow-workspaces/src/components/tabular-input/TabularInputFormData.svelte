@@ -11,7 +11,7 @@
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { Button, Tooltip } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
   export let keyValue: {
@@ -35,6 +35,7 @@
   export let isWebApp = false;
   let pairs = keyValue;
   let controller: boolean = false;
+  let pairsContainer: HTMLElement;
 
   const theme = new TabularInputTheme().build();
 
@@ -67,7 +68,22 @@
     }
   };
 
-  const updateParam = (index: number): void => {
+  /**
+   * Scrolls the container to bring the newly added row into view
+   */
+  const scrollToNewRow = async () => {
+    await tick();
+
+    if (pairsContainer) {
+      const lastRow = pairsContainer.lastElementChild;
+
+      if (lastRow) {
+        lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
+    }
+  };
+
+  const updateParam = async (index: number): Promise<void> => {
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
@@ -83,9 +99,14 @@
         base: "",
       });
       pairs = pairs;
+      callback(pairs);
+
+      await scrollToNewRow();
+    } else {
+      callback(pairs);
     }
-    callback(pairs);
   };
+
   const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
@@ -259,7 +280,11 @@
       </div>
     </div>
   </div>
-  <div class="w-100" style="display:block; position:relative;">
+  <div
+    class="w-100"
+    style="display:block; position:relative;"
+    bind:this={pairsContainer}
+  >
     {#if pairs}
       {#each pairs as element, index}
         <div class="pair-data-row w-100 d-flex align-items-center px-1">

@@ -66,6 +66,7 @@ import {
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import { parse, GraphQLError } from "graphql";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+import constants from "src/constants/constants";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -754,8 +755,8 @@ class GraphqlExplorerViewModel {
             inputFields.length > 0
               ? `{ ${inputFields} }`
               : arg.value !== null
-              ? JSON.stringify(arg.value)
-              : "null";
+                ? JSON.stringify(arg.value)
+                : "null";
 
           return `${arg.name}: ${value}`;
         })
@@ -1146,7 +1147,7 @@ class GraphqlExplorerViewModel {
         decodeData[0],
         decodeData[1],
         schemaQuery,
-        selectedAgent
+        selectedAgent,
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
@@ -1666,8 +1667,8 @@ class GraphqlExplorerViewModel {
       variables: decodeData[3],
     });
     const selectedAgent = localStorage.getItem(
-          "selectedAgent",
-        ) as WorkspaceUserAgentBaseEnum;
+      "selectedAgent",
+    ) as WorkspaceUserAgentBaseEnum;
     makeGraphQLRequest(
       decodeData[0],
       decodeData[1],
@@ -2063,11 +2064,13 @@ class GraphqlExplorerViewModel {
       selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
     };
 
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const res = await this.collectionService.updateGraphqlInCollection(
       graphqlTabData.id as string,
       collectionId,
       workspaceId,
       graphqlPayload,
+      baseUrl,
       folderId,
     );
 
@@ -2270,17 +2273,21 @@ class GraphqlExplorerViewModel {
             },
           };
         }
-        const res = await this.collectionService.addGraphqlInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: CollectionItemTypeBaseEnum.GRAPHQL,
-            graphql: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addGraphqlInCollection(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: CollectionItemTypeBaseEnum.GRAPHQL,
+              graphql: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -2423,23 +2430,27 @@ class GraphqlExplorerViewModel {
             },
           };
         }
-        const res = await this.collectionService.addGraphqlInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            type: CollectionItemTypeBaseEnum.FOLDER,
-            name: path[path.length - 1].name,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addGraphqlInCollection(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: CollectionItemTypeBaseEnum.GRAPHQL,
-              graphql: unadaptedRequest,
+              id: path[path.length - 1].id,
+              type: CollectionItemTypeBaseEnum.FOLDER,
+              name: path[path.length - 1].name,
+              items: {
+                name: tabName,
+                description,
+                type: CollectionItemTypeBaseEnum.GRAPHQL,
+                graphql: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestInFolder(
             path[0].id,
@@ -2516,6 +2527,17 @@ class GraphqlExplorerViewModel {
     }
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -2580,10 +2602,14 @@ class GraphqlExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2665,11 +2691,15 @@ class GraphqlExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2750,10 +2780,12 @@ class GraphqlExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -2820,6 +2852,7 @@ class GraphqlExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -2828,6 +2861,7 @@ class GraphqlExplorerViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(

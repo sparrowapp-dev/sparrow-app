@@ -16,7 +16,6 @@
   export let teamList = [];
   export let disableNewInviteTag;
   export let modifyTeam;
-  export let activeIndex;
   export let threeDotIconDisable = false;
 </script>
 
@@ -26,13 +25,13 @@
     class="sidebar-teams-header d-flex justify-content-between p-3 px-2 pb-0 mb-1"
   >
     <h6
-      class="teams-heading ms-2 px-1"
-      style="font-size: 14px; color:var(--bg-ds-neutral-300); line-height:20.02px; display:flex;align-items:center; margin-bottom:0;"
+      class="teams-heading px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
+      style=" color:var(--bg-ds-neutral-300); display:flex;align-items:center; margin-bottom:0;"
     >
-      Teams
+      Sparrow Hubs
     </h6>
     <div>
-      <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
+      <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
         <Button
           type="primary"
           size="small"
@@ -52,14 +51,13 @@
         <button
           class={`sidebar-items d-flex w-100 mb-1 
         px-3 align-items-center justify-content-between rounded teams-outer border-0 ${
-          team.teamId === activeIndex ? "active" : ""
+          team.isOpen ? "active" : ""
         }`}
           style={!isGuestUser
             ? "gap:4px; padding:4px; padding-left:8px;"
             : "pointer-events: none; gap:4px; padding:4px; padding-left:8px; "}
           on:click={async () => {
             await setOpenTeam(team.teamId);
-            activeIndex = team.teamId;
             if (team.isNewInvite) {
               let data = await disableNewInviteTag(team.teamId);
               if (data) {
@@ -74,7 +72,7 @@
               <div class="" style="height: 24px; width:24px;">
                 <Avatar
                   type={"letter"}
-                  size={"small"}
+                  size={"extra-small"}
                   letter={team.name[0]}
                   bgColor={"var(--bg-ds-secondary-400)"}
                 />
@@ -82,13 +80,13 @@
             {:else}
               <Avatar
                 type={"image"}
-                size={"small"}
+                size={"extra-small"}
                 image={base64ToURL(team.logo)}
               />
             {/if}
             <p
-              style="font-weight: 500; padding:4px 2px; font-size:12px; line-height:18px; "
-              class="ellipsis sparrow-fs-12 text-left teams-title overflow-hidden my-auto"
+              style=" padding:2px 4px; "
+              class="ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
             >
               {team.name || ""}
             </p>
@@ -102,9 +100,7 @@
               size="extra-small"
               customWidth="24px"
               type="teritiary-regular"
-              startIcon={team.teamId !== activeIndex
-                ? PeopleRegular
-                : PeopleFilled}
+              startIcon={!team.isOpen ? PeopleRegular : PeopleFilled}
             />
           {/if}
           {#if threeDotIconDisable}
@@ -136,10 +132,6 @@
 
   .teams-heading {
     outline: none;
-    margin-left: 5px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 21px;
   }
   .teams-outer {
     padding: 6px 5px;

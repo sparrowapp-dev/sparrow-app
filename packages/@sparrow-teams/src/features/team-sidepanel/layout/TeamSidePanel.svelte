@@ -84,9 +84,9 @@
         <div
           class="sidebar-teams-header d-flex justify-content-between p-3 pb-0"
         >
-          <h6 class="teams-heading ms-2 px-1">Teams</h6>
+          <h6 class="teams-heading ms-2 px-1">Sparrow Hubs</h6>
           <div>
-            <Tooltip title="New Team" placement={"bottom-center"} distance={10}>
+            <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
               <button
                 class="new-team-btn rounded border-0"
                 on:click={() => {

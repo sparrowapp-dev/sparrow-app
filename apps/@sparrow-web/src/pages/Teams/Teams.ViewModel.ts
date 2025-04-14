@@ -1,4 +1,4 @@
-import { TeamAdapter } from "../../adapter";
+import { TeamAdapter, WorkspaceTabAdapter } from "../../adapter";
 import { TabRepository } from "../../repositories/tab.repository";
 import { TeamRepository } from "../../repositories/team.repository";
 import { TeamService } from "../../services/team.service";
@@ -11,7 +11,6 @@ import { GithubRepoReposistory } from "../../repositories/github-repo.repository
 import { GithubService } from "../../services/github.service";
 import { moveNavigation } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
-import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
 import type { Team } from "@sparrow/common/interfaces";
@@ -96,6 +95,7 @@ export class TeamsViewModel {
           _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces,
@@ -117,6 +117,7 @@ export class TeamsViewModel {
           teamId: _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces: updatedWorkspaces,
@@ -186,6 +187,7 @@ export class TeamsViewModel {
           team: {
             teamId: team.id,
             teamName: team.name,
+            hubUrl: team?.hubUrl || "",
           },
           environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
@@ -240,9 +242,9 @@ export class TeamsViewModel {
       const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
-      notifications.success(`New team ${team.name} is created.`);
+      notifications.success(`New hub ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new team. Please try again.");
+      notifications.error("Failed to create a new hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -267,10 +269,8 @@ export class TeamsViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     const res = await this.workspaceRepository.readWorkspace(id);
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateId(id);
-    initWorkspaceTab.updateName(res.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("collections");
   };

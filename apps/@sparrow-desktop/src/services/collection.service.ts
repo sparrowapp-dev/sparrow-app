@@ -54,25 +54,24 @@ export class CollectionService {
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
 
-  public fetchCollection = async (workspaceId: string) => {
+  public fetchCollection = async (workspaceId: string, baseUrl: string) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/collection/${workspaceId}`,
+      `${baseUrl}/api/collection/${workspaceId}`,
       {
         headers: getAuthHeaders(),
       },
     );
     return response;
   };
-  public addCollection = async (collection: CreateCollectionPostBody) => {
-    const response = await makeRequest(
-      "POST",
-      `${this.apiUrl}/api/collection`,
-      {
-        body: collection,
-        headers: getAuthHeaders(),
-      },
-    );
+  public addCollection = async (
+    collection: CreateCollectionPostBody,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest("POST", `${baseUrl}/api/collection`, {
+      body: collection,
+      headers: getAuthHeaders(),
+    });
     return response;
   };
 
@@ -80,10 +79,11 @@ export class CollectionService {
     collectionId: string,
     workspaceId: string,
     name: UpdateCollectionName,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
       {
         body: name,
         headers: getAuthHeaders(),
@@ -96,10 +96,11 @@ export class CollectionService {
   public deleteCollection = async (
     workspaceId: string,
     collectionId: string,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
       { headers: getAuthHeaders() },
     );
 
@@ -110,10 +111,11 @@ export class CollectionService {
     workspaceId: string,
     collectionId: string,
     folder: CreateDirectoryPostBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
       {
         body: folder,
         headers: getAuthHeaders(),
@@ -127,10 +129,11 @@ export class CollectionService {
     collectionId: string,
     folderId: string,
     folder: CreateDirectoryPostBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
       {
         body: folder,
         headers: getAuthHeaders(),
@@ -145,10 +148,11 @@ export class CollectionService {
     collectionId: string,
     folderId: string,
     body,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder/${folderId}`,
       {
         body,
         headers: getAuthHeaders(),
@@ -159,10 +163,11 @@ export class CollectionService {
 
   public addRequestInCollection = async (
     apiRequest: CreateApiRequestPostBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/collection/request`,
+      `${baseUrl}/api/collection/request`,
       {
         body: apiRequest,
         headers: getAuthHeaders(),
@@ -174,10 +179,11 @@ export class CollectionService {
   public updateRequestInCollection = async (
     requestId: string,
     requestBody: CreateApiRequestPostBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/collection/request/${requestId}`,
+      `${baseUrl}/api/collection/request/${requestId}`,
       {
         body: requestBody,
         headers: getAuthHeaders(),
@@ -190,10 +196,11 @@ export class CollectionService {
   public deleteRequestInCollection = async (
     requestId: string,
     deleteRequestBody: DeleteRequestName,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/request/${requestId}`,
+      `${baseUrl}/api/collection/request/${requestId}`,
       {
         body: deleteRequestBody,
         headers: getAuthHeaders(),
@@ -202,10 +209,10 @@ export class CollectionService {
     return response;
   };
 
-  public addSocketInCollection = async (apiRequest) => {
+  public addSocketInCollection = async (apiRequest, baseUrl: string) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/collection/websocket`,
+      `${baseUrl}/api/collection/websocket`,
       {
         body: apiRequest,
         headers: getAuthHeaders(),
@@ -214,10 +221,14 @@ export class CollectionService {
     return response;
   };
 
-  public updateSocketInCollection = async (requestId: string, requestBody) => {
+  public updateSocketInCollection = async (
+    requestId: string,
+    requestBody,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/collection/websocket/${requestId}`,
+      `${baseUrl}/api/collection/websocket/${requestId}`,
       {
         body: requestBody,
         headers: getAuthHeaders(),
@@ -230,10 +241,11 @@ export class CollectionService {
   public deleteSocketInCollection = async (
     requestId: string,
     deleteRequestBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/websocket/${requestId}`,
+      `${baseUrl}/api/collection/websocket/${requestId}`,
       {
         body: deleteRequestBody,
         headers: getAuthHeaders(),
@@ -273,7 +285,13 @@ export class CollectionService {
   };
 
   public validateImportCollectionURL = async (url = "") => {
-    return makeHttpRequestV2(url, 'GET', '[{"key":"Accept-Encoding","value":"gzip, br","checked":true},{"key":"User-Agent","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","checked":true},{"key":"Connection","value":"keep-alive","checked":true},{"key":"Accept","value":"*/*","checked":true}]', '', 'text/plain');
+    return makeHttpRequestV2(
+      url,
+      "GET",
+      '[{"key":"Accept-Encoding","value":"gzip, br","checked":true},{"key":"User-Agent","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","checked":true},{"key":"Connection","value":"keep-alive","checked":true},{"key":"Accept","value":"*/*","checked":true}]',
+      "",
+      "text/plain",
+    );
   };
 
   public importCollection = async (
@@ -387,6 +405,7 @@ export class CollectionService {
     _socketIo:
       | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
       | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+    baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -394,7 +413,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/collection/socketio`,
+      `${baseUrl}/api/collection/socketio`,
       {
         body: _socketIo,
         headers: getAuthHeaders(),
@@ -408,6 +427,7 @@ export class CollectionService {
     _socketIo:
       | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
       | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+    baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -415,7 +435,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/collection/socketio/${_socketIoId}`,
+      `${baseUrl}/api/collection/socketio/${_socketIoId}`,
       {
         body: _socketIo,
         headers: getAuthHeaders(),
@@ -427,6 +447,7 @@ export class CollectionService {
   public deleteSocketIoInCollection = async (
     _socketIoId: string,
     _socketIo: SocketIORequestDeletePayloadDtoInterface,
+    baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionDtoInterface>
@@ -434,7 +455,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/socketio/${_socketIoId}`,
+      `${baseUrl}/api/collection/socketio/${_socketIoId}`,
       {
         body: _socketIo,
         headers: getAuthHeaders(),
@@ -465,6 +486,7 @@ export class CollectionService {
     _graphql:
       | GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface
       | GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
+    _baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -472,7 +494,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/collection/graphql`,
+      `${_baseUrl}/api/collection/graphql`,
       {
         body: _graphql,
         headers: getAuthHeaders(),
@@ -497,6 +519,7 @@ export class CollectionService {
       auth?: GraphqlRequestAuthDtoInterface;
       selectedGraphqlAuthType: GraphqlRequestAuthModeBaseEnum;
     },
+    _baseUrl: string,
     _folderId?: string,
   ): Promise<
     HttpClientResponseInterface<
@@ -557,7 +580,7 @@ export class CollectionService {
     }
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
+      `${_baseUrl}/api/collection/graphql/${_graphqlId}`,
       {
         body: graphqlBody,
         headers: getAuthHeaders(),
@@ -569,6 +592,7 @@ export class CollectionService {
   public deleteGraphqlInCollection = async (
     _graphqlId: string,
     _graphql: GraphqlRequestDeletePayloadDtoInterface,
+    _baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionDtoInterface>
@@ -576,7 +600,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/graphql/${_graphqlId}`,
+      `${_baseUrl}/api/collection/graphql/${_graphqlId}`,
       {
         body: _graphql,
         headers: getAuthHeaders(),
@@ -587,6 +611,7 @@ export class CollectionService {
 
   public createSavedRequestInCollection = async (
     _savedRequest: HttpRequestSavedCreateUpdatePayloadDtoInterface,
+    _baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -594,7 +619,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/collection/response`,
+      `${_baseUrl}/api/collection/response`,
       {
         body: _savedRequest,
         headers: getAuthHeaders(),
@@ -606,6 +631,7 @@ export class CollectionService {
   public updateSavedRequestInCollection = async (
     _savedRequestId: string,
     _savedRequest: HttpRequestSavedUpdatePayloadDtoInterface,
+    _baseUrl: string,
   ): Promise<
     HttpClientResponseInterface<
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
@@ -613,7 +639,7 @@ export class CollectionService {
   > => {
     const response = await makeRequest(
       "PATCH",
-      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      `${_baseUrl}/api/collection/response/${_savedRequestId}`,
       {
         body: _savedRequest,
         headers: getAuthHeaders(),
@@ -625,10 +651,11 @@ export class CollectionService {
   public deleteSavedRequestInCollection = async (
     _savedRequestId: string,
     _savedRequest: HttpRequestSavedDeletePayloadDtoInterface,
+    _baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/collection/response/${_savedRequestId}`,
+      `${_baseUrl}/api/collection/response/${_savedRequestId}`,
       {
         body: _savedRequest,
         headers: getAuthHeaders(),

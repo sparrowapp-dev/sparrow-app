@@ -108,17 +108,6 @@
       isWelcomePopupOpen = value;
     }
   });
-  let isGithubStarHover = false;
-
-  let activeIndex = "";
-
-  $: {
-    if ($openTeam) {
-      activeIndex = $openTeam?.teamId;
-    }
-  }
-
-  let isExpandLoginButton = false;
 
   const launchSparrowWebApp = () => {
     let appDetected = false;
@@ -212,7 +201,6 @@
                 teamList={$teamList}
                 {disableNewInviteTag}
                 {modifyTeam}
-                bind:activeIndex
               />
               <!-- Recent APIs-->
               {#if !isGuestUser}
@@ -257,8 +245,7 @@
                     />
 
                     <span
-                      class=""
-                      style="font-size: 12px; font-weight:500; line-height:18px;"
+                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                     >
                       {githubRepoData?.stargazers_count || ""}
                     </span>
@@ -266,17 +253,6 @@
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
-                  <!-- <span class="text-fs-14 text-secondary-200 pe-2"
-                    >v{version}</span
-                  > -->
-                  <!-- <WithButton
-                    icon={DoubleArrowIcon}
-                    onClick={() => {
-                      handleCollapseCollectionList();
-                    }}
-                    disable={false}
-                    loader={false}
-                  /> -->
                   <Button
                     type="teritiary-regular"
                     size="extra-small"
@@ -349,7 +325,7 @@
 </Modal>
 
 <Modal
-  title={"New Team"}
+  title={"New Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

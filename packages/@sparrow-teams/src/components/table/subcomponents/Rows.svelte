@@ -106,7 +106,7 @@
       onOpenCollection(list._id);
     }}
     style="max-width: 15vw; padding-right: 10px;"
-    class="tab-data rounded-start py-2 overflow-hidden ellipsis"
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-start py-2 overflow-hidden ellipsis"
   >
     {list?.name}
     {#if list?.isNewInvite}
@@ -122,7 +122,7 @@
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
-    class="tab-data py-2 px-4"
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 px-4"
   >
     {list?.collections?.length ? list.collections.length : 0}
   </td>
@@ -133,7 +133,7 @@
         e.stopPropagation();
         onOpenCollection(list._id);
       }}
-      class="tab-data py-2"
+      class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2"
     >
       <div class="d-flex px-3">
         <UserProfileList
@@ -157,12 +157,14 @@
       e.stopPropagation();
       onOpenCollection(list._id);
     }}
-    class="tab-data py-2 px-4"
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 px-4"
   >
     {calculateTimeDifferenceInDays(new Date(), new Date(list?.updatedAt))}
   </td>
 
-  <td class="tab-data py-2 position-relative">
+  <td
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 position-relative"
+  >
     {#if isWebEnvironment}
       <button
         class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
@@ -175,7 +177,9 @@
     {/if}
   </td>
 
-  <td class="tab-data rounded-end py-2">
+  <td
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-end py-2"
+  >
     <div
       bind:this={workspaceTabWrapper}
       class="threedot-icon-container"
@@ -229,9 +233,6 @@
   }
 
   .tab-data {
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 18px;
     vertical-align: middle;
     padding-top: 10px;
   }

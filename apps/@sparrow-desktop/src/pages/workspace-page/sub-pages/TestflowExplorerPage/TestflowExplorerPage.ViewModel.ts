@@ -18,7 +18,10 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
-import { RequestDataTypeEnum, type HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
+import {
+  RequestDataTypeEnum,
+  type HttpRequestCollectionLevelAuthTabInterface,
+} from "@sparrow/common/types/workspace";
 import {
   TabPersistenceTypeEnum,
   type Tab,
@@ -42,7 +45,11 @@ import { notifications } from "@sparrow/library/ui";
 import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
-import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionAuthTypeBaseEnum,
+  CollectionRequestAddToBaseEnum,
+} from "@sparrow/common/types/workspace/collection-base";
+import constants from "@app/constants/constants";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -334,18 +341,17 @@ export class TestflowExplorerPageViewModel {
     return nodes;
   };
 
-
-  private fetchCollectionAuth = async(_collectionId: string)=>{
-      const collectionRx = await this.collectionRepository.readCollection(_collectionId);
+  private fetchCollectionAuth = async (_collectionId: string) => {
+    const collectionRx =
+      await this.collectionRepository.readCollection(_collectionId);
     const collectionDoc = collectionRx?.toMutableJSON();
     let collectionAuth;
-      if(collectionDoc?.auth){
+    if (collectionDoc?.auth) {
       collectionAuth = {
-          auth : collectionDoc?.auth,
-          collectionAuthNavigation: collectionDoc?.selectedAuthType
-        } as HttpRequestCollectionLevelAuthTabInterface
-      }
-      else{
+        auth: collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType,
+      } as HttpRequestCollectionLevelAuthTabInterface;
+    } else {
       collectionAuth = {
         auth: {
           bearerToken: "",
@@ -359,11 +365,11 @@ export class TestflowExplorerPageViewModel {
             addTo: CollectionRequestAddToBaseEnum.HEADER,
           },
         },
-          collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH
-        }
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+      };
     }
     return collectionAuth;
-    }
+  };
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -434,11 +440,13 @@ export class TestflowExplorerPageViewModel {
             element.data.folderId,
             request,
           );
-          const collectionAuth = await this.fetchCollectionAuth(element.data.collectionId);
+          const collectionAuth = await this.fetchCollectionAuth(
+            element.data.collectionId,
+          );
           const decodeData = this._decodeRequest.init(
             adaptedRequest.property.request,
             environments?.filtered || [],
-            collectionAuth
+            collectionAuth,
           );
           const start = Date.now();
 
@@ -750,6 +758,17 @@ export class TestflowExplorerPageViewModel {
     this.compareTestflowWithServer();
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * @description - saves testflow to the mongo server
    */
@@ -822,6 +841,7 @@ export class TestflowExplorerPageViewModel {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(activeWorkspace._id);
     const response = await this.testflowService.updateTestflow(
       activeWorkspace._id,
       currentTestflow?.id as string,
@@ -830,6 +850,7 @@ export class TestflowExplorerPageViewModel {
         nodes: currentTestflow?.property?.testflow?.nodes,
         edges: currentTestflow?.property?.testflow?.edges,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.testflowRepository.updateTestflow(
@@ -884,5 +905,27 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.name = _name;
     }
     this.tab = progressiveTab;
+  };
+
+  /**
+   * @description - This function will clear the test flow store data.
+   */
+  public clearTestFlowData = () => {
+    const currentTestflow = this._tab.getValue();
+    testFlowDataStore.update((testFlowDataMap) => {
+      const wsData: TFDataStoreType | undefined = testFlowDataMap.get(
+        currentTestflow?.tabId as string,
+      );
+      if (wsData) {
+        const clearedResponse = wsData.nodes.map((node) => ({
+          ...node,
+          response: { body: "", headers: [], status: "", time: 0, size: 0 },
+        }));
+        wsData.nodes = clearedResponse;
+        testFlowDataMap.set(currentTestflow?.tabId as string, wsData);
+      }
+      return testFlowDataMap;
+    });
+    notifications.success(`Cleared all Responses for testflow.`);
   };
 }

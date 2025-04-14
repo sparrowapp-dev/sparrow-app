@@ -318,7 +318,7 @@
             position={"absolute"}
             isHeaderCombined={true}
             maxBodyHeight={"300px"}
-            placeholderText=" Team / Workspace  "
+            placeholderText=" Hub / Workspace  "
             iconRequired={true}
             icon={WorkspaceRegular}
             iconColor={"var(--icon-ds-neutral-100)"}
@@ -380,7 +380,7 @@
           headerHeight={"28px"}
         >
           <div slot="pre-select" class="mb-1">
-            <div class="workspacename">{currentTeamName}</div>
+            <div class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">{currentTeamName}</div>
           </div>
           <div
             slot="post-select"
@@ -388,7 +388,7 @@
             style="justify-content: center; align-items:center;"
           >
             <div class="lower-underline"></div>
-            <div class="view-all-workspace" on:click={handleViewWorkspaces}>
+            <div class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={handleViewWorkspaces}>
               <span>View all Workspaces</span>
               <Button
                 type="teritiary-regular"
@@ -397,7 +397,7 @@
               />
             </div>
             <div class="lower-underline"></div>
-            <div class="create-new-workspace" on:click={onCreateWorkspace}>
+            <div class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={onCreateWorkspace}>
               <span>Create New Workspace</span>
               <div style="align-content: flex-end;">
                 <Button
@@ -685,8 +685,6 @@
     width: 100%;
     color: var(--text-ds-neutral-100);
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
     line-height: 18px;
     padding: 10px;
     background-color: var(--bg-ds-surface-600);
@@ -716,8 +714,6 @@
     color: var(--text-ds-neutral-100);
     background-color: var(--bg-ds-surface-600);
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
     min-height: 28px;
     padding: 8px 6px;
   }
@@ -730,8 +726,6 @@
     width: 100%;
   }
   .workspacename {
-    font-size: 12px;
-    font-weight: 400;
     color: var(--text-ds-neutral-200);
     padding: 7px 8px;
     overflow: hidden;

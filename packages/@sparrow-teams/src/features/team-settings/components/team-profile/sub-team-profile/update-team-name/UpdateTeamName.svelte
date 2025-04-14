@@ -4,6 +4,7 @@
   import { Input } from "@sparrow/library/forms";
   export let teamName: string;
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
+  export let isTeamNameInvalid = false;
   const inputId = "input-team-name";
   const blurInputField = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -36,6 +37,11 @@
         onUpdateTeam(TeamPropertyEnum.NAME);
       }}
     />
+    {#if isTeamNameInvalid}
+      <p class="help-label-error text-ds-font-size-12">
+        Invalid Hub Name. It cannot contain only special characters.
+      </p>
+    {/if}
   </div>
 </div>
 
@@ -57,5 +63,10 @@
   }
   .container-width {
     width: calc(100%-98px);
+  }
+  .help-label-error {
+    margin-top: 0px;
+    color: var(--text-ds-danger-300);
+    font-family: "Inter", sans-serif;
   }
 </style>

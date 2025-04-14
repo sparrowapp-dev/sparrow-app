@@ -265,7 +265,7 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-3"
+    class="my-collection d-flex flex-column w-100 z-3 p-3"
     style=" min-width: 450px"
   >
     <div class="d-flex gap-2 mb-4">
@@ -286,6 +286,7 @@
           type={"text"}
           size={"medium"}
           maxlength={500}
+          width={"398px"}
           id={"renameInputFieldCollection"}
           value={$tab?.name || ""}
           variant={"inline"}
@@ -510,7 +511,7 @@
           !isSynced && collection?.activeSync ? "d-none" : "d-block"
         } align-items-center`}
       >
-        <div class="d-flex gap-4 mb-4 ps-2">
+        <div class="d-flex gap-4 ps-2">
           <div class="d-flex align-items-center gap-2">
             <span class="fs-4 highlighted-number">{totalFolders}</span>
             <p style="font-size: 12px;" class="mb-0">Folders</p>
@@ -536,13 +537,14 @@
             <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
           </div>
         </div>
+        <hr />
         <div class="d-flex align-items-start ps-0 h-100 z-0">
           <textarea
             disabled={!isCollectionEditable}
             id="updateCollectionDescField"
             value={$tab?.description || ""}
             class=" border-0 text-fs-12 collection-area input-outline w-100 p-2"
-            placeholder="Add description"
+            placeholder="Describe this collection and share code examples or usage tips for the APIs."
             on:input={handleInputDescription}
           />
         </div>
@@ -580,10 +582,6 @@
 </div>
 
 <style>
-  .my-collection {
-    padding: 24px;
-  }
-
   .input-outline {
     border-radius: 0%;
   }
@@ -593,6 +591,7 @@
     border-radius: 4px !important;
     color: var(--text-secondary-1000);
     background-color: var(--bg-ds-surface-600);
+    height: 168px;
   }
   textarea::placeholder {
     color: var(--text-secondary-550);
@@ -609,9 +608,6 @@
 
   .add-button:hover {
     background-color: var(--dropdown-hover);
-  }
-  .collection-area {
-    height: 300px;
   }
 
   .highlighted-number {

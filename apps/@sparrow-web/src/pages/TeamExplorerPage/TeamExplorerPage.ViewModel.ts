@@ -14,12 +14,14 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { TeamService } from "../../services/team.service";
 import { UserService } from "../../services/user.service";
 import { WorkspaceService } from "../../services/workspace.service";
-import { InitWorkspaceTab, Sleep } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
 import { getClientUser } from "../../utils/jwt";
+import { WorkspaceTabAdapter } from "src/adapter";
+import constants from "src/constants/constants";
+import { Sleep } from "@sparrow/common/utils";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -129,6 +131,28 @@ export class TeamExplorerPageViewModel {
     return null;
   };
 
+  public constructBaseUrl = async (_teamId: string) => {
+    const teamData = await this.teamRepository.getTeamDoc(_teamId);
+    const hubUrl = teamData?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
+  public workspaceConstructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * sync teams data with backend server
    * @param userId User id
@@ -144,6 +168,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces,
@@ -165,6 +190,7 @@ export class TeamExplorerPageViewModel {
           teamId: _id,
           name,
           users,
+          hubUrl,
           description,
           logo,
           workspaces: updatedWorkspaces,
@@ -234,6 +260,7 @@ export class TeamExplorerPageViewModel {
           team: {
             teamId: team.id,
             teamName: team.name,
+            hubUrl: team?.hubUrl || "",
           },
           environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
@@ -278,10 +305,14 @@ export class TeamExplorerPageViewModel {
       items: [],
       createdAt: new Date().toISOString(),
     };
-    const response = await this.workspaceService.createWorkspace({
-      name: newWorkspace.name,
-      id: teamId,
-    });
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.workspaceService.createWorkspace(
+      {
+        name: newWorkspace.name,
+        id: teamId,
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await this.workspaceRepository.addWorkspace({
@@ -296,9 +327,8 @@ export class TeamExplorerPageViewModel {
         await this.refreshWorkspaces(clientUserId);
       }
 
-      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
-      initWorkspaceTab.updateName(res.name);
-      await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(res._id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       // this will be removed when we unlock collection in web app.
       navigate("collections");
@@ -341,13 +371,11 @@ export class TeamExplorerPageViewModel {
       await this.handleDisableWorkspaceInviteTag(id);
     }
     const res = await this.workspaceRepository.readWorkspace(id);
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateId(id);
-    initWorkspaceTab.updateName(res.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     // Disabling the switching of workspace in web
-    navigate("/app/collections");
+    navigate("collections");
   };
 
   /**
@@ -362,9 +390,11 @@ export class TeamExplorerPageViewModel {
     _inviteBody: InviteBody,
     _userId: string,
   ) => {
+    const baseUrl = await this.constructBaseUrl(_teamId);
     const response = await this.teamService.inviteMembersAtTeam(
       _teamId,
       _inviteBody,
+      baseUrl,
     );
     if (response.isSuccessful) {
       const responseData = response.data.data;
@@ -396,9 +426,11 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
+    const baseUrl = await this.constructBaseUrl(_teamId);
     const response = await this.teamService.removeMembersAtTeam(
       _teamId,
       _userId,
+      baseUrl,
     );
     if (response.isSuccessful) {
       const responseData = response.data.data;
@@ -429,9 +461,11 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
+    const baseUrl = await this.constructBaseUrl(_teamId);
     const response = await this.teamService.demoteToMemberAtTeam(
       _teamId,
       _userId,
+      baseUrl,
     );
     if (response.isSuccessful === true) {
       const responseData = response.data.data;
@@ -464,9 +498,11 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
+    const baseUrl = await this.constructBaseUrl(_teamId);
     const response = await this.teamService.promoteToAdminAtTeam(
       _teamId,
       _userId,
+      baseUrl,
     );
     if (response.isSuccessful) {
       const responseData = response.data.data;
@@ -512,9 +548,11 @@ export class TeamExplorerPageViewModel {
     }
 
     if (count > 1) {
+      const baseUrl = await this.constructBaseUrl(_teamId);
       const response = await this.teamService.promoteToOwnerAtTeam(
         _teamId,
         _userId,
+        baseUrl,
       );
 
       if (response.isSuccessful === true) {
@@ -555,9 +593,11 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
+    const baseUrl = await this.workspaceConstructBaseUrl(_workspaceId);
     const response = await this.workspaceService.removeUserFromWorkspace(
       _workspaceId,
       _userId,
+      baseUrl,
     );
     if (response.isSuccessful === true) {
       await this.refreshWorkspaces(loggedInUserId);
@@ -589,10 +629,12 @@ export class TeamExplorerPageViewModel {
     user.subscribe((value) => {
       loggedInUserId = value?._id;
     });
+    const baseUrl = await this.workspaceConstructBaseUrl(_workspaceId);
     const response = await this.workspaceService.changeUserRoleAtWorkspace(
       _workspaceId,
       _userId,
       _body,
+      baseUrl,
     );
     if (response.isSuccessful) {
       await this.refreshWorkspaces(loggedInUserId);
@@ -630,7 +672,11 @@ export class TeamExplorerPageViewModel {
       );
       return;
     }
-    const response = await this.workspaceService.deleteWorkspace(workspace._id);
+    const baseUrl = await this.constructBaseUrl(workspace.team?.teamId);
+    const response = await this.workspaceService.deleteWorkspace(
+      workspace._id,
+      baseUrl,
+    );
     if (response.isSuccessful) {
       await this.workspaceRepository.deleteWorkspace(workspace._id);
       if (isActiveWorkspace) {
@@ -666,7 +712,12 @@ export class TeamExplorerPageViewModel {
    * @param _teamData - team data that will be override
    */
   public updateTeam = async (_teamId: string, _teamData: any) => {
-    const response = await this.teamService.updateTeam(_teamId, _teamData);
+    const baseUrl = await this.constructBaseUrl(_teamId);
+    const response = await this.teamService.updateTeam(
+      _teamId,
+      _teamData,
+      baseUrl,
+    );
     if (response.isSuccessful) {
       delete response?._id;
       this.teamRepository.modifyTeam(_teamId, response.data.data);
@@ -696,7 +747,8 @@ export class TeamExplorerPageViewModel {
 **/
 
   public leaveTeam = async (userId: string, teamId: string) => {
-    const response = await this.teamService.leaveTeam(teamId);
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.leaveTeam(teamId, baseUrl);
 
     if (!response.isSuccessful) {
       notifications.error(
@@ -736,7 +788,7 @@ export class TeamExplorerPageViewModel {
       setTimeout(async () => {
         await this.refreshTeams(userId);
         await this.refreshWorkspaces(userId);
-        notifications.success("You left a team.");
+        notifications.success("You left a hub.");
         resolve();
       }, 500),
     );
@@ -787,9 +839,11 @@ export class TeamExplorerPageViewModel {
     _data: addUsersInWorkspacePayload,
     _invitedUserCount: number,
   ) => {
+    const baseUrl = await this.workspaceConstructBaseUrl(_workspaceId);
     const response = await this.workspaceService.addUsersInWorkspace(
       _workspaceId,
       _data,
+      baseUrl,
     );
     if (response?.data?.data) {
       const newTeam = response.data.data.users;
