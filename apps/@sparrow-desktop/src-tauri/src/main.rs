@@ -1252,24 +1252,34 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            app.emit(
+            // Get the main window (fallback to "windows" if "main" isn't available)
+            let window = if app.get_webview_window("main").is_some() {
+                app.get_webview_window("main").unwrap()
+            } else {
+                app.get_webview_window("windows").unwrap()
+            };
+            // Show and focus the window
+            let _ = window.unminimize();
+            let _ = window.show();
+            let _ = window.set_focus();
+        
+            // Emit general single-instance payload
+            let _ = app.emit(
                 "single-instance",
                 SingleInstancePayload {
                     args: argv.clone(),
                     cwd: _cwd,
                 },
-            )
-            .unwrap();
+            );
+
             if argv.len() > 1 {
-                app.emit(
+                let _ = app.emit(
                     "deep-link-urls",
                     Payload {
                         url: argv[1].to_string(),
                     },
-                )
-                .unwrap();
+                );
             } else {
-                // Handle the case where argv is empty or doesn't have enough elements
                 println!("No URL provided in command line arguments.");
             }
         }))

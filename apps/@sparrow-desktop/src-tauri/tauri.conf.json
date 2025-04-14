@@ -82,6 +82,9 @@
   },
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
+    "singleInstance": {
+      "enabled": true
+    },
     "updater": {
       "windows": {
         "installMode": "passive"
