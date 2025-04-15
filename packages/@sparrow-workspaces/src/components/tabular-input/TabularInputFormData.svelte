@@ -230,7 +230,7 @@
 
 <div
   class="mb-0 me-0 py-0 section-layout w-100"
-  style="overflow:hidden; border-radius:4px;"
+  style="overflow:visible; border-radius:4px;"
 >
   <div
     class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired
@@ -287,7 +287,7 @@
   >
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 d-flex align-items-center px-1">
+        <div class="pair-data-row w-100 d-flex align-items-center px-1" style="position:relative">
           <!-- <div class="button-container">
             <Button
               size="extra-small"
@@ -308,8 +308,9 @@
           </div>
 
           <div class="d-flex gap-0" style="width: calc(100% - 86px);">
-            <div class="w-50 position-relative d-flex align-items-center">
-              <CodeMirrorInput
+            <div class="w-50 d-flex align-items-center" >
+              <div class="position-absolute top-0" style="width: calc(50% - 48px);">
+                <CodeMirrorInput
                 bind:value={element.key}
                 onUpdateInput={() => {
                   updateParam(index);
@@ -320,6 +321,7 @@
                 {environmentVariables}
                 {onUpdateEnvironment}
               />
+              </div>
             </div>
             {#if element.type === "file"}
               <div class="w-50 position-relative d-flex align-items-center">
@@ -348,8 +350,9 @@
                 </div>
               </div>
             {:else}
-              <div class="w-50 position-relative d-flex align-items-center">
-                <CodeMirrorInput
+              <div class="w-50 d-flex align-items-center">
+                <div class="position-absolute top-0 left-6" style="width: calc(50% - 48px);">
+                      <CodeMirrorInput
                   bind:value={element.value}
                   onUpdateInput={() => {
                     updateParam(index);
@@ -360,6 +363,7 @@
                   {environmentVariables}
                   {onUpdateEnvironment}
                 />
+                </div>
               </div>
             {/if}
           </div>
