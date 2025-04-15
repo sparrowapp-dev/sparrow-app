@@ -229,3 +229,4 @@ export { default as PlayFilled } from "./PlayFilled.svelte";
 export { default as BoardRegular } from "./BoardRegular.svelte";
 export { default as BorderFilled} from "./BorderFilled.svelte";
 export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte"
+export {default as SettingsRegular} from "./SettingsRegular.svelte"
