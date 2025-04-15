@@ -81,6 +81,7 @@
     menuItem={"v3"}
     maxHeaderWidth={"1285px"}
     zIndex={200}
+    isError={isTeamError}
     position={"absolute"}
     onclick={(flag) => handleSelectTeam(flag)}
     placeholderText="Select Hub"
