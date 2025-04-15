@@ -45,10 +45,10 @@ export class TeamService {
     return response;
   };
 
-  public leaveTeam = async (teamId: string) => {
+  public leaveTeam = async (teamId: string, baseUrl: string) => {
     const response = await makeRequest(
       "PUT",
-      `${apiUrl}/api/team/${teamId}/leave`,
+      `${baseUrl}/api/team/${teamId}/leave`,
       {
         headers: getAuthHeaders(),
       },

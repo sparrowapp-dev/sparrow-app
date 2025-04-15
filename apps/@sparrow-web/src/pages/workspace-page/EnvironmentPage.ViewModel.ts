@@ -57,8 +57,11 @@ export class EnvironmentViewModel {
     if (isGuestUser) {
       return {};
     }
-    const response =
-      await this.environmentService.fetchAllEnvironments(workspaceId);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.environmentService.fetchAllEnvironments(
+      workspaceId,
+      baseUrl,
+    );
     if (response?.isSuccessful && response?.data?.data) {
       const environments = response.data.data;
       await this.environmentRepository.refreshEnvironment(
@@ -125,7 +128,7 @@ export class EnvironmentViewModel {
     return null;
   };
 
-  public constructBaseUrl = async (_id: string) => {
+  private constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 

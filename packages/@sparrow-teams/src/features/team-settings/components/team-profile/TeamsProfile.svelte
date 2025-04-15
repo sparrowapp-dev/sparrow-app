@@ -14,6 +14,7 @@
 
   let teamName: string = openTeam?.name;
   let teamDescription: string = openTeam?.description;
+  let isTeamNameInvalid = false;
   let uploadTeamIcon: IUpdateTeamIcon = {
     file: {
       value: [],
@@ -39,6 +40,11 @@
       }
     },
   );
+
+  const isOnlySpecialCharacters = (teamName: string) => {
+    // This regex checks if the string contains ONLY non-alphanumeric characters
+    return /^[^a-zA-Z0-9]+$/.test(teamName);
+  };
 
   /**
    * This function updates a specified property of a team. Depending on the
@@ -67,7 +73,12 @@
     } else if (property === TeamPropertyEnum.NAME) {
       if (!teamName) {
         teamName = openTeam?.name;
+        isTeamNameInvalid = false;
+      } else if (isOnlySpecialCharacters(teamName)) {
+        isTeamNameInvalid = true;
+        return;
       }
+      isTeamNameInvalid = false;
       data = {
         name: teamName,
       };
@@ -83,7 +94,11 @@
 
 <div class="settings-content h-100">
   <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} />
-  <UpdateTeamName bind:teamName onUpdateTeam={handleUpdateTeam} />
+  <UpdateTeamName
+    bind:teamName
+    onUpdateTeam={handleUpdateTeam}
+    {isTeamNameInvalid}
+  />
   <TeamOwner {ownerDetails} />
   <UpdateTeamDescription bind:teamDescription onUpdateTeam={handleUpdateTeam} />
 </div>

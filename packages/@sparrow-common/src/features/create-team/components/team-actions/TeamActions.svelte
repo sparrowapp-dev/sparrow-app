@@ -47,7 +47,7 @@
     buttonClassProp={`me-1`}
     onClick={async () => {
       teamForm.name.isTouched = true;
-      if (!teamForm.name.value) return;
+      if (!teamForm.name.value || teamForm.name.invalid) return;
       teamUnderSubmission = true;
       const response = await onCreateTeam(
         teamForm.name.value,

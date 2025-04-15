@@ -50,6 +50,7 @@ import {
   CollectionAuthTypeBaseEnum,
   CollectionRequestAddToBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
+import constants from "src/constants/constants";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -761,6 +762,17 @@ export class TestflowExplorerPageViewModel {
     this.compareTestflowWithServer();
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * @description - saves testflow to the mongo server
    */
@@ -833,6 +845,7 @@ export class TestflowExplorerPageViewModel {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(activeWorkspace._id);
     const response = await this.testflowService.updateTestflow(
       activeWorkspace._id,
       currentTestflow?.id as string,
@@ -841,6 +854,7 @@ export class TestflowExplorerPageViewModel {
         nodes: currentTestflow?.property?.testflow?.nodes,
         edges: currentTestflow?.property?.testflow?.edges,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.testflowRepository.updateTestflow(
