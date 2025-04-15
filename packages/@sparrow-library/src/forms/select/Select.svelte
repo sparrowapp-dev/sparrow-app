@@ -201,8 +201,8 @@
     bodyTopDistance =
       bodyHeight + selectHeaderWrapper.getBoundingClientRect().bottom >
       window.innerHeight
-        ? selectHeaderWrapper.getBoundingClientRect().top - 5 - bodyHeight
-        : 5 + selectHeaderWrapper.getBoundingClientRect().bottom;
+        ? selectHeaderWrapper.getBoundingClientRect().top - 15 - bodyHeight
+        : 15 + selectHeaderWrapper.getBoundingClientRect().bottom;
     bodyRightDistance =
       window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
     isOpen = !isOpen;
@@ -390,7 +390,7 @@
               {selectedRequest?.description ?? ""}
             </span>
             <span
-              class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
                 selectedRequest?.color,
               )}"
             >
@@ -399,7 +399,7 @@
           </div>
         {:else}
           <span
-            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
               selectedRequest?.color,
             )}"
             style=" {disabled || selectedRequest?.hide
@@ -571,7 +571,8 @@
     background-color: transparent;
   }
   .select-background-secondary {
-    background-color: var(--bg-ds-surface-600);
+    // background-color: var(--bg-ds-surface-600);
+    background-color: transparent;
   }
 
   // hover or open-body states
@@ -729,7 +730,7 @@
   }
   .disabled-option {
     pointer-events: none; /* Disable pointer events */
-    opacity: 0.6; /* Reduce opacity to visually indicate disabled state */
+    opacity: 0.2; /* Reduce opacity to visually indicate disabled state */
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }

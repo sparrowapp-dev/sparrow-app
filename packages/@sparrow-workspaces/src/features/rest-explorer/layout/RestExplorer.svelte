@@ -663,8 +663,8 @@
 {#if !isGuestUser}
   <div
     style="position: fixed;
-        bottom: 22px;
-        right:70px;
+        bottom: 28px;
+        right:30px;
         z-index: 200;"
   >
     <div

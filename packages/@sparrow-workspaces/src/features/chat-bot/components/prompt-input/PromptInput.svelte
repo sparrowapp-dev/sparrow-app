@@ -112,7 +112,10 @@
           },
         ]}
         titleId={"azure-ai"}
-        headerHeight={"28px"}
+        onclick={() => {}}
+        variant={"secondary"}
+        zIndex={499}
+        disabled={false}
         maxHeaderWidth={"110px"}
         minBodyWidth={"182px"}
         menuItem={"v2"}
