@@ -358,7 +358,6 @@
       <p
         class="mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
       >
-        d
         {openTeam?.name}
       </p>
     </div>
