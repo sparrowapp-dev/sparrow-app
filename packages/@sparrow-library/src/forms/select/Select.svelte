@@ -390,7 +390,7 @@
               {selectedRequest?.description ?? ""}
             </span>
             <span
-              class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
                 selectedRequest?.color,
               )}"
             >
@@ -399,7 +399,7 @@
           </div>
         {:else}
           <span
-            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
               selectedRequest?.color,
             )}"
             style=" {disabled || selectedRequest?.hide
