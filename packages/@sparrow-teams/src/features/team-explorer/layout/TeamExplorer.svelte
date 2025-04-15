@@ -23,6 +23,8 @@
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
+  import InvitesView from "../../invited-users/layout/InvitesView.svelte";
+
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -98,6 +100,12 @@
    */
   export let onUpdateTeam;
 
+  export let onWithDrawInvite;
+
+  export let onResendInvite;
+
+  export let onAcceptInvite;
+
   /**
    * Flag to check if user is guest user
    */
@@ -109,6 +117,7 @@
   let userRole: string;
   let previousTeamId = "";
   let searchQuery = "";
+  let searchInviteQuery = "";
   let hasText = false;
   let leaveButtonMenu: boolean = false;
   const addButtonData = [
@@ -139,6 +148,7 @@
     });
   };
 
+  $: console.log(searchInviteQuery, "SEARCHINVITE");
   /**
    *
    */
@@ -156,6 +166,15 @@
         id: TeamTabsEnum.MEMBERS,
         count: openTeam?.users?.length || 1,
         visible: true,
+        disabled: isGuestUser === true ? true : false,
+      },
+      {
+        name: "Invites",
+        id: TeamTabsEnum.INVITES,
+        count: openTeam?._data.invites?.length || 0,
+        visible:
+          (openTeam?.owner === userId || openTeam?.admins.includes(userId)) &&
+          openTeam?._data.invites?.length > 0,
         disabled: isGuestUser === true ? true : false,
       },
       {
@@ -225,12 +244,18 @@
     hasText = searchQuery.length > 0;
   };
 
+  const handleSearchInvite = (event) => {
+    searchInviteQuery = event.detail.toLowerCase();
+  };
+
   /**
    *
    */
   onDestroy(() => {
     selectedViewSubscribe();
   });
+
+  $: console.log("openTeam", openTeam);
 </script>
 
 {#if openTeam}
@@ -448,6 +473,35 @@
           />
         {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
           <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
+        {:else if activeTeamTab === TeamTabsEnum.INVITES}
+          <div class="h-100 d-flex flex-column">
+            {#if openTeam && openTeam?._data?.invites?.length > 0 && !isGuestUser}
+              <div style="margin-bottom:12px">
+                <div class={`d-flex  rounded  align-items-center`}>
+                  <Search
+                    variant={"primary"}
+                    id="search-input"
+                    size="small"
+                    placeholder="Search invites by email"
+                    on:input={handleSearchInvite}
+                    bind:value={searchInviteQuery}
+                    customWidth={"320px"}
+                  />
+                </div>
+              </div>
+            {/if}
+            <div style="flex:1; overflow:auto;" class="py-2">
+              <InvitesView
+                invites={openTeam?._data?.invites?.filter((elem) => {
+                  return elem?.email?.toLowerCase().includes(searchInviteQuery);
+                }) || []}
+                onWithDrawInvite={onWithDrawInvite}
+                onResendInvite={onResendInvite}
+                {openTeam}
+                {userId}
+              />
+            </div>
+          </div>
         {/if}
       </div>
     </div>

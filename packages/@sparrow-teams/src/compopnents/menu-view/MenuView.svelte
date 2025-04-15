@@ -54,7 +54,7 @@
 
 <nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
   <div
-    style={`width: ${noOfColumns}px; background-color: var(--bg-tertiary-400)`}
+    style={`width: ${noOfColumns}px; background-color: var(--bg-ds-surface-600)`}
     class="overflow-hidden navbar p-0 d-flex flex-column border-radius-4 align-items-start justify-content-start text-whiteColor"
   >
     <ul class="p-1 w-100 mb-0">
@@ -89,6 +89,6 @@
   }
 
   ul li button:hover {
-    background-color: var(--bg-tertiary-600);
+    background-color: var(--bg-ds-surface-400);
   }
 </style>

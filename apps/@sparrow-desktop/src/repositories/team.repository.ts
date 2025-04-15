@@ -249,6 +249,7 @@ export class TeamRepository {
       if (data.users) value.users = data.users;
       if (data.owner) value.owner = data.owner;
       if (data.admins) value.admins = data.admins;
+      if (data.invites) value.invites = data.invites;
       if (data.createdAt) value.createdAt = data.createdAt;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;

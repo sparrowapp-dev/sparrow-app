@@ -855,4 +855,36 @@ export class TeamExplorerPageViewModel {
 
     return response;
   };
+
+  public resendInvite = async (
+    teamId: string,
+    email: string,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response= await this.teamService.resendInvite(teamId, email, baseUrl);
+    if (response.isSuccessful) { 
+      console.log("resend invite succesful");
+      return response;
+    }
+  }
+
+  public withdrawInvite = async (
+  teamId: string,
+  email: string,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.withdrawInvite(teamId, email, baseUrl);
+    if(response.isSuccessful) {
+      console.log("withdraw invite succesful");
+          return response;
+    }
+  }
+
+  public acceptInvite = async (teamId: string, email: string, baseUrl: string) => { 
+    const response = await this.teamService.acceptInvite(teamId, email, baseUrl);
+    if(response.isSuccessful) {
+      console.log("accept invite succesful");
+      return response;
+    }
+  }
 }
