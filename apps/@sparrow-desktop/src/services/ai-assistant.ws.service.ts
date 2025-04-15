@@ -236,7 +236,7 @@ export class AiAssistantWebSocketService {
     ) {
       this.reconnectTimer = setTimeout(() => {
         // Adding this console info, to debug in deployed environments
-        console.info(
+        console.debug(
           `Attempting to reconnect (${this.reconnectAttempts + 1}/${
             this.maxReconnectAttempts
           })...`,
