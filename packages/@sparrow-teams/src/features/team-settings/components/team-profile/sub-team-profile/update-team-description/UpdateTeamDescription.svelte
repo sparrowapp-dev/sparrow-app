@@ -1,10 +1,10 @@
 <script lang="ts">
   import { TeamPropertyEnum } from "../../../../types";
   import { DESCRIPTION_CONFIG } from "../../../../constants";
+  import { Button } from "@sparrow/library/ui";
 
   export let teamDescription: string;
-  export let onUpdateTeam: (property: TeamPropertyEnum) => void;
-
+  export let onUpdateTeam: (properties: TeamPropertyEnum[]) => Promise<void>;
   const inputId = "input-team-description";
   const blurInputField = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -20,6 +20,7 @@
       {DESCRIPTION_CONFIG.TITLE}
     </p>
   </div>
+
   <div class="container-width">
     <textarea
       required
@@ -35,12 +36,24 @@
       on:keydown={(e) => {
         blurInputField(e);
       }}
+    />
+
+    <!--
       on:blur={() => {
         onUpdateTeam(TeamPropertyEnum.DESCRIPTION);
       }}
-    />
+        -->
   </div>
 </div>
+
+<Button
+  title={"Save"}
+  textStyleProp={"font-size: var(--base-text)"}
+  type={"primary"}
+  loader={false}
+  onClick={() =>
+    onUpdateTeam([TeamPropertyEnum.NAME, TeamPropertyEnum.DESCRIPTION])}
+/>
 
 <style>
   .desc {

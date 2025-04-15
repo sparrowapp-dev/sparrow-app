@@ -51,31 +51,29 @@
    * @param property - The property of the team to be updated.
    * @returns A promise that resolves when the update is complete.
    */
-  const handleUpdateTeam = async (property: TeamPropertyEnum) => {
+  const handleUpdateTeam = async (properties: TeamPropertyEnum[]) => {
     const blankFile = new File([""], "blank.jpg", {
       type: "",
       lastModified: 1706698162061,
     });
-    let data;
-    if (property === TeamPropertyEnum.IMAGE) {
-      data = {
-        image:
+
+    const data: Partial<TeamPostBody> = {};
+
+    properties.forEach((property) => {
+      if (property === TeamPropertyEnum.IMAGE) {
+        data.image =
           uploadTeamIcon.file.value.length === 0
             ? blankFile
-            : uploadTeamIcon.file.value,
-      };
-    } else if (property === TeamPropertyEnum.NAME) {
-      if (!teamName) {
-        teamName = openTeam?.name;
+            : uploadTeamIcon.file.value;
+      } else if (property === TeamPropertyEnum.NAME) {
+        if (!teamName) {
+          teamName = openTeam?.name;
+        }
+        data.name = teamName;
+      } else if (property === TeamPropertyEnum.DESCRIPTION) {
+        data.description = teamDescription;
       }
-      data = {
-        name: teamName,
-      };
-    } else if (property === TeamPropertyEnum.DESCRIPTION) {
-      data = {
-        description: teamDescription,
-      };
-    }
+    });
 
     await onUpdateTeam(openTeam.teamId, data);
   };

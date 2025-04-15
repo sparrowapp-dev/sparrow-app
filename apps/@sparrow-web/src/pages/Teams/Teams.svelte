@@ -223,7 +223,7 @@
                 </section>
               {/if}
             </div>
-
+            <hr />
             <!-- github repo section -->
             <section class="px-2">
               <div

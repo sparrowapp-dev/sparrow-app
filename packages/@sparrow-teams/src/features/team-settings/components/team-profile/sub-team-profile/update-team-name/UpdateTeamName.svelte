@@ -32,10 +32,12 @@
       on:keydown={(e) => {
         blurInputField(e);
       }}
-      on:blur={() => {
+    />
+    <!--
+     on:blur={() => {
         onUpdateTeam(TeamPropertyEnum.NAME);
       }}
-    />
+    -->
   </div>
 </div>
 
