@@ -265,7 +265,7 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-3 p-3"
+    class="my-collection d-flex flex-column w-100 z-1 p-3"
     style=" min-width: 450px"
   >
     <div class="d-flex gap-2 mb-4">
