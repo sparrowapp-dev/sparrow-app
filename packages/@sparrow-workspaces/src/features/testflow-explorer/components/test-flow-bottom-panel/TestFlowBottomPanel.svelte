@@ -338,10 +338,7 @@
             {#if !responseLoader && selectedNodeResponse?.response?.status === ResponseStatusCode.ERROR}
               <ResponseErrorScreen />
             {:else if !responseLoader && selectedNodeResponse?.response?.status}
-              <div
-                class="d-flex flex-column"
-                style="height: 100%; padding-bottom: 12px;"
-              >
+              <div class="d-flex flex-column" style="height: 100%;">
                 <div class="d-flex" style="margin-bottom: 12px;">
                   <ResponseNavigator
                     requestStateSection={responseNavigation}

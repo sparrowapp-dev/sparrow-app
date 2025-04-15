@@ -374,11 +374,6 @@
    */
   const handleCreateCustomRequest = async () => {
     try {
-      if (!customRequestName) {
-        notifications.error(`Request name is required.`);
-        return;
-      }
-
       isCreatingCustomRequest = true;
       const isExist = await checkRequestExistInNode(
         selectedBlock?.data?.tabId,

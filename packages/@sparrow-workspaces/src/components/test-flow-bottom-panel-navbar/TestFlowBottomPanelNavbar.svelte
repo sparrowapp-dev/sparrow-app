@@ -143,6 +143,7 @@
     align-items: center;
     background-color: var(--bg-ds-surface-600);
     border-radius: 4px;
+    padding-left: 2px;
   }
 
   .request-name-text {

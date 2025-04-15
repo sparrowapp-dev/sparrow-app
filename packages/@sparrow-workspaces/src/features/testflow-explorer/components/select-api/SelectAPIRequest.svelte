@@ -79,6 +79,7 @@
   collectionData.subscribe((value) => {
     if (value) {
       collections = value;
+      arrayData = value;
       allApis = handleSearchApis();
       filteredApis = allApis;
       initializeMap(collections);
@@ -330,7 +331,7 @@
   >
     {#if !selectApiName}
       {#if selectedCollection}
-        <div class="d-flex ellipsis back-header px-1">
+        <div class="d-flex ellipsis back-header">
           <Tooltip title={"Back"} placement={"top-center"} size="medium">
             <Button
               size="extra-small"
@@ -369,6 +370,7 @@
             </div>
           {/if}
         </div>
+        <hr class="my-1" />
       {/if}
       <div class="scrollable-list">
         {#if showSampleApi}
@@ -444,8 +446,11 @@
             style="align-items:center; justify-content:center;"
             class="d-flex"
           >
-            <p style="margin: 0px;" class="search-notfound-text">
-              No results found.
+            <p
+              style="margin: 0px;  color: var(--text-ds-neutral-400) ;"
+              class="my-2 search-notfound-text"
+            >
+              == No results found.
             </p>
           </div>
         {/if}
@@ -488,14 +493,21 @@
       </div>
     {:else}
       <div style="align-items:center; justify-content:center;" class="d-flex">
-        <p style="margin: 0px;" class="search-notfound-text">
+        <p
+          style="margin: 0px; color: var(--text-ds-neutral-400) ;"
+          class="my-2 search-notfound-text"
+        >
           No results found.
         </p>
       </div>
     {/if}
 
-    <div on:click={handleOpenAddCustomRequestModal} class="custom-component">
-      <AddRegular size={"12px"} color={"var(--icon-ds-neutral-100)"} />
+    <hr class="my-1" />
+    <div
+      on:click={handleOpenAddCustomRequestModal}
+      class="px-2 py-1 custom-component border-radius-2"
+    >
+      <AddRegular size={"18px"} color={"var(--icon-ds-neutral-100)"} />
       <div class="label-text" style="margin-left: 18px;">
         Add Custom Request
       </div>
@@ -556,8 +568,8 @@
   }
   .dropdown-single-option {
     align-items: center;
-    margin-left: 4px;
-    margin-right: 4px;
+    /* margin-left: 4px;
+    margin-right: 4px; */
     padding-top: 6px;
     padding-bottom: 6px;
   }
@@ -583,9 +595,6 @@
   }
   .back-header {
     width: 100%;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--bg-ds-surface-200);
-    margin-bottom: 2px;
   }
   .selected-container {
     align-items: center;
@@ -622,11 +631,10 @@
     flex-direction: row;
     align-items: center;
     align-content: center;
-    padding-left: 13px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-top: 4px;
-    border-top: 1px solid var(--border-ds-surface-100);
+  }
+
+  .custom-component:hover {
+    background-color: var(--bg-ds-surface-400);
   }
 
   .search-box {
