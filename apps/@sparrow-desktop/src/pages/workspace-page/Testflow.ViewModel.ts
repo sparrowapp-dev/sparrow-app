@@ -302,8 +302,46 @@ export class TestflowViewModel {
       _testflow._id,
       currentWorkspace._id,
     );
+
+    const nds = _testflow._data.nodes.map((_nd)=>{
+
+      return {
+        ..._nd,
+        data:{
+          ..._nd?.data,
+          requestData: {
+            ..._nd?.data?.requestData,
+            state: {
+              requestBodyLanguage: "Text",
+              requestBodyNavigation: "None",
+              requestAuthNavigation: "No Auth",
+              requestNavigation: "Parameters",
+              responseNavigation: "Response",
+              responseBodyLanguage: "Text",
+              responseBodyFormatter: "Pretty",
+              requestExtensionNavigation: "",
+              requestLeftSplitterWidthPercentage: 50,
+              requestRightSplitterWidthPercentage: 50,
+              isExposeEditDescription: true,
+              isSendRequestInProgress: false,
+              isSaveDescriptionInProgress: false,
+              isSaveRequestInProgress: false,
+              isParameterBulkEditActive: false,
+              isHeaderBulkEditActive: false,
+              isChatbotActive: false,
+              isChatbotSuggestionsActive: true,
+              isChatbotGeneratingResponse: false,
+              isDocGenerating: false,
+              isDocAlreadyGenerated: false,
+            }
+
+          }
+        }
+      };
+    });
+  
     initTestflowTab.updateName(_testflow.name);
-    initTestflowTab.setNodes(_testflow.nodes);
+    initTestflowTab.setNodes(nds);
     initTestflowTab.setEdges(_testflow.edges);
     initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initTestflowTab.getValue());

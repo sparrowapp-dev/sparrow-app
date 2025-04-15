@@ -180,7 +180,7 @@
 
 <section
   class="section"
-  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "default"};`}
+  style={`height: ${height}px; border-top: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; cursor: ${isResizing ? "ns-resize" : "unset"};`}
 >
   <div
     on:mousedown={startResize}

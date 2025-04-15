@@ -306,44 +306,6 @@
     return "";
   };
 
-  // Sync the nodes with collection data
-  const syncNodesWithCollectionList = () => {
-    nodes.update((_nodes) => {
-      const dbNodes = _nodes;
-      for (let index = 0; index < dbNodes.length; index++) {
-        if (collectionListDocument) {
-          const collection = collectionListDocument.find(
-            (col) => col.id === dbNodes[index].data.collectionId,
-          );
-          if (collection) {
-            let request;
-            if (
-              dbNodes[index].data.folderId &&
-              dbNodes[index].data.folderId?.length > 0
-            ) {
-              const folder = collection.items.find(
-                (fol) => fol.id === dbNodes[index].data.folderId,
-              );
-              if (folder) {
-                request = folder.items.find(
-                  (req) => req.id === dbNodes[index].data.requestId,
-                );
-              }
-            } else {
-              request = collection.items.find(
-                (req) => req.id === dbNodes[index].data.requestId,
-              );
-            }
-            dbNodes[index].data.name = request?.name || "";
-            dbNodes[index].data.method = request?.request?.method || "";
-            dbNodes[index].data.requestData = request?.request || undefined;
-          }
-        }
-      }
-      return dbNodes;
-    });
-  };
-
   // Filter collections based on the current tab's workspace ID
   const collectionsSubscriber = collectionList.subscribe((value) => {
     if (value) {
@@ -353,14 +315,12 @@
       filteredCollections.set(
         collectionListDocument as unknown as CollectionDto[],
       );
-      // syncNodesWithCollectionList();
     }
   });
 
   nodes.subscribe((nodes) => {
     if (nodes?.length > 0) {
       if (!limitNodesChange) {
-        // syncNodesWithCollectionList();
         limitNodesChange = limitNodesChange + 1;
       }
     }
@@ -1187,7 +1147,7 @@
   </div>
   <!-- Open the bottom panel when it contains the data -->
   {#if selectedBlock && selectedBlock?.data?.requestId}
-    <div style=" background-color: transparent; margin: 0px 13px 7px 13px;">
+    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
       <TestFlowBottomPanel
         {selectedBlock}
         {environmentVariables}
@@ -1356,7 +1316,7 @@
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
 
 <Modal
-  title={""}
+  title={"Delete block?"}
   type={"dark"}
   width={"540px"}
   zIndex={1000}
