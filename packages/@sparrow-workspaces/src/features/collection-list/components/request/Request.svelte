@@ -145,6 +145,7 @@
       method: api?.request?.method,
       requestData: {
         ...api?.request,
+        name: api.name,
         state: requestState,
       },
     };

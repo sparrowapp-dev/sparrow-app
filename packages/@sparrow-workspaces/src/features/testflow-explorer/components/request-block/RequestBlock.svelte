@@ -74,7 +74,6 @@
   export let id;
 
   let isEditing = false;
-  let inputfield: any;
   let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
   let isRunTextVisible = false; // State to track visibility of run text
@@ -194,27 +193,8 @@
     return false;
   };
 
-  const handleClick = (item) => {
+  const handleClick = (item: any) => {
     if (item.onClick) item.onClick();
-  };
-
-  const handleClickOutsideBlock = () => {
-    moreOptionsMenu = false;
-  };
-
-  onMount(() => {
-    document.addEventListener("click", handleClickOutsideBlock);
-  });
-
-  onDestroy(() => {
-    document.removeEventListener("click", handleClickOutsideBlock);
-  });
-
-  const enableEditing = () => {
-    isEditing = true;
-    $: if (isEditing) {
-      setTimeout(() => inputfield?.focus(), 0);
-    }
   };
 
   let moreOptions = [
@@ -223,25 +203,25 @@
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
       Icon: RenameRegular,
-      onClick: enableEditing,
+      onClick: () => {
+        isEditing = true;
+      },
     },
     {
       name: "Run From Here",
       iconSize: "16px",
-      iconColor: "var(--icon-ds-neutral-100)",
+      iconColor: "var(--icon-ds-neutral-50)",
       Icon: ArrowExportRegular,
       onClick: () => {
-        moreOptionsMenu = !moreOptionsMenu;
         data.onContextMenu(id, "run-from-here");
       },
     },
     {
       name: "Run Till Here",
       iconSize: "16px",
-      iconColor: "var(--icon-ds-neutral-100)",
+      iconColor: "var(--icon-ds-neutral-50)",
       Icon: ArrowImportRegular,
       onClick: () => {
-        moreOptionsMenu = !moreOptionsMenu;
         data.onContextMenu(id, "run-till-here");
       },
     },
@@ -251,7 +231,6 @@
       iconColor: "var(--icon-ds-danger-300)",
       Icon: DeleteRegular,
       onClick: () => {
-        moreOptionsMenu = !moreOptionsMenu;
         data.onContextMenu(id, "delete");
       },
     },
@@ -305,22 +284,29 @@
         {/if}
       </div>
       {#if !isEditing}
-        <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
+        <span class="px-1" style="padding-top: 2px; padding-bottom:1px;">
           {truncateName(blockName, 20)}
         </span>
       {:else}
         <input
-          bind:this={inputfield}
+          autofocus
           type="text"
           class="rename-input"
           on:input={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             data.updateBlockName("blockName", e?.target?.value);
+          }}
+          on:click={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
           }}
           value={blockName}
           on:blur={() => {
             if (blockName.trim().length == 0) {
               data.updateBlockName("blockName", "Untitled");
             }
+            isEditing = false;
           }}
         />
       {/if}
@@ -329,32 +315,37 @@
       style="position: relative;"
       class="d-flex justify-content-center align-items-center"
       tabindex="0"
+      on:click={(e) => {
+        e.stopPropagation();
+        moreOptionsMenu = !moreOptionsMenu;
+      }}
       on:blur={() => {
-        moreOptionsMenu = false;
+        setTimeout(() => {
+          moreOptionsMenu = false;
+        }, 10);
       }}
     >
-      <Button
-        type="teritiary-regular"
-        id="moreOpitonsButton"
-        size="small"
-        iconSize={16}
-        startIcon={MoreHorizontalRegular}
-        onClick={() => {
-          moreOptionsMenu = !moreOptionsMenu;
-          event.stopPropagation();
-        }}
-      />
+      <span
+        class="p-1 rounded-1 more-option-btn"
+        style={moreOptionsMenu
+          ? "background-color: var(--bg-ds-surface-400) !important;"
+          : ""}
+      >
+        <MoreHorizontalRegular
+          size={"16px"}
+          color={"var(--icon-ds-neutral-100)"}
+        />
+      </span>
       {#if moreOptionsMenu}
         <div
           class="menu-container"
-          style="background-color: var(--bg-ds-surface-600); z-index:1000; border-radius:4px; width:150px; position:absolute; top:30px; right:-123px;"
+          style="background-color: var(--bg-ds-surface-600); z-index:1000; border-radius:4px; width:150px; position:absolute; top:30px; right:-126px;"
         >
           {#each moreOptions as item}
             <div
               class="menu-item d-flex align-items-center justify-content-start gap-2"
               style="color: {item.iconColor};"
               on:click={() => handleClick(item)}
-              tabindex={0}
             >
               <svelte:component
                 this={item.Icon}
@@ -703,7 +694,7 @@
     width: 150px;
     outline: none;
     border-radius: 4px !important;
-    padding: 4px 2px;
+    padding: 4px 3px;
     caret-color: var(--bg-ds-primary-300);
     font-family: "Inter", sans-serif;
     font-weight: 500;
@@ -746,8 +737,6 @@
     margin-bottom: 2px;
   }
   .status-icon {
-    padding-top: 2px;
-    padding-bottom: 1px;
     padding-left: 4px;
     padding-right: 2px;
   }
@@ -756,5 +745,8 @@
   }
   .response-text-fail {
     color: var(--text-ds-danger-300);
+  }
+  .more-option-btn:hover {
+    background-color: var(--bg-ds-surface-300);
   }
 </style>
