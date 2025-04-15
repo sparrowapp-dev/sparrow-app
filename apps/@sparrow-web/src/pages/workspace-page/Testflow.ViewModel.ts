@@ -19,6 +19,7 @@ import {
   isFirstTimeInTestFlow,
   isTestFlowTourGuideOpen,
 } from "@sparrow/workspaces/stores";
+import constants from "src/constants/constants";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -120,28 +121,32 @@ export class TestflowViewModel {
       notifications.success(`New ${TFDefaultEnum.NAME} Created!`);
       return;
     }
-    const response = await this.testflowService.addTestflow({
-      name: newTestflow.name,
-      workspaceId: newTestflow.workspaceId,
-      edges: [],
-      nodes: [
-        {
-          id: "1",
-          type: "startBlock",
-          position: {
-            x: 100,
-            y: 200,
+    const baseUrl = await this.constructBaseUrl(newTestflow.workspaceId);
+    const response = await this.testflowService.addTestflow(
+      {
+        name: newTestflow.name,
+        workspaceId: newTestflow.workspaceId,
+        edges: [],
+        nodes: [
+          {
+            id: "1",
+            type: "startBlock",
+            position: {
+              x: 100,
+              y: 200,
+            },
+            data: {
+              requestId: "",
+              collectionId: "",
+              folderId: "",
+              method: "",
+              name: "",
+            },
           },
-          data: {
-            requestId: "",
-            collectionId: "",
-            folderId: "",
-            method: "",
-            name: "",
-          },
-        },
-      ],
-    });
+        ],
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -157,7 +162,7 @@ export class TestflowViewModel {
         workspaceId: currentWorkspace._id,
       });
       // scroll the top tab bar to right
-      moveNavigation("right")
+      moveNavigation("right");
       notifications.success("New Testflow created successfully.");
       // MixpanelEvent(Events.CREATE_TESTFLOW);
       let isFirstTimeUsingTestFlow = false;
@@ -202,9 +207,11 @@ export class TestflowViewModel {
       };
     }
 
+    const baseUrl = await this.constructBaseUrl(currentWorkspace._id);
     const response = await this.testflowService.deleteTestflow(
       currentWorkspace._id,
       testflow._id,
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.testflowRepository.removeTestflow(testflow._id);
@@ -254,12 +261,14 @@ export class TestflowViewModel {
       }
       return;
     }
+    const baseUrl = await this.constructBaseUrl(currentWorkspace._id);
     const response = await this.testflowService.updateTestflow(
       currentWorkspace._id,
       testflow._id,
       {
         name: newTestflowName,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.testflowRepository.updateTestflow(testflow._id, {
@@ -305,6 +314,17 @@ export class TestflowViewModel {
     this.tabRepository.createTab(initTestflowTab.getValue());
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * @description - refreshes testflow data with sync to mongo server
    * @param workspaceId - workspace Id to which testflow belongs
@@ -322,7 +342,11 @@ export class TestflowViewModel {
     if (isGuestUser) {
       return {};
     }
-    const response = await this.testflowService.fetchAllTestflow(workspaceId);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.testflowService.fetchAllTestflow(
+      workspaceId,
+      baseUrl,
+    );
     if (response?.isSuccessful && response?.data?.data) {
       const testflows = response.data.data;
       await this.testflowRepository.refreshTestflow(
@@ -380,6 +404,7 @@ export class TestflowViewModel {
       return true;
     }
 
+    const baseUrl = await this.constructBaseUrl(activeWorkspace._id);
     const response = await this.testflowService.updateTestflow(
       activeWorkspace._id,
       currentTestflow?.id as string,
@@ -388,6 +413,7 @@ export class TestflowViewModel {
         nodes: currentTestflow?.property?.testflow?.nodes,
         edges: currentTestflow?.property?.testflow?.edges,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.testflowRepository.updateTestflow(
