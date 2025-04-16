@@ -95,7 +95,7 @@
       />
     </span>
     <Button
-      disable={isCreatingCustomRequest}
+      disable={isCreatingCustomRequest || !requestName}
       title={"Create"}
       textClassProp={"fs-6"}
       type={"primary"}
