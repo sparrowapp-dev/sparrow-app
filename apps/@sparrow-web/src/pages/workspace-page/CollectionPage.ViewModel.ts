@@ -3507,10 +3507,12 @@ export default class CollectionsViewModel {
       }
       return true;
     }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     const response =
       await this.collectionService.deleteSavedRequestInCollection(
         requestResponse.id,
         requestObject,
+        baseUrl
       );
 
     if (response.isSuccessful) {

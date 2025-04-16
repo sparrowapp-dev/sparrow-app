@@ -137,7 +137,7 @@
   handleModalState={() => (isDeletePopup = false)}
 >
   <div
-    class="mb-1 mt-2 text-ds-font-size-14 text-ds-font-weight-regular"
+    class="mb-1 mt-2 text-ds-font-size-14 text-ds-font-weight-medium"
     style="color: var(--text-ds-nuetral-100); line-height:20px;"
   >
     <p>

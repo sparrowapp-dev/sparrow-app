@@ -129,7 +129,7 @@
         <div
           bind:this={chatContainer}
           class="my-2"
-          style="flex:1; overflow:auto;"
+          style="flex:1; overflow-x:hidden; overflow-y:auto;"
         >
           <div
             class="d-flex flex-column h-100 align-items-center justify-content-center"
@@ -198,6 +198,7 @@
                       isLastRecieverMessage={conversations.length - 1 === index
                         ? true
                         : false}
+                      {isResponseGenerating}
                     />
                   </div>
                 {/each}

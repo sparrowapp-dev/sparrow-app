@@ -126,13 +126,14 @@ export class TabularInputTheme{
         },
       },
       ".cm-scroller::-webkit-scrollbar": {
-        width: "6px",
+        width: "10px",
         height: "0px !important",
         display: "block",
+        
       },
       ".cm-scroller::-webkit-scrollbar-thumb": {
         backgroundColor: "var(--border-ds-neutral-300)",
-        borderRadius: "3px",
+        borderRadius: "8px",
       },
       ".cm-scroller::-webkit-scrollbar-horizontal": {
         display: "none !important",

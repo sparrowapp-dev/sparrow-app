@@ -341,7 +341,7 @@
 >
   <div class="text-lightGray mb-1">
     <p
-      class="text-ds-font-size-12 text-ds-line-height-120 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Collection? Everything in <span
         class="text-whiteColor fw-bold">"{collection.name}"</span
