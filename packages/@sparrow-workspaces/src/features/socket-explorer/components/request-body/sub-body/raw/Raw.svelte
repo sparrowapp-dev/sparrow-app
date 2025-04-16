@@ -10,12 +10,13 @@
   };
 </script>
 
-<div class="request-body position-relative">
+<div class="request-body position-relative h-100">
   <Editor
     bind:lang
     bind:value
     on:change={handleCodeMirrorChange}
     isEditable={true}
+    autofocus={true}
     {isBodyBeautified}
     beautifySyntaxCallback={updateBeautifiedState}
     placeholder={"Message"}

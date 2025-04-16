@@ -4,6 +4,7 @@
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import handleCodeMirrorSyntaxFormat from "./editor";
   import { EditorView } from "codemirror";
+  import { EditorSelection } from "@codemirror/state";
   import { createEventDispatcher } from "svelte";
   import { placeholder as CreatePlaceHolder } from "@codemirror/view";
   import { linter } from "@codemirror/lint";
@@ -22,6 +23,7 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
+  export let autofocus = false;
 
   const dispatch = createEventDispatcher();
 
@@ -64,6 +66,26 @@
     createDiagnostics(view.state.doc.toString()),
   );
 
+  const findCursorPosition = (text: string): number => {
+    if (!text || text.length === 0) return 0;
+
+    const lines = text.split("\n");
+    let lineIndex = lines.length - 1;
+    while (lineIndex >= 0 && lines[lineIndex].trim() === "") {
+      lineIndex--;
+    }
+
+    if (lineIndex < 0) return 0;
+
+    let position = 0;
+    for (let i = 0; i < lineIndex; i++) {
+      position += lines[i].length + 1;
+    }
+
+    position += lines[lineIndex].length;
+    return position;
+  };
+
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
@@ -77,14 +99,26 @@
       CreatePlaceHolder(placeholder),
     ];
 
+    const cursorPos = findCursorPosition(value);
     let state = EditorState.create({
       doc: value,
       extensions: extensions,
+      selection: EditorSelection.cursor(cursorPos),
     });
+
     codeMirrorView = new EditorView({
       parent: codeMirrorEditorDiv,
       state: state,
     });
+
+    if (autofocus && isEditable) {
+      setTimeout(() => {
+        codeMirrorView.focus();
+        codeMirrorView.dispatch({
+          effects: EditorView.scrollIntoView(cursorPos),
+        });
+      }, 0);
+    }
   }
 
   function destroyCodeMirrorEditor() {
@@ -115,15 +149,26 @@
   // Run whenever component state changes
   afterUpdate(() => {
     if (value?.toString() !== codeMirrorView.state.doc?.toString()) {
+      const cursorPos = findCursorPosition(value);
+
       codeMirrorView.dispatch({
         changes: {
           from: 0,
           to: codeMirrorView.state.doc.length,
           insert: value,
         },
+        selection: EditorSelection.cursor(cursorPos),
         annotations: [{ autoChange: true }],
       });
+
+      if (autofocus && isEditable) {
+        codeMirrorView.focus();
+        codeMirrorView.dispatch({
+          effects: EditorView.scrollIntoView(cursorPos),
+        });
+      }
     }
+
     handleCodeMirrorSyntaxFormat(
       codeMirrorView,
       languageConf,
