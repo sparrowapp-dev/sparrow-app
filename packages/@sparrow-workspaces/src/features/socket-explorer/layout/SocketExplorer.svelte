@@ -88,14 +88,16 @@
   const handleKeydown = async (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
       event.preventDefault();
-      const x = await onSaveSocket();
-      if (
-        x.status === "error" &&
-        x.message === "request is not a part of any workspace or collection"
-      ) {
-        toggleSaveRequest(true);
-      } else if (x.status === "success") {
-        notifications.success("WebSocket request saved successfully.");
+      if (!$tab.isSaved) {
+        const x = await onSaveSocket();
+        if (
+          x.status === "error" &&
+          x.message === "request is not a part of any workspace or collection"
+        ) {
+          toggleSaveRequest(true);
+        } else if (x.status === "success") {
+          notifications.success("WebSocket request saved successfully.");
+        }
       }
     }
   };
