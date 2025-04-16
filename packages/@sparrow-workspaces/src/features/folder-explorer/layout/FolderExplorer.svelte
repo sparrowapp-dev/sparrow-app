@@ -213,7 +213,8 @@
         >
           <Button
             id={`add-item-collection`}
-            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              collection?.activeSync}
             title={"New"}
             type={"primary"}
             onClick={() => {
