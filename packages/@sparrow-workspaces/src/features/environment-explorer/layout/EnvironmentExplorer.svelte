@@ -144,6 +144,29 @@
           </button>
         {/if}
 
+        <!-- <Input
+          id={"environment-name"}
+          width={"calc(100% - 500px)"}
+          type="text"
+          bind:value={environmentName}
+          on:input={(e) => {
+            handleCurrentEnvironmentNameChange(environmentName, "");
+          }}
+          on:blur={(e) => {
+            handleCurrentEnvironmentNameChange(environmentName, "blur");
+          }}
+          defaultBorderColor="transparent"
+          hoveredBorderColor={"var(--border-ds-primary-300)"}
+          focusedBorderColor={"var(--border-ds-primary-300)"}
+          class="text-fs-18 bg-transparent ellipsis fw-normal px-2 rounded-1 "
+          style="outline:none;"
+          disabled={$currentEnvironment?.property?.environment?.type ==
+            "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          placeholder=""
+          height="36px"
+          isPencilIconRequired={false}
+        /> -->
+
         <Input
           type={"text"}
           size={"medium"}
