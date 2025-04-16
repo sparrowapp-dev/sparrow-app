@@ -87,6 +87,7 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
+  import { onDestroy, onMount } from "svelte";
 
   /**
    * Role of user in active workspace
@@ -222,6 +223,24 @@
   ];
 
   let isBackgroundClickable = true;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+
+      if (isCollectionEditable && $tab && !$tab.isSaved) {
+        onSaveCollection();
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
