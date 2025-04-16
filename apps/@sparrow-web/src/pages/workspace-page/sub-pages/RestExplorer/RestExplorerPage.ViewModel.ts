@@ -2557,6 +2557,17 @@ class RestExplorerViewModel {
   public stopGeneratingAIResponse = async () => {
     const componentData = this._tab.getValue();
 
+    // Handling the case where user clicked stop generating just after the "start" stream status
+    const conversation = componentData?.property?.request?.ai?.conversations || [];
+    if(conversation.length > 0){
+      // Remove last message
+      const lastResponse = conversation[conversation.length-1];
+      if(lastResponse.type === "Receiver" && lastResponse?.message === ''){  
+        conversation.pop();
+        await this.updateRequestAIConversation(conversation);
+      }
+    }
+
     try {
       // Send stop signal to the server
       await this.aiAssistentWebSocketService.stopGeneration(
