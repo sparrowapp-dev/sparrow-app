@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Loader } from "@sparrow/library/ui";
+  import { Loader, notifications } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
+  import { onMount, onDestroy } from "svelte";
 
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
@@ -82,6 +83,29 @@
     } else {
       loading.set(tabIdValue);
     }
+  });
+
+  const handleKeydown = async (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      const x = await onSaveSocket();
+      if (
+        x.status === "error" &&
+        x.message === "request is not a part of any workspace or collection"
+      ) {
+        toggleSaveRequest(true);
+      } else if (x.status === "success") {
+        notifications.success("WebSocket request saved successfully.");
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeydown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeydown);
   });
 </script>
 
