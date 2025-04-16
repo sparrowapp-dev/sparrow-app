@@ -162,7 +162,7 @@
       class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Flow?
-      <span style="font-weight:700;" class="">"{flow.name}"</span>
+      <span class="text-whiteColor fw-bold">"{flow.name}"</span>
       and all its blocks will be removed and cannot be restored.
     </p>
   </div>

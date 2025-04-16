@@ -3505,6 +3505,7 @@ export default class CollectionsViewModel {
         );
         this.tabRepository.removeTab(requestResponse.id);
       }
+      notifications.success(`"${requestResponse.name}" Response deleted.`);
       return true;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -3537,7 +3538,7 @@ export default class CollectionsViewModel {
 
       // Deleting the main tab no child exists
       this.handleRemoveTab(requestResponse.id);
-
+      console.log('zzz', requestResponse.name)
       notifications.success(`"${requestResponse.name}" Response deleted.`);
       MixpanelEvent(Events.DELETE_RESPONSE, {
         source: "Collection list",

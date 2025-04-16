@@ -141,7 +141,7 @@
     style="color: var(--text-ds-nuetral-100); line-height:20px;"
   >
     <p>
-      Are you sure you want to delete this WebSocket? <span>"{api.name}"</span>
+      Are you sure you want to delete this WebSocket? <span class="text-whiteColor fw-bold">"{api.name}"</span>
       will be removed and cannot be restored.
     </p>
   </div>
