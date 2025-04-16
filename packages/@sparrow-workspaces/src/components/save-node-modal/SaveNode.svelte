@@ -34,7 +34,7 @@
     </span>
     <Button
       disable={isSaveRequestLoader}
-      title={"Save"}
+      title={"Continue"}
       textClassProp={"fs-6"}
       type={"primary"}
       onClick={() => {

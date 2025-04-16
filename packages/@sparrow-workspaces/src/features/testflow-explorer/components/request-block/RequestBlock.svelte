@@ -43,14 +43,6 @@
     name: string;
     method: string;
     onClick: (id: string) => void;
-    onUpdateSelectedAPI: (
-      id: string,
-      name: string,
-      requestId: string,
-      collectionId: string,
-      method: string,
-      folderId?: string,
-    ) => void;
     onContextMenu: (id: string, event: string) => void;
     onOpenAddCustomRequestModal: (id: string) => void;
     onOpenSaveNodeRequestModal: (
@@ -455,7 +447,6 @@
                 collectionId: requestEvent.collectionId,
                 name: requestEvent.name,
                 method: requestEvent.method,
-                requestData: requestEvent.requestData,
               };
               data.onClick(id, requestData);
             }}

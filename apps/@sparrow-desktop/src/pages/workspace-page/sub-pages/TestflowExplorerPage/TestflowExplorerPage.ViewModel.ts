@@ -1085,17 +1085,8 @@ export class TestflowExplorerPageViewModel {
     collectionId: string,
     requestId: string,
     folderId: string,
-    nodeId?: string,
-    tabId?: string,
   ) => {
     let request;
-    if (!collectionId) {
-      request = await this.collectionRepository.readRequestDataInNode(
-        tabId,
-        nodeId,
-      );
-      return request;
-    }
     if (folderId) {
       request = await this.collectionRepository.readRequestInFolder(
         collectionId,
