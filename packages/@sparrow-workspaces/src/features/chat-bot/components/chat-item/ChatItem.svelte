@@ -322,7 +322,7 @@
               on:click={handleCopyResponse}
             >
               {#if showTickIcon}
-                <TickIcon size={"14px"} color={"grey"} />
+                <TickIcon width={"18px"} height={"18px"} color={"grey"} />
               {:else}
                 <CopyRegular size={"16px"} />
               {/if}

@@ -573,8 +573,7 @@
     background-color: transparent;
   }
   .select-background-secondary {
-    // background-color: var(--bg-ds-surface-600);
-    background-color: transparent;
+    background-color: var(--bg-ds-surface-600);
   }
 
   // hover or open-body states
