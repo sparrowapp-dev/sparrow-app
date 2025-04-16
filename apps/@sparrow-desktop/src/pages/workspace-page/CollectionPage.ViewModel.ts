@@ -3500,7 +3500,7 @@ export default class CollectionsViewModel {
       await this.collectionService.deleteSavedRequestInCollection(
         requestResponse.id,
         requestObject,
-        baseUrl
+        baseUrl,
       );
 
     if (response.isSuccessful) {
@@ -6303,31 +6303,36 @@ export default class CollectionsViewModel {
 
     const newRequestMap = {};
     const addedRequestMap = {};
+    const addedRequestFolderMap: Record<string, string> = {}; // operationId → folder name
+    const folderByNameMap: Record<string, any> = {}; // folder name → folder object
+    const folderNameSet = new Set<string>();
     const deletedOpSet = new Set(deleted);
 
-    // Step 1: Build maps from newJson
-    function buildNewMaps(items) {
+    // Step 1: Build maps from newJson (requests & folder names)
+    function buildNewMaps(items: any[], currentFolderName = "") {
       for (const item of items) {
-        if (item.type === "REQUEST" && item.operationId) {
+        if (item.type === "FOLDER" && item.items) {
+          folderByNameMap[item.name] = item; // map folder for potential full insert
+          folderNameSet.add(item.name);
+          buildNewMaps(item.items, item.name); // recurse into folder
+        } else if (item.type === "REQUEST" && item.operationId) {
           if (modifiedSet.has(item.operationId)) {
             newRequestMap[item.operationId] = item;
           }
           if (addedSet.has(item.operationId)) {
             addedRequestMap[item.operationId] = item;
+            addedRequestFolderMap[item.operationId] = currentFolderName;
           }
-        }
-        if (item.items) {
-          buildNewMaps(item.items);
         }
       }
     }
     buildNewMaps(newJson.items || []);
 
     // Step 2: Modify & Remove in-place
-    function updateAndClean(items) {
+    function updateAndClean(items: any[]): any[] {
       return items.filter((item) => {
         if (item.type === "REQUEST" && deletedOpSet.has(item.operationId)) {
-          return false; // Remove this item
+          return false; // Remove
         }
 
         if (item.type === "REQUEST" && modifiedSet.has(item.operationId)) {
@@ -6340,25 +6345,57 @@ export default class CollectionsViewModel {
         }
 
         if (item.items) {
-          item.items = updateAndClean(item.items); // Recurse
+          item.items = updateAndClean(item.items);
         }
 
         return true;
       });
     }
 
-    existingJson.items = updateAndClean(existingJson?.items || []);
+    existingJson.items = updateAndClean(existingJson.items || []);
 
-    // Step 3: Add new APIs (for now add them to the first folder-level)
-    const defaultFolder = existingJson.items.find((i) => i.type === "FOLDER");
-    if (defaultFolder && defaultFolder.items) {
-      for (const opId of added) {
-        const newItem = addedRequestMap[opId];
-        if (newItem) {
-          defaultFolder.items.push(newItem);
+    // Step 3: Index existing folders by name
+    const existingFolderMap: Record<string, any> = {};
+    function indexFolders(items: any[]) {
+      for (const item of items) {
+        if (item.type === "FOLDER") {
+          existingFolderMap[item.name] = item;
+          if (item.items) indexFolders(item.items);
         }
       }
     }
+    indexFolders(existingJson.items || []);
+
+    // Step 4: Add new APIs
+    const defaultFolder = existingJson.items.find((i) => i.type === "FOLDER");
+
+    for (const opId of added) {
+      const newItem = addedRequestMap[opId];
+      const folderName = addedRequestFolderMap[opId];
+      const targetFolder = existingFolderMap[folderName];
+
+      if (newItem && targetFolder?.items) {
+        targetFolder.items.push(newItem); // Add to existing folder
+      } else if (folderName && !existingFolderMap[folderName]) {
+        // Folder doesn't exist → add full folder from newJson
+        const newFolder = folderByNameMap[folderName];
+        if (newFolder) {
+          existingJson.items.push(newFolder);
+          existingFolderMap[folderName] = newFolder; // Track it now to avoid adding twice
+        } else if (defaultFolder?.items) {
+          defaultFolder.items.push(newItem); // fallback
+        }
+      } else if (defaultFolder?.items) {
+        defaultFolder.items.push(newItem); // fallback
+      }
+    }
+    // Step 5: Remove folders from existingJson that are not present in newJson
+    existingJson.items = existingJson.items.filter((item) => {
+      if (item.type === "FOLDER") {
+        return folderNameSet.has(item.name); // ✅ Keep only if still exists
+      }
+      return true; // Keep non-folder items
+    });
 
     return existingJson;
   };

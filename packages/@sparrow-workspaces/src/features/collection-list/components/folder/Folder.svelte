@@ -232,7 +232,9 @@
     isOpen={isFolderPopup}
     handleModalState={(flag = false) => (isFolderPopup = flag)}
   >
-    <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
+    <div
+      class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+    >
       <p>
         Are you sure you want to delete this Folder? Everything in <span
           class="text-whiteColor fw-bold">"{explorer.name}"</span
@@ -325,11 +327,12 @@
           },
           displayText: "Rename Folder",
           disabled: false,
-          hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
-              ? false
-              : true,
+          // hidden:
+          //   !collection.activeSync ||
+          //   (explorer?.source === "USER" && collection.activeSync)
+          //     ? false
+          //     : true,
+          hidden: false,
         },
         {
           onClick: () => {
