@@ -164,18 +164,31 @@ export class TeamService {
 
   public acceptInvite = async (
     teamId: string,
-    emailId: string,
     baseUrl: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${baseUrl}/api/team/${teamId}/user/accept/${emailId}`,
+      `${baseUrl}/api/team/${teamId}/invite/user/accept`,
       {
         headers: getAuthHeaders(),
       },
     );
     return response;
   };
+
+  public ignoreInvite= async (
+     teamId: string,
+     baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${apiUrl}/api/team/${teamId}/invite/not-accepted`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+    }
 
 }
 

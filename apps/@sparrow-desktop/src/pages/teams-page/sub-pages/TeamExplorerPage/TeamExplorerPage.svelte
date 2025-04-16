@@ -21,9 +21,6 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
-  const acceptInvite: Observable<string> = _viewModel.acceptInvite;
-  const withdrawInvite: Observable<string> = _viewModel.withdrawInvite;
-  const resendInvite: Observable<string> = _viewModel.resendInvite;  
 
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
@@ -94,6 +91,7 @@
   onWithDrawInvite={_viewModel.withdrawInvite}
   onResendInvite={_viewModel.resendInvite}
   onAcceptInvite={_viewModel.acceptInvite}
+  onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
 />
 

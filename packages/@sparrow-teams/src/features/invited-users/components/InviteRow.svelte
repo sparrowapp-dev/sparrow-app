@@ -9,13 +9,12 @@
   export let onWithDrawInvite;
   export let onResendInvite;
   export let openTeam;
-  export let userId: string;
 
-  const handleWithDrawInvite = () =>{
-      onWithDrawInvite(openTeam?.teamId, user);
-  }
+  const handleWithDrawInvite = () => {
+    onWithDrawInvite(openTeam?.teamId, user);
+  };
   const handleResendInvite = () => {
-     onResendInvite(openTeam?.teamId, user);
+    onResendInvite(openTeam?.teamId, user);
   };
 
   let pos = { x: 0, y: 0 };
@@ -43,28 +42,34 @@
 
   let noOfColumns = 150;
   let noOfRows = 2;
+  let isNearBottom = false;
 
   // Unique ID for this row based on index
   const rowId = `invite-row-${index}`;
 
   const openMenu = (e: MouseEvent) => {
     e.stopPropagation();
-    
+
     // Close other menus
     const customEvent = new CustomEvent("closeAllMenus", {
       detail: { exceptRowId: rowId },
     });
     window.dispatchEvent(customEvent);
-    
-    // Get the button's position
+
     const buttonRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    
-    // Position the menu to the right of the button
-    pos = { 
-      x: buttonRect.right, 
-      y: buttonRect.top
+
+    const viewportHeight = window.innerHeight;
+
+    isNearBottom = viewportHeight - buttonRect.bottom < 150 ? true : false;
+
+    pos = {
+      x: buttonRect.right - 142 ,
+      y:
+        buttonRect.top +
+        buttonRect.height +
+        (isNearBottom ? buttonRect.height : -buttonRect.height),
     };
-    
+
     showMenu = true;
   };
 
@@ -73,14 +78,10 @@
   }
 
   function handleRowClick(e: MouseEvent) {
-    // Only handle clicks directly on the row, not from children
     if (e.currentTarget === e.target) {
       console.log(`Row ${index} clicked`);
-      // Additional row click handling
     }
   }
-
-  // Listen for close all menus event
   function handleCloseAllMenus(e: CustomEvent) {
     if (e.detail.exceptRowId !== rowId) {
       showMenu = false;

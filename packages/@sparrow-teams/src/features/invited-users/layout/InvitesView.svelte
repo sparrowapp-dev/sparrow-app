@@ -38,7 +38,14 @@
         <tbody class="overflow-y-auto position-relative z-0">
           {#each invites as list, index}
             {#if  new Date(list?.expiresAt) > new Date()}
-              <InviteRow user={list?.email} role={list?.role} {index} {onWithDrawInvite} {onResendInvite} {openTeam} {userId}/>
+              <InviteRow 
+              user={list?.email} 
+              role={list?.role} 
+              {index} 
+              {onWithDrawInvite} 
+              {onResendInvite} 
+              {openTeam} 
+              {userId}/>
             {/if}
           {/each}
         </tbody>

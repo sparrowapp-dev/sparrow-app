@@ -863,8 +863,12 @@ export class TeamExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response= await this.teamService.resendInvite(teamId, email, baseUrl);
     if (response.isSuccessful) { 
-      console.log("resend invite succesful");
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(`Invite resent successfully!`);
       return response;
+    }
+    else {
+      notifications.error("Failed to resend invite. Please try again.");
     }
   }
 
@@ -874,17 +878,42 @@ export class TeamExplorerPageViewModel {
   ) => {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.withdrawInvite(teamId, email, baseUrl);
-    if(response.isSuccessful) {
-      console.log("withdraw invite succesful");
-          return response;
+    if(response?.isSuccessful) {
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(`Invite withdrawn successfully!`);
+        return response;
+    }
+    else {
+      notifications.error("Failed to withdraw invite. Please try again.");
     }
   }
 
-  public acceptInvite = async (teamId: string, email: string, baseUrl: string) => { 
-    const response = await this.teamService.acceptInvite(teamId, email, baseUrl);
-    if(response.isSuccessful) {
-      console.log("accept invite succesful");
+  public acceptInvite = async (teamId: string) => { 
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.acceptInvite(teamId, baseUrl);
+    if (response.isSuccessful) {
+       this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(`Invite accepted successfully!`);
       return response;
+    }
+    else {
+      notifications.error("Failed to accept invite. Please try again.");
+    }
+  }
+
+  public ignoreInvite = async (teamId: string) => { 
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.ignoreInvite(teamId, baseUrl);
+    if (response.isSuccessful) { 
+      const teams = await this.teamRepository.getTeamsDocuments();
+      await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
+      await this.teamRepository.removeTeam(teamId);
+      notifications.success(`Invite ignored successfully!`);
+      debugger;
+      return response;
+    }
+    else {
+      notifications.error("Failed to ignore invite. Please try again.");
     }
   }
 }

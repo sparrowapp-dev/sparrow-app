@@ -17,6 +17,8 @@
   export let disableNewInviteTag;
   export let modifyTeam;
   export let threeDotIconDisable = false;
+
+  $: console.log("teamList", teamList);
 </script>
 
 <!--Teams list-->

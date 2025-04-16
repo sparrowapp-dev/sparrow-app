@@ -57,6 +57,13 @@ export class TeamRepository {
     return RxDB.getInstance().rxdb.team.find().sort({ index: "asc" }).$;
   };
 
+    /**
+   * get all teams observable of user
+   */
+  public getTeamsDocuments = (): Observable<TeamDocument[]> => {
+    return RxDB.getInstance().rxdb.team.find().sort({ index: "asc" }).exec();
+  };
+
   /**
    * Check whether the team is active
    */

@@ -137,6 +137,8 @@
     }
   };
 
+  $: console.log("team id", teamId);
+
   const handleInvite = async () => {
     checkInviteValidation();
     loader = true;
