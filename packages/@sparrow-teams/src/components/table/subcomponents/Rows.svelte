@@ -4,7 +4,7 @@
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
-
+  import { ChevronVerticalFilled } from "@sparrow/library/icons";
   export let list;
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
@@ -24,7 +24,6 @@
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
-
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
@@ -84,6 +83,10 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
+
+  export let size = "20px";
+  export let color = "";
+  $: finalColor = color === "" ? "inherit" : color;
 </script>
 
 {#if showMenu}
@@ -190,7 +193,7 @@
         onClick={(e) => {
           rightClickContextMenu(e);
         }}
-        startIcon={ThreeDotIcon}
+        startIcon={ChevronVerticalFilled}
       />
     </div>
   </td>
@@ -221,15 +224,18 @@
   .workspace-list-item td {
     background-color: transparent;
   }
+
   .threedot-icon-container {
     visibility: visible;
-    background-color: transparent;
-    z-index: 2;
-    transform: rotate(90deg);
-    outline: none;
+    pointer-events: none;
+    transition:
+      visibility 0.3s ease,
+      opacity 0.3s ease;
   }
+
   tr:hover .threedot-icon-container {
     visibility: visible;
+    pointer-events: auto;
   }
 
   .tab-data {

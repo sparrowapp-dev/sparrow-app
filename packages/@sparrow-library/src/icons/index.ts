@@ -149,6 +149,7 @@ export { default as FolderRegular } from "./FolderRegular.svelte";
 export { default as FolderOpenRegular } from "./FolderOpenRegular.svelte";
 export { default as ChevronDoubleLeftRegular } from "./ChevronDoubleLeftRegular.svelte";
 export { default as ChevronDoubleRightRegular } from "./ChevronDoubleRightRegular.svelte";
+export { default as ChevronVerticalFilled } from "./ChevronVerticalFilled.svelte";
 export { default as FolderIcon3 } from "./FolderIcon.svelte";
 export { default as SearchIcon2 } from "./SearchIcon2.svelte";
 export { default as PlusIcon2 } from "./PlusIcon.svelte";
@@ -227,5 +228,5 @@ export { default as OpenRegular } from "./OpenRegular.svelte";
 export { default as RenameRegular } from "./RenameRegular.svelte";
 export { default as PlayFilled } from "./PlayFilled.svelte";
 export { default as BoardRegular } from "./BoardRegular.svelte";
-export { default as BorderFilled} from "./BorderFilled.svelte";
-export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte"
+export { default as BorderFilled } from "./BorderFilled.svelte";
+export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte";
