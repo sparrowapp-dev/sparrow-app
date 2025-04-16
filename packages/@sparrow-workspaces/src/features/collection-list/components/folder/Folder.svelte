@@ -515,30 +515,32 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-          <Tooltip
-            title={"Add REST API"}
-            placement={"bottom-center"}
-            zIndex={701}
-            distance={13}
-          >
-            <span class="threedot-icon-container d-flex">
-              <Button
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-                startIcon={ArrowSwapRegular}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  expand = true;
-                  onItemCreated("requestFolder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                  });
-                }}
-              />
-            </span>
-          </Tooltip>
+          {#if !collection?.activeSync}
+            <Tooltip
+              title={"Add REST API"}
+              placement={"bottom-center"}
+              zIndex={701}
+              distance={13}
+            >
+              <span class="threedot-icon-container d-flex">
+                <Button
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  startIcon={ArrowSwapRegular}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    expand = true;
+                    onItemCreated("requestFolder", {
+                      workspaceId: collection.workspaceId,
+                      collection,
+                      folder: explorer,
+                    });
+                  }}
+                />
+              </span>
+            </Tooltip>
+          {/if}
 
           <Tooltip
             title={"More"}
