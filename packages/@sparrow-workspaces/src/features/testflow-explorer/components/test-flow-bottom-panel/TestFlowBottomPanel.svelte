@@ -24,6 +24,7 @@
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { Loader } from "@sparrow/library/ui";
+  import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
 
   export let selectedBlock;
   export let onClose;
@@ -48,8 +49,11 @@
   let requestNavigation = "Parameters";
   let apiState;
 
-  const handleResponseState = (key: string, value: any) => {
-    handleUpdateRequestData(key, value);
+  const handleResponseState = (_state) => {
+    responseState = {
+      ...responseState,
+      ..._state,
+    };
   };
 
   /**
@@ -132,19 +136,16 @@
     try {
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
-
-      if (selectedNodeResponse) {
-        apiState = {
-          ...apiState,
-          responseBodyLanguage:
-            selectedNodeResponse?.response?.responseContentType,
-        };
-      }
     } catch (err) {
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
       responseLoader = false;
     }
+  };
+
+  let responseState: TFResponseStateType = {
+    responseBodyLanguage: "JSON",
+    responseBodyFormatter: "Pretty",
   };
 
   $: {
@@ -168,10 +169,9 @@
           selectedNodeResponse = undefined;
         } else {
           selectedNodeResponse = nodeResponse;
-          // handleUpdateRequestData(
-          //   "responseBodyLanguage",
-          //   selectedNodeResponse?.response?.responseContentType,
-          // );
+          responseState.responseBodyLanguage = selectedNodeResponse?.response
+            .responseContentType as string;
+          responseState.responseBodyFormatter = "Pretty";
         }
       }
     }
@@ -353,7 +353,7 @@
                   {#if selectedNodeResponse?.response?.responseContentType !== "Image"}
                     <ResponseBodyNavigator
                       response={selectedNodeResponse?.response}
-                      {apiState}
+                      apiState={responseState}
                       onUpdateResponseState={handleResponseState}
                       {onClearResponse}
                       {isWebApp}
@@ -365,7 +365,7 @@
                   >
                     <ResponseBody
                       response={selectedNodeResponse?.response}
-                      {apiState}
+                      apiState={responseState}
                     />
                   </div>
                 {:else if responseNavigation === "Headers"}

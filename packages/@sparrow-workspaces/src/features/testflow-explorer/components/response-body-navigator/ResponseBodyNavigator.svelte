@@ -47,7 +47,7 @@
   };
 
   const handleTypeDropdown = (tab: string) => {
-    onUpdateResponseState("responseBodyLanguage", tab);
+    onUpdateResponseState({ responseBodyLanguage: tab });
   };
 
   $: {
@@ -117,10 +117,9 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateResponseState(
-              "responseBodyFormatter",
-              ResponseFormatter.PRETTY,
-            );
+            onUpdateResponseState({
+              responseBodyFormatter: ResponseFormatter.PRETTY,
+            });
           }}
           class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.PRETTY
@@ -137,10 +136,9 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateResponseState(
-              "responseBodyFormatter",
-              ResponseFormatter.RAW,
-            );
+            onUpdateResponseState({
+              responseBodyFormatter: ResponseFormatter.RAW,
+            });
           }}
           class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.RAW
@@ -150,10 +148,9 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateResponseState(
-              "responseBodyFormatter",
-              ResponseFormatterEnum.PREVIEW,
-            );
+            onUpdateResponseState({
+              responseBodyFormatter: ResponseFormatterEnum.PREVIEW,
+            });
           }}
           class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatterEnum.PREVIEW
