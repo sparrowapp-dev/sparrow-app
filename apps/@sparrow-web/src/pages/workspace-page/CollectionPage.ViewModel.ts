@@ -3512,7 +3512,7 @@ export default class CollectionsViewModel {
       await this.collectionService.deleteSavedRequestInCollection(
         requestResponse.id,
         requestObject,
-        baseUrl
+        baseUrl,
       );
 
     if (response.isSuccessful) {
@@ -4604,16 +4604,26 @@ export default class CollectionsViewModel {
     currentWorkspaceId: string,
     importJSON: string,
     contentType: ContentTypeEnum,
+    activeSyncEnabled: boolean,
+    activeSyncUrl: string,
   ) => {
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
     if (isGuestUser !== true) {
+      let oapiJSON = importJSON;
+      if (contentType === ContentTypeEnum["application/json"]) {
+        oapiJSON = {
+          ...JSON.parse(importJSON),
+          isActiveSyncEnabled: activeSyncEnabled,
+          activeSyncUrl: activeSyncEnabled ? activeSyncUrl : "",
+        };
+      }
       const response =
         await this.collectionService.importCollectionFromJsonObject(
           currentWorkspaceId,
-          importJSON,
+          oapiJSON,
           contentType,
         );
 
@@ -6204,5 +6214,319 @@ export default class CollectionsViewModel {
       notifications.error("Failed to save workspace. Please try again.");
     }
     return false;
+  };
+
+  private compareApisByOperationId = async (existingJson, newJson) => {
+    function flattenRequestsByOperationId(json) {
+      const requests = {};
+
+      function recurse(items) {
+        for (const item of items) {
+          if (item.type === "REQUEST" && item.operationId) {
+            requests[item.operationId] = item.request || {};
+          }
+          if (item.items) {
+            recurse(item.items);
+          }
+        }
+      }
+
+      recurse(json.items || []);
+      return requests;
+    }
+
+    function areRequestsDifferent(reqA, reqB) {
+      const keysToCompare = [
+        "method",
+        "url",
+        "headers",
+        "body",
+        "queryParams",
+        "auth",
+      ];
+
+      for (const key of keysToCompare) {
+        const a = reqA[key] ?? null;
+        const b = reqB[key] ?? null;
+
+        if (JSON.stringify(a) !== JSON.stringify(b)) {
+          return true; // Different
+        }
+      }
+      return false; // Same
+    }
+
+    const oldRequests = flattenRequestsByOperationId(existingJson);
+    const newRequests = flattenRequestsByOperationId(newJson);
+
+    const added = [];
+    const deleted = [];
+    const modified = [];
+
+    const oldOps = new Set(Object.keys(oldRequests));
+    const newOps = new Set(Object.keys(newRequests));
+
+    // Added & Modified
+    for (const opId of newOps) {
+      if (!oldOps.has(opId)) {
+        added.push(opId);
+      } else {
+        if (areRequestsDifferent(oldRequests[opId], newRequests[opId])) {
+          modified.push(opId);
+        }
+      }
+    }
+
+    // Deleted
+    for (const opId of oldOps) {
+      if (!newOps.has(opId)) {
+        deleted.push(opId);
+      }
+    }
+
+    const totalOld = oldOps.size;
+    const totalChanges = added.length + deleted.length + modified.length;
+
+    let percentChange = 0;
+    if (totalOld === 0 && totalChanges > 0) {
+      percentChange = 100;
+    } else if (totalOld > 0) {
+      percentChange = Math.min(100, (totalChanges / totalOld) * 100);
+    }
+
+    return {
+      addedCount: added.length,
+      deletedCount: deleted.length,
+      modifiedCount: modified.length,
+      percentChange: Number(percentChange.toFixed(1)),
+      added,
+      deleted,
+      modified,
+      name: existingJson.name,
+      collectionId: existingJson.id,
+    };
+  };
+
+  public handleCompareCollection = async (collectionId: string) => {
+    const collection =
+      await this.collectionRepository.readCollection(collectionId);
+    if (collection?.activeSyncUrl) {
+      const response = await this.getOapiJsonFromURL(collection?.activeSyncUrl);
+      const parsedJSON = await this.collectionService.parseOAPIJSONToCollection(
+        response?.data?.body,
+        ContentTypeEnum["application/json"],
+      );
+      if (parsedJSON.isSuccessful) {
+        const comparisonChanges = await this.compareApisByOperationId(
+          collection,
+          parsedJSON.data.data,
+        );
+        return comparisonChanges;
+      }
+    }
+    return {};
+  };
+
+  private syncApis = async (
+    existingJson,
+    newJson,
+    modified: string[],
+    added: string[],
+    deleted: string[],
+  ) => {
+    const modifiedSet = new Set(modified);
+    const addedSet = new Set(added);
+    const deletedSet = new Set(deleted);
+
+    const newRequestMap = {};
+    const addedRequestMap = {};
+    const addedRequestFolderMap: Record<string, string> = {}; // operationId → folder name
+    const folderByNameMap: Record<string, any> = {}; // folder name → folder object
+    const folderNameSet = new Set<string>();
+    const deletedOpSet = new Set(deleted);
+
+    // Step 1: Build maps from newJson (requests & folder names)
+    function buildNewMaps(items: any[], currentFolderName = "") {
+      for (const item of items) {
+        if (item.type === "FOLDER" && item.items) {
+          folderByNameMap[item.name] = item; // map folder for potential full insert
+          folderNameSet.add(item.name);
+          buildNewMaps(item.items, item.name); // recurse into folder
+        } else if (item.type === "REQUEST" && item.operationId) {
+          if (modifiedSet.has(item.operationId)) {
+            newRequestMap[item.operationId] = item;
+          }
+          if (addedSet.has(item.operationId)) {
+            addedRequestMap[item.operationId] = item;
+            addedRequestFolderMap[item.operationId] = currentFolderName;
+          }
+        }
+      }
+    }
+    buildNewMaps(newJson.items || []);
+
+    // Step 2: Modify & Remove in-place
+    function updateAndClean(items: any[]): any[] {
+      return items.filter((item) => {
+        if (item.type === "REQUEST" && deletedOpSet.has(item.operationId)) {
+          return false; // Remove
+        }
+
+        if (item.type === "REQUEST" && modifiedSet.has(item.operationId)) {
+          const newItem = newRequestMap[item.operationId];
+          if (newItem) {
+            item.request = newItem.request;
+            item.name = newItem.name;
+            item.description = newItem.description;
+          }
+        }
+
+        if (item.items) {
+          item.items = updateAndClean(item.items);
+        }
+
+        return true;
+      });
+    }
+
+    existingJson.items = updateAndClean(existingJson.items || []);
+
+    // Step 3: Index existing folders by name
+    const existingFolderMap: Record<string, any> = {};
+    function indexFolders(items: any[]) {
+      for (const item of items) {
+        if (item.type === "FOLDER") {
+          existingFolderMap[item.name] = item;
+          if (item.items) indexFolders(item.items);
+        }
+      }
+    }
+    indexFolders(existingJson.items || []);
+
+    // Step 4: Add new APIs
+    const defaultFolder = existingJson.items.find((i) => i.type === "FOLDER");
+
+    for (const opId of added) {
+      const newItem = addedRequestMap[opId];
+      const folderName = addedRequestFolderMap[opId];
+      const targetFolder = existingFolderMap[folderName];
+
+      if (newItem && targetFolder?.items) {
+        targetFolder.items.push(newItem); // Add to existing folder
+      } else if (folderName && !existingFolderMap[folderName]) {
+        // Folder doesn't exist → add full folder from newJson
+        const newFolder = folderByNameMap[folderName];
+        if (newFolder) {
+          existingJson.items.push(newFolder);
+          existingFolderMap[folderName] = newFolder; // Track it now to avoid adding twice
+        } else if (defaultFolder?.items) {
+          defaultFolder.items.push(newItem); // fallback
+        }
+      } else if (defaultFolder?.items) {
+        defaultFolder.items.push(newItem); // fallback
+      }
+    }
+    // Step 5: Remove folders from existingJson that are not present in newJson
+    existingJson.items = existingJson.items.filter((item) => {
+      if (item.type === "FOLDER") {
+        return folderNameSet.has(item.name); // ✅ Keep only if still exists
+      }
+      return true; // Keep non-folder items
+    });
+
+    return existingJson;
+  };
+
+  public syncCollection = async (collectionId: string) => {
+    try {
+      const collection =
+        await this.collectionRepository.readCollection(collectionId);
+      if (collection?.activeSyncUrl) {
+        const response = await this.getOapiJsonFromURL(
+          collection?.activeSyncUrl,
+        );
+        const parsedJSON =
+          await this.collectionService.parseOAPIJSONToCollection(
+            response?.data?.body,
+            ContentTypeEnum["application/json"],
+          );
+        const comparisonChanges = await this.compareApisByOperationId(
+          collection,
+          parsedJSON.data.data,
+        );
+        const updatedJSONWithSyncedAPIs = await this.syncApis(
+          collection.toMutableJSON(),
+          parsedJSON.data.data,
+          comparisonChanges.modified,
+          comparisonChanges.added,
+          comparisonChanges.deleted,
+        );
+        const baseUrl = await this.constructBaseUrl(
+          updatedJSONWithSyncedAPIs.workspaceId,
+        );
+        const apiResponse = await this.collectionService.updateCollectionData(
+          collectionId as string,
+          updatedJSONWithSyncedAPIs.workspaceId as string,
+          {
+            items: updatedJSONWithSyncedAPIs.items,
+          },
+          baseUrl,
+        );
+        if (apiResponse.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collectionId as string,
+            apiResponse.data.data,
+          );
+          notifications.success(`Collection synced successfully.`);
+        } else {
+          notifications.error("Failed to sync collection. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      notifications.error("Failed to sync collection. Please try again.");
+    }
+  };
+
+  public replaceCollection = async (collectionId: string) => {
+    try {
+      const collection =
+        await this.collectionRepository.readCollection(collectionId);
+      if (collection?.activeSyncUrl) {
+        const response = await this.getOapiJsonFromURL(
+          collection?.activeSyncUrl,
+        );
+        const parsedJSON =
+          await this.collectionService.parseOAPIJSONToCollection(
+            response?.data?.body,
+            ContentTypeEnum["application/json"],
+          );
+        const baseUrl = await this.constructBaseUrl(collection.workspaceId);
+        const apiResponse = await this.collectionService.updateCollectionData(
+          collectionId as string,
+          collection.workspaceId as string,
+          {
+            items: parsedJSON.data.data.items,
+            name: parsedJSON.data.data.name,
+            description: parsedJSON.data.data.description,
+          },
+          baseUrl,
+        );
+        if (apiResponse.isSuccessful) {
+          this.collectionRepository.updateCollection(
+            collectionId as string,
+            apiResponse.data.data,
+          );
+          notifications.success(`Collection replaced successfully.`);
+        } else {
+          notifications.error(
+            "Failed to replace collection. Please try again.",
+          );
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      notifications.error("Failed to replace collection. Please try again.");
+    }
   };
 }
