@@ -103,13 +103,13 @@
   {/if}
 
   {#if $isTestFlowTourGuideOpen && $currentStep == 7}
-    <div style="position:absolute; bottom:250px; right:318px;">
+    <div style="position:absolute; bottom:260px; right:300px;">
       <TestFlowTourGuide
         isLastStep={true}
         isPuleCircleRequired={false}
         title="Congratulations! 🎊"
         pulsePosition={{ top: "210px", left: "250px" }}
-        description={`Great work! You’ve got one successful running flow. Below in the table, you’ll find this icon, which will take you to the API if you need to tweak any values.`}
+        description={`Great work! You’ve got one successful running flow.`}
         tipPosition="bottom-right"
         onNext={() => {
           currentStep.set(-1);

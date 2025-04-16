@@ -25,7 +25,11 @@
     SaveTestflow,
   } from "../components";
   import {
+    RequestDatasetEnum,
+    RequestDataTypeEnum,
     RequestSectionEnum,
+    ResponseFormatterEnum,
+    ResponseSectionEnum,
     type CollectionDto,
   } from "@sparrow/common/types/workspace";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
@@ -77,7 +81,7 @@
   } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
   import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
-  import Arrow from "../icons/Arrow.svelte";
+  import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -623,7 +627,7 @@
           id: targetNode,
           type: "requestBlock",
           data: {
-            blockName: `block ${targetNode - 1}`,
+            blockName: `Block ${targetNode - 1}`,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string, _options = undefined) {
@@ -1231,140 +1235,67 @@
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
-    <div class="request-container" style="z-index:10;">
-      <div
-        class="rounded-2 d-flex flex-column"
-        style="background-color:var(--bg-secondary-850); border:1px solid var(--border-tertiary-300);  margin:10px; height:350px;"
-      >
-        <!-- Request Response Nav -->
-        <TestFlowBottomPanel
-          {selectedBlock}
-          {environmentVariables}
-          onClose={() => unselectNodes()}
-          onRedirect={onRedrectRequest}
-          {handleUpdateRequestData}
-          {isWebApp}
-          onClearResponse={() => {}}
-          {userRole}
-          {onUpdateEnvironment}
-        />
-
-        <!-- Request Respone Body -->
-        <div
-          class="d-flex justify-content-between m-1"
-          style="flex:1; overflow:auto;"
-        >
-          <!-- Sidebar -->
-          <TableSidebar selectedNode={sampleApiData} bind:selectedTab />
-
-          <!-- Request Data -->
-          <div class="request-rhs-container h-100">
-            {#if selectedTab === "response"}
-              <div class="p-2 h-100" style="">
-                <div
-                  class="d-flex flex-column h-100 pt-1"
-                  style="overflow:auto;"
-                >
-                  <div class="h-100 d-flex flex-column">
-                    <div style="flex:1; overflow:auto;">
-                      {#if sampleApiData?.response?.status === ResponseStatusCode.ERROR}
-                        <ResponseErrorScreen />
-                      {:else if sampleApiData?.response?.status}
-                        <div class="h-100 d-flex flex-column">
-                          <ResponseStatus response={sampleApiData?.response} />
-                          <ResponseNavigator
-                            requestStateSection={responseNavigation}
-                            {updateResponseNavigation}
-                            responseHeadersLength={sampleApiData?.response
-                              ?.headers?.length || 0}
-                          />
-                          {#if responseNavigation === "Response"}
-                            {#if responseState?.responseBodyLanguage !== "Image"}
-                              <ResponseBodyNavigator
-                                response={sampleApiData?.response}
-                                apiState={responseState}
-                                {onUpdateRequestState}
-                                onClearResponse={() => {}}
-                                {isWebApp}
-                              />
-                            {/if}
-                            <div style="flex:1; overflow:auto;">
-                              <ResponseBody
-                                response={sampleApiData?.response}
-                                apiState={responseState}
-                              />
-                            </div>
-                          {:else if responseNavigation === "Headers"}
-                            <div style="flex:1; overflow:auto;">
-                              <ResponseHeaders
-                                responseHeader={sampleApiData?.response.headers}
-                              />
-                            </div>
-                          {/if}
-                        </div>
-                      {/if}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {:else}
-              <div class="p-2 h-100" style="">
-                <div
-                  class="d-flex flex-column h-100 pt-1"
-                  style="overflow:auto;"
-                >
-                  <div class="h-100 d-flex flex-column">
-                    <RequestNavigatorTestFlow
-                      paramsLength={sampleApiData?.request?.property?.request
-                        ?.queryParams?.length || 0}
-                      headersLength={sampleApiData?.request?.property?.request
-                        ?.headers?.length || 0}
-                      autoGeneratedHeadersLength={sampleApiData?.request
-                        ?.property?.request?.autoGeneratedHeaders?.length || 0}
-                      {updateActiveTabInsideRequestBody}
-                      bind:requestNavigation
-                    />
-
-                    <div style="flex:1; overflow:auto;" class="p-0 w-100">
-                      {#if requestNavigation === RequestSectionEnum.REQUEST_BODY}
-                        <RequestBodyTestFlow
-                          body={sampleApiData?.request?.property?.request?.body}
-                          method={sampleApiData?.request?.property?.request
-                            ?.method}
-                          requestState={sampleApiData?.request?.property
-                            ?.request?.state}
-                          {environmentVariables}
-                        />
-                      {:else if requestNavigation === RequestSectionEnum.PARAMETERS}
-                        <RequestParameterTestFlow
-                          params={sampleApiData?.request?.property?.request
-                            ?.queryParams}
-                          authParameter={{}}
-                          isBulkEditActive={false}
-                          onUpdateRequestState={() => {}}
-                          {environmentVariables}
-                        />
-                      {:else if requestNavigation === RequestSectionEnum.HEADERS}
-                        <RequestHeaderTestFlow
-                          headers={sampleApiData?.request?.property?.request
-                            ?.headers}
-                          autoGeneratedHeaders={sampleApiData?.request?.property
-                            ?.request?.autoGeneratedHeaders}
-                          authHeader={{}}
-                          {environmentVariables}
-                          onHeadersChange={() => {}}
-                          isBulkEditActive={false}
-                          onUpdateRequestState={() => {}}
-                        />
-                      {/if}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {/if}
-          </div>
-        </div>
-      </div>
+    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+      <!-- Request Response Nav -->
+      <TestFlowBottomPanel
+        selectedBlock={{
+          data: {
+            name: "Sample API",
+            method: "GET",
+            blockName: "Block 1",
+            requestData: {
+              name: "Sample API",
+              method: "GET",
+              state: {
+                requestBodyLanguage: RequestDataTypeEnum.TEXT,
+                requestBodyNavigation: RequestDatasetEnum.NONE,
+                requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+                requestNavigation: RequestSectionEnum.PARAMETERS,
+                responseNavigation: ResponseSectionEnum.RESPONSE,
+                responseBodyLanguage: RequestDataTypeEnum.TEXT,
+                responseBodyFormatter: ResponseFormatterEnum.PRETTY,
+                requestExtensionNavigation: "",
+                requestLeftSplitterWidthPercentage: 50,
+                requestRightSplitterWidthPercentage: 50,
+                isExposeEditDescription: true,
+                isSendRequestInProgress: false,
+                isSaveDescriptionInProgress: false,
+                isSaveRequestInProgress: false,
+                isParameterBulkEditActive: false,
+                isHeaderBulkEditActive: false,
+                isChatbotActive: false,
+                isChatbotSuggestionsActive: true,
+                isChatbotGeneratingResponse: false,
+                isDocGenerating: false,
+                isDocAlreadyGenerated: false,
+              },
+              url: "https://sparrowapp.dev/api/v1/docs",
+              queryParams: [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ],
+              headers: [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ],
+            },
+          },
+        }}
+        {environmentVariables}
+        onClose={() => unselectNodes()}
+        onRedirect={onRedrectRequest}
+        {handleUpdateRequestData}
+        {isWebApp}
+        onClearResponse={() => {}}
+        {userRole}
+        {onUpdateEnvironment}
+      />
     </div>
   {/if}
 
@@ -1489,7 +1420,7 @@
   }
 
   .request-container {
-    background-color: var(--bg-secondary-800);
+    /* background-color: var(--bg-secondary-800); */
     width: 100%;
   }
   .testing-txt {
