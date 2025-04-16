@@ -127,9 +127,6 @@
     } else if (tab === "Headers") {
       responseNavigation = "Headers";
     }
-
-    handleUpdateRequestData("responseNavigation", tab);
-    return responseNavigation;
   };
 
   const handleClickTestButton = async () => {
@@ -153,8 +150,6 @@
       apiState = selectedBlock?.data?.requestData?.state;
       requestNavigation =
         selectedBlock?.data?.requestData?.state?.requestNavigation;
-      responseNavigation =
-        selectedBlock?.data?.requestData?.state?.responseNavigation;
 
       if (testflowStore) {
         const nodes = testflowStore?.nodes ?? [];
@@ -171,7 +166,6 @@
           selectedNodeResponse = nodeResponse;
           responseState.responseBodyLanguage = selectedNodeResponse?.response
             .responseContentType as string;
-          responseState.responseBodyFormatter = "Pretty";
         }
       }
     }
@@ -359,10 +353,7 @@
                       {isWebApp}
                     />
                   {/if}
-                  <div
-                    style="flex:1; overflow:auto; padding:8px;"
-                    class="border"
-                  >
+                  <div style="flex:1; overflow:auto;" class="border">
                     <ResponseBody
                       response={selectedNodeResponse?.response}
                       apiState={responseState}
