@@ -129,6 +129,7 @@
           {item}
           {slidebarPlace}
           on:click={(event) => handleCompo(event.detail)}
+          
         />
       </div>
     {/each}
@@ -140,6 +141,8 @@
           {item}
           {slidebarPlace}
           on:click={(event) => handleCompo(event.detail)}
+          {isGuestUser}
+          {type}
         />
       </div>
     {/each}

@@ -5,7 +5,7 @@
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
@@ -80,15 +80,14 @@
    * Scrolls the container to bring the newly added row into view
    */
   const scrollToNewRow = async () => {
-    await tick();
-
-    if (pairsContainer) {
-      const lastRow = pairsContainer.lastElementChild;
-
-      if (lastRow) {
-        lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+    setTimeout(() => {
+      if (pairsContainer) {
+        const lastRow = pairsContainer.lastElementChild;
+        if (lastRow) {
+          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
       }
-    }
+    }, 0);
   };
 
   const updateParam = async (index: number): Promise<void> => {

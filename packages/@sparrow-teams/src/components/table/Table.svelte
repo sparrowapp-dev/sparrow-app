@@ -65,6 +65,7 @@
     background-color: transparent;
     z-index: 999 !important;
     text-align: center;
+    line-height: 1.5;
   }
   thead {
     border-bottom: 0px solid var(--bg-ds-surface-900);
