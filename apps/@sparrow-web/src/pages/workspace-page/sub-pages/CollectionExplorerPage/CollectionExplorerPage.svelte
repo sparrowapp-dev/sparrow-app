@@ -25,6 +25,7 @@
 
   // Exports
   export let tab: TabDocument;
+  export let onSyncCollection;
 
   // ViewModel initialization
   const _viewModel = new CollectionExplorerPage(tab);
@@ -191,6 +192,7 @@
   tab={_viewModel.tab}
   bind:collection
   {environmentVariables}
+  {onSyncCollection}
   onUpdateDescription={_viewModel.handleUpdateDescription}
   onItemCreated={_viewModel.handleCreateItem}
   onCreateAPIRequest={_viewModel.handleCreateRequest}
