@@ -28,6 +28,7 @@ import {
   type EventsValues,
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { Base64Converter, Sleep, StatusCode } from "@sparrow/common/utils";
+import { version } from "../../../package.json";
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -60,6 +61,7 @@ const success = (data: any): HttpClientResponseInterface => {
 const getAuthHeaders = () => {
   return {
     Authorization: `Bearer ${getUserToken()}`,
+    "x-app-version": version,
   };
 };
 
@@ -67,6 +69,7 @@ const getMultipartAuthHeaders = () => {
   return {
     "Content-Type": "multipart/form-data",
     Authorization: `Bearer ${getUserToken()}`,
+    "x-app-version": version,
   };
 };
 
@@ -80,6 +83,7 @@ const getMultipartAuthHeaders = () => {
 const getRefHeaders = () => {
   return {
     Authorization: `Bearer ${getRefToken()}`,
+    "x-app-version": version,
   };
 };
 
@@ -203,7 +207,6 @@ function timeout(timeout: number) {
   });
 }
 
-
 function formatTime(date) {
   let hours = date.getHours();
   const minutes = date.getMinutes();
@@ -275,7 +278,7 @@ const disconnectWebSocket = async (tab_id: string) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
       url = wsData.url;
-      if(wsData?.status === "connecting"){
+      if (wsData?.status === "connecting") {
         wsData.status = "disconnected";
         abortController = wsData?.abortController;
         isRequestCancelled = true;
@@ -291,11 +294,11 @@ const disconnectWebSocket = async (tab_id: string) => {
     }
     return webSocketDataMap;
   });
-  if(isRequestCancelled){
+  if (isRequestCancelled) {
     if (abortController) {
-        abortController.abort(); // Abort the request using the stored controller
+      abortController.abort(); // Abort the request using the stored controller
     }
-   return;
+    return;
   }
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
@@ -618,15 +621,15 @@ const connectWebSocket = async (
 };
 
 /**
- * 
- * @param url 
- * @param method 
- * @param headers 
- * @param body 
- * @param contentType 
- * @param selectedAgent 
- * @param signal 
- * @returns 
+ *
+ * @param url
+ * @param method
+ * @param headers
+ * @param body
+ * @param contentType
+ * @param selectedAgent
+ * @param signal
+ * @returns
  */
 const makeHttpRequestV2 = async (
   url: string,
@@ -1178,18 +1181,17 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
     const wsData = socketIoDataMap.get(_tabId);
     if (wsData) {
       url = wsData.url;
-      if(wsData?.status === "connecting"){
+      if (wsData?.status === "connecting") {
         wsData.status = "disconnected";
         abortController = wsData?.abortController;
         isRequestCancelled = true;
-      
-      insertSocketIoDataToMap(
-        _tabId,
-        "Connection aborted",
-        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
-      );
-      }
-      else{
+
+        insertSocketIoDataToMap(
+          _tabId,
+          "Connection aborted",
+          SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+        );
+      } else {
         wsData.status = "disconnecting";
         isRequestCancelled = false;
       }
@@ -1198,11 +1200,11 @@ const disconnectSocketIo = async (_tabId: string): Promise<void> => {
     }
     return socketIoDataMap;
   });
-  if(isRequestCancelled){
+  if (isRequestCancelled) {
     if (abortController) {
-        abortController.abort(); // Abort the request using the stored controller
+      abortController.abort(); // Abort the request using the stored controller
     }
-   return;
+    return;
   }
 
   socketIoDataStore.update((webSocketDataMap) => {
@@ -1252,19 +1254,19 @@ const makeGraphQLRequest = async (
   const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
   const startTime = performance.now();
   try {
-    if (_selectedAgent === "Cloud Agent"){
-     
+    if (_selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/graphql-request";
       const axiosResponse = await axios({
-        data: { 
-          url: _url, 
-          method: "POST", 
-          headers: "[]", 
+        data: {
+          url: _url,
+          method: "POST",
+          headers: "[]",
           body: JSON.stringify({
-          query: _query,
-          variables: _variables || {}
-          }), 
-          contentType: "application/json" },
+            query: _query,
+            variables: _variables || {},
+          }),
+          contentType: "application/json",
+        },
         url: proxyUrl,
         method: "POST",
       });
@@ -1272,20 +1274,22 @@ const makeGraphQLRequest = async (
       httpResponse = JSON.stringify({
         body: JSON.stringify(axiosResponse.data.data),
         headers: axiosResponse.data.headers,
-        status:  axiosResponse.data.status
+        status: axiosResponse.data.status,
       });
-    }
-    else{
+    } else {
       const axiosResponse = await axios({
         method: "POST",
         url: _url,
         data: { query: _query, variables: _variables || {} } || {},
       });
-  
+
       httpResponse = JSON.stringify({
         body: JSON.stringify(axiosResponse.data),
         headers: axiosResponse.headers,
-        status:  axiosResponse.status + " " + (new StatusCode().getText(axiosResponse.status))
+        status:
+          axiosResponse.status +
+          " " +
+          new StatusCode().getText(axiosResponse.status),
       });
     }
     const endTime = performance.now();
@@ -1320,12 +1324,14 @@ const makeGraphQLRequest = async (
       // Check if request is aborted after request fails
       throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
     }
-    if(err?.response){
+    if (err?.response) {
       httpResponse = JSON.stringify({
-        body: JSON.stringify(err.response.data 
-        ),
+        body: JSON.stringify(err.response.data),
         headers: err.response.headers,
-        status:  err.response.status + " " + (new StatusCode().getText(err.response.status))
+        status:
+          err.response.status +
+          " " +
+          new StatusCode().getText(err.response.status),
       });
       const parsedResponse = JSON.parse(httpResponse);
       return success(parsedResponse);
@@ -1344,7 +1350,6 @@ const makeGraphQLRequest = async (
   }
 };
 
-
 export {
   makeRequest,
   getAuthHeaders,
@@ -1357,5 +1362,5 @@ export {
   sendSocketIoMessage,
   connectSocketIo,
   disconnectSocketIo,
-  makeGraphQLRequest
+  makeGraphQLRequest,
 };
