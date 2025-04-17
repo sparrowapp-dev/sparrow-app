@@ -866,7 +866,7 @@ export class TeamExplorerPageViewModel {
     const response= await this.teamService.resendInvite(teamId, email, baseUrl);
     if (response.isSuccessful) { 
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite resent successfully!`);
+      notifications.success(`Invite resend successfully!`);
       return response;
     }
     else {
@@ -910,7 +910,7 @@ export class TeamExplorerPageViewModel {
       const teams = await this.teamRepository.getTeamsDocuments();
       await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
       await this.teamRepository.removeTeam(teamId);
-      notifications.success(`Invite ignored successfully!`);
+      notifications.success(`Invite ignored. The hub has been removed from your panel.`);
       return response;
     }
     else {
