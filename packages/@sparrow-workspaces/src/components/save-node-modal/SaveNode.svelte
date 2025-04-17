@@ -3,9 +3,8 @@
 
   export let handleModalState;
   export let requestName;
-  export let nodeNumber;
+  export let blockName;
   export let onSaveRequest;
-  export let isSaveRequestLoader;
 </script>
 
 <!-- Section for the modal content -->
@@ -14,7 +13,7 @@
     class="text-fs-14 text-lightGray"
     style="color: var(--text-secondary-1000); margin: 24px 0px"
   >
-    {`The request “${requestName}” in Block ${nodeNumber} has unsaved changes. Changing the
+    {`The request “${requestName}” in ${blockName} has unsaved changes. Changing the
       API will discard your edits. Do you wish to continue?`}
   </div>
 
@@ -23,7 +22,7 @@
     <span style="margin-right: 15px;">
       <!-- Cancel button to close the modal without leaving the team -->
       <Button
-        disable={isSaveRequestLoader}
+        disable={false}
         title={"Cancel"}
         textClassProp={"fs-6"}
         type={"secondary"}
@@ -33,14 +32,14 @@
       />
     </span>
     <Button
-      disable={isSaveRequestLoader}
+      disable={false}
       title={"Continue"}
       textClassProp={"fs-6"}
       type={"primary"}
       onClick={() => {
         onSaveRequest();
       }}
-      loader={isSaveRequestLoader}
+      loader={false}
     />
   </div>
 </section>
