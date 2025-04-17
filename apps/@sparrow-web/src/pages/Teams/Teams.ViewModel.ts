@@ -381,7 +381,9 @@ export class TeamsViewModel {
   public setupRedirect = () => {
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
-    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
+    const isGuest = !accessToken || !refreshToken;
+    const isSparrowEdge = isGuest ? "&isSparrowEdge=true" : "";
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email${isSparrowEdge}`;
     window.location.href = sparrowRedirect;
   };
 }
