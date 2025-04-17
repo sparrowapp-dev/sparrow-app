@@ -159,7 +159,7 @@
 >
   <div class="text-lightGray mb-1">
     <p
-      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-regular"
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Flow?
       <span style="font-weight:700;" class="">"{flow.name}"</span>

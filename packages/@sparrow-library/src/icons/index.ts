@@ -231,3 +231,4 @@ export { default as PlayFilled } from "./PlayFilled.svelte";
 export { default as RenameRegular } from "./RenameRegular.svelte";
 export { default as BorderFilled} from "./BorderFilled.svelte";
 export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte"
+export { default as SettingsRegular } from "./SettingsRegular.svelte";

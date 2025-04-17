@@ -20,7 +20,7 @@
 <section>
   <div>
     <!-- Prompt message for the user to confirm leaving the team -->
-    <p class="text-fs-14" style="color: var(--text-secondary-1000);">
+    <p class="text-fs-14 text-ds-font-weight-medium" style="color: var(--text-secondary-1000);">
       Are you sure you want to delete this block?
 
       {#if deleteCount > 0}
