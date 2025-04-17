@@ -1,6 +1,6 @@
 <script lang="ts">
   import { HelpIcon, SaveIcon } from "@sparrow/library/assets";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";
   import { Search } from "@sparrow/library/forms";
@@ -72,6 +72,21 @@
   };
   let isGuidePopup = false;
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      const canSave = !(
+        $currentEnvironment?.property?.environment?.state?.isSaveInProgress ||
+        $currentEnvironment?.isSaved ||
+        userRole === WorkspaceRole.WORKSPACE_VIEWER
+      );
+
+      if (canSave && $currentEnvironment?.tabId) {
+        onSaveEnvironment();
+      }
+    }
+  };
+
   onMount(async () => {
     const event = await onFetchEnvironmentGuide({
       id: "environment-guide",
@@ -81,6 +96,12 @@
     } else {
       isPopoverContainer = false;
     }
+
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
   });
 </script>
 
@@ -179,7 +200,11 @@
           </div>
 
           <div class="position-relative">
-            <Tooltip title="Save" placement="bottom-center" distance={10}>
+            <Tooltip
+              title="Save (Ctrl+S)"
+              placement="bottom-center"
+              distance={10}
+            >
               <Button
                 type="primary"
                 startIcon={SaveRegular}

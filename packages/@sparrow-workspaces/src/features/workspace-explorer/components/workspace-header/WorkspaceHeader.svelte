@@ -3,6 +3,7 @@
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { PeopleRegular, SaveRegular } from "@sparrow/library/icons";
+  import { onDestroy, onMount } from "svelte";
   /**
    * The name of the workspace.
    */
@@ -47,6 +48,27 @@
   export let onSaveWorkspace;
 
   export let isSaved;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      if (
+        userRole !== WorkspaceRole.WORKSPACE_VIEWER &&
+        !isSaved &&
+        onSaveWorkspace
+      ) {
+        onSaveWorkspace();
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <section>

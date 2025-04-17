@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Loader } from "@sparrow/library/ui";
+  import { Loader, notifications } from "@sparrow/library/ui";
   import { Modal } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
 
@@ -35,6 +35,8 @@
   import { writable } from "svelte/store";
   import { SocketSectionEnum } from "@sparrow/common/types/workspace/socket-io-request-tab";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
+  import { onDestroy, onMount } from "svelte";
+  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<any[]>;
@@ -85,6 +87,33 @@
     } else {
       loading.set(tabIdValue);
     }
+  });
+
+  const handleKeydown = async (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      if (!$tab.isSaved) {
+        const x = await onSaveSocket();
+        if (
+          x.status === "error" &&
+          x.message === "request is not a part of any workspace or collection"
+        ) {
+          toggleSaveRequest(true);
+        } else if (x.status === "success") {
+          notifications.success(
+            `${SocketIORequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+          );
+        }
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeydown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeydown);
   });
 </script>
 
