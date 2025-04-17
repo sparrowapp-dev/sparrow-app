@@ -3538,7 +3538,6 @@ export default class CollectionsViewModel {
 
       // Deleting the main tab no child exists
       this.handleRemoveTab(requestResponse.id);
-      console.log('zzz', requestResponse.name)
       notifications.success(`"${requestResponse.name}" Response deleted.`);
       MixpanelEvent(Events.DELETE_RESPONSE, {
         source: "Collection list",
