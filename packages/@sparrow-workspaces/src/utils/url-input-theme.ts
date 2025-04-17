@@ -9,6 +9,7 @@ export class UrlInputTheme {
         flex: "1",
         borderRadius: "0",
         fontSize: "14px",
+        overflow: "hidden",
       },
       ".cm-content": {
         caretColor: "var(--white-color)",

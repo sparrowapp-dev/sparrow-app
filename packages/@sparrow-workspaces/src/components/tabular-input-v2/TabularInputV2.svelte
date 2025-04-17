@@ -11,6 +11,8 @@
   import { Button, Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
+  import { CodeMirrorInput } from "..";
+  import { TabularInputTheme } from "../../utils";
 
   /**
    * tabular pair entries
@@ -31,6 +33,7 @@
   export let disabled = false;
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
+  const theme = new TabularInputTheme().build();
 
   $: {
     if (keyValue) {
@@ -205,7 +208,7 @@
             style="height:28px;"
           >
             <div
-              class="d-flex w-100 px-1 align-items-center justify-content-center gap-2 pair-container"
+              class="d-flex w-100 px-1 align-items-center justify-content-center gap-2 pair-container position-relative"
               style="height: 28px;"
             >
               <div class="d-flex justify-content-center align-items-center">
@@ -229,33 +232,37 @@
                 </div>
               </div>
 
-              <div class="d-flex w-100">
-                <div class="w-50 position-relative">
-                  <input
-                    type="text"
-                    bind:value={element.key}
-                    on:input={() => {
-                      updatePairs(index);
-                    }}
-                    placeholder="Add Variable"
-                    class="table-input-v2 w-100 text-fs-12 placeholder-color"
-                    {disabled}
-                  />
+              
+                <div class="w-50">
+                  <div class="position-absolute top-0" style="width: calc(50% - 32px);">
+                    <CodeMirrorInput
+                      bind:value={element.key}
+                      onUpdateInput={() => {
+                        updatePairs(index);
+                      }}
+                      disabled={disabled}
+                      placeholder={"Add Variable"}
+                      {theme}
+                      enableEnvironmentHighlighting={false}
+                    />
+                  </div>
                 </div>
 
-                <div class="w-50 position-relative">
-                  <input
-                    type="text"
-                    bind:value={element.value}
-                    on:input={() => {
-                      updatePairs(index);
-                    }}
-                    placeholder="Add Value"
-                    class="w-100 text-fs-12 placeholder-color"
-                    {disabled}
-                  />
+                <div class="w-50 ">
+                  <div class="position-absolute top-0" style="width: calc(50% - 33px);">
+                    <CodeMirrorInput
+                      bind:value={element.value}
+                      onUpdateInput={() => {
+                        updatePairs(index);
+                      }}
+                      disabled={disabled}
+                      placeholder={"Add Value"}
+                      {theme}
+                      enableEnvironmentHighlighting={false}
+                    />
+                  </div>
                 </div>
-              </div>
+              
 
               {#if pairs.length - 1 != index && !disabled}
                 <Tooltip
@@ -308,33 +315,6 @@
     height: 28px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-  }
-  input {
-    background-color: transparent;
-    border: 0;
-    outline: none;
-    height: 26px;
-    border-radius: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-  input {
-    background-color: transparent;
-    border: 1px solid transparent;
-    transition: border 0.1s ease-in-out;
-  }
-
-  input:hover {
-    background-color: var(--bg-ds-surface-400);
-    border: 1px solid var(--border-ds-neutral-400);
-  }
-
-  input:focus {
-    background-color: var(--bg-ds-surface-400);
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
-  .placeholder-color::placeholder {
-    color: var(--text-ds-neutral-400);
   }
   .value-pair-rows {
     background-color: var(--bg-ds-surface-600);

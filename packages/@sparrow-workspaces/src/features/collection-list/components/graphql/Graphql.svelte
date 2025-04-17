@@ -132,7 +132,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 text-ds-font-size-12">
+  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
     <p>
       Are you sure you want to delete this {GraphqlRequestDefaultAliasBaseEnum.NAME}?
       <span class="text-whiteColor fw-bold">"{graphql.name}"</span>

@@ -47,6 +47,7 @@
   export let onUpdateCollectionAuth;
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
+  export let onSyncCollection;
 
   /**
    * Icons and images
@@ -74,6 +75,7 @@
   import {
     AddRegular,
     ArrowSwapRegular,
+    ArrowSyncRegular,
     CaretDownFilled,
     CaretUpFilled,
     FolderAddRegular,
@@ -87,6 +89,7 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
+  import { onDestroy, onMount } from "svelte";
 
   /**
    * Role of user in active workspace
@@ -222,6 +225,24 @@
   ];
 
   let isBackgroundClickable = true;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+
+      if (isCollectionEditable && $tab && !$tab.isSaved) {
+        onSaveCollection();
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -265,7 +286,7 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-3 p-3"
+    class="my-collection d-flex flex-column w-100 z-1 p-3"
     style=" min-width: 450px"
   >
     <div class="d-flex gap-2 mb-4">
@@ -420,6 +441,22 @@
             />
           </div>
         {/if} -->
+        {#if collection?.activeSync}
+          <div class="me-2">
+            <Button
+              id={`sync-collection`}
+              disable={!isCollectionEditable}
+              title={"Sync Collection"}
+              type={"secondary"}
+              onClick={async () => {
+                await onSyncCollection(collection.id);
+                console.log("collection", collection);
+              }}
+              size="medium"
+              startIcon={ArrowSyncRegular}
+            />
+          </div>
+        {/if}
 
         <div
           class="d-flex me-2 flex-column justify-content-center"
@@ -435,7 +472,7 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable}
+              disable={!isCollectionEditable || collection?.activeSync}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -507,9 +544,8 @@
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div
-        class={`${
-          !isSynced && collection?.activeSync ? "d-none" : "d-block"
-        } align-items-center`}
+        class={`d-block
+        align-items-center`}
       >
         <div class="d-flex gap-4 ps-2">
           <div class="d-flex align-items-center gap-2">

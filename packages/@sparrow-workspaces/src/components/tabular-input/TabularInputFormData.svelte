@@ -11,7 +11,7 @@
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { Button, Tooltip } from "@sparrow/library/ui";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
   export let keyValue: {
@@ -72,15 +72,14 @@
    * Scrolls the container to bring the newly added row into view
    */
   const scrollToNewRow = async () => {
-    await tick();
-
-    if (pairsContainer) {
-      const lastRow = pairsContainer.lastElementChild;
-
-      if (lastRow) {
-        lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+    setTimeout(() => {
+      if (pairsContainer) {
+        const lastRow = pairsContainer.lastElementChild;
+        if (lastRow) {
+          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
       }
-    }
+    }, 0);
   };
 
   const updateParam = async (index: number): Promise<void> => {
@@ -230,7 +229,7 @@
 
 <div
   class="mb-0 me-0 py-0 section-layout w-100"
-  style="overflow:hidden; border-radius:4px;"
+  style="overflow:visible; border-radius:4px;"
 >
   <div
     class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired
@@ -287,7 +286,10 @@
   >
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 d-flex align-items-center px-1">
+        <div
+          class="pair-data-row w-100 d-flex align-items-center px-1"
+          style="position:relative"
+        >
           <!-- <div class="button-container">
             <Button
               size="extra-small"
@@ -308,18 +310,23 @@
           </div>
 
           <div class="d-flex gap-0" style="width: calc(100% - 86px);">
-            <div class="w-50 position-relative d-flex align-items-center">
-              <CodeMirrorInput
-                bind:value={element.key}
-                onUpdateInput={() => {
-                  updateParam(index);
-                }}
-                disabled={!isInputBoxEditable ? true : false}
-                placeholder={"Add Key"}
-                {theme}
-                {environmentVariables}
-                {onUpdateEnvironment}
-              />
+            <div class="w-50 d-flex align-items-center">
+              <div
+                class="position-absolute top-0"
+                style="width: calc(50% - 48px);"
+              >
+                <CodeMirrorInput
+                  bind:value={element.key}
+                  onUpdateInput={() => {
+                    updateParam(index);
+                  }}
+                  disabled={!isInputBoxEditable ? true : false}
+                  placeholder={"Add Key"}
+                  {theme}
+                  {environmentVariables}
+                  {onUpdateEnvironment}
+                />
+              </div>
             </div>
             {#if element.type === "file"}
               <div class="w-50 position-relative d-flex align-items-center">
@@ -348,18 +355,23 @@
                 </div>
               </div>
             {:else}
-              <div class="w-50 position-relative d-flex align-items-center">
-                <CodeMirrorInput
-                  bind:value={element.value}
-                  onUpdateInput={() => {
-                    updateParam(index);
-                  }}
-                  placeholder={"Add Value"}
-                  disabled={!isInputBoxEditable ? true : false}
-                  {theme}
-                  {environmentVariables}
-                  {onUpdateEnvironment}
-                />
+              <div class="w-50 d-flex align-items-center">
+                <div
+                  class="position-absolute top-0 left-6"
+                  style="width: calc(50% - 48px);"
+                >
+                  <CodeMirrorInput
+                    bind:value={element.value}
+                    onUpdateInput={() => {
+                      updateParam(index);
+                    }}
+                    placeholder={"Add Value"}
+                    disabled={!isInputBoxEditable ? true : false}
+                    {theme}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
+                  />
+                </div>
               </div>
             {/if}
           </div>

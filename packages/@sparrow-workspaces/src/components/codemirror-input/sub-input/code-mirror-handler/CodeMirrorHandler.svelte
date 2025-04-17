@@ -56,6 +56,7 @@
    */
   export let environmentAxisY;
   export let environmentAxisX;
+export let enableEnvironmentHighlighting = true;
   /**
    * environment dialog box unique id
    */
@@ -340,22 +341,32 @@
     });
 
   export const environmentHighlightStyle = (
-    aggregateEnvs: AggregateEnvironment[],
-  ) => {
-    const decorator = getMatchDecorator(aggregateEnvs);
+  aggregateEnvs: AggregateEnvironment[],
+  enableHighlighting: boolean
+) => {
+  if (!enableHighlighting) {
+    return ViewPlugin.define(() => ({
+      decorations: Decoration.none,
+      update() {}
+    }), {
+      decorations: v => v.decorations,
+    });
+  }
 
-    return ViewPlugin.define(
-      (view) => ({
-        decorations: decorator.createDeco(view),
-        update(u) {
-          this.decorations = decorator.updateDeco(u, this.decorations);
-        },
-      }),
-      {
-        decorations: (v) => v.decorations,
+  const decorator = getMatchDecorator(aggregateEnvs);
+
+  return ViewPlugin.define(
+    (view) => ({
+      decorations: decorator.createDeco(view),
+      update(u) {
+        this.decorations = decorator.updateDeco(u, this.decorations);
       },
-    );
-  };
+    }),
+    {
+      decorations: (v) => v.decorations,
+    }
+  );
+};
 
   /**
    * Initialize code mirror editor
@@ -400,24 +411,24 @@
     initializeAsync();
   });
 
-  afterUpdate(() => {
-    if (codeMirrorView) {
-      if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
-        codeMirrorView.dispatch({
-          changes: {
-            from: 0,
-            to: codeMirrorView.state.doc.length,
-            insert: rawValue,
-          },
-        });
-      }
+afterUpdate(() => {
+  if (codeMirrorView) {
+    if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
       codeMirrorView.dispatch({
-        effects: languageConf.reconfigure([
-          environmentHighlightStyle(filterData),
-        ]),
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: rawValue,
+        },
       });
     }
-  });
+    codeMirrorView.dispatch({
+      effects: languageConf.reconfigure([
+        environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
+      ]),
+    });
+  }
+});
 
   const destroyCodeMirrorEditor = () => {
     if (codeMirrorView) {

@@ -22,6 +22,8 @@
   export let placeholder;
   export let theme;
   export let disabled = false;
+
+  export let enableEnvironmentHighlighting = true;
   /**
    * unique id used to focus codemirror input
    */
@@ -114,6 +116,7 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
+  {enableEnvironmentHighlighting}
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
