@@ -47,6 +47,7 @@
   export let onUpdateCollectionAuth;
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
+  export let onSyncCollection;
 
   /**
    * Icons and images
@@ -74,6 +75,7 @@
   import {
     AddRegular,
     ArrowSwapRegular,
+    ArrowSyncRegular,
     CaretDownFilled,
     CaretUpFilled,
     FolderAddRegular,
@@ -439,6 +441,22 @@
             />
           </div>
         {/if} -->
+        {#if collection?.activeSync}
+          <div class="me-2">
+            <Button
+              id={`sync-collection`}
+              disable={!isCollectionEditable}
+              title={"Sync Collection"}
+              type={"secondary"}
+              onClick={async () => {
+                await onSyncCollection(collection.id);
+                console.log("collection", collection);
+              }}
+              size="medium"
+              startIcon={ArrowSyncRegular}
+            />
+          </div>
+        {/if}
 
         <div
           class="d-flex me-2 flex-column justify-content-center"
@@ -454,7 +472,7 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable}
+              disable={!isCollectionEditable || collection?.activeSync}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -526,9 +544,8 @@
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div
-        class={`${
-          !isSynced && collection?.activeSync ? "d-none" : "d-block"
-        } align-items-center`}
+        class={`d-block
+        align-items-center`}
       >
         <div class="d-flex gap-4 ps-2">
           <div class="d-flex align-items-center gap-2">

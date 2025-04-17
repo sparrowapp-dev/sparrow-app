@@ -194,15 +194,17 @@
   let bodyTopDistance: number;
   const toggleSelect = () => {
     const bodyHeight =
+      15 +
       data.filter((element) => {
         return !element.hide;
-      }).length * 36;
+      }).length *
+        34;
     bodyLeftDistance = selectHeaderWrapper.getBoundingClientRect().left;
     bodyTopDistance =
       bodyHeight + selectHeaderWrapper.getBoundingClientRect().bottom >
       window.innerHeight
-        ? selectHeaderWrapper.getBoundingClientRect().top - 15 - bodyHeight
-        : 15 + selectHeaderWrapper.getBoundingClientRect().bottom;
+        ? selectHeaderWrapper.getBoundingClientRect().top - 5 - bodyHeight
+        : 5 + selectHeaderWrapper.getBoundingClientRect().bottom;
     bodyRightDistance =
       window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
     isOpen = !isOpen;
@@ -571,8 +573,7 @@
     background-color: transparent;
   }
   .select-background-secondary {
-    // background-color: var(--bg-ds-surface-600);
-    background-color: transparent;
+    background-color: var(--bg-ds-surface-600);
   }
 
   // hover or open-body states
