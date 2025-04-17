@@ -4173,17 +4173,21 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.REQUEST,
+              request: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -4232,22 +4236,26 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.REQUEST,
+                request: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.collectionRepository.addRequestInFolder(
             path[0].id,

@@ -115,6 +115,7 @@
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
+  let isCollectionSyncing = false;
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -426,12 +427,14 @@
           <div class="me-2">
             <Button
               id={`sync-collection`}
-              disable={!isCollectionEditable}
+              disable={!isCollectionEditable || isCollectionSyncing}
+              loader={isCollectionSyncing}
               title={"Sync Collection"}
               type={"secondary"}
               onClick={async () => {
+                isCollectionSyncing = true;
                 await onSyncCollection(collection.id);
-                console.log("collection", collection);
+                isCollectionSyncing = false;
               }}
               size="medium"
               startIcon={ArrowSyncRegular}
