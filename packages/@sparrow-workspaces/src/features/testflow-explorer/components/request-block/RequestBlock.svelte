@@ -481,21 +481,22 @@
   {#if !isDropHereVisible && isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
+        style="border-radius: 50%;"
         on:click={() => {
           data.onClick(id);
           isAddBlockVisible = false;
-          isCreateBlockArrowHovered = false;
-        }}
-        on:mouseenter={() => {
-          isCreateBlockArrowHovered = true;
-        }}
-        on:mouseleave={() => {
           isCreateBlockArrowHovered = false;
         }}
       >
         <span class="d-flex align-items-center">
           <span
             class="btnc position p-1 d-flex align-items-center justify-content-center"
+            on:mouseenter={() => {
+              isCreateBlockArrowHovered = true;
+            }}
+            on:mouseleave={() => {
+              isCreateBlockArrowHovered = false;
+            }}
           >
             <ArrowRightIcon
               height={"10px"}
