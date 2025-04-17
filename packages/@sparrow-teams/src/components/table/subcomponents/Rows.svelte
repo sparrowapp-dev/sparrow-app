@@ -187,7 +187,15 @@
       bind:this={workspaceTabWrapper}
       class="threedot-icon-container"
       style="display: flex; justify-content: center; align-items: center;"
-    ></div>
+    >
+      <Button
+        type="teritiary-regular"
+        onClick={(e) => {
+          rightClickContextMenu(e);
+        }}
+        startIcon={ChevronVerticalFilled}
+      />
+    </div>
   </td>
 </tr>
 
