@@ -77,6 +77,15 @@
         }
         return true;
       });
+    if (currentEmailEntered) {
+      data = [
+        ...data,
+        {
+          email: currentEmailEntered,
+          name: currentEmailEntered,
+        },
+      ];
+    }
   };
 
   /**
