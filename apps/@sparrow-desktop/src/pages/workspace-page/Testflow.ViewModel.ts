@@ -9,7 +9,6 @@ import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import {
-  TabPersistenceTypeEnum,
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 
@@ -20,6 +19,7 @@ import {
   isTestFlowTourGuideOpen,
 } from "@sparrow/workspaces/stores";
 import constants from "@app/constants/constants";
+import { TestflowTabAdapter } from "@app/adapter";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -93,9 +93,9 @@ export class TestflowViewModel {
             collectionId: "",
             requestId: "",
             folderId: "",
-            workspaceId: currentWorkspace._id,
+            name:"",
+            method:"",
             requestData: null,
-            isDeleted: false,
           },
           position: { x: 100, y: 200 },
         },
@@ -171,7 +171,6 @@ export class TestflowViewModel {
       let isFirstTimeUsingTestFlow = false;
       isFirstTimeInTestFlow.subscribe((value) => {
         isFirstTimeUsingTestFlow = value;
-        console.log("isFirstTimeUsingTestFlow", isFirstTimeUsingTestFlow);
       });
       if (isFirstTimeUsingTestFlow) {
         currentStep.set(3);
@@ -305,54 +304,8 @@ export class TestflowViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       _testflow.workspaceId,
     );
-
-    const initTestflowTab = this.initTab.testflow(
-      _testflow._id,
-      currentWorkspace._id,
-    );
-
-    const nds = _testflow._data.nodes.map((_nd)=>{
-
-      return {
-        ..._nd,
-        data:{
-          ..._nd?.data,
-          requestData: {
-            ..._nd?.data?.requestData,
-            state: {
-              requestBodyLanguage: "Text",
-              requestBodyNavigation: "None",
-              requestAuthNavigation: "No Auth",
-              requestNavigation: "Parameters",
-              responseNavigation: "Response",
-              responseBodyLanguage: "Text",
-              responseBodyFormatter: "Pretty",
-              requestExtensionNavigation: "",
-              requestLeftSplitterWidthPercentage: 50,
-              requestRightSplitterWidthPercentage: 50,
-              isExposeEditDescription: true,
-              isSendRequestInProgress: false,
-              isSaveDescriptionInProgress: false,
-              isSaveRequestInProgress: false,
-              isParameterBulkEditActive: false,
-              isHeaderBulkEditActive: false,
-              isChatbotActive: false,
-              isChatbotSuggestionsActive: true,
-              isChatbotGeneratingResponse: false,
-              isDocGenerating: false,
-              isDocAlreadyGenerated: false,
-            }
-
-          }
-        }
-      };
-    });
-  
-    initTestflowTab.updateName(_testflow.name);
-    initTestflowTab.setNodes(nds);
-    initTestflowTab.setEdges(_testflow.edges);
-    initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
-    this.tabRepository.createTab(initTestflowTab.getValue());
+    const testflowTab = new TestflowTabAdapter().adapt(currentWorkspace._id, _testflow.toMutableJSON());
+    this.tabRepository.createTab(testflowTab);
   };
 
   private constructBaseUrl = async (_id: string) => {
@@ -425,6 +378,8 @@ export class TestflowViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentTestflow?.path?.workspaceId as string,
     );
+
+    const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -433,9 +388,8 @@ export class TestflowViewModel {
       await this.testflowRepository.updateTestflow(
         currentTestflow?.id as string,
         {
-          name: currentTestflow.name,
-          nodes: currentTestflow?.property?.testflow?.nodes,
-          edges: currentTestflow?.property?.testflow?.edges,
+          ...unadaptedTestflow,
+          updatedAt: new Date().toISOString(),
         },
       );
       notifications.success(
@@ -449,11 +403,7 @@ export class TestflowViewModel {
     const response = await this.testflowService.updateTestflow(
       activeWorkspace._id,
       currentTestflow?.id as string,
-      {
-        name: currentTestflow.name,
-        nodes: currentTestflow?.property?.testflow?.nodes,
-        edges: currentTestflow?.property?.testflow?.edges,
-      },
+      unadaptedTestflow,
       baseUrl,
     );
     if (response.isSuccessful) {

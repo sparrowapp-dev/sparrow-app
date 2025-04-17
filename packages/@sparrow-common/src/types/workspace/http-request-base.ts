@@ -68,6 +68,7 @@ export enum HttpRequestContentTypeBaseEnum {
   "application/javascript" = "application/javascript",
   "text/plain" = "text/plain",
   "text/html" = "text/html",
+  "none" = "none"
 }
 
 export interface HttpRequestBaseInterface {

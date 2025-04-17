@@ -6,7 +6,7 @@ import {
   InitRequestTab,
   moveNavigation,
 } from "@sparrow/common/utils";
-import { RequestTabAdapter } from "../../../../adapter";
+import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
 import type {
   EnvironmentDocument,
   TabDocument,
@@ -130,11 +130,9 @@ export class TestflowExplorerPageViewModel {
         data: {
           blockName: elem.data.blockName,
           requestId: elem.data.requestId,
-          workspaceId: elem.data.workspaceId,
           folderId: elem.data.folderId,
           collectionId: elem.data.collectionId,
           requestData: elem.data.requestData,
-          isDeleted: elem.data.isDeleted,
         },
         position: { x: elem.position.x, y: elem.position.y },
       };
@@ -958,14 +956,13 @@ export class TestflowExplorerPageViewModel {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
+    const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       await this.testflowRepository.updateTestflow(
         currentTestflow?.id as string,
         {
-          name: currentTestflow.name,
-          nodes: currentTestflow?.property?.testflow?.nodes,
-          edges: currentTestflow?.property?.testflow?.edges,
+          ...unadaptedTestflow,
           updatedAt: new Date().toISOString(),
         },
       );
@@ -1003,11 +1000,7 @@ export class TestflowExplorerPageViewModel {
     const response = await this.testflowService.updateTestflow(
       activeWorkspace._id,
       currentTestflow?.id as string,
-      {
-        name: currentTestflow.name,
-        nodes: currentTestflow?.property?.testflow?.nodes,
-        edges: currentTestflow?.property?.testflow?.edges,
-      },
+      unadaptedTestflow,
       baseUrl,
     );
     if (response.isSuccessful) {

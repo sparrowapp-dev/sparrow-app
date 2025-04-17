@@ -303,7 +303,6 @@
       for (let index = 0; index < dbNodes.length; index++) {
         if (dbNodes[index].id === id) {
           dbNodes[index].data.requestId = requestId;
-          dbNodes[index].data.workspaceId = $tab?.path?.workspaceId ?? "";
           dbNodes[index].data.collectionId = collectionId;
           dbNodes[index].data.folderId = folderId ?? "";
           dbNodes[index].data.requestData = response;
@@ -675,8 +674,6 @@
             requestId: _requestData?.requestId,
             collections: filteredCollections,
             tabId: $tab.tabId,
-            workspaceId: _requestData?.workspaceId,
-            isDeleted: _requestData?.isDeleted,
             requestData: requestData || createBlankObject("", "", ""),
           },
           position: nextNodePosition,
@@ -758,8 +755,6 @@
             requestId: dbNodes[i].data?.requestId,
             folderId: dbNodes[i].data?.folderId,
             requestData: dbNodes[i].data?.requestData,
-            workspaceId: dbNodes[i].data?.workspaceId,
-            isDeleted: dbNodes[i].data?.isDeleted,
             collections: filteredCollections,
             tabId: $tab.tabId,
           },
