@@ -543,7 +543,8 @@
             style="max-width: 492px; color:var(--bg-ds-neutral-300);"
           >
             <div class="text-center">
-             {openTeam?.description} has invited you to be a member on the {openTeam?.name}.
+             {openTeam?._data?.description?.trim().split(" ")[0]
+} has invited you to be a member on the {openTeam?.name}.
               <br />
               Once you accept you will gain access to the workspaces within this
               hub.
