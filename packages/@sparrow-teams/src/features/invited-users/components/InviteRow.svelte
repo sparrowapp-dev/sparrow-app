@@ -77,11 +77,6 @@
     showMenu = false;
   }
 
-  function handleRowClick(e: MouseEvent) {
-    if (e.currentTarget === e.target) {
-      console.log(`Row ${index} clicked`);
-    }
-  }
   function handleCloseAllMenus(e: CustomEvent) {
     if (e.detail.exceptRowId !== rowId) {
       showMenu = false;
@@ -103,7 +98,6 @@
   id={rowId}
   tabindex="0"
   class="position-relative invite-row-item cursor-pointer ellipsis"
-  on:click={handleRowClick}
   style="width:100%"
 >
   <td

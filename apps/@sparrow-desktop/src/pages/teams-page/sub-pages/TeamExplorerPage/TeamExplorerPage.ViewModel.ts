@@ -909,7 +909,6 @@ export class TeamExplorerPageViewModel {
       await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
       await this.teamRepository.removeTeam(teamId);
       notifications.success(`Invite ignored successfully!`);
-      debugger;
       return response;
     }
     else {
