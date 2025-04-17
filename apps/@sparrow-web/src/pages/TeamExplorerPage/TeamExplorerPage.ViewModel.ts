@@ -912,12 +912,16 @@ export class TeamExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.acceptInvite(teamId, baseUrl);
     if (response.isSuccessful) {
-       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite accepted successfully!`);
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+       notifications.success(
+         `You are now a member ${response?.data?.data.name} Hub.`,
+       );
       return response;
     }
     else {
-      notifications.error("Failed to accept invite. Please try again.");
+     notifications.error(
+       `Failed to join the ${response?.data?.data.name} Hub. Please try again.`,
+     );
     }
   }
 
