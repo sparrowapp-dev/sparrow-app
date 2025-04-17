@@ -404,7 +404,9 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
       );
     } else {
-      notifications.error("Failed to send invite. Please try again.");
+      notifications.error(
+        response?.message || "Failed to send invite. Please try again.",
+      );
     }
     return response;
   };

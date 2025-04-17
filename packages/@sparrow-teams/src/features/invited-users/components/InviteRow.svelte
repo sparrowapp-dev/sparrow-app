@@ -63,11 +63,10 @@
     isNearBottom = viewportHeight - buttonRect.bottom < 150 ? true : false;
 
     pos = {
-      x: buttonRect.right - 142 ,
+      x: buttonRect.left - 142 + (buttonRect.width / 2),
       y:
         buttonRect.top +
-        buttonRect.height +
-        (isNearBottom ? buttonRect.height : -buttonRect.height),
+        2*buttonRect.height + -buttonRect.height,
     };
 
     showMenu = true;
