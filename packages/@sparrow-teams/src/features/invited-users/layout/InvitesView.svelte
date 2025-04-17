@@ -18,7 +18,6 @@
 
   const tableHeaderContent = ["Users", "", "", "", "Roles", "Actions"];
 
-  $: console.log("Invites: ", invites);
 </script>
 
 <div class="h-100 d-flex flex-column">

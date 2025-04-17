@@ -182,7 +182,7 @@ export class TeamService {
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${apiUrl}/api/team/${teamId}/invite/not-accepted`,
+      `${baseUrl}/api/team/${teamId}/invite/not-accepted`,
       {
         headers: getAuthHeaders(),
       },

@@ -152,8 +152,6 @@
       }
     });
   };
-
-  $: console.log(openTeam, "SEARCHINVITE");
   /**
    *
    */
