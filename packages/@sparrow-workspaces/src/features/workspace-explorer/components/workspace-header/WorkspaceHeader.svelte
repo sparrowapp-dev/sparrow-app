@@ -52,11 +52,7 @@
   const handleKeyDown = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
       event.preventDefault();
-      if (
-        userRole !== WorkspaceRole.WORKSPACE_VIEWER &&
-        !isSaved &&
-        onSaveWorkspace
-      ) {
+      if (userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSaved) {
         onSaveWorkspace();
       }
     }
