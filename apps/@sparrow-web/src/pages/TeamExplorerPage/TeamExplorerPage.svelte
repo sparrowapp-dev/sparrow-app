@@ -223,6 +223,10 @@
     {openInDesktop}
     {isWebEnvironment}
     isWebApp={true}
+    onWithDrawInvite={_viewModel.withdrawInvite}
+    onResendInvite={_viewModel.resendInvite}
+    onAcceptInvite={_viewModel.acceptInvite}
+    onIgnoreInvite={_viewModel.ignoreInvite}
   />
 {/if}
 

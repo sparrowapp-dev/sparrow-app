@@ -370,7 +370,9 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
       );
     } else {
-      notifications.error("Failed to send invite. Please try again.");
+     notifications.error(
+             response?.message || "Failed to send invite. Please try again.",
+           );
     }
     return response;
   };
@@ -909,7 +911,6 @@ export class TeamExplorerPageViewModel {
       await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
       await this.teamRepository.removeTeam(teamId);
       notifications.success(`Invite ignored successfully!`);
-      debugger;
       return response;
     }
     else {
