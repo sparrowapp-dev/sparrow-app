@@ -157,16 +157,10 @@
   const handleCodePreview = async (event: MouseEvent) => {
     const wrapper = (event.target as HTMLElement).closest(".wrapper");
     if (!wrapper) return;
-
     const originalCodeBlock = wrapper.querySelector("pre > code.hljs");
     const originalPreElement = originalCodeBlock?.parentElement;
-
     if (!originalCodeBlock || !originalPreElement) return;
-
     const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
-    const clonedCodeBlock = preClone.querySelector("code.hljs") as HTMLElement;
-
-    clonedCodeBlock.style.maxWidth = "100%";
     onClickCodeBlockPreview(preClone);
   };
 
