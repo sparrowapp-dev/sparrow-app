@@ -250,7 +250,9 @@
     searchInviteQuery = event.detail.toLowerCase();
   };
 
-  $: console.log(openTeam, "openTeam");
+  $: activeTeamTab === TeamTabsEnum.INVITES && !openTeam?._data?.invites?.length  ?
+    onUpdateActiveTab(TeamTabsEnum.WORKSPACES): null;
+  
 
   /**
    *
