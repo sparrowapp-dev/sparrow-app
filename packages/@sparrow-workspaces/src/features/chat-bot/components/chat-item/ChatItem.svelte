@@ -155,18 +155,19 @@
    * @param event - The mouse event triggered by clicking on the wrapper.
    */
   const handleCodePreview = async (event: MouseEvent) => {
-    const wrapper = (event.target as HTMLElement).closest(
-      ".wrapper",
-    ) as HTMLElement | null;
-
+    const wrapper = (event.target as HTMLElement).closest(".wrapper");
     if (!wrapper) return;
 
-    const preElement = wrapper.querySelector("pre > code")
-      ?.parentElement as HTMLPreElement | null;
+    const originalCodeBlock = wrapper.querySelector("pre > code.hljs");
+    const originalPreElement = originalCodeBlock?.parentElement;
 
-    if (preElement) {
-      onClickCodeBlockPreview(preElement);
-    }
+    if (!originalCodeBlock || !originalPreElement) return;
+
+    const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
+    const clonedCodeBlock = preClone.querySelector("code.hljs") as HTMLElement;
+
+    clonedCodeBlock.style.maxWidth = "100%";
+    onClickCodeBlockPreview(preClone);
   };
 
   /**
