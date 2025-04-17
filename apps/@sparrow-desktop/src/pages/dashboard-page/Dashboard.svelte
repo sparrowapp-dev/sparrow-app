@@ -618,6 +618,7 @@
       {sidebarItems}
       isVisible={isLoginBannerActive}
       onLogout={_viewModel.handleLogout}
+      {isGuestUser}
     />
     <!-- 
       -- Dashboard renders any of the pages between collection, environment and help.

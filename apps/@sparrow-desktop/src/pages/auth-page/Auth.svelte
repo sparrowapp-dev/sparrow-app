@@ -201,8 +201,8 @@
           on:blur={async () => {}}
         />
         {#if isTokenErrorMessage}
-          <small class="text-danger-200 text-fs-12"
-            >Invalid or expired code.</small
+          <div class="text-danger-200 text-fs-12 text-ds-line-height-100"
+            >The entered code is invalid or expired. Please enter a valid code.</div
           >
         {/if}
       </div>
@@ -265,7 +265,7 @@
               <CopyIcon2 height={"14px"} width={"16px"} color={"#CCCCCCE5"} />
               <span
                 style="text-decoration: underline; text-underline-offset: 4px;"
-                >copy</span
+                >Copy</span
               >
             </span>
             the link if you are facing any issue in redirecting to the login page.
