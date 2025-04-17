@@ -213,7 +213,7 @@
         </div>
       </header>
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div>
+      <div class="env-heading-popup">
         {#if isPopoverContainer && $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
           <Popover
             heading={`Welcome to Environments!`}
@@ -316,6 +316,9 @@
   .env-heading:focus {
     outline: none;
     border: 1px solid #85c2ff !important;
+  }
+  .env-heading-popup {
+    margin-top: 8px;
   }
 
   .env-help-btn {
