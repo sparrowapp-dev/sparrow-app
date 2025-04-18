@@ -246,7 +246,7 @@ export class TestflowExplorerPageViewModel {
    */
   private compareTestflowWithServer = new Debounce().debounce(
     this.compareTestflowWithServerDebounced,
-    1000,
+    0,
   );
 
   /**
