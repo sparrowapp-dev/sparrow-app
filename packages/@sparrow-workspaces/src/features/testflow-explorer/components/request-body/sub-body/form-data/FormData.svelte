@@ -6,10 +6,8 @@
   export let environmentVariables;
   export let onUpdateEnvironment;
 
-  const handleFormDataChange = (pairs) => {
-    onUpdateRequestBody({
-      formdata: pairs,
-    });
+  const handleFormDataChange = (pairs: any) => {
+    onUpdateRequestBody(pairs);
   };
 </script>
 
@@ -19,8 +17,8 @@
     callback={handleFormDataChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    isCheckBoxEditable={false}
-    isInputBoxEditable={false}
+    isCheckBoxEditable={true}
+    isInputBoxEditable={true}
     isTopHeaderRequired={true}
   />
 </section>

@@ -24,33 +24,32 @@ export class TestflowService {
     return response;
   };
 
-  public addTestflow = async (
-    _testflow: {
-      name: string;
-      workspaceId: string;
-      edges: {
-        id: string;
-        source: string;
-        target: string;
-      }[];
-      nodes: {
-        id: string;
-        type: string;
-        position: {
-          x: number;
-          y: number;
-        };
-        data: {
-          requestId: string;
-          collectionId: string;
-          folderId: string;
-          method: string;
-          name: String;
-        };
-      }[];
-    },
-    baseUrl: string,
-  ) => {
+  public addTestflow = async (_testflow: {
+    name: string;
+    workspaceId: string;
+    edges: {
+      id: string;
+      source: string;
+      target: string;
+    }[];
+    nodes: {
+      id: string;
+      type: string;
+      position: {
+        x: number;
+        y: number;
+      };
+      data: {
+        blockName: string;
+        requestId: string;
+        collectionId: string;
+        folderId: string;
+        workspaceId: string;
+        isDeleted: boolean;
+        requestData: object;
+      };
+    }[];
+  },baseUrl:string) => {
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/workspace/testflow`,

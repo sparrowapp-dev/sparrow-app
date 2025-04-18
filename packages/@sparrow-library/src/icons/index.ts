@@ -224,10 +224,12 @@ export { default as CaretDownRegular } from "./CaretDownRegular.svelte";
 export { default as WarningFilled } from "./WarningFilled.svelte";
 export { default as DismissCircleRegular } from "./DismissCircleRegular.svelte";
 export { default as OpenRegular } from "./OpenRegular.svelte";
-export { default as RenameRegular } from "./RenameRegular.svelte";
-export { default as PlayFilled } from "./PlayFilled.svelte";
 export { default as BoardRegular } from "./BoardRegular.svelte";
-export { default as BorderFilled } from "./BorderFilled.svelte";
-export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte";
+export { default as ArrowExportRegular} from "./ArrowExportRegular.svelte";
+export { default as ArrowImportRegular } from "./ArrowImportRegular.svelte";
+export { default as PlayFilled } from "./PlayFilled.svelte";
+export { default as RenameRegular } from "./RenameRegular.svelte";
+export { default as BorderFilled} from "./BorderFilled.svelte";
+export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte"
 export { default as SettingsRegular } from "./SettingsRegular.svelte";
 export { default as MoreVerticalRegular } from "./MoreVerticalRegular.svelte";
