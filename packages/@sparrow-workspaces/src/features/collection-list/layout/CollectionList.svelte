@@ -94,7 +94,6 @@
   export let handleTabUpdate;
   export let onCompareCollection;
   export let onSyncCollection;
-  export let isSyncChangesAvailable = false;
 
   let isExpandCollectionLine = false;
   // export let handleExpandCollectionLine;
@@ -339,7 +338,6 @@
               >
                 {#each collectionFilter as col}
                   <Collection
-                    bind:isSyncChangesAvailable
                     bind:userRole
                     {onItemCreated}
                     {onItemDeleted}
@@ -385,7 +383,6 @@
               {#each collectionListDocument as col}
                 <Collection
                   bind:userRole
-                  bind:isSyncChangesAvailable
                   {onItemCreated}
                   {onItemDeleted}
                   {onItemRenamed}

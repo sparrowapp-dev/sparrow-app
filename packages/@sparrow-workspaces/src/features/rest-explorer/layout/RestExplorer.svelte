@@ -316,31 +316,29 @@
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
             <!--Disabling the Quick Help feature, will be taken up in next release-->
-            <div>
-              {#if isPopoverContainer}
-                <Popover
-                  onClose={closeCollectionHelpText}
-                  heading={`Welcome to Sparrow`}
-                >
-                  <p class="mb-0 text-fs-12">
-                    Your one-stop solution for API testing and management. Start
-                    organizing your API requests into collections, utilize
-                    environment variables, and streamline your development
-                    process. Get started now by creating your first collection
-                    or exploring our features
-                    <span
-                      on:click={() => {
-                        isGuidePopup = true;
-                      }}
-                      class="link p-0 border-0"
-                      style="font-size: 12px;"
-                      >See how it works.
-                    </span>
-                  </p>
-                </Popover>
-              {/if}
-            </div>
-            <div class="pt-2"></div>
+            {#if isPopoverContainer}
+              <Popover
+                onClose={closeCollectionHelpText}
+                heading={`Welcome to Sparrow`}
+              >
+                <p class="mb-0 text-fs-12">
+                  Your one-stop solution for API testing and management. Start
+                  organizing your API requests into collections, utilize
+                  environment variables, and streamline your development
+                  process. Get started now by creating your first collection or
+                  exploring our features
+                  <span
+                    on:click={() => {
+                      isGuidePopup = true;
+                    }}
+                    class="link p-0 border-0"
+                    style="font-size: 12px;"
+                    >See how it works.
+                  </span>
+                </p>
+              </Popover>
+              <div class="pt-2"></div>
+            {/if}
 
             {#if !isLoading}
               <Splitpanes

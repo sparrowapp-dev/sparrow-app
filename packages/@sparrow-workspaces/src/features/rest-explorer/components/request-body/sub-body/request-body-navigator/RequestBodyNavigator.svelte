@@ -10,6 +10,7 @@
   export let onUpdateRequestState;
   export let updateBeautifiedState: (value: boolean) => void;
   export let requestState;
+
   let handleDropdown = (tab: string) => {
     // collectionsMethods.updateRequestState(tab, "dataset");
     onUpdateRequestState({ requestBodyNavigation: tab });

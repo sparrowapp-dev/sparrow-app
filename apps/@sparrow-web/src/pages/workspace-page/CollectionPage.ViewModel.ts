@@ -4185,17 +4185,21 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.REQUEST,
+              request: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -4244,22 +4248,26 @@ export default class CollectionsViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.REQUEST,
+                request: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.collectionRepository.addRequestInFolder(
             path[0].id,
@@ -6222,8 +6230,11 @@ export default class CollectionsViewModel {
 
       function recurse(items) {
         for (const item of items) {
-          if (item.type === "REQUEST" && item.operationId) {
-            requests[item.operationId] = item.request || {};
+          if (item.type === ItemType.REQUEST) {
+            const key = item.operationId || item.name;
+            if (key) {
+              requests[key] = item.request || {};
+            }
           }
           if (item.items) {
             recurse(item.items);
@@ -6345,6 +6356,10 @@ export default class CollectionsViewModel {
     const folderNameSet = new Set<string>();
     const deletedOpSet = new Set(deleted);
 
+    function getRequestKey(item: any): string | null {
+      return item.operationId || item.name || null;
+    }
+
     // Step 1: Build maps from newJson (requests & folder names)
     function buildNewMaps(items: any[], currentFolderName = "") {
       for (const item of items) {
@@ -6352,13 +6367,15 @@ export default class CollectionsViewModel {
           folderByNameMap[item.name] = item; // map folder for potential full insert
           folderNameSet.add(item.name);
           buildNewMaps(item.items, item.name); // recurse into folder
-        } else if (item.type === "REQUEST" && item.operationId) {
-          if (modifiedSet.has(item.operationId)) {
-            newRequestMap[item.operationId] = item;
+        } else if (item.type === "REQUEST") {
+          const key = getRequestKey(item);
+          if (!key) continue;
+          if (modifiedSet.has(key)) {
+            newRequestMap[key] = item;
           }
-          if (addedSet.has(item.operationId)) {
-            addedRequestMap[item.operationId] = item;
-            addedRequestFolderMap[item.operationId] = currentFolderName;
+          if (addedSet.has(key)) {
+            addedRequestMap[key] = item;
+            addedRequestFolderMap[key] = currentFolderName;
           }
         }
       }
@@ -6368,12 +6385,13 @@ export default class CollectionsViewModel {
     // Step 2: Modify & Remove in-place
     function updateAndClean(items: any[]): any[] {
       return items.filter((item) => {
-        if (item.type === "REQUEST" && deletedOpSet.has(item.operationId)) {
+        const key = getRequestKey(item);
+        if (item.type === "REQUEST" && key && deletedOpSet.has(key)) {
           return false; // Remove
         }
 
-        if (item.type === "REQUEST" && modifiedSet.has(item.operationId)) {
-          const newItem = newRequestMap[item.operationId];
+        if (item.type === "REQUEST" && key && modifiedSet.has(key)) {
+          const newItem = newRequestMap[key];
           if (newItem) {
             item.request = newItem.request;
             item.name = newItem.name;

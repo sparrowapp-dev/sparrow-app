@@ -137,7 +137,6 @@
   export let userCount = 0;
   export let onCompareCollection;
   export let onSyncCollection;
-  export let isSyncChangesAvailable = false;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -701,7 +700,6 @@
           bind:scrollList
           bind:userRole
           bind:isFirstCollectionExpand
-          bind:isSyncChangesAvailable
           {onRefetchCollection}
           {showImportCurlPopup}
           {collectionList}

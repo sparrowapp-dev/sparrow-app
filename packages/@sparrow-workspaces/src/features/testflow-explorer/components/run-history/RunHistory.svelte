@@ -33,7 +33,7 @@
   };
 
   const truncateName = (name: string, charLimit: number = 12): string => {
-    if (name.length > charLimit) {
+    if (name?.length > charLimit) {
       return name.slice(0, charLimit) + "...";
     }
     return name;
@@ -52,6 +52,7 @@
         type="secondary"
         size="medium"
         startIcon={HistoryRegular}
+        disable={testflowStore?.isTestFlowRunning}
         onClick={() => {
           toggleHistoryContainer(!testflowStore?.isRunHistoryEnable);
           MixpanelEvent(Events.Run_History);
@@ -372,6 +373,10 @@
     line-height: 18px;
     text-align: right;
     color: var(--text-ds-neutral-200);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
   }
   .text-success.text-fail {
     font-family: "Inter", sans-serif;

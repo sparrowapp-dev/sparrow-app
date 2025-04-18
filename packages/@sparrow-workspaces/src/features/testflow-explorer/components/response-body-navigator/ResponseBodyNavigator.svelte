@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { downloadIcon } from "@sparrow/library/assets";
-  import { copyIcon } from "@sparrow/library/assets";
+  import { CopyRegular, ArrowDownloadRegular } from "@sparrow/library/icons";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications, Tooltip } from "@sparrow/library/ui";
   import {
@@ -15,11 +14,12 @@
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
-  import { CopyIcon, DownloadIcon2 } from "@sparrow/library/icons";
+  import { responseBodyDataFormatTypes } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import { onMount } from "svelte";
 
   export let response;
-  export let apiState;
-  export let onUpdateRequestState;
+  export let apiState: any;
+  export let onUpdateResponseState;
   export let onClearResponse;
   export let isWebApp;
 
@@ -46,8 +46,8 @@
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
 
-  const handleTypeDropdown: (tab: string) => void = (tab) => {
-    onUpdateRequestState({ responseBodyLanguage: tab });
+  const handleTypeDropdown = (tab: string) => {
+    onUpdateResponseState({ responseBodyLanguage: tab });
   };
 
   $: {
@@ -117,7 +117,7 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
+            onUpdateResponseState({
               responseBodyFormatter: ResponseFormatter.PRETTY,
             });
           }}
@@ -136,7 +136,7 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
+            onUpdateResponseState({
               responseBodyFormatter: ResponseFormatter.RAW,
             });
           }}
@@ -148,7 +148,7 @@
         <span
           role="button"
           on:click={() => {
-            onUpdateRequestState({
+            onUpdateResponseState({
               responseBodyFormatter: ResponseFormatterEnum.PREVIEW,
             });
           }}
@@ -163,28 +163,7 @@
         <span class="">
           <WithSelectV3
             id={"hash565"}
-            data={[
-              {
-                name: "JSON",
-                id: RequestDataType.JSON,
-              },
-              {
-                name: "XML",
-                id: RequestDataType.XML,
-              },
-              {
-                name: "HTML",
-                id: RequestDataType.HTML,
-              },
-              {
-                name: "Javascript",
-                id: RequestDataType.JAVASCRIPT,
-              },
-              {
-                name: "Text",
-                id: RequestDataType.TEXT,
-              },
-            ]}
+            data={responseBodyDataFormatTypes}
             titleId={apiState.responseBodyLanguage}
             onclick={handleTypeDropdown}
             zIndex={499}
@@ -213,7 +192,7 @@
         <!-- Copy button -->
         <Tooltip title={"Copy"}>
           <WithButtonV6
-            icon={CopyIcon}
+            icon={CopyRegular}
             onClick={handleCopy}
             disable={false}
             loader={false}
@@ -223,7 +202,7 @@
         {#if !isWebApp}
           <Tooltip title={"Export"}>
             <WithButtonV6
-              icon={DownloadIcon2}
+              icon={ArrowDownloadRegular}
               onClick={handleDownloaded}
               disable={false}
               loader={false}
