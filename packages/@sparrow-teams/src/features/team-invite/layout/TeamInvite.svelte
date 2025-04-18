@@ -352,7 +352,7 @@
   {/if}
 {/if}
 <div class="mt-3">
-  <div class="d-flex align-items-center ellipsis gap-2 text-ds-font-size-12">
+  <div class="d-flex align-items-center ellipsis gap-1 text-ds-font-size-12">
     <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
         <Avatar type={"image"} size={"large"} image={base64ToURL(teamLogo)} />
@@ -361,7 +361,6 @@
           <Avatar
             type={"person"}
             size={"small"}
-            letter={teamName.charAt(0)}
             bgColor={"var(--bg-tertiary-800)"}
           />
         </span>
