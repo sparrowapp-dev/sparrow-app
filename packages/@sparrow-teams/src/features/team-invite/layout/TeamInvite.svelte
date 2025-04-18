@@ -315,7 +315,7 @@
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
-  <p class="invite-subheader text-textColor mt-1 mb-1">
+  <p class="invite-subheader text-textColor mt-1 mb-1 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">
     Admins will have access to all current and future hub workspaces.
   </p>
 {/if}
@@ -359,8 +359,8 @@
       {:else}
         <span class="">
           <Avatar
-            type={"letter"}
-            size={"large"}
+            type={"person"}
+            size={"small"}
             letter={teamName.charAt(0)}
             bgColor={"var(--bg-tertiary-800)"}
           />
