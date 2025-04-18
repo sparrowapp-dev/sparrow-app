@@ -177,7 +177,7 @@
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
-  <div class="p-3 d-flex flex-column w-100 z-3">
+  <div class="p-3 d-flex flex-column w-100 z-1">
     <div class="d-flex gap-2 mb-4">
       <div class="d-flex flex-column flex-grow-1">
         <Input
@@ -213,7 +213,8 @@
         >
           <Button
             id={`add-item-collection`}
-            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+            disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              collection?.activeSync}
             title={"New"}
             type={"primary"}
             onClick={() => {

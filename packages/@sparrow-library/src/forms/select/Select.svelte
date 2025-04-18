@@ -211,9 +211,11 @@
 
   const toggleSelect = () => {
     const bodyHeight =
+      15 +
       data.filter((element) => {
         return !element.hide;
-      }).length * 36;
+      }).length *
+        34;
     bodyLeftDistance = selectHeaderWrapper.getBoundingClientRect().left;
     bodyTopDistance =
       bodyHeight + selectHeaderWrapper.getBoundingClientRect().bottom >
@@ -417,7 +419,7 @@
               {selectedRequest?.description ?? ""}
             </span>
             <span
-              class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
                 selectedRequest?.color,
               )}"
             >
@@ -426,7 +428,7 @@
           </div>
         {:else}
           <span
-            class="ellipsis me-3 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
               selectedRequest?.color,
             )}"
             style=" {disabled || selectedRequest?.hide
@@ -772,7 +774,7 @@
   }
   .disabled-option {
     pointer-events: none; /* Disable pointer events */
-    opacity: 0.6; /* Reduce opacity to visually indicate disabled state */
+    opacity: 0.2; /* Reduce opacity to visually indicate disabled state */
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }

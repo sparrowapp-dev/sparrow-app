@@ -1,5 +1,4 @@
-<script>
-  import { onMount } from "svelte";
+<script lang="ts">
   import { Select } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { Input } from "@sparrow/library/forms";
@@ -7,25 +6,14 @@
 
   export let handleModalState;
   export let handleCreateCustomRequest;
-  export let handleUpdateRequestName;
-  export let handleUpdateRequestURL;
-  export let handleUpdateRequestMethod;
+
   export let requestName = "";
   export let requestURL = "";
   export let httpRequestMethod = "GET";
-  export let isCreatingCustomRequest = false;
 
-  const handleDropdown = (tabId) => {
+  const handleDropdown = (tabId: any) => {
     httpRequestMethod = tabId;
-    handleUpdateRequestMethod(tabId);
   };
-
-  // Reset the fields on model open
-  onMount(() => {
-    requestName = "";
-    requestURL = "";
-    handleDropdown("GET");
-  });
 </script>
 
 <!-- Section for the modal content -->
@@ -41,7 +29,6 @@
       variant="primary"
       bind:value={requestName}
       width="100%"
-      on:input={handleUpdateRequestName}
     />
   </div>
 
@@ -75,7 +62,6 @@
         variant="primary"
         bind:value={requestURL}
         width="100%"
-        on:input={handleUpdateRequestURL}
       />
     </div>
   </div>
@@ -85,7 +71,7 @@
     <span style="margin-right: 15px;">
       <!-- Cancel button to close the modal without leaving the team -->
       <Button
-        disable={isCreatingCustomRequest}
+        disable={false}
         title={"Cancel"}
         textClassProp={"fs-6"}
         type={"secondary"}
@@ -95,14 +81,14 @@
       />
     </span>
     <Button
-      disable={isCreatingCustomRequest || !requestName}
+      disable={!requestName}
       title={"Create"}
       textClassProp={"fs-6"}
       type={"primary"}
       onClick={() => {
-        handleCreateCustomRequest();
+        handleCreateCustomRequest(requestName, httpRequestMethod, requestURL);
       }}
-      loader={isCreatingCustomRequest}
+      loader={false}
     />
   </div>
 </section>

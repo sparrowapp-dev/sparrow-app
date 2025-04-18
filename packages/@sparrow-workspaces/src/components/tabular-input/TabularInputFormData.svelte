@@ -35,6 +35,7 @@
   export let isWebApp = false;
   let pairs = keyValue;
   let controller: boolean = false;
+  let pairsContainer: HTMLElement;
 
   const theme = new TabularInputTheme().build();
 
@@ -67,7 +68,21 @@
     }
   };
 
-  const updateParam = (index: number): void => {
+  /**
+   * Scrolls the container to bring the newly added row into view
+   */
+  const scrollToNewRow = async () => {
+    setTimeout(() => {
+      if (pairsContainer) {
+        const lastRow = pairsContainer.lastElementChild;
+        if (lastRow) {
+          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+      }
+    }, 0);
+  };
+
+  const updateParam = async (index: number): Promise<void> => {
     pairs = pairs;
     if (
       pairs.length - 1 === index &&
@@ -83,9 +98,14 @@
         base: "",
       });
       pairs = pairs;
+      callback(pairs);
+
+      await scrollToNewRow();
+    } else {
+      callback(pairs);
     }
-    callback(pairs);
   };
+
   const deleteParam = (index: number): void => {
     if (pairs.length > 1) {
       let filteredKeyValue = pairs.filter((elem, i) => {
@@ -209,7 +229,7 @@
 
 <div
   class="mb-0 me-0 py-0 section-layout w-100"
-  style="overflow:hidden; border-radius:4px;"
+  style="overflow:visible; border-radius:4px;"
 >
   <div
     class="w-100 d-flex align-items-center pair-header-row {!isTopHeaderRequired
@@ -249,7 +269,7 @@
             style=""
           >
             <p
-              class="text-nowrap text-primary-300 mb-0 me-0 "
+              class="text-nowrap text-primary-300 mb-0 me-0"
               style="font-size: 10px; font-weight:400;"
             >
               Bulk Edit
@@ -259,10 +279,17 @@
       </div>
     </div>
   </div>
-  <div class="w-100" style="display:block; position:relative;">
+  <div
+    class="w-100"
+    style="display:block; position:relative;"
+    bind:this={pairsContainer}
+  >
     {#if pairs}
       {#each pairs as element, index}
-        <div class="pair-data-row w-100 d-flex align-items-center px-1">
+        <div
+          class="pair-data-row w-100 d-flex align-items-center px-1"
+          style="position:relative"
+        >
           <!-- <div class="button-container">
             <Button
               size="extra-small"
@@ -283,18 +310,23 @@
           </div>
 
           <div class="d-flex gap-0" style="width: calc(100% - 86px);">
-            <div class="w-50 position-relative d-flex align-items-center">
-              <CodeMirrorInput
-                bind:value={element.key}
-                onUpdateInput={() => {
-                  updateParam(index);
-                }}
-                disabled={!isInputBoxEditable ? true : false}
-                placeholder={"Add Key"}
-                {theme}
-                {environmentVariables}
-                {onUpdateEnvironment}
-              />
+            <div class="w-50 d-flex align-items-center">
+              <div
+                class="position-absolute top-0"
+                style="width: calc(50% - 48px);"
+              >
+                <CodeMirrorInput
+                  bind:value={element.key}
+                  onUpdateInput={() => {
+                    updateParam(index);
+                  }}
+                  disabled={!isInputBoxEditable ? true : false}
+                  placeholder={"Add Key"}
+                  {theme}
+                  {environmentVariables}
+                  {onUpdateEnvironment}
+                />
+              </div>
             </div>
             {#if element.type === "file"}
               <div class="w-50 position-relative d-flex align-items-center">
@@ -323,18 +355,23 @@
                 </div>
               </div>
             {:else}
-              <div class="w-50 position-relative d-flex align-items-center">
-                <CodeMirrorInput
-                  bind:value={element.value}
-                  onUpdateInput={() => {
-                    updateParam(index);
-                  }}
-                  placeholder={"Add Value"}
-                  disabled={!isInputBoxEditable ? true : false}
-                  {theme}
-                  {environmentVariables}
-                  {onUpdateEnvironment}
-                />
+              <div class="w-50 d-flex align-items-center">
+                <div
+                  class="position-absolute top-0 left-6"
+                  style="width: calc(50% - 48px);"
+                >
+                  <CodeMirrorInput
+                    bind:value={element.value}
+                    onUpdateInput={() => {
+                      updateParam(index);
+                    }}
+                    placeholder={"Add Value"}
+                    disabled={!isInputBoxEditable ? true : false}
+                    {theme}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
+                  />
+                </div>
               </div>
             {/if}
           </div>

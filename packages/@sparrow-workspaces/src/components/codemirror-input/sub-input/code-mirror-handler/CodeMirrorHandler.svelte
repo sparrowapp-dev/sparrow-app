@@ -52,6 +52,7 @@
    */
   export let environmentAxisY;
   export let environmentAxisX;
+  export let enableEnvironmentHighlighting = true;
   /**
    * environment dialog box unique id
    */
@@ -342,7 +343,20 @@
 
   export const environmentHighlightStyle = (
     aggregateEnvs: AggregateEnvironment[],
+    enableHighlighting: boolean,
   ) => {
+    if (!enableHighlighting) {
+      return ViewPlugin.define(
+        () => ({
+          decorations: Decoration.none,
+          update() {},
+        }),
+        {
+          decorations: (v) => v.decorations,
+        },
+      );
+    }
+
     const decorator = getMatchDecorator(aggregateEnvs);
 
     return ViewPlugin.define(
@@ -415,7 +429,7 @@
       }
       codeMirrorView.dispatch({
         effects: languageConf.reconfigure([
-          environmentHighlightStyle(filterData),
+          environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
         ]),
       });
     }

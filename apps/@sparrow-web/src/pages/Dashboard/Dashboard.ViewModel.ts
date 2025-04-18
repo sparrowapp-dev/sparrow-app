@@ -173,7 +173,7 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
         } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
         }));

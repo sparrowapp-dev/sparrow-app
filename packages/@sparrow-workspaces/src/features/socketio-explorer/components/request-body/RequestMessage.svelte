@@ -45,12 +45,13 @@
       >
         <div></div>
         <div>
-           <Button
-          type="teritiary-regular"
-          startIcon={BroomRegular}
-          onClick={onClearInput}
-          title="Clear Inputs"
-          size="small"
+          <Button
+            type="teritiary-regular"
+            startIcon={BroomRegular}
+            onClick={onClearInput}
+            title="Clear Inputs"
+            size="small"
+            disable={!body || body.trim() === ""}
           />
         </div>
       </div>

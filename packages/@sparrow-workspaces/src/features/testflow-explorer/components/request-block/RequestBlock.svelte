@@ -289,6 +289,10 @@
             e.stopPropagation();
             data.updateBlockName("blockName", e?.target?.value);
           }}
+          on:change={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           on:click={(e) => {
             e.preventDefault();
             e.stopPropagation();

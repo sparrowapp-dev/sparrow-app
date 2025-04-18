@@ -29,6 +29,7 @@
   export let regenerateAiResponse;
   export let isLastRecieverMessage;
   export let status;
+  export let isResponseGenerating;
 
   export let onClickCodeBlockPreview;
 
@@ -307,7 +308,9 @@
         -- REGENERATE / COPY
         -- 
         -->
-        {#if isLastRecieverMessage}
+
+        <!-- Show only if last message is not an error message -->
+        {#if !isResponseGenerating && isLastRecieverMessage && status}
           <Tooltip
             placement="top-center"
             title={showTickIcon ? "Copied" : "Copy"}
@@ -319,7 +322,7 @@
               on:click={handleCopyResponse}
             >
               {#if showTickIcon}
-                <TickIcon size={"14px"} color={"grey"} />
+                <TickIcon width={"18px"} height={"18px"} color={"grey"} />
               {:else}
                 <CopyRegular size={"16px"} />
               {/if}

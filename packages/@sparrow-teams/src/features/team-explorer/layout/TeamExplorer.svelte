@@ -23,6 +23,8 @@
   import { CrossIcon, MoreOptions } from "@sparrow/library/icons";
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
+  import InvitesView from "../../invited-users/layout/InvitesView.svelte";
+
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -98,6 +100,14 @@
    */
   export let onUpdateTeam;
 
+  export let onWithDrawInvite;
+
+  export let onResendInvite;
+
+  export let onAcceptInvite;
+
+  export let onIgnoreInvite;
+
   /**
    * Flag to check if user is guest user
    */
@@ -109,8 +119,11 @@
   let userRole: string;
   let previousTeamId = "";
   let searchQuery = "";
+  let searchInviteQuery = "";
   let hasText = false;
   let leaveButtonMenu: boolean = false;
+  let isInviteIgnoreProgress = false;
+  let isInviteAcceptProgress = false;
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -132,13 +145,12 @@
    *
    */
   const findUserType = () => {
-    openTeam?.users.forEach((user) => {
+    openTeam?.users?.forEach((user) => {
       if (user.id === userId) {
         userRole = user.role;
       }
     });
   };
-
   /**
    *
    */
@@ -156,6 +168,15 @@
         id: TeamTabsEnum.MEMBERS,
         count: openTeam?.users?.length || 1,
         visible: true,
+        disabled: isGuestUser === true ? true : false,
+      },
+      {
+        name: "Invites",
+        id: TeamTabsEnum.INVITES,
+        count: openTeam?._data.invites?.length || 0,
+        visible:
+          (openTeam?.owner === userId || openTeam?.admins?.includes(userId)) &&
+          openTeam?._data.invites?.length > 0,
         disabled: isGuestUser === true ? true : false,
       },
       {
@@ -225,6 +246,14 @@
     hasText = searchQuery.length > 0;
   };
 
+  const handleSearchInvite = (event) => {
+    searchInviteQuery = event.detail.toLowerCase();
+  };
+
+  $: activeTeamTab === TeamTabsEnum.INVITES && !openTeam?._data?.invites?.length  ?
+    onUpdateActiveTab(TeamTabsEnum.WORKSPACES): null;
+  
+
   /**
    *
    */
@@ -238,219 +267,321 @@
     class="teams-content h-100"
     style="background-color: var(--bg-ds-surface-900);"
   >
-    <div class="content-teams d-flex flex-column h-100 px-3 pt-3 pb-2">
-      <div class="" style="">
-        <div
-          class="team-heading d-flex justify-content-between position-relative pb-3"
-        >
-          <h2 class="d-flex ellipsis overflow-visible mb-0 team-title">
-            {#if openTeam?.logo?.size}
-              <Avatar
-                type="image"
-                size="large"
-                image={base64ToURL(openTeam?.logo)}
-              />
-            {:else}
-              <Avatar
-                type="letter"
-                size="large"
-                letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
-                bgColor="var(--bg-secondary-600)"
-              />
-            {/if}
-            <span
-              class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
-              >{openTeam?.name || ""}
-            </span>
-            <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
-            {#if !isGuestUser}
-              {#if userRole !== "owner"}
-                <div
-                  class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
-                  on:click={() => {
-                    leaveButtonMenu = !leaveButtonMenu;
-                  }}
-                >
-                  <Dropdown
-                    zIndex={600}
-                    buttonId="leaveButton"
-                    bind:isMenuOpen={leaveButtonMenu}
-                    options={addButtonData}
-                  >
-                    <Tooltip
-                      title={"Leave Hub"}
-                      placement={"bottom-center"}
-                      distance={12}
-                      show={!leaveButtonMenu}
-                      zIndex={10}
-                    >
-                      <div id="leaveButton">
-                        <MoreOptions height="15px" width="5px" color="White" />
-                      </div>
-                    </Tooltip>
-                  </Dropdown>
-                </div>
+    {#if openTeam.owner}
+      <div class="content-teams d-flex flex-column h-100 px-3 pt-3 pb-2">
+        <div class="" style="">
+          <div
+            class="team-heading d-flex justify-content-between position-relative pb-3"
+          >
+            <h2 class="d-flex ellipsis overflow-visible mb-0 team-title">
+              {#if openTeam?.logo?.size}
+                <Avatar
+                  type="image"
+                  size="large"
+                  image={base64ToURL(openTeam?.logo)}
+                />
+              {:else}
+                <Avatar
+                  type="letter"
+                  size="large"
+                  letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+                  bgColor="var(--bg-secondary-600)"
+                />
               {/if}
-            {/if}
-          </h2>
-
-          <div class="d-flex align-items-end justify-content-end gap-3">
-            {#if openTeam?.users?.length > 1 && !isGuestUser}
-              <p class="d-flex my-auto sparrow-fs-12">
-                <PeopleIcon
-                  color={"var(--sparrow-text-color)"}
-                  classProp="mx-2 my-auto d-flex"
-                />
-                <span class="my-auto" style="width: 66px;"
-                  >{openTeam?.users.length} Members</span
-                >
-              </p>
-            {/if}
-            <Button
-              title={`Invite`}
-              type={"secondary"}
-              onClick={() => {
-                isTeamInviteModalOpen = true;
-              }}
-              disable={isGuestUser ||
-                (userRole !== TeamRole.TEAM_ADMIN &&
-                  userRole !== TeamRole.TEAM_OWNER)}
-            />
-            <Button
-              title={`New Workspace`}
-              type={`primary`}
-              onClick={async () => {
-                await handleCreateNewWorkspace();
-              }}
-              loader={isWorkspaceCreationInProgress}
-              disable={isGuestUser ||
-                isWorkspaceCreationInProgress ||
-                (userRole !== TeamRole.TEAM_ADMIN &&
-                  userRole !== TeamRole.TEAM_OWNER)}
-            />
-          </div>
-        </div>
-
-        <!--Workspace, setting and members tab-->
-
-        <div
-          class="teams-menu d-flex justify-content-between align-items-center position-relative"
-        >
-          <div class="teams-menu__left gap-4 align-items-center pb-3">
-            <Navigator
-              tabs={teamTabs.filter((tab) => tab.visible !== false)}
-              currentTabId={activeTeamTab}
-              onTabClick={onUpdateActiveTab}
-            />
-          </div>
-          <div class="teams-menu__right">
-            {#if activeTeamTab === TeamTabsEnum.WORKSPACES && !isGuestUser}
-              <span class="mx-3" style="cursor:pointer;">
-                <img
-                  on:click={() => {
-                    workspaceView.set(TeamViewEnum.GRID);
-                  }}
-                  class:view-active={selectedView === TeamViewEnum.GRID}
-                  src={table}
-                  alt=""
-                />
-              </span>
               <span
-                style="cursor:pointer;display:flex;justify-content:center;align-items:center"
-                on:click={() => {
-                  workspaceView.set(TeamViewEnum.LIST);
-                }}
-                class:view-active={selectedView === TeamViewEnum.LIST}
-                src={hamburger}
-                alt=""
-              >
-                <ListRegular size={"16px"} />
+                class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
+                >{openTeam?.name || ""}
               </span>
-            {/if}
-          </div>
-        </div>
-      </div>
+              <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
+              {#if !isGuestUser}
+                {#if userRole !== "owner"}
+                  <div
+                    class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
+                    on:click={() => {
+                      leaveButtonMenu = !leaveButtonMenu;
+                    }}
+                  >
+                    <Dropdown
+                      zIndex={600}
+                      buttonId="leaveButton"
+                      bind:isMenuOpen={leaveButtonMenu}
+                      options={addButtonData}
+                    >
+                      <Tooltip
+                        title={"Leave Hub"}
+                        placement={"bottom-center"}
+                        distance={12}
+                        show={!leaveButtonMenu}
+                        zIndex={10}
+                      >
+                        <div id="leaveButton">
+                          <MoreOptions
+                            height="15px"
+                            width="5px"
+                            color="White"
+                          />
+                        </div>
+                      </Tooltip>
+                    </Dropdown>
+                  </div>
+                {/if}
+              {/if}
+            </h2>
 
-      <div style="flex:1; overflow:auto;">
-        {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
-          <div class="h-100 d-flex flex-column">
-            {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
-              <div class="">
-                <div class={`d-flex  rounded  align-items-center mb-3`}>
-                  <Search
-                    variant={"primary"}
-                    id="search-input"
-                    size="medium"
-                    placeholder="Search workspaces in {openTeam?.name}"
-                    on:input={handleSearchInput}
-                    bind:value={searchQuery}
-                    customWidth={"450px"}
+            <div class="d-flex align-items-end justify-content-end gap-3">
+              {#if openTeam?.users?.length > 1 && !isGuestUser}
+                <p class="d-flex my-auto sparrow-fs-12">
+                  <PeopleIcon
+                    color={"var(--sparrow-text-color)"}
+                    classProp="mx-2 my-auto d-flex"
                   />
-                </div>
-              </div>
-            {/if}
-            <div style="flex:1; overflow:auto;">
-              {#if selectedView === TeamViewEnum.LIST}
-                <WorkspaceListView
-                  {onAddMember}
-                  {isWebEnvironment}
-                  {openInDesktop}
-                  bind:isGuestUser
-                  {searchQuery}
-                  {openTeam}
-                  data={workspaces.filter((elem) => {
-                    return (
-                      elem?.team?.teamId === openTeam?.teamId &&
-                      elem?.name?.toLowerCase().includes(searchQuery)
-                    );
-                  }) || []}
-                  {onSwitchWorkspace}
-                  {onDeleteWorkspace}
-                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
-                    userRole === TeamRole.TEAM_OWNER}
-                />
-              {:else if selectedView == TeamViewEnum.GRID}
-                <WorkspaceGridView
-                  {onAddMember}
-                  bind:isGuestUser
-                  {onDeleteWorkspace}
-                  {openInDesktop}
-                  {isWebEnvironment}
-                  {searchQuery}
-                  workspaces={workspaces.filter((elem) => {
-                    return (
-                      elem?.team?.teamId === openTeam?.teamId &&
-                      elem?.name?.toLowerCase().includes(searchQuery)
-                    );
-                  }) || []}
-                  onCreateNewWorkspace={handleCreateNewWorkspace}
-                  {onSwitchWorkspace}
-                  bind:isWorkspaceCreationInProgress
-                  isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
-                    userRole === TeamRole.TEAM_OWNER}
-                />
-                <!--Enabled in next phase-->
+                  <span class="my-auto" style="width: 66px;"
+                    >{openTeam?.users.length} Members</span
+                  >
+                </p>
+              {/if}
+              <Button
+                title={`Invite`}
+                type={"secondary"}
+                onClick={() => {
+                  isTeamInviteModalOpen = true;
+                }}
+                disable={isGuestUser ||
+                  (userRole !== TeamRole.TEAM_ADMIN &&
+                    userRole !== TeamRole.TEAM_OWNER)}
+              />
+              <Button
+                title={`New Workspace`}
+                type={`primary`}
+                onClick={async () => {
+                  await handleCreateNewWorkspace();
+                }}
+                loader={isWorkspaceCreationInProgress}
+                disable={isGuestUser ||
+                  isWorkspaceCreationInProgress ||
+                  (userRole !== TeamRole.TEAM_ADMIN &&
+                    userRole !== TeamRole.TEAM_OWNER)}
+              />
+            </div>
+          </div>
+
+          <!--Workspace, setting and members tab-->
+
+          <div
+            class="teams-menu d-flex justify-content-between align-items-center position-relative"
+          >
+            <div class="teams-menu__left gap-4 align-items-center pb-3">
+              <Navigator
+                tabs={teamTabs.filter((tab) => tab.visible !== false)}
+                currentTabId={activeTeamTab}
+                onTabClick={onUpdateActiveTab}
+              />
+            </div>
+            <div class="teams-menu__right">
+              {#if activeTeamTab === TeamTabsEnum.WORKSPACES && !isGuestUser}
+                <span class="mx-3" style="cursor:pointer;">
+                  <img
+                    on:click={() => {
+                      workspaceView.set(TeamViewEnum.GRID);
+                    }}
+                    class:view-active={selectedView === TeamViewEnum.GRID}
+                    src={table}
+                    alt=""
+                  />
+                </span>
+                <span
+                  style="cursor:pointer;display:flex;justify-content:center;align-items:center"
+                  on:click={() => {
+                    workspaceView.set(TeamViewEnum.LIST);
+                  }}
+                  class:view-active={selectedView === TeamViewEnum.LIST}
+                  src={hamburger}
+                  alt=""
+                >
+                  <ListRegular size={"16px"} />
+                </span>
               {/if}
             </div>
           </div>
-        {:else if activeTeamTab === TeamTabsEnum.MEMBERS}
-          <TeamMembers
-            {userId}
-            userType={userRole}
-            {openTeam}
-            {workspaces}
-            {onRemoveMembersAtTeam}
-            {onDemoteToMemberAtTeam}
-            {onPromoteToAdminAtTeam}
-            {onPromoteToOwnerAtTeam}
-            {onRemoveUserFromWorkspace}
-            {onChangeUserRoleAtWorkspace}
-          />
-        {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
-          <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
-        {/if}
+        </div>
+
+        <div style="flex:1; overflow:auto;">
+          {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
+            <div class="h-100 d-flex flex-column">
+              {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
+                <div class="">
+                  <div class={`d-flex  rounded  align-items-center mb-3`}>
+                    <Search
+                      variant={"primary"}
+                      id="search-input"
+                      size="medium"
+                      placeholder="Search workspaces in {openTeam?.name}"
+                      on:input={handleSearchInput}
+                      bind:value={searchQuery}
+                      customWidth={"450px"}
+                    />
+                  </div>
+                </div>
+              {/if}
+              <div style="flex:1; overflow:auto;">
+                {#if selectedView === TeamViewEnum.LIST}
+                  <WorkspaceListView
+                    {onAddMember}
+                    {isWebEnvironment}
+                    {openInDesktop}
+                    bind:isGuestUser
+                    {searchQuery}
+                    {openTeam}
+                    data={workspaces.filter((elem) => {
+                      return (
+                        elem?.team?.teamId === openTeam?.teamId &&
+                        elem?.name?.toLowerCase().includes(searchQuery)
+                      );
+                    }) || []}
+                    {onSwitchWorkspace}
+                    {onDeleteWorkspace}
+                    isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                      userRole === TeamRole.TEAM_OWNER}
+                  />
+                {:else if selectedView == TeamViewEnum.GRID}
+                  <WorkspaceGridView
+                    {onAddMember}
+                    bind:isGuestUser
+                    {onDeleteWorkspace}
+                    {openInDesktop}
+                    {isWebEnvironment}
+                    {searchQuery}
+                    workspaces={workspaces.filter((elem) => {
+                      return (
+                        elem?.team?.teamId === openTeam?.teamId &&
+                        elem?.name?.toLowerCase().includes(searchQuery)
+                      );
+                    }) || []}
+                    onCreateNewWorkspace={handleCreateNewWorkspace}
+                    {onSwitchWorkspace}
+                    bind:isWorkspaceCreationInProgress
+                    isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
+                      userRole === TeamRole.TEAM_OWNER}
+                  />
+                  <!--Enabled in next phase-->
+                {/if}
+              </div>
+            </div>
+          {:else if activeTeamTab === TeamTabsEnum.MEMBERS}
+            <TeamMembers
+              {userId}
+              userType={userRole}
+              {openTeam}
+              {workspaces}
+              {onRemoveMembersAtTeam}
+              {onDemoteToMemberAtTeam}
+              {onPromoteToAdminAtTeam}
+              {onPromoteToOwnerAtTeam}
+              {onRemoveUserFromWorkspace}
+              {onChangeUserRoleAtWorkspace}
+            />
+          {:else if activeTeamTab === TeamTabsEnum.SETTINGS && userRole === "owner"}
+            <TeamSettings openTeam={openTeam?.toMutableJSON()} {onUpdateTeam} />
+          {:else if activeTeamTab === TeamTabsEnum.INVITES}
+            <div class="h-100 d-flex flex-column">
+              {#if openTeam && openTeam?._data?.invites?.length > 0 && !isGuestUser}
+                <div style="margin-bottom:12px">
+                  <div class={`d-flex  rounded  align-items-center`}>
+                    <Search
+                      variant={"primary"}
+                      id="search-input"
+                      size="small"
+                      placeholder="Search invites by email"
+                      on:input={handleSearchInvite}
+                      bind:value={searchInviteQuery}
+                      customWidth={"320px"}
+                    />
+                  </div>
+                </div>
+              {/if}
+              <div style="flex:1; overflow:auto;" class="py-2">
+                <InvitesView
+                  invites={openTeam?._data?.invites?.filter((elem) => {
+                    return elem?.email
+                      ?.toLowerCase()
+                      .includes(searchInviteQuery);
+                  }) || []}
+                  {onWithDrawInvite}
+                  {onResendInvite}
+                  {openTeam}
+                  {userId}
+                />
+              </div>
+            </div>
+          {/if}
+        </div>
       </div>
-    </div>
+    {:else}
+      <div style="padding:16px; gap:24px" class="d-flex flex-column">
+        <h2 class="d-flex ellipsis overflow-visible team-title">
+          <Avatar
+            type="letter"
+            size="large"
+            letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+            bgColor="var(--bg-ds-secondary-400)"
+          />
+          <span
+            class="my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
+            style="margin-left:12px"
+            >{openTeam?.name || ""}
+          </span>
+        </h2>
+
+        <div
+          style="background-color:var(--bg-ds-surface-100); min-height:1px;width:100%;"
+        ></div>
+
+        <div
+          class="d-flex justify-content-center align-items-center flex-column"
+          style="gap:24px;"
+        >
+          <div
+            class="w-100 mx-auto text-ds-font-weight-regular text-ds-line-height-143 text-ds-font-size-14 d-flex justify-content-center align-items-center"
+            style="max-width: 492px; color:var(--bg-ds-neutral-300);"
+          >
+            <div class="text-center">
+             {openTeam?._data?.description?.trim().split(" ")[0]
+} has invited you to be a member on the {openTeam?.name}.
+              <br />
+              Once you accept you will gain access to the workspaces within this
+              hub.
+            </div>
+          </div>
+
+          <div class="d-flex" style="gap:12px;">
+            <Button
+            type="primary"
+             title="Accept"
+             onClick={async() => {
+                isInviteAcceptProgress = true;
+                await onAcceptInvite(openTeam?.teamId);
+                isInviteAcceptProgress = false;
+
+             }}
+             loader={isInviteAcceptProgress}
+            />
+           
+            <Button
+            type="secondary"
+             title="Ignore"
+             onClick={async() => {
+                isInviteIgnoreProgress = true;
+                await onIgnoreInvite(openTeam?.teamId);
+                isInviteIgnoreProgress = false;
+                
+             }}
+             loader={isInviteIgnoreProgress}
+             
+            />
+          </div>
+        </div>
+      </div>
+    {/if}
   </div>
 {/if}
 
