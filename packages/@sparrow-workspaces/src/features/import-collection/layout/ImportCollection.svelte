@@ -159,40 +159,85 @@
     supportedFileTypes: string[],
   ) => {
     isInputDataTouched = true;
-    const targetFile = e?.target?.files || e?.dataTransfer?.files;
 
-    if (targetFile && targetFile[0].size > maxSize * 1024) {
+    const targetFile = e?.target?.files || e?.dataTransfer?.files;
+    const file = targetFile?.[0];
+
+    // File existence check
+    if (!file) {
+      uploadCollection.file.invalid = true;
+      return;
+    }
+
+    // Size validation
+    if (file.size > maxSize * 1024) {
       uploadCollection.file.showFileSizeError = true;
       uploadCollection.file.invalid = true;
       return;
     }
-    const fileType = `.${(targetFile && targetFile[0]?.name)
-      .split(".")
-      .pop()
-      .toLowerCase()}`;
+
+    // Type validation
+    const fileType = `.${file.name.split(".").pop().toLowerCase()}`;
     if (!supportedFileTypes.includes(fileType)) {
       uploadCollection.file.showFileTypeError = true;
       uploadCollection.file.invalid = true;
       return;
     }
+
+    // Reset error states
     uploadCollection.file.showFileSizeError = false;
     uploadCollection.file.showFileTypeError = false;
     uploadCollection.file.invalid = false;
-    uploadCollection.file.value = targetFile && targetFile[0];
+    uploadCollection.file.value = file;
 
-    // Read the file content
+    // Read file content
     const reader = new FileReader();
+
     reader.onload = async (event) => {
-      const fileContent = event.target?.result;
-      const res = await validateFileUpload(fileContent);
-      if (res) {
-        uploadCollection.file.invalid = false;
-      } else {
+      try {
+        const fileContent = event.target?.result;
+
+        if (
+          !fileContent ||
+          typeof fileContent !== "string" ||
+          fileContent.trim().length === 0
+        ) {
+          uploadCollection.file.invalid = true;
+          uploadCollection.file.value = [];
+          return;
+        }
+
+        // Basic JSON check (can adjust for XML if needed)
+        const parsed = JSON.parse(fileContent);
+
+        // Optional: Check for Postman collection schema
+        const isPostman = parsed?.info?.schema?.includes("postman.com");
+
+        if (!isPostman) {
+          uploadCollection.file.invalid = true;
+          uploadCollection.file.value = [];
+          return;
+        }
+
+        // Custom validation
+        const res = await validateFileUpload(fileContent);
+
+        uploadCollection.file.invalid = !res;
+        if (!res) uploadCollection.file.value = [];
+      } catch (err) {
+        console.error("File read or validation error:", err);
         uploadCollection.file.invalid = true;
         uploadCollection.file.value = [];
       }
     };
-    reader.readAsText(targetFile ? targetFile[0] : "");
+
+    reader.onerror = () => {
+      uploadCollection.file.invalid = true;
+      uploadCollection.file.value = [];
+      console.error("FileReader failed to read the file.");
+    };
+
+    reader.readAsText(file);
   };
 
   const handleLogoReset = (e: any) => {
@@ -220,112 +265,67 @@
     }
   };
 
-  const validateJSON = (data) => {
+  const validateJSON = (data: any) => {
     return validateImportBody(data);
   };
 
   let isLoading = false;
   const handleImport = async () => {
-    isLoading = true;
-    isInputDataTouched = true;
-    if (activeSync) {
-      isRepositoryPathTouched = true;
-    }
-    if (isRepositoryPath) {
-      isRepositoryBranchTouched = true;
-    }
-    if (importType === "text" && importData === "") {
-      isTextEmpty = true;
-    }
-    if (
-      importType === "text" &&
-      importData &&
-      ((isValidClientJSON && isValidServerJSON) ||
-        (isValidClientXML && isValidServerXML))
-    ) {
-      /**
-       * Handle imports using JSON / XML textarea
-       */
-      const contentType = validateJSON(importData);
-      handleImportJsonObject(contentType, importData);
-    } else if (
-      importType === "text" &&
-      importData &&
-      isValidClientDeployedURL &&
-      isValidServerDeployedURL
-    ) {
-      /**
-       * Handle imports using deployed URL
-       */
-      const response = await onGetOapiTextFromURL(importData);
-      const contentType = validateJSON(importData);
-      if (response?.data?.status === ResponseStatusCode.OK) {
-        handleImportJsonObject(contentType, response?.data?.body);
-      }
-    } else if (
-      importType === "text" &&
-      importData &&
-      isValidClientURL &&
-      isValidServerURL
-    ) {
-      /**
-       * Handle imports using localhost URL
-       */
-      const response = await onGetOapiTextFromURL(importData);
-      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
-        const contentType = validateJSON(response?.data?.body);
-        handleImportJsonObject(contentType, response?.data?.body);
+    try {
+      isLoading = true;
+      isInputDataTouched = true;
+
+      if (activeSync) {
+        isRepositoryPathTouched = true;
       }
 
-      // else if (
-      //   activeSync &&
-      //   response?.data?.status === ResponseStatusCode.OK &&
-      //   isRepositoryPath &&
-      //   repositoryBranch &&
-      //   repositoryPath &&
-      //   repositoryBranch !== "not exist" &&
-      //   currentBranch
-      // ) {
-      //   if (
-      //     getBranchList
-      //       .map((elem) => {
-      //         return elem.name;
-      //       })
-      //       .includes(currentBranch)
-      //   ) {
-      //     const requestBody = {
-      //       urlData: {
-      //         data: JSON.parse(response.data.response),
-      //         headers: response.data.headers,
-      //       },
-      //       url: importUrl,
-      //       primaryBranch: repositoryBranch,
-      //       currentBranch: currentBranch,
-      //       localRepositoryPath: repositoryPath,
-      //     };
-      //     handleImportUrl(requestBody);
-      //   } else {
-      //     notifications.error(
-      //       `Can't import local branch. Please push ${currentBranch} to remote first.`,
-      //     );
-      //   }
-      // }
-    } else if (
-      importType === "file" &&
-      uploadCollection?.file?.value?.length !== 0
-    ) {
-      handleFileUpload(uploadCollection?.file?.value);
+      if (isRepositoryPath) {
+        isRepositoryBranchTouched = true;
+      }
+
+      if (importType === "text" && importData === "") {
+        isTextEmpty = true;
+      }
+
+      if (importType === "text" && importData) {
+        if (
+          (isValidClientJSON && isValidServerJSON) ||
+          (isValidClientXML && isValidServerXML)
+        ) {
+          // Handle imports using JSON / XML textarea
+          const contentType = validateJSON(importData);
+          handleImportJsonObject(contentType, importData);
+        } else if (isValidClientDeployedURL && isValidServerDeployedURL) {
+          // Handle imports using deployed URL
+          const response = await onGetOapiTextFromURL(importData);
+          if (response?.data?.status === ResponseStatusCode.OK) {
+            const contentType = validateJSON(importData);
+            handleImportJsonObject(contentType, response?.data?.body);
+          }
+        } else if (isValidClientURL && isValidServerURL) {
+          // Handle imports using localhost URL
+          const response = await onGetOapiTextFromURL(importData);
+          if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
+            const contentType = validateJSON(response?.data?.body);
+            handleImportJsonObject(contentType, response?.data?.body);
+          }
+        }
+      } else if (importType === "file") {
+        // Handle file imports
+        if (uploadCollection?.file?.value?.length !== 0) {
+          handleFileUpload(uploadCollection?.file?.value);
+        } else {
+          uploadCollection.file.invalid = true;
+          uploadCollection.file.showFileSizeError = false;
+          uploadCollection.file.showFileTypeError = false;
+        }
+      }
+    } catch (error) {
+      console.error("Error during import process:", error);
+      notifications.error("An error occurred during the import process.");
+    } finally {
       isLoading = false;
-      return;
-    } else if (
-      importType === "file" &&
-      uploadCollection?.file?.value?.length === 0
-    ) {
-      uploadCollection.file.invalid = true;
-      uploadCollection.file.showFileSizeError = false;
-      uploadCollection.file.showFileTypeError = false;
     }
-    isLoading = false;
   };
 
   const handleImportJsonObject = async (contentType, importJSON) => {
