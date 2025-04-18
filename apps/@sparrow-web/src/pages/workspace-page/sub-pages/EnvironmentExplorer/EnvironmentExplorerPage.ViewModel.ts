@@ -148,7 +148,7 @@ export class EnvironmentExplorerViewModel {
    */
   private compareRequestWithServer = new Debounce().debounce(
     this.compareEnvironmentWithServerDebounced,
-    1000,
+    0,
   );
 
   /**

@@ -209,7 +209,7 @@ class CollectionExplorerPage {
    */
   private compareCollectionWithServer = new Debounce().debounce(
     this.compareCollectionWithServerDebounced,
-    1000,
+    0,
   );
 
   public get activeWorkspace() {
