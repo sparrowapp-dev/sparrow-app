@@ -130,7 +130,10 @@
     workspaceMeta.id = _workspace._id;
     workspaceMeta.name = _workspace.name;
     collection = value.filter((collectionDocument: CollectionDocument) => {
-      return collectionDocument.workspaceId === workspaceMeta.id;
+      return (
+        collectionDocument.workspaceId === workspaceMeta.id &&
+        !collectionDocument?.activeSync
+      );
     });
     directory = JSON.parse(JSON.stringify(collection));
     if (latestRoute.id) navigateToDirectory(latestRoute);
