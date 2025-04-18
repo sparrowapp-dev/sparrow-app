@@ -207,14 +207,7 @@
   onGenerateDocumentation={_viewModel.generateDocumentation}
   azureBlobCDN={constants.AZURE_CDN_URL}
   onSaveResponse={_viewModel.saveResponse}
+  onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
+  onGenerateAiResponse={_viewModel.generateAIResponseWS}
+  onToggleLike={_viewModel.toggleChatMessageLike}
 />
-{#if !isGuestUser}
-  <ChatBot
-    bind:tab={_viewModel.tab}
-    onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
-    onUpdateAiConversation={_viewModel.updateRequestAIConversation}
-    onUpdateRequestState={_viewModel.updateRequestState}
-    onGenerateAiResponse={_viewModel.generateAiResponse}
-    onToggleLike={_viewModel.toggleChatMessageLike}
-  />
-{/if}

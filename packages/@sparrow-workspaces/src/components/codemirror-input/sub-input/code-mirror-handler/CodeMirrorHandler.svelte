@@ -17,10 +17,6 @@
    */
   export let rawValue: string;
   /**
-   * on change event
-   */
-  export let handleRawChange: () => void;
-  /**
    * on focus event
    */
   export let handleFocusChange: () => void;
@@ -56,6 +52,7 @@
    */
   export let environmentAxisY;
   export let environmentAxisX;
+  export let enableEnvironmentHighlighting = true;
   /**
    * environment dialog box unique id
    */
@@ -82,18 +79,23 @@
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
   let prevValue = "";
+
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
-    handleInputChange(userInput);
-    if (prevValue !== userInput) {
-      handleEnvironmentBox("", "");
-    }
-    prevValue = userInput;
-    if (rawValue?.length > 0) {
-      handleRawChange();
+    if (update.docChanged) {
+      const isAutoChange = update?.transactions?.some((transaction) =>
+        transaction?.annotations?.some((annotation) => annotation?.autoChange),
+      );
+      if (!isAutoChange) {
+        // only hits for input, blur etc type of events
+        handleInputChange(userInput);
+        if (prevValue !== userInput) {
+          handleEnvironmentBox("", "");
+        }
+        prevValue = userInput;
+      }
     }
     handleHighlightClass();
-
     if (inputWrapper) {
       const dialogboxWidth = 400;
       const dialogboxHeight = 170;
@@ -341,7 +343,20 @@
 
   export const environmentHighlightStyle = (
     aggregateEnvs: AggregateEnvironment[],
+    enableHighlighting: boolean,
   ) => {
+    if (!enableHighlighting) {
+      return ViewPlugin.define(
+        () => ({
+          decorations: Decoration.none,
+          update() {},
+        }),
+        {
+          decorations: (v) => v.decorations,
+        },
+      );
+    }
+
     const decorator = getMatchDecorator(aggregateEnvs);
 
     return ViewPlugin.define(
@@ -409,11 +424,12 @@
             to: codeMirrorView.state.doc.length,
             insert: rawValue,
           },
+          annotations: [{ autoChange: true }],
         });
       }
       codeMirrorView.dispatch({
         effects: languageConf.reconfigure([
-          environmentHighlightStyle(filterData),
+          environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
         ]),
       });
     }

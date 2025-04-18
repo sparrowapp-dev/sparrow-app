@@ -220,6 +220,11 @@
   let memberOwnershipPopupLoader: boolean = false;
   let confirmationText: string = "";
   let confirmationError: string = "";
+
+  const truncateText = (text: string, limit: number = 15): string => {
+    if (!text) return "";
+    return text.length > limit ? text.substring(0, limit) + "..." : text;
+  };
 </script>
 
 <Modal
@@ -232,13 +237,18 @@
     handlePopup(flag, "isMemberRemovePopup");
   }}
 >
-  <div style="font-size: 14px;" class="text-lightGray mb-1">
-    <p style="font-size:12px;" class="text-textColor">
+  <div class="text-lightGray text-ds-font-size-14 mb-1">
+    <p
+      class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+    >
       Are you sure you want to remove <span class="text-whiteColor"
-        >"{user.name}"</span
+        >"{truncateText(user.name, 20)}"</span
       >
       ? They will lose access to the
-      <span class="text-whiteColor">"{openTeam?.name}"</span> team.
+      <span
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >"{openTeam?.name}"</span
+      > hub.
     </p>
   </div>
   <div
@@ -248,7 +258,6 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Cancel"}
-      textStyleProp={"font-size: var(--base-text)"}
       type={"secondary"}
       loader={false}
       onClick={() => {
@@ -259,7 +268,6 @@
     <Button
       disable={memberRemovePopupLoader}
       title={"Remove"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"danger"}
       loader={memberRemovePopupLoader}
@@ -291,27 +299,36 @@
           bgColor={"var(--bg-tertiary-700)"}
         />
 
-        <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
-            >{user.name}</span
+        <div class="name px-2" style="width: 90%;">
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+            >{truncateText(user.name, 20)}</span
           ><br />
           <span
-            style="font-size:12px;display: inline-block;"
-            class="text-textColor">{user.email}</span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+            >{user.email}</span
           >
         </div>
       </div>
     </div>
 
     <p
-      style="font-size:12px; color:var( --text-secondary-1000); font-weight:400;"
+      style="color:var( --text-secondary-1000);"
+      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
     >
       You are assigning the role of an '<span
         class="text-whiteColor"
         style=" font-weight:700;">Admin</span
-      >' to {user.name}. Following access will be provided to {user.name}:
+      >' to {truncateText(user.name, 20)}. Following access will be provided to {truncateText(
+        user.name,
+        20,
+      )}:
     </p>
-    <ul class="ps-4" style="font-size:12px; color:var( --text-secondary-1000);">
+    <ul
+      class="ps-4 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+      style="color:var( --text-secondary-1000);"
+    >
       {#each AdminLevelPermission as permission}
         <li>{permission}</li>
       {/each}
@@ -338,13 +355,16 @@
           />
         {/if}
       </div>
-      <p style="font-size:16px;" class="mb-0 ellipsis">{openTeam?.name}</p>
+      <p
+        class="mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular ellipsis"
+      >
+        {openTeam?.name}
+      </p>
     </div>
 
     <Button
       disable={memberPromotePopupLoader}
       title={"Update Access"}
-      textStyleProp={"font-size: var(--base-text)"}
       loaderSize={18}
       type={"primary"}
       loader={memberPromotePopupLoader}
@@ -374,13 +394,15 @@
           letter={user?.name[0] || ""}
           bgColor={"var(--bg-tertiary-700)"}
         />
-        <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
-            >{user.name}</span
+        <div class="name px-2" style="width: 90%;">
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{truncateText(user.name, 20)}</span
           ><br />
           <span
-            style="font-size:12px;display: inline-block;"
-            class="text-textColor">{user.email}</span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{user.email}</span
           >
         </div>
       </div>
@@ -451,13 +473,15 @@
           letter={user.name[0] || ""}
           bgColor={"var(--bg-tertiary-700)"}
         />
-        <div class="name px-2" style="width: 80%;">
-          <span style="font-size:12px;" class="text-whiteColor"
-            >{user.name}</span
+        <div class="name px-2" style="width: 90%;">
+          <span
+            class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{truncateText(user.name, 20)}</span
           ><br />
           <span
-            style="font-size:12px;display: inline-block;"
-            class="text-textColor">{user.email}</span
+            style="display: inline-block;"
+            class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{user.email}</span
           >
         </div>
       </div>
@@ -467,7 +491,8 @@
       style="font-size:12px; color:var(--text-secondary-1000); font-weight:400;"
     >
       You are assigning the role of <span class="text-whiteColor">‘Owner’</span>
-      to {user.name}. All the Owner’s access will be transferred to {user.name}
+      to {truncateText(user.name, 20)}. All the Owner’s access will be
+      transferred to {truncateText(user.name, 20)}
       and you will be demoted to Admin. This action cannot be undone.
     </p>
   </div>
@@ -476,7 +501,7 @@
     class="confirm-header mb-0 sparrow-fs-14"
     style="color: var(--text-secondary-200);"
   >
-    Enter team name to confirm<span class="asterik ms-1">*</span>
+    Enter hub name to confirm<span class="asterik ms-1">*</span>
   </p>
   <input
     id={`input-${user.id}`}
@@ -532,9 +557,9 @@
       onClick={() => {
         confirmationText = confirmationText.replace(/’/g, "'");
         if (confirmationText === "") {
-          confirmationError = `Team name cannot be empty.`;
+          confirmationError = `Hub name cannot be empty.`;
         } else if (confirmationText !== openTeam?.name) {
-          confirmationError = `Team name does not match.`;
+          confirmationError = `Hub name does not match.`;
         } else {
           confirmationError = "";
           handleMemberOwnershipPopUpSuccess();
@@ -591,10 +616,14 @@
       bgColor={""}
     />
     <div class="name px-2">
-      <span style="font-size:12px;" class="text-whiteColor"
+      <span
+        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
         >{user.name} {owner ? "(You)" : ""}</span
       ><br />
-      <span style="font-size:12px;" class="text-textColor">{user.email}</span>
+      <span
+        class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >{user.email}</span
+      >
     </div>
   </div>
   <div class="position">

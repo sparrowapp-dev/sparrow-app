@@ -41,10 +41,10 @@ import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
-import { InitWorkspaceTab } from "@sparrow/common/utils";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
 import { open } from "@tauri-apps/plugin-shell";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 
 export class DashboardViewModel {
   constructor() {}
@@ -58,7 +58,8 @@ export class DashboardViewModel {
   private featureSwitchService = new FeatureSwitchService();
   private featureSwitchRepository = new FeatureSwitchRepository();
   private guestUserRepository = new GuestUserRepository();
-  private aiAssistantWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistantWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
 
@@ -127,7 +128,7 @@ export class DashboardViewModel {
 
   // redirects to Sparrow Feature Updates.
   public redirectFeatureUpdates = async () => {
-    await open(constants.SPARROW_GITHUB + '/sparrow-app/releases');
+    await open(constants.SPARROW_GITHUB + "/sparrow-app/releases");
     return;
   };
 
@@ -172,6 +173,7 @@ export class DashboardViewModel {
         const {
           _id,
           name,
+          hubUrl,
           users,
           description,
           logo,
@@ -184,7 +186,7 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
         } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
         }));
@@ -193,6 +195,7 @@ export class DashboardViewModel {
         const item = {
           teamId: _id,
           name,
+          hubUrl,
           users,
           description,
           logo,
@@ -283,6 +286,7 @@ export class DashboardViewModel {
           team: {
             teamId: team.id,
             teamName: team.name,
+            hubUrl: team?.hubUrl || "",
           },
           environmentId: "",
           isActiveWorkspace: isActiveWorkspace,
@@ -398,6 +402,17 @@ export class DashboardViewModel {
     return res;
   };
 
+  public constructBaseUrl = async (_teamId: string) => {
+    const teamData = await this.teamRepository.getTeamDoc(_teamId);
+    const hubUrl = teamData?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    * Create workspace in the team
    * @param teamId ID of team where workspace need to be created
@@ -406,10 +421,14 @@ export class DashboardViewModel {
     workspaceName: string,
     teamId: string,
   ) => {
-    const response = await this.workspaceService.createWorkspace({
-      name: workspaceName,
-      id: teamId,
-    });
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.workspaceService.createWorkspace(
+      {
+        name: workspaceName,
+        id: teamId,
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
       await this.workspaceRepository.addWorkspace({
@@ -423,9 +442,8 @@ export class DashboardViewModel {
         await this.refreshWorkspaces(clientUserId);
       }
 
-      const initWorkspaceTab = new InitWorkspaceTab(res._id, res._id);
-      initWorkspaceTab.updateName(res.name);
-      await this.tabRepository.createTab(initWorkspaceTab.getValue(), res._id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(res._id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, res._id);
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
@@ -446,10 +464,9 @@ export class DashboardViewModel {
     const ws = await this.workspaceRepository.readWorkspace(id);
     if (!ws) return;
 
-    const initWorkspaceTab = new InitWorkspaceTab(id, id);
-    initWorkspaceTab.updateName(ws.name);
-    await this.tabRepository.createTab(initWorkspaceTab.getValue(), id);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, ws);
     await this.workspaceRepository.setActiveWorkspace(id);
+    await this.tabRepository.createTab(initWorkspaceTab, id);
     navigate("collections");
   };
 
@@ -530,7 +547,10 @@ export class DashboardViewModel {
     workspaceId: string,
     collection: any,
   ) => {
-    const collectionTab = new CollectionTabAdapter().adapt(workspaceId,collection);
+    const collectionTab = new CollectionTabAdapter().adapt(
+      workspaceId,
+      collection,
+    );
     // Create the tab with the new collection
     await this.tabRepository.createTab(collectionTab, workspaceId);
     // Update UI
@@ -559,14 +579,13 @@ export class DashboardViewModel {
   };
 
   public switchAndCreateWorkspaceTab = async (workspace: any) => {
-    const initWorkspaceTab = new InitWorkspaceTab(workspace._id, workspace._id);
-    initWorkspaceTab.updateName(workspace.name);
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(
+      workspace._id,
+      workspace,
+    );
 
     // Create tab and set active workspace
-    await this.tabRepository.createTab(
-      initWorkspaceTab.getValue(),
-      workspace._id,
-    );
+    await this.tabRepository.createTab(initWorkspaceTab, workspace._id);
     moveNavigation("right");
   };
 
@@ -972,19 +991,19 @@ export class DashboardViewModel {
       let environment = await this.getRecentEnvironment();
       environment = environment.map((_environment) => {
         const workspaceDetails = workspaceMap[_environment.workspaceId];
-        const path:string[] = [];
+        const path: string[] = [];
         if (workspaceDetails) {
           path.push(workspaceDetails.teamName);
           path.push(workspaceDetails.workspaceName);
         }
 
-        return ({
+        return {
           title: _environment.name,
           workspace: _environment.workspaceId,
           id: _environment.id,
           variable: _environment.variable,
-          path: this.createPath(path)
-        })
+          path: this.createPath(path),
+        };
       });
 
       let workspace = await this.getRecentWorkspace();
@@ -993,7 +1012,7 @@ export class DashboardViewModel {
       let testflow = await this.getRecentTestflow();
       testflow = testflow.map((_value) => {
         const workspaceDetails = workspaceMap[_value._data.workspaceId];
-        const path:string[] = [];
+        const path: string[] = [];
         if (workspaceDetails) {
           path.push(workspaceDetails.teamName);
           path.push(workspaceDetails.workspaceName);
@@ -1001,7 +1020,7 @@ export class DashboardViewModel {
 
         return {
           ..._value._data,
-          path: this.createPath(path)
+          path: this.createPath(path),
         };
       });
 

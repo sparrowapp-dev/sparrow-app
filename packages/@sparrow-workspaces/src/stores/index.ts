@@ -24,3 +24,6 @@ export {
 } from "./recent-left-panel";
 
 export { tabsSplitterDirection } from "./tabs-view";
+export { isChatbotOpenInCurrTab } from "./chatbot-state";
+
+export { updateActiveSyncStates } from "./active-sync";

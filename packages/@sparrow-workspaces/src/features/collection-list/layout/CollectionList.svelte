@@ -92,6 +92,8 @@
 
   export let ActiveTab;
   export let handleTabUpdate;
+  export let onCompareCollection;
+  export let onSyncCollection;
 
   let isExpandCollectionLine = false;
   // export let handleExpandCollectionLine;
@@ -273,8 +275,8 @@
           style="display: flex; height:24px; gap:4px; align-items:center; padding:2px 4px; "
         >
           <p
-            class="sparrow-fs-13 mb-0"
-            style="font-weight:400; font-size:12px; line-height:18px; color:var(--text-ds-neutral-50); "
+            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-0"
+            style=" color:var(--text-ds-neutral-50); "
           >
             Collections
           </p>
@@ -350,6 +352,8 @@
                     {activeTabId}
                     {searchData}
                     {isWebApp}
+                    {onCompareCollection}
+                    {onSyncCollection}
                   />
                 {/each}
               </List>
@@ -361,8 +365,8 @@
                 classProps={"pe-0"}
               >
                 <p
-                  class="mx-1 text-fs-12 mb-0 text-center"
-                  style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+                  class="mx-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular mb-0 text-center"
+                  style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
                 >
                   It seems we couldn't find the result matching your search
                   query.
@@ -392,6 +396,8 @@
                   {activeTabId}
                   bind:isFirstCollectionExpand
                   {isWebApp}
+                  {onCompareCollection}
+                  {onSyncCollection}
                 />
               {/each}
             </List>
@@ -414,8 +420,8 @@
 
           {#if searchData.length !== 0}
             <p
-              class="mx-1 text-fs-12 mb-0 text-center"
-              style=" font-weight:300;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              class="mx-1 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular mb-0 text-center"
+              style="color: var(--text-ds-neutral-400); letter-spacing: 0.5px;"
             >
               It seems we couldn't find the result matching your search query.
             </p>

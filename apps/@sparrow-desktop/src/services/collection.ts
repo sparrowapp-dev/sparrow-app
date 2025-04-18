@@ -1,8 +1,5 @@
 import constants from "@app/constants/constants";
-import {
-  makeRequest,
-  getAuthHeaders,
-} from "@app/containers/api/api.common";
+import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 
 import type {
   CreateApiRequestPostBody,
@@ -50,10 +47,11 @@ const insertCollectionDirectory = async (
 
 const insertCollectionRequest = async (
   apiRequest: CreateApiRequestPostBody,
+  _baseUrl: string,
 ) => {
   const response = await makeRequest(
     "POST",
-    `${apiUrl}/api/collection/request`,
+    `${_baseUrl}/api/collection/request`,
     {
       body: apiRequest,
       headers: getAuthHeaders(),

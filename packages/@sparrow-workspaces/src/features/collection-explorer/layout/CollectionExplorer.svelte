@@ -47,6 +47,7 @@
   export let onUpdateCollectionAuth;
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
+  export let onSyncCollection;
 
   /**
    * Icons and images
@@ -74,6 +75,7 @@
   import {
     AddRegular,
     ArrowSwapRegular,
+    ArrowSyncRegular,
     CaretDownFilled,
     CaretUpFilled,
     FolderAddRegular,
@@ -87,6 +89,7 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
+  import { onDestroy, onMount } from "svelte";
 
   /**
    * Role of user in active workspace
@@ -113,6 +116,7 @@
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
+  let isCollectionSyncing = false;
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -222,6 +226,24 @@
   ];
 
   let isBackgroundClickable = true;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+
+      if (isCollectionEditable && $tab && !$tab.isSaved) {
+        onSaveCollection();
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -265,7 +287,7 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-3"
+    class="my-collection d-flex flex-column w-100 z-1 p-3"
     style=" min-width: 450px"
   >
     <div class="d-flex gap-2 mb-4">
@@ -286,6 +308,7 @@
           type={"text"}
           size={"medium"}
           maxlength={500}
+          width={"398px"}
           id={"renameInputFieldCollection"}
           value={$tab?.name || ""}
           variant={"inline"}
@@ -419,6 +442,24 @@
             />
           </div>
         {/if} -->
+        {#if collection?.activeSync}
+          <div class="me-2">
+            <Button
+              id={`sync-collection`}
+              disable={!isCollectionEditable || isCollectionSyncing}
+              loader={isCollectionSyncing}
+              title={"Sync Collection"}
+              type={"secondary"}
+              onClick={async () => {
+                isCollectionSyncing = true;
+                await onSyncCollection(collection.id);
+                isCollectionSyncing = false;
+              }}
+              size="medium"
+              startIcon={ArrowSyncRegular}
+            />
+          </div>
+        {/if}
 
         <div
           class="d-flex me-2 flex-column justify-content-center"
@@ -434,7 +475,7 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable}
+              disable={!isCollectionEditable || collection?.activeSync}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -506,11 +547,10 @@
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div
-        class={`${
-          !isSynced && collection?.activeSync ? "d-none" : "d-block"
-        } align-items-center`}
+        class={`d-block
+        align-items-center`}
       >
-        <div class="d-flex gap-4 mb-4 ps-2">
+        <div class="d-flex gap-4 ps-2">
           <div class="d-flex align-items-center gap-2">
             <span class="fs-4 highlighted-number">{totalFolders}</span>
             <p style="font-size: 12px;" class="mb-0">Folders</p>
@@ -536,13 +576,14 @@
             <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
           </div>
         </div>
+        <hr />
         <div class="d-flex align-items-start ps-0 h-100 z-0">
           <textarea
             disabled={!isCollectionEditable}
             id="updateCollectionDescField"
             value={$tab?.description || ""}
             class=" border-0 text-fs-12 collection-area input-outline w-100 p-2"
-            placeholder="Add description"
+            placeholder="Describe this collection and share code examples or usage tips for the APIs."
             on:input={handleInputDescription}
           />
         </div>
@@ -580,10 +621,6 @@
 </div>
 
 <style>
-  .my-collection {
-    padding: 24px;
-  }
-
   .input-outline {
     border-radius: 0%;
   }
@@ -593,6 +630,7 @@
     border-radius: 4px !important;
     color: var(--text-secondary-1000);
     background-color: var(--bg-ds-surface-600);
+    height: 168px;
   }
   textarea::placeholder {
     color: var(--text-secondary-550);
@@ -609,9 +647,6 @@
 
   .add-button:hover {
     background-color: var(--dropdown-hover);
-  }
-  .collection-area {
-    height: 300px;
   }
 
   .highlighted-number {

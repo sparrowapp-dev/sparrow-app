@@ -29,7 +29,7 @@
   <div
     class="w-100 position-relative {apiState.bodyFormatter ===
     ResponseFormatterEnum.PREVIEW
-      ? 'h-100'
+      ? 'h-100 overflow-hidden'
       : ''}"
   >
     {#if apiState.bodyLanguage === RequestDataTypeEnum.IMAGE}
@@ -57,9 +57,7 @@
         -- Reponse content-type set to HTML preview,
         -- 
       -->
-      <iframe
-        srcdoc={response.body}
-        style="width: 100%; height: calc(100% - 10px);"
+      <iframe srcdoc={response.body} style="width: 100%; height: calc(100%);"
       ></iframe>
     {:else}
       <!-- 

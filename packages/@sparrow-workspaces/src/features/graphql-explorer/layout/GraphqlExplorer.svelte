@@ -178,7 +178,7 @@
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 px-3 pt-3 pb-2">
+    <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
       <!-- 
         --
@@ -236,8 +236,7 @@
         {onSaveRequest}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 10px;"></div>
-      <div class="pt-2"></div>
+      <div class="" style="margin-top: 12px;"></div>
       <div style="flex:1; overflow:auto;">
         {#if !isLoading}
           <Splitpanes

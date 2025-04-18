@@ -33,18 +33,22 @@ export class TeamService {
     return response;
   };
 
-  public updateTeam = async (teamId: string, team: TeamPostBody) => {
-    const response = await makeRequest("PUT", `${apiUrl}/api/team/${teamId}`, {
+  public updateTeam = async (
+    teamId: string,
+    team: TeamPostBody,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest("PUT", `${baseUrl}/api/team/${teamId}`, {
       body: team,
       headers: getMultipartAuthHeaders(),
     });
     return response;
   };
 
-  public leaveTeam = async (teamId: string) => {
+  public leaveTeam = async (teamId: string, baseUrl: string) => {
     const response = await makeRequest(
       "PUT",
-      `${apiUrl}/api/team/${teamId}/leave`,
+      `${baseUrl}/api/team/${teamId}/leave`,
       {
         headers: getAuthHeaders(),
       },
@@ -55,10 +59,11 @@ export class TeamService {
   public inviteMembersAtTeam = async (
     teamId: string,
     inviteBody: InviteBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${apiUrl}/api/team/${teamId}/user`,
+      `${baseUrl}/api/team/${teamId}/user`,
       {
         body: inviteBody,
         headers: getAuthHeaders(),
@@ -67,10 +72,14 @@ export class TeamService {
     return response;
   };
 
-  public removeMembersAtTeam = async (teamId: string, userId: string) => {
+  public removeMembersAtTeam = async (
+    teamId: string,
+    userId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "DELETE",
-      `${apiUrl}/api/team/${teamId}/user/${userId}`,
+      `${baseUrl}/api/team/${teamId}/user/${userId}`,
       {
         headers: getAuthHeaders(),
       },
@@ -78,10 +87,14 @@ export class TeamService {
     return response;
   };
 
-  public promoteToAdminAtTeam = async (teamId: string, userId: string) => {
+  public promoteToAdminAtTeam = async (
+    teamId: string,
+    userId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "POST",
-      `${apiUrl}/api/team/${teamId}/admin/${userId}`,
+      `${baseUrl}/api/team/${teamId}/admin/${userId}`,
       {
         headers: getAuthHeaders(),
       },
@@ -89,10 +102,14 @@ export class TeamService {
     return response;
   };
 
-  public demoteToMemberAtTeam = async (teamId: string, userId: string) => {
+  public demoteToMemberAtTeam = async (
+    teamId: string,
+    userId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "PUT",
-      `${apiUrl}/api/team/${teamId}/admin/${userId}`,
+      `${baseUrl}/api/team/${teamId}/admin/${userId}`,
       {
         headers: getAuthHeaders(),
       },
@@ -100,10 +117,66 @@ export class TeamService {
     return response;
   };
 
-  public promoteToOwnerAtTeam = async (teamId: string, userId: string) => {
+  public promoteToOwnerAtTeam = async (
+    teamId: string,
+    userId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "POST",
-      `${apiUrl}/api/team/${teamId}/owner/${userId}`,
+      `${baseUrl}/api/team/${teamId}/owner/${userId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public resendInvite = async (
+    teamId: string,
+    email: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/team/${teamId}/invite/resend/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public withdrawInvite = async (
+    teamId: string,
+    email: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/team/${teamId}/invite/not-accepted/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public acceptInvite = async (teamId: string, baseUrl: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/team/${teamId}/invite/user/accept`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public ignoreInvite = async (teamId: string, baseUrl: string) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/team/${teamId}/invite/not-accepted`,
       {
         headers: getAuthHeaders(),
       },

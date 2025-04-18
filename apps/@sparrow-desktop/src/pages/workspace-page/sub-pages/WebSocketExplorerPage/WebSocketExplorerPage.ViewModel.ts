@@ -4,10 +4,11 @@ import {
   ReduceQueryParams,
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/socket-explorer/utils";
-import { createDeepCopy, moveNavigation,
-  
-} from "@sparrow/common/utils";
-import { startLoading,stopLoading } from "../../../../../../../packages/@sparrow-common/src/store";
+import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import {
+  startLoading,
+  stopLoading,
+} from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
   Debounce,
@@ -58,6 +59,7 @@ import { WebSocketService } from "../../../../services/web-socket.service";
 import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import constants from "@app/constants/constants";
 
 class RestExplorerViewModel {
   /**
@@ -724,13 +726,18 @@ class RestExplorerViewModel {
         message: "",
       };
     }
-    const res = await this.collectionService.updateSocketInCollection(_id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
-    });
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const res = await this.collectionService.updateSocketInCollection(
+      _id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...folderSource,
+        ...userSource,
+        items: itemSource,
+      },
+      baseUrl,
+    );
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
@@ -925,17 +932,21 @@ class RestExplorerViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketInCollection({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.WEB_SOCKET,
-            websocket: unadaptedSocket,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketInCollection(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.WEB_SOCKET,
+              websocket: unadaptedSocket,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -1058,23 +1069,27 @@ class RestExplorerViewModel {
             },
           };
         }
-        const res = await this.collectionService.addSocketInCollection({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await this.collectionService.addSocketInCollection(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.WEB_SOCKET,
-              websocket: unadaptedSocket,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.WEB_SOCKET,
+                websocket: unadaptedSocket,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestInFolder(
             path[0].id,
@@ -1132,6 +1147,17 @@ class RestExplorerViewModel {
       }
       MixpanelEvent(Events.SAVE_API_REQUEST);
     }
+  };
+
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
   };
 
   /**
@@ -1201,10 +1227,14 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -1286,11 +1316,15 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -1350,10 +1384,12 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -1425,6 +1461,7 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -1433,6 +1470,7 @@ class RestExplorerViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(

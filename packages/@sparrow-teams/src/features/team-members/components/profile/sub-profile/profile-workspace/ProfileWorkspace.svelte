@@ -62,8 +62,8 @@
     style="height: 34px; "
   >
     <span
-      style="font-size:12px; font-weight:400; width:calc(100% - 120px);"
-      class="text-whiteColor ellipsis"
+      style="width:calc(100% - 120px);"
+      class="text-whiteColor ellipsis text-ds-line-height-150 text-ds-font-size-12 text-ds-font-weight-semi-bold"
       ><span style="color:var(--text-ds-neutral-400);">{workspace.name}</span
       ></span
     >

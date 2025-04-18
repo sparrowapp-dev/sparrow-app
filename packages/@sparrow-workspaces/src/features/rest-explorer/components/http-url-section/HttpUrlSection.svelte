@@ -80,7 +80,7 @@
 <div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
   <!-- Http Method Dropdown -->
   <Select
-    headerTheme={"secondary"}
+    variant={"secondary"}
     id={"api-request"}
     size={"medium"}
     data={[
@@ -110,7 +110,6 @@
         color: "patch",
       },
     ]}
-    borderRounded={"4px"}
     titleId={httpMethod}
     onclick={handleDropdown}
     borderHighlight={"active"}
@@ -120,11 +119,7 @@
     zIndex={500}
     borderType={"none"}
     menuItem={"v2"}
-    bodyTheme={"surface"}
-    isDropIconFilled={true}
     highlightTickedItem={false}
-    headerFontSize={"12px"}
-    headerHeight={"36px"}
   />
 
   <CodeMirrorInput

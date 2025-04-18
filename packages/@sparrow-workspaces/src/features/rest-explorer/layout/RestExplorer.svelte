@@ -25,7 +25,9 @@
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
 
+  import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
+  import { Events } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
   import type {
@@ -54,9 +56,12 @@
     ResponseSectionEnum,
     type KeyValue,
   } from "@sparrow/common/types/workspace";
-  import { tabsSplitterDirection } from "../../../stores";
+  import {
+    tabsSplitterDirection,
+    isChatbotOpenInCurrTab,
+  } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Carousel, Modal } from "@sparrow/library/ui";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
   import {
@@ -72,9 +77,14 @@
   import {
     CheckmarkCircleFilled,
     ErrorCircleFilled,
+    CaretDownFilled,
   } from "@sparrow/library/icons";
+
+  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
+  import { AIChatInterface } from "../../chat-bot/components";
+  import { ChatBot } from "../../chat-bot";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -105,13 +115,19 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onOpenCollection;
+
+  export let onGenerateAiResponse;
+  export let onToggleLike;
+
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
   export let onUpdateCollectionGuide: (query, isActive) => void;
-  // export let onUpdateAiPrompt;
-  // export let onUpdateAiConversation;
+  export let onUpdateAiPrompt;
+  export let onUpdateAiConversation;
   export let onGenerateDocumentation;
+  export let onStopGeneratingAIResponse;
+
   /**
    * Role of user in active workspace
    */
@@ -124,6 +140,37 @@
   export let collectionAuth;
   export let collection;
   const loading = writable<boolean>(false);
+
+  // Reference to the splitpane container element
+  let splitpaneContainer;
+  let splitpaneContainerWidth = 0;
+
+  // Chatbot pane size constraints in pixels (based on Figma design)
+  const minPx = 343;
+  const maxPx = 525;
+  const defaultPx = 452;
+
+  // Chatbot pane size constraints in percentage (calculated at runtime)
+  let minSizePct = 0;
+  let maxSizePct = 0;
+  let defaultSizePct = 0;
+
+  /**
+   * Converts the pixel-based min, max, and default sizes
+   * of the chatbot pane into percentages relative to the
+   * current width of the splitpane container.
+   *
+   * Required because `svelte-splitpane` accepts sizes in percentages.
+   */
+  function updateSplitpaneContSizes() {
+    if (!splitpaneContainer) return;
+
+    splitpaneContainerWidth = splitpaneContainer.clientWidth;
+
+    minSizePct = (minPx / splitpaneContainerWidth) * 100;
+    maxSizePct = (maxPx / splitpaneContainerWidth) * 100;
+    defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
+  }
 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
@@ -141,7 +188,19 @@
         isPopoverContainer = true;
       }
     });
+
+    // Delay to ensure DOM is ready before measuring container width
+    setTimeout(() => {
+      updateSplitpaneContSizes();
+      // Watch for container size changes and update pane size percentages
+      const resizeObserver = new ResizeObserver(() => {
+        updateSplitpaneContSizes();
+      });
+      resizeObserver.observe(splitpaneContainer);
+      return () => resizeObserver.disconnect(); // Cleanup on component unmount
+    }, 0);
   });
+
   export let onRenameCollection;
   export let onRenameFolder;
 
@@ -169,14 +228,29 @@
     });
   }
   let isGuidePopup = false;
+
+  // Here we are closing the chatbot when user switches to vertical layout view.
+  // This can be handled with a better approach, as its not user friendly way
+  // that we are closing the Chatbot interface with respect to vertical layout switching
+  // $: {
+  //   if (!isLoading && $tabsSplitterDirection != "horizontal") {
+  //     console.log("not active chatbox!!");
+  //     onUpdateRequestState({
+  //       isChatbotActive: false,
+  //     });
+  //   }
+  // }
+  $: if (!isGuestUser && $tab?.property?.request?.state?.isChatbotActive) {
+    isChatbotOpenInCurrTab.set(true);
+  }
+  onDestroy(() => {
+    isChatbotOpenInCurrTab.set(false);
+  });
 </script>
 
 {#if $tab.tabId}
   <div class="d-flex rest-explorer-layout h-100">
-    <div
-      class="w-100 d-flex flex-column h-100 pt-3 pb-3"
-      style="padding:0px 12px"
-    >
+    <div class="w-100 d-flex flex-column h-100 p-3">
       <!-- Request Name Header -->
       <!-- 
         --
@@ -234,226 +308,260 @@
         {onSaveRequest}
         {isGuestUser}
       />
-      <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 8px;">
-        {#if isPopoverContainer}
-          <Popover
-            onClose={closeCollectionHelpText}
-            heading={`Welcome to Sparrow`}
-          >
-            <p class="mb-0 text-fs-12">
-              Your one-stop solution for API testing and management. Start
-              organizing your API requests into collections, utilize environment
-              variables, and streamline your development process. Get started
-              now by creating your first collection or exploring our features
-              <span
-                on:click={() => {
-                  isGuidePopup = true;
+
+      <div
+        bind:this={splitpaneContainer}
+        style="flex:1; overflow:auto; margin-top: 12px;"
+      >
+        <Splitpanes class="explorer-chatbot-splitter">
+          <Pane class="position-relative bg-transparent">
+            <!--Disabling the Quick Help feature, will be taken up in next release-->
+            {#if isPopoverContainer}
+              <Popover
+                onClose={closeCollectionHelpText}
+                heading={`Welcome to Sparrow`}
+              >
+                <p class="mb-0 text-fs-12">
+                  Your one-stop solution for API testing and management. Start
+                  organizing your API requests into collections, utilize
+                  environment variables, and streamline your development
+                  process. Get started now by creating your first collection or
+                  exploring our features
+                  <span
+                    on:click={() => {
+                      isGuidePopup = true;
+                    }}
+                    class="link p-0 border-0"
+                    style="font-size: 12px;"
+                    >See how it works.
+                  </span>
+                </p>
+              </Popover>
+              <div class="pt-2"></div>
+            {/if}
+
+            {#if !isLoading}
+              <Splitpanes
+                class="rest-splitter w-100 h-100"
+                id={"rest-splitter"}
+                horizontal={$tabsSplitterDirection === "horizontal"
+                  ? true
+                  : false}
+                dblClickSplitter={false}
+                on:resize={(e) => {
+                  onUpdateRequestState({
+                    requestLeftSplitterWidthPercentage: e.detail[0].size,
+                  });
+                  onUpdateRequestState({
+                    requestRightSplitterWidthPercentage: e.detail[1].size,
+                  });
                 }}
-                class="link p-0 border-0"
-                style="font-size: 12px;"
-                >See how it works.
-              </span>
-            </p>
-          </Popover>
-        {/if}
-      </div>
-      <div class="pt-2"></div>
-      <div style="flex:1; overflow:auto;">
-        {#if !isLoading}
-          <Splitpanes
-            class="rest-splitter w-100 h-100"
-            id={"rest-splitter"}
-            horizontal={$tabsSplitterDirection === "horizontal" ? true : false}
-            dblClickSplitter={false}
-            on:resize={(e) => {
-              onUpdateRequestState({
-                requestLeftSplitterWidthPercentage: e.detail[0].size,
-              });
-              onUpdateRequestState({
-                requestRightSplitterWidthPercentage: e.detail[1].size,
-              });
-            }}
-          >
-            <Pane
-              minSize={30}
-              size={$tab.property.request?.state
-                ?.requestLeftSplitterWidthPercentage}
-              class="position-relative bg-transparent"
-            >
-              <!-- Request Pane -->
-              <div
-                class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
-                'horizontal'
-                  ? 'pb-1'
-                  : 'pe-2'}"
               >
-                <RequestNavigator
-                  requestStateSection={$tab.property.request?.state
-                    ?.requestNavigation}
-                  {onUpdateRequestState}
-                  authParameterLength={$requestAuthParameter.value ? 1 : 0}
-                  authHeaderLength={$requestAuthHeader.value ? 1 : 0}
-                  paramsLength={$tab.property?.request?.queryParams?.length ||
-                    0}
-                  headersLength={$tab.property?.request?.headers?.length || 0}
-                  autoGeneratedHeadersLength={$tab.property?.request
-                    ?.autoGeneratedHeaders?.length || 0}
-                />
-                <div style="flex:1; overflow:auto;" class="p-0">
-                  {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
-                    <RequestParameters
-                      isBulkEditActive={$tab?.property?.request.state
-                        ?.isParameterBulkEditActive}
+                <Pane
+                  minSize={30}
+                  size={$tab.property.request?.state
+                    ?.requestLeftSplitterWidthPercentage}
+                  class="position-relative bg-transparent"
+                >
+                  <!-- Request Pane -->
+                  <div
+                    class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
+                    'horizontal'
+                      ? 'pb-1'
+                      : 'pe-2'}"
+                  >
+                    <RequestNavigator
+                      requestStateSection={$tab.property.request?.state
+                        ?.requestNavigation}
                       {onUpdateRequestState}
-                      params={$tab.property.request.queryParams}
-                      {onUpdateRequestParams}
-                      authParameter={$requestAuthParameter}
-                      {onUpdateEnvironment}
-                      {environmentVariables}
+                      authParameterLength={$requestAuthParameter.value ? 1 : 0}
+                      authHeaderLength={$requestAuthHeader.value ? 1 : 0}
+                      paramsLength={$tab.property?.request?.queryParams
+                        ?.length || 0}
+                      headersLength={$tab.property?.request?.headers?.length ||
+                        0}
+                      autoGeneratedHeadersLength={$tab.property?.request
+                        ?.autoGeneratedHeaders?.length || 0}
                     />
-                  {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
-                    <RequestBody
-                      body={$tab.property.request.body}
-                      method={$tab.property.request.method}
-                      requestState={$tab.property.request.state}
-                      {onUpdateRequestBody}
-                      {onUpdateRequestState}
-                      {onUpdateEnvironment}
-                      {environmentVariables}
-                      {isWebApp}
-                    />
-                  {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
-                    <RequestHeaders
-                      isBulkEditActive={$tab?.property?.request.state
-                        ?.isHeaderBulkEditActive}
-                      {onUpdateRequestState}
-                      {environmentVariables}
-                      {onUpdateEnvironment}
-                      headers={$tab.property.request.headers}
-                      autoGeneratedHeaders={$tab.property.request
-                        .autoGeneratedHeaders}
-                      authHeader={$requestAuthHeader}
-                      onHeadersChange={onUpdateHeaders}
-                      onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
-                      {isWebApp}
-                    />
-                  {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
-                    <RequestAuth
-                      requestStateAuth={$tab.property.request.state
-                        .requestAuthNavigation}
-                      {onUpdateRequestState}
-                      auth={$tab.property.request.auth}
-                      collectionAuth={$collectionAuth}
-                      {onUpdateRequestAuth}
-                      {onUpdateEnvironment}
-                      {environmentVariables}
-                      {collection}
-                      {onOpenCollection}
-                    />
-                  {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
-                    <RequestDoc
-                      isDocGenerating={$tab.property.request?.state
-                        ?.isDocGenerating}
-                      isDocAlreadyGenerated={$tab.property.request?.state
-                        ?.isDocAlreadyGenerated}
-                      {onGenerateDocumentation}
-                      {onUpdateRequestDescription}
-                      requestDoc={$tab.description}
-                      {isGuestUser}
-                    />
-                  {/if}
-                </div>
-              </div>
-            </Pane>
-            <Pane
-              minSize={30}
-              size={$tab.property.request?.state
-                ?.requestRightSplitterWidthPercentage}
-              class="bg-transparent position-relative"
-            >
-              <!-- Response Pane -->
-              <div
-                class="d-flex flex-column h-100 {$tabsSplitterDirection ===
-                'horizontal'
-                  ? 'pt-1'
-                  : 'ps-2'}"
-              >
-                <div class="h-100 d-flex flex-column">
-                  <div style="flex:1; overflow:auto;">
-                    {#if storeData?.isSendRequestInProgress}
-                      <ResponseDefaultScreen {isWebApp} />
-                      <div
-                        style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
-                      >
-                        <Loader loaderSize={"20px"} />
-                      </div>
-                    {:else if !storeData?.response.status}
-                      <ResponseDefaultScreen {isWebApp} />
-                    {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                      <ResponseErrorScreen
-                        onSendButtonClicked={onSendRequest}
-                        response={storeData.response}
-                        {environmentVariables}
-                      />
-                    {:else if storeData?.response.status}
-                      <div class="h-100 d-flex flex-column" style="gap:12px">
-                        <div
-                          class="d-flex"
-                          style="position:sticky; top:0; z-index:2; background-color:var(--bg-ds-surface-900)"
-                        >
-                          <ResponseNavigator
-                            requestStateSection={storeData?.response.navigation}
-                            {onUpdateResponseState}
-                            responseHeadersLength={storeData?.response.headers
-                              ?.length || 0}
-                          />
-                          <ResponseStatus response={storeData.response} />
-                        </div>
-                        <div
-                          class="flex-grow-1 d-flex flex-column"
-                          style="overflow:auto; min-height:0;"
-                        >
-                          {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
-                            {#if storeData?.response.bodyLanguage !== "Image"}
-                              <ResponseBodyNavigator
-                                response={storeData?.response}
-                                apiState={storeData?.response}
-                                path={$tab.path}
-                                {onUpdateResponseState}
-                                {onClearResponse}
-                                {onSaveResponse}
-                                {isWebApp}
-                                {isGuestUser}
-                              />
-                            {/if}
-                            <div
-                              style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
-                            >
-                              <ResponseBody
-                                response={storeData?.response}
-                                apiState={storeData?.response}
-                              />
-                            </div>
-                          {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                            <div style="overflow:auto;">
-                              <ResponseHeaders
-                                responseHeader={storeData.response?.headers}
-                              />
-                            </div>
-                          {/if}
-                        </div>
-                      </div>
-                    {/if}
+                    <div style="flex:1; overflow:auto;" class="p-0">
+                      {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
+                        <RequestParameters
+                          isBulkEditActive={$tab?.property?.request.state
+                            ?.isParameterBulkEditActive}
+                          {onUpdateRequestState}
+                          params={$tab.property.request.queryParams}
+                          {onUpdateRequestParams}
+                          authParameter={$requestAuthParameter}
+                          {onUpdateEnvironment}
+                          {environmentVariables}
+                        />
+                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
+                        <RequestBody
+                          body={$tab.property.request.body}
+                          method={$tab.property.request.method}
+                          requestState={$tab.property.request.state}
+                          {onUpdateRequestBody}
+                          {onUpdateRequestState}
+                          {onUpdateEnvironment}
+                          {environmentVariables}
+                          {isWebApp}
+                        />
+                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
+                        <RequestHeaders
+                          isBulkEditActive={$tab?.property?.request.state
+                            ?.isHeaderBulkEditActive}
+                          {onUpdateRequestState}
+                          {environmentVariables}
+                          {onUpdateEnvironment}
+                          headers={$tab.property.request.headers}
+                          autoGeneratedHeaders={$tab.property.request
+                            .autoGeneratedHeaders}
+                          authHeader={$requestAuthHeader}
+                          onHeadersChange={onUpdateHeaders}
+                          onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
+                          {isWebApp}
+                        />
+                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
+                        <RequestAuth
+                          requestStateAuth={$tab.property.request.state
+                            .requestAuthNavigation}
+                          {onUpdateRequestState}
+                          auth={$tab.property.request.auth}
+                          collectionAuth={$collectionAuth}
+                          {onUpdateRequestAuth}
+                          {onUpdateEnvironment}
+                          {environmentVariables}
+                          {collection}
+                          {onOpenCollection}
+                        />
+                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                        <RequestDoc
+                          isDocGenerating={$tab.property.request?.state
+                            ?.isDocGenerating}
+                          isDocAlreadyGenerated={$tab.property.request?.state
+                            ?.isDocAlreadyGenerated}
+                          {onGenerateDocumentation}
+                          {onUpdateRequestDescription}
+                          requestDoc={$tab.description}
+                          {isGuestUser}
+                        />
+                      {/if}
+                    </div>
                   </div>
-                </div>
-              </div>
+                </Pane>
+                <Pane
+                  minSize={30}
+                  size={$tab.property.request?.state
+                    ?.requestRightSplitterWidthPercentage}
+                  class="bg-transparent position-relative"
+                >
+                  <!-- Response Pane -->
+                  <div
+                    class="d-flex flex-column h-100 {$tabsSplitterDirection ===
+                    'horizontal'
+                      ? 'pt-1'
+                      : 'ps-2'}"
+                  >
+                    <div class="h-100 d-flex flex-column">
+                      <div style="flex:1; overflow:auto;">
+                        {#if storeData?.isSendRequestInProgress}
+                          <ResponseDefaultScreen {isWebApp} />
+                          <div
+                            style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
+                          >
+                            <Loader loaderSize={"20px"} />
+                          </div>
+                        {:else if !storeData?.response.status}
+                          <ResponseDefaultScreen {isWebApp} />
+                        {:else if storeData?.response.status === ResponseStatusCode.ERROR}
+                          <ResponseErrorScreen
+                            onSendButtonClicked={onSendRequest}
+                            response={storeData.response}
+                            {environmentVariables}
+                          />
+                        {:else if storeData?.response.status}
+                          <div
+                            class="h-100 d-flex flex-column"
+                            style="gap:12px"
+                          >
+                            <div
+                              class="d-flex"
+                              style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
+                            >
+                              <ResponseNavigator
+                                requestStateSection={storeData?.response
+                                  .navigation}
+                                {onUpdateResponseState}
+                                responseHeadersLength={storeData?.response
+                                  .headers?.length || 0}
+                              />
+                              <ResponseStatus response={storeData.response} />
+                            </div>
+                            <div
+                              class="flex-grow-1 d-flex flex-column"
+                              style="overflow:auto; min-height:0;"
+                            >
+                              {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
+                                {#if storeData?.response.bodyLanguage !== "Image"}
+                                  <ResponseBodyNavigator
+                                    response={storeData?.response}
+                                    apiState={storeData?.response}
+                                    path={$tab.path}
+                                    {onUpdateResponseState}
+                                    {onClearResponse}
+                                    {onSaveResponse}
+                                    {isWebApp}
+                                    {isGuestUser}
+                                  />
+                                {/if}
+                                <div
+                                  style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                                >
+                                  <ResponseBody
+                                    response={storeData?.response}
+                                    apiState={storeData?.response}
+                                  />
+                                </div>
+                              {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
+                                <div style="overflow:auto;">
+                                  <ResponseHeaders
+                                    responseHeader={storeData.response?.headers}
+                                  />
+                                </div>
+                              {/if}
+                            </div>
+                          </div>
+                        {/if}
+                      </div>
+                    </div>
+                  </div>
+                </Pane>
+              </Splitpanes>
+            {:else}
+              <!-- loading state -->
+              <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
+            {/if}
+          </Pane>
+          <!-- AI Chatbot Interface -->
+          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive}
+            <Pane
+              class="position-relative bg-transparent"
+              minSize={minSizePct}
+              size={defaultSizePct}
+              maxSize={maxSizePct}
+            >
+              <ChatBot
+                {tab}
+                {onUpdateAiPrompt}
+                {onUpdateAiConversation}
+                {onUpdateRequestState}
+                {onGenerateAiResponse}
+                {onStopGeneratingAIResponse}
+                {onToggleLike}
+              />
             </Pane>
-          </Splitpanes>
-        {:else}
-          <!-- loading state -->
-          <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
-        {/if}
+          {/if}
+        </Splitpanes>
       </div>
     </div>
     <!--
@@ -555,7 +663,63 @@
   </div>
 </Modal>
 
+<!-- ChatBot Toggler -->
+{#if !isGuestUser}
+  <div
+    style="position: fixed;
+        bottom: 28px;
+        right:30px;
+        z-index: 200;"
+  >
+    <div
+      class="sparrow-ai-icon"
+      role="button"
+      on:click={() => {
+        if ($tabsSplitterDirection != "horizontal") {
+          tabsSplitterDirection.set("horizontal");
+          isChatbotOpenInCurrTab.set(true);
+        }
+        onUpdateRequestState({
+          isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
+        });
+
+        MixpanelEvent(Events.AI_Chat_Initiation);
+      }}
+    >
+      <div
+        class="chatten-box"
+        tabindex="0"
+        style="display: {!$tab?.property?.request?.state?.isChatbotActive
+          ? 'flex'
+          : 'none'}"
+      >
+        <SparrowSecondaryIcon />
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
+  .chatten-box {
+    background-color: var(--bg-ds-primary-400);
+    height: 40px;
+    width: 40px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .chatten-box:hover {
+    background-color: var(--bg-ds-primary-500);
+  }
+  .chatten-box:focus-visible {
+    height: 40px;
+    width: 40px;
+    border-radius: 10px;
+    border: 2px solid var(--border-ds-primary-300);
+    outline: none;
+  }
+
   .rest-explorer-layout {
     background-color: var(--bg-ds-surface-900);
   }
@@ -584,6 +748,27 @@
   ) {
     background-color: var(--bg-ds-primary-400) !important;
   }
+
+  /* Disabling the splitter for explorer and chatbot interface - only split dragger is allowed on hover */
+  :global(
+    .explorer-chatbot-splitter.splitpanes--vertical > .splitpanes__splitter
+  ) {
+    width: 8px !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  :global(
+    .explorer-chatbot-splitter.splitpanes--vertical
+      > .splitpanes__splitter:hover,
+    .explorer-chatbot-splitter.splitpanes--vertical
+      > .splitpanes__splitter:active
+  ) {
+    border: none !important;
+    border-right: 2px solid var(--border-ds-primary-300) !important;
+    background: transparent !important;
+  }
+
   .link {
     color: var(--text-primary-300);
     text-decoration: underline;

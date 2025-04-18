@@ -87,14 +87,15 @@
     }
     const isEmailAlreadyExist = isEmailAlreadyExistInTeam(email);
     if (isEmailAlreadyExist) {
-      notifications.error("User already in team!");
+      notifications.error("User already in hub.");
     }
-    const isUserExist = await onValidateEmail(email); // checks if user exist on server
-    if (!isUserExist) {
-      // notifications.error("User doesn't exist on sparrow!");
-    }
-    const isValidEmail =
-      validateEmail(email) && !isEmailAlreadyExist && isUserExist;
+    // const isUserExist = await onValidateEmail(email); // checks if user exist on server
+    // if (!isUserExist) {
+    // notifications.error("User doesn't exist on sparrow!");
+    // }
+    // const isValidEmail =
+    //   validateEmail(email) && !isEmailAlreadyExist && isUserExist;
+    const isValidEmail = validateEmail(email) && !isEmailAlreadyExist;
 
     if (!isValidEmail) {
       invalidEmails.push(email);
@@ -198,13 +199,16 @@
 </script>
 
 <div class="d-flex flex-column">
-  <p class="invite-header mb-0" style="color: var(--text-ds-neutral-200);">
+  <p
+    class="invite-header mb-0 text-ds-font-size-14"
+    style="color: var(--text-ds-neutral-200);"
+  >
     Invite by email<span class="asterik">*</span>
   </p>
 
   <p
-    style="padding: 2px 0px; font-size: 12px; color: var(--text-ds-neutral-400);"
-    class="invite-subheader mt-0 mb-1"
+    style="padding: 2px 0px;color: var(--text-ds-neutral-400);"
+    class="invite-subheader mt-0 mb-1 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
   >
     You can add multiple emails.
   </p>
@@ -237,7 +241,7 @@
       autocapitalize="none"
       style="outline:none;border:none;flex-grow:1; background:transparent;"
       bind:value={currentEmailEntered}
-      class="input-container text-fs-12"
+      class="input-container text-fs-14 text-ds-font-weight-medium text-ds-line-height-143"
       on:keyup={(event) => {
         if (
           (event.key === "," || event.key === "Enter") &&
@@ -269,7 +273,9 @@
 </div>
 
 <div class="mt-4">
-  <p class="role-title text-fs-14 text-secondary-1000 mb-1">
+  <p
+    class="role-title text-fs-14 text-secondary-1000 mb-1 text-ds-font-weight-regular text-ds-line-height-143"
+  >
     Role<span class="asterik">*</span>
   </p>
   <Select
@@ -300,20 +306,17 @@
       },
     ]}
     maxHeaderWidth={"100%"}
+    variant={"tertiary"}
+    size={"medium"}
     onclick={handleDropdown}
     position={"absolute"}
     menuItem={"v2"}
-    bodyTheme={"violet"}
-    headerTheme={"violet2"}
-    borderRounded={"4px"}
-    headerFontWeight={400}
-    headerFontSize={"12px"}
     isError={roleError && selectedRole === defaultRole}
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
-  <p class="invite-subheader text-textColor mt-1 mb-1">
-    Admins will have access to all current and future team workspaces.
+  <p class="invite-subheader text-textColor mt-1 mb-1 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">
+    Admins will have access to all current and future hub workspaces.
   </p>
 {/if}
 {#if roleError && selectedRole === defaultRole}
@@ -325,7 +328,7 @@
     <p class="role-title text-fs-12 text-secondary-1000 mb-0">
       Specify Workspace<span class="asterik">*</span>
     </p>
-    <p class="invite-subheader text-textColor mt-0 mb-1">
+    <p class="invite-subheader text-textColor mt-0 mb-1 text-ds-font-size-12">
       Select workspaces you would want to give access to.
     </p>
   </div>
@@ -342,29 +345,30 @@
   />
 
   {#if workspaceError && !countCheckedList(teamSpecificWorkspace)}
-    <p class="error-text">
+    <p class="error-text text-ds-font-size-12">
       You need to select at least one workspace. If you wish to give access to
       all workspaces, please click on select all.
     </p>
   {/if}
 {/if}
 <div class="mt-3">
-  <div class="d-flex align-items-center description ellipsis gap-2">
+  <div class="d-flex align-items-center ellipsis gap-1 text-ds-font-size-12">
     <div class="d-flex align-items-center" style="width: 36px;">
       {#if teamLogo?.size}
         <Avatar type={"image"} size={"large"} image={base64ToURL(teamLogo)} />
       {:else}
         <span class="">
           <Avatar
-            type={"letter"}
-            size={"large"}
-            letter={teamName.charAt(0)}
+            type={"person"}
+            size={"small"}
             bgColor={"var(--bg-tertiary-800)"}
           />
         </span>
       {/if}
     </div>
-    <p style="font-size:12px; font-weight:500" class="mb-0 ellipsis me-1">
+    <p
+      class="mb-0 ellipsis me-1 text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130"
+    >
       {teamName}
     </p>
   </div>
@@ -391,17 +395,6 @@
 </div>
 
 <style>
-  .invite-header {
-    font-size: 14px;
-  }
-  .invite-subheader {
-    font-size: 12px;
-  }
-
-  .description {
-    font-size: 12px;
-  }
-
   .asterik {
     color: var(--dangerColor);
     margin-left: 4px;
@@ -410,7 +403,6 @@
     margin-top: 4px;
     margin-bottom: 0 !important;
     color: var(--error--color);
-    font-size: 12px;
   }
 
   .email-container {

@@ -59,6 +59,7 @@ import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/h
 import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import { InitTab } from "@sparrow/common/factory";
 import type { GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
+import constants from "@app/constants/constants";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -219,6 +220,17 @@ class CollectionExplorerPage {
     return this.environmentRepository.getEnvironment();
   }
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -287,10 +299,15 @@ class CollectionExplorerPage {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
+
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -372,11 +389,15 @@ class CollectionExplorerPage {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path?.workspaceId as string,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path?.workspaceId as string,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -512,6 +533,9 @@ class CollectionExplorerPage {
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       return;
     }
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
     const response = await this.collectionService.updateCollectionData(
       progressiveTab.id as string,
       progressiveTab.path.workspaceId as string,
@@ -522,6 +546,7 @@ class CollectionExplorerPage {
         selectedAuthType:
           progressiveTab.property.collection.state.collectionAuthNavigation,
       },
+      baseUrl,
     );
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
@@ -904,8 +929,11 @@ class CollectionExplorerPage {
       moveNavigation("right");
       return;
     } else {
-      response =
-        await this.collectionService.addRequestInCollection(requestObj);
+      const baseUrl = await this.constructBaseUrl(collection.workspaceId);
+      response = await this.collectionService.addRequestInCollection(
+        requestObj,
+        baseUrl,
+      );
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
         this.collectionRepository.addRequestOrFolderInCollection(
@@ -1051,8 +1079,11 @@ class CollectionExplorerPage {
       moveNavigation("right");
       return;
     }
-    const response =
-      await this.collectionService.addRequestInCollection(requestObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -1157,6 +1188,7 @@ class CollectionExplorerPage {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(workspaceId);
     // Add the folder in the collection on the Database
     const response = await this.collectionService.addFolderInCollection(
       workspaceId,
@@ -1166,6 +1198,7 @@ class CollectionExplorerPage {
         name: folder.name,
         description: folder.description,
       },
+      baseUrl,
     );
 
     // Update UI elements and handle navigation on success
@@ -1278,8 +1311,11 @@ class CollectionExplorerPage {
       moveNavigation("right");
       return;
     }
-    const response =
-      await this.collectionService.addSocketInCollection(websocketObj);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addSocketInCollection(
+      websocketObj,
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -1359,8 +1395,10 @@ class CollectionExplorerPage {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addSocketIoInCollection(
       socketIoOfCollectionPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
@@ -1442,8 +1480,10 @@ class CollectionExplorerPage {
       return;
     }
 
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
     const response = await this.collectionService.addGraphqlInCollection(
       graphqlOfCollectionPayload,
+      baseUrl,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;

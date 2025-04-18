@@ -10,6 +10,7 @@
   export let onUpdateRequestState;
   export let updateBeautifiedState: (value: boolean) => void;
   export let requestState;
+
   let handleDropdown = (tab: string) => {
     // collectionsMethods.updateRequestState(tab, "dataset");
     onUpdateRequestState({ requestBodyNavigation: tab });
@@ -73,7 +74,10 @@
     </div>
   {/if}
 </div>
-<div class="d-flex align-items-center justify-content-between" style="margin-bottom:12px;">
+<div
+  class="d-flex align-items-center justify-content-between"
+  style="margin-bottom:12px;"
+>
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash124"}
@@ -104,8 +108,6 @@
       onclick={handleDropdown}
       zIndex={499}
       disabled={false}
-      minHeaderWidth={"160px"}
-      headerHeight={"28px"}
     />
     <span style="padding-right:12px" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
@@ -137,8 +139,6 @@
         onclick={handleRawDropDown}
         zIndex={499}
         disabled={false}
-        minHeaderWidth={"160px"}
-        headerHeight={"28px"}
       />
     {/if}
   </div>

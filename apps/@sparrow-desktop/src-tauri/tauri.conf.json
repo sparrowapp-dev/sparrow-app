@@ -82,6 +82,9 @@
   },
   "identifier": "dev.sparrowapp.desktop",
   "plugins": {
+    "singleInstance": {
+      "enabled": true
+    },
     "updater": {
       "windows": {
         "installMode": "passive"
@@ -99,5 +102,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.21.0"
+  "version": "2.22.0"
 }

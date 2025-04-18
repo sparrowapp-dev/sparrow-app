@@ -21,6 +21,7 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   user.subscribe(async (value) => {
@@ -87,11 +88,15 @@
   onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
   onUpdateTeam={_viewModel.updateTeam}
+  onWithDrawInvite={_viewModel.withdrawInvite}
+  onResendInvite={_viewModel.resendInvite}
+  onAcceptInvite={_viewModel.acceptInvite}
+  onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
 />
 
 <Modal
-  title={"Invite Team Members"}
+  title={"Add People to Hub"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}
@@ -142,7 +147,7 @@
 </Modal>
 
 <Modal
-  title={"Leave Team?"}
+  title={"Leave Hub?"}
   type={"dark"}
   width={"35%"}
   zIndex={1000}

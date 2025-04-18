@@ -154,17 +154,20 @@
     menuItem={"v2"}
     bodyTheme={"violet"}
     headerTheme={"violet2"}
+    variant={"tertiary"}
     borderRounded={"4px"}
     headerFontWeight={400}
     headerFontSize={"12px"}
     isError={showErrors && selectedRole === defaultRole}
+    minHeaderWidth={"100%"}
+    size={"medium"}
   />
   {#if showErrors && selectedRole === defaultRole}
     <p class="error-text sparrow-fs-12">Role cannot be empty.</p>
   {/if}
 </div>
 <div class="text-secondary-200 mt-2 sparrow-fs-12">
-  You can invite your team members or external collaborators to this workspace.
+  You can invite hub members or external collaborators to this workspace.
   Invited people will have access to only the <span style="color:white"
     >{currentWorkspaceDetails.name}</span
   > workspace.
@@ -177,7 +180,7 @@
       >
     </p>
     <p class="text-secondary-200 mb-0 ellipsis">
-      Team: <span style="color:white"> {teamName}</span>
+      Hub: <span style="color:white"> {teamName}</span>
     </p>
   </div>
   <div>

@@ -123,16 +123,16 @@
 />
 
 <Modal
-  title={"Delete Request?"}
+  title={"Delete Response?"}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
+  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
     <p>
-      Are you sure you want to delete this response <span
+      Are you sure you want to delete this response? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
       >
       will be removed and cannot be restored.
@@ -140,8 +140,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
@@ -287,8 +286,8 @@
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px); "
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style=" width: calc(100% - 50px); "
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -300,11 +299,10 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style="font-size: 12px;"
-      >
-        <p class="ellipsis m-0 p-0">
+      <div class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}">
+        <p
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        >
           {api.name}
         </p>
       </div>

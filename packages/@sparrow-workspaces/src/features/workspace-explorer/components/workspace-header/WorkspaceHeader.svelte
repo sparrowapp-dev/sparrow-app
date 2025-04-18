@@ -3,6 +3,7 @@
   import { Input } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
   import { PeopleRegular, SaveRegular } from "@sparrow/library/icons";
+  import { onDestroy, onMount } from "svelte";
   /**
    * The name of the workspace.
    */
@@ -38,40 +39,36 @@
    */
   export let userRole;
 
-  const onRenameInputKeyPress = () => {
-    const inputField = document.getElementById(
-      "renameInputFieldWorkspace",
-    ) as HTMLInputElement;
-    inputField.blur();
+  const handleInputName = (event: Event) => {
+    onUpdateWorkspaceName(event.detail, "");
+  };
+  const handleBlurName = (event: Event) => {
+    onUpdateWorkspaceName(event.detail, "blur");
+  };
+  export let onSaveWorkspace;
+
+  export let isSaved;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      if (userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSaved) {
+        onSaveWorkspace();
+      }
+    }
   };
 
-  const resetInputField = () => {
-    const inputField = document.getElementById(
-      "renameInputFieldWorkspace",
-    ) as HTMLInputElement;
-    inputField.value = workspaceName;
-  };
-  const handleInputName = (event) => {
-    if (event.key === "Enter") {
-      onRenameInputKeyPress();
-    }
-  };
-  const handleBlurName = () => {
-    const newValue = event.target.value;
-    const previousValue = workspaceName;
-    if (event.target.value?.trim() === "") {
-      resetInputField();
-    } else if (newValue !== previousValue) {
-      onUpdateWorkspaceName(workspaceID, newValue);
-    }
-  };
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <section>
-  <div
-    class="About d-flex flex-column h-100"
-    style="padding-bottom:24px; gap:16px !important; "
-  >
+  <div class="About d-flex flex-column h-100" style="gap:16px !important; ">
     <div class="d-flex" style="justify-content: space-between;">
       <div
         class="ellipsis w-auto"
@@ -90,20 +87,31 @@
           on:blur={handleBlurName}
         />
       </div>
-      {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
-        <div class="d-flex gap-2 ms-3">
-          <Button
-            startIcon={PeopleRegular}
-            size={"medium"}
-            type={"primary"}
-            title={"Invite"}
-            onClick={() => {
-              isWorkspaceInviteModalOpen = true;
-            }}
-            disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
-          />
-        </div>
-      {/if}
+      <div class="d-flex gap-2">
+        {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
+          <div class="d-flex gap-2 ms-3">
+            <Button
+              startIcon={PeopleRegular}
+              size={"medium"}
+              type={"primary"}
+              title={"Invite"}
+              onClick={() => {
+                isWorkspaceInviteModalOpen = true;
+              }}
+              disable={userRole !== WorkspaceRole.WORKSPACE_ADMIN}
+            />
+          </div>
+        {/if}
+
+        <Button
+          disable={isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          startIcon={SaveRegular}
+          type={"secondary"}
+          onClick={() => {
+            onSaveWorkspace();
+          }}
+        />
+      </div>
     </div>
   </div>
 </section>

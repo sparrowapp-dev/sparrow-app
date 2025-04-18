@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Spinner } from "@sparrow/library/ui";
+  import { Spinner, Tag, Toggle } from "@sparrow/library/ui";
   import { Select } from "@sparrow/library/forms";
   import {
     debounce,
@@ -64,6 +64,7 @@
     isValidServerXML = false,
     isValidServerDeployedURL = false;
 
+  let isActiveSyncEnabled = false;
   const handleInputField = async () => {
     isimportDataLoading = true;
     isValidClientURL = false;
@@ -260,7 +261,11 @@
       const response = await onGetOapiTextFromURL(importData);
       const contentType = validateJSON(importData);
       if (response?.data?.status === ResponseStatusCode.OK) {
-        handleImportJsonObject(contentType, response?.data?.body);
+        handleImportJsonObject(
+          ContentTypeEnum["application/json"],
+          response?.data?.body,
+          isActiveSyncEnabled,
+        );
       }
     } else if (
       importType === "text" &&
@@ -274,7 +279,11 @@
       const response = await onGetOapiTextFromURL(importData);
       if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
         const contentType = validateJSON(response?.data?.body);
-        handleImportJsonObject(contentType, response?.data?.body);
+        handleImportJsonObject(
+          contentType,
+          response?.data?.body,
+          isActiveSyncEnabled,
+        );
       }
 
       // else if (
@@ -328,7 +337,11 @@
     isLoading = false;
   };
 
-  const handleImportJsonObject = async (contentType, importJSON) => {
+  const handleImportJsonObject = async (
+    contentType,
+    importJSON,
+    activeSyncEnabled = false,
+  ) => {
     if (!contentType) {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -341,6 +354,8 @@
       currentWorkspaceId,
       importJSON,
       contentType,
+      activeSyncEnabled,
+      importData,
     );
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
@@ -514,7 +529,9 @@
 {#if importType === "text"}
   <div>
     <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-      Paste your OAS text or Swagger/Localhost Link
+      Paste OAS Text or Swagger/Localhost Link <span class="required-mark"
+        >*</span
+      >
     </p>
   </div>
   <div class="textarea-div rounded border-0 position-relative">
@@ -528,7 +545,7 @@
       on:blur={() => {
         isInputDataTouched = true;
       }}
-      placeholder={"Example - OpenAPI JSON text or http://localhost:8080/api-docs-json"}
+      placeholder={"Eg: OpenAPI JSON text or http://localhost:8080/api/docs-json "}
       bind:value={importData}
       class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&
@@ -758,7 +775,38 @@
     {/if}
   </div>
 {/if}
-
+{#if isValidServerDeployedURL || isValidServerURL}
+  <div
+    class="d-flex"
+    style="justify-content: space-between; align-items:flex-start; margin-top:10px;"
+  >
+    <div>
+      <div class="d-flex">
+        <p
+          class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+          style="color: var(--text-ds-neutral-200); margin-bottom:0px; margin-right:8px;"
+        >
+          Enable active sync
+        </p>
+        <Tag type="cyan" text={"Beta"} />
+      </div>
+      <p
+        class="text-ds-font-size-12 text-ds-font-weight-medium"
+        style="color: var(--text-ds-neutral-400);"
+      >
+        Keeps your Sparrow collection in sync with your Swagger in real-time.
+        While edits are allowed, adding or deleting APIs is disabled to maintain
+        consistency.
+      </p>
+    </div>
+    <Toggle
+      isActive={isActiveSyncEnabled}
+      onChange={() => {
+        isActiveSyncEnabled = !isActiveSyncEnabled;
+      }}
+    />
+  </div>
+{/if}
 <div
   class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
 >
@@ -789,6 +837,15 @@
       onCloseModal();
     }}>Create Empty Collection</button
   >
+</div>
+<div style="margin-top: 20px; justify-content:center" class="d-flex">
+  <p
+    class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
+    style="color: var(--text-ds-neutral-300); text-align: center;"
+  >
+    For active sync, only swagger or localhost links are supported. Uploading
+    files or pasting OpenAPI JSON text will create a normal collection.
+  </p>
 </div>
 
 <style lang="scss">
@@ -1063,5 +1120,9 @@
   input:checked + .slider:before {
     background-color: var(--send-button);
     transform: translateX(16px);
+  }
+  .required-mark {
+    color: var(--text-ds-danger-400);
+    font-family: "Inter", sans-serif;
   }
 </style>

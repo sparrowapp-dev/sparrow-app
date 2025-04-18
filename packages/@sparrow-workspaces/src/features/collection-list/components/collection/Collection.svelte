@@ -24,6 +24,9 @@
   export let userRole;
   export let isWebApp = false;
   export let isFirstCollectionExpand = false;
+  export let onCompareCollection;
+  export let onSyncCollection;
+  let isSyncChangesAvailable = false;
 
   import {
     openedComponent,
@@ -37,7 +40,7 @@
     ItemType,
     UntrackedItems,
   } from "@sparrow/common/enums/item-type.enum";
-  import { Spinner } from "@sparrow/library/ui";
+  import { Spinner, Tag } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
@@ -69,6 +72,11 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import type { CollectionBaseInterface } from "@sparrow/common/types/workspace/collection-base";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
+  import CircleSmallFilled from "../../../../../../@sparrow-library/src/icons/CircleSmallFilled.svelte";
+  import {
+    activeSyncStore,
+    updateActiveSyncStates,
+  } from "../../../../stores/active-sync";
 
   let deletedIds: string[] = [];
   let requestCount = 0;
@@ -88,6 +96,8 @@
   let noOfColumns = 180;
   let inputField: HTMLInputElement;
   let collectionTabWrapper: HTMLElement;
+  let isEnableSyncButton = false;
+  let isSyncing = false;
 
   /**
    * Handle position of the context menu
@@ -195,11 +205,11 @@
 
   onMount(async () => {
     if (collection?.activeSync) {
-      let response = await onBranchSwitched(collection);
-      if (response) {
-        isBranchSynced = response.isBranchSynced;
-        activeSyncLoad = response.activeSyncLoad;
-      }
+      // let response = await onBranchSwitched(collection);
+      // if (response) {
+      //   isBranchSynced = response.isBranchSynced;
+      //   activeSyncLoad = response.activeSyncLoad;
+      // }
     }
     // isActiveSyncEnabled = await commonService.isFeatureEnabled(
     //   "isActiveSyncEnabled",
@@ -214,20 +224,29 @@
 
   let prevCurrentBranch = "";
   let prevBranches = "";
-  $: {
-    if (collection?.activeSync && collection?.currentBranch) {
-      if (collection.currentBranch !== prevCurrentBranch) {
-        onBranchSwitched(collection);
-      }
-      prevCurrentBranch = collection.currentBranch;
-    }
-    if (collection?.activeSync && collection?.branches) {
-      if (JSON.stringify(collection.branches) !== prevBranches) {
-        onBranchSwitched(collection);
-      }
-      prevBranches = JSON.stringify(collection.branches);
-    }
-  }
+  let activeSyncChanges = {
+    addedCount: 0,
+    deletedCount: 0,
+    modifiedCount: 0,
+    percentChange: 0,
+    added: [],
+    deleted: [],
+    modified: [],
+  };
+  // $: {
+  //   if (collection?.activeSync && collection?.currentBranch) {
+  //     if (collection.currentBranch !== prevCurrentBranch) {
+  //       onBranchSwitched(collection);
+  //     }
+  //     prevCurrentBranch = collection.currentBranch;
+  //   }
+  //   if (collection?.activeSync && collection?.branches) {
+  //     if (JSON.stringify(collection.branches) !== prevBranches) {
+  //       onBranchSwitched(collection);
+  //     }
+  //     prevBranches = JSON.stringify(collection.branches);
+  //   }
+  // }
 
   let deleteLoader: boolean = false;
   let refreshCollectionLoader = false;
@@ -267,6 +286,53 @@
       verticalCollectionLine = false;
     }
   }
+
+  let intervalId;
+
+  onMount(async () => {
+    // Call it once immediately
+    activeSyncChanges = await onCompareCollection(collection.id);
+
+    // Set interval and save its ID
+    intervalId = setInterval(
+      () => {
+        onCompareCollection(collection.id)
+          .then((result) => {
+            activeSyncChanges = result;
+            console.log("changes ---->", activeSyncChanges);
+            if (activeSyncChanges.percentChange > 0) {
+              // isSyncChangesAvailable = true;
+              updateActiveSyncStates(collection.id, {
+                isChangesAvailable: true,
+                isloading: false,
+              });
+              isEnableSyncButton = true;
+            }
+          })
+          .catch((error) => {
+            console.error("Error during interval compare:", error);
+          });
+      },
+      1 * 60 * 1000,
+    ); // 2 minutes
+
+    // Optional: cleanup right here if component is destroyed
+    return () => {
+      clearInterval(intervalId);
+    };
+  });
+
+  activeSyncStore.subscribe((syncState) => {
+    const state = syncState.get(collection.id);
+    if (state) {
+      isSyncChangesAvailable = state.isChangesAvailable;
+      isSyncing = state.isloading;
+    }
+  });
+
+  onDestroy(() => {
+    clearInterval(intervalId); // Clean-up to avoid memory leaks
+  });
 </script>
 
 <svelte:window
@@ -284,32 +350,34 @@
   isOpen={isCollectionPopup}
   handleModalState={() => (isCollectionPopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
-    <p>
+  <div class="text-lightGray mb-1">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+    >
       Are you sure you want to delete this Collection? Everything in <span
         class="text-whiteColor fw-bold">"{collection.name}"</span
       >
       will be removed.
     </p>
   </div>
-  <div class="d-flex gap-3 sparrow-fs-12">
-    <div class="d-flex gap-1">
+  <div class="d-flex gap-3">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{requestCount}</span>
       <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{graphQLCount}</span>
       <p>GraphQL</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{webSocketCount}</span>
       <p>WebSocket</p>
     </div>
-    <div class="d-flex gap-1">
+    <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{socketIoCount}</span>
       <p>Socket.IO</p>
     </div>
@@ -349,7 +417,9 @@
 
 {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
-    xAxis={collectionTabWrapper.getBoundingClientRect().right - 30}
+    xAxis={collection.activeSync
+      ? collectionTabWrapper.getBoundingClientRect().right - 115
+      : collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
       collectionTabWrapper.getBoundingClientRect().top + 20,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
@@ -372,11 +442,12 @@
         },
         displayText: "Rename Collection",
         disabled: false,
-        hidden:
-          !(collection?.activeSync && isBranchSynced) &&
-          !(collection?.activeSync && !isBranchSynced)
-            ? false
-            : true,
+        hidden: false,
+        // hidden:
+        //   !(collection?.activeSync && isBranchSynced) &&
+        //   !(collection?.activeSync && !isBranchSynced)
+        //     ? false
+        //     : true,
       },
       {
         onClick: () =>
@@ -490,7 +561,9 @@
 >
   <button
     tabindex="-1"
-    class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
+    class="d-flex {collection?.activeSync
+      ? 'main-collection-sync'
+      : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
@@ -521,10 +594,10 @@
     />
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldCollection w-100 ellipsis"
+        class="py-0 renameInputFieldCollection w-100 ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         id="renameInputFieldCollection"
         type="text"
-        style="font-size: 12px; font-weight:400; line-height:18px; gap: 4px; "
+        style=" gap: 4px; "
         value={collection.name}
         maxlength={100}
         bind:this={inputField}
@@ -539,12 +612,11 @@
         style="height: 32px; text-align: left; width:80% ; padding:2px 4px;"
       >
         <p
-          class="ellipsis mb-0"
-          style="font-size: 12px; font-weight:400; line-height:18px;  "
+          class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         >
           {collection.name}
         </p>
-        {#if collection.activeSync}
+        <!-- {#if collection.activeSync}
           <span
             class="text-muted small w-100 ellipsis"
             style="font-size: 0.5rem;"
@@ -558,7 +630,7 @@
                 : ""
               : "(Default)"}
           </span>
-        {/if}
+        {/if} -->
       </div>
     {/if}
   </button>
@@ -571,26 +643,28 @@
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-      <Tooltip
-        title={"Add Options"}
-        placement={"bottom-center"}
-        distance={13}
-        show={!showAddItemMenu}
-        zIndex={701}
-      >
-        <span class="add-icon-container">
-          <Button
-            id={`add-item-collection-${collection.id}`}
-            size="extra-small"
-            customWidth={"24px"}
-            type="teritiary-regular"
-            onClick={(e) => {
-              rightClickContextMenu2(e);
-            }}
-            startIcon={AddRegular}
-          />
-        </span>
-      </Tooltip>
+      {#if !collection?.activeSync}
+        <Tooltip
+          title={"Add Options"}
+          placement={"bottom-center"}
+          distance={13}
+          show={!showAddItemMenu}
+          zIndex={701}
+        >
+          <span class="add-icon-container">
+            <Button
+              id={`add-item-collection-${collection.id}`}
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+              onClick={(e) => {
+                rightClickContextMenu2(e);
+              }}
+              startIcon={AddRegular}
+            />
+          </span>
+        </Tooltip>
+      {/if}
 
       <Tooltip
         title={"More"}
@@ -614,12 +688,29 @@
       </Tooltip>
     {/if}
 
+    {#if collection?.activeSync && isSyncChangesAvailable && !isSyncing}
+      <Tooltip
+        title={"Changes available for this collection."}
+        placement={"top-center"}
+        distance={10}
+        zIndex={701}
+      >
+        <CircleSmallFilled color="var(--icon-ds-danger-300)" />
+      </Tooltip>
+    {:else if isSyncing}
+      <Spinner size={"15px"} />
+    {/if}
     {#if isActiveSyncEnabled && collection?.activeSync}
-      <Tooltip placement="bottom-center" title="Sync" styleProp="left: 25%;">
+      <div style="width: 55px">
+        <Tag type="cyan" text={"Sync On"} />
+      </div>
+      <!-- <Tooltip placement="bottom-center" title="Sync" styleProp="left: 25%;">
         <button
           class="sync-button p-1 border-0 rounded"
           on:click={() => {
-            onRefetchCollection(collection.workspaceId, collection);
+            // onRefetchCollection(collection.workspaceId, collection);
+            console.log("clciked");
+            onCompareCollection(collection.id);
           }}
           on:mouseenter={() => {
             isSyncBtnHovered = true;
@@ -638,190 +729,236 @@
             />
           </span>
         </button>
-      </Tooltip>
+      </Tooltip> -->
     {/if}
   {/if}
 </div>
 <!-- {console.log(collection.name, !collection?.activeSync, activeSyncLoad)} -->
-{#if !collection?.activeSync || activeSyncLoad}
-  {#if !collection?.activeSync || isBranchSynced}
-    <div
-      class="z-1"
-      style=" padding-left: 0; padding-right:0;  display: {visibility
-        ? 'block'
-        : 'none'};"
-    >
+<!-- {#if !collection?.activeSync || activeSyncLoad} -->
+<!-- {#if !collection?.activeSync || isBranchSynced} -->
+<div
+  class="z-1"
+  style=" padding-left: 0; padding-right:0;  display: {visibility
+    ? 'block'
+    : 'none'};"
+>
+  <div
+    class=" ps-0 position-relative"
+    style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
+  >
+    {#if collection?.items?.length > 0}
       <div
-        class=" ps-0 position-relative"
-        style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
-      >
-        {#if collection?.items?.length > 0}
+        class="box-line"
+        style="background-color: {verticalCollectionLine
+          ? 'var(--bg-ds-neutral-500)'
+          : 'var(--bg-ds-surface-100)'}"
+      ></div>
+    {/if}
+    <div class="">
+      {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <div class="ps-5" style="height: 32px; ">
           <div
-            class="box-line"
-            style="background-color: {verticalCollectionLine
-              ? 'var(--bg-ds-neutral-500)'
-              : 'var(--bg-ds-surface-100)'}"
-          ></div>
-        {/if}
-        <div class="">
-          {#each collection.items as explorer}
-            <Folder
-              {userRole}
-              {onItemCreated}
-              {onItemDeleted}
-              {onItemRenamed}
-              {onItemOpened}
-              {collection}
-              {userRoleInWorkspace}
-              {activeTabPath}
-              {explorer}
-              {activeTabType}
-              {activeTabId}
-              {searchData}
-              {isWebApp}
-            />
-          {/each}
-        </div>
-        {#if !collection?.items?.length}
-          <p
-            class="text-fs-10 ps-5 ms-2 my-{collection.id === activeTabId
-              ? '0'
-              : '0'} text-secondary-300"
+            style="background-color: var(--bg-ds-primary-800); align-items:center; justify-content:space-between; border-radius:4px;"
+            class="d-flex"
           >
-            This collection is empty
-          </p>
-        {/if}
-
-        <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
-          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Tooltip
-              title={"Add Folder"}
-              placement={"bottom-center"}
-              distance={12}
+            <p
+              class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-medium"
+              style="margin-bottom: 0px; margin-left:6px;"
             >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px; "
-                role="button"
-                tabindex="0"
-                on:keydown={() => {}}
-                on:click={() => {
-                  onItemCreated("folder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
+              Changes Available
+            </p>
+            <div class="d-flex">
+              <Button
+                title={"Sync"}
+                type={"link-primary"}
+                loader={false}
+                onClick={() => {
+                  console.log("Synced clicked");
+                  onSyncCollection(collection.id);
                 }}
-              >
-                <FolderAddRegular
-                  size="16px"
-                  color="var(--bg-ds-neutral-300)"
+              />
+              <Tooltip placement="top-center" title={"Dismiss"} distance={12}>
+                <Button
+                  type={"teritiary-regular"}
+                  loader={false}
+                  onClick={() => {
+                    isEnableSyncButton = false;
+                  }}
+                  startIcon={DismissRegular}
                 />
-              </div>
-            </Tooltip>
-
-            <Tooltip
-              title={"Add REST API"}
-              placement={"bottom-center"}
-              distance={12}
-            >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("requestCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                }}
-              >
-                <ArrowSwapRegular
-                  size="16px"
-                  color="var(--bg-ds-neutral-300)"
-                />
-              </div>
-            </Tooltip>
-
-            <Tooltip
-              title={`Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-              placement={"bottom-center"}
-              distance={12}
-            >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("socketioCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                  MixpanelEvent(Events.Collection_SocketIO, {
-                    description: "Created Socket.IO inside collection.",
-                  });
-                }}
-              >
-                <SocketIoIcon
-                  height={"13px"}
-                  width={"13px"}
-                  color={"var(--request-arc)"}
-                />
-              </div>
-            </Tooltip>
-            <Tooltip
-              title={"Add WebSocket"}
-              placement={"bottom-center"}
-              distance={12}
-            >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("websocketCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                  MixpanelEvent(Events.Collection_WebSocket);
-                }}
-              >
-                <SocketIcon
-                  height="12px"
-                  width="16px"
-                  color="var(--request-arc)"
-                />
-              </div>
-            </Tooltip>
-
-            <Tooltip
-              title={`Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-              placement={"bottom-center"}
-              distance={12}
-            >
-              <div
-                class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                style="height: 24px; width: 24px;"
-                role="button"
-                on:click={() => {
-                  onItemCreated("graphqlCollection", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                  });
-                  MixpanelEvent(Events.Collection_GraphQL, {
-                    description: "Created GraphQL inside collection.",
-                  });
-                }}
-              >
-                <GraphIcon
-                  height={"13px"}
-                  width={"13px"}
-                  color={"var(--request-arc)"}
-                />
-              </div>
-            </Tooltip>
-          {/if}
+              </Tooltip>
+            </div>
+          </div>
         </div>
-        <!-- {#if showFolderAPIButtons}
+      {/if}
+      {#each collection.items as explorer}
+        <Folder
+          {userRole}
+          {onItemCreated}
+          {onItemDeleted}
+          {onItemRenamed}
+          {onItemOpened}
+          {collection}
+          {userRoleInWorkspace}
+          {activeTabPath}
+          {explorer}
+          {activeTabType}
+          {activeTabId}
+          {searchData}
+          {isWebApp}
+        />
+      {/each}
+    </div>
+    {#if !collection?.items?.length}
+      <p
+        class="text-ds-font-size-12 ps-5 ms-2 my-{collection.id === activeTabId
+          ? '0'
+          : '0'} text-secondary-300"
+      >
+        This collection is empty
+      </p>
+    {/if}
+
+    <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <Tooltip
+          title={collection?.activeSync
+            ? "Adding folders is disabled for active sync collections."
+            : "Add Folder"}
+          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          distance={12}
+        >
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px; "
+            role="button"
+            tabindex="0"
+            on:keydown={() => {}}
+            on:click={() => {
+              if (!collection?.activeSync) {
+                onItemCreated("folder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              }
+            }}
+          >
+            <FolderAddRegular size="16px" color="var(--bg-ds-neutral-300)" />
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          title={collection?.activeSync
+            ? "Adding requests is disabled for active sync collections."
+            : "Add REST API"}
+          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          distance={12}
+        >
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              if (!collection?.activeSync) {
+                onItemCreated("requestCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              }
+            }}
+          >
+            <ArrowSwapRegular size="16px" color="var(--bg-ds-neutral-300)" />
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          title={collection?.activeSync
+            ? "Adding requests is disabled for active sync collections."
+            : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          distance={12}
+        >
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              if (!collection?.activeSync) {
+                onItemCreated("socketioCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+                MixpanelEvent(Events.Collection_SocketIO, {
+                  description: "Created Socket.IO inside collection.",
+                });
+              }
+            }}
+          >
+            <SocketIoIcon
+              height={"13px"}
+              width={"13px"}
+              color={"var(--request-arc)"}
+            />
+          </div>
+        </Tooltip>
+        <Tooltip
+          title={collection?.activeSync
+            ? "Adding requests is disabled for active sync collections."
+            : "Add WebSocket"}
+          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          distance={12}
+        >
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              if (!collection?.activeSync) {
+                onItemCreated("websocketCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+                MixpanelEvent(Events.Collection_WebSocket);
+              }
+            }}
+          >
+            <SocketIcon height="12px" width="16px" color="var(--request-arc)" />
+          </div>
+        </Tooltip>
+
+        <Tooltip
+          title={collection?.activeSync
+            ? "Adding requests is disabled for active sync collections."
+            : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          distance={12}
+        >
+          <div
+            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+            style="height: 24px; width: 24px;"
+            role="button"
+            on:click={() => {
+              if (!collection?.activeSync) {
+                onItemCreated("graphqlCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+                MixpanelEvent(Events.Collection_GraphQL, {
+                  description: "Created GraphQL inside collection.",
+                });
+              }
+            }}
+          >
+            <GraphIcon
+              height={"13px"}
+              width={"13px"}
+              color={"var(--request-arc)"}
+            />
+          </div>
+        </Tooltip>
+      {/if}
+    </div>
+    <!-- {#if showFolderAPIButtons}
           <div class="mt-2 mb-2 d-flex">
             <Tooltip
               placement="bottom-center"
@@ -875,9 +1012,10 @@
             </Tooltip>
           </div>
         {/if} -->
-      </div>
-    </div>
-  {:else}
+  </div>
+</div>
+
+<!-- {:else}
     <div
       style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
         ? 'block'
@@ -886,7 +1024,7 @@
       <span class="sparrow-fs-12 text-muted">This branch is unavailable</span>
     </div>
   {/if}
-{/if}
+{/if} -->
 
 <style>
   .box-line {
@@ -1008,7 +1146,10 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-collection {
-    width: calc(100% - 58px);
+    width: calc(100% - 55px);
+  }
+  .main-collection-sync {
+    width: calc(100% - 119px);
   }
   .active-collection-tab {
     background-color: var(--bg-ds-surface-500) !important;

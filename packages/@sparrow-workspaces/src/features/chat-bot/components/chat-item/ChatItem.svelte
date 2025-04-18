@@ -2,18 +2,12 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@sparrow/library/ui";
-  import { copyIcon, tickIcon } from "../../assests";
+  import { copyIcon, tickIcon, ArrowExpand } from "../../assests";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";
   import "highlight.js/styles/atom-one-dark.css";
-  import {
-    CopyIcon2,
-    DislikeIcon,
-    LikeIcon,
-    RefreshIcon,
-    TickIcon,
-  } from "@sparrow/library/icons";
+  import { TickIcon } from "@sparrow/library/icons";
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -35,6 +29,9 @@
   export let regenerateAiResponse;
   export let isLastRecieverMessage;
   export let status;
+  export let isResponseGenerating;
+
+  export let onClickCodeBlockPreview;
 
   let showTickIcon: boolean = false;
 
@@ -65,18 +62,23 @@
         container.className = "wrapper";
         const lang = pre.querySelector("code")?.getAttribute("class");
         hljs.highlightBlock(pre.querySelector("code"));
-        // Add content or value to the container div
+        // Adding code block action buttons like copy code and preview code
         container.innerHTML = `
-      <div class="code-header bg-tertiary-300 ps-3 pe-2 py-1 d-flex align-items-center justify-content-between">
-        <span>${lang?.split("-")[1] ?? ""}</span>
-        <button role="button" class="position-relative copy-code-${messageId} action-button copy-code-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-          <img src="${copyIcon}" id="${index}">
-          <button class="copy-code-tooltip z-1 d-flex align-items-center justify-content-center position-absolute invisible text-fs-12">Copy
-            <div class="copy-code-tooltip-square"></div>
-          </button>
-        </button>
-      </div>
-        `;
+            <div class="code-header d-flex align-items-center justify-content-between">
+              <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+                <img src="${ArrowExpand}" id="${index}">
+                <div class="codeBlock-action-btns-tooltip">Preview
+                  <div class="codeBlock-action-btns-tooltip-square"></div>
+                </div>
+              </button>
+              <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+                <img src="${copyIcon}" id="${index}">
+                <div class="codeBlock-action-btns-tooltip">Copy
+                  <div class="codeBlock-action-btns-tooltip-square"></div>
+                </div>
+              </button>
+            </div>
+          `;
 
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
@@ -93,12 +95,20 @@
    * @param event - The mouse event triggered by clicking on the wrapper.
    */
   const handleCopyCode = async (event: MouseEvent) => {
-    const id = (event.target as HTMLElement).id;
     const targetElement = event.target as
       | HTMLImageElement
       | HTMLButtonElement
       | any;
     const firstChild = targetElement.children[0];
+
+    // Prevent click if tick icon is already shown
+    if (
+      targetElement.classList.contains("tick-icon") ||
+      firstChild?.classList?.contains("tick-icon")
+    ) {
+      return;
+    }
+
     const tagName = targetElement.tagName;
     if (tagName === "IMG") {
       const originalSrc = targetElement?.src;
@@ -118,9 +128,11 @@
         firstChild.classList.remove("tick-icon");
       }, 5000);
     }
+
     const target = (event.target as HTMLElement).closest(
       ".wrapper",
     ) as HTMLElement | null;
+
     if (target) {
       const codeElement = target.querySelector(
         "pre code",
@@ -135,6 +147,21 @@
         }
       }
     }
+  };
+
+  /**
+   * Handles the click event to preview code from a specified wrapper to the modal popup.
+   *
+   * @param event - The mouse event triggered by clicking on the wrapper.
+   */
+  const handleCodePreview = async (event: MouseEvent) => {
+    const wrapper = (event.target as HTMLElement).closest(".wrapper");
+    if (!wrapper) return;
+    const originalCodeBlock = wrapper.querySelector("pre > code.hljs");
+    const originalPreElement = originalCodeBlock?.parentElement;
+    if (!originalCodeBlock || !originalPreElement) return;
+    const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
+    onClickCodeBlockPreview(preClone);
   };
 
   /**
@@ -168,18 +195,30 @@
     // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
-      const wrappers = document.querySelectorAll(`.copy-code-${messageId}`);
+      const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);
+      const previewCodeBtns = document.querySelectorAll(
+        `.preview-code-${messageId}`,
+      );
 
       // Remove previous event listeners
       cleanUpListeners();
 
       cleanUpListeners = () => {
-        wrappers.forEach((wrapper) => {
+        copyCodeBtns.forEach((wrapper) => {
           wrapper.removeEventListener("click", handleCopyCode);
         });
       };
-      wrappers.forEach((wrapper) => {
+      copyCodeBtns.forEach((wrapper) => {
         wrapper.addEventListener("click", handleCopyCode);
+      });
+
+      cleanUpListeners = () => {
+        previewCodeBtns.forEach((wrapper) => {
+          wrapper.removeEventListener("click", handleCodePreview);
+        });
+      };
+      previewCodeBtns.forEach((wrapper) => {
+        wrapper.addEventListener("click", handleCodePreview);
       });
     }, 200);
   };
@@ -237,7 +276,7 @@
     -- RECIEVER
     -- 
     -->
-    <div class="recieve-item p-3">
+    <div class="recieve-item p-2">
       <div class="d-flex justify-content-between">
         <div class="d-flex gap-1 pb-2">
           {#if status}
@@ -264,7 +303,9 @@
         -- REGENERATE / COPY
         -- 
         -->
-        {#if isLastRecieverMessage}
+
+        <!-- Show only if last message is not an error message -->
+        {#if !isResponseGenerating && isLastRecieverMessage && status}
           <Tooltip
             placement="top-center"
             title={showTickIcon ? "Copied" : "Copy"}
@@ -276,7 +317,7 @@
               on:click={handleCopyResponse}
             >
               {#if showTickIcon}
-                <TickIcon size={"14px"} color={"grey"} />
+                <TickIcon width={"18px"} height={"18px"} color={"grey"} />
               {:else}
                 <CopyRegular size={"16px"} />
               {/if}
@@ -348,21 +389,62 @@
 
   :global(.message-wrapper .wrapper) {
     border-radius: 4px !important;
-    overflow: hidden !important;
     margin-bottom: 10px;
   }
-  :global(.message-wrapper .hljs) {
-    background: #000 !important;
-    border: 2px solid var(--border-ds-surface-400);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+
+  /* :global(.message-wrapper) {
+    overflow: hidden !important;
+  } */
+
+  :global(.wrapper) {
+    position: relative;
   }
+
+  :global(.code-header) {
+    position: absolute;
+    right: 0;
+    transform: translate(-30%, -50%);
+    border-radius: 4px;
+    background-color: var(--border-ds-surface-500);
+    border: 1px solid var(--border-ds-surface-300);
+    padding: 2px;
+    gap: 2px;
+  }
+
+  :global(.message-wrapper .hljs) {
+    max-width: 496px;
+    min-width: 276px;
+    max-height: 400px;
+    min-height: 70px;
+
+    /* *sparrow black is not rendering, so using hardcode hexcode* */
+    /* background: var(--sparrow-black) !important; */
+    background: #000 !important;
+
+    border: 2px solid var(--border-ds-surface-400);
+    border-radius: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Styling code block scroll bar */
+  :global(.message-wrapper .hljs::-webkit-scrollbar-thumb) {
+    background-color: var(--bg-ds-surface-100);
+  }
+  :global(.message-wrapper .hljs::-webkit-scrollbar),
+  :global(.message-wrapper .hljs::-webkit-scrollbar-thumb),
+  :global(.message-wrapper .hljs::-webkit-scrollbar-button) {
+    cursor: pointer;
+  }
+
   :global(.action-button) {
-    height: 30px;
+    height: 28px;
+    width: 28px;
     background-color: transparent;
     box-shadow: none;
     border: none;
-    width: 30px;
   }
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
@@ -381,34 +463,37 @@
     height: 16px;
   }
 
-  :global(.copy-code-tooltip) {
+  :global(.codeBlock-action-btns-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;
+    font-size: 12px;
+    font: Inter, sans-serif;
     gap: 6px;
-    top: 40px;
-    border-radius: 2px;
+    bottom: 40px;
+    border-radius: 4px;
     left: 50%;
     transform: translateX(-50%);
     position: absolute;
     padding: 4px 8px;
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-100);
     opacity: 0;
     -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
   }
-  :global(.copy-code-tooltip-square) {
-    z-index: 0;
+  :global(.codeBlock-action-btns-tooltip-square) {
     position: absolute;
-    top: -5px;
+    bottom: -5px;
     left: 50%;
     border-radius: 2px;
     height: 10px;
     width: 10px;
-    background-color: var(--bg-tertiary-700);
+    background-color: var(--bg-ds-surface-100);
     transform: translateX(-38%) rotate(45deg); /* Rotate 45 degrees */
   }
-  :global(.copy-code-selector:hover .copy-code-tooltip) {
+  :global(
+    .codeBlock-action-btns-selector:hover .codeBlock-action-btns-tooltip
+  ) {
     visibility: visible !important;
     opacity: 1;
   }

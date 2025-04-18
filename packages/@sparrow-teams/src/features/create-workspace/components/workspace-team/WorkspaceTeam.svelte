@@ -55,6 +55,7 @@
   const handleSelectTeam = (flag: string) => {
     selectedTeam = flag;
     onSelectTeam(flag);
+    isTeamError = false;
   };
 </script>
 
@@ -75,21 +76,15 @@
     data={teamTabs}
     titleId={selectedTeam}
     minHeaderWidth={"auto"}
-    iconRequired={false}
-    isDropIconFilled={true}
-    borderType={"none"}
-    borderActiveType={"none"}
-    headerHighlight={""}
-    headerTheme={"violet2"}
+    size={"medium"}
+    variant={"tertiary"}
     menuItem={"v3"}
-    headerFontSize={"12px"}
     maxHeaderWidth={"1285px"}
     zIndex={200}
-    bodyTheme={"violet"}
-    borderRounded={"2px"}
+    isError={isTeamError}
     position={"absolute"}
     onclick={(flag) => handleSelectTeam(flag)}
-    placeholderText="Select Team"
+    placeholderText="Select Hub"
   />
 
   <!-- 

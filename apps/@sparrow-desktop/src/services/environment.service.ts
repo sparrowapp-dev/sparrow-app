@@ -10,10 +10,13 @@ export class EnvironmentService {
 
   private apiUrl: string = constants.API_URL;
 
-  public fetchAllEnvironments = async (workspaceId: string) => {
+  public fetchAllEnvironments = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/workspace/${workspaceId}/environment`,
+      `${baseUrl}/api/workspace/${workspaceId}/environment`,
       { headers: getAuthHeaders() },
     );
     return response;
@@ -31,10 +34,13 @@ export class EnvironmentService {
     return response;
   };
 
-  public addEnvironment = async (environment: CreateEnvironmentPostBody) => {
+  public addEnvironment = async (
+    environment: CreateEnvironmentPostBody,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/workspace/environment`,
+      `${baseUrl}/api/workspace/environment`,
       {
         body: environment,
         headers: getAuthHeaders(),
@@ -48,10 +54,11 @@ export class EnvironmentService {
     workspaceId: string,
     environmentId: string,
     environment: UpdateEnvironmentPostBody,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
+      `${baseUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
       {
         body: environment,
         headers: getAuthHeaders(),
@@ -62,10 +69,11 @@ export class EnvironmentService {
   public deleteEnvironment = async (
     workspaceId: string,
     environmentId: string,
+    baseUrl: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
+      `${baseUrl}/api/workspace/${workspaceId}/environment/${environmentId}`,
       { headers: getAuthHeaders() },
     );
     return response;

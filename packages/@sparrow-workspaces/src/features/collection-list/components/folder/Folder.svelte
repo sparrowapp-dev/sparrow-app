@@ -127,11 +127,11 @@
     if (searchData) {
       expand = true;
     }
-    if (activeTabPath) {
-      if (activeTabPath?.folderId === explorer.id) {
-        expand = true;
-      }
-    }
+    // if (activeTabPath) {
+    // if (activeTabPath?.folderId === explorer.id) {
+    //   expand = true;
+    // }
+    // }
     if (explorer) {
       requestIds = [];
       requestCount = 0;
@@ -232,7 +232,9 @@
     isOpen={isFolderPopup}
     handleModalState={(flag = false) => (isFolderPopup = flag)}
   >
-    <div class="text-lightGray mb-1 sparrow-fs-14">
+    <div
+      class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+    >
       <p>
         Are you sure you want to delete this Folder? Everything in <span
           class="text-whiteColor fw-bold">"{explorer.name}"</span
@@ -240,7 +242,7 @@
         will be removed.
       </p>
     </div>
-    <div class="d-flex gap-3 sparrow-fs-12">
+    <div class="d-flex gap-3 text-ds-font-size-12">
       <div class="d-flex gap-1">
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
@@ -325,11 +327,12 @@
           },
           displayText: "Rename Folder",
           disabled: false,
-          hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
-              ? false
-              : true,
+          // hidden:
+          //   !collection.activeSync ||
+          //   (explorer?.source === "USER" && collection.activeSync)
+          //     ? false
+          //     : true,
+          hidden: false,
         },
         {
           onClick: () => {
@@ -478,10 +481,10 @@
           {/if}
           {#if isRenaming}
             <input
-              class="py-0 renameInputFieldFolder w-100"
+              class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
               id="renameInputFieldFolder"
               type="text"
-              style="font-size: 12px; padding-left:5px; font-weight:400; color : var(--text-ds-neutral-50); line-height:18px;"
+              style=" padding-left:5px;  color : var(--text-ds-neutral-50); "
               autofocus
               maxlength={100}
               value={explorer.name}
@@ -503,7 +506,9 @@
                       padding:2px 4px;
                       "
             >
-              <p class="ellipsis mb-0" style="font-size: 12px;">
+              <p
+                class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+              >
                 {explorer.name}
               </p>
             </div>
@@ -513,30 +518,32 @@
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
         {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-          <Tooltip
-            title={"Add REST API"}
-            placement={"bottom-center"}
-            zIndex={701}
-            distance={13}
-          >
-            <span class="threedot-icon-container d-flex">
-              <Button
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-                startIcon={ArrowSwapRegular}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  expand = true;
-                  onItemCreated("requestFolder", {
-                    workspaceId: collection.workspaceId,
-                    collection,
-                    folder: explorer,
-                  });
-                }}
-              />
-            </span>
-          </Tooltip>
+          {#if !collection?.activeSync}
+            <Tooltip
+              title={"Add REST API"}
+              placement={"bottom-center"}
+              zIndex={701}
+              distance={13}
+            >
+              <span class="threedot-icon-container d-flex">
+                <Button
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  startIcon={ArrowSwapRegular}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    expand = true;
+                    onItemCreated("requestFolder", {
+                      workspaceId: collection.workspaceId,
+                      collection,
+                      folder: explorer,
+                    });
+                  }}
+                />
+              </span>
+            </Tooltip>
+          {/if}
 
           <Tooltip
             title={"More"}
@@ -590,7 +597,7 @@
           {/each}
           {#if !explorer?.items?.length}
             <p
-              class="text-fs-10 my-2 text-secondary-300"
+              class="text-ds-font-size-12 my-2 text-secondary-300"
               style="padding-left: 90px;"
             >
               This folder is empty

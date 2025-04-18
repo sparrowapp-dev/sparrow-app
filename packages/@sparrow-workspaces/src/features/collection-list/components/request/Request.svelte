@@ -85,6 +85,7 @@
   let inputField: HTMLInputElement;
   let isRenaming = false;
   let deleteLoader: boolean = false;
+  let isDragging: boolean = false;
 
   let requestTabWrapper: HTMLElement;
 
@@ -132,6 +133,7 @@
   };
 
   const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
+    isDragging = true;
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
@@ -174,6 +176,9 @@
     //   }
     // }
   }
+  const dragStop = () => {
+    isDragging = false;
+  };
 </script>
 
 <svelte:window
@@ -189,7 +194,7 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 sparrow-fs-14">
+  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
     <p>
       Are you sure you want to delete this Request? <span
         class="text-whiteColor fw-bold">"{api.name}"</span
@@ -199,8 +204,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100"
-    style="font-size: 16px;"
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
@@ -294,6 +298,7 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
+  on:dragleave={dragStop}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -371,8 +376,8 @@
 
     {#if isRenaming}
       <input
-        class="py-0 renameInputFieldFile"
-        style="font-size: 12px; width: calc(100% - 50px); "
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style=" width: calc(100% - 50px);"
         id="renameInputFieldFile"
         type="text"
         maxlength={100}
@@ -386,9 +391,11 @@
     {:else}
       <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
-        style={`font-size: 12px; color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
+        style={`color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
-        <p class="ellipsis m-0 p-0">
+        <p
+          class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        >
           {api.name}
         </p>
       </div>
@@ -398,13 +405,7 @@
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-    <Tooltip
-      title={"More"}
-      show={!showMenu}
-      placement={"bottom-center"}
-      zIndex={701}
-      distance={17}
-    >
+    {#if isDragging}
       <span class="threedot-icon-container d-flex">
         <Button
           tabindex={-1}
@@ -418,7 +419,29 @@
           }}
         />
       </span>
-    </Tooltip>
+    {:else}
+      <Tooltip
+        title={"More"}
+        show={!showMenu}
+        placement={"bottom-center"}
+        zIndex={701}
+        distance={17}
+      >
+        <span class="threedot-icon-container d-flex">
+          <Button
+            tabindex={-1}
+            id={`show-more-api-${api.id}`}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              rightClickContextMenu(e);
+            }}
+          />
+        </span>
+      </Tooltip>
+    {/if}
   {/if}
 </div>
 <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">

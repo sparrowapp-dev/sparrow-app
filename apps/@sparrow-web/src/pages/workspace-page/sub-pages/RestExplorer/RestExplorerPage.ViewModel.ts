@@ -93,6 +93,9 @@ import { RequestSavedTabAdapter } from "src/adapter/request-saved-tab";
 import { InitTab } from "@sparrow/common/factory";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
+import { getClientUser } from "src/utils/jwt";
+import constants from "src/constants/constants";
+
 class RestExplorerViewModel {
   /**
    * Repository
@@ -111,7 +114,8 @@ class RestExplorerViewModel {
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
   private aiAssistentService = new AiAssistantService();
-  private aiAssistentWebSocketService = new AiAssistantWebSocketService();
+  private aiAssistentWebSocketService =
+    AiAssistantWebSocketService.getInstance();
   /**
    * Utils
    */
@@ -508,19 +512,23 @@ class RestExplorerViewModel {
         notifications.success("Response saved successfully.");
         return savedRequestId || "";
       }
-      const res = await this.collectionService.createSavedRequestInCollection({
-        collectionId: collectionId,
-        workspaceId: workspaceId,
-        requestId: requestId,
-        folderId: folderId,
-        ...userSource,
-        items: {
-          name: componentData.name,
-          description: componentData.description,
-          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
-          requestResponse: unadaptedRequest,
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const res = await this.collectionService.createSavedRequestInCollection(
+        {
+          collectionId: collectionId,
+          workspaceId: workspaceId,
+          requestId: requestId,
+          folderId: folderId,
+          ...userSource,
+          items: {
+            name: componentData.name,
+            description: componentData.description,
+            type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
+            requestResponse: unadaptedRequest,
+          },
         },
-      });
+        baseUrl,
+      );
       if (res.isSuccessful) {
         if (folderId) {
           this.collectionRepository.addSavedRequestInFolder(
@@ -1647,17 +1655,21 @@ class RestExplorerViewModel {
           };
           return;
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.REQUEST,
+              request: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -1818,23 +1830,27 @@ class RestExplorerViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.REQUEST,
+                request: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestInFolder(
             path[0].id,
@@ -1912,6 +1928,17 @@ class RestExplorerViewModel {
     }
   };
 
+  private constructBaseUrl = async (_id: string) => {
+    const workspaceData = await this.workspaceRepository.readWorkspace(_id);
+    const hubUrl = workspaceData?.team?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   /**
    *
    * @param isGlobalVariable - defines to save local or global
@@ -1979,10 +2006,14 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2064,11 +2095,15 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -2151,10 +2186,12 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateCollectionData(
         collectionId,
         workspaceId,
         { name: newCollectionName },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateCollection(
@@ -2224,6 +2261,7 @@ class RestExplorerViewModel {
           isSuccessful: true,
         };
       }
+      const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.collectionService.updateFolderInCollection(
         workspaceId,
         collectionId,
@@ -2232,6 +2270,7 @@ class RestExplorerViewModel {
           ...userSource,
           name: newFolderName,
         },
+        baseUrl,
       );
       if (response.isSuccessful) {
         this.collectionRepository.updateRequestOrFolderInCollection(
@@ -2264,9 +2303,14 @@ class RestExplorerViewModel {
     const sleep = (ms: number) =>
       new Promise((resolve) => setTimeout(resolve, ms));
     const displayNextChunk = async () => {
+      const componentData = this._tab.getValue();
+
+      // Check if generation should be stopped
+      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse)
+        return;
+
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
-        const componentData = this._tab.getValue();
         const length =
           componentData?.property?.request?.ai?.conversations.length;
         componentData.property.request.ai.conversations[length - 1].message =
@@ -2292,6 +2336,283 @@ class RestExplorerViewModel {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+
+  // AI WebSocket - Start
+
+  /**
+   * Handles socket connection errors with a consistent approach
+   * @param componentData - The current component data
+   */
+  private async handleAIResponseError(
+    componentData: RequestTab,
+    errorMessage: string,
+  ) {
+    await this.updateRequestAIConversation([
+      ...(componentData?.property?.request?.ai?.conversations || []),
+      {
+        message: errorMessage || "Something went wrong. Please try again",
+        messageId: uuidv4(),
+        type: MessageTypeEnum.RECEIVER,
+        isLiked: false,
+        isDisliked: false,
+        status: false,
+      },
+    ]);
+    await this.updateRequestState({ isChatbotGeneratingResponse: false });
+  }
+
+  /**
+   * Appends a new chunk to an existing AI message by its messageId
+   * @param messageId - ID of the message to update
+   * @param chunk - New chunk to append to the message
+   */
+  private async updateAIResponseByChunk(messageId: string, chunk: string) {
+    const componentData = this._tab.getValue();
+    const conversations =
+      componentData?.property?.request?.ai?.conversations || [];
+
+    let foundIndex = -1;
+    // Find the index of the message we need to update
+    for (let i = 0; i < conversations.length; i++) {
+      if (conversations[i].messageId === messageId) {
+        foundIndex = i;
+        break;
+      }
+    }
+
+    if (foundIndex !== -1) {
+      // Create a shallow clone of the conversations array
+      const updatedConversations = [...conversations];
+
+      // Update only the specific message by appending the new chunk
+      updatedConversations[foundIndex] = {
+        ...updatedConversations[foundIndex],
+        message: updatedConversations[foundIndex].message + chunk,
+      };
+      await this.updateRequestAIConversation(updatedConversations);
+    } else console.error("chunk not found!");
+  }
+
+  /**
+   * Generates the AI Response from server with websocket communication protocol
+   * @param Prompt - Prompt from the user
+   */
+  public generateAIResponseWS = async (prompt = "") => {
+    await this.updateRequestState({ isChatbotGeneratingResponse: true });
+    const componentData = this._tab.getValue();
+
+    // extraction of request API data for setting AI Context
+    const apiData = {
+      body: componentData.property.request.body,
+      headers: componentData.property.request.headers,
+      method: componentData.property.request.method,
+      queryParams: componentData.property.request.queryParams,
+      url: componentData.property.request.url,
+      auth: componentData.property.request.auth,
+    };
+
+    try {
+      const userEmail = getClientUser().email;
+      let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
+      let accumulatedMessage = ""; // Track the accumulated message content
+      let messageCreated = false; // Flag to track if we've created the initial message
+
+      const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        userEmail,
+        prompt,
+        JSON.stringify(apiData),
+      );
+
+      if (!socketResponse) {
+        throw new Error("Something went wrong. Please try again");
+      }
+
+      // Remove existing listeners to prevent duplicates
+      const STREAMING_STATES = {
+        START: "start",
+        STREAMING: "streaming",
+        END: "end",
+      };
+      const events = [
+        `assistant-response`,
+        `assistant-response_${componentData.tabId}`,
+        `disconnect`,
+        `connect_error`,
+      ];
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.removeListener(event),
+      );
+
+      // Unified event handler
+      const handleSocketEvent = async (event, response) => {
+        switch (event) {
+          case "disconnect":
+          case "connect_error":
+            // After getting response don't listen again for this the same request
+            events.forEach((event) =>
+              this.aiAssistentWebSocketService.removeListener(event),
+            );
+            await this.handleAIResponseError(
+              componentData,
+              "Something went wrong. Please try again",
+            );
+            break;
+
+          // Listening for "assistant-response" because initial "Limit Reached" msg is coming without tabId
+          case `assistant-response`:
+          case `assistant-response_${componentData.tabId}`:
+            // Handle special error messages
+            if (
+              response.messages &&
+              (response.messages.includes("Limit Reached") ||
+                response.messages.includes("Some Issue Occurred"))
+            ) {
+              // After getting error response remove all listeners
+              events.forEach((event) =>
+                this.aiAssistentWebSocketService.removeListener(event),
+              );
+
+              const errorMessage = response.messages.includes("Limit Reached")
+                ? "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section."
+                : "Some issue occurred while processing your request, please try again.";
+
+              await this.updateRequestAIConversation([
+                ...(componentData?.property?.request?.ai?.conversations || []),
+                {
+                  message: errorMessage,
+                  messageId: uuidv4(),
+                  type: MessageTypeEnum.RECEIVER,
+                  isLiked: false,
+                  isDisliked: false,
+                  status: false,
+                },
+              ]);
+              await this.updateRequestState({
+                isChatbotGeneratingResponse: false,
+              });
+              return;
+            }
+
+            // Handle streaming responses
+            if (response.stream_status) {
+              const { stream_status, messages, thread_id } = response;
+
+              // Handle thread ID on stream start if not already set
+              if (stream_status === STREAMING_STATES.START) {
+                // console.log("** stream started ** ");
+                const thisTabThreadId =
+                  componentData?.property?.request?.ai?.threadId;
+                if (!thisTabThreadId && thread_id) {
+                  await this.updateRequestAIThread(thread_id);
+                }
+
+                // Create empty message container that will be updated with chunks
+                if (!messageCreated) {
+                  await this.updateRequestAIConversation([
+                    ...(componentData?.property?.request?.ai?.conversations ||
+                      []),
+                    {
+                      message: "",
+                      messageId: responseMessageId,
+                      type: MessageTypeEnum.RECEIVER,
+                      isLiked: false,
+                      isDisliked: false,
+                      status: true,
+                    },
+                  ]);
+                  messageCreated = true;
+                }
+              }
+
+              // Handle incoming message chunk
+              else if (
+                stream_status === STREAMING_STATES.STREAMING &&
+                messages
+              ) {
+                accumulatedMessage += messages;
+
+                // Append only the new chunk to the existing message
+                await this.updateAIResponseByChunk(responseMessageId, messages);
+              }
+
+              // Handle end of stream
+              else if (stream_status === STREAMING_STATES.END) {
+                // Cleanup listeners as stream is complete
+                events.forEach((event) =>
+                  this.aiAssistentWebSocketService.removeListener(event),
+                );
+
+                // Update state to indicate response generation is complete
+                await this.updateRequestState({
+                  isChatbotGeneratingResponse: false,
+                });
+              }
+            }
+            break;
+        }
+      };
+
+      // Add new listeners
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.addListener(event, (response) =>
+          handleSocketEvent(event, response),
+        ),
+      );
+    } catch (error) {
+      console.error("Something went wrong!:", error.message);
+      await this.handleAIResponseError(componentData, error.message);
+    }
+  };
+
+  /**
+   * Stops the response generation from the FE and sends stop generate event to server
+   *
+   */
+  public stopGeneratingAIResponse = async () => {
+    const componentData = this._tab.getValue();
+
+    // Handling the case where user clicked stop generating just after the "start" stream status
+    const conversation =
+      componentData?.property?.request?.ai?.conversations || [];
+    if (conversation.length > 0) {
+      // Remove last message
+      const lastResponse = conversation[conversation.length - 1];
+      if (lastResponse.type === "Receiver" && lastResponse?.message === "") {
+        conversation.pop();
+        await this.updateRequestAIConversation(conversation);
+      }
+    }
+
+    try {
+      // Send stop signal to the server
+      await this.aiAssistentWebSocketService.stopGeneration(
+        componentData.tabId,
+        componentData?.property?.request?.ai?.threadId || null,
+        getClientUser().email,
+      );
+
+      await this.updateRequestState({ isChatbotGeneratingResponse: false });
+
+      // Remove all event listeners to prevent further updates
+      const events = [
+        `assistant-response`,
+        `assistant-response_${componentData.tabId}`,
+        `disconnect`,
+        `connect_error`,
+      ];
+      events.forEach((event) =>
+        this.aiAssistentWebSocketService.removeListener(event),
+      );
+
+      // Show error msg in the chat for stop generation
+      // this.handleAIResponseError(componentData, "Generation Stopped")
+    } catch (error) {
+      console.error("Error stopping AI response generation:", error);
+    }
+  };
+  // AI WebSocket - End
 
   /**
    * Generates an AI response based on the given prompt.

@@ -25,6 +25,8 @@ env:
   VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
   VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
   VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
+  VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
+  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
 
@@ -82,17 +84,17 @@ jobs:
 
       - name: msi sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-    
+
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
-           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1

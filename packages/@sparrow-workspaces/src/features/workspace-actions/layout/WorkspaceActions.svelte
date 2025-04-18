@@ -135,6 +135,8 @@
   export let refreshLoad = false;
   export let refreshWorkspace: () => void;
   export let userCount = 0;
+  export let onCompareCollection;
+  export let onSyncCollection;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -552,7 +554,7 @@
     </div>
 
     <div
-      class="d-flex align-items-center justify-content-between ps-2 pt-3 pe-1 gap-2"
+      class="d-flex align-items-center justify-content-between px-2 pt-3 gap-2"
     >
       <Search
         id="collection-list-search"
@@ -720,6 +722,8 @@
           {isWebApp}
           {ActiveTab}
           {handleTabUpdate}
+          {onCompareCollection}
+          {onSyncCollection}
         />
       </div>
 
@@ -786,7 +790,7 @@
 
     <!-- <hr class="ms-2 me-2 mb-0 mt-0" /> -->
     <div
-      class="px-3 py-2 d-flex align-items-center justify-content-between"
+      class="p-2 d-flex align-items-center justify-content-between"
       style="z-index: 4;"
     >
       <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>

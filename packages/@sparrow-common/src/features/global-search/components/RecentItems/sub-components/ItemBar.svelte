@@ -68,7 +68,9 @@
   </div>
   <div class="request-details">
     <div class="request-header">
-      <span class="request-title">
+      <span
+        class="request-title text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+      >
         {#if data?.isTitleHighLightEnable && data?.charsToBeHightlighted && data?.name}
           <!-- Highlight specific substring -->
           {#each highlightSubstring(data.name, data.charsToBeHightlighted) as segment}
@@ -82,9 +84,15 @@
           {data?.name}
         {/if}
       </span>
-      <span class="request-path">{data?.path}</span>
+      <span
+        class="request-path text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        >{data?.path}</span
+      >
     </div>
-    <span class="request-url">{data.url || ""}</span>
+    <span
+      class="request-url text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+      >{data.url || ""}</span
+    >
   </div>
 </div>
 
@@ -130,9 +138,6 @@
 
   .request-title {
     color: var(--text-ds-neutral-300);
-    font:
-      400 12px Inter,
-      sans-serif;
     flex: 1 1 0;
     max-width: fit-content;
   }
@@ -144,17 +149,11 @@
 
   .request-path {
     color: var(--text-ds-neutral-500);
-    font:
-      400 12px Inter,
-      sans-serif;
     flex: 2 1 0;
   }
 
   .request-url {
     color: var(--text-ds-primary-300);
-    font:
-      400 12px Inter,
-      sans-serif;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

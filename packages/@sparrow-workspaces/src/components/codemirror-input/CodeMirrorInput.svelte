@@ -22,6 +22,8 @@
   export let placeholder;
   export let theme;
   export let disabled = false;
+
+  export let enableEnvironmentHighlighting = true;
   /**
    * unique id used to focus codemirror input
    */
@@ -33,12 +35,12 @@
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
-  let trackCursor: number;
+  let trackCursor: number | undefined;
   let environmentAxisY: number;
   let environmentAxisX: number;
   let dialogType = "";
   let localEnvKey: string;
-  let filterData = [];
+  let filterData: any[] = [];
   let id = uuidv4() + codeId;
 
   $: {
@@ -68,7 +70,7 @@
   };
 
   let handleFocusValue = () => {
-    handleInputValue();
+    // handleInputValue();
   };
   let handleBlurValue = () => {
     setTimeout(() => {
@@ -77,8 +79,10 @@
       filterData = [];
     }, 300);
   };
+
   let handleInputChange = (text: string) => {
     value = text;
+    handleInputValue();
   };
   let handleKeyUpValue = (e: EditorSelection) => {
     trackCursor = e.main.head;
@@ -98,7 +102,6 @@
 
 <CodeMirrorHandler
   rawValue={value}
-  handleRawChange={handleInputValue}
   handleFocusChange={handleFocusValue}
   handleBlurChange={handleBlurValue}
   {handleInputChange}
@@ -114,6 +117,7 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
+  {enableEnvironmentHighlighting}
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
