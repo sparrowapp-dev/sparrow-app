@@ -755,7 +755,7 @@
       ></div>
     {/if}
     <div class="">
-      {#if isSyncChangesAvailable && isEnableSyncButton}
+      {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <div class="ps-5" style="height: 32px; ">
           <div
             style="background-color: var(--bg-ds-primary-800); align-items:center; justify-content:space-between; border-radius:4px;"
