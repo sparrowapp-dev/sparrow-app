@@ -15,7 +15,7 @@
     <div class="d-flex flex-column h-100">
       {#if isFetched}
         <div style="flex:1; overflow:auto; position:relative;">
-          <div>
+          <div class="h-100">
             <Editor
               bind:lang
               bind:value

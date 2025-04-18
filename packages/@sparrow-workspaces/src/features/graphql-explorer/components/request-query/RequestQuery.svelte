@@ -38,12 +38,13 @@
             <img src={beautifyIcon} style="height:10px; width:10px;" />
           </div>
         {/if}
-        <div>
+        <div class="h-100">
           <Editor
             bind:lang
             bind:value
             on:change={handleCodeMirrorChange}
             isEditable={true}
+            autofocus={true}
             class="m-0"
             {isBodyBeautified}
             beautifySyntaxCallback={updateBeautifiedState}

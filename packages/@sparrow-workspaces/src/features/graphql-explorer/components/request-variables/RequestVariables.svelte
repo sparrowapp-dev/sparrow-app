@@ -16,12 +16,13 @@
   <div style="flex:1; overflow:auto;">
     <div class="d-flex flex-column h-100">
       <div style="flex:1; overflow:auto; position:relative;">
-        <div>
+        <div class="h-100">
           <Editor
             bind:lang
             bind:value
             on:change={handleCodeMirrorChange}
             isEditable={true}
+            autofocus={true}
             class="m-0"
             {isBodyBeautified}
             placeholder={""}
