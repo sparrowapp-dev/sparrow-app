@@ -324,7 +324,6 @@
 
   activeSyncStore.subscribe((syncState) => {
     const state = syncState.get(collection.id);
-    console.log("activesyncstatechanged", state);
     if (state) {
       isSyncChangesAvailable = state.isChangesAvailable;
       isSyncing = state.isloading;
