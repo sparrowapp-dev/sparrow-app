@@ -233,7 +233,7 @@
 
 <style>
   .email-container {
-    background-color: var(--bg-tertiary-300);
+    background-color: var(--bg-ds-surface-400);
     border: 1px solid;
     padding: 3px 8px 3px 8px;
     border: 1px solid var(--border-secondary-400);

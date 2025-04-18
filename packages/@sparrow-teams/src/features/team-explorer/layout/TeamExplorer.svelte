@@ -11,7 +11,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
-  import { ListRegular } from "@sparrow/library/icons";
+  import { AddRegular, ListRegular, PeopleRegular } from "@sparrow/library/icons";
 
   import {
     TeamTabsEnum,
@@ -343,6 +343,7 @@
               <Button
                 title={`Invite`}
                 type={"secondary"}
+                startIcon={PeopleRegular}
                 onClick={() => {
                   isTeamInviteModalOpen = true;
                 }}
@@ -353,6 +354,7 @@
               <Button
                 title={`New Workspace`}
                 type={`primary`}
+                startIcon={AddRegular}
                 onClick={async () => {
                   await handleCreateNewWorkspace();
                 }}
