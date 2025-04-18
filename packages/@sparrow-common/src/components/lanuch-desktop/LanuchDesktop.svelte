@@ -1,5 +1,5 @@
 <script>
-  import { MacIcon, WindowsIcon } from "@sparrow/library/icons";
+  import { MacIcon, SparrowIcon } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   export let launchSparrowWebApp;
   let windowOs = true;
@@ -27,7 +27,7 @@
       {#if windowOs}
         <MacIcon height="12px" width="12px" color="white" />
       {:else}
-        <WindowsIcon height="12px" width="12px" color="white" />
+        <SparrowIcon height="12px" width="12px" color="white" />
       {/if}
 
       <p
