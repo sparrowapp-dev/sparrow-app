@@ -450,7 +450,7 @@
               style="margin: 0px;  color: var(--text-ds-neutral-400) ;"
               class="my-2 search-notfound-text"
             >
-              == No results found.
+              No results found.
             </p>
           </div>
         {/if}
