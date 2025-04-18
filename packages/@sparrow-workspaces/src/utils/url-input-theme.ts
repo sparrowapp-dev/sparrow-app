@@ -1,4 +1,5 @@
 import { EditorView } from "@codemirror/view";
+
 export class UrlInputTheme {
   private theme;
   constructor() {
@@ -10,13 +11,17 @@ export class UrlInputTheme {
         borderRadius: "0",
         fontSize: "14px",
         overflow: "hidden",
+        maxHeight: "164px !important",
       },
       ".cm-content": {
         caretColor: "var(--white-color)",
-        height: "100%",
+        height: "auto",
         paddingTop: "7px",
         backgroundColor: "var(--bg-ds-surface-600)",
-        "border-radius": "4px",
+        maxHeight: "164px !important",
+        borderRadius: "4px",
+        overflowY: "auto",
+        overflowX: "hidden",
       },
       ".cm-content::placeholder": {
         color: "var(--background-color)",
@@ -38,7 +43,7 @@ export class UrlInputTheme {
       },
       ".cm-placeholder": {
         color: "var(--text-ds-neutral-400)",
-        "font-size": "14x",
+        "font-size": "14px",
         "line-height": "20px",
       },
       ".cm-button": {
@@ -67,19 +72,62 @@ export class UrlInputTheme {
         fontSize: "30px",
         fontWeight: "400",
       },
-      "&.cm-editor:hover": {
-        outline: "1px solid var(--border-ds-neutral-300)",
-        "border-radius": "4px",
-      },
-      "&.cm-editor.cm-focused": {
-        "border-radius": "4px",
-        outline: "1px solid var(--border-ds-primary-300)",
+      "&.cm-editor": {
+        maxHeight: "164px !important",
+
+        "&:hover": {
+          outline: "1px solid var(--border-ds-neutral-300)",
+          borderRadius: "4px",
+        },
+        "&.cm-focused": {
+          borderRadius: "4px",
+          outline: "1px solid var(--border-ds-primary-300)",
+          height: "auto !important",
+          maxHeight: "164px !important",
+          minHeight: "36px !important",
+          position: "absolute",
+          zIndex: "10",
+          width: "100%",
+          overflowY: "auto",
+          overflowX: "hidden",
+        },
+        "&.cm-focused .cm-scroller": {
+          whiteSpace: "pre-wrap !important",
+          wordBreak: "break-word !important",
+          overflowX: "hidden !important",
+          overflowY: "auto !important",
+          maxHeight: "164px !important",
+          width: "100% !important",
+        },
+        "&.cm-focused .cm-content": {
+          whiteSpace: "pre-wrap !important",
+          wordBreak: "break-all !important",
+          maxHeight: "164px !important",
+          width: "100% !important",
+        },
+        "&.cm-focused .cm-line": {
+          width: "100% !important",
+          maxWidth: "100% !important",
+          display: "block !important",
+          boxSizing: "border-box !important",
+          paddingRight: "10px !important",
+        },
       },
       ".cm-scroller::-webkit-scrollbar": {
-        display: "none",
+        width: "10px",
+        height: "0px !important",
+      },
+      ".cm-scroller::-webkit-scrollbar-thumb": {
+        backgroundColor: "var(--border-ds-neutral-300)",
+        borderRadius: "8px",
+      },
+      ".cm-scroller::-webkit-scrollbar-horizontal": {
+        display: "none !important",
+        height: "0 !important",
       },
     });
   }
+
   public build() {
     return this.theme;
   }
