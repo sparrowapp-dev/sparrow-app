@@ -373,6 +373,10 @@
     line-height: 18px;
     text-align: right;
     color: var(--text-ds-neutral-200);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
   }
   .text-success.text-fail {
     font-family: "Inter", sans-serif;
