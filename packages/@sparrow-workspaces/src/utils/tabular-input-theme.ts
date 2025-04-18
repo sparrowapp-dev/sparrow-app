@@ -13,7 +13,7 @@ export class TabularInputTheme{
         fontSize: "12px",
         lineHeight: "130%",
         fontWeight: "500",
-        carotColor:"var(--bg-ds-primary-300)",
+        carotColor: "var(--bg-ds-primary-300)",
         maxHeight: "164px !important",
       },
       ".cm-content": {
@@ -22,6 +22,8 @@ export class TabularInputTheme{
         maxHeight: "164px !important",
         padding: "4px",
         color: "var(--text-ds-neutral-50)",
+        overflowY: "auto",
+        overflowX: "hidden", 
       },
       ".cm-panels": {
         backgroundColor: "var(--bg-ds-surface-400)",
@@ -36,7 +38,7 @@ export class TabularInputTheme{
         alignItems: "center",
       },
       ".cm-textfield": {
-        backgroundColor: "var(--background-color)"
+        backgroundColor: "var(--background-color)",
       },
       ".cm-button": {
         backgroundColor: "var(--background-color)",
@@ -72,10 +74,10 @@ export class TabularInputTheme{
         border: "1px solid transparent",
         // borderRadius: "4px",
         maxHeight: "164px !important",
-        carotColor:"var(--bg-ds-primary-300)",
-       
+        carotColor: "var(--bg-ds-primary-300)",
+
         "&.cm-focused": {
-          carotColor:"var(--bg-ds-primary-300)",
+          carotColor: "var(--bg-ds-primary-300)",
           border: "1px solid var(--border-ds-primary-300) !important",
           backgroundColor: "var(--bg-ds-surface-400)",
           // borderRadius: "4px",
@@ -84,7 +86,6 @@ export class TabularInputTheme{
           maxHeight: "165px !important", // Increased max height
           minHeight: "27px !important", // Keep minimum height
           overflowX: "hidden !important",
-          overflowY: "auto !important",
           transformOrigin: "top", // Grow from top down
           zIndex: "10", // Ensure it's above other content
           position: "absolute",
@@ -93,7 +94,6 @@ export class TabularInputTheme{
           whiteSpace: "pre-wrap !important",
           wordBreak: "break-word !important",
           overflowX: "hidden !important",
-          overflowY: "auto !important",
           // height: "auto !important",
           maxHeight: "164px !important",
           width: "100% !important",
@@ -104,7 +104,6 @@ export class TabularInputTheme{
           // height: "auto !important",
           maxHeight: "164px !important",
           width: "100% !important",
-          
         },
         "&.cm-focused .cm-line": {
           width: "100% !important",
@@ -129,7 +128,6 @@ export class TabularInputTheme{
         width: "10px",
         height: "0px !important",
         display: "block",
-        
       },
       ".cm-scroller::-webkit-scrollbar-thumb": {
         backgroundColor: "var(--border-ds-neutral-300)",

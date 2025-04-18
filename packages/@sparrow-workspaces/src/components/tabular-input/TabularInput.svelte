@@ -46,6 +46,7 @@
   let pairsContainer: HTMLElement;
 
   const theme = new TabularInputTheme().build();
+  
 
   $: {
     if (keyValue) {
