@@ -24,7 +24,6 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
-  import { sparrowIconBgIcon } from "@sparrow/library/assets";
 
   export let isWebApp = false;
 
@@ -250,6 +249,10 @@
   const handleSearchInvite = (event) => {
     searchInviteQuery = event.detail.toLowerCase();
   };
+
+  $: activeTeamTab === TeamTabsEnum.INVITES && !openTeam?._data?.invites?.length  ?
+    onUpdateActiveTab(TeamTabsEnum.WORKSPACES): null;
+  
 
   /**
    *
@@ -542,7 +545,8 @@
             style="max-width: 492px; color:var(--bg-ds-neutral-300);"
           >
             <div class="text-center">
-              [Firstname] has invited you to be a member on the {openTeam?.name}.
+             {openTeam?._data?.description?.trim().split(" ")[0]
+} has invited you to be a member on the {openTeam?.name}.
               <br />
               Once you accept you will gain access to the workspaces within this
               hub.

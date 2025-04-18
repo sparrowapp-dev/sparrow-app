@@ -1649,17 +1649,21 @@ class RestExplorerViewModel {
           };
           return;
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.REQUEST,
+              request: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -1820,23 +1824,27 @@ class RestExplorerViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.REQUEST,
+                request: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestInFolder(
             path[0].id,
@@ -2560,6 +2568,18 @@ class RestExplorerViewModel {
    */
   public stopGeneratingAIResponse = async () => {
     const componentData = this._tab.getValue();
+
+    // Handling the case where user clicked stop generating just after the "start" stream status
+    const conversation =
+      componentData?.property?.request?.ai?.conversations || [];
+    if (conversation.length > 0) {
+      // Remove last message
+      const lastResponse = conversation[conversation.length - 1];
+      if (lastResponse.type === "Receiver" && lastResponse?.message === "") {
+        conversation.pop();
+        await this.updateRequestAIConversation(conversation);
+      }
+    }
 
     try {
       // Send stop signal to the server
