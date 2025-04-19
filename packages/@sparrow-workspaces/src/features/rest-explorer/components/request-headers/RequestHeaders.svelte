@@ -54,14 +54,22 @@
     callback={handleHeaderChange}
     {environmentVariables}
     {onUpdateEnvironment}
+    showMergeView={true}
+    newModifiedPairs={[
+      { key: "dnt", value: "1", checked: true },
+      { key: "accept", value: "ish", checked: true },
+      { key: "referer", value: "No", checked: true },
+      { key: "this is new val", value: "yes", checked: true },
+      { key: "origins", value: "yes", checked: true },
+    ]}
   />
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center" style="padding:12px 0px">
-       <Toggle
+        <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"
-         /> 
+        />
       </div>
     {/if}
   </div>

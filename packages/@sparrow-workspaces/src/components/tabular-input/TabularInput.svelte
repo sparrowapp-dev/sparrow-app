@@ -4,22 +4,14 @@
     KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
-  import { CodeMirrorInput } from "../";
   import { onMount, tick } from "svelte";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Tooltip, Button } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
   import { Toggle } from "@sparrow/library/ui";
 
-  // exports
-  export let keyValue: KeyValuePair[];
-  export let callback: (pairs: KeyValuePair[]) => void;
-  export let readable: { key: string; value: string } = {
-    key: "",
-    value: "",
-  };
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
@@ -31,6 +23,18 @@
   export let isInputBoxEditable = true;
   export let bulkEditPlaceholder = "";
   // export let type: "file" | "text" = "text";
+
+  // exports
+  export let keyValue: KeyValuePair[];
+  export let callback: (pairs: KeyValuePair[]) => void;
+  export let readable: { key: string; value: string } = {
+    key: "",
+    value: "",
+  };
+
+  // New props for merge/diff view **anish
+  export let showMergeView = false;
+  export let newModifiedPairs: KeyValuePair[] = [];
 
   let enableKeyValueHighlighting = true;
   let pairs: KeyValuePair[] = keyValue;
@@ -47,11 +51,214 @@
 
   const theme = new TabularInputTheme().build();
 
+  // Calculate diff between original and current data **anish
+  type DiffType = "added" | "deleted" | "modified" | "unchanged";
+  type DiffPair = KeyValuePair & {
+    diffType: DiffType;
+    originalIndex?: number;
+    currentIndex?: number;
+  };
+  let diffPairs: DiffPair[] = [];
+
+  // Funtion to calculate diff. b/w origional data (pairs) and new data (newModifiedPairs)
+  function calculateDiff(): DiffPair[] {
+    // if (!showMergeView || !pairs || pairs.length === 0) {
+    //   console.log("pairs ", pairs.length);
+    //   return newModifiedPairs.map((pair) => ({
+    //     ...pair,
+    //     diffType: "unchanged",
+    //   }));
+    // }
+
+    // If table data is empty but we have new data, then consider everything as an addition
+    // if (!pairs || pairs.length === 0) {
+    //   console.log("pairs ", pairs.length);
+    //   return newModifiedPairs.map((pair) => ({
+    //     ...pair,
+    //     diffType: "added",
+    //     currentIndex: newModifiedPairs.indexOf(pair),
+    //   }));
+    // }
+
+    const result: DiffPair[] = [];
+    const origMap = new Map();
+    const newMap = new Map();
+
+    // Create maps of both original and new items
+    pairs.forEach((pair, index) => {
+      origMap.set(pair.key, { pair, index });
+    });
+
+    newModifiedPairs.forEach((pair, index) => {
+      newMap.set(pair.key, { pair, index });
+    });
+
+    // Create a map of original items using key as a unique identifier
+    pairs.forEach((pair, index) => {
+      origMap.set(pair.key, { pair, index });
+    });
+    // Check for modified or added items
+    newModifiedPairs.forEach((currentPair, currentIndex) => {
+      if (currentPair.key === "") return; // Skip empty rows
+
+      const originalEntry = origMap.get(currentPair.key);
+
+      if (originalEntry) {
+        // Key exists in both - check if value changed
+        if (originalEntry.pair.value !== currentPair.value) {
+          result.push({
+            ...currentPair,
+            diffType: "modified",
+            originalIndex: originalEntry.index,
+            currentIndex,
+          });
+
+          // Also add the original version to show what changed
+          result.push({
+            ...originalEntry.pair,
+            diffType: "deleted",
+            originalIndex: originalEntry.index,
+          });
+        } else {
+          // Unchanged
+          result.push({
+            ...currentPair,
+            diffType: "unchanged",
+            originalIndex: originalEntry.index,
+            currentIndex,
+          });
+        }
+
+        // Mark as processed
+        origMap.delete(currentPair.key);
+      } else {
+        // New item
+        result.push({
+          ...currentPair,
+          diffType: "added",
+          currentIndex,
+        });
+      }
+    });
+
+    // Add deleted items (those in original but not in current)
+    origMap.forEach(({ pair, index }) => {
+      if (pair.key !== "") {
+        // Skip empty rows
+        result.push({
+          ...pair,
+          diffType: "deleted",
+          originalIndex: index,
+        });
+      }
+    });
+
+    // Sort by original position to maintain a logical order
+    result.sort((a, b) => {
+      // First priority: Group items with the same key together
+      if (a.key === b.key) {
+        // When keys match, deleted comes before added
+        if (
+          a.diffType === "deleted" &&
+          (b.diffType === "added" || b.diffType === "modified")
+        ) {
+          return -1; // Deletion comes first
+        }
+        if (
+          (a.diffType === "added" || a.diffType === "modified") &&
+          b.diffType === "deleted"
+        ) {
+          return 1; // Addition comes second
+        }
+      }
+
+      // Then sort by original position
+      if (a.originalIndex !== undefined && b.originalIndex !== undefined) {
+        return a.originalIndex - b.originalIndex;
+      }
+
+      // Fall back to current position
+      if (a.currentIndex !== undefined && b.currentIndex !== undefined) {
+        return a.currentIndex - b.currentIndex;
+      }
+
+      return 0;
+    });
+
+    const lastEmptyRow: DiffPair = {
+      key: "",
+      value: "",
+      checked: false,
+      diffType: "unchanged",
+      originalIndex: result.length - 1,
+      currentIndex: result.length - 1,
+    };
+    return [...result, lastEmptyRow];
+  }
+
+  $: if (showMergeView) diffPairs = calculateDiff();
+
+  // Update when original data changes (Note: don't think this is required) **anish
+  $: if (pairs && showMergeView) diffPairs = calculateDiff();
+
+  // Update diff when inputs change
   $: {
     if (keyValue) {
       identifySelectAllState();
+      if (showMergeView) diffPairs = calculateDiff(); // **anish
     }
   }
+  // setTimeout(() => {
+  //   console.log("appling changes!!");
+  //   // applyChanges();
+  // }, 10000);
+
+  // Toggle merge view **anish
+  const toggleMergeView = (show: boolean) => {
+    showMergeView = show;
+    if (show) diffPairs = calculateDiff();
+  };
+
+  // Function to apply all changes from diff view to the original data
+  const applyChanges = (): void => {
+    if (!showMergeView) return;
+
+    // Extract all valid pairs from diffPairs (excluding deleted ones)
+    const updatedPairs = diffPairs
+      .filter((pair) => pair.diffType !== "deleted")
+      .map((pair) => ({
+        key: pair.key,
+        value: pair.value,
+        checked: pair.checked || false,
+      }));
+
+    // Add an empty row at the end if needed
+    if (
+      updatedPairs.length > 0 &&
+      (updatedPairs[updatedPairs.length - 1].key !== "" ||
+        updatedPairs[updatedPairs.length - 1].value !== "")
+    ) {
+      updatedPairs.push({ key: "", value: "", checked: false });
+    }
+
+    pairs = updatedPairs; // Update the pairs array with the new data
+    showMergeView = false; // Turn off merge view after applying changes
+    callback(pairs); // Notify parent component of the changes
+    newModifiedPairs = JSON.parse(JSON.stringify(pairs)); // Save current state for potential future comparison
+  };
+
+  // Function to undo all changes and revert to original state
+  const undoChanges = (): void => {
+    if (!showMergeView) return;
+    showMergeView = false;
+    diffPairs = []; // Reset any potential changes by discarding diffPairs
+    callback(pairs); // Notify parent of unchanged data
+  };
+
+  onMount(() => {
+    handleBulkTextUpdate();
+    if (showMergeView) diffPairs = calculateDiff(); // **anish
+  });
 
   /**
    * @description - calculates the select all checkbox state - weather checked or not
@@ -105,6 +312,16 @@
       pairs.push({ key: "", value: "", checked: false });
       pairs = pairs;
       callback(pairs);
+
+      // Recalculate diff if merge view is active **anish
+      if (showMergeView) {
+        diffPairs = calculateDiff();
+
+        // Recalculate diff if merge view is active **anish
+        if (showMergeView) {
+          diffPairs = calculateDiff();
+        }
+      }
 
       await scrollToNewRow();
     } else {
@@ -249,22 +466,18 @@
   const toggleBulkEdit = (event) => {
     onToggleBulkEdit(event.target.checked);
   };
-
-  onMount(() => {
-    handleBulkTextUpdate();
-  });
 </script>
 
 <div>
   {#if !isBulkEditActive}
     <section class="mb-0 me-0 py-0 section-layout w-100" style="">
       <div
-        class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
+        class="d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
         style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
-        <div style=" width:24px; margin-right:12px" class="">
+        <div style="width:24px; margin-right:12px" class="">
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
@@ -289,7 +502,7 @@
         </div>
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
-            <div class="w-100 d-flex justify-content-end">
+            <div class="w-100 d-flex justify-content-end gap-2">
               {#if isBulkEditRequired}
                 <Toggle
                   bind:isActive={bulkToggle}
@@ -301,6 +514,14 @@
                   onChange={toggleBulkEdit}
                 />
               {/if}
+              <Toggle
+                isActive={showMergeView}
+                label="Show Diff"
+                fontSize="12px"
+                textColor="var(--text-ds-neutral-200)"
+                fontWeight="400"
+                onChange={() => toggleMergeView(!showMergeView)}
+              />
             </div>
           </div>
         </div>
@@ -329,21 +550,67 @@
             isCheckBoxEditable={false}
           />
         {/if}
-        {#each pairs as element, index (index)}
-          <LazyElement
-            {element}
-            {index}
-            {pairs}
-            {theme}
-            {environmentVariables}
-            {onUpdateEnvironment}
-            {updateParam}
-            {updateCheck}
-            {deleteParam}
-            {isInputBoxEditable}
-            {isCheckBoxEditable}
-          />
-        {/each}
+
+        {#if showMergeView}
+          {#each diffPairs as element, index (index)}
+            <LazyElement
+              element={{
+                key: element.key,
+                value: element.value,
+                checked: element.checked,
+              }}
+              {index}
+              pairs={diffPairs}
+              {theme}
+              {environmentVariables}
+              {onUpdateEnvironment}
+              {updateParam}
+              {updateCheck}
+              {deleteParam}
+              isInputBoxEditable={false}
+              isCheckBoxEditable={true}
+              customClass={`diff-row diff-${element.diffType}`}
+            />
+            <!-- isInputBoxEditable={element.diffType !== "deleted"} -->
+            <!-- isCheckBoxEditable={element.diffType !== "deleted"} -->
+          {/each}
+
+          <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+            <Button
+              title={"Keep the Changes"}
+              type={"primary"}
+              onClick={() => {
+                "click applyChanges";
+                applyChanges();
+              }}
+            ></Button>
+
+            <Button
+              title={"Undo"}
+              type={"secondary"}
+              onClick={() => {
+                "click undoChanges";
+                undoChanges();
+              }}
+            ></Button>
+          </div>
+        {:else}
+          {#each pairs as element, index (index)}
+            <LazyElement
+              {element}
+              {index}
+              {pairs}
+              {theme}
+              {environmentVariables}
+              {onUpdateEnvironment}
+              {updateParam}
+              {updateCheck}
+              {deleteParam}
+              {isInputBoxEditable}
+              {isCheckBoxEditable}
+            />
+          {/each}
+        {/if}
       </div>
     </section>
   {:else}
@@ -469,5 +736,26 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
+  }
+
+  .merge-view-label {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+  }
+
+  :global(.diff-row.diff-added) {
+    background-color: #113b21 !important ;
+  }
+
+  :global(.diff-row.diff-deleted) {
+    background-color: #3d1514 !important;
+  }
+
+  :global(.diff-row.diff-modified) {
+    background-color: #113b21 !important ;
+    /* background-color: rgba(246, 184, 59, 0.288) !important; */
   }
 </style>
