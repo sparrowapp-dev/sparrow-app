@@ -4,6 +4,7 @@
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
+  import ChevronVerticalFilled from "../../../../../@sparrow-library/src/icons/ChevronVerticalFilled.svelte";
 
   export let list;
   export let activeTeam;
@@ -190,7 +191,7 @@
         onClick={(e) => {
           rightClickContextMenu(e);
         }}
-        startIcon={ThreeDotIcon}
+        startIcon={ChevronVerticalFilled}
       />
     </div>
   </td>
@@ -223,13 +224,15 @@
   }
   .threedot-icon-container {
     visibility: visible;
-    background-color: transparent;
-    z-index: 2;
-    transform: rotate(90deg);
-    outline: none;
+    pointer-events: none;
+    transition:
+      visibility 0.3s ease,
+      opacity 0.3s ease;
   }
+
   tr:hover .threedot-icon-container {
     visibility: visible;
+    pointer-events: auto;
   }
 
   .tab-data {

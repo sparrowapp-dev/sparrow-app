@@ -138,6 +138,7 @@ export { default as PersonIcon } from "./Person.svelte";
 
 export { default as AddRegular } from "./AddRegularIcon.svelte";
 export { default as ChevronRightRegular } from "./ChevronRightRegular.svelte";
+export { default as ChevronVerticalFilled } from "./ChevronVerticalFilled.svelte";
 export { default as MoreHorizontalRegular } from "./MoreHorizontalRegular.svelte";
 export { default as ChevronDownRegular } from "./ChevronDownRegular.svelte";
 export { default as ArrowSwapRegular } from "./ArrowSwapRegular.svelte";
