@@ -61,6 +61,8 @@
       { key: "referer", value: "No", checked: true },
       { key: "this is new val", value: "yes", checked: true },
       { key: "origins", value: "yes", checked: true },
+      { key: "karan", value: "aujla", checked: true },
+      { key: "origin", value: "https://app.alphametricx.com", checked: true },
     ]}
   />
   <div>

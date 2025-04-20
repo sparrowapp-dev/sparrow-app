@@ -82,16 +82,6 @@
 
     const result: DiffPair[] = [];
     const origMap = new Map();
-    const newMap = new Map();
-
-    // Create maps of both original and new items
-    pairs.forEach((pair, index) => {
-      origMap.set(pair.key, { pair, index });
-    });
-
-    newModifiedPairs.forEach((pair, index) => {
-      newMap.set(pair.key, { pair, index });
-    });
 
     // Create a map of original items using key as a unique identifier
     pairs.forEach((pair, index) => {
@@ -172,7 +162,17 @@
         }
       }
 
-      // Then sort by original position
+      // Second priority: Put completely new items at the end
+      const aIsNew = a.diffType === "added" && a.originalIndex === undefined;
+      const bIsNew = b.diffType === "added" && b.originalIndex === undefined;
+
+      if (aIsNew && !bIsNew) {
+        return 1; // a is new but b is not - push a to the end
+      } else if (!aIsNew && bIsNew) {
+        return -1; // b is new but a is not - push b to the end
+      }
+
+      // Then sort by original position for existing items
       if (a.originalIndex !== undefined && b.originalIndex !== undefined) {
         return a.originalIndex - b.originalIndex;
       }
