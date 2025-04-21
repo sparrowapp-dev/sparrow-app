@@ -80,7 +80,7 @@
     CaretDownFilled,
   } from "@sparrow/library/icons";
 
-  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
+  import { SparrowSecondaryIcon, SparkleFilled } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
   import { AIChatInterface } from "../../chat-bot/components";
@@ -246,6 +246,64 @@
   onDestroy(() => {
     isChatbotOpenInCurrTab.set(false);
   });
+
+  const handleOnClickAIDebug = async () => {
+    // adjusting the panel layout
+    if ($tabsSplitterDirection != "horizontal") {
+      tabsSplitterDirection.set("horizontal");
+      isChatbotOpenInCurrTab.set(true);
+    }
+
+    const isResponseGenerating =
+      $tab?.property?.request?.state?.isChatbotGeneratingResponse;
+
+    if (!isResponseGenerating) {
+      // console.log("LKKK :> ", $tab?.property?.request?.ai?.conversations);
+      onUpdateAiConversation([
+        ...$tab?.property?.request?.ai?.conversations,
+        {
+          message: "Help me debug",
+          messageId: "",
+          type: "Sender",
+          isLiked: false,
+          isDisliked: false,
+          status: true,
+        },
+      ]);
+
+      const debugPrompt = `
+        I am getting the below mentioned error when i send request, 
+        can you help me debug this error, let me know if i need to 
+        change anyhing in the request to solve this issue. here's 
+        the error response i am getting while sending the request, 
+        I've stringified the response. 
+        Response: ${JSON.stringify(storeData.response)}`;
+
+      console.log("debugPrompt :> ", debugPrompt);
+
+      // Scroller for user prompt
+      // setTimeout(() => {
+      //   if (scrollList) scrollList("bottom", -1, "smooth");
+      // }, 10);
+
+      // Send Prompt
+      await onGenerateAiResponse(debugPrompt);
+
+      // Scroller for AI response
+      // setTimeout(() => {
+      //   if (scrollList) scrollList("bottom", -1, "smooth");
+      // }, 10);
+
+      onUpdateRequestState({ isChatbotActive: true });
+    }
+    MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
+  };
+
+  const isClientError = () => {
+    const status = storeData?.response?.status;
+    const code = parseInt(status?.split(" ")[0]);
+    return code >= 400 && code < 500;
+  };
 </script>
 
 {#if $tab.tabId}
@@ -485,7 +543,7 @@
                             style="gap:12px"
                           >
                             <div
-                              class="d-flex"
+                              class="d-flex justify-content-between"
                               style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                             >
                               <ResponseNavigator
@@ -495,7 +553,18 @@
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
                               />
-                              <ResponseStatus response={storeData.response} />
+
+                              <div class="d-flex">
+                                <Button
+                                  title="Help me debug"
+                                  type={"secondary"}
+                                  startIcon={SparkleFilled}
+                                  disable={!isClientError()}
+                                  onClick={handleOnClickAIDebug}
+                                ></Button>
+
+                                <ResponseStatus response={storeData.response} />
+                              </div>
                             </div>
                             <div
                               class="flex-grow-1 d-flex flex-column"
