@@ -162,7 +162,7 @@ export const basicTheme = EditorView.theme({
     backgroundColor: "var(--background-color)",
     border: "none",
   },
-  ".cm-activeLine": { backgroundColor: "transparent" },
+  ".cm-activeLine": { backgroundColor: "var(--bg-ds-surface-600)" },
   ".cm-gutters": {
     backgroundColor: "transparent",
     borderRight: "0",
