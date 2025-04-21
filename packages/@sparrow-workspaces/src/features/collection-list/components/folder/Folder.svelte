@@ -237,7 +237,7 @@
     >
       <p>
         Are you sure you want to delete this Folder? Everything in <span
-          class="text-whiteColor fw-bold">"{explorer.name}"</span
+        class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
         >
         will be removed.
       </p>
