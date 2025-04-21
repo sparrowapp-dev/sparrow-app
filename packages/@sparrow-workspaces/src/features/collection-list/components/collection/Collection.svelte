@@ -827,6 +827,7 @@
             : "Add Folder"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -853,6 +854,7 @@
             : "Add REST API"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -877,6 +879,7 @@
             : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -907,6 +910,7 @@
             : "Add WebSocket"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -932,6 +936,7 @@
             : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
