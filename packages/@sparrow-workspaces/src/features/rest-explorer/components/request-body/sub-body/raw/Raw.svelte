@@ -1,48 +1,41 @@
 <script lang="ts">
   import { Editor } from "@sparrow/library/forms";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
   export let isBodyBeautified = false;
   export let onUpdateRequestBody: (data: string) => void = () => {};
   export let updateBeautifiedState: (value: boolean) => void;
 
-  // ToDo: the below values should also get updated when merge view disable or when content changed
-  export let isMergeViewEnable = false;
-  let newModifiedContent = `{ 
-  key: "origion", 
-  value: "1", 
-  checked: true 
-  }`;
+  export let isMergeViewEnabled = false;
+  export let newModifiedContent: string;
 
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
+    console.log("updating llkklkkl");
     onUpdateRequestBody({ raw: e.detail });
   };
 
-  setTimeout(() => {
-    console.log("calling toggleDiffView() :>> ");
-    isMergeViewEnable = true;
-  }, 10000);
+  // Watch for changes and dispatch events
+  $: dispatch("mergeViewStateChange", isMergeViewEnabled);
+  $: dispatch("mergeViewContentChange", newModifiedContent);
 
-  $: {
-    if (isMergeViewEnable) {
-      console.log("ismer :>> ", isMergeViewEnable);
-    }
-  }
-  $: {
-    if (newModifiedContent) {
-      console.log("iscont :>> ", newModifiedContent);
-    }
-  }
+  $: if (isMergeViewEnabled)
+    console.log("in RAW - mergeviewenabled : ", isMergeViewEnabled);
+  $: if (newModifiedContent)
+    console.log("in RAW - newModifiedContent : ", newModifiedContent);
 </script>
 
 <div class="request-body position-relative">
   <Editor
     bind:lang
     bind:value
-    bind:showMergeView={isMergeViewEnable}
+    bind:isMergeViewEnabled
     bind:newModifiedContent
     on:change={handleCodeMirrorChange}
-    isEditable={isMergeViewEnable ? false : true}
+    isEditable={isMergeViewEnabled ? false : true}
     {isBodyBeautified}
     beautifySyntaxCallback={updateBeautifiedState}
   />

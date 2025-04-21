@@ -27,7 +27,11 @@
 
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
-  import { Events } from "@sparrow/common/enums";
+  import {
+    Events,
+    RequestDataset,
+    RequestDataType,
+  } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
   import type {
@@ -85,6 +89,7 @@
   import { writable } from "svelte/store";
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -246,6 +251,58 @@
   onDestroy(() => {
     isChatbotOpenInCurrTab.set(false);
   });
+
+  let isMergeViewEnableForRequestBody = false;
+  let newModifiedContent: string | KeyValuePair[];
+  let mergeViewRequestDatasetType: RequestDataset;
+
+  $: if (isMergeViewEnableForRequestBody)
+    console.log(
+      "isMergeViewEnableForRequestBody :> ",
+      isMergeViewEnableForRequestBody,
+    );
+  $: if (newModifiedContent)
+    console.log("newModifiedContent :> ", newModifiedContent);
+
+  setTimeout(() => {
+    console.log("enabledMergeViewForReqBody() :>> ");
+
+    const dataURLEncoded = [
+      { key: "dnt", value: "1", checked: true },
+      { key: "accept", value: "ish", checked: true },
+      { key: "referer", value: "No", checked: true },
+      { key: "this is new val", value: "yes", checked: true },
+      { key: "origins", value: "yes", checked: true },
+      { key: "karan", value: "aujla", checked: true },
+      { key: "origin", value: "https://app.alphametricx.com", checked: true },
+    ];
+
+    const dataRaw = `{ 
+  "key": "origion", 
+  "value": "1", 
+  "checked": true,
+  "ghibli": "image"
+}`;
+    // enabledMergeViewForReqBody(dataURLEncoded, RequestDataset.URLENCODED);
+    enabledMergeViewForReqBody(dataRaw, RequestDataset.RAW);
+
+    setTimeout(() => {
+      console.log(
+        "next settimout: ",
+        newModifiedContent,
+        isMergeViewEnableForRequestBody,
+      );
+    }, 5000);
+  }, 5000);
+
+  const enabledMergeViewForReqBody = async (
+    newContent: string | KeyValuePair[],
+    requestDatasetType: RequestDataset,
+  ) => {
+    newModifiedContent = newContent;
+    mergeViewRequestDatasetType = requestDatasetType;
+    isMergeViewEnableForRequestBody = true;
+  };
 </script>
 
 {#if $tab.tabId}
@@ -401,6 +458,9 @@
                           {onUpdateEnvironment}
                           {environmentVariables}
                           {isWebApp}
+                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
+                          bind:newModifiedContent
+                          {mergeViewRequestDatasetType}
                         />
                       {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                         <RequestHeaders

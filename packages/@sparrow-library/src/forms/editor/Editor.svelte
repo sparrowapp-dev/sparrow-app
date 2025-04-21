@@ -28,12 +28,12 @@
   export let errorEndIndex = 0;
 
   // For merge view - now as props
-  export let showMergeView = false;
-  export let newModifiedContent = ""; // New content to show in merge view
+  export let isMergeViewEnabled = false;
+  export let newModifiedContent: string; // New content to show in merge view
 
-  let previousMergeViewState = showMergeView;
+  let previousMergeViewState = isMergeViewEnabled;
   let originalContent = value; // Store the original content for comparison
-  let currentModifiedContent = ""; // Track the current modified content
+  // let currentModifiedContent = ""; // Track the current modified content
 
   const dispatch = createEventDispatcher();
 
@@ -63,7 +63,7 @@
       if (!isAutoChange) {
         // only hits for input, blur etc type of events.
         const content = update.state.doc.toString(); // Get the new content
-        currentModifiedContent = content; // Update our tracking of modified content
+        // currentModifiedContent = content; // Update our tracking of modified content
         dispatch("change", content); // Dispatch the new content to parent.
       }
     }
@@ -134,7 +134,7 @@
     if (codeMirrorView) {
       codeMirrorView.dispatch({
         effects: mergeConf.reconfigure(
-          showMergeView ? [createMergeExtension(originalContent)] : [],
+          isMergeViewEnabled ? [createMergeExtension(originalContent)] : [],
         ),
       });
     }
@@ -145,7 +145,7 @@
    * This function accepts the changes and updates the original value
    */
   const applyChanges = () => {
-    if (!showMergeView || !codeMirrorView) return;
+    if (!isMergeViewEnabled || !codeMirrorView) return;
 
     // Get the current modified content
     const modifiedContent = codeMirrorView.state.doc.toString();
@@ -158,7 +158,8 @@
     // dispatch("change", modifiedContent);
     // dispatch("applyChanges", modifiedContent);
 
-    showMergeView = false; // Exit merge view mode
+    isMergeViewEnabled = false; // Exit merge view mode
+    newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
     updateMergeView(); // Update the editor view
   };
@@ -168,7 +169,7 @@
    * This function declines the changes and keeps the original value
    */
   const undoChanges = () => {
-    if (!showMergeView || !codeMirrorView) return;
+    if (!isMergeViewEnabled || !codeMirrorView) return;
 
     // Restore original content
     codeMirrorView.dispatch({
@@ -181,15 +182,16 @@
     });
 
     // dispatch("undoChanges", originalContent); // Notify parent that changes were declined
-    showMergeView = false; // Exit merge view mode
+    isMergeViewEnabled = false; // Exit merge view mode
+    newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
     updateMergeView(); // Update the editor view
   };
 
   onMount(() => {
     initalizeCodeMirrorEditor(value);
-    // Store initial content as original
-    originalContent = value;
+
+    originalContent = value; // Store initial content as original
 
     // Attach keydown listener to prevent global search when inside CodeMirror
     codeMirrorEditorDiv.addEventListener("keydown", (event) => {
@@ -199,11 +201,11 @@
     });
   });
 
-  // Handle changes to showMergeView prop
-  $: if (codeMirrorView && showMergeView !== previousMergeViewState) {
-    previousMergeViewState = showMergeView;
+  // Handle changes to isMergeViewEnabled prop
+  $: if (codeMirrorView && isMergeViewEnabled !== previousMergeViewState) {
+    previousMergeViewState = isMergeViewEnabled;
 
-    if (showMergeView) {
+    if (isMergeViewEnabled) {
       // Store current content as original
       originalContent = codeMirrorView.state.doc.toString();
 
@@ -217,7 +219,7 @@
           },
           annotations: [{ autoChange: true }],
         });
-        currentModifiedContent = newModifiedContent;
+        // currentModifiedContent = newModifiedContent;
       }
     } else {
       // If turning off merge view, restore original content
@@ -231,12 +233,11 @@
       });
     }
 
-    // Update the merge view
     updateMergeView();
   }
 
   // Handle changes to newModifiedContent when in merge view
-  $: if (codeMirrorView && showMergeView && newModifiedContent) {
+  $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
     codeMirrorView.dispatch({
       changes: {
         from: 0,
@@ -245,12 +246,13 @@
       },
       annotations: [{ autoChange: true }],
     });
-    currentModifiedContent = newModifiedContent;
+    // currentModifiedContent = newModifiedContent;
+    updateMergeView();
   }
 
   // Run whenever component state changes
   afterUpdate(() => {
-    if (!showMergeView && value !== codeMirrorView.state.doc.toString()) {
+    if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
       codeMirrorView.dispatch({
         changes: {
           from: 0,
@@ -288,16 +290,24 @@
   }
 
   onDestroy(() => {
+    // If changes are not saved, then undo those changes before gettings destroyed
+    if (isMergeViewEnabled) {
+      console.log("on destroy;");
+      undoChanges();
+      dispatch("mergeViewStateChange");
+      dispatch("mergeViewContentChange");
+      // isMergeViewEnabled = false;
+    }
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed
   });
 </script>
 
 <div
-  class={`${componentClass} basic-codemirror-editor ${showMergeView ? "merge-view" : ""}`}
+  class={`${componentClass} basic-codemirror-editor ${isMergeViewEnabled ? "merge-view" : ""}`}
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if showMergeView}
+{#if isMergeViewEnabled}
   <div class="d-flex justify-content-end mt-3 me-0 gap-2">
     <Button
       title={"Keep the Changes"}
@@ -326,7 +336,7 @@
     margin-right: 1%;
   }
 
-  .merge-view :global(.cm-activeLine),
+  /* .merge-view :global(.cm-activeLine), */
   .merge-view :global(.cm-changedLine) {
     background-color: #113b21;
   }
@@ -346,6 +356,6 @@
   }
 
   .merge-view :global(.ͼw) {
-    color: var(--editor-string-color);
+    /* color: var(--editor-string-color); */
   }
 </style>
