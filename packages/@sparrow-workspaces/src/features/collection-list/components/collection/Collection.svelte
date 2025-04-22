@@ -355,7 +355,7 @@
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Collection? Everything in <span
-        class="text-whiteColor fw-bold">"{collection.name}"</span
+      class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{collection.name}"</span
       >
       will be removed.
     </p>
@@ -755,7 +755,7 @@
       ></div>
     {/if}
     <div class="">
-      {#if isSyncChangesAvailable && isEnableSyncButton}
+      {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <div class="ps-5" style="height: 32px; ">
           <div
             style="background-color: var(--bg-ds-primary-800); align-items:center; justify-content:space-between; border-radius:4px;"
@@ -827,6 +827,7 @@
             : "Add Folder"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -853,6 +854,7 @@
             : "Add REST API"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -877,6 +879,7 @@
             : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -907,6 +910,7 @@
             : "Add WebSocket"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -932,6 +936,7 @@
             : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"

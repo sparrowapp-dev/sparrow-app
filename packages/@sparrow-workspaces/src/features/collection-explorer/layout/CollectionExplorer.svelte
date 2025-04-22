@@ -237,6 +237,30 @@
     }
   };
 
+  const syncedTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const months = Math.floor(days / 30); // Approximation
+
+    if (seconds < 60) {
+      return "just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (months) {
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      return ``;
+    }
+  };
+
   onMount(() => {
     window.addEventListener("keydown", handleKeyDown);
   });
@@ -538,12 +562,21 @@
         </div>
       </div>
     {/if} -->
-    <div class="d-flex pb-3">
+    <div class="d-flex pb-3" style="justify-content: space-between;">
       <CollectionNavigator
         collectionNavigation={$tab?.property?.collection?.state
           ?.collectionNavigation}
         {onUpdateCollectionState}
       />
+      <div class="d-flex" style="align-items: center;">
+        <ArrowSyncRegular size="12px" />
+        <p
+          style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
+          class="text-ds-font-size-12"
+        >
+          Synced {syncedTimeAgo(collection?.syncedAt)}
+        </p>
+      </div>
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div
