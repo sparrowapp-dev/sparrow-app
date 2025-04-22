@@ -26,6 +26,8 @@
           }}
           placeholder={"Username"}
           {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
         />
       </div>
     </div>
@@ -42,6 +44,8 @@
           }}
           placeholder={"Password"}
           {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
         />
       </div>
     </div>

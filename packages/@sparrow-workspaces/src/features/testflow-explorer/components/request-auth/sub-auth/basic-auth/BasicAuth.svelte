@@ -27,6 +27,8 @@
           }}
           placeholder={"Username"}
           {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
           {disabled}
         />
       </div>
@@ -44,13 +46,14 @@
           }}
           placeholder={"Password"}
           {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
           {disabled}
         />
       </div>
     </div>
   </div>
 </div>
-
 
 <style>
   .auth-input-container {

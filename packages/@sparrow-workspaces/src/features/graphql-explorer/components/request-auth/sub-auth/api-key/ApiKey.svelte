@@ -28,7 +28,6 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-          
         />
       </div>
     </div>
@@ -37,7 +36,10 @@
     <p class="mb-2 text-secondary-100">Value</p>
 
     <div class="position-relative" style="min-height: 40px;">
-      <div class="position-absolute top-0 auth-input-container">
+      <div
+        class="position-absolute top-0 a {environmentVariables}
+        {onUpdateEnvironment}uth-input-container"
+      >
         <CodeMirrorInput
           bind:value={apiData.authValue}
           onUpdateInput={() => {
@@ -45,6 +47,8 @@
           }}
           placeholder={"Enter auth value"}
           {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
         />
       </div>
     </div>
