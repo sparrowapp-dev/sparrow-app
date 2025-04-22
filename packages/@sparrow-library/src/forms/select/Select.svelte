@@ -522,7 +522,7 @@
           role="button"
           on:keydown={() => {}}
         >
-        {#if menuItem === "v2"}
+          {#if menuItem === "v2"}
             <MenuItemsv2
               {list}
               fontSize={headerFontSize}
@@ -778,9 +778,7 @@
     color: lightgray; /* Change background color for visual differentiation */
     /* Add any other styles to indicate the disabled state */
   }
-  .select-btn:hover {
-    background-color: var(--bg-ds-surface-400) !important;
-  }
+
   .color-primary {
     color: var(--text-ds-primary-300);
   }
@@ -794,7 +792,7 @@
   }
 
   .color-white {
-    color: var(--text-ds-neutral-200);
+    color: var(--text-ds-neutral-50);
   }
 
   .color-get {
