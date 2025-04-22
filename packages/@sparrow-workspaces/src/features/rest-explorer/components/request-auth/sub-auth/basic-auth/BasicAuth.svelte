@@ -29,7 +29,9 @@
           placeholder={"Username"}
           {theme}
           {disabled}
-           enableEnvironmentHighlighting={false}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>
@@ -46,9 +48,11 @@
             handleInput();
           }}
           placeholder={"Password"}
-          {theme} 
+          {theme}
           {disabled}
-           enableEnvironmentHighlighting={false}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>

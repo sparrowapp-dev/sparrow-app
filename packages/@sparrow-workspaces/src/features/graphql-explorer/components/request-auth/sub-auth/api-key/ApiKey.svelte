@@ -26,6 +26,8 @@
           }}
           placeholder={"Enter auth key"}
           {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
            enableEnvironmentHighlighting={false}
         />
       </div>

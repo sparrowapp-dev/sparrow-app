@@ -61,7 +61,9 @@
           placeholder={"Enter auth key"}
           {theme}
           {disabled}
-           enableEnvironmentHighlighting={false}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>
@@ -80,13 +82,14 @@
           placeholder={"Enter auth value"}
           {theme}
           {disabled}
-           enableEnvironmentHighlighting={false}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>
   </div>
 </div>
-
 
 <style>
   .auth-input-container {

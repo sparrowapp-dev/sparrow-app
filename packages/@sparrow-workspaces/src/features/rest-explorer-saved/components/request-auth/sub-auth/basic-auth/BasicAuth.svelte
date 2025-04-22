@@ -27,7 +27,9 @@
           placeholder={"Username"}
           {theme}
           disabled={true}
-           enableEnvironmentHighlighting={false}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>
@@ -45,13 +47,14 @@
           placeholder={"Password"}
           {theme}
           disabled={true}
-           enableEnvironmentHighlighting={false}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>
   </div>
 </div>
-
 
 <style>
   .auth-input-container {
