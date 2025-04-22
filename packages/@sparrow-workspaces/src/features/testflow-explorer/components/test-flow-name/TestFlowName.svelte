@@ -29,7 +29,6 @@
 <style>
   .input-name-container {
     border: 1px solid var(--border-color);
-    /* background: var(--bg-ds-surface-400); */
     position: relative;
     border: 1px solid transparent;
     gap: 2px;
