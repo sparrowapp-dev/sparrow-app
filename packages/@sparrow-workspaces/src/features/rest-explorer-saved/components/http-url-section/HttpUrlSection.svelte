@@ -119,7 +119,7 @@
         codeId={"url"}
         class={"input-url"}
         {userRole}
-        isFocusedOnMount={true}
+        isFocusedOnMount={false}
         disabled={true}
       />
     </div>

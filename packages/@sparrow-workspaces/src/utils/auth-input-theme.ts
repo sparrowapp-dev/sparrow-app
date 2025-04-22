@@ -68,6 +68,7 @@ export class AuthInputTheme {
       },
       "&.cm-editor": {
         maxHeight: "164px !important",
+        minHeight: "32px !important",
 
         "&:hover": {
           border: "1px solid var(--border-ds-neutral-300)",
@@ -77,7 +78,7 @@ export class AuthInputTheme {
           borderRadius: "4px",
           height: "auto !important",
           maxHeight: "164px !important",
-          minHeight: "34px !important",
+          minHeight: "32px !important",
           position: "absolute", // Keep this for expanding behavior
           zIndex: "10",
           width: "100%",
@@ -89,6 +90,7 @@ export class AuthInputTheme {
           whiteSpace: "pre-wrap !important",
           wordBreak: "break-all !important",
           maxHeight: "164px !important",
+          minHeight: "32px !important",
           width: "100% !important",
         },
         "&.cm-focused .cm-line": {

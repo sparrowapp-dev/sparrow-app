@@ -23,7 +23,7 @@ export class TabularInputTheme{
         padding: "4px",
         color: "var(--text-ds-neutral-50)",
         overflowY: "auto",
-        overflowX: "hidden", 
+        overflowX: "hidden",
       },
       ".cm-panels": {
         backgroundColor: "var(--bg-ds-surface-400)",
@@ -128,10 +128,12 @@ export class TabularInputTheme{
         width: "10px",
         height: "0px !important",
         display: "block",
+        display: "none",
       },
       ".cm-scroller::-webkit-scrollbar-thumb": {
         backgroundColor: "var(--border-ds-neutral-300)",
         borderRadius: "8px",
+        display: "none",
       },
       ".cm-scroller::-webkit-scrollbar-horizontal": {
         display: "none !important",

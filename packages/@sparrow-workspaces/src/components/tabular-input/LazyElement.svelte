@@ -77,8 +77,8 @@
           disabled={!isInputBoxEditable ? true : false}
           placeholder={"Add Key"}
           {theme}
-          {environmentVariables}
-          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
+          
         />
       </div>
       <div
@@ -93,8 +93,7 @@
           placeholder={"Add Value"}
           disabled={!isInputBoxEditable ? true : false}
           {theme}
-          {environmentVariables}
-          {onUpdateEnvironment}
+          enableEnvironmentHighlighting={false}
         />
       </div>
     </div>

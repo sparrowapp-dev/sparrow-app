@@ -19,6 +19,7 @@ export class UrlInputTheme {
         paddingTop: "7px",
         backgroundColor: "var(--bg-ds-surface-600)",
         maxHeight: "164px !important",
+        minHeight: "36px !important",
         borderRadius: "4px",
         overflowY: "auto",
         overflowX: "hidden",

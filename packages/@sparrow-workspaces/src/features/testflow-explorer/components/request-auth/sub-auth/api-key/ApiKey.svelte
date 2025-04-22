@@ -49,43 +49,48 @@
 </div>
 <div class="d-flex flex-column w-100">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class=" mb-2 text-secondary-100">Key</p>
+    <p class="mb-2 text-secondary-100">Key</p>
 
-    <div class="position-relative auth-input-container">
-      <CodeMirrorInput
-        bind:value={apiData.authKey}
-        onUpdateInput={() => {
-          handleAuthChange();
-        }}
-        placeholder={"Enter auth key"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        {disabled}
-      />
+    <div class="position-relative" style="padding-bottom: 40px;">
+      <div class="position-absolute top-0 auth-input-container">
+        <CodeMirrorInput
+          bind:value={apiData.authKey}
+          onUpdateInput={() => {
+            handleAuthChange();
+          }}
+          placeholder={"Enter auth key"}
+          {theme}
+          {disabled}
+           enableEnvironmentHighlighting={false}
+        />
+      </div>
     </div>
   </div>
+
   <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Value</p>
-    <div class="position-relative auth-input-container">
-      <CodeMirrorInput
-        bind:value={apiData.authValue}
-        onUpdateInput={() => {
-          handleAuthChange();
-        }}
-        placeholder={"Enter auth value"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        {disabled}
-      />
+
+    <div class="position-relative" style="padding-bottom: 40px;">
+      <div class="position-absolute top-0 auth-input-container">
+        <CodeMirrorInput
+          bind:value={apiData.authValue}
+          onUpdateInput={() => {
+            handleAuthChange();
+          }}
+          placeholder={"Enter auth value"}
+          {theme}
+          {disabled}
+           enableEnvironmentHighlighting={false}
+        />
+      </div>
     </div>
   </div>
 </div>
 
+
 <style>
   .auth-input-container {
-    max-width: 615px;
+    width: 615px;
   }
 
   .radio {
