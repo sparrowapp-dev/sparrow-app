@@ -121,19 +121,23 @@
     menuItem={"v2"}
     highlightTickedItem={false}
   />
+  <div class="w-100 d-flex align-items-center position-relative ">
+    <div class="position-absolute top-0" style="width: calc(100% );">
+      <CodeMirrorInput
+        value={requestUrl}
+        onUpdateInput={onUpdateRequestUrl}
+        placeholder={"Enter a URL"}
+        {theme}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        codeId={"url"}
+        class={"input-url"}
+        {userRole}
+        isFocusedOnMount={false}
 
-  <CodeMirrorInput
-    value={requestUrl}
-    onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter a URL"}
-    {theme}
-    {onUpdateEnvironment}
-    {environmentVariables}
-    codeId={"url"}
-    class={"input-url"}
-    {userRole}
-    isFocusedOnMount={true}
-  />
+      />
+    </div>
+  </div>
 
   <!-- Send button -->
   {#if !isSendRequestInProgress}
