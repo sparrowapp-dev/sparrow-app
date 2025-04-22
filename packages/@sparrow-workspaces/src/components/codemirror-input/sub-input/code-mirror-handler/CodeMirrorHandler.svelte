@@ -1,7 +1,13 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import { EditorView } from "codemirror";
-  import { EditorState, Compartment, EditorSelection } from "@codemirror/state";
+  import {
+    EditorState,
+    Compartment,
+    EditorSelection,
+    type TransactionSpec,
+    RangeSetBuilder,
+  } from "@codemirror/state";
   import { javascriptLanguage } from "@codemirror/lang-javascript";
   import {
     keymap,
@@ -9,6 +15,9 @@
     MatchDecorator,
     Decoration,
     placeholder as CreatePlaceHolder,
+    WidgetType,
+    type DecorationSet,
+    ViewUpdate,
   } from "@codemirror/view";
   import { undo, redo } from "@codemirror/commands";
   import { history, historyKeymap } from "@codemirror/commands";
@@ -121,6 +130,83 @@
       }
     }
   });
+
+  // Widget to render the dynamic expression.
+  class ExpressionWidget extends WidgetType {
+    constructor(
+      readonly name: string,
+      readonly from: number,
+      readonly to: number,
+    ) {
+      super();
+    }
+
+    toDOM(view: EditorView) {
+      const container = document.createElement("span");
+      container.className = "cm-expression-block";
+
+      const text = document.createElement("span");
+      text.textContent = this.name;
+
+      const close = document.createElement("span");
+      close.textContent = "❌";
+      close.className = "cm-expression-block-close";
+
+      close.onclick = (e) => {
+        e.stopPropagation();
+        view.dispatch({ changes: { from: this.from, to: this.to } });
+      };
+
+      container.appendChild(text);
+      container.appendChild(close);
+
+      container.onclick = (e) => {
+        e.stopPropagation();
+        console.log("Clicked:", this.name);
+      };
+
+      return container;
+    }
+
+    ignoreEvent() {
+      return true;
+    }
+  }
+
+  const expressionMatcher = new MatchDecorator({
+    regexp: /\[\[(\w+)\]\]/g,
+    decoration: (match) =>
+      Decoration.replace({
+        widget: new ExpressionWidget(
+          match[1],
+          match.index,
+          match.index + match[0].length,
+        ),
+        inclusive: false,
+      }),
+  });
+
+  const expressionPlugin = ViewPlugin.fromClass(
+    class {
+      placeholders: DecorationSet;
+      constructor(view: EditorView) {
+        this.placeholders = expressionMatcher.createDeco(view);
+      }
+      update(update: ViewUpdate) {
+        this.placeholders = expressionMatcher.updateDeco(
+          update,
+          this.placeholders,
+        );
+      }
+    },
+    {
+      decorations: (instance) => instance.placeholders,
+      provide: (plugin) =>
+        EditorView.atomicRanges.of((view) => {
+          return view.plugin(plugin)?.placeholders || Decoration.none;
+        }),
+    },
+  );
 
   /**
    * Disable keys in codemirror
@@ -381,6 +467,7 @@
       doc: value,
       extensions: [
         theme,
+        expressionPlugin,
         updateExtensionView,
         keyBinding,
         history(), // Add history extension
@@ -455,5 +542,39 @@
     width: 100%;
     max-width: calc(100vw - 50px);
     min-width: 50%;
+  }
+
+  :global(.cm-expression-block) {
+    display: inline-block;
+    background-color: #eef;
+    border-radius: 4px;
+    padding: 0px 6px;
+    cursor: pointer;
+  }
+
+  :global(.cm-expression-block span) {
+    max-width: 100px; /* Or any width you prefer */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+    color: black;
+  }
+
+  :global(.cm-expression-block-close) {
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: 4px;
+    color: var(--text-ds-danger-300);
+  }
+  .cm-inline-button {
+    margin: 4px 0;
+    padding: 4px 8px;
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
   }
 </style>
