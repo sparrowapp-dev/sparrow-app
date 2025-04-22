@@ -91,7 +91,8 @@
 
 <style>
   .auth-input-container {
-    width: 615px;
+    max-width: 615px;
+    width: 100%;
   }
 
   .radio {
