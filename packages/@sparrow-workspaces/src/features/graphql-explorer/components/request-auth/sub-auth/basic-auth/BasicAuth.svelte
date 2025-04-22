@@ -51,8 +51,6 @@
     </div>
   </div>
 </div>
-{environmentVariables}
-{onUpdateEnvironment}
 
 <style>
   .auth-input-container {
