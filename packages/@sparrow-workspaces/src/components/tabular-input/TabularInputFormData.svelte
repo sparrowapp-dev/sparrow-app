@@ -324,8 +324,7 @@
                   placeholder={"Add Key"}
                   {theme}
                   {environmentVariables}
-                  {onUpdateEnvironment}
-                   enableEnvironmentHighlighting={false}
+                  {onUpdateEnvironment} 
                 />
               </div>
             </div>
@@ -371,7 +370,6 @@
                     {theme}
                     {environmentVariables}
                     {onUpdateEnvironment}
-                     enableEnvironmentHighlighting={false}
                   />
                 </div>
               </div>

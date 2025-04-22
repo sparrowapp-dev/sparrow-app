@@ -26,7 +26,6 @@
         placeholder={"Token"}
         {theme}
         {disabled}
-         enableEnvironmentHighlighting={false}
       />
     </div>
   </div>

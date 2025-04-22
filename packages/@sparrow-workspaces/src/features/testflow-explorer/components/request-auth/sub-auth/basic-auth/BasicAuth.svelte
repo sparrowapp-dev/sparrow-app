@@ -28,7 +28,6 @@
           placeholder={"Username"}
           {theme}
           {disabled}
-           enableEnvironmentHighlighting={false}
         />
       </div>
     </div>
@@ -46,7 +45,6 @@
           placeholder={"Password"}
           {theme}
           {disabled}
-           enableEnvironmentHighlighting={false}
         />
       </div>
     </div>

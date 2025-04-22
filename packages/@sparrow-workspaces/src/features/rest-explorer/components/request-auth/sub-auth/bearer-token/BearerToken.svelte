@@ -28,7 +28,6 @@
         {disabled}
         {environmentVariables}
         {onUpdateEnvironment}
-        enableEnvironmentHighlighting={false}
       />
     </div>
   </div>

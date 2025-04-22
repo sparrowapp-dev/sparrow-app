@@ -28,7 +28,7 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-           enableEnvironmentHighlighting={false}
+          
         />
       </div>
     </div>
@@ -45,7 +45,6 @@
           }}
           placeholder={"Enter auth value"}
           {theme}
-           enableEnvironmentHighlighting={false}
         />
       </div>
     </div>

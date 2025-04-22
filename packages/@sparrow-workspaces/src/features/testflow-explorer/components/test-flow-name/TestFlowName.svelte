@@ -22,7 +22,6 @@
     }}
     placeholder={""}
     {theme}
-     enableEnvironmentHighlighting={false}
   />
  </div>
 
