@@ -32,7 +32,6 @@
 
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
-
   import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
   import type { CollectionDocument } from "@app/database/database";
@@ -43,6 +42,10 @@
     TestFlowTourGuide,
   } from "@sparrow/workspaces/components";
   import { BroomRegular } from "@sparrow/library/icons";
+  import {
+    NewTourGuideContent,
+    totalSteps,
+  } from "../../workspace-tour-guide/utils/NewTourGuideContent";
   import { Button, Modal, Tooltip } from "@sparrow/library/ui";
   import { PlayFilled } from "@sparrow/library/icons";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
@@ -65,6 +68,12 @@
     isTestFlowTourGuideOpen,
   } from "../../../stores/guide.tour";
   import { platform } from "@tauri-apps/plugin-os";
+  import DefaultTourGuide from "../../workspace-tour-guide/components/default-tour-guide/DefaultTourGuide.svelte";
+  import {
+    defaultCurrentStep,
+    isDefaultTourGuideClose,
+    isDefaultTourGuideOpen,
+  } from "../../../stores";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -114,6 +123,10 @@
     });
     return response;
   };
+
+  $: currentStepData = NewTourGuideContent.find(
+    (step) => step.stepCount === $defaultCurrentStep,
+  );
 
   /**
    * Updates the selected API in a specific node.
@@ -743,9 +756,9 @@
           <div style="position:absolute;  top:60px; right:320px">
             <TestFlowTourGuide
               targetId="run-btn"
-              title="Ready, Set, Run 🏃🏻‍♂️"
+              title="Run Your Test Flow"
               pulsePosition={{ top: "-62px", left: "260px" }}
-              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! <br/> Alternatively, you can use the "Start" play button to initiate the flow as well.`}
+              description={`Almost there! With your blocks and API in place, go ahead and click 'Run' to execute your test flow.`}
               tipPosition="top-right"
               onNext={async () => {
                 currentStep.set(7);
@@ -804,10 +817,11 @@
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
       <div style="position:absolute; top:260px; left:265px; z-index:1000;">
         <TestFlowTourGuide
-          title="One Block At A Time 🧱"
-          pulsePosition={{ top: "-64px", left: "30px" }}
-          description={`Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there.`}
+          targetId="addButton"
+          title="Add Your First Block"
+          description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
           tipPosition="top-left"
+          pulsePosition={{ top: "-64px", left: "30px" }}
           onNext={() => {
             currentStep.set(4);
             createNewNode("1");
@@ -822,8 +836,8 @@
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
       <div style="position:absolute; top:232px; left:638px; z-index:1000;">
         <TestFlowTourGuide
-          title="Block Added! 👏 "
-          description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
+          title="Select an API"
+          description={`Block added--nice! Now, click the dropdown to select an API. Don't have one? No worries, a sample API is available for you to use.`}
           tipPosition="left-top"
           pulsePosition={{ top: "8px", left: "-150px" }}
           onNext={() => {
@@ -839,8 +853,8 @@
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
       <div style="position:absolute; top:265px; left:632px; z-index:1000;">
         <TestFlowTourGuide
-          title="Sample API waiting...⏱️"
-          description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
+          title="Sample API Ready"
+          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
           tipPosition="left-top"
           pulsePosition={{ top: "10px", left: "-145px" }}
           onNext={() => {

@@ -2,6 +2,7 @@
   import { CrossIcon } from "@sparrow/library/assets";
   import { onMount, onDestroy } from "svelte";
   import { PulseCircle } from "@sparrow/common/components";
+  import { Button } from "@sparrow/library/ui";
 
   export let pulsePosition = { top: "0px", left: "0px" };
   export let targetId;
@@ -63,15 +64,6 @@
 
   <div class="tip {tipPosition}"></div>
 
-  <!-- Close button (X) -->
-  <div class="close-icon" on:click={handleClose}>
-    <CrossIcon
-      height={"11px"}
-      width={"11px"}
-      color={"var(--icon-tertiary-100)"}
-    />
-  </div>
-
   <!-- Title and content -->
   <h2
     class="text-fs-16"
@@ -87,17 +79,20 @@
   </p>
 
   <!-- Next/Done button -->
-  <div class="d-flex justify-content-end">
-    <button
-      class=" mt-2 rounded-1 text-fs-12"
-      style="font-weight:500; border: none; background-color:#2A2C3C; padding:7px 10px;"
-      on:click={handleNext}
-      >{#if isLastStep}
-        Done
-      {:else}
-        Next
-      {/if}</button
-    >
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      type="outline-secondary"
+      size="small"
+      title="Dismiss"
+      onClick={handleClose}
+    />
+
+    <Button
+      type="primary"
+      size="small"
+      title={isLastStep ? "Done" : "Next"}
+      onClick={handleNext}
+    />
   </div>
 </div>
 
@@ -115,11 +110,10 @@
 
   .popup {
     position: absolute;
-    background-color: #1c1d2b;
+    background-color: #1d212b;
     border-radius: 8px;
     padding: 16px;
-    max-width: 300px;
-    width: 300px;
+    width: 352px;
     font-family: Arial, sans-serif;
     z-index: 100000;
     border: 0.3px solid var(--border-tertiary-190);
@@ -140,79 +134,5 @@
     top: 10px;
     right: 10px;
     cursor: pointer;
-  }
-
-  .popup .tip {
-    position: absolute;
-    width: 19px;
-    height: 19px;
-
-    background-color: #1c1d2b;
-  }
-
-  /* Tip positions */
-  .tip.top-left {
-    top: -10px;
-    left: 25px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(45deg);
-  }
-
-  .tip.top-right {
-    top: -10px;
-    right: 30px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(45deg);
-  }
-
-  .tip.bottom-left {
-    bottom: -10px;
-    left: 25px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(225deg);
-  }
-
-  .tip.bottom-right {
-    bottom: -10px;
-    right: 25px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(225deg);
-  }
-
-  /* New Tip Positions */
-  .tip.left-top {
-    top: 25px;
-    left: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(314deg);
-  }
-
-  .tip.left-bottom {
-    bottom: 25px;
-    left: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(314deg);
-  }
-
-  .tip.right-top {
-    top: 25px;
-    right: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(135deg);
-  }
-
-  .tip.right-bottom {
-    bottom: 25px;
-    right: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(135deg);
   }
 </style>
