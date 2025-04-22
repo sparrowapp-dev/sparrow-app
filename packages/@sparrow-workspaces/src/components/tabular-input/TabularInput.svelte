@@ -34,6 +34,7 @@
 
   // New props for merge/diff view **anish
   export let showMergeView = false;
+  export let isMergeViewLoading = false;
   export let newModifiedPairs: KeyValuePair[] = [];
 
   let enableKeyValueHighlighting = true;
@@ -62,6 +63,9 @@
 
   // Funtion to calculate diff. b/w origional data (pairs) and new data (newModifiedPairs)
   function calculateDiff(): DiffPair[] {
+    // Set a flag to indicate calculation is in progress
+    isMergeViewLoading = true;
+
     // if (!showMergeView || !pairs || pairs.length === 0) {
     //   console.log("pairs ", pairs.length);
     //   return newModifiedPairs.map((pair) => ({
@@ -193,35 +197,54 @@
       originalIndex: result.length - 1,
       currentIndex: result.length - 1,
     };
+
+    isMergeViewLoading = false;
     return [...result, lastEmptyRow];
   }
 
-  $: if (showMergeView) diffPairs = calculateDiff();
+  // $: if (showMergeView) diffPairs = calculateDiff();
+  const updateDiffPairsWithLoading = async () => {
+    isMergeViewLoading = true;
+    await sleep(1000);
+    diffPairs = calculateDiff();
+  };
+  $: if (showMergeView) updateDiffPairsWithLoading();
 
   // Update when original data changes (Note: don't think this is required) **anish
-  $: if (pairs && showMergeView) diffPairs = calculateDiff();
+  // $: if (pairs && showMergeView) diffPairs = calculateDiff();
 
   // Update diff when inputs change
   $: {
     if (keyValue) {
+      console.log("in identifySelectAllState() :>> ");
       identifySelectAllState();
-      if (showMergeView) diffPairs = calculateDiff(); // **anish
+      // if (showMergeView) diffPairs = calculateDiff(); // **anish
+      // if (showMergeView) {
+      //   isMergeViewLoading = true;
+      //   // Use setTimeout to ensure UI updates before heavy calculation
+      //   setTimeout(() => {
+      //     diffPairs = calculateDiff();
+      //     // calculateDiff will set isMergeViewLoading to false
+      //   }, 1000);
+      // }
     }
   }
-  // setTimeout(() => {
-  //   console.log("appling changes!!");
-  //   // applyChanges();
-  // }, 10000);
 
   // Toggle merge view **anish
-  const toggleMergeView = (show: boolean) => {
+  const toggleMergeView = async (show: boolean) => {
     showMergeView = show;
-    if (show) diffPairs = calculateDiff();
+    if (show) {
+      isMergeViewLoading = true;
+      await sleep(1000);
+      diffPairs = calculateDiff();
+    }
   };
 
   // Function to apply all changes from diff view to the original data
-  const applyChanges = (): void => {
+  const applyChanges = async () => {
     if (!showMergeView) return;
+
+    isMergeViewLoading = true;
 
     // Extract all valid pairs from diffPairs (excluding deleted ones)
     const updatedPairs = diffPairs
@@ -244,21 +267,35 @@
     pairs = updatedPairs; // Update the pairs array with the new data
     showMergeView = false; // Turn off merge view after applying changes
     callback(pairs); // Notify parent component of the changes
-    newModifiedPairs = JSON.parse(JSON.stringify(pairs)); // Save current state for potential future comparison
+    // newModifiedPairs = JSON.parse(JSON.stringify(pairs)); // Save current state for potential future comparison
+    newModifiedPairs = [];
+
+    await sleep(1000);
+    isMergeViewLoading = false; // Reset loading state
   };
 
   // Function to undo all changes and revert to original state
-  const undoChanges = (): void => {
+  const undoChanges = async () => {
     if (!showMergeView) return;
     showMergeView = false;
+    newModifiedPairs = [];
     diffPairs = []; // Reset any potential changes by discarding diffPairs
     callback(pairs); // Notify parent of unchanged data
+
+    isMergeViewLoading = true;
+    await sleep(1000);
+    isMergeViewLoading = false; // Reset loading state
   };
 
   onMount(() => {
     handleBulkTextUpdate();
     if (showMergeView) diffPairs = calculateDiff(); // **anish
   });
+
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
 
   /**
    * @description - calculates the select all checkbox state - weather checked or not
@@ -551,7 +588,7 @@
           />
         {/if}
 
-        {#if showMergeView}
+        {#if !isMergeViewLoading && showMergeView}
           {#each diffPairs as element, index (index)}
             <LazyElement
               element={{

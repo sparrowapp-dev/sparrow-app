@@ -29,6 +29,7 @@
 
   // For merge view - now as props
   export let isMergeViewEnabled = false;
+  export let isMergeViewLoading = false;
   export let newModifiedContent: string; // New content to show in merge view
 
   let previousMergeViewState = isMergeViewEnabled;
@@ -206,6 +207,8 @@
     previousMergeViewState = isMergeViewEnabled;
 
     if (isMergeViewEnabled) {
+      isMergeViewLoading = true;
+
       // Store current content as original
       originalContent = codeMirrorView.state.doc.toString();
 
@@ -220,6 +223,15 @@
           annotations: [{ autoChange: true }],
         });
         // currentModifiedContent = newModifiedContent;
+
+        // Update merge view
+        updateMergeView();
+
+        // Use setTimeout to allow the merge view to be rendered
+        // This is a workaround since the operation isn't really async
+        setTimeout(() => {
+          isMergeViewLoading = false;
+        }, 1000); // Adjust timing based on your needs
       }
     } else {
       // If turning off merge view, restore original content
@@ -238,6 +250,8 @@
 
   // Handle changes to newModifiedContent when in merge view
   $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
+    isMergeViewLoading = true;
+
     codeMirrorView.dispatch({
       changes: {
         from: 0,
@@ -248,6 +262,11 @@
     });
     // currentModifiedContent = newModifiedContent;
     updateMergeView();
+
+    // Use setTimeout to allow the merge view to be rendered
+    setTimeout(() => {
+      isMergeViewLoading = false;
+    }, 1000);
   }
 
   // Run whenever component state changes
@@ -294,8 +313,6 @@
     if (isMergeViewEnabled) {
       console.log("on destroy;");
       undoChanges();
-      dispatch("mergeViewStateChange");
-      dispatch("mergeViewContentChange");
       // isMergeViewEnabled = false;
     }
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed

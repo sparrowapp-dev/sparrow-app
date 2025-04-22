@@ -9,6 +9,7 @@
     UrlEncoded,
   } from "./sub-body";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { Loader } from "@sparrow/library/ui";
 
   export let environmentVariables = [];
   export let onUpdateEnvironment;
@@ -24,37 +25,9 @@
   };
 
   export let isMergeViewEnabled = false;
+  export let isMergeViewLoading = false;
   export let mergeViewRequestDatasetType: RequestDataset;
   export let newModifiedContent: string | KeyValuePair[];
-
-  // Wrapper variables for each component type
-  $: rawMergeEnabled =
-    isMergeViewEnabled && mergeViewRequestDatasetType === RequestDataset.RAW;
-  $: rawModifiedContent =
-    mergeViewRequestDatasetType === RequestDataset.RAW
-      ? newModifiedContent
-      : null;
-
-  $: urlencodedMergeEnabled =
-    isMergeViewEnabled &&
-    mergeViewRequestDatasetType === RequestDataset.URLENCODED;
-  $: urlencodedModifiedContent =
-    mergeViewRequestDatasetType === RequestDataset.URLENCODED
-      ? newModifiedContent
-      : null;
-
-  // Add similar variables for other component types as needed
-
-  // Handler functions to synchronize changes back to parent variables
-  function updateMergeEnabled(value: boolean) {
-    isMergeViewEnabled = value;
-    console.log("sync isMergeViewEnabled :>> ", isMergeViewEnabled);
-  }
-
-  function updateModifiedContent(value: string | KeyValuePair[]) {
-    newModifiedContent = value;
-    console.log("sync newModifiedContent :>> ", newModifiedContent);
-  }
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -64,7 +37,17 @@
     {requestState}
     {updateBeautifiedState}
   />
-  <div style="flex:1; overflow:auto;">
+
+  {#if isMergeViewLoading}
+    <div
+      class="ping-pong"
+      style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
+    >
+      <Loader loaderSize={"20px"} />
+    </div>
+  {/if}
+
+  <div style="flex:1; overflow:auto;" class="ding-ding">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <Raw
         {onUpdateRequestBody}
@@ -72,17 +55,10 @@
         value={body.raw}
         {isBodyBeautified}
         {updateBeautifiedState}
-        bind:isMergeViewEnabled={rawMergeEnabled}
-        bind:newModifiedContent={rawModifiedContent}
-        on:mergeViewStateChange={(e) =>
-          mergeViewRequestDatasetType === RequestDataset.RAW &&
-          updateMergeEnabled(e.detail)}
-        on:mergeViewContentChange={(e) =>
-          mergeViewRequestDatasetType === RequestDataset.RAW &&
-          updateModifiedContent(e.detail)}
+        bind:isMergeViewEnabled
+        bind:isMergeViewLoading
+        bind:newModifiedContent
       />
-      <!-- bind:isMergeViewEnabled
-        bind:newModifiedContent -->
     {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
       <None />
     {:else if requestState.requestBodyNavigation === RequestDataset.URLENCODED}
@@ -91,17 +67,10 @@
         {onUpdateRequestBody}
         {onUpdateEnvironment}
         {environmentVariables}
-        bind:isMergeViewEnabled={urlencodedMergeEnabled}
-        bind:newModifiedContent={urlencodedModifiedContent}
-        on:mergeViewStateChange={(e) =>
-          mergeViewRequestDatasetType === RequestDataset.URLENCODED &&
-          updateMergeEnabled(e.detail)}
-        on:mergeViewContentChange={(e) =>
-          mergeViewRequestDatasetType === RequestDataset.URLENCODED &&
-          updateModifiedContent(e.detail)}
+        bind:isMergeViewEnabled
+        bind:isMergeViewLoading
+        bind:newModifiedContent
       />
-      <!-- bind:isMergeViewEnabled
-        bind:newModifiedContent -->
     {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
       <FormData
         keyValue={body.formdata}

@@ -5,6 +5,7 @@
   export let currentTabId;
   export let onTabClick;
   export let type: "segmentedTab" | "default" = "default";
+  export let allDisableState = false;
   let leftSliderDistance = 0;
   let sliderWidth = 0;
   let tabElements: { [key: string]: HTMLButtonElement | undefined } = {};
@@ -16,7 +17,6 @@
       sliderWidth = tab.offsetWidth;
     }
   };
-  let allDisableState = false;
   $: {
     let tab1 = tabs;
     for (let tab of tab1) {

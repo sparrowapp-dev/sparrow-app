@@ -11,6 +11,7 @@
   export let updateBeautifiedState: (value: boolean) => void;
 
   export let isMergeViewEnabled = false;
+  export let isMergeViewLoading = false;
   export let newModifiedContent: string;
 
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
@@ -19,8 +20,8 @@
   };
 
   // Watch for changes and dispatch events
-  $: dispatch("mergeViewStateChange", isMergeViewEnabled);
-  $: dispatch("mergeViewContentChange", newModifiedContent);
+  // $: dispatch("mergeViewStateChange", isMergeViewEnabled);
+  // $: dispatch("mergeViewContentChange", newModifiedContent);
 
   $: if (isMergeViewEnabled)
     console.log("in RAW - mergeviewenabled : ", isMergeViewEnabled);
@@ -34,6 +35,7 @@
     bind:value
     bind:isMergeViewEnabled
     bind:newModifiedContent
+    bind:isMergeViewLoading
     on:change={handleCodeMirrorChange}
     isEditable={isMergeViewEnabled ? false : true}
     {isBodyBeautified}

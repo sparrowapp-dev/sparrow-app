@@ -12,18 +12,9 @@
   };
 
   export let isMergeViewEnabled = false;
+  export let isMergeViewLoading = false;
   export let newModifiedContent: KeyValuePair[];
 
-  $: {
-    if (isMergeViewEnabled) {
-      console.log("in URLEnc - mergeviewenabled : ", isMergeViewEnabled);
-    }
-  }
-  $: {
-    if (newModifiedContent) {
-      console.log("in URLEnc - newModifiedContent : ", newModifiedContent);
-    }
-  }
 </script>
 
 <section class="w-100">
@@ -33,6 +24,7 @@
     {environmentVariables}
     {onUpdateEnvironment}
     bind:showMergeView={isMergeViewEnabled}
+    bind:isMergeViewLoading
     bind:newModifiedPairs={newModifiedContent}
   />
 </section>
