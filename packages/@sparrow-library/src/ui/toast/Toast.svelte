@@ -196,6 +196,6 @@
   }
   .custom-toast-container {
     position: fixed;
-    z-index: 1000000 !important;
+    z-index: 10002 !important;
   }
 </style>
