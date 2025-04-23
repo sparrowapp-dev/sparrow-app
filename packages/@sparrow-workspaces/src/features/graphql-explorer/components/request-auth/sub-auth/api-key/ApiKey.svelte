@@ -38,7 +38,7 @@
     <div class="position-relative" style="min-height: 40px;">
       <div
         class="position-absolute top-0 a {environmentVariables}
-        {onUpdateEnvironment}uth-input-container"
+        {onUpdateEnvironment} auth-input-container"
       >
         <CodeMirrorInput
           bind:value={apiData.authValue}
@@ -57,7 +57,8 @@
 
 <style>
   .auth-input-container {
-    width: 615px;
+    max-width: 615px;
+    width:100%;
   }
 
   .radio {
