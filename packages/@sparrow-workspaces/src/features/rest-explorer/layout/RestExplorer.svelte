@@ -258,7 +258,6 @@
       $tab?.property?.request?.state?.isChatbotGeneratingResponse;
 
     if (!isResponseGenerating) {
-      // console.log("LKKK :> ", $tab?.property?.request?.ai?.conversations);
       onUpdateAiConversation([
         ...$tab?.property?.request?.ai?.conversations,
         {
@@ -279,16 +278,15 @@
         I've stringified the response. 
         Response: ${JSON.stringify(storeData.response)}`;
 
-      console.log("debugPrompt :> ", debugPrompt);
-
+      // ToDo: Enable scroller
       // Scroller for user prompt
       // setTimeout(() => {
       //   if (scrollList) scrollList("bottom", -1, "smooth");
       // }, 10);
 
-      // Send Prompt
       await onGenerateAiResponse(debugPrompt);
 
+      // ToDo: Enable scroller
       // Scroller for AI response
       // setTimeout(() => {
       //   if (scrollList) scrollList("bottom", -1, "smooth");
@@ -296,9 +294,15 @@
 
       onUpdateRequestState({ isChatbotActive: true });
     }
-    MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
+
+    // ToDo: Register mixpanel event for "Help me debug" action
+    // MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
   };
 
+  /**
+   * Checks whether the response status code indicates a client error (HTTP 4xx).
+   * @returns {boolean} - Returns true if the status code is between 400 and 499, otherwise false.
+   */
   const isClientError = () => {
     const status = storeData?.response?.status;
     const code = parseInt(status?.split(" ")[0]);
