@@ -281,10 +281,11 @@
     ];
 
     // Raw body content
-    const dataRaw = `{ 
-  "key": "origion", 
-  "value": "1", 
-  "checked": true,
+    const dataRaw = `{
+  "key": "original",
+  "email": "@gmail.com",
+  "value": "1",
+  "checked": false,
   "ghibli": "image"
 }`;
 

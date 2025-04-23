@@ -28,11 +28,6 @@
   let previousMergeViewState = isMergeViewEnabled;
   let originalContent = value; // Store the original content for comparison
 
-  // setTimeout(() => {
-  //   newModifiedContent = "anish:kumar\npizza:burger";
-  //   isMergeViewEnabled = true;
-  // }, 7000);
-
   const dispatch = createEventDispatcher();
 
   let componentClass = "";
@@ -276,9 +271,9 @@
 
   onDestroy(() => {
     // If changes are not saved, then undo those changes before getting destroyed
-    if (isMergeViewEnabled) {
-      undoChanges();
-    }
+    // if (isMergeViewEnabled) {
+    //   undoChanges();
+    // }
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed
   });
 </script>
@@ -288,15 +283,14 @@
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if isMergeViewEnabled}
+{#if !isMergeViewLoading && isMergeViewEnabled}
   <div class="d-flex justify-content-end mt-3 me-0 gap-2">
     <Button
       title={"Keep the Changes"}
       type={"primary"}
-      onClick={() => applyChanges()}
+      onClick={applyChanges}
     />
-
-    <Button title={"Undo"} type={"secondary"} onClick={() => undoChanges()} />
+    <Button title={"Undo"} type={"secondary"} onClick={undoChanges} />
   </div>
 {/if}
 
