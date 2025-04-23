@@ -645,9 +645,9 @@
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
-            title="Getting Started  🎉"
+            title="Welcome to Test Flow!"
             pulsePosition={{ top: "-58px", left: "14px" }}
-            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
+            description={`Let's begin by creating your first flow. Click the '+ Add' button to get started`}
             tipPosition="top-left"
             onNext={() => {
               currentStep.set(2);
@@ -669,8 +669,8 @@
         >
           <TestFlowTourGuide
             targetId="addButton"
-            title="Add Your Flow 🌊"
-            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
+            title="Add Your Flow"
+            description={`Click 'Add Test Flow' to instantly create a new flow. It's that simple--your workspace is ready!`}
             tipPosition="left-top"
             pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
             onNext={() => {
