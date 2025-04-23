@@ -289,7 +289,7 @@
 }`;
 
     // enabledMergeViewForReqBody(dataRaw, RequestDataset.RAW);
-    enabledMergeViewForReqBody(dataURLEncoded, RequestDataset.URLENCODED);
+    // enabledMergeViewForReqBody(dataURLEncoded, RequestDataset.URLENCODED);
 
     setTimeout(() => {
       console.log(
