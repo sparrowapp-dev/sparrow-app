@@ -79,8 +79,8 @@
         tableClassProps="table p-0 table-responsive w-100"
         tableStyleProp="max-height: 100%; "
         dataSearch="true"
-        tableHeaderClassProp="position-sticky top-0 z-2"
-        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);"
+        tableHeaderClassProp="position-sticky top-0"
+        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);z-index: 103;"
         contributorsCount={openTeam?.users?.length}
         headerObject={tableHeaderContent}
         onSortToggle={handleSortToggle}
