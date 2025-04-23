@@ -4,7 +4,7 @@
   import { MenuView } from "@sparrow/teams/compopnents";
   import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
-  import ChevronVerticalFilled from "../../../../../@sparrow-library/src/icons/ChevronVerticalFilled.svelte";
+  import { MoreVerticalRegular } from "@sparrow/library/icons";
 
   export let list;
   export let activeTeam;
@@ -191,7 +191,7 @@
         onClick={(e) => {
           rightClickContextMenu(e);
         }}
-        startIcon={ChevronVerticalFilled}
+        startIcon={MoreVerticalRegular}
       />
     </div>
   </td>
