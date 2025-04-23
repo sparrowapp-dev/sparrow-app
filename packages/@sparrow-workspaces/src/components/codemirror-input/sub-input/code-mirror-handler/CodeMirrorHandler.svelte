@@ -131,7 +131,9 @@
     }
   });
 
-  // Widget to render the dynamic expression.
+  /**
+   * Widget to render the dynamic expression.
+   */
   class ExpressionWidget extends WidgetType {
     constructor(
       readonly name: string,
@@ -162,7 +164,7 @@
 
       container.onclick = (e) => {
         e.stopPropagation();
-        console.log("Clicked:", this.name);
+        // add click operation here
       };
 
       return container;
@@ -173,6 +175,10 @@
     }
   }
 
+  /**
+   * Create regex matching pattern for the expression.
+   * @example [[expression]]
+   */
   const expressionMatcher = new MatchDecorator({
     regexp: /\[\[(\w+)\]\]/g,
     decoration: (match) =>
@@ -186,6 +192,10 @@
       }),
   });
 
+  /**
+   * Create a decoration set for the expression matcher.
+   * @param view - The editor view instance.
+   */
   const expressionPlugin = ViewPlugin.fromClass(
     class {
       placeholders: DecorationSet;
@@ -209,7 +219,7 @@
   );
 
   /**
-   * Disable keys in codemirror
+   * handle keyboard events in codemirror
    */
   const keyBinding = keymap.of([
     {
@@ -546,20 +556,20 @@
 
   :global(.cm-expression-block) {
     display: inline-block;
-    background-color: #eef;
+    background-color: var(--bg-ds-neutral-50);
     border-radius: 4px;
     padding: 0px 6px;
     cursor: pointer;
   }
 
   :global(.cm-expression-block span) {
-    max-width: 100px; /* Or any width you prefer */
+    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     display: inline-block;
     vertical-align: middle;
-    color: black;
+    color: var(--text-ds-neutral-800);
   }
 
   :global(.cm-expression-block-close) {
@@ -567,14 +577,5 @@
     font-size: 0.8em;
     margin-left: 4px;
     color: var(--text-ds-danger-300);
-  }
-  .cm-inline-button {
-    margin: 4px 0;
-    padding: 4px 8px;
-    background-color: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
   }
 </style>
