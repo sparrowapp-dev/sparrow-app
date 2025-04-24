@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { toasts } from "svelte-toasts";
   import { TeamPropertyEnum } from "../../../../types";
   import { DESCRIPTION_CONFIG } from "../../../../constants";
   import { Button } from "@sparrow/library/ui";
@@ -50,8 +51,14 @@
   textStyleProp={"font-size: var(--base-text)"}
   type={"primary"}
   loader={false}
-  onClick={() =>
-    onUpdateTeam([TeamPropertyEnum.NAME, TeamPropertyEnum.DESCRIPTION])}
+  onClick={() => {
+    toasts.success("Team updated successfully!");
+    onUpdateTeam([
+      TeamPropertyEnum.NAME,
+      TeamPropertyEnum.DESCRIPTION,
+      TeamPropertyEnum.IMAGE,
+    ]);
+  }}
 />
 
 <style>

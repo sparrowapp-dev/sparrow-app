@@ -6,7 +6,7 @@
   import { OSDetector } from "@sparrow/common/utils";
 
   export let uploadTeamIcon: IUpdateTeamIcon;
-  export let onUpdateTeam: (property: TeamPropertyEnum) => void;
+  export let onUpdateTeam: (properties: TeamPropertyEnum[]) => Promise<void>;
 
   import { platform } from "@tauri-apps/plugin-os";
   import { onMount } from "svelte";
@@ -78,7 +78,7 @@
     uploadTeamIcon.file.showFileTypeError = false;
     uploadTeamIcon.file.invalid = false;
     uploadTeamIcon.file.value = targetFile && targetFile[0];
-    onUpdateTeam(TeamPropertyEnum.IMAGE);
+    //onUpdateTeam([TeamPropertyEnum.IMAGE]);
   };
 
   /**
@@ -93,7 +93,7 @@
       showFileSizeError: false,
       showFileTypeError: false,
     };
-    onUpdateTeam(TeamPropertyEnum.IMAGE);
+    // onUpdateTeam([TeamPropertyEnum.IMAGE]);
   };
 
   /**
