@@ -490,6 +490,7 @@
   let isSyncReplaceModalOpen = false;
   let isSyncModalOpen = false;
   let isCollectionSyncing = false;
+  let isReplaceCollectionModalOpen = false;
 
   // Add userValidation state
   let userValidation = {
@@ -1474,18 +1475,8 @@
         size={"medium"}
         type={"secondary"}
         onClick={async () => {
-          isCollectionSyncing = true;
-          updateActiveSyncStates(activeSyncChanges.collectionId, {
-            isChangesAvailable: false,
-            isloading: true,
-          });
-          await _viewModel.replaceCollection(activeSyncChanges.collectionId);
-          updateActiveSyncStates(activeSyncChanges.collectionId, {
-            isChangesAvailable: false,
-            isloading: false,
-          });
-          isCollectionSyncing = false;
           isSyncReplaceModalOpen = false;
+          isReplaceCollectionModalOpen = true;
         }}
       ></Button>
       <Button
@@ -1499,6 +1490,62 @@
         }}
       ></Button>
     </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Replace Existing Collection"}
+  zIndex={1000}
+  isOpen={isReplaceCollectionModalOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isReplaceCollectionModalOpen = false;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      This will overwrite your current collection with the latest version. Any
+      additional changes that you made in the collection will be overwritten.
+      Are you sure you want to continue?
+    </p>
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isReplaceCollectionModalOpen = false;
+      }}
+    ></Button>
+    <Button
+      title={"Replace Collection"}
+      size={"medium"}
+      loader={isCollectionSyncing}
+      disable={isCollectionSyncing}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"155px"}
+      onClick={async () => {
+        isCollectionSyncing = true;
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: true,
+        });
+        await _viewModel.replaceCollection(activeSyncChanges.collectionId);
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: false,
+        });
+        isCollectionSyncing = false;
+        isReplaceCollectionModalOpen = false;
+      }}
+    ></Button>
   </div>
 </Modal>
 
