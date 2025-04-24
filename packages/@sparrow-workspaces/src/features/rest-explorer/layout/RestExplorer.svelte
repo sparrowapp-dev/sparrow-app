@@ -147,6 +147,12 @@
   export let collection;
   const loading = writable<boolean>(false);
 
+  $: if (storeData) {
+    const { bodyFormatter, navigation, size, time, ...restData } =
+      storeData.response;
+    console.log("Req. Res :>> ", restData);
+  }
+
   // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
@@ -315,17 +321,37 @@
     isMergeViewEnableForRequestBody = true;
   };
 
-  $: {
-    if (
-      isMergeViewEnableForRequestBody &&
-      $tab.property.request?.state?.requestNavigation &&
-      $tab.property.request?.state?.requestBodyNavigation
-    ) {
-      console.log(
-        "!!!!!!!!!!!!!!!!!!!!!!!!!!! shifting while active merge changes !!!!!!!!!!!!!!!!!!!!!!!!!!!",
-      );
-    }
-  }
+  const handleApplyChangeOnAISuggestion = async (changeData) => {
+    const { target, language, content } = changeData;
+    console.log(
+      "handling AI Suggestions :>> ",
+      target,
+      language,
+      JSON.stringify(content, null, 2),
+    );
+    try {
+      switch (target) {
+        case "body": {
+          console.log("changeing for req body :>> ");
+          enabledMergeViewForReqBody(
+            JSON.stringify(content, null, 2),
+            RequestDataset.RAW,
+          );
+          break;
+        }
+        case "paramters": {
+          console.log("changeing for params :>> ");
+          break;
+        }
+        case "headers": {
+          console.log("changeing for headers :>> ");
+          break;
+        }
+        default:
+          break;
+      }
+    } catch (error) {}
+  };
 </script>
 
 {#if $tab.tabId}
@@ -640,6 +666,7 @@
                 {onGenerateAiResponse}
                 {onStopGeneratingAIResponse}
                 {onToggleLike}
+                {handleApplyChangeOnAISuggestion}
               />
             </Pane>
           {/if}

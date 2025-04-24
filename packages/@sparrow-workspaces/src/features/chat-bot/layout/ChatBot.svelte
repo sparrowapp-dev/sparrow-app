@@ -29,6 +29,7 @@
   export let onGenerateAiResponse;
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
+  export let handleApplyChangeOnAISuggestion;
 
   let scrollList: ScrollList;
 
@@ -85,6 +86,7 @@
       {regenerateAiResponse}
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
+      {handleApplyChangeOnAISuggestion}
       bind:scrollList
     />
   </div>

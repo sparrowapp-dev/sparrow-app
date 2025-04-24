@@ -2,7 +2,12 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@sparrow/library/ui";
-  import { copyIcon, tickIcon, ArrowExpand } from "../../assests";
+  import {
+    copyIcon,
+    tickIcon,
+    ArrowExpand,
+    ArrowTrendingSparkle,
+  } from "../../assests";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";
@@ -33,6 +38,8 @@
 
   export let onClickCodeBlockPreview;
 
+  export let handleApplyChangeOnAISuggestion;
+
   let showTickIcon: boolean = false;
 
   /**
@@ -46,39 +53,119 @@
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
-    // Select all <pre> elements
+    // First, process actionable code blocks
+    const preElements = doc.querySelectorAll("pre");
+    preElements.forEach((pre) => {
+      const codeElem = pre.querySelector("code");
+      if (!codeElem) return;
+
+      // Check if this is an actionable code block
+      const codeClass = codeElem.getAttribute("class") || "";
+      if (codeClass.includes("language-actionable")) {
+        try {
+          const actionableContent = codeElem.textContent || ""; // Extract the actionable block content
+          const actionableJson = JSON.parse(actionableContent); // Parse the actionable JSON
+
+          // Check if it contains the required fields
+          if (
+            actionableJson.target &&
+            actionableJson.language &&
+            actionableJson["change-codeblock"]
+          ) {
+            const changeCodeBlockMatch = actionableJson[
+              "change-codeblock"
+            ].match(/```[\w\s]*\n([\s\S]*?)```/); // Extract the change-codeblock content
+
+            if (changeCodeBlockMatch && changeCodeBlockMatch[1]) {
+              const codeContent = changeCodeBlockMatch[1]; // Get just the content inside the inner code block
+
+              // Get the language of the inner code block
+              const innerLangMatch =
+                actionableJson["change-codeblock"].match(/```(\w+)/);
+              const innerLang = innerLangMatch
+                ? innerLangMatch[1]
+                : actionableJson.language;
+
+              // Create a new code element with the extracted content
+              const newCode = document.createElement("code");
+              newCode.textContent = codeContent;
+              newCode.className = `language-${innerLang}`;
+
+              // Replace the old code element content with just the inner code block
+              while (pre.firstChild) {
+                pre.removeChild(pre.firstChild);
+              }
+              pre.appendChild(newCode);
+
+              // Store the actionable metadata as a data attribute for later use
+              pre.setAttribute(
+                "data-actionable",
+                JSON.stringify({
+                  target: actionableJson.target,
+                  language: actionableJson.language,
+                }),
+              );
+            }
+          }
+        } catch (e) {
+          console.error("Failed to parse actionable code block:", e);
+        }
+      }
+    });
+
+    // Now process all code blocks for syntax highlighting
     const codeElements = doc.querySelectorAll("pre > code");
-    const preElements = Array.from(codeElements)
+    const highlightedPreElements = Array.from(codeElements)
       .filter((elem) => {
         if (elem.innerHTML.trim()) return true;
         return false;
       })
       .map((codeElem) => codeElem.parentElement);
 
-    preElements.forEach((pre, index) => {
+    highlightedPreElements.forEach((pre, index) => {
       if (pre) {
         // Create a new container div
         const container = document.createElement("div");
         container.className = "wrapper";
         const lang = pre.querySelector("code")?.getAttribute("class");
         hljs.highlightBlock(pre.querySelector("code"));
+
+        // Check if this was an actionable block
+        const actionableData = pre.getAttribute("data-actionable");
+        let additionalButtons = "";
+
+        // Add a "Apply Change" button for actionable blocks
+        if (actionableData) {
+          additionalButtons = `
+          <button role="button" class="position-relative apply-change-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}" data-actionable='${actionableData}'>
+            <img src="${ArrowTrendingSparkle}" id="${index}">
+            <div class="codeBlock-action-btns-tooltip">Insert
+              <div class="codeBlock-action-btns-tooltip-square"></div>
+            </div>
+          </button>
+        `;
+        }
+
         // Adding code block action buttons like copy code and preview code
         container.innerHTML = `
-            <div class="code-header d-flex align-items-center justify-content-between">
+          <div class="code-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              ${additionalButtons}
               <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
                 <img src="${ArrowExpand}" id="${index}">
                 <div class="codeBlock-action-btns-tooltip">Preview
                   <div class="codeBlock-action-btns-tooltip-square"></div>
                 </div>
               </button>
-              <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-                <img src="${copyIcon}" id="${index}">
-                <div class="codeBlock-action-btns-tooltip">Copy
-                  <div class="codeBlock-action-btns-tooltip-square"></div>
-                </div>
-              </button>
             </div>
-          `;
+            <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+              <img src="${copyIcon}" id="${index}">
+              <div class="codeBlock-action-btns-tooltip">Copy
+                <div class="codeBlock-action-btns-tooltip-square"></div>
+              </div>
+            </button>
+          </div>
+        `;
 
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
@@ -169,6 +256,58 @@
     }
   };
 
+  // Add the handleApplyChange function
+  const handleApplyChange = (event: MouseEvent) => {
+    const button = event.target as HTMLElement;
+    const actionableButton = button.closest("[data-actionable]");
+    const actionableData = actionableButton?.getAttribute("data-actionable");
+
+    if (actionableData) {
+      try {
+        const data = JSON.parse(actionableData);
+        const wrapper = actionableButton.closest(
+          ".wrapper",
+        ) as HTMLElement | null;
+
+        if (wrapper) {
+          const codeElement = wrapper.querySelector(
+            "pre code",
+          ) as HTMLElement | null;
+          if (codeElement) {
+            const codeContent = codeElement.textContent || "";
+
+            // console.log(" hit apply Change :>> ", {
+            //   target: data.target,
+            //   language: data.language,
+            //   content: JSON.parse(codeContent),
+            // });
+
+            handleApplyChangeOnAISuggestion({
+              target: data.target,
+              language: data.language,
+              content: JSON.parse(codeContent),
+            });
+
+            // Optional: Provide visual feedback that change was sent
+            const img = actionableButton?.querySelector("img");
+            if (img) {
+              const originalSrc = img?.src;
+              img.src = tickIcon;
+              img.classList.add("tick-icon");
+              setTimeout(() => {
+                img.src = originalSrc;
+                img.classList.remove("tick-icon");
+              }, 5000);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to apply change:", e);
+        notifications.error("Failed to apply change");
+      }
+    }
+  };
+
   /**
    * Handles the response copy to clipboard functionality.
    */
@@ -197,34 +336,46 @@
    */
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
-    // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
       const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);
       const previewCodeBtns = document.querySelectorAll(
         `.preview-code-${messageId}`,
       );
+      const applyChangeBtns = document.querySelectorAll(
+        `.apply-change-${messageId}`,
+      );
 
       // Remove previous event listeners
       cleanUpListeners();
 
-      cleanUpListeners = () => {
-        copyCodeBtns.forEach((wrapper) => {
-          wrapper.removeEventListener("click", handleCopyCode);
-        });
-      };
-      copyCodeBtns.forEach((wrapper) => {
-        wrapper.addEventListener("click", handleCopyCode);
+      // Add listeners for copy code buttons
+      copyCodeBtns.forEach((btn) => {
+        btn.addEventListener("click", handleCopyCode);
       });
 
+      // Add listeners for preview code buttons
+      previewCodeBtns.forEach((btn) => {
+        btn.addEventListener("click", handleCodePreview);
+      });
+
+      // Add listeners for apply change buttons
+      applyChangeBtns.forEach((btn) => {
+        btn.addEventListener("click", handleApplyChange);
+      });
+
+      // Update cleanup function
       cleanUpListeners = () => {
-        previewCodeBtns.forEach((wrapper) => {
-          wrapper.removeEventListener("click", handleCodePreview);
+        copyCodeBtns.forEach((btn) => {
+          btn.removeEventListener("click", handleCopyCode);
+        });
+        previewCodeBtns.forEach((btn) => {
+          btn.removeEventListener("click", handleCodePreview);
+        });
+        applyChangeBtns.forEach((btn) => {
+          btn.removeEventListener("click", handleApplyChange);
         });
       };
-      previewCodeBtns.forEach((wrapper) => {
-        wrapper.addEventListener("click", handleCodePreview);
-      });
     }, 200);
   };
 

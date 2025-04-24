@@ -54,7 +54,7 @@
     callback={handleHeaderChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    showMergeView={true}
+    showMergeView={false}
     newModifiedPairs={[
       { key: "dnt", value: "1", checked: true },
       { key: "accept", value: "ish", checked: true },
