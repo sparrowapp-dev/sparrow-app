@@ -23,8 +23,8 @@
     callback={handleUrlEncodeChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    bind:showMergeView={isMergeViewEnabled}
     bind:isMergeViewLoading
+    bind:showMergeView={isMergeViewEnabled}
     bind:newModifiedPairs={newModifiedContent}
   />
 </section>

@@ -260,6 +260,8 @@
   });
 
   let isMergeViewEnableForRequestBody = false;
+  let isMergeViewEnableForParams = false;
+  let isMergeViewEnableForRequestHeaders = false;
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDataset;
@@ -269,23 +271,58 @@
       "isMergeViewEnableForRequestBody :> ",
       isMergeViewEnableForRequestBody,
     );
-  $: if (newModifiedContent)
-    console.log("newModifiedContent :> ", newModifiedContent);
+  // $: if (newModifiedContent) console.log("newModifiedContent :> ", newModifiedContent);
 
   setTimeout(() => {
     console.log("enabledMergeViewForReqBody() :>> ");
 
     // Table format
-    const dataURLEncoded = [
-      { key: "dnt", value: "1", checked: true },
-      { key: "accept", value: "ish", checked: true },
-      { key: "referer", value: "No", checked: true },
-      { key: "this is new val", value: "yes", checked: true },
-      { key: "origins", value: "yes", checked: true },
-      { key: "karan", value: "aujla", checked: true },
-      { key: "origin", value: "https://app.alphametricx.com", checked: true },
-    ];
-
+    const dataURLEncoded = {
+      main_title: "asdas",
+      newsletter_title: "ByCrypt12", // Change this title to a unique one
+      newsletter_content: "",
+      searchId: "",
+      recipients: [],
+      sendOn_dateType: "",
+      send_type: "Daily",
+      send_type_option: [],
+      send_time: "09:00:00",
+      publish_type: "html",
+      publishedOn: "",
+      newsletter_body: [],
+      title: "",
+      content: "",
+      title_color: "#000000",
+      content_color: "#000000",
+      date_color: "#000000",
+      background_color: "#ffffff",
+      background_image: "",
+      logo_image: "",
+      logo_dimensions: {
+        logo_width: 40,
+        logo_height: 40,
+      },
+      background_height: 200,
+      footer:
+        "[This report may contain links to external or third party websites. These links are provided solely for your convenience. Links taken to other sites are done so at your own risk and its affiliates, “AlphaMetricx”, accept no liability for any linked sites or their content. AlphaMetricx does not own the content offered on such links and does not claim any ownership or intellectual property rights whatsoever. AlphaMetricx makes no warranties or representations, express or implied about such linked websites, the third parties they are owned and operated by, the information contained on them and their authenticity, or the suitability or quality of any of their products or services. AlphaMetricx does not authorize the infringement of any intellectual property rights contained in material offered through these linked sites. Please refer to the use agreement and/or copyright statements of any external site you visit, or the terms and conditions of any externally provided web site for instructions, restrictions, and guidelines. If you have a question, please contact the webmaster of the external site.] \\n \\n Not interested in getting these emails? Click here to unsubscribe (alerts@alphametricx.com).",
+      section_label: "Also appeared in",
+      logo_align: "left",
+      date_align: "right",
+      display_logo: true,
+      display_date: true,
+      display_footer: true,
+      display_header_title: true,
+      display_header_description: true,
+      display_section_link: true,
+      is_media: true,
+      is_syndication: true,
+      is_keyword: true,
+      is_sentiment: true,
+      articleMediaShow: false,
+      date_format: "%A, %B %d, %Y",
+      send_timezone: "America/New_York",
+      is_published: false,
+    };
     // Raw body content
     const dataRaw = `{
   "key": "original",
@@ -296,7 +333,11 @@
 }`;
 
     // enabledMergeViewForReqBody(dataRaw, RequestDataset.RAW);
-    // enabledMergeViewForReqBody(dataURLEncoded, RequestDataset.URLENCODED);
+    // console.log("jsss :>> ");
+    // enabledMergeViewForReqBody(
+    //   JSON.stringify(dataURLEncoded, null, 2),
+    //   RequestDataset.URLENCODED,
+    // );
 
     setTimeout(() => {
       console.log(
@@ -311,46 +352,120 @@
     newContent: string | KeyValuePair[],
     requestDatasetType: RequestDataset,
   ) => {
-    isMergeViewLoading = true;
+    // newModifiedContent = newContent;
+    if (requestDatasetType === RequestDataset.RAW) {
+      newModifiedContent = newContent;
+    } else if (requestDatasetType === RequestDataset.URLENCODED) {
+      newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
+    } else if (requestDatasetType === RequestDataset.FORMDATA) {
+      return;
+    } else if (requestDatasetType === RequestDataset.BINARY) {
+    } else {
+    }
+
     onUpdateRequestState({
       requestNavigation: RequestSectionEnum.REQUEST_BODY,
     });
     onUpdateRequestState({ requestBodyNavigation: requestDatasetType });
-    newModifiedContent = newContent;
+
+    await sleep(500);
+    // newModifiedContent = newContent;
     mergeViewRequestDatasetType = requestDatasetType;
     isMergeViewEnableForRequestBody = true;
+    isMergeViewLoading = true;
   };
 
   const handleApplyChangeOnAISuggestion = async (changeData) => {
-    const { target, language, content } = changeData;
-    console.log(
-      "handling AI Suggestions :>> ",
-      target,
-      language,
-      JSON.stringify(content, null, 2),
-    );
+    let { target, language, content } = changeData;
+    // console.log(
+    //   "handling AI Suggestions :>> ",
+    //   target,
+    //   language,
+    //   JSON.stringify(content, null, 2),
+    // );
+
+    target = "headers";
+    const rawBodyReqState =
+      $tab.property?.request?.state?.requestBodyNavigation;
     try {
       switch (target) {
         case "body": {
-          console.log("changeing for req body :>> ");
+          console.log("changeing for req body :>> ", rawBodyReqState);
           enabledMergeViewForReqBody(
             JSON.stringify(content, null, 2),
-            RequestDataset.RAW,
+            rawBodyReqState,
           );
           break;
         }
-        case "paramters": {
-          console.log("changeing for params :>> ");
-          break;
-        }
-        case "headers": {
-          console.log("changeing for headers :>> ");
+
+        case "headers":
+        case "parameters": {
+          const newData = convertJsonToKeyValPairs(content);
+          console.log("changing for params || headers :>> ", newData, target);
+
+          onUpdateRequestState({
+            requestNavigation:
+              target === "headers"
+                ? RequestSectionEnum.HEADERS
+                : RequestSectionEnum.PARAMETERS,
+          });
+          await sleep(500);
+          newModifiedContent = newData;
+          // mergeViewRequestDatasetType = rawBodyReqState;
+          isMergeViewLoading = true;
+          if (target === "headers") isMergeViewEnableForRequestHeaders = true;
+          else isMergeViewEnableForParams = true;
           break;
         }
         default:
           break;
       }
     } catch (error) {}
+  };
+
+  /**
+   * Converts an object (data A) to an array of KeyValuePair objects (data B)
+   * @param {Record<string, any>} dataA - The input object to convert
+   * @param {boolean} defaultChecked - Default value for the checked property if not found in input (defaults to true)
+   * @returns {KeyValuePair[]} Array of objects conforming to KeyValuePair interface
+   */
+  const convertJsonToKeyValPairs = (
+    dataA: Record<string, any>,
+  ): KeyValuePair[] => {
+    // Check if input is valid
+    if (!dataA || typeof dataA !== "object" || Array.isArray(dataA)) {
+      throw new Error("Input must be a valid object");
+    }
+
+    const defaultChecked = true; // fallback value
+
+    // Get checked value from input if it exists
+    const checkedValue =
+      typeof dataA.checked === "boolean" ? dataA.checked : defaultChecked;
+
+    // Convert object to array of KeyValuePair objects
+    const dataB: KeyValuePair[] = Object.entries(dataA)
+      .filter(([key]) => key !== "checked") // Skip the checked property itself
+      .map(([key, value]) => {
+        // Convert value to string if it's not already
+        const stringValue =
+          Array.isArray(value) || (typeof value === "object" && value !== null)
+            ? JSON.stringify(value)
+            : String(value);
+
+        return {
+          key,
+          value: stringValue,
+          checked: checkedValue,
+        };
+      });
+
+    return dataB;
+  };
+
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   };
 </script>
 
@@ -498,6 +613,9 @@
                           authParameter={$requestAuthParameter}
                           {onUpdateEnvironment}
                           {environmentVariables}
+                          bind:isMergeViewEnabled={isMergeViewEnableForParams}
+                          bind:isMergeViewLoading
+                          bind:newModifiedContent
                         />
                       {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
                         <RequestBody
@@ -528,6 +646,9 @@
                           onHeadersChange={onUpdateHeaders}
                           onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
                           {isWebApp}
+                          bind:isMergeViewEnabled={isMergeViewEnableForRequestHeaders}
+                          bind:isMergeViewLoading
+                          bind:newModifiedContent
                         />
                       {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
                         <RequestAuth
