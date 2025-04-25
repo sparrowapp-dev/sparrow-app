@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - development
+      - design-system
 
 jobs:
    build:
