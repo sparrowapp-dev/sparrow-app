@@ -7,10 +7,13 @@
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
-
+  import { posthogClient, initPostHog } from "@app/utils/posthog/posthogConfig";
   export let url = "/";
 
   onMount(async () => {
+    if (typeof window !== "undefined") {
+      initPostHog();
+    }
     handleLogin(window.location.search);
   });
 </script>
