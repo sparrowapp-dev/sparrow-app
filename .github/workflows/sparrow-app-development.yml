@@ -1,8 +1,9 @@
-name: design-system release
+name: Development release
 
 on:
   push:
     branches:
+      - development
       - design-system
   workflow_dispatch:
 
@@ -27,6 +28,7 @@ env:
   VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
   VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
   VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
+  VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
 
@@ -84,17 +86,17 @@ jobs:
 
       - name: msi sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-    
+
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
-           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-           $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -109,6 +111,55 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      - name: Post Windows Build Links to Teams
+        run: |
+          $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+          $msiFileName = $msiFile.Name
+          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          
+          $body = @{
+            "type" = "message"
+            "attachments" = @(
+              @{
+                "contentType" = "application/vnd.microsoft.card.adaptive"
+                "content" = @{
+                  "type" = "AdaptiveCard"
+                  "body" = @(
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "🚀 New Windows Build Available"
+                      "weight" = "bolder"
+                      "size" = "large"
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Branch: development"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Download Link:"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = $msiUrl
+                      "color" = "accent"
+                      "wrap" = $true
+                    }
+                  )
+                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+                  "version" = "1.2"
+                }
+              }
+            )
+          }
+          
+          $jsonBody = $body | ConvertTo-Json -Depth 10
+          
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+        shell: pwsh
 
   release_macos:
     runs-on: macos-latest
@@ -171,63 +222,52 @@ jobs:
       - name: Upload & download File to S3
         run: |
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
-
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Download MSI files from S3 bucket
+      - name: Post macOS Build Links to Teams
         run: |
-          mkdir msi_files
-          aws s3 cp s3://sparrow-release-assests-dev/ msi_files/ --recursive --exclude "*" --include "*.msi"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Install App Center CLI
-        run: |
-          npm install -g appcenter-cli@latest
-
-      - name: Get Branch Name
-        id: pr_branch
-        run: |
-          if [[ -n "${{ github.head_ref }}" ]]; then
-            echo "::set-output name=branch::${{ github.head_ref }}"
-          else
-            echo "::set-output name=branch::${{ github.ref_name }}"
-          fi
-
-      - name: Upload to App Center
-        run: |
-          appcenter login --token ${{ secrets.APPCENTER_API_TOKEN }}
-          branch_name="${{ steps.pr_branch.outputs.branch }}"
-          echo "Branch Name: $branch_name"
-          appcenter distribute release -f /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg -g Collaborators --app techdome/Sparrow-1 --build-version test-${branch_name} --build-number ${{ github.run_number }}
-          appcenter distribute release -f msi_files/*.msi -g Collaborators --app techdome/Sparrow --build-version test-${branch_name} --build-number ${{ github.run_number }}
-      - name: status check and upload
-        uses: neonidian/teams-notify-build-status@v3
-        if: always()
-        with:
-          webhookUrl: |
-            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-          message: |
-            🚀 **Build Status Update** 🚀
-            The workflow (sparrow-app for **Mac**) has completed with status: **${{ job.status }}**.
-            👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow-mac)!
-          titleBackgroundColor: ${{ job.status }}
-        env:
-          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
-
-      - name: status check and upload
-        uses: neonidian/teams-notify-build-status@v3
-        if: always()
-        with:
-          webhookUrl: |
-            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-          message: |
-            🚀 **Build Status Update** 🚀
-            The workflow (sparrow-app for windows) has completed with status: **${{ job.status }}**.
-            👉 Check it out latest release here [AppCenter](https://appcenter.ms/users/techdome/apps/Sparrow)!
-          titleBackgroundColor: ${{ job.status }}
-        env:
-          SHOULD_DISPLAY_VIEW_COMMIT_BUTTON: true
+          DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
+          DMG_FILENAME=$(basename "$DMG_FILE")
+          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
+          
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+              \"attachments\": [
+                {
+                  \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                  \"content\": {
+                    \"type\": \"AdaptiveCard\",
+                    \"body\": [
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"🍎 New macOS Build Available\",
+                        \"weight\": \"bolder\",
+                        \"size\": \"large\"
+                      },
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"Branch: development\",
+                        \"wrap\": true
+                      },
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"Download Link:\",
+                        \"wrap\": true
+                      },
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"$DMG_URL\",
+                        \"color\": \"accent\",
+                        \"wrap\": true
+                      }
+                    ],
+                    \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                    \"version\": \"1.2\"
+                  }
+                }
+              ]
+            }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
