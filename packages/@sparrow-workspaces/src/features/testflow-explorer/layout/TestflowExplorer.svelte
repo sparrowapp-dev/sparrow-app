@@ -279,7 +279,7 @@
         requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
         break;
       case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
-        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
         break;
     }
     return requestAuthNavigation;
