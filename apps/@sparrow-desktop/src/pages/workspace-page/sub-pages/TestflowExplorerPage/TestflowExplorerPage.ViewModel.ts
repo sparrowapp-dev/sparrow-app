@@ -42,7 +42,7 @@ import type {
 } from "@sparrow/common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
-import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
+import { DecodeTestflow } from "@sparrow/workspaces/features/testflow-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 import {
@@ -55,7 +55,6 @@ import {
 } from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
-import type { EnvironmentDocType } from "@app/models/environment.model";
 import constants from "@app/constants/constants";
 
 export class TestflowExplorerPageViewModel {
@@ -74,7 +73,7 @@ export class TestflowExplorerPageViewModel {
   /**
    * Utils
    */
-  private _decodeRequest = new DecodeRequest();
+  private _decodeRequest = new DecodeTestflow();
 
   /**
    * Constructor to initialize the TestflowExplorerPageViewModel class
@@ -446,6 +445,8 @@ export class TestflowExplorerPageViewModel {
       expand: false,
     };
 
+    let requestChainResponse = {};
+
     // Sequential execution
     for (const element of runningNodes) {
       if (element?.type === "requestBlock" && element?.data?.requestId) {
@@ -465,13 +466,13 @@ export class TestflowExplorerPageViewModel {
           request,
         );
 
-        // Extract the auth data from the API request
-        const collectionAuth = extractAuthData(request);
+
+
 
         const decodeData = this._decodeRequest.init(
           adaptedRequest.property.request,
           environments?.filtered || [],
-          collectionAuth,
+          requestChainResponse
         );
         const start = Date.now();
 
@@ -493,7 +494,7 @@ export class TestflowExplorerPageViewModel {
             );
             if (existingTestFlowData) {
               let resData: TFHistoryAPIResponseStoreType;
-              if (response.isSuccessful) {
+              // if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
                   JSON.stringify(response),
                 ).length;
@@ -535,29 +536,38 @@ export class TestflowExplorerPageViewModel {
                   time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
-              } else {
-                resData = {
-                  body: "",
-                  headers: [],
-                  status: ResponseStatusCode.ERROR,
-                  time: duration,
-                  size: 0,
-                };
-                failedRequests++;
-                totalTime += duration;
-                const req = {
-                  method: request?.request?.method as string,
-                  name: request?.name as string,
-                  status: ResponseStatusCode.ERROR,
-                  time: new ParseTime().convertMilliseconds(duration),
-                };
-                history.requests.push(req);
-              }
+              // } else {
+              //   resData = {
+              //     body: "",
+              //     headers: [],
+              //     status: ResponseStatusCode.ERROR,
+              //     time: duration,
+              //     size: 0,
+              //   };
+              //   failedRequests++;
+              //   totalTime += duration;
+              //   const req = {
+              //     method: request?.request?.method as string,
+              //     name: request?.name as string,
+              //     status: ResponseStatusCode.ERROR,
+              //     time: new ParseTime().convertMilliseconds(duration),
+              //   };
+              //   history.requests.push(req);
+              // }
               existingTestFlowData.nodes.push({
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
               });
+
+              requestChainResponse[element.data.blockName] = {
+                response: {
+                  body: JSON.parse(resData.body),
+                  headers: response?.data?.headers
+                },
+                request: adaptedRequest
+              }
+
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
@@ -586,6 +596,13 @@ export class TestflowExplorerPageViewModel {
                 request: adaptedRequest,
               });
 
+              requestChainResponse[element.data.blockName] = {
+                response: {
+                  body: {}
+                },
+                request: adaptedRequest
+              }
+
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -611,6 +628,8 @@ export class TestflowExplorerPageViewModel {
       history.status = "pass";
     }
 
+
+    console.log(requestChainResponse);
     testFlowDataStore.update((testFlowDataMap) => {
       const wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
@@ -679,11 +698,9 @@ export class TestflowExplorerPageViewModel {
       request,
     );
 
-    const collectionAuth = extractAuthData(request);
     const decodeData = this._decodeRequest.init(
       adaptedRequest.property.request,
       environments?.filtered || [],
-      collectionAuth,
     );
 
     const start = Date.now();
