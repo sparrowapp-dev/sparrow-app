@@ -1,0 +1,57 @@
+name: Sparrow Bot
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:     # Allow manual triggering
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  stale:
+    name: Process Stale Items
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run Sparrow Bot Stale
+        uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          command: stale
+  
+  pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run Sparrow Bot PR Title Validation
+        uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          command: pr-title
+          pr-title: ${{ github.event.pull_request.title }}
+          pr-number: ${{ github.event.pull_request.number }}
+          commit-sha: ${{ github.event.pull_request.head.sha }}
+  
+  auto-label:
+    name: Auto Label
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' || github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run Sparrow Bot Auto Label
+        uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          command: auto-label
+          issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
+          content: ${{ github.event.issue.body || github.event.pull_request.body }}
