@@ -5857,11 +5857,11 @@ export default class CollectionsViewModel {
     }
   };
 
-  public setupRedirect = () => {
+  public setupRedirect = async () => {
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
-    const isGuest = !accessToken || !refreshToken;
-    const isSparrowEdge = isGuest ? "&isSparrowEdge=true" : "";
+    const isGuestUser = await this.getGuestUserState();
+    const isSparrowEdge = isGuestUser ? "&isSparrowEdge=true" : "";
     const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email${isSparrowEdge}`;
     window.location.href = sparrowRedirect;
   };
