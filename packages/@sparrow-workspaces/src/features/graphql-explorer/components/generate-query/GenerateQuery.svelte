@@ -13,6 +13,7 @@
   import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
   import { Breadcrumbs } from "@sparrow/library/ui";
   import { Select } from "@sparrow/library/forms";
+  import * as Sentry from "@sentry/svelte";
 
   export let schema;
   export let updateSchema;
@@ -78,6 +79,7 @@
         breadcrum = calculateBreadcrumPath(queryBuilder, 5);
       }
     } catch (e) {
+      Sentry.captureException(e); 
       querySchema = [];
       queryBuilder = [];
       breadcrum = [];

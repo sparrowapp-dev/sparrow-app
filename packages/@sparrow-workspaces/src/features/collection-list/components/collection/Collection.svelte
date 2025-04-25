@@ -2,6 +2,7 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import * as Sentry from "@sentry/svelte";
 
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
@@ -310,6 +311,7 @@
             }
           })
           .catch((error) => {
+            Sentry.captureException(error); 
             console.error("Error during interval compare:", error);
           });
       },

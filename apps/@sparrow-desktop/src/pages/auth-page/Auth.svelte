@@ -32,6 +32,7 @@
   import { leftIconIcon } from "@sparrow/library/assets";
   import { jwtDecode } from "@app/utils/jwt";
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
+  import * as Sentry from "@sentry/svelte";
   let isEntry = false;
   let isHover = false;
   let externalSparrowLink =
@@ -234,6 +235,7 @@
               isTokenErrorMessage = false;
               handleLoginV2(token);
             } catch (e) {
+              Sentry.captureException(e); 
               isTokenErrorMessage = true;
             } finally {
               isTokenValidationLoading = false;

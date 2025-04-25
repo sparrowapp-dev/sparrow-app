@@ -58,6 +58,7 @@ import { isGuestUserActive } from "src/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
 import type { EnvironmentDocType } from "src/models/environment.model";
 import constants from "src/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -569,6 +570,7 @@ export class TestflowExplorerPageViewModel {
             return testFlowDataMap;
           });
         } catch (error) {
+          Sentry.captureException(error); 
           if (error?.name === "AbortError") {
             break;
           }
@@ -742,6 +744,7 @@ export class TestflowExplorerPageViewModel {
       }
       status = resData.status;
     } catch (error) {
+      Sentry.captureException(error);
       resData = {
         body: "",
         headers: [],
