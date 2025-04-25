@@ -213,6 +213,12 @@ export class AppViewModel {
       const existingAccessToken = localStorage.getItem("AUTH_TOKEN");
       const workspaceId = params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
+
+      // If running in Sparrow Edge mode and a valid access token already exists,
+      // skip further login logic to avoid overriding the existing user session.
+      if (isSparrowEdge === "true" && existingAccessToken) {
+        return;
+      }
       if (isSparrowEdge === "true" && !existingAccessToken) {
         await this.addGuestUser();
         setTimeout(async () => {

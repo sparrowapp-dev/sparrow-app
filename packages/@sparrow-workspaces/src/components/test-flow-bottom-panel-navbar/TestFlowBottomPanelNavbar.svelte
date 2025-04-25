@@ -163,7 +163,7 @@
     margin: 0px 10px;
     flex: 1;
     display: flex;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 4px;
   }
 

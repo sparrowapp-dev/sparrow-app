@@ -80,10 +80,13 @@
   } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
   import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
+
   import {
     HttpRequestAuthTypeBaseEnum,
     HttpRequestContentTypeBaseEnum,
   } from "@sparrow/common/types/workspace/http-request-base";
+   import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
+
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -1066,6 +1069,7 @@
       selectNode(_id);
     }
   };
+  let isDynamicExpressionModalOpen = true;
 </script>
 
 <div
@@ -1339,6 +1343,19 @@
   </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
+
+<Modal
+  title={"Insert Dynamic Content"}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isDynamicExpressionModalOpen}
+  handleModalState={(flag = false) => {
+    isDynamicExpressionModalOpen = false;
+  }}
+>
+  <TestflowDynamicExpression />
+</Modal>
 
 <Modal
   title={"Delete block?"}

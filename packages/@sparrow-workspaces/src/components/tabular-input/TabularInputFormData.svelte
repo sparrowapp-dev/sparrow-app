@@ -324,7 +324,7 @@
                   placeholder={"Add Key"}
                   {theme}
                   {environmentVariables}
-                  {onUpdateEnvironment}
+                  {onUpdateEnvironment} 
                 />
               </div>
             </div>

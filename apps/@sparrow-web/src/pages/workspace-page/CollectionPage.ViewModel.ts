@@ -3505,6 +3505,7 @@ export default class CollectionsViewModel {
         );
         this.tabRepository.removeTab(requestResponse.id);
       }
+      notifications.success(`"${requestResponse.name}" Response deleted.`);
       return true;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -3537,7 +3538,6 @@ export default class CollectionsViewModel {
 
       // Deleting the main tab no child exists
       this.handleRemoveTab(requestResponse.id);
-
       notifications.success(`"${requestResponse.name}" Response deleted.`);
       MixpanelEvent(Events.DELETE_RESPONSE, {
         source: "Collection list",
@@ -5875,10 +5875,12 @@ export default class CollectionsViewModel {
     }
   };
 
-  public setupRedirect = () => {
+  public setupRedirect = async () => {
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
-    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
+    const isGuestUser = await this.getGuestUserState();
+    const isSparrowEdge = isGuestUser ? "&isSparrowEdge=true" : "";
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email${isSparrowEdge}`;
     window.location.href = sparrowRedirect;
   };
 
@@ -6487,6 +6489,7 @@ export default class CollectionsViewModel {
           updatedJSONWithSyncedAPIs.workspaceId as string,
           {
             items: updatedJSONWithSyncedAPIs.items,
+            syncedAt: new Date(),
           },
           baseUrl,
         );
@@ -6527,6 +6530,7 @@ export default class CollectionsViewModel {
             items: parsedJSON.data.data.items,
             name: parsedJSON.data.data.name,
             description: parsedJSON.data.data.description,
+            syncedAt: new Date(),
           },
           baseUrl,
         );

@@ -49,35 +49,39 @@
   </div>
 </div>
 <div class="d-flex flex-column w-100 ps-1 pt-4 pe-1">
-  <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p style="color: var(--text-ds-neutral-200);" class=" mb-2">Key</p>
-
-    <div class="position-relative auth-input-container">
-      <CodeMirrorInput
-        bind:value={apiData.authKey}
-        onUpdateInput={() => {
-          handleAuthChange();
-        }}
-        placeholder={"Enter auth key"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-      />
+  <div class="mb-3" style="font-size: 12px; font-weight: 500">
+    <p style="color: var(--text-ds-neutral-200);" class="mb-2">Key</p>
+    <div class="position-relative" style="padding-bottom: 40px;">
+      <div class="position-absolute top-0 auth-input-container">
+        <CodeMirrorInput
+          bind:value={apiData.authKey}
+          onUpdateInput={() => {
+            handleAuthChange();
+          }}
+          placeholder={"Enter auth key"}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+        />
+      </div>
     </div>
   </div>
-  <div class="mb-3" style="font-size: 12px; font-weight:500">
+
+  <div class="mb-3" style="font-size: 12px; font-weight: 500">
     <p style="color: var(--text-ds-neutral-200);" class="mb-2">Value</p>
-    <div class="position-relative auth-input-container">
-      <CodeMirrorInput
-        bind:value={apiData.authValue}
-        onUpdateInput={() => {
-          handleAuthChange();
-        }}
-        placeholder={"Enter auth value"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-      />
+    <div class="position-relative" style="padding-bottom: 40px;">
+      <div class="position-absolute top-0 auth-input-container">
+        <CodeMirrorInput
+          bind:value={apiData.authValue}
+          onUpdateInput={() => {
+            handleAuthChange();
+          }}
+          placeholder={"Enter auth value"}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -85,6 +89,7 @@
 <style>
   .auth-input-container {
     max-width: 615px;
+    width: 100%;
   }
 
   .radio {

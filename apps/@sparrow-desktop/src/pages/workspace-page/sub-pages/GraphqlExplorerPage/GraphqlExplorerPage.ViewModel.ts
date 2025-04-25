@@ -299,7 +299,7 @@ class GraphqlExplorerViewModel {
    */
   private compareRequestWithServer = new Debounce().debounce(
     this.compareRequestWithServerDebounced,
-    1000,
+    0,
   );
 
   /**
