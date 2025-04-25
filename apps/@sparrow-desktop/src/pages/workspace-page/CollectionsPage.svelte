@@ -1011,7 +1011,7 @@
   >
     <div class="py-4">
       <p class=" mb-4">
-        You don't seem to have access to this resourse. Please check if you are
+        You don't seem to have access to this resource. Please check if you are
         using the right account.
       </p>
     </div>
