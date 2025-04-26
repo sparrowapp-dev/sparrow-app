@@ -17,7 +17,12 @@
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
-  import { MessageTypeEnum } from "@sparrow/common/types/workspace";
+  import {
+    MessageTypeEnum,
+    RequestDatasetEnum,
+    RequestDataTypeEnum,
+    RequestSectionEnum,
+  } from "@sparrow/common/types/workspace";
   import { ArrowSyncRegular, ThumbLikeRegular } from "@sparrow/library/icons";
   import {
     ThumbLikeFilled,
@@ -43,8 +48,64 @@
   let showTickIcon: boolean = false;
 
   /**
+   * Validates if the metadata sent by AI inside HTML comment matches the application's request section data
+   *
+   * @param target - The target value extracted from the comment
+   * @param language - The language value extracted from the comment
+   * @param type - The type value extracted from the comment
+   * @returns boolean indicating if all values are valid according to the enums
+   */
+  const validateMetadata = (
+    target: RequestSectionEnum,
+    language: RequestDataTypeEnum,
+    type: RequestDatasetEnum,
+  ): boolean => {
+    // Check if target is valid - must match a value in RequestSectionEnum
+    const validTargets = Object.values(RequestSectionEnum);
+    if (!target || !validTargets.includes(target)) {
+      console.debug(
+        `Invalid target: ${target}, expected one of: ${validTargets.join(", ")}`,
+      );
+      return false;
+    }
+
+    // Check if language is valid - must match a value in RequestDataTypeEnum
+    const validLanguages = Object.values(RequestDataTypeEnum);
+    if (!language || !validLanguages.includes(language)) {
+      console.debug(
+        `Invalid language: ${language}, expected one of: ${validLanguages.join(", ")}`,
+      );
+      return false;
+    }
+
+    // Check if type is valid - must match a value in RequestDatasetEnum
+    const validTypes = Object.values(RequestDatasetEnum);
+    if (!type || !validTypes.includes(type)) {
+      console.debug(
+        `Invalid type: ${type}, expected one of: ${validTypes.join(", ")}`,
+      );
+      return false;
+    }
+
+    // For non-REQUEST_BODY targets, type should be NONE
+    if (
+      target !== RequestSectionEnum.REQUEST_BODY &&
+      type !== RequestDatasetEnum.NONE
+    ) {
+      console.log(
+        `Invalid type: ${type} for target: ${target}, expected ${RequestDatasetEnum.NONE}`,
+      );
+      return false;
+    }
+
+    // All checks passed
+    return true;
+  };
+
+  /**
    * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
    * in custom containers with additional copy paste functionality.
+   * Validates actionable code blocks against application enums.
    *
    * @param htmlString - The HTML string to decode and process.
    * @returns The processed HTML string.
@@ -59,57 +120,90 @@
       const codeElem = pre.querySelector("code");
       if (!codeElem) return;
 
-      // Check if this is an actionable code block
-      const codeClass = codeElem.getAttribute("class") || "";
-      if (codeClass.includes("language-actionable")) {
-        try {
-          const actionableContent = codeElem.textContent || ""; // Extract the actionable block content
-          const actionableJson = JSON.parse(actionableContent); // Parse the actionable JSON
+      // Check if this pre element is preceded by an HTML comment
+      let previousNode = pre.previousSibling;
+      let isActionable = false;
+      let actionableTarget = "";
+      let actionableLanguage = "";
+      let actionableType = "";
 
-          // Check if it contains the required fields
-          if (
-            actionableJson.target &&
-            actionableJson.language &&
-            actionableJson["change-codeblock"]
-          ) {
-            const changeCodeBlockMatch = actionableJson[
-              "change-codeblock"
-            ].match(/```[\w\s]*\n([\s\S]*?)```/); // Extract the change-codeblock content
+      // console.log("camer here 1 :>> ", htmlString, doc, pre, previousNode);
+      // Look for HTML comment nodes that might contain actionable metadata
+      while (previousNode) {
+        // Check if it's a comment node
+        if (previousNode.nodeType === Node.COMMENT_NODE) {
+          const commentContent = previousNode.textContent || "";
 
-            if (changeCodeBlockMatch && changeCodeBlockMatch[1]) {
-              const codeContent = changeCodeBlockMatch[1]; // Get just the content inside the inner code block
-
-              // Get the language of the inner code block
-              const innerLangMatch =
-                actionableJson["change-codeblock"].match(/```(\w+)/);
-              const innerLang = innerLangMatch
-                ? innerLangMatch[1]
-                : actionableJson.language;
-
-              // Create a new code element with the extracted content
-              const newCode = document.createElement("code");
-              newCode.textContent = codeContent;
-              newCode.className = `language-${innerLang}`;
-
-              // Replace the old code element content with just the inner code block
-              while (pre.firstChild) {
-                pre.removeChild(pre.firstChild);
-              }
-              pre.appendChild(newCode);
-
-              // Store the actionable metadata as a data attribute for later use
-              pre.setAttribute(
-                "data-actionable",
-                JSON.stringify({
-                  target: actionableJson.target,
-                  language: actionableJson.language,
-                }),
-              );
+          // Check if this is a suggestion comment
+          if (commentContent.includes("suggestion:")) {
+            // Extract target from suggestion comment
+            const targetMatch = commentContent.match(/target=([^;]+)/);
+            if (targetMatch && targetMatch[1]) {
+              actionableTarget = targetMatch[1].trim();
             }
+
+            // Extract language from suggestion comment
+            const langMatch = commentContent.match(/lang=([^;]+)/);
+            if (langMatch && langMatch[1]) {
+              actionableLanguage = langMatch[1].trim();
+            }
+
+            // Extract type from suggestion comment
+            const typeMatch = commentContent.match(/type=([^;]+)/);
+            if (typeMatch && typeMatch[1]) {
+              actionableType = typeMatch[1].trim();
+            }
+
+            // actionableTarget = "BSON";
+            // actionableType = ""
+            // actionableLanguage = ""
+
+            // Validate metadata against application enums
+            isActionable = validateMetadata(
+              actionableTarget as RequestSectionEnum,
+              actionableLanguage as RequestDataTypeEnum,
+              actionableType as RequestDatasetEnum,
+            );
+
+            // console.log("Found suggestion comment:", {
+            //   target: actionableTarget,
+            //   language: actionableLanguage,
+            //   type: actionableType,
+            //   isActionable: isActionable,
+            // });
           }
-        } catch (e) {
-          console.error("Failed to parse actionable code block:", e);
+
+          // Remove the comment node after processing
+          const commentToRemove = previousNode;
+          previousNode = previousNode.previousSibling;
+          commentToRemove.parentNode?.removeChild(commentToRemove);
+          continue;
         }
+
+        // If it's a whitespace text node, continue checking previous nodes
+        if (
+          previousNode.nodeType === Node.TEXT_NODE &&
+          previousNode.textContent?.trim() === ""
+        ) {
+          previousNode = previousNode.previousSibling;
+          continue;
+        }
+
+        // If we reach a non-comment, non-whitespace node, stop checking
+        break;
+      }
+
+      // If we found an actionable block that passed validation, mark it with the necessary metadata
+      if (isActionable) {
+        // Store the actionable metadata as a data attribute for later use
+        pre.setAttribute(
+          "data-actionable",
+          JSON.stringify({
+            target: actionableTarget,
+            language: actionableLanguage,
+            type: actionableType,
+          }),
+        );
       }
     });
 
@@ -137,35 +231,35 @@
         // Add a "Apply Change" button for actionable blocks
         if (actionableData) {
           additionalButtons = `
-          <button role="button" class="position-relative apply-change-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}" data-actionable='${actionableData}'>
-            <img src="${ArrowTrendingSparkle}" id="${index}">
-            <div class="codeBlock-action-btns-tooltip">Insert
-              <div class="codeBlock-action-btns-tooltip-square"></div>
-            </div>
-          </button>
-        `;
+        <button role="button" class="position-relative apply-change-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}" data-actionable='${actionableData}'>
+          <img src="${ArrowTrendingSparkle}" id="${index}">
+          <div class="codeBlock-action-btns-tooltip">Insert
+            <div class="codeBlock-action-btns-tooltip-square"></div>
+          </div>
+        </button>
+      `;
         }
 
         // Adding code block action buttons like copy code and preview code
         container.innerHTML = `
-          <div class="code-header d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-              ${additionalButtons}
-              <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-                <img src="${ArrowExpand}" id="${index}">
-                <div class="codeBlock-action-btns-tooltip">Preview
-                  <div class="codeBlock-action-btns-tooltip-square"></div>
-                </div>
-              </button>
-            </div>
-            <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-              <img src="${copyIcon}" id="${index}">
-              <div class="codeBlock-action-btns-tooltip">Copy
+        <div class="code-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            ${additionalButtons}
+            <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+              <img src="${ArrowExpand}" id="${index}">
+              <div class="codeBlock-action-btns-tooltip">Preview
                 <div class="codeBlock-action-btns-tooltip-square"></div>
               </div>
             </button>
           </div>
-        `;
+          <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+            <img src="${copyIcon}" id="${index}">
+            <div class="codeBlock-action-btns-tooltip">Copy
+              <div class="codeBlock-action-btns-tooltip-square"></div>
+            </div>
+          </button>
+        </div>
+      `;
 
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
@@ -174,6 +268,62 @@
 
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
+  };
+
+  // Add the handleApplyChange function
+  const handleApplyChange = (event: MouseEvent) => {
+    const button = event.target as HTMLElement;
+    const actionableButton = button.closest("[data-actionable]");
+    const actionableData = actionableButton?.getAttribute("data-actionable");
+
+    if (actionableData) {
+      try {
+        const metaData = JSON.parse(actionableData);
+        const wrapper = actionableButton.closest(
+          ".wrapper",
+        ) as HTMLElement | null;
+
+        if (wrapper) {
+          const codeElement = wrapper.querySelector(
+            "pre code",
+          ) as HTMLElement | null;
+          if (codeElement) {
+            const codeContent = codeElement.textContent || "";
+
+            let target: RequestSectionEnum = metaData.target;
+            let language: RequestDataTypeEnum = metaData.language;
+            let requestBodyType: RequestDatasetEnum = metaData.type;
+
+            let modifiedContent =
+              language === RequestDataTypeEnum.JSON
+                ? JSON.stringify(JSON.parse(codeContent), null, 2)
+                : codeContent;
+
+            handleApplyChangeOnAISuggestion(
+              target,
+              language,
+              requestBodyType,
+              modifiedContent,
+            );
+
+            // Optional: Provide visual feedback that change was sent
+            const img = actionableButton?.querySelector("img");
+            if (img) {
+              const originalSrc = img?.src;
+              img.src = tickIcon;
+              img.classList.add("tick-icon");
+              setTimeout(() => {
+                img.src = originalSrc;
+                img.classList.remove("tick-icon");
+              }, 5000);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to apply change:", e);
+        notifications.error("Failed to apply change");
+      }
+    }
   };
 
   /**
@@ -253,58 +403,6 @@
 
     if (preElement) {
       onClickCodeBlockPreview(preElement);
-    }
-  };
-
-  // Add the handleApplyChange function
-  const handleApplyChange = (event: MouseEvent) => {
-    const button = event.target as HTMLElement;
-    const actionableButton = button.closest("[data-actionable]");
-    const actionableData = actionableButton?.getAttribute("data-actionable");
-
-    if (actionableData) {
-      try {
-        const data = JSON.parse(actionableData);
-        const wrapper = actionableButton.closest(
-          ".wrapper",
-        ) as HTMLElement | null;
-
-        if (wrapper) {
-          const codeElement = wrapper.querySelector(
-            "pre code",
-          ) as HTMLElement | null;
-          if (codeElement) {
-            const codeContent = codeElement.textContent || "";
-
-            // console.log(" hit apply Change :>> ", {
-            //   target: data.target,
-            //   language: data.language,
-            //   content: JSON.parse(codeContent),
-            // });
-
-            handleApplyChangeOnAISuggestion({
-              target: data.target,
-              language: data.language,
-              content: JSON.parse(codeContent),
-            });
-
-            // Optional: Provide visual feedback that change was sent
-            const img = actionableButton?.querySelector("img");
-            if (img) {
-              const originalSrc = img?.src;
-              img.src = tickIcon;
-              img.classList.add("tick-icon");
-              setTimeout(() => {
-                img.src = originalSrc;
-                img.classList.remove("tick-icon");
-              }, 5000);
-            }
-          }
-        }
-      } catch (e) {
-        console.error("Failed to apply change:", e);
-        notifications.error("Failed to apply change");
-      }
     }
   };
 

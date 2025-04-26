@@ -57,6 +57,7 @@
   } from "@sparrow/workspaces/type";
   import {
     RequestDatasetEnum,
+    RequestDataTypeEnum,
     RequestSectionEnum,
     ResponseSectionEnum,
     type KeyValue,
@@ -146,6 +147,14 @@
   export let collectionAuth;
   export let collection;
   const loading = writable<boolean>(false);
+
+  // Props for showing merge/diff view in RequestBody, Headers and Params
+  let isMergeViewEnableForRequestBody = false;
+  let isMergeViewEnableForParams = false;
+  let isMergeViewEnableForHeaders = false;
+  let isMergeViewLoading = false;
+  let newModifiedContent: string | KeyValuePair[];
+  let mergeViewRequestDatasetType: RequestDatasetEnum;
 
   $: if (storeData) {
     const { bodyFormatter, navigation, size, time, ...restData } =
@@ -259,168 +268,159 @@
     isChatbotOpenInCurrTab.set(false);
   });
 
-  let isMergeViewEnableForRequestBody = false;
-  let isMergeViewEnableForParams = false;
-  let isMergeViewEnableForRequestHeaders = false;
-  let isMergeViewLoading = false;
-  let newModifiedContent: string | KeyValuePair[];
-  let mergeViewRequestDatasetType: RequestDataset;
+  //   setTimeout(() => {
+  //     console.log("enabledMergeViewForReqBody() :>> ");
 
-  $: if (isMergeViewEnableForRequestBody)
-    console.log(
-      "isMergeViewEnableForRequestBody :> ",
-      isMergeViewEnableForRequestBody,
-    );
-  // $: if (newModifiedContent) console.log("newModifiedContent :> ", newModifiedContent);
+  //     // Table format
+  //     const dataURLEncoded = {
+  //       main_title: "asdas",
+  //       newsletter_title: "ByCrypt12", // Change this title to a unique one
+  //       newsletter_content: "",
+  //       searchId: "",
+  //       recipients: [],
+  //       sendOn_dateType: "",
+  //       send_type: "Daily",
+  //       send_type_option: [],
+  //       send_time: "09:00:00",
+  //       publish_type: "html",
+  //       publishedOn: "",
+  //       newsletter_body: [],
+  //       title: "",
+  //       content: "",
+  //       title_color: "#000000",
+  //       content_color: "#000000",
+  //       date_color: "#000000",
+  //       background_color: "#ffffff",
+  //       background_image: "",
+  //       logo_image: "",
+  //       logo_dimensions: {
+  //         logo_width: 40,
+  //         logo_height: 40,
+  //       },
+  //       background_height: 200,
+  //       footer:
+  //         "[This report may contain links to external or third party websites. These links are provided solely for your convenience. Links taken to other sites are done so at your own risk and its affiliates, “AlphaMetricx”, accept no liability for any linked sites or their content. AlphaMetricx does not own the content offered on such links and does not claim any ownership or intellectual property rights whatsoever. AlphaMetricx makes no warranties or representations, express or implied about such linked websites, the third parties they are owned and operated by, the information contained on them and their authenticity, or the suitability or quality of any of their products or services. AlphaMetricx does not authorize the infringement of any intellectual property rights contained in material offered through these linked sites. Please refer to the use agreement and/or copyright statements of any external site you visit, or the terms and conditions of any externally provided web site for instructions, restrictions, and guidelines. If you have a question, please contact the webmaster of the external site.] \\n \\n Not interested in getting these emails? Click here to unsubscribe (alerts@alphametricx.com).",
+  //       section_label: "Also appeared in",
+  //       logo_align: "left",
+  //       date_align: "right",
+  //       display_logo: true,
+  //       display_date: true,
+  //       display_footer: true,
+  //       display_header_title: true,
+  //       display_header_description: true,
+  //       display_section_link: true,
+  //       is_media: true,
+  //       is_syndication: true,
+  //       is_keyword: true,
+  //       is_sentiment: true,
+  //       articleMediaShow: false,
+  //       date_format: "%A, %B %d, %Y",
+  //       send_timezone: "America/New_York",
+  //       is_published: false,
+  //     };
+  //     // Raw body content
+  //     const dataRaw = `{
+  //   "key": "original",
+  //   "email": "@gmail.com",
+  //   "value": "1",
+  //   "checked": false,
+  //   "ghibli": "image"
+  // }`;
 
-  setTimeout(() => {
-    console.log("enabledMergeViewForReqBody() :>> ");
+  //     // enabledMergeViewForReqBody(dataRaw, RequestDataset.RAW);
+  //     // console.log("jsss :>> ");
+  //     // enabledMergeViewForReqBody(
+  //     //   JSON.stringify(dataURLEncoded, null, 2),
+  //     //   RequestDataset.URLENCODED,
+  //     // );
 
-    // Table format
-    const dataURLEncoded = {
-      main_title: "asdas",
-      newsletter_title: "ByCrypt12", // Change this title to a unique one
-      newsletter_content: "",
-      searchId: "",
-      recipients: [],
-      sendOn_dateType: "",
-      send_type: "Daily",
-      send_type_option: [],
-      send_time: "09:00:00",
-      publish_type: "html",
-      publishedOn: "",
-      newsletter_body: [],
-      title: "",
-      content: "",
-      title_color: "#000000",
-      content_color: "#000000",
-      date_color: "#000000",
-      background_color: "#ffffff",
-      background_image: "",
-      logo_image: "",
-      logo_dimensions: {
-        logo_width: 40,
-        logo_height: 40,
-      },
-      background_height: 200,
-      footer:
-        "[This report may contain links to external or third party websites. These links are provided solely for your convenience. Links taken to other sites are done so at your own risk and its affiliates, “AlphaMetricx”, accept no liability for any linked sites or their content. AlphaMetricx does not own the content offered on such links and does not claim any ownership or intellectual property rights whatsoever. AlphaMetricx makes no warranties or representations, express or implied about such linked websites, the third parties they are owned and operated by, the information contained on them and their authenticity, or the suitability or quality of any of their products or services. AlphaMetricx does not authorize the infringement of any intellectual property rights contained in material offered through these linked sites. Please refer to the use agreement and/or copyright statements of any external site you visit, or the terms and conditions of any externally provided web site for instructions, restrictions, and guidelines. If you have a question, please contact the webmaster of the external site.] \\n \\n Not interested in getting these emails? Click here to unsubscribe (alerts@alphametricx.com).",
-      section_label: "Also appeared in",
-      logo_align: "left",
-      date_align: "right",
-      display_logo: true,
-      display_date: true,
-      display_footer: true,
-      display_header_title: true,
-      display_header_description: true,
-      display_section_link: true,
-      is_media: true,
-      is_syndication: true,
-      is_keyword: true,
-      is_sentiment: true,
-      articleMediaShow: false,
-      date_format: "%A, %B %d, %Y",
-      send_timezone: "America/New_York",
-      is_published: false,
-    };
-    // Raw body content
-    const dataRaw = `{
-  "key": "original",
-  "email": "@gmail.com",
-  "value": "1",
-  "checked": false,
-  "ghibli": "image"
-}`;
-
-    // enabledMergeViewForReqBody(dataRaw, RequestDataset.RAW);
-    // console.log("jsss :>> ");
-    // enabledMergeViewForReqBody(
-    //   JSON.stringify(dataURLEncoded, null, 2),
-    //   RequestDataset.URLENCODED,
-    // );
-
-    setTimeout(() => {
-      console.log(
-        "next settimout: ",
-        newModifiedContent,
-        isMergeViewEnableForRequestBody,
-      );
-    }, 5000);
-  }, 5000);
+  //     setTimeout(() => {
+  //       console.log(
+  //         "next settimout: ",
+  //         newModifiedContent,
+  //         isMergeViewEnableForRequestBody,
+  //       );
+  //     }, 5000);
+  //   }, 5000);
 
   const enabledMergeViewForReqBody = async (
-    newContent: string | KeyValuePair[],
-    requestDatasetType: RequestDataset,
+    newContent: string,
+    requestDatasetType: RequestDatasetEnum,
+    contentType: RequestDataTypeEnum,
   ) => {
-    // newModifiedContent = newContent;
-    if (requestDatasetType === RequestDataset.RAW) {
-      newModifiedContent = newContent;
-    } else if (requestDatasetType === RequestDataset.URLENCODED) {
-      newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
-    } else if (requestDatasetType === RequestDataset.FORMDATA) {
-      return;
-    } else if (requestDatasetType === RequestDataset.BINARY) {
-    } else {
-    }
-
+    // Auto Navigation
     onUpdateRequestState({
       requestNavigation: RequestSectionEnum.REQUEST_BODY,
     });
     onUpdateRequestState({ requestBodyNavigation: requestDatasetType });
+    onUpdateRequestState({ requestBodyLanguage: contentType });
 
-    await sleep(500);
-    // newModifiedContent = newContent;
+    if (requestDatasetType === RequestDatasetEnum.RAW) {
+      newModifiedContent = newContent;
+    } else if (requestDatasetType === RequestDatasetEnum.URLENCODED) {
+      newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
+    } else if (requestDatasetType === RequestDatasetEnum.FORMDATA) return;
+    else if (requestDatasetType === RequestDatasetEnum.BINARY) return;
+    else return;
+
     mergeViewRequestDatasetType = requestDatasetType;
     isMergeViewEnableForRequestBody = true;
     isMergeViewLoading = true;
   };
 
-  const handleApplyChangeOnAISuggestion = async (changeData) => {
-    let { target, language, content } = changeData;
+  const handleApplyChangeOnAISuggestion = async (
+    target: RequestSectionEnum,
+    language: RequestDataTypeEnum,
+    requestBodyType: RequestDatasetEnum,
+    modifiedContent,
+  ) => {
+    // return;
+    // target = "Parameters";
     // console.log(
-    //   "handling AI Suggestions :>> ",
+    //   "here : >> ",
     //   target,
     //   language,
-    //   JSON.stringify(content, null, 2),
+    //   requestBodyType,
+    //   modifiedContent,
     // );
 
-    target = "headers";
-    const rawBodyReqState =
-      $tab.property?.request?.state?.requestBodyNavigation;
     try {
       switch (target) {
-        case "body": {
-          console.log("changeing for req body :>> ", rawBodyReqState);
+        case RequestSectionEnum.REQUEST_BODY: {
+          console.log(`Changing ${target} :> `);
           enabledMergeViewForReqBody(
-            JSON.stringify(content, null, 2),
-            rawBodyReqState,
+            modifiedContent,
+            requestBodyType,
+            language,
           );
           break;
         }
+        case RequestSectionEnum.HEADERS:
+        case RequestSectionEnum.PARAMETERS: {
+          console.log(`Changing ${target} ::>> `);
 
-        case "headers":
-        case "parameters": {
-          const newData = convertJsonToKeyValPairs(content);
-          console.log("changing for params || headers :>> ", newData, target);
+          const newData = convertJsonToKeyValPairs(JSON.parse(modifiedContent));
 
           onUpdateRequestState({
             requestNavigation:
-              target === "headers"
+              target === RequestSectionEnum.HEADERS
                 ? RequestSectionEnum.HEADERS
                 : RequestSectionEnum.PARAMETERS,
           });
           await sleep(500);
           newModifiedContent = newData;
-          // mergeViewRequestDatasetType = rawBodyReqState;
           isMergeViewLoading = true;
-          if (target === "headers") isMergeViewEnableForRequestHeaders = true;
+          if (target === RequestSectionEnum.HEADERS)
+            isMergeViewEnableForHeaders = true;
           else isMergeViewEnableForParams = true;
           break;
         }
         default:
           break;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("Error which inserting AI suggestions: ", error);
+    }
   };
 
   /**
@@ -646,7 +646,7 @@
                           onHeadersChange={onUpdateHeaders}
                           onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
                           {isWebApp}
-                          bind:isMergeViewEnabled={isMergeViewEnableForRequestHeaders}
+                          bind:isMergeViewEnabled={isMergeViewEnableForHeaders}
                           bind:isMergeViewLoading
                           bind:newModifiedContent
                         />

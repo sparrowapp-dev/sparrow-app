@@ -10,6 +10,7 @@
   } from "./sub-body";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { Loader } from "@sparrow/library/ui";
+  import type { RequestDatasetEnum } from "@sparrow/common/types/workspace";
 
   export let environmentVariables = [];
   export let onUpdateEnvironment;
@@ -26,7 +27,7 @@
 
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
-  export let mergeViewRequestDatasetType: RequestDataset;
+  export let mergeViewRequestDatasetType: RequestDatasetEnum;
   export let newModifiedContent: string | KeyValuePair[];
 </script>
 
