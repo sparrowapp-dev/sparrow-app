@@ -100,5 +100,6 @@
     callback={handleParamsChange}
     onUpdateEnvironment={() => {}}
     {environmentVariables}
+    dynamicExpression={true}
   />
 </section>

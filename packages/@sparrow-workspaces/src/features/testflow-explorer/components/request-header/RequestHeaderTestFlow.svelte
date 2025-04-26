@@ -50,6 +50,7 @@
     callback={handleHeaderChange}
     {environmentVariables}
     onUpdateEnvironment={() => {}}
+    dynamicExpression={true}
   />
   <div>
     {#if !isBulkEditActive}

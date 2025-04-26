@@ -30,6 +30,7 @@
   export let isTopHeaderRequired = true;
   export let isInputBoxEditable = true;
   export let bulkEditPlaceholder = "";
+  export let dynamicExpression = false;
   // export let type: "file" | "text" = "text";
 
   let enableKeyValueHighlighting = true;
@@ -46,7 +47,6 @@
   let pairsContainer: HTMLElement;
 
   const theme = new TabularInputTheme().build();
-  
 
   $: {
     if (keyValue) {
@@ -273,7 +273,10 @@
           />
         </div>
 
-        <div class="d-flex gap-0" style="width: calc(100% - 188px);">
+        <div
+          class="d-flex gap-0"
+          style="width: calc(100% - {dynamicExpression ? '220px' : '188px'});"
+        >
           <div
             class="w-50 position-relative header-text"
             style="padding-left: 6px;"
@@ -327,6 +330,7 @@
             deleteParam={() => {}}
             isInputBoxEditable={false}
             isCheckBoxEditable={false}
+            {dynamicExpression}
           />
         {/if}
         {#each pairs as element, index (index)}
@@ -342,6 +346,7 @@
             {deleteParam}
             {isInputBoxEditable}
             {isCheckBoxEditable}
+            {dynamicExpression}
           />
         {/each}
       </div>

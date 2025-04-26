@@ -4,3 +4,7 @@ import { writable } from "svelte/store";
 export const testFlowDataStore = writable<Map<string, TFDataStoreType>>(
   new Map(),
 );
+
+export const isDynamicExpressionModalOpen = writable(false);
+
+export const selectedRequestTypes = writable({});
