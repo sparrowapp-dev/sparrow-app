@@ -15,19 +15,59 @@
     "labels": {
       "categories": {
         "type": ["feature", "bug", "enhancement", "documentation", "maintenance"],
-        "priority": ["critical", "high", "medium", "low"]
+        "priority": ["critical", "high", "medium", "low"],
+        "status": ["in-progress", "review-needed", "blocked", "completed"],
+        "size": ["size: small", "size: medium", "size: large", "size: extra-large"],
+        "contributor": ["first-time-contributor", "maintainer"]
       },
       "autoLabeling": {
         "rules": [
           {
             "pattern": "\\bfix(es|ed)?\\b|\\bbug\\b",
-            "labels": ["bug"]
+            "labels": ["bug"],
+            "scope": "both",
+            "priority": 1
           },
           {
-            "pattern": "\\bfeature\\b|\\benhancement\\b",
-            "labels": ["enhancement"]
+            "pattern": "\\bdoc(s|umentation)?\\b",
+            "labels": ["documentation"],
+            "scope": "both",
+            "priority": 1
           }
-        ]
+        ],
+        "fileBased": {
+          "rules": [
+            {
+              "filePatterns": ["\\.md$", "docs/.*"],
+              "labels": ["documentation"]
+            },
+            {
+              "filePatterns": ["\\.tsx?$", "\\.jsx?$"],
+              "labels": ["frontend"]
+            }
+          ]
+        },
+        "sizeBased": {
+          "enabled": true,
+          "thresholds": {
+            "small": 10,
+            "medium": 100,
+            "large": 500
+          },
+          "labels": {
+            "small": "size: small",
+            "medium": "size: medium",
+            "large": "size: large",
+            "extraLarge": "size: extra-large"
+          }
+        },
+        "contributorBased": {
+          "enabled": true,
+          "labels": {
+            "firstTimeContributor": "first-time-contributor",
+            "maintainer": "maintainer"
+          }
+        }
       }
     }
   }

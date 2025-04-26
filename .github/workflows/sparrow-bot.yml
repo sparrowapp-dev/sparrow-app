@@ -55,3 +55,5 @@ jobs:
           command: auto-label
           issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
           content: ${{ github.event.issue.body || github.event.pull_request.body }}
+          title: ${{ github.event.issue.title || github.event.pull_request.title }}
+          is-pr: ${{ github.event_name == 'pull_request' }}
