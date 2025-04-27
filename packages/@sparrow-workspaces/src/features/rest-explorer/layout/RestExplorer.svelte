@@ -355,6 +355,11 @@
     onUpdateRequestState({ requestBodyNavigation: requestDatasetType });
     onUpdateRequestState({ requestBodyLanguage: contentType });
 
+    if (isMergeViewEnableForRequestBody) {
+      notifications.info("Please accept the current suggested changes first.");
+      return;
+    }
+
     if (requestDatasetType === RequestDatasetEnum.RAW) {
       newModifiedContent = newContent;
     } else if (requestDatasetType === RequestDatasetEnum.URLENCODED) {
@@ -365,7 +370,7 @@
 
     mergeViewRequestDatasetType = requestDatasetType;
     isMergeViewEnableForRequestBody = true;
-    isMergeViewLoading = true;
+    // isMergeViewLoading = true;
   };
 
   const handleApplyChangeOnAISuggestion = async (
@@ -388,6 +393,7 @@
       switch (target) {
         case RequestSectionEnum.REQUEST_BODY: {
           console.log(`Changing ${target} :> `);
+          // requestBodyType = "URL Encoded" as RequestDatasetEnum;
           enabledMergeViewForReqBody(
             modifiedContent,
             requestBodyType,

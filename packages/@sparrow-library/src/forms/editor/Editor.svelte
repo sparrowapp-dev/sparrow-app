@@ -7,7 +7,7 @@
   import { createEventDispatcher } from "svelte";
   import { placeholder as CreatePlaceHolder } from "@codemirror/view";
   import { linter } from "@codemirror/lint";
-  import { Button } from "../../ui";
+  import { Button, notifications } from "../../ui";
   import type { Diagnostic } from "@codemirror/lint";
 
   // Import the merge extensions
@@ -31,17 +31,16 @@
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
   export let newModifiedContent: string; // New content to show in merge view
-
-  let previousMergeViewState = isMergeViewEnabled;
+  let hasChanges = false;
   let originalContent = value; // Store the original content for comparison
-  // let currentModifiedContent = ""; // Track the current modified content
+  let previousMergeViewState = isMergeViewEnabled;
 
   const dispatch = createEventDispatcher();
 
   let componentClass = "";
   const languageConf = new Compartment();
   const lintConf = new Compartment(); // Compartment for linting
-  const mergeConf = new Compartment();
+  const mergeConf = new Compartment(); // Compartment for diff/merge view
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
@@ -57,15 +56,19 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
+    console.log("in updateExtensionView :>> 1 ");
     if (update.docChanged) {
+      console.log("in updateExtensionView :>> 2");
+
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
       if (!isAutoChange) {
+        console.log("in updateExtensionView :>> 3");
         // only hits for input, blur etc type of events.
         const content = update.state.doc.toString(); // Get the new content
-        // currentModifiedContent = content; // Update our tracking of modified content
         dispatch("change", content); // Dispatch the new content to parent.
+        if (isMergeViewEnabled) checkForChanges();
       }
     }
   });
@@ -132,7 +135,9 @@
 
   // Update the merge view with current original content
   function updateMergeView() {
+    console.log("in update merge view :>> 1");
     if (codeMirrorView) {
+      console.log("in update merge view :>> 2");
       codeMirrorView.dispatch({
         effects: mergeConf.reconfigure(
           isMergeViewEnabled ? [createMergeExtension(originalContent)] : [],
@@ -148,20 +153,15 @@
   const applyChanges = () => {
     if (!isMergeViewEnabled || !codeMirrorView) return;
 
-    // Get the current modified content
     const modifiedContent = codeMirrorView.state.doc.toString();
-
-    // Update the original value with the modified content
-    value = modifiedContent;
+    dispatch("change", modifiedContent);
+    value = modifiedContent; // Update the original value with the modified content
     originalContent = modifiedContent; // Update internal state
 
-    // Notify parent component of change
-    // dispatch("change", modifiedContent);
-    // dispatch("applyChanges", modifiedContent);
-
-    isMergeViewEnabled = false; // Exit merge view mode
-    newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
+    isMergeViewEnabled = false;
+    newModifiedContent = ""; // reset the content
+    hasChanges = false;
     updateMergeView(); // Update the editor view
   };
 
@@ -170,7 +170,9 @@
    * This function declines the changes and keeps the original value
    */
   const undoChanges = () => {
+    console.log("in undoChanges() :>> 1");
     if (!isMergeViewEnabled || !codeMirrorView) return;
+    console.log("in undoChanges() :>> 2");
 
     // Restore original content
     codeMirrorView.dispatch({
@@ -181,13 +183,37 @@
       },
       annotations: [{ autoChange: true }],
     });
-
     // dispatch("undoChanges", originalContent); // Notify parent that changes were declined
-    isMergeViewEnabled = false; // Exit merge view mode
-    newModifiedContent = ""; // reset the content
+
     previousMergeViewState = false;
+    isMergeViewEnabled = false;
+    isMergeViewLoading = false;
+    newModifiedContent = "";
+    hasChanges = false;
     updateMergeView(); // Update the editor view
   };
+
+  // Function to check if there are actual changes between original and current content
+  function checkForChanges() {
+    if (!codeMirrorView || !isMergeViewEnabled) {
+      hasChanges = false;
+      return;
+    }
+    const currentContent = codeMirrorView.state.doc.toString();
+    hasChanges = newModifiedContent !== currentContent;
+
+    console.log("curr :>> ", currentContent);
+    console.log("new :>> ", originalContent);
+    console.log("has changes 1 :>> ", hasChanges);
+    if (!hasChanges) {
+      console.log("has changes 2 :>> ", hasChanges);
+      undoChanges(); // resetting the mergeview states and props
+      notifications.success("You already have updated changes.");
+    }
+  }
+
+  // Call this function whenever content might change
+  $: if (codeMirrorView && isMergeViewEnabled) checkForChanges();
 
   onMount(() => {
     initalizeCodeMirrorEditor(value);
@@ -204,9 +230,11 @@
 
   // Handle changes to isMergeViewEnabled prop
   $: if (codeMirrorView && isMergeViewEnabled !== previousMergeViewState) {
+    console.log("in rec 1");
     previousMergeViewState = isMergeViewEnabled;
 
     if (isMergeViewEnabled) {
+      console.log("in rec 1, in isMergeVeiwEnabled ? :>>");
       isMergeViewLoading = true;
 
       // Store current content as original
@@ -214,6 +242,7 @@
 
       // Apply new content if provided
       if (newModifiedContent) {
+        console.log("**** Applying the new content! ****");
         codeMirrorView.dispatch({
           changes: {
             from: 0,
@@ -222,7 +251,6 @@
           },
           annotations: [{ autoChange: true }],
         });
-        // currentModifiedContent = newModifiedContent;
 
         // Update merge view
         updateMergeView();
@@ -234,6 +262,8 @@
         }, 1000); // Adjust timing based on your needs
       }
     } else {
+      console.log("in rec 1, in else isMergeVeiwEnabled ? :>>");
+      console.log("***** Turning off the merge view *****");
       // If turning off merge view, restore original content
       codeMirrorView.dispatch({
         changes: {
@@ -250,6 +280,8 @@
 
   // Handle changes to newModifiedContent when in merge view
   $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
+    console.log("in rec 2 :>> ");
+    console.log("**** Inserting new content ****");
     isMergeViewLoading = true;
 
     codeMirrorView.dispatch({
@@ -260,8 +292,8 @@
       },
       annotations: [{ autoChange: true }],
     });
-    // currentModifiedContent = newModifiedContent;
     updateMergeView();
+    // checkForChanges();
 
     // Use setTimeout to allow the merge view to be rendered
     setTimeout(() => {
@@ -271,7 +303,12 @@
 
   // Run whenever component state changes
   afterUpdate(() => {
+    console.log("in afterupdate :>> ");
+
+    // Handling the mergeview state while component state changes
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
+      console.log("in if of mergeview :>> ");
+
       codeMirrorView.dispatch({
         changes: {
           from: 0,
@@ -310,11 +347,11 @@
 
   onDestroy(() => {
     // If changes are not saved, then undo those changes before gettings destroyed
-    if (isMergeViewEnabled) {
-      console.log("on destroy;");
-      undoChanges();
-      // isMergeViewEnabled = false;
-    }
+    // if (isMergeViewEnabled) {
+    //   console.log("on destroy;");
+    //   undoChanges();
+    //   // isMergeViewEnabled = false;
+    // }
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed
   });
 </script>
@@ -324,7 +361,7 @@
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if isMergeViewEnabled}
+{#if hasChanges}
   <div class="d-flex justify-content-end mt-3 me-0 gap-2">
     <Button
       title={"Keep the Changes"}

@@ -101,17 +101,12 @@
   };
 
   const onTabClick = (tabId: ResponseSectionEnum) => {
-    if (isMergeViewLoading || isMergeViewEnabled) {
-      console.log("Click Blocked as MergeView is enabled!!");
-      return;
-    }
     onUpdateRequestState({ requestNavigation: tabId });
   };
 </script>
 
 <div style="padding-bottom: 12px;">
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
-  <!-- allDisableState={isMergeViewLoading || isMergeViewEnabled ? true : false} -->
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
