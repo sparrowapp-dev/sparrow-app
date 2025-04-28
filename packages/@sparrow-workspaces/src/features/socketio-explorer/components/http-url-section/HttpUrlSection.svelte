@@ -53,7 +53,10 @@
 </script>
 
 <div class={` ${componentClass}`} style="display: flex; gap: 6px;">
-  <CodeMirrorInput
+
+   <div class="w-100 d-flex align-items-center position-relative ">
+    <div class="position-absolute top-0" style="width: calc(100% );">
+       <CodeMirrorInput
     bind:value={requestUrl}
     onUpdateInput={onUpdateRequestUrl}
     placeholder={"Enter URL here"}
@@ -64,6 +67,8 @@
     class={"input-url"}
     {userRole}
   />
+    </div>
+  </div>
 
   <!-- Send button -->
   <Button

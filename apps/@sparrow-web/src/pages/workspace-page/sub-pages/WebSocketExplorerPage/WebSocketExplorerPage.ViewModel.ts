@@ -199,7 +199,7 @@ class RestExplorerViewModel {
    */
   private compareRequestWithServer = new Debounce().debounce(
     this.compareRequestWithServerDebounced,
-    1000,
+    0,
   );
   /**
    *
@@ -728,14 +728,17 @@ class RestExplorerViewModel {
       };
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const res = await this.collectionService.updateSocketInCollection(_id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
+    const res = await this.collectionService.updateSocketInCollection(
+      _id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...folderSource,
+        ...userSource,
+        items: itemSource,
+      },
       baseUrl,
-    });
+    );
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();

@@ -106,8 +106,9 @@ export class TeamsViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          invites,
         } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
         }));
@@ -130,6 +131,7 @@ export class TeamsViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          invites,
         };
         data.push(item);
       }
@@ -378,10 +380,12 @@ export class TeamsViewModel {
     await this.teamRepository.modifyTeam(teamId, team);
   };
 
-  public setupRedirect = () => {
+  public setupRedirect = async () => {
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
-    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
+    const isGuestUser = await this.getGuestUser();
+    const isSparrowEdge = isGuestUser ? "&isSparrowEdge=true" : "";
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email${isSparrowEdge}`;
     window.location.href = sparrowRedirect;
   };
 }

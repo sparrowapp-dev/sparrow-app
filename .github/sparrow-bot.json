@@ -1,0 +1,33 @@
+{
+    "stale": {
+      "daysBeforeStale": 60,
+      "daysBeforeClose": 7,
+      "exemptLabels": ["pinned", "security", "bug"],
+      "staleLabel": "stale",
+      "staleMessage": "🤖 **Sparrow Bot Here!**\n\nThis item has been automatically marked as stale because it hasn't had any activity in the last 60 days.\n\n- If this is still relevant, please comment or update it within 7 days.\n- If no activity occurs, this will be automatically closed.\n\nThank you for helping keep our repository organized! 🙏",
+      "closeMessage": "🤖 **Sparrow Bot Here!**\n\nThis item has been automatically closed due to inactivity.\n\nFeel free to reopen it if you believe it still needs attention.\n\nThank you for your contributions! 🙏"
+    },
+    "prTitle": {
+      "types": ["feat", "fix", "docs", "style", "refactor", "test", "chore"],
+      "scopes": ["core", "api", "ui", "docs", "deps"],
+      "patterns": ["^(feat|fix|docs|style|refactor|test|chore)(\\(\\w+\\))?!?: .+$"]
+    },
+    "labels": {
+      "categories": {
+        "type": ["feature", "bug", "enhancement", "documentation", "maintenance"],
+        "priority": ["critical", "high", "medium", "low"]
+      },
+      "autoLabeling": {
+        "rules": [
+          {
+            "pattern": "\\bfix(es|ed)?\\b|\\bbug\\b",
+            "labels": ["bug"]
+          },
+          {
+            "pattern": "\\bfeature\\b|\\benhancement\\b",
+            "labels": ["enhancement"]
+          }
+        ]
+      }
+    }
+  }

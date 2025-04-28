@@ -401,6 +401,21 @@ export class CollectionService {
     return response;
   };
 
+  public parseOAPIJSONToCollection = async (
+    json: string,
+    contentType: ContentTypeEnum,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/parse-collection`,
+      {
+        body: json,
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
+      },
+    );
+    return response;
+  };
+
   public addSocketIoInCollection = async (
     _socketIo:
       | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface

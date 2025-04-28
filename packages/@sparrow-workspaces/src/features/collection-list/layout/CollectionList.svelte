@@ -92,6 +92,8 @@
 
   export let ActiveTab;
   export let handleTabUpdate;
+  export let onCompareCollection;
+  export let onSyncCollection;
 
   let isExpandCollectionLine = false;
   // export let handleExpandCollectionLine;
@@ -350,6 +352,8 @@
                     {activeTabId}
                     {searchData}
                     {isWebApp}
+                    {onCompareCollection}
+                    {onSyncCollection}
                   />
                 {/each}
               </List>
@@ -392,6 +396,8 @@
                   {activeTabId}
                   bind:isFirstCollectionExpand
                   {isWebApp}
+                  {onCompareCollection}
+                  {onSyncCollection}
                 />
               {/each}
             </List>

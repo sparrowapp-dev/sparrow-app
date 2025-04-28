@@ -1,23 +1,23 @@
-name: Sparrow-web-design-system
+name: Sparrow-web-prod
 on:
   push:
     branches:
-      - design-system
+      - main
 
 jobs:
-   build:
-      runs-on: ubuntu-latest
-      environment: sparrow_web_Dev
-      steps:
-         - uses: actions/checkout@master
+  build:
+    runs-on: ubuntu-latest
+    environment: sparrow_web_Prod
+    steps:
+      - uses: actions/checkout@master
 
-         - uses: Azure/docker-login@v1
-           with:
-              login-server: sparrowprod.azurecr.io
-              username: ${{ secrets.REGISTRY_USERNAME }}
-              password: ${{ secrets.REGISTRY_PASSWORD }}
+      - uses: Azure/docker-login@v1
+        with:
+          login-server: sparrowprod.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-         - run: |
+      - run: |
               docker build -f ./Sparrow-Web.Dockerfile \
                 --build-arg PORT=${{ vars.PORT }} \
                 --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
@@ -25,7 +25,7 @@ jobs:
                 --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
                 --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
                 --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
-                --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL_DS }} \
+                --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
                 --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
                 --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
                 --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
@@ -37,30 +37,33 @@ jobs:
                 --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
                 --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
                 --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
-                -t sparrowprod.azurecr.io/sparrow-web-design-system:${{ github.run_number }} .
+                --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET=${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
+                --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
+                --build-arg VITE_WEB_CANNY_FEEDBACK_URL=${{ vars.VITE_WEB_CANNY_FEEDBACK_URL }} \
+                -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
-              docker push sparrowprod.azurecr.io/sparrow-web-design-system:${{ github.run_number }}
+               docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
 
-   deploy:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-         - uses: actions/checkout@master
-         - uses: richardrigutins/replace-in-files@v1
-           with:
-              files: "./apps/@sparrow-web/deploymentManifests/design-system.yml"
-              search-text: '_BUILD__ID_'
-              replacement-text: '${{ github.run_number }}'
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: richardrigutins/replace-in-files@v1
+        with:
+          files: "./apps/@sparrow-web/deploymentManifests/deployment.yml"
+          search-text: "_BUILD__ID_"
+          replacement-text: "${{ github.run_number }}"
 
-         - uses: azure/setup-kubectl@v2.0
+      - uses: azure/setup-kubectl@v2.0
 
-         - uses: Azure/k8s-set-context@v2
-           with:
-              kubeconfig: ${{ secrets.KUBE_CONFIG }}
+      - uses: Azure/k8s-set-context@v2
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
-         - uses: Azure/k8s-deploy@v4
-           with:
-              action: deploy
-              namespace: sparrow-dev
-              manifests: |
-                 ./apps/@sparrow-web/deploymentManifests/design-system.yml
+      - uses: Azure/k8s-deploy@v4
+        with:
+          action: deploy
+          namespace: sparrow-prod
+          manifests: |
+            ./apps/@sparrow-web/deploymentManifests/deployment.yml

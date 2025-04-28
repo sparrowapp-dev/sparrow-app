@@ -21,6 +21,7 @@
   export let method;
   export let isWebApp = false;
   let isBodyBeautified = false;
+
   const updateBeautifiedState = (value: boolean) => {
     isBodyBeautified = value;
   };

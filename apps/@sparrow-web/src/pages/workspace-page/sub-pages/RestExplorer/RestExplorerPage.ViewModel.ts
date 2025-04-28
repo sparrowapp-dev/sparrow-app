@@ -427,7 +427,7 @@ class RestExplorerViewModel {
    */
   private compareRequestWithServer = new Debounce().debounce(
     this.compareRequestWithServerDebounced,
-    1000,
+    0,
   );
   /**
    *
@@ -1655,17 +1655,21 @@ class RestExplorerViewModel {
           };
           return;
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[path.length - 1].id,
-          workspaceId: _workspaceMeta.id,
-          ...userSource,
-          items: {
-            name: tabName,
-            description,
-            type: ItemType.REQUEST,
-            request: unadaptedRequest,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[path.length - 1].id,
+            workspaceId: _workspaceMeta.id,
+            ...userSource,
+            items: {
+              name: tabName,
+              description,
+              type: ItemType.REQUEST,
+              request: unadaptedRequest,
+            },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestOrFolderInCollection(
             path[path.length - 1].id,
@@ -1826,23 +1830,27 @@ class RestExplorerViewModel {
             },
           };
         }
-        const res = await insertCollectionRequest({
-          collectionId: path[0].id,
-          workspaceId: _workspaceMeta.id,
-          folderId: path[path.length - 1].id,
-          ...userSource,
-          items: {
-            id: path[path.length - 1].id,
-            name: path[path.length - 1].name,
-            type: ItemType.FOLDER,
+        const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
+        const res = await insertCollectionRequest(
+          {
+            collectionId: path[0].id,
+            workspaceId: _workspaceMeta.id,
+            folderId: path[path.length - 1].id,
+            ...userSource,
             items: {
-              name: tabName,
-              description,
-              type: ItemType.REQUEST,
-              request: unadaptedRequest,
+              id: path[path.length - 1].id,
+              name: path[path.length - 1].name,
+              type: ItemType.FOLDER,
+              items: {
+                name: tabName,
+                description,
+                type: ItemType.REQUEST,
+                request: unadaptedRequest,
+              },
             },
           },
-        });
+          baseUrl,
+        );
         if (res.isSuccessful) {
           this.addRequestInFolder(
             path[0].id,
@@ -2354,13 +2362,14 @@ class RestExplorerViewModel {
   }
 
   /**
- * Appends a new chunk to an existing AI message by its messageId
- * @param messageId - ID of the message to update
- * @param chunk - New chunk to append to the message
- */
+   * Appends a new chunk to an existing AI message by its messageId
+   * @param messageId - ID of the message to update
+   * @param chunk - New chunk to append to the message
+   */
   private async updateAIResponseByChunk(messageId: string, chunk: string) {
     const componentData = this._tab.getValue();
-    const conversations = componentData?.property?.request?.ai?.conversations || [];
+    const conversations =
+      componentData?.property?.request?.ai?.conversations || [];
 
     let foundIndex = -1;
     // Find the index of the message we need to update
@@ -2378,11 +2387,10 @@ class RestExplorerViewModel {
       // Update only the specific message by appending the new chunk
       updatedConversations[foundIndex] = {
         ...updatedConversations[foundIndex],
-        message: updatedConversations[foundIndex].message + chunk
+        message: updatedConversations[foundIndex].message + chunk,
       };
       await this.updateRequestAIConversation(updatedConversations);
-    }
-    else console.error("chunk not found!")
+    } else console.error("chunk not found!");
   }
 
   /**
@@ -2425,8 +2433,8 @@ class RestExplorerViewModel {
       const STREAMING_STATES = {
         START: "start",
         STREAMING: "streaming",
-        END: "end"
-      }
+        END: "end",
+      };
       const events = [
         `assistant-response`,
         `assistant-response_${componentData.tabId}`,
@@ -2456,10 +2464,11 @@ class RestExplorerViewModel {
           case `assistant-response`:
           case `assistant-response_${componentData.tabId}`:
             // Handle special error messages
-            if (response.messages &&
+            if (
+              response.messages &&
               (response.messages.includes("Limit Reached") ||
-                response.messages.includes("Some Issue Occurred"))) {
-
+                response.messages.includes("Some Issue Occurred"))
+            ) {
               // After getting error response remove all listeners
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
@@ -2480,7 +2489,9 @@ class RestExplorerViewModel {
                   status: false,
                 },
               ]);
-              await this.updateRequestState({ isChatbotGeneratingResponse: false });
+              await this.updateRequestState({
+                isChatbotGeneratingResponse: false,
+              });
               return;
             }
 
@@ -2491,7 +2502,8 @@ class RestExplorerViewModel {
               // Handle thread ID on stream start if not already set
               if (stream_status === STREAMING_STATES.START) {
                 // console.log("** stream started ** ");
-                const thisTabThreadId = componentData?.property?.request?.ai?.threadId;
+                const thisTabThreadId =
+                  componentData?.property?.request?.ai?.threadId;
                 if (!thisTabThreadId && thread_id) {
                   await this.updateRequestAIThread(thread_id);
                 }
@@ -2499,7 +2511,8 @@ class RestExplorerViewModel {
                 // Create empty message container that will be updated with chunks
                 if (!messageCreated) {
                   await this.updateRequestAIConversation([
-                    ...(componentData?.property?.request?.ai?.conversations || []),
+                    ...(componentData?.property?.request?.ai?.conversations ||
+                      []),
                     {
                       message: "",
                       messageId: responseMessageId,
@@ -2511,11 +2524,13 @@ class RestExplorerViewModel {
                   ]);
                   messageCreated = true;
                 }
-
               }
 
               // Handle incoming message chunk
-              else if (stream_status === STREAMING_STATES.STREAMING && messages) {
+              else if (
+                stream_status === STREAMING_STATES.STREAMING &&
+                messages
+              ) {
                 accumulatedMessage += messages;
 
                 // Append only the new chunk to the existing message
@@ -2524,14 +2539,15 @@ class RestExplorerViewModel {
 
               // Handle end of stream
               else if (stream_status === STREAMING_STATES.END) {
-
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>
                   this.aiAssistentWebSocketService.removeListener(event),
                 );
 
                 // Update state to indicate response generation is complete
-                await this.updateRequestState({ isChatbotGeneratingResponse: false });
+                await this.updateRequestState({
+                  isChatbotGeneratingResponse: false,
+                });
               }
             }
             break;
@@ -2556,6 +2572,18 @@ class RestExplorerViewModel {
    */
   public stopGeneratingAIResponse = async () => {
     const componentData = this._tab.getValue();
+
+    // Handling the case where user clicked stop generating just after the "start" stream status
+    const conversation =
+      componentData?.property?.request?.ai?.conversations || [];
+    if (conversation.length > 0) {
+      // Remove last message
+      const lastResponse = conversation[conversation.length - 1];
+      if (lastResponse.type === "Receiver" && lastResponse?.message === "") {
+        conversation.pop();
+        await this.updateRequestAIConversation(conversation);
+      }
+    }
 
     try {
       // Send stop signal to the server

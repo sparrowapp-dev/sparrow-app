@@ -47,6 +47,7 @@
   export let onUpdateCollectionAuth;
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
+  export let onSyncCollection;
 
   /**
    * Icons and images
@@ -74,6 +75,7 @@
   import {
     AddRegular,
     ArrowSwapRegular,
+    ArrowSyncRegular,
     CaretDownFilled,
     CaretUpFilled,
     FolderAddRegular,
@@ -87,6 +89,7 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
+  import { onDestroy, onMount } from "svelte";
 
   /**
    * Role of user in active workspace
@@ -113,6 +116,7 @@
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
+  let isCollectionSyncing = false;
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -222,6 +226,48 @@
   ];
 
   let isBackgroundClickable = true;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+
+      if (isCollectionEditable && $tab && !$tab.isSaved) {
+        onSaveCollection();
+      }
+    }
+  };
+
+  const syncedTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const months = Math.floor(days / 30); // Approximation
+
+    if (seconds < 60) {
+      return "just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (months) {
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      return ``;
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -420,6 +466,24 @@
             />
           </div>
         {/if} -->
+        {#if collection?.activeSync}
+          <div class="me-2">
+            <Button
+              id={`sync-collection`}
+              disable={!isCollectionEditable || isCollectionSyncing}
+              loader={isCollectionSyncing}
+              title={"Sync Collection"}
+              type={"secondary"}
+              onClick={async () => {
+                isCollectionSyncing = true;
+                await onSyncCollection(collection.id);
+                isCollectionSyncing = false;
+              }}
+              size="medium"
+              startIcon={ArrowSyncRegular}
+            />
+          </div>
+        {/if}
 
         <div
           class="d-flex me-2 flex-column justify-content-center"
@@ -435,7 +499,7 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable}
+              disable={!isCollectionEditable || collection?.activeSync}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -498,18 +562,28 @@
         </div>
       </div>
     {/if} -->
-    <div class="d-flex pb-3">
+    <div class="d-flex pb-3" style="justify-content: space-between;">
       <CollectionNavigator
         collectionNavigation={$tab?.property?.collection?.state
           ?.collectionNavigation}
         {onUpdateCollectionState}
       />
+      {#if collection?.activeSync}
+        <div class="d-flex" style="align-items: center;">
+          <ArrowSyncRegular size="12px" />
+          <p
+            style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
+            class="text-ds-font-size-12"
+          >
+            Synced {syncedTimeAgo(collection?.syncedAt)}
+          </p>
+        </div>
+      {/if}
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div
-        class={`${
-          !isSynced && collection?.activeSync ? "d-none" : "d-block"
-        } align-items-center`}
+        class={`d-block
+        align-items-center`}
       >
         <div class="d-flex gap-4 ps-2">
           <div class="d-flex align-items-center gap-2">

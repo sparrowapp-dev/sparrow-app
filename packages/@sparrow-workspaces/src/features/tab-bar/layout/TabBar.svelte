@@ -352,7 +352,7 @@
     transition: all 300ms;
   }
   .tabbar {
-    height: 35px;
+    height: 100%;
     background-color: var(--sparrow-black);
   }
 

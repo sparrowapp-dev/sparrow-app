@@ -135,6 +135,8 @@
   export let refreshLoad = false;
   export let refreshWorkspace: () => void;
   export let userCount = 0;
+  export let onCompareCollection;
+  export let onSyncCollection;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -720,6 +722,8 @@
           {isWebApp}
           {ActiveTab}
           {handleTabUpdate}
+          {onCompareCollection}
+          {onSyncCollection}
         />
       </div>
 

@@ -154,10 +154,13 @@
     menuItem={"v2"}
     bodyTheme={"violet"}
     headerTheme={"violet2"}
+    variant={"tertiary"}
     borderRounded={"4px"}
     headerFontWeight={400}
     headerFontSize={"12px"}
     isError={showErrors && selectedRole === defaultRole}
+    minHeaderWidth={"100%"}
+    size={"medium"}
   />
   {#if showErrors && selectedRole === defaultRole}
     <p class="error-text sparrow-fs-12">Role cannot be empty.</p>

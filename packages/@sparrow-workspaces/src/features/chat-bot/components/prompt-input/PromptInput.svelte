@@ -94,7 +94,7 @@
         id={"ai-model-selector"}
         data={[
           {
-            name: "Azure AI",
+            name: "GPT-4o",
             id: "azure-ai",
             hide: false,
           },
@@ -102,13 +102,13 @@
             name: "Open AI 4.0",
             id: "open-AI-40",
             disabled: true,
-            hide: false,
+            hide: true,
           },
           {
             name: "DeepSeek",
             id: "deepseek",
             disabled: true,
-            hide: false,
+            hide: true,
           },
         ]}
         titleId={"azure-ai"}

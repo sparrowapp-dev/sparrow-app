@@ -392,18 +392,13 @@
    * @param event - The mouse event triggered by clicking on the wrapper.
    */
   const handleCodePreview = async (event: MouseEvent) => {
-    const wrapper = (event.target as HTMLElement).closest(
-      ".wrapper",
-    ) as HTMLElement | null;
-
+    const wrapper = (event.target as HTMLElement).closest(".wrapper");
     if (!wrapper) return;
-
-    const preElement = wrapper.querySelector("pre > code")
-      ?.parentElement as HTMLPreElement | null;
-
-    if (preElement) {
-      onClickCodeBlockPreview(preElement);
-    }
+    const originalCodeBlock = wrapper.querySelector("pre > code.hljs");
+    const originalPreElement = originalCodeBlock?.parentElement;
+    if (!originalCodeBlock || !originalPreElement) return;
+    const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
+    onClickCodeBlockPreview(preClone);
   };
 
   /**
@@ -571,7 +566,7 @@
               on:click={handleCopyResponse}
             >
               {#if showTickIcon}
-                <TickIcon size={"14px"} color={"grey"} />
+                <TickIcon width={"18px"} height={"18px"} color={"grey"} />
               {:else}
                 <CopyRegular size={"16px"} />
               {/if}
