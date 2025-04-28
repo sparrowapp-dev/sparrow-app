@@ -88,7 +88,7 @@
           lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
         }
       }
-    }, 0);
+    }, 100);
   };
 
   const updateParam = async (index: number): Promise<void> => {
@@ -126,7 +126,7 @@
     setTimeout(() => {
       pairs[pairs.length - 1].key = "";
       pairs[pairs.length - 1].value = "";
-    }, 0);
+    }, 100);
   };
 
   const updateCheck = (index: number): void => {
