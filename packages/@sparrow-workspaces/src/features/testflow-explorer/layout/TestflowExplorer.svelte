@@ -80,7 +80,10 @@
   } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
   import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
-  import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import {
+    HttpRequestAuthTypeBaseEnum,
+    HttpRequestContentTypeBaseEnum,
+  } from "@sparrow/common/types/workspace/http-request-base";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -220,6 +223,68 @@
     return response;
   };
 
+  const setBodyType = (header: string) => {
+    let requestBodyNavigation = RequestDatasetEnum.RAW;
+    let requestBodyLanguage = RequestDataTypeEnum.TEXT;
+    switch (header) {
+      case HttpRequestContentTypeBaseEnum["none"]:
+        requestBodyNavigation = RequestDatasetEnum.NONE;
+        requestBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/json"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.JSON;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/xml"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.XML;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/javascript"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.JAVASCRIPT;
+        break;
+      case HttpRequestContentTypeBaseEnum["text/plain"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
+      case HttpRequestContentTypeBaseEnum["text/html"]:
+        requestBodyNavigation = RequestDatasetEnum.RAW;
+        requestBodyLanguage = RequestDataTypeEnum.HTML;
+        break;
+      case HttpRequestContentTypeBaseEnum["application/x-www-form-urlencoded"]:
+        requestBodyNavigation = RequestDatasetEnum.URLENCODED;
+        break;
+      case HttpRequestContentTypeBaseEnum["multipart/form-data"]:
+        requestBodyNavigation = RequestDatasetEnum.FORMDATA;
+        break;
+    }
+    return { requestBodyLanguage, requestBodyNavigation };
+  };
+
+  const setAuthType = (
+    auth: HttpRequestAuthTypeBaseEnum,
+  ): HttpRequestAuthTypeBaseEnum => {
+    let requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+    switch (auth) {
+      case HttpRequestAuthTypeBaseEnum.NO_AUTH:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+        break;
+      case HttpRequestAuthTypeBaseEnum.API_KEY:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.API_KEY;
+        break;
+      case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
+        break;
+      case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+        break;
+      case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+        break;
+    }
+    return requestAuthNavigation;
+  };
+
   const createCustomRequestObject = async (
     collectionId: string,
     requestId: string,
@@ -283,6 +348,21 @@
       response.name = "Untitled";
     }
     response.state = tempTab?.state;
+    if (data?.request?.selectedRequestBodyType) {
+      const bodyType = setBodyType(data?.request?.selectedRequestBodyType);
+      if (bodyType?.requestBodyLanguage) {
+        response.state.requestBodyLanguage = bodyType.requestBodyLanguage;
+      }
+      if (bodyType?.requestBodyNavigation) {
+        response.state.requestBodyNavigation = bodyType.requestBodyNavigation;
+      }
+    }
+    if (data?.request?.selectedRequestAuthType) {
+      const AuthType = setAuthType(data?.request?.selectedRequestAuthType);
+      if (AuthType) {
+        response.state.requestAuthNavigation = AuthType;
+      }
+    }
     return response;
   };
 
