@@ -3,7 +3,7 @@
   import { AngleRightIcon } from "@sparrow/library/icons";
   import { AngleLeftIcon } from "@sparrow/library/icons";
   import { PlusIcon } from "@sparrow/library/icons";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
 
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
@@ -194,23 +194,18 @@
         </span>
       {/if}
       <Tooltip
-        title={"Add New Request"}
+        title={"New Request"}
         placement={"bottom-center"}
         distance={10}
         zIndex={20}
       >
-        <button
-          on:click={onNewTabRequested}
-          role="button"
-          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
-          style="height:26px; width:28px; background-color: transparent; border:0px;border-top-left-radius:0px; border-bottom-left-radius:0px;"
-        >
-          <PlusIcon
-            height={"21px"}
-            width={"21px"}
-            color="var(--bg-ds-neutral-100)"
-          />
-        </button>
+      <Button
+      type="teritiary-regular"
+      startIcon={PlusIcon}
+      onClick={onNewTabRequested}
+      size="small"
+
+      />
       </Tooltip>
     </div>
     <div class="d-flex ms-auto my-auto {!tabList.length ? 'd-none' : ''}">
