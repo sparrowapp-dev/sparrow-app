@@ -11,6 +11,19 @@
 * add 2.22.1 patch release version ([3c16c28](https://github.com/sparrowapp-dev/sparrow-app/commit/3c16c28ff9518a4d64c1112f2fe7605f4c76331b))
 * add testflow runner ([4cda204](https://github.com/sparrowapp-dev/sparrow-app/commit/4cda204d3868d5120678dd40d773adf9e21432f9))
 
+# [2.23.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.22.0...v2.23.0) (2025-04-28)
+
+
+### Bug Fixes
+
+* testflow tab selections for body and auth ([b53348b](https://github.com/sparrowapp-dev/sparrow-app/commit/b53348bea7518dc17b65ea6548c22690ec11940b))
+
+
+### Features
+
+* add 2.22.1 patch release version ([3c16c28](https://github.com/sparrowapp-dev/sparrow-app/commit/3c16c28ff9518a4d64c1112f2fe7605f4c76331b))
+* add testflow runner ([4cda204](https://github.com/sparrowapp-dev/sparrow-app/commit/4cda204d3868d5120678dd40d773adf9e21432f9))
+
 # [2.22.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.21.0...v2.22.0) (2025-04-18)
 
 
