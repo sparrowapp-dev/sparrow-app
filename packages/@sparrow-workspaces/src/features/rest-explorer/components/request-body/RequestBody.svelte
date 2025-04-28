@@ -10,7 +10,7 @@
   } from "./sub-body";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { Loader } from "@sparrow/library/ui";
-  import type { RequestDatasetEnum } from "@sparrow/common/types/workspace";
+  import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
 
   export let environmentVariables = [];
   export let onUpdateEnvironment;
@@ -50,28 +50,47 @@
 
   <div style="flex:1; overflow:auto;" class="ding-ding">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
-      <Raw
-        {onUpdateRequestBody}
-        lang={requestState.requestBodyLanguage}
-        value={body.raw}
-        {isBodyBeautified}
-        {updateBeautifiedState}
-        bind:isMergeViewEnabled
-        bind:isMergeViewLoading
-        bind:newModifiedContent
-      />
+      {#if isMergeViewEnabled && mergeViewRequestDatasetType === RequestDatasetEnum.RAW}
+        <Raw
+          {onUpdateRequestBody}
+          lang={requestState.requestBodyLanguage}
+          value={body.raw}
+          {isBodyBeautified}
+          {updateBeautifiedState}
+          bind:isMergeViewEnabled
+          bind:isMergeViewLoading
+          bind:newModifiedContent
+        />
+      {:else}
+        <Raw
+          {onUpdateRequestBody}
+          lang={requestState.requestBodyLanguage}
+          value={body.raw}
+          {isBodyBeautified}
+          {updateBeautifiedState}
+        />
+      {/if}
     {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
       <None />
     {:else if requestState.requestBodyNavigation === RequestDataset.URLENCODED}
-      <UrlEncoded
-        value={body.urlencoded}
-        {onUpdateRequestBody}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        bind:isMergeViewEnabled
-        bind:isMergeViewLoading
-        bind:newModifiedContent
-      />
+      {#if isMergeViewEnabled && mergeViewRequestDatasetType === RequestDatasetEnum.URLENCODED}
+        <UrlEncoded
+          value={body.urlencoded}
+          {onUpdateRequestBody}
+          {onUpdateEnvironment}
+          {environmentVariables}
+          bind:isMergeViewEnabled
+          bind:isMergeViewLoading
+          bind:newModifiedContent
+        />
+      {:else}
+        <UrlEncoded
+          value={body.urlencoded}
+          {onUpdateRequestBody}
+          {onUpdateEnvironment}
+          {environmentVariables}
+        />
+      {/if}
     {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
       <FormData
         keyValue={body.formdata}

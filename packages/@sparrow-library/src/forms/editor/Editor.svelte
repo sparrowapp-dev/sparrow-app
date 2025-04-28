@@ -58,13 +58,13 @@
   const updateExtensionView = EditorView.updateListener.of((update) => {
     console.log("in updateExtensionView :>> 1 ");
     if (update.docChanged) {
-      console.log("in updateExtensionView :>> 2");
+      // console.log("in updateExtensionView :>> 2");
 
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
       if (!isAutoChange) {
-        console.log("in updateExtensionView :>> 3");
+        // console.log("in updateExtensionView :>> 3");
         // only hits for input, blur etc type of events.
         const content = update.state.doc.toString(); // Get the new content
         dispatch("change", content); // Dispatch the new content to parent.
@@ -202,8 +202,8 @@
     const currentContent = codeMirrorView.state.doc.toString();
     hasChanges = newModifiedContent !== currentContent;
 
-    console.log("curr :>> ", currentContent);
-    console.log("new :>> ", originalContent);
+    // console.log("curr :>> ", currentContent);
+    // console.log("new :>> ", originalContent);
     console.log("has changes 1 :>> ", hasChanges);
     if (!hasChanges) {
       console.log("has changes 2 :>> ", hasChanges);
