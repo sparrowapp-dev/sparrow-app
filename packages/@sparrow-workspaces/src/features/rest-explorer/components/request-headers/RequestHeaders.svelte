@@ -18,9 +18,6 @@
   export let isMergeViewLoading = false;
   export let newModifiedContent: KeyValuePair[];
 
-  $: if (isMergeViewLoading)
-    console.log("********** Loading Enabled *****************");
-
   export let isBulkEditActive;
   export let onUpdateRequestState;
   let isBulkEditRequired = true;
@@ -69,20 +66,11 @@
     callback={handleHeaderChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    bind:showMergeView={isMergeViewEnabled}
     bind:isMergeViewLoading
+    bind:showMergeView={isMergeViewEnabled}
     bind:newModifiedPairs={newModifiedContent}
   />
-  <!-- showMergeView={false}
-    newModifiedPairs={[
-      { key: "dnt", value: "1", checked: true },
-      { key: "accept", value: "ish", checked: true },
-      { key: "referer", value: "No", checked: true },
-      { key: "this is new val", value: "yes", checked: true },
-      { key: "origins", value: "yes", checked: true },
-      { key: "karan", value: "aujla", checked: true },
-      { key: "origin", value: "https://app.alphametricx.com", checked: true },
-    ]} -->
+
   <div>
     {#if !isBulkEditActive}
       <div class="d-flex align-items-center" style="padding:12px 0px">

@@ -49,7 +49,7 @@
     </div>
   {/if}
 
-  <div style="flex:1; overflow:auto;" class="ding-ding">
+  <div style="flex:1; overflow:auto;">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       {#if isMergeViewEnabled && mergeViewRequestDatasetType === RequestDatasetEnum.RAW}
         <Raw

@@ -156,6 +156,7 @@
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
 
+  // ToDo: For testing only, should be removed while raising PR
   $: if (storeData) {
     const { bodyFormatter, navigation, size, time, ...restData } =
       storeData.response;
@@ -268,81 +269,12 @@
     isChatbotOpenInCurrTab.set(false);
   });
 
-  //   setTimeout(() => {
-  //     console.log("enabledMergeViewForReqBody() :>> ");
-
-  //     // Table format
-  //     const dataURLEncoded = {
-  //       main_title: "asdas",
-  //       newsletter_title: "ByCrypt12", // Change this title to a unique one
-  //       newsletter_content: "",
-  //       searchId: "",
-  //       recipients: [],
-  //       sendOn_dateType: "",
-  //       send_type: "Daily",
-  //       send_type_option: [],
-  //       send_time: "09:00:00",
-  //       publish_type: "html",
-  //       publishedOn: "",
-  //       newsletter_body: [],
-  //       title: "",
-  //       content: "",
-  //       title_color: "#000000",
-  //       content_color: "#000000",
-  //       date_color: "#000000",
-  //       background_color: "#ffffff",
-  //       background_image: "",
-  //       logo_image: "",
-  //       logo_dimensions: {
-  //         logo_width: 40,
-  //         logo_height: 40,
-  //       },
-  //       background_height: 200,
-  //       footer:
-  //         "[This report may contain links to external or third party websites. These links are provided solely for your convenience. Links taken to other sites are done so at your own risk and its affiliates, “AlphaMetricx”, accept no liability for any linked sites or their content. AlphaMetricx does not own the content offered on such links and does not claim any ownership or intellectual property rights whatsoever. AlphaMetricx makes no warranties or representations, express or implied about such linked websites, the third parties they are owned and operated by, the information contained on them and their authenticity, or the suitability or quality of any of their products or services. AlphaMetricx does not authorize the infringement of any intellectual property rights contained in material offered through these linked sites. Please refer to the use agreement and/or copyright statements of any external site you visit, or the terms and conditions of any externally provided web site for instructions, restrictions, and guidelines. If you have a question, please contact the webmaster of the external site.] \\n \\n Not interested in getting these emails? Click here to unsubscribe (alerts@alphametricx.com).",
-  //       section_label: "Also appeared in",
-  //       logo_align: "left",
-  //       date_align: "right",
-  //       display_logo: true,
-  //       display_date: true,
-  //       display_footer: true,
-  //       display_header_title: true,
-  //       display_header_description: true,
-  //       display_section_link: true,
-  //       is_media: true,
-  //       is_syndication: true,
-  //       is_keyword: true,
-  //       is_sentiment: true,
-  //       articleMediaShow: false,
-  //       date_format: "%A, %B %d, %Y",
-  //       send_timezone: "America/New_York",
-  //       is_published: false,
-  //     };
-  //     // Raw body content
-  //     const dataRaw = `{
-  //   "key": "original",
-  //   "email": "@gmail.com",
-  //   "value": "1",
-  //   "checked": false,
-  //   "ghibli": "image"
-  // }`;
-
-  //     // enabledMergeViewForReqBody(dataRaw, RequestDataset.RAW);
-  //     // console.log("jsss :>> ");
-  //     // enabledMergeViewForReqBody(
-  //     //   JSON.stringify(dataURLEncoded, null, 2),
-  //     //   RequestDataset.URLENCODED,
-  //     // );
-
-  //     setTimeout(() => {
-  //       console.log(
-  //         "next settimout: ",
-  //         newModifiedContent,
-  //         isMergeViewEnableForRequestBody,
-  //       );
-  //     }, 5000);
-  //   }, 5000);
-
+  /**
+   * Enables the diff/merge view while having suggested changes by AI
+   * @param newContent The new changes suggested
+   * @param requestDatasetType Request Body dataset type (Raw, Binary, URL Encoded, Form Data)
+   * @param contentType Request Body dataset type (JSON, HTML, JavaScript, Text, XML)
+   */
   const enabledMergeViewForReqBody = async (
     newContent: string,
     requestDatasetType: RequestDatasetEnum,
@@ -374,24 +306,32 @@
     // isMergeViewLoading = true;
   };
 
+  /**
+   * Embeds the changes suggested by AI in request data
+   * @param target Where to insert the changes (Request Body or Headers or Parameters)
+   * @param language Language type of suggested code changes by AI (JSON, HTML, JavaScript, Text, XML)
+   * @param requestBodyType Request Body datas et type (Raw, Binary, URL Encoded, Form Data)
+   * @param modifiedContent The new content suggested by AI
+   */
   const handleApplyChangeOnAISuggestion = async (
     target: RequestSectionEnum,
     language: RequestDataTypeEnum,
     requestBodyType: RequestDatasetEnum,
     modifiedContent,
   ) => {
+    // For testing, remove while raising PR
     // target = "Parameters";
     // target = "Headers";
-    // console.log("target : >> ", target);
-    // console.log("language : >> ", language);
-    // console.log("requestBodyType : >> ", requestBodyType);
 
     try {
       switch (target) {
         case RequestSectionEnum.REQUEST_BODY: {
           console.log(`Changing ${target} :> `);
+
+          // For testing, remove while raising PR
           // requestBodyType = "URL Encoded" as RequestDatasetEnum;
           // requestBodyType = "Form Data" as RequestDatasetEnum;
+
           enabledMergeViewForReqBody(
             modifiedContent,
             requestBodyType,
@@ -401,10 +341,10 @@
         }
         case RequestSectionEnum.HEADERS:
         case RequestSectionEnum.PARAMETERS: {
-          console.log(`Changing ${target} ::>> `);
-
+          // console.log(`Changing ${target} ::>> `);
           const newData = convertJsonToKeyValPairs(JSON.parse(modifiedContent));
 
+          // Auto navigating to request navigator tab
           onUpdateRequestState({
             requestNavigation:
               target === RequestSectionEnum.HEADERS
@@ -615,8 +555,6 @@
                         0}
                       autoGeneratedHeadersLength={$tab.property?.request
                         ?.autoGeneratedHeaders?.length || 0}
-                      bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
-                      bind:isMergeViewLoading
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
                       {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}

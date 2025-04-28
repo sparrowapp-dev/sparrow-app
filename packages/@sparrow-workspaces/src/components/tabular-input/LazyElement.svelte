@@ -22,9 +22,7 @@
   export let deleteParam;
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
-
-  // Other imports and props **anish
-  export let customClass = ""; // Add this prop
+  export let customClass = "";
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -82,7 +80,6 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-          
         />
       </div>
       <div

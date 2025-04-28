@@ -48,11 +48,12 @@
   let showTickIcon: boolean = false;
 
   /**
-   * Validates if the metadata sent by AI inside HTML comment matches the application's request section data
+   * Validates if the metadata sent by AI wrapped inside HTML comment
+   * Check if the metadata sent by AI is application user friendly (Matching with request data or not).
    *
-   * @param target - The target value extracted from the comment
-   * @param language - The language value extracted from the comment
-   * @param type - The type value extracted from the comment
+   * @param target - The target value (Where to apply the change -> Req. Body or Headers or Parameters)
+   * @param language - The language value of the code suggested (Json, html, javascript etc) 
+   * @param type - The type value (Raw, url encoded, formdata)
    * @returns boolean indicating if all values are valid according to the enums
    */
   const validateMetadata = (
@@ -127,7 +128,6 @@
       let actionableLanguage = "";
       let actionableType = "";
 
-      // console.log("camer here 1 :>> ", htmlString, doc, pre, previousNode);
       // Look for HTML comment nodes that might contain actionable metadata
       while (previousNode) {
         // Check if it's a comment node
