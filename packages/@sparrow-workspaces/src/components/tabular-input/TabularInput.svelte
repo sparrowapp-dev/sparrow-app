@@ -5,7 +5,7 @@
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
   import { onMount } from "svelte";
-  import { Tooltip, Button } from "@sparrow/library/ui";
+  import { Tooltip, Button, notifications } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
@@ -37,6 +37,7 @@
   export let isMergeViewLoading = false;
   export let newModifiedPairs: KeyValuePair[] = [];
 
+  let hasChanges = false;
   let enableKeyValueHighlighting = true;
   let pairs: KeyValuePair[] = keyValue;
   let controller: boolean = false;
@@ -197,7 +198,40 @@
     };
 
     isMergeViewLoading = false;
+
+    // Check for changes after calculating diff
+    setTimeout(() => {
+      checkForChanges();
+    }, 0);
+
     return [...result, lastEmptyRow];
+  }
+
+  /**
+   * Checks if there are any actual changes between the original data and the new data
+   * Sets hasChanges to true if there are added, deleted, or modified items
+   */
+  function checkForChanges(): boolean {
+    if (!diffPairs || diffPairs.length === 0) return false;
+
+    // Check if there are any changes (added, deleted, or modified items)
+    const changes = diffPairs.filter(
+      (pair) =>
+        pair.diffType === "added" ||
+        pair.diffType === "deleted" ||
+        pair.diffType === "modified",
+    );
+
+    // Update hasChanges state
+    hasChanges = changes.length > 0;
+
+    if (!hasChanges) {
+      console.log("has changes 2 :>> ", hasChanges);
+      undoChanges(); // resetting the mergeview states and props
+      notifications.success("You already have updated changes.");
+    }
+
+    return hasChanges;
   }
 
   // Convert diffPairs to bulk text format for BulkEditEditor
@@ -223,6 +257,7 @@
     await sleep(2000);
     diffPairs = calculateDiff();
     diffBulkText = diffPairsToBulkText();
+    checkForChanges();
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 
@@ -240,12 +275,13 @@
       isMergeViewLoading = true;
       await sleep(2000);
       diffPairs = calculateDiff();
+      checkForChanges();
 
       // Update bulk text to reflect diff if bulk edit is active
       if (isBulkEditActive) {
         bulkText = diffPairsToBulkText();
       }
-    }
+    } else hasChanges = false; // Reset when merge view is disabled
   };
 
   // Function to apply all changes from diff view to the original data
@@ -277,6 +313,7 @@
     callback(pairs); // Notify parent component of the changes
     // newModifiedPairs = JSON.parse(JSON.stringify(pairs)); // Save current state for potential future comparison
     newModifiedPairs = [];
+    hasChanges = false; // Reset after applying changes
 
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
@@ -289,6 +326,7 @@
     newModifiedPairs = [];
     diffPairs = []; // Reset any potential changes by discarding diffPairs
     callback(pairs); // Notify parent of unchanged data
+    hasChanges = false; // Reset hasChanges after undoing changes
 
     isMergeViewLoading = true;
     await sleep(2000);
@@ -301,6 +339,7 @@
     if (showMergeView) {
       diffPairs = calculateDiff();
       diffBulkText = diffPairsToBulkText();
+      checkForChanges();
     }
   });
 
@@ -364,9 +403,8 @@
       // Recalculate diff if merge view is active (althrough will disable the edit while in merge view) **anish
       if (showMergeView) {
         diffPairs = calculateDiff();
-
-        // ToDo: Calculate only if Bulk Edit mode is active (change in every place)
-        diffBulkText = diffPairsToBulkText();
+        diffBulkText = diffPairsToBulkText(); // ToDo: Calculate only if Bulk Edit mode is active (change in every place)
+        checkForChanges();
       }
 
       await scrollToNewRow();
@@ -457,6 +495,7 @@
       newModifiedPairs = newPairs;
       diffPairs = calculateDiff();
       diffBulkText = diffPairsToBulkText();
+      checkForChanges();
     } else {
       pairs = newPairs;
       callback(pairs);
@@ -612,7 +651,7 @@
           />
         {/if}
 
-        {#if !isMergeViewLoading && showMergeView}
+        {#if !isMergeViewLoading && showMergeView && hasChanges}
           {#each diffPairs as element, index (index)}
             <LazyElement
               element={{
@@ -635,6 +674,16 @@
             <!-- isInputBoxEditable={element.diffType !== "deleted"} -->
             <!-- isCheckBoxEditable={element.diffType !== "deleted"} -->
           {/each}
+
+          <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+            <Button
+              title={"Keep the Changes!!"}
+              type={"primary"}
+              onClick={applyChanges}
+            ></Button>
+            <Button title={"Undo"} type={"secondary"} onClick={undoChanges}
+            ></Button>
+          </div>
         {:else}
           {#each pairs as element, index (index)}
             <LazyElement
@@ -651,18 +700,6 @@
               {isCheckBoxEditable}
             />
           {/each}
-        {/if}
-
-        {#if !isMergeViewLoading && showMergeView}
-          <div class="d-flex justify-content-end mt-3 me-0 gap-2">
-            <Button
-              title={"Keep the Changes!!"}
-              type={"primary"}
-              onClick={applyChanges}
-            ></Button>
-            <Button title={"Undo"} type={"secondary"} onClick={undoChanges}
-            ></Button>
-          </div>
         {/if}
       </div>
     </section>

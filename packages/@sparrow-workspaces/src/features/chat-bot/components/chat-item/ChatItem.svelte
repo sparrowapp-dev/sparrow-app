@@ -315,7 +315,7 @@
               setTimeout(() => {
                 img.src = originalSrc;
                 img.classList.remove("tick-icon");
-              }, 5000);
+              }, 3000);
             }
           }
         }

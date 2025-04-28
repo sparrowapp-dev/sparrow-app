@@ -380,7 +380,7 @@
     requestBodyType: RequestDatasetEnum,
     modifiedContent,
   ) => {
-    target = "Parameters";
+    // target = "Parameters";
     // target = "Headers";
     // console.log("target : >> ", target);
     // console.log("language : >> ", language);
@@ -411,9 +411,17 @@
                 ? RequestSectionEnum.HEADERS
                 : RequestSectionEnum.PARAMETERS,
           });
+
+          if (isMergeViewEnableForHeaders || isMergeViewEnableForParams) {
+            notifications.error(
+              "Please accept the current suggested changes first.",
+            );
+            return;
+          }
+
           await sleep(500);
           newModifiedContent = newData;
-          isMergeViewLoading = true;
+          // isMergeViewLoading = true;
           if (target === RequestSectionEnum.HEADERS)
             isMergeViewEnableForHeaders = true;
           else isMergeViewEnableForParams = true;

@@ -9,8 +9,6 @@
   import { linter } from "@codemirror/lint";
   import { Button, notifications } from "../../ui";
   import type { Diagnostic } from "@codemirror/lint";
-
-  // Import the merge extensions
   import { unifiedMergeView } from "@codemirror/merge";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
@@ -27,7 +25,7 @@
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
 
-  // For merge view - now as props
+  // For merge view props
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
   export let newModifiedContent: string; // New content to show in merge view
@@ -56,15 +54,11 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    console.log("in updateExtensionView :>> 1 ");
     if (update.docChanged) {
-      // console.log("in updateExtensionView :>> 2");
-
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
       if (!isAutoChange) {
-        // console.log("in updateExtensionView :>> 3");
         // only hits for input, blur etc type of events.
         const content = update.state.doc.toString(); // Get the new content
         dispatch("change", content); // Dispatch the new content to parent.
@@ -135,9 +129,7 @@
 
   // Update the merge view with current original content
   function updateMergeView() {
-    console.log("in update merge view :>> 1");
     if (codeMirrorView) {
-      console.log("in update merge view :>> 2");
       codeMirrorView.dispatch({
         effects: mergeConf.reconfigure(
           isMergeViewEnabled ? [createMergeExtension(originalContent)] : [],

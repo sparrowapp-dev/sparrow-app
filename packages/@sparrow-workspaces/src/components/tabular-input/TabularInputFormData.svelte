@@ -10,7 +10,7 @@
   import { crossIcon as close } from "@sparrow/library/assets";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
-  import { Button, Tooltip } from "@sparrow/library/ui";
+  import { Button, notifications, Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
@@ -45,6 +45,7 @@
     base: string;
   }[] = [];
 
+  let hasChanges = false;
   let pairs = keyValue;
   let controller: boolean = false;
   let pairsContainer: HTMLElement;
@@ -71,8 +72,44 @@
   };
   let diffPairs: DiffPair[] = [];
 
+  /**
+   * Checks if there are any actual changes between the original data and the new data
+   * Sets hasChanges to true if there are added, deleted, or modified items
+   */
+  function checkForChanges(): boolean {
+    if (!diffPairs || diffPairs.length === 0) return false;
+
+    // Check if there are any changes (added, deleted, or modified items)
+    const changes = diffPairs.filter(
+      (pair) =>
+        pair.diffType === "added" ||
+        pair.diffType === "deleted" ||
+        pair.diffType === "modified",
+    );
+
+    // Update hasChanges state
+    hasChanges = changes.length > 0;
+
+    if (!hasChanges) {
+      console.log("has changes 2 :>> ", hasChanges);
+      undoChanges(); // resetting the mergeview states and props
+      notifications.success("You already have updated changes.");
+    }
+    return hasChanges;
+  }
+
   // Function to calculate diff between original data (pairs) and new data (newModifiedPairs)
   function calculateDiff(): DiffPair[] {
+    // If table data is empty but we have new data, then consider everything as an addition
+    // if (!pairs || pairs.length === 0) {
+    //   console.log("pairs ", pairs.length);
+    //   return newModifiedPairs.map((pair) => ({
+    //     ...pair,
+    //     diffType: "added",
+    //     currentIndex: newModifiedPairs.indexOf(pair),
+    //   }));
+    // }
+
     const result: DiffPair[] = [];
     const origMap = new Map();
 
@@ -90,9 +127,10 @@
       if (originalEntry) {
         // Key exists in both - check if value changed
         if (
-          originalEntry.pair.value !== currentPair.value ||
-          originalEntry.pair.type !== currentPair.type ||
-          originalEntry.pair.base !== currentPair.base
+          originalEntry.pair.value !== currentPair.value
+          // || // type and base should also be compared, disabling it temporaraliy
+          // originalEntry.pair.type !== currentPair.type ||
+          // originalEntry.pair.base !== currentPair.base
         ) {
           result.push({
             ...currentPair,
@@ -195,6 +233,12 @@
     };
 
     isMergeViewLoading = false;
+
+    // Check for changes after calculating diff
+    setTimeout(() => {
+      checkForChanges();
+    }, 0);
+
     return [...result, lastEmptyRow];
   }
 
@@ -202,6 +246,7 @@
     isMergeViewLoading = true;
     await sleep(2000);
     diffPairs = calculateDiff();
+    checkForChanges();
   };
 
   $: if (showMergeView) updateDiffPairsWithLoading();
@@ -213,7 +258,8 @@
       isMergeViewLoading = true;
       await sleep(2000);
       diffPairs = calculateDiff();
-    }
+      checkForChanges();
+    } else hasChanges = false;
   };
 
   // Function to apply all changes from diff view to the original data
@@ -252,6 +298,7 @@
     showMergeView = false; // Turn off merge view after applying changes
     callback(pairs); // Notify parent component of the changes
     newModifiedPairs = [];
+    hasChanges = false;
 
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
@@ -264,6 +311,7 @@
     newModifiedPairs = [];
     diffPairs = []; // Reset any potential changes by discarding diffPairs
     callback(pairs); // Notify parent of unchanged data
+    hasChanges = false;
 
     isMergeViewLoading = true;
     await sleep(2000);
@@ -333,6 +381,7 @@
       // Recalculate diff if merge view is active
       if (showMergeView) {
         diffPairs = calculateDiff();
+        checkForChanges();
       }
 
       await scrollToNewRow();
@@ -425,6 +474,11 @@
       // Reset the input to allow re-uploading the same file
       target.value = "";
     });
+
+    if (showMergeView) {
+      diffPairs = calculateDiff();
+      checkForChanges();
+    }
   });
 
   const removeFormFile = (index: number) => {
@@ -521,8 +575,8 @@
   >
     <!-- {#if isMergeViewLoading}
       <div class="text-center py-3">Loading diff view...</div> -->
-    {#if !isMergeViewLoading && showMergeView}
-      {#each diffPairs as element, index}
+    {#if !isMergeViewLoading && showMergeView && hasChanges}
+      {#each diffPairs as element, index (index)}
         <div
           class="pair-data-row w-100 d-flex align-items-center px-1 diff-row diff-{element.diffType}"
           style="position:relative"
@@ -534,7 +588,7 @@
                 on:input={() => {
                   updateCheck(index);
                 }}
-                disabled={!isCheckBoxEditable || element.diffType === "deleted"}
+                disabled={!isCheckBoxEditable}
               />
             {/if}
           </div>
