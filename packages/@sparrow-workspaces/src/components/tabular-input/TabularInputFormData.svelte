@@ -58,6 +58,8 @@
     }
   }
 
+  // ************ Diff/Merge View Methods - Start ************
+
   // Calculate diff between original and current data
   type DiffType = "added" | "deleted" | "modified" | "unchanged";
   type DiffPair = {
@@ -72,37 +74,10 @@
   };
   let diffPairs: DiffPair[] = [];
 
-  /**
-   * Checks if there are any actual changes between the original data and the new data
-   * Sets hasChanges to true if there are added, deleted, or modified items
-   */
-  function checkForChanges(): boolean {
-    if (!diffPairs || diffPairs.length === 0) return false;
-
-    // Check if there are any changes (added, deleted, or modified items)
-    const changes = diffPairs.filter(
-      (pair) =>
-        pair.diffType === "added" ||
-        pair.diffType === "deleted" ||
-        pair.diffType === "modified",
-    );
-
-    // Update hasChanges state
-    hasChanges = changes.length > 0;
-
-    if (!hasChanges) {
-      console.log("has changes 2 :>> ", hasChanges);
-      undoChanges(); // resetting the mergeview states and props
-      notifications.success("You already have updated changes.");
-    }
-    return hasChanges;
-  }
-
   // Function to calculate diff between original data (pairs) and new data (newModifiedPairs)
   function calculateDiff(): DiffPair[] {
     // If table data is empty but we have new data, then consider everything as an addition
     // if (!pairs || pairs.length === 0) {
-    //   console.log("pairs ", pairs.length);
     //   return newModifiedPairs.map((pair) => ({
     //     ...pair,
     //     diffType: "added",
@@ -179,7 +154,7 @@
       }
     });
 
-    // Sort by original position to maintain a logical order
+    // Comparator: Custom Sorting Method for Sorting by original position to maintain a logical order
     result.sort((a, b) => {
       // First priority: Group items with the same key together
       if (a.key === b.key) {
@@ -242,13 +217,37 @@
     return [...result, lastEmptyRow];
   }
 
+  /**
+   * Checks if there are any actual changes between the original data and the new data
+   * Sets hasChanges to true if there are added, deleted, or modified items
+   */
+  function checkForChanges(): boolean {
+    if (!diffPairs || diffPairs.length === 0) return false;
+
+    // Check if there are any changes (added, deleted, or modified items)
+    const changes = diffPairs.filter(
+      (pair) =>
+        pair.diffType === "added" ||
+        pair.diffType === "deleted" ||
+        pair.diffType === "modified",
+    );
+
+    // Update hasChanges state
+    hasChanges = changes.length > 0;
+
+    if (!hasChanges) {
+      undoChanges(); // resetting the mergeview states and props
+      notifications.success("You already have updated changes.");
+    }
+    return hasChanges;
+  }
+
   const updateDiffPairsWithLoading = async () => {
     isMergeViewLoading = true;
     await sleep(2000);
     diffPairs = calculateDiff();
     checkForChanges();
   };
-
   $: if (showMergeView) updateDiffPairsWithLoading();
 
   // Toggle merge view
@@ -265,9 +264,7 @@
   // Function to apply all changes from diff view to the original data
   const applyChanges = async () => {
     if (!showMergeView) return;
-
     isMergeViewLoading = true;
-
     // Extract all valid pairs from diffPairs (excluding deleted ones)
     const updatedPairs = diffPairs
       .filter((pair) => pair.diffType !== "deleted")
@@ -322,6 +319,8 @@
   const sleep = (ms: number): Promise<void> => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
+
+  // ************ Diff/Merge View Methods - Ends ************
 
   /**
    * @description - calculates the select all checkbox state - weather checked or not
@@ -573,8 +572,7 @@
     style="display:block; position:relative;"
     bind:this={pairsContainer}
   >
-    <!-- {#if isMergeViewLoading}
-      <div class="text-center py-3">Loading diff view...</div> -->
+    <!-- Showing Duplicate Fake Rows For Diff/Merge View -->
     {#if !isMergeViewLoading && showMergeView && hasChanges}
       {#each diffPairs as element, index (index)}
         <div
@@ -891,15 +889,22 @@
   }
 
   /* Diff view styling */
+
+  /* Diff/Merge View: Style for new row added */
   .diff-row.diff-added {
-    background-color: #113b21 !important;
+    /* background-color: #113b21 !important; */
+    background-color: var(--bg-ds-success-800) !important ;
   }
 
-  .diff-row.diff-deleted {
-    background-color: #3d1514 !important;
-  }
-
+  /* Diff/Merge View: Style for row modified */
   .diff-row.diff-modified {
-    background-color: #113b21 !important;
+    /* background-color: #113b21 !important; */
+    background-color: var(--bg-ds-success-800) !important ;
+  }
+
+  /* Diff/Merge View: Style for new row deleted */
+  .diff-row.diff-deleted {
+    /* background-color: #3d1514 !important; */
+    background-color: var(--bg-ds-danger-800) !important;
   }
 </style>

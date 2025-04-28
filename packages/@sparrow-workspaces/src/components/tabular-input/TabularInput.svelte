@@ -43,7 +43,7 @@
   let controller: boolean = false;
 
   let bulkText = "";
-  let diffBulkText = "";
+  let diffBulkText = ""; // contains new modified content for comparision for bulk editor
   let bulkToggle = isBulkEditActive;
 
   let isErrorIconHovered = false;
@@ -54,6 +54,8 @@
 
   const theme = new TabularInputTheme().build();
 
+  // ********** Diff/Merge View Methods - Start **********
+
   // Calculate diff between original and current data **anish
   type DiffType = "added" | "deleted" | "modified" | "unchanged";
   type DiffPair = KeyValuePair & {
@@ -61,21 +63,12 @@
     originalIndex?: number;
     currentIndex?: number;
   };
-  let diffPairs: DiffPair[] = [];
+  let diffPairs: DiffPair[] = []; // contains new modified content for comparision for TabularInput
 
   // Funtion to calculate diff. b/w origional data (pairs) and new data (newModifiedPairs)
   function calculateDiff(): DiffPair[] {
-    // if (!showMergeView || !pairs || pairs.length === 0) {
-    //   console.log("pairs ", pairs.length);
-    //   return newModifiedPairs.map((pair) => ({
-    //     ...pair,
-    //     diffType: "unchanged",
-    //   }));
-    // }
-
     // If table data is empty but we have new data, then consider everything as an addition
     // if (!pairs || pairs.length === 0) {
-    //   console.log("pairs ", pairs.length);
     //   return newModifiedPairs.map((pair) => ({
     //     ...pair,
     //     diffType: "added",
@@ -146,7 +139,7 @@
       }
     });
 
-    // Sort by original position to maintain a logical order
+    // Comparator: Custom sorting method for sorting by original position to maintain a logical order
     result.sort((a, b) => {
       // First priority: Group items with the same key together
       if (a.key === b.key) {
@@ -226,7 +219,6 @@
     hasChanges = changes.length > 0;
 
     if (!hasChanges) {
-      console.log("has changes 2 :>> ", hasChanges);
       undoChanges(); // resetting the mergeview states and props
       notifications.success("You already have updated changes.");
     }
@@ -261,13 +253,6 @@
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 
-  // Update diff when inputs change
-  $: {
-    if (keyValue) {
-      identifySelectAllState();
-    }
-  }
-
   // Toggle merge view **anish
   const toggleMergeView = async (show: boolean) => {
     showMergeView = show;
@@ -287,9 +272,7 @@
   // Function to apply all changes from diff view to the original data
   const applyChanges = async () => {
     if (!showMergeView) return;
-
     isMergeViewLoading = true;
-
     // Extract all valid pairs from diffPairs (excluding deleted ones)
     const updatedPairs = diffPairs
       .filter((pair) => pair.diffType !== "deleted")
@@ -333,6 +316,13 @@
     isMergeViewLoading = false; // Reset loading state
   };
 
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  // ********** Diff/Merge View Methods - End **********
+
   onMount(() => {
     handleBulkTextUpdate();
 
@@ -343,10 +333,12 @@
     }
   });
 
-  // Utility function to create a delay
-  const sleep = (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
+  // Update diff when inputs change
+  $: {
+    if (keyValue) {
+      identifySelectAllState();
+    }
+  }
 
   /**
    * @description - calculates the select all checkbox state - weather checked or not
@@ -651,6 +643,7 @@
           />
         {/if}
 
+        <!-- Showing Duplicate Fake Rows For Diff/Merge View -->
         {#if !isMergeViewLoading && showMergeView && hasChanges}
           {#each diffPairs as element, index (index)}
             <LazyElement
@@ -839,16 +832,21 @@
     align-items: center;
   }
 
+  /* Diff/Merge View: Style for new row added */
   :global(.diff-row.diff-added) {
-    background-color: #113b21 !important ;
+    /* background-color: #113b21 !important ; */
+    background-color: var(--bg-ds-success-800) !important ;
   }
 
-  :global(.diff-row.diff-deleted) {
-    background-color: #3d1514 !important;
-  }
-
+  /* Diff/Merge View: Style for row modified */
   :global(.diff-row.diff-modified) {
-    background-color: #113b21 !important ;
-    /* background-color: rgba(246, 184, 59, 0.288) !important; */
+    /* background-color: #113b21 !important ; */
+    background-color: var(--bg-ds-success-800) !important ;
+  }
+
+  /* Diff/Merge View: Style for new row deleted */
+  :global(.diff-row.diff-deleted) {
+    /* background-color: #3d1514 !important; */
+    background-color: var(--bg-ds-danger-800) !important;
   }
 </style>

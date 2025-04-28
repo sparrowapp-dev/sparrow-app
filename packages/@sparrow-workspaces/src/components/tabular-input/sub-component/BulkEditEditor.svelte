@@ -146,15 +146,10 @@
   const applyChanges = () => {
     if (!isMergeViewEnabled || !codeMirrorView) return;
 
-    // Get the current modified content
-    const modifiedContent = codeMirrorView.state.doc.toString();
-
-    // Update the original value with the modified content
-    value = modifiedContent;
+    const modifiedContent = codeMirrorView.state.doc.toString(); // Get the current modified content
+    value = modifiedContent; // Update the original value with the modified content
     originalContent = modifiedContent; // Update internal state
-
-    // Notify parent component of change
-    // dispatch("applyChanges", modifiedContent);
+    // dispatch("applyChanges", modifiedContent); // Notify parent component of change
 
     isMergeViewEnabled = false; // Exit merge view mode
     newModifiedContent = ""; // reset the content
@@ -192,9 +187,7 @@
 
     if (isMergeViewEnabled) {
       isMergeViewLoading = true;
-
-      // Store current content as original
-      originalContent = codeMirrorView.state.doc.toString();
+      originalContent = codeMirrorView.state.doc.toString(); // Store current content as original
 
       // Apply new content if provided
       if (newModifiedContent) {
@@ -206,14 +199,11 @@
           },
           annotations: [{ autoChange: true }],
         });
-
-        // Update merge view
         updateMergeView();
 
-        // Use setTimeout to allow the merge view to be rendered
         setTimeout(() => {
           isMergeViewLoading = false;
-        }, 1000); // Adjust timing based on your needs
+        }, 1000);
       }
     } else {
       // If turning off merge view, restore original content
@@ -227,13 +217,12 @@
       });
     }
 
-    updateMergeView();
+    updateMergeView(); // Can be removed
   }
 
   // Handle changes to newModifiedContent when in merge view
   $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
     isMergeViewLoading = true;
-
     codeMirrorView.dispatch({
       changes: {
         from: 0,
@@ -242,10 +231,7 @@
       },
       annotations: [{ autoChange: true }],
     });
-
     updateMergeView();
-
-    // Use setTimeout to allow the merge view to be rendered
     setTimeout(() => {
       isMergeViewLoading = false;
     }, 1000);
@@ -270,10 +256,6 @@
   });
 
   onDestroy(() => {
-    // If changes are not saved, then undo those changes before getting destroyed
-    // if (isMergeViewEnabled) {
-    //   undoChanges();
-    // }
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed
   });
 </script>
@@ -310,22 +292,25 @@
   }
 
   /* Merge view styles */
-  /* .merge-view :global(.cm-activeLine), */
   .merge-view :global(.cm-changedLine) {
-    background-color: #113b21;
+    /* background-color: #113b21; */
+    background: var(--bg-ds-success-800) !important;
   }
 
   .merge-view :global(.cm-deletedChunk) {
-    background-color: #3d1514;
+    /* background-color: #3d1514; */
+    background-color: var(--bg-ds-danger-800) !important;
   }
 
   /* Specific styling for deleted text */
   .merge-view :global(.cm-deletedText) {
-    background-color: #621b18;
+    /* background-color: #621b18; */
+    background-color: var(--bg-ds-danger-700) !important;
   }
 
   /* Specific styling for added text */
   .merge-view :global(.cm-changedText) {
-    background: #14522e !important;
+    /* background: #14522e !important; */
+    background: var(--bg-ds-success-700) !important;
   }
 </style>

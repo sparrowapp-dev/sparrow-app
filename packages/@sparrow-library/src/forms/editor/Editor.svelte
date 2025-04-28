@@ -162,9 +162,7 @@
    * This function declines the changes and keeps the original value
    */
   const undoChanges = () => {
-    console.log("in undoChanges() :>> 1");
     if (!isMergeViewEnabled || !codeMirrorView) return;
-    console.log("in undoChanges() :>> 2");
 
     // Restore original content
     codeMirrorView.dispatch({
@@ -194,14 +192,12 @@
     const currentContent = codeMirrorView.state.doc.toString();
     hasChanges = newModifiedContent !== currentContent;
 
-    // console.log("curr :>> ", currentContent);
-    // console.log("new :>> ", originalContent);
-    console.log("has changes 1 :>> ", hasChanges);
     if (!hasChanges) {
-      console.log("has changes 2 :>> ", hasChanges);
       undoChanges(); // resetting the mergeview states and props
       notifications.success("You already have updated changes.");
     }
+
+    return hasChanges;
   }
 
   // Call this function whenever content might change
@@ -209,32 +205,25 @@
 
   onMount(() => {
     initalizeCodeMirrorEditor(value);
-
-    originalContent = value; // Store initial content as original
-
     // Attach keydown listener to prevent global search when inside CodeMirror
     codeMirrorEditorDiv.addEventListener("keydown", (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
         event.stopPropagation();
       }
     });
+    originalContent = value; // Store initial content as original
   });
 
   // Handle changes to isMergeViewEnabled prop
   $: if (codeMirrorView && isMergeViewEnabled !== previousMergeViewState) {
-    console.log("in rec 1");
     previousMergeViewState = isMergeViewEnabled;
 
     if (isMergeViewEnabled) {
-      console.log("in rec 1, in isMergeVeiwEnabled ? :>>");
       isMergeViewLoading = true;
+      originalContent = codeMirrorView.state.doc.toString(); // Store current content as original
 
-      // Store current content as original
-      originalContent = codeMirrorView.state.doc.toString();
-
-      // Apply new content if provided
       if (newModifiedContent) {
-        console.log("**** Applying the new content! ****");
+        // Apply new content if provided
         codeMirrorView.dispatch({
           changes: {
             from: 0,
@@ -243,19 +232,15 @@
           },
           annotations: [{ autoChange: true }],
         });
-
-        // Update merge view
         updateMergeView();
 
         // Use setTimeout to allow the merge view to be rendered
         // This is a workaround since the operation isn't really async
         setTimeout(() => {
           isMergeViewLoading = false;
-        }, 1000); // Adjust timing based on your needs
+        }, 1000);
       }
     } else {
-      console.log("in rec 1, in else isMergeVeiwEnabled ? :>>");
-      console.log("***** Turning off the merge view *****");
       // If turning off merge view, restore original content
       codeMirrorView.dispatch({
         changes: {
@@ -267,15 +252,12 @@
       });
     }
 
-    updateMergeView();
+    updateMergeView(); // ToDo: No need, remove it
   }
 
   // Handle changes to newModifiedContent when in merge view
   $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
-    console.log("in rec 2 :>> ");
-    console.log("**** Inserting new content ****");
     isMergeViewLoading = true;
-
     codeMirrorView.dispatch({
       changes: {
         from: 0,
@@ -285,9 +267,9 @@
       annotations: [{ autoChange: true }],
     });
     updateMergeView();
-    // checkForChanges();
 
     // Use setTimeout to allow the merge view to be rendered
+    // This is a workaround since the operation isn't really async
     setTimeout(() => {
       isMergeViewLoading = false;
     }, 1000);
@@ -295,12 +277,8 @@
 
   // Run whenever component state changes
   afterUpdate(() => {
-    console.log("in afterupdate :>> ");
-
     // Handling the mergeview state while component state changes
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
-      console.log("in if of mergeview :>> ");
-
       codeMirrorView.dispatch({
         changes: {
           from: 0,
@@ -338,12 +316,6 @@
   }
 
   onDestroy(() => {
-    // If changes are not saved, then undo those changes before gettings destroyed
-    // if (isMergeViewEnabled) {
-    //   console.log("on destroy;");
-    //   undoChanges();
-    //   // isMergeViewEnabled = false;
-    // }
     destroyCodeMirrorEditor(); // Call destroyCodeMirrorEditor when component is being destroyed
   });
 </script>
@@ -382,26 +354,25 @@
     margin-right: 1%;
   }
 
-  /* .merge-view :global(.cm-activeLine), */
+  /* Style for customizing the css for codemirror merge view */
+
+  /* styling for added row */
   .merge-view :global(.cm-changedLine) {
-    background-color: #113b21;
+    background: var(--bg-ds-success-800);
   }
 
+  /* styling for deleted row */
   .merge-view :global(.cm-deletedChunk) {
-    background-color: #3d1514;
+    background-color: var(--bg-ds-danger-800);
   }
 
-  /* Specific styling for deleted text */
+  /* styling for deleted text */
   .merge-view :global(.cm-deletedText) {
-    background-color: #621b18;
+    background-color: var(--bg-ds-danger-700);
   }
 
-  /* Specific styling for added text */
+  /* styling for added text */
   .merge-view :global(.cm-changedText) {
-    background: #14522e !important;
-  }
-
-  .merge-view :global(.ͼw) {
-    /* color: var(--editor-string-color); */
+    background: var(--bg-ds-success-700);
   }
 </style>
