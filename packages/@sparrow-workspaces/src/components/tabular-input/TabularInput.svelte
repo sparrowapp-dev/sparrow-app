@@ -21,6 +21,29 @@
     value: "",
   };
   export let environmentVariables;
+  export let handleDynamicExpression:
+    | ((key: string, index: number, id: string) => void)
+    | undefined = undefined;
+  export let handleRemoveDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleOpenCurrentDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let getDEByKeyAndValue: (
+    key: string,
+    value: string,
+    index: number,
+  ) => void | undefined;
+  export let handleDynamicNewExpression: (key: string, index: number) => void;
+  export let handleRemoveDynamicExpressionKey: (
+    key: string,
+    index: number,
+  ) => void;
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
@@ -331,6 +354,12 @@
             isInputBoxEditable={false}
             isCheckBoxEditable={false}
             {dynamicExpression}
+            {getDEByKeyAndValue}
+            {handleDynamicExpression}
+            {handleRemoveDynamicExpression}
+            {handleOpenCurrentDynamicExpression}
+            {handleDynamicNewExpression}
+            {handleRemoveDynamicExpressionKey}
           />
         {/if}
         {#each pairs as element, index (index)}
@@ -347,6 +376,11 @@
             {isInputBoxEditable}
             {isCheckBoxEditable}
             {dynamicExpression}
+            {getDEByKeyAndValue}
+            {handleDynamicExpression}
+            {handleRemoveDynamicExpression}
+            {handleOpenCurrentDynamicExpression}
+            {handleDynamicNewExpression}
           />
         {/each}
       </div>

@@ -24,6 +24,31 @@
   export let deleteParam;
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
+  export let handleRemoveDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleOpenCurrentDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleDynamicExpression:
+    | ((key: string, index: number, id?: string) => void)
+    | undefined = undefined;
+
+  export let getDEByKeyAndValue: (
+    key: string,
+    value: string,
+    index: number,
+  ) => void | undefined;
+
+  export let handleDynamicNewExpression: (key: string, index: number) => void;
+  export let handleRemoveDynamicExpressionKey: (
+    key: string,
+    index: number,
+  ) => void;
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -37,6 +62,29 @@
     isInView = detail.inView;
     scrollDirection = detail?.scrollDirection?.vertical;
   };
+
+  let handleOpenDE = (id: string) => {
+    console.log("this is where we are calling the DE", id, index, element.key);
+    handleOpenCurrentDynamicExpression(element.key, index, id);
+  };
+
+  let removeDynamicExpression = (id: string) => {
+    handleRemoveDynamicExpression(element.key, index, id);
+  };
+
+  let dynamicExpressionItems = getDEByKeyAndValue(
+    element?.key || "",
+    element?.value || "",
+    index,
+  );
+
+  isDynamicExpressionModalOpen.subscribe(() => {
+    dynamicExpressionItems = getDEByKeyAndValue(
+      element?.key || "",
+      element?.value || "",
+      index,
+    );
+  });
 </script>
 
 <div
@@ -99,6 +147,9 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
+          {handleOpenDE}
+          {dynamicExpressionItems}
+          {removeDynamicExpression}
         />
       </div>
     </div>
@@ -118,6 +169,7 @@
                 startIcon={MathFormulaRegular}
                 onClick={() => {
                   isDynamicExpressionModalOpen.set(true);
+                  handleDynamicNewExpression(element?.key, index);
                 }}
               />
             </div>
@@ -129,7 +181,10 @@
               size="extra-small"
               type="teritiary-regular"
               startIcon={DeleteRegular}
-              onClick={() => deleteParam(index)}
+              onClick={() => {
+                deleteParam(index);
+                handleRemoveDynamicExpressionKey(element.key, index);
+              }}
             />
           </div>
         </Tooltip>

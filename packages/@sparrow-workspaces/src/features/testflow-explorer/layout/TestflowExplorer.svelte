@@ -84,6 +84,10 @@
   import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
   import { isDynamicExpressionModalOpen } from "../store/testflow";
   import { selectedRequestTypes } from "../store/testflow";
+  import {
+    isDynamicExpressionContent,
+    updateDynamicExpressionValue,
+  } from "../store/testflow";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -1118,6 +1122,29 @@
     }
   };
 
+  const handleSetDynamicExpression = () => {
+    const currentOpenItem = $isDynamicExpressionContent.find(
+      (item) => item.isCurrentOpen,
+    );
+    if (
+      currentOpenItem?.blockName &&
+      currentOpenItem?.requestType &&
+      currentOpenItem?.method
+    ) {
+      updateDynamicExpressionValue(
+        currentOpenItem?.id,
+        currentOpenItem?.blockName,
+        currentOpenItem?.requestType,
+        currentOpenItem?.key,
+        currentOpenItem?.method,
+        currentOpenItem?.index,
+        expression,
+      );
+      expression = "";
+      isDynamicExpressionModalOpen.set(false);
+    }
+  };
+
   $: {
     if (selectedAPI && selectedApiRequestType) {
       const data: any = selectedAPI?.requestData[selectedApiRequestType];
@@ -1128,6 +1155,22 @@
       } else if (data && selectedApiRequestType === "queryParams") {
         // selectedRequestTypes.set(data);
       }
+    }
+  }
+
+  const setIsCurrentOpenFalse = () => {
+    isDynamicExpressionContent.update((items) =>
+      items.map((item) =>
+        item.isCurrentOpen ? { ...item, isCurrentOpen: false } : item,
+      ),
+    );
+  };
+
+  $: {
+    if ($isDynamicExpressionModalOpen === false) {
+      setTimeout(() => {
+        setIsCurrentOpenFalse();
+      }, 500);
     }
   }
 </script>
@@ -1428,6 +1471,7 @@
     {handleAddingNested}
     {handleFunctionType}
     {handleExpressionChange}
+    {handleSetDynamicExpression}
   />
 </Modal>
 

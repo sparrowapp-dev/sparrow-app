@@ -6,12 +6,14 @@
   import { onMount } from "svelte";
   import DynamicContent from "../components/dynamic-content/DynamicContent.svelte";
   import FunctionsOptions from "../components/function-options/FunctionsOptions.svelte";
+  import { isDynamicExpressionContent } from "../../testflow-explorer/store";
 
   export let requestApis: any;
   export let environmentVariables: any;
   export let expression: string;
   export let selectedApiRequestType: string;
   export let selectedRequest: any;
+  export let handleSetDynamicExpression: () => void;
   export let handleSelectApi: (data: any) => void;
   export let handleAddingNested: (value: string) => void;
   export let handleRemoveSelectApi: () => void;
@@ -68,7 +70,10 @@
       responseNavigation = "Functions";
     }
   };
-  $: console.log("-------------------selected request", selectedRequest);
+  $: currentOpenItem = $isDynamicExpressionContent.find(
+    (item) => item.isCurrentOpen,
+  );
+  $: expression = currentOpenItem?.value || "";
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px;">
@@ -120,10 +125,18 @@
   style="margin-top: 24px;"
 >
   <div>
-    <p style="margin: 0px;">Location</p>
+    <p style="margin: 0px;">
+      {currentOpenItem?.blockName} > {currentOpenItem?.method} > {currentOpenItem?.requestType}
+      > {currentOpenItem?.key}
+    </p>
   </div>
   <div>
-    <Button title="Insert Dynamic Content" type="primary" size="medium" />
+    <Button
+      title="Insert Dynamic Content"
+      type="primary"
+      size="medium"
+      onClick={handleSetDynamicExpression}
+    />
   </div>
 </div>
 
