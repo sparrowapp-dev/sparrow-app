@@ -21,6 +21,18 @@
       destination: collectionAuthNavigation,
     });
   };
+
+  const handlecollection_auth_removed = ({
+    collectionAuthNavigation,
+  }: {
+    collectionAuthNavigation: string;
+  }) => {
+    captureEvent("collection_auth_removed", {
+      component: "CollectionAuth",
+      button_text: collectionAuthNavigation,
+      destination: collectionAuthNavigation,
+    });
+  };
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -52,7 +64,12 @@
             titleId={requestStateAuth}
             onclick={(id = "") => {
               onUpdateRequestState({ collectionAuthNavigation: id });
-              handlecollection_auth_set({ collectionAuthNavigation: id });
+
+              if (id == "No Auth") {
+                handlecollection_auth_removed({ collectionAuthNavigation: id });
+              } else {
+                handlecollection_auth_set({ collectionAuthNavigation: id });
+              }
             }}
             disabled={false}
           />

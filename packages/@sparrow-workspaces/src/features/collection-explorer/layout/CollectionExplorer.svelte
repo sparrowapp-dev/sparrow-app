@@ -49,6 +49,8 @@
   export let onUpdateEnvironment;
   export let onSyncCollection;
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
   /**
    * Icons and images
    */
@@ -143,6 +145,15 @@
       updateLastUpdateAndCount();
     }
   }
+
+  const handlecollection_collection_saved = ({ name }: { name: string }) => {
+    console.log(name + "cc");
+    captureEvent("collection_saved", {
+      component: "CollectionExplorer",
+      button_text: name,
+      destination: name,
+    });
+  };
 
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -517,6 +528,7 @@
           type={"secondary"}
           onClick={() => {
             onSaveCollection();
+            handlecollection_collection_saved({ name: "Collection Saved" });
           }}
         />
       </div>
