@@ -458,6 +458,10 @@
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
+              onClick={(e) => {
+                e.stopPropagation();
+                expand = !expand;
+              }}
             />
           </span>
 

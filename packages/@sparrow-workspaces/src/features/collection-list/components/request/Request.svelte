@@ -194,10 +194,13 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
     <p>
       Are you sure you want to delete this Request? <span
-      class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{api.name}"</span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{api.name}"</span
       >
       will be removed and cannot be restored.
     </p>
@@ -356,6 +359,10 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
+          onClick={(e) => {
+            e.stopPropagation();
+            expand = !expand;
+          }}
         />
       {:else}
         <div

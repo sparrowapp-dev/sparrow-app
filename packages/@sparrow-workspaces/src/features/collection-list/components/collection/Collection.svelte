@@ -589,7 +589,8 @@
       type="teritiary-regular"
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
       onClick={(e) => {
-        // visibility = !visibility;
+        e.stopPropagation();
+        visibility = !visibility;
       }}
     />
     {#if isRenaming}
