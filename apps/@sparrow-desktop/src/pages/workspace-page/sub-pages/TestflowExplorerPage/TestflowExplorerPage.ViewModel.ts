@@ -560,13 +560,49 @@ export class TestflowExplorerPageViewModel {
                 request: adaptedRequest,
               });
 
-              requestChainResponse[element.data.blockName] = {
-                response: {
-                  body: JSON.parse(resData.body),
-                  headers: response?.data?.headers
-                },
-                request: adaptedRequest
-              }
+              const responseHeader = this._decodeRequest.setResponseContentType(
+                formattedHeaders,
+              );
+
+            
+                console.log(decodeData[4]);
+                const headersObject = Object.fromEntries(
+                  JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
+                );
+                
+
+                let reqBody;
+                if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
+                  try{
+                    reqBody = JSON.parse(decodeData[3]);
+                  }
+                  catch(e){
+                    reqBody = {};
+                  }
+                }
+                else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
+                  const formDataObject = Object.fromEntries(
+                    JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
+                  );
+                  reqBody = formDataObject || {}
+                }
+                else{
+                  reqBody = decodeData[3];
+                }
+                requestChainResponse[element.data.blockName] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    url: decodeData[0],
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:{}
+                  }
+                }
+           
+           
 
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
@@ -574,6 +610,7 @@ export class TestflowExplorerPageViewModel {
             return testFlowDataMap;
           });
         } catch (error) {
+          console.error(error);
           if (error?.name === "AbortError") {
             break;
           }
@@ -598,9 +635,15 @@ export class TestflowExplorerPageViewModel {
 
               requestChainResponse[element.data.blockName] = {
                 response: {
-                  body: {}
+                  body: {},
+                  headers:{}
                 },
-                request: adaptedRequest
+                request: {
+                  url: decodeData[0],
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
               }
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);

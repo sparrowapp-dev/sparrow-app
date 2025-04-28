@@ -274,12 +274,12 @@ class DecodeTestflow {
       // bodyArray.push(...this.extractKeyValue(formdata));
       bodyArray.push(...textBodyArray);
       bodyArray.push(...fileBodyArray);
-      return JSON.stringify(bodyArray);
+      return this.setDynamicExpression(JSON.stringify(bodyArray), _previousResponse) ;
     } else if (datatype === RequestDatasetEnum.URLENCODED) {
-      return this.setEnvironmentVariables(
+      return this.setDynamicExpression(this.setEnvironmentVariables(
         JSON.stringify(this.extractKeyValue(urlencoded)),
         environmentVariables,
-      );
+      ), _previousResponse) ;
     } else if (datatype === RequestDatasetEnum.NONE) {
       return "";
     }
@@ -355,7 +355,10 @@ class DecodeTestflow {
       });
       return `[[${updated}]]` 
     });
-    // debugger;
+    // if(text.includes("sdfg")){
+    //   debugger;
+
+    // }
     environmentVariables.forEach((element) => {
       const regex = new RegExp(`{{(${element.key})}}`, "g");
       updatedText = updatedText.replace(regex, element.value);
@@ -382,7 +385,17 @@ class DecodeTestflow {
             return (${expr});
           }
         `);
-        return fn(response);
+         const s = fn(response);
+         if(typeof s === "string"){
+          return s
+          .replace(/\n/g, '')    // Remove newlines (we can add this line to handle headers as well, as headers can not have new lines)
+          .replace(/\\/g, '\\\\')  // Escape backslashes
+          .replace(/\"/g, '\\\"')   // Escape double quotes
+          .replace(/\t/g, '\\t');   // Escape tabs (optional)
+        }
+        else{
+          return s;
+        }
       } catch (e) {
         console.error("Eval error:", e.message);
         return '';
@@ -405,11 +418,10 @@ class DecodeTestflow {
           }
         `);
         const s = fn(response);
-        console.log(typeof s, s);
         if(typeof s === "string"){
-          return "'"+s+"'"
+          return '"'+s+'"';
         }
-        if (typeof s === "object" && s !== null) {
+        if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
           return `${JSON.stringify(s)}`; // serialize object
         }
         return s;
