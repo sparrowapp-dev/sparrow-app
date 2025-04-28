@@ -186,11 +186,15 @@
     {/if}
 
     <div
-      class="d-flex ps-1 align-items-center justify-content-center my-auto"
+      class="d-flex align-items-center justify-content-center my-auto"
       style="height: 24px; gap:8px;  padding:4px 8px; "
     >
+      {#if tabList.length <= 0}
+        <span>
+        </span>
+      {/if}
       <Tooltip
-        title={"New"}
+        title={"Add New Request"}
         placement={"bottom-center"}
         distance={10}
         zIndex={20}
@@ -199,7 +203,7 @@
           on:click={onNewTabRequested}
           role="button"
           class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
-          style="height:26px; width:28px; background-color: transparent; border:0px;border-top-left-radius:0px; border-bottom-left-radius:0px;   "
+          style="height:26px; width:28px; background-color: transparent; border:0px;border-top-left-radius:0px; border-bottom-left-radius:0px;"
         >
           <PlusIcon
             height={"21px"}
