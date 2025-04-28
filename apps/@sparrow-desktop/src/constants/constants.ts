@@ -26,7 +26,7 @@ const constants = {
   DOCS_URL: import.meta.env.VITE_SPARROW_DOCS,
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_APP_ENVIRONMENT_PATH,
   SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_SPARROW_AI_WEBSOCKET,
-  SENTRY_DNS: import.meta.env.VITE_SENTRY_DNS,
+  SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
   APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
 };
 

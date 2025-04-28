@@ -27,7 +27,7 @@ const formatVersion = (version: string): string => {
 // // Initialize Sentry
 if (constants.APP_ENVIRONMENT !== 'LOCAL-FE') {
   Sentry.init({
-    dsn: constants.SENTRY_DNS,
+    dsn: constants.SENTRY_DSN,
     environment: constants.APP_ENVIRONMENT, // Set the environment
     release: formatVersion(version),
     beforeSend: (event) => {
