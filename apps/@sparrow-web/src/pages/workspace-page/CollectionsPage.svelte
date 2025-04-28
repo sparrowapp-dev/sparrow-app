@@ -2,7 +2,7 @@
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { userValidationStore } from "@app/store/deviceSync.store";
-
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   // ---- Store
   import {
     leftPanelWidth,
@@ -339,6 +339,19 @@
   /**
    * Handle save functionality on close confirmation popup
    */
+
+  const handlecollection_document_response = ({
+    event_name,
+  }: {
+    event_name: string;
+  }) => {
+    captureEvent("document_response", {
+      component: "CollectionsPage",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
+
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
@@ -1009,6 +1022,9 @@
       customWidth={"95px"}
       disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
       onClick={() => {
+        handlecollection_document_response({
+          event_name: "Response Doc Saved!",
+        });
         handlePopupSave();
       }}
     ></Button>
