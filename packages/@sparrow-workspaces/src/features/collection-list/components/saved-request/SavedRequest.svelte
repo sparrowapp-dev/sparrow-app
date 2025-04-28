@@ -94,6 +94,14 @@
       destination: event_name,
     });
   };
+
+  const handle_delete_response = ({ event_name }: { event_name: string }) => {
+    captureEvent("delete_response", {
+      component: "SavedRequest",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
   let newRequestName: string = "";
 
   const handleRenameInput = (event: Event) => {
@@ -173,6 +181,7 @@
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {
+        handle_delete_response({ event_name: "Delete Response" });
         deleteLoader = true;
         onItemDeleted("saved_request", {
           workspaceId: collection.workspaceId,
@@ -227,6 +236,7 @@
       },
       {
         onClick: () => {
+          handle_delete_response({ event_name: "Delete Response" });
           isDeletePopup = true;
         },
         displayText: "Delete",
