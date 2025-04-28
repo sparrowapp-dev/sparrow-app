@@ -147,7 +147,6 @@
   }
 
   const handlecollection_collection_saved = ({ name }: { name: string }) => {
-    console.log(name + "cc");
     captureEvent("collection_saved", {
       component: "CollectionExplorer",
       button_text: name,
