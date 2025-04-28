@@ -1,6 +1,7 @@
 <script lang="ts">
   import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     copyToClipBoard,
     handleDownloadResponse,
@@ -123,6 +124,14 @@
       console.error("Save dialog was canceled or no path was selected.");
     }
   };
+
+  const handle_save_response = ({ event_name }: { event_name: string }) => {
+    captureEvent("save_response", {
+      component: "ResponseBodyNavigator",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
 </script>
 
 <div
@@ -239,7 +248,10 @@
           <!-- Save button -->
           <Button
             startIcon={SaveRegular}
-            onClick={onSaveResponse}
+            onClick={() => {
+              onSaveResponse();
+              handle_save_response({ event_name: "Save Response" });
+            }}
             disable={false}
             loader={false}
             size={"small"}
