@@ -93,14 +93,28 @@
         />
       {/if}
     {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
-      <FormData
-        keyValue={body.formdata}
-        {onUpdateRequestBody}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        formData={body.formdata}
-        {isWebApp}
-      />
+      {#if isMergeViewEnabled && mergeViewRequestDatasetType === RequestDatasetEnum.FORMDATA}
+        <FormData
+          keyValue={body.formdata}
+          {onUpdateRequestBody}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          formData={body.formdata}
+          {isWebApp}
+          bind:isMergeViewEnabled
+          bind:isMergeViewLoading
+          bind:newModifiedContent
+        />
+      {:else}
+        <FormData
+          keyValue={body.formdata}
+          {onUpdateRequestBody}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          formData={body.formdata}
+          {isWebApp}
+        />
+      {/if}
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
     {/if}

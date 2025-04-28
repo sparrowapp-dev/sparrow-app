@@ -364,8 +364,9 @@
       newModifiedContent = newContent;
     } else if (requestDatasetType === RequestDatasetEnum.URLENCODED) {
       newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
-    } else if (requestDatasetType === RequestDatasetEnum.FORMDATA) return;
-    else if (requestDatasetType === RequestDatasetEnum.BINARY) return;
+    } else if (requestDatasetType === RequestDatasetEnum.FORMDATA) {
+      newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
+    } else if (requestDatasetType === RequestDatasetEnum.BINARY) return;
     else return;
 
     mergeViewRequestDatasetType = requestDatasetType;
@@ -379,7 +380,8 @@
     requestBodyType: RequestDatasetEnum,
     modifiedContent,
   ) => {
-    // target = "Parameters";
+    target = "Parameters";
+    // target = "Headers";
     // console.log("target : >> ", target);
     // console.log("language : >> ", language);
     // console.log("requestBodyType : >> ", requestBodyType);
@@ -389,6 +391,7 @@
         case RequestSectionEnum.REQUEST_BODY: {
           console.log(`Changing ${target} :> `);
           // requestBodyType = "URL Encoded" as RequestDatasetEnum;
+          // requestBodyType = "Form Data" as RequestDatasetEnum;
           enabledMergeViewForReqBody(
             modifiedContent,
             requestBodyType,
