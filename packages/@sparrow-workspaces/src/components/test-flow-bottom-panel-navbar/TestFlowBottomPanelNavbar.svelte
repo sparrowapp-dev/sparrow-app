@@ -1,5 +1,5 @@
 <script>
-  import { ArrowOutwardIcon } from "@sparrow/library/icons";
+  import { ArrowOutwardIcon, MathFormulaRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
@@ -21,6 +21,7 @@
   export let onUpdateEnvironment;
   export let handleClickTestButton;
   export let isTestFlowRuning = false;
+  export let handleOpenCurrentDynamicExpression;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -76,6 +77,22 @@
       {onUpdateEnvironment}
       {userRole}
       {environmentVariables}
+      handleOpenCurrentDynamicExpression={(obj) => {
+        handleOpenCurrentDynamicExpression({
+          ...obj,
+          type: "url",
+        });
+      }}
+    />
+    <Button
+      size="extra-small"
+      type="teritiary-regular"
+      startIcon={MathFormulaRegular}
+      onClick={() => {
+        handleOpenCurrentDynamicExpression({
+          type: "url",
+        });
+      }}
     />
   </div>
 

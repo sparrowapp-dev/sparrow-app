@@ -15,6 +15,8 @@
     updateIsCurrentExpression,
   } from "../../store";
 
+  export let handleOpenCurrentDynamicExpression;
+
   export let requestUrl;
   export let selectedBlock;
   export let params;
@@ -211,36 +213,6 @@
     isDynamicExpressionContent.set(updatedItems);
   };
 
-  const handleOpenCurrentDynamicExpression = (
-    key: string,
-    index: number,
-    id: string,
-  ) => {
-    const itemIndex = $isDynamicExpressionContent.findIndex(
-      (item) =>
-        item?.id === id &&
-        item?.blockName === selectedBlock?.data?.blockName &&
-        item?.requestType === "queryParams" &&
-        item?.method === "request" &&
-        item?.key === key &&
-        item?.index === index,
-    );
-    if (itemIndex !== -1) {
-      const updatedItem = {
-        ...$isDynamicExpressionContent[itemIndex],
-        isCurrentOpen: true,
-      };
-
-      // Create a new array with the updated item
-      $isDynamicExpressionContent = [
-        ...$isDynamicExpressionContent.slice(0, itemIndex),
-        updatedItem,
-        ...$isDynamicExpressionContent.slice(itemIndex + 1),
-      ];
-    }
-    $isDynamicExpressionModalOpen = true;
-  };
-
   let DynamicExpressionParams;
 
   const getDEByKeyAndValue = (
@@ -327,12 +299,8 @@
     onUpdateEnvironment={() => {}}
     {environmentVariables}
     dynamicExpression={true}
-    {getDEByKeyAndValue}
-    blockName={selectedBlock?.data?.blockName}
-    {handleDynamicExpression}
-    {handleRemoveDynamicExpression}
-    {handleOpenCurrentDynamicExpression}
-    {handleDynamicNewExpression}
-    {handleRemoveDynamicExpressionKey}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "parameters" });
+    }}
   />
 </section>

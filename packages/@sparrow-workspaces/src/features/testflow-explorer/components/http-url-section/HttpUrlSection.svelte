@@ -7,6 +7,7 @@
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let userRole;
+  export let handleOpenCurrentDynamicExpression;
 
   const theme = new UrlInputTheme().build();
 </script>
@@ -24,6 +25,7 @@
         codeId={"url"}
         class={"testflow-input-url"}
         {userRole}
+        handleOpenDE={handleOpenCurrentDynamicExpression}
         isFocusedOnMount={false}
       />
     </div>

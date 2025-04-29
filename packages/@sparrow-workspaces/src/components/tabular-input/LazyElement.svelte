@@ -29,28 +29,7 @@
     index: number,
     id: string,
   ) => void;
-  export let handleOpenCurrentDynamicExpression: (
-    key: string,
-    index: number,
-    id: string,
-  ) => void;
-  export let handleDynamicExpression:
-    | ((key: string, index: number, id?: string) => void)
-    | undefined = undefined;
-
-  export let getDEByKeyAndValue: (
-    key: string,
-    value: string,
-    index: number,
-    blockName: string,
-  ) => void | undefined;
-
-  export let handleDynamicNewExpression: (key: string, index: number) => void;
-  export let handleRemoveDynamicExpressionKey: (
-    key: string,
-    index: number,
-  ) => void;
-  export let blockName: string;
+  export let handleOpenCurrentDynamicExpression;
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -65,29 +44,13 @@
     scrollDirection = detail?.scrollDirection?.vertical;
   };
 
-  let handleOpenDE = (id: string) => {
-    handleOpenCurrentDynamicExpression(element.key, index, id);
+  let handleOpenDE = (obj: any) => {
+    handleOpenCurrentDynamicExpression(obj);
   };
 
   let removeDynamicExpression = (id: string) => {
     handleRemoveDynamicExpression(element.key, index, id);
   };
-
-  let dynamicExpressionItems = getDEByKeyAndValue(
-    element?.key || "",
-    element?.value || "",
-    index,
-    blockName,
-  );
-
-  isDynamicExpressionModalOpen.subscribe(() => {
-    dynamicExpressionItems = getDEByKeyAndValue(
-      element?.key || "",
-      element?.value || "",
-      index,
-      blockName,
-    );
-  });
 </script>
 
 <div
@@ -150,9 +113,15 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-          {handleOpenDE}
-          {dynamicExpressionItems}
-          {removeDynamicExpression}
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              destination: {
+                row: "value",
+                index: index,
+              },
+            });
+          }}
         />
       </div>
     </div>
@@ -171,8 +140,12 @@
                 type="teritiary-regular"
                 startIcon={MathFormulaRegular}
                 onClick={() => {
-                  isDynamicExpressionModalOpen.set(true);
-                  handleDynamicNewExpression(element?.key, index);
+                  handleOpenCurrentDynamicExpression({
+                    destination: {
+                      row: "value",
+                      index: index,
+                    },
+                  });
                 }}
               />
             </div>
@@ -186,7 +159,6 @@
               startIcon={DeleteRegular}
               onClick={() => {
                 deleteParam(index);
-                handleRemoveDynamicExpressionKey(element.key, index);
               }}
             />
           </div>

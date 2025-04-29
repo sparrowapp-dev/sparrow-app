@@ -1,22 +1,20 @@
 <script lang="ts">
   import { writable } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
-  import Editor from "../../../../../../@sparrow-library/src/forms/editor/Editor.svelte";
+  import { Editor } from "@sparrow/library/forms";
   import { selectedRequestTypes } from "../../../testflow-explorer/store";
 
   export let expression = "";
+  console.log(expression);
   export let handleExpressionChange: (value: string) => void;
   export let handleAddingNested: (value: string) => void;
-  export let selectedRequest: any;
   export let selectedApiRequestType: string;
-  export let environmentVariables: any;
-  export let onUpdateEnvironment: any;
 
   let data: any = {};
   let topLevelKeys: any[] = [];
 
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
-    handleExpressionChange(e.detail);
+    expression = e.detail;
   };
 
   export const customSuggestions = writable<any[]>([]);
@@ -70,13 +68,11 @@
 
   <div class="expression-textarea-editor">
     <Editor
-      lang={"Text"}
+      lang={"text"}
       placeholder={"Select API data, functions, or variables from the panel."}
       bind:value={expression}
       on:change={handleCodeMirrorChange}
       isEditable={true}
-      customSuggestions={true}
-      suggestions={$customSuggestions}
     />
   </div>
 
