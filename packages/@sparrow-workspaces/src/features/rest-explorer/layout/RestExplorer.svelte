@@ -367,8 +367,8 @@
         default:
           break;
       }
-    } catch (error) {
-      console.log("Error which inserting AI suggestions: ", error);
+    } catch (err) {
+      console.log("Error which inserting AI suggestions: ", err);
     }
   };
 
