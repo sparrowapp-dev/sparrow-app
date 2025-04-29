@@ -645,7 +645,7 @@
         <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
-            title="Welcome to Test Flow!"
+            title="Welcome to Test Flow"
             pulsePosition={{ top: "-58px", left: "14px" }}
             description={`Let's begin by creating your first flow. Click the '+ Add' button to get started`}
             tipPosition="top-left"
