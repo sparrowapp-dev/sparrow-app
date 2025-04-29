@@ -112,7 +112,7 @@
     class="response-container d-flex align-items-center pb-1 px-0 justify-content-between w-100 z-1 position-sticky"
     style="top:55.4px;  margin-top: -1px;"
   >
-    <div class="d-flex gap-3 align-items-center justify-content-center">
+    <div class="d-flex gap-1 align-items-center justify-content-center">
       <div class="d-flex align-items-center rounded mb-0 py-1">
         <span
           role="button"
@@ -121,7 +121,7 @@
               responseBodyFormatter: ResponseFormatter.PRETTY,
             });
           }}
-          class="rounded text-fs-12 border-radius-2 px-3 me-3 py-1 btn-formatter {apiState.responseBodyFormatter ===
+          class="rounded text-fs-12 border-radius-2 px-3 me-1 py-1 btn-formatter {apiState.responseBodyFormatter ===
           ResponseFormatter.PRETTY
             ? 'bg-tertiary-500 text-secondary-100'
             : ''}"
