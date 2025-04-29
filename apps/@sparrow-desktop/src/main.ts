@@ -7,27 +7,13 @@ import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import { version } from "../src-tauri/tauri.conf.json";
 
-// Format version function
-const formatVersion = (version: string): string => {
-  try {
-    const parts = version.split(".");
-    const major = parts[0];
-    const minor = parts[1];
-    const patch = parts[2];
-
-    return patch === "0" ? `${major}.${minor}` : `${major}.${minor}.${patch}`;
-  } catch (error) {
-    return version;
-  }
-};
-
 
 // // Initialize Sentry
 if (constants.APP_ENVIRONMENT !== 'LOCAL-FE') {
   Sentry.init({
     dsn: constants.SENTRY_DSN,
     environment: constants.APP_ENVIRONMENT, // Set the environment
-    release: formatVersion(version),
+    release: version,
     beforeSend: (event) => {
       return event;
     },
