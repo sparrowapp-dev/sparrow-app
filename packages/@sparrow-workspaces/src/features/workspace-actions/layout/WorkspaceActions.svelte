@@ -649,6 +649,7 @@
             pulsePosition={{ top: "-58px", left: "14px" }}
             description={`Let's begin by creating your first flow. Click the '+ Add' button to get started`}
             tipPosition="top-left"
+            stepCount="1/7"
             onNext={() => {
               currentStep.set(2);
               addButtonMenu = true;
@@ -672,6 +673,7 @@
             title="Add Your Flow"
             description={`Click 'Add Test Flow' to instantly create a new flow. It's that simple--your workspace is ready!`}
             tipPosition="left-top"
+            stepCount="2/7"
             pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
             onNext={() => {
               currentStep.set(3);

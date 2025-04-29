@@ -7,6 +7,7 @@
   export let pulsePosition = { top: "0px", left: "0px" };
   export let targetId;
   export let title = "";
+  export let stepCount = "";
   export let description = "";
   export let tipPosition = "top-left";
   export let onNext;
@@ -59,40 +60,48 @@
 <!-- Popup positioned based on the target element -->
 <div class="popup p-4" style="top: {top}px; left: {left}px;">
   {#if isPuleCircleRequired}
-    <PulseCircle {pulsePosition} />
+    <!-- <PulseCircle {pulsePosition} /> -->
   {/if}
 
   <div class="tip {tipPosition}"></div>
 
   <!-- Title and content -->
-  <h2
-    class="text-fs-16"
-    style="font-weight: 500; color:var(--text-primary-300);"
-  >
+  <h2 class="text-fs-16" style="font-weight: 500; color:#ffff;">
     {title}
   </h2>
   <p
     class="text-fs-13"
-    style="line-height: 19.5px; font-weight:400; color:var(--text-secondary-100);"
+    style="line-height: 19.5px; font-weight: 300; color: #e5e5e5"
   >
     {@html description}
   </p>
 
-  <!-- Next/Done button -->
-  <div class="d-flex justify-content-end gap-2">
-    <Button
-      type="outline-secondary"
-      size="small"
-      title="Dismiss"
-      onClick={handleClose}
-    />
+  <!-- Step and Buttons Row -->
+  <div class="d-flex justify-content-between align-items-center">
+    <!-- Step Count -->
+    <p
+      class="mb-0 text-fs-13"
+      style="line-height: 19.5px; font-weight: 400; color: #9B9DA1;"
+    >
+      {stepCount}
+      <!-- Example: "1/7" -->
+    </p>
 
-    <Button
-      type="primary"
-      size="small"
-      title={isLastStep ? "Done" : "Next"}
-      onClick={handleNext}
-    />
+    <!-- Buttons -->
+    <div class="d-flex gap-2">
+      <Button
+        type="outline-secondary"
+        size="small"
+        title="Dismiss"
+        onClick={handleClose}
+      />
+      <Button
+        type="primary"
+        size="small"
+        title={isLastStep ? "Done" : "Next"}
+        onClick={handleNext}
+      />
+    </div>
   </div>
 </div>
 
