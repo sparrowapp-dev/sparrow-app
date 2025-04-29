@@ -37,6 +37,7 @@
   export let isWebApp = false;
   export let runSingleNode;
   export let testflowStore;
+  export let handleOpenCurrentDynamicExpression;
 
   let responseLoader = false;
   let height = 300;
@@ -243,6 +244,7 @@
       {userRole}
       {onUpdateEnvironment}
       {handleClickTestButton}
+      {handleOpenCurrentDynamicExpression}
       isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
   </div>
@@ -275,6 +277,7 @@
               {selectedBlock}
               onUpdateRequestState={handleUpdateRequestData}
               {environmentVariables}
+              {handleOpenCurrentDynamicExpression}
             />
           {:else if requestNavigation === RequestSectionEnum.REQUEST_BODY}
             <RequestBodyTestFlow
@@ -292,6 +295,7 @@
               authHeader={{}}
               {environmentVariables}
               onHeadersChange={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
               {selectedBlock}
               isBulkEditActive={false}
             />

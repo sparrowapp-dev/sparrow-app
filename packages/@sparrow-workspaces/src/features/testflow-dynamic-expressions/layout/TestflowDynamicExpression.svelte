@@ -10,7 +10,10 @@
 
   export let requestApis: any;
   export let environmentVariables: any;
-  export let expression: string;
+  export let dynamicExpressionEditorContent;
+  export let onInsertExpression;
+  let expression = dynamicExpressionEditorContent;
+  console.log(expression);
   export let selectedApiRequestType: string;
   export let selectedRequest: any;
   export let handleSetDynamicExpression: () => void;
@@ -27,6 +30,7 @@
     label: string,
     blockName: string,
   ) => void;
+  export let onPreviewExpression;
 
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
@@ -71,19 +75,20 @@
   $: currentOpenItem = $isDynamicExpressionContent.find(
     (item) => item.isCurrentOpen,
   );
-  $: expression = currentOpenItem?.value || "";
+  // $: expression = currentOpenItem?.value || "";
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px;">
   <div class="w-50">
     <ExpressionEditor
-      {expression}
+      bind:expression
       {handleAddingNested}
       {selectedRequest}
       {handleExpressionChange}
       {onUpdateEnvironment}
       {selectedApiRequestType}
       {environmentVariables}
+      {onPreviewExpression}
     />
   </div>
   <div class="w-50">
@@ -133,7 +138,9 @@
       title="Insert Dynamic Content"
       type="primary"
       size="medium"
-      onClick={handleSetDynamicExpression}
+      onClick={() => {
+        onInsertExpression(expression);
+      }}
     />
   </div>
 </div>

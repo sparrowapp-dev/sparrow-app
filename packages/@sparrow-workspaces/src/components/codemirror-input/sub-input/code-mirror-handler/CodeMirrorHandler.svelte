@@ -68,9 +68,7 @@
   export let id;
   export let componentClass;
   export let isFocusedOnMount = false;
-  export let handleOpenDE: (id: string) => void;
-  export let removeDynamicExpression: (id: string) => void | undefined;
-  export let dynamicExpressionItems: any | undefined;
+  export let handleOpenDE;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -142,7 +140,7 @@
       readonly name: string,
       readonly from: number,
       readonly to: number,
-      readonly id: string,
+      // readonly id: string,
     ) {
       super();
     }
@@ -162,7 +160,7 @@
         e.stopPropagation();
         view.dispatch({ changes: { from: this.from, to: this.to } });
 
-        removeDynamicExpression(this.id);
+        // removeDynamicExpression(this.id);
       };
 
       container.appendChild(text);
@@ -170,7 +168,10 @@
 
       container.onclick = (e) => {
         e.stopPropagation();
-        handleOpenDE(this.id);
+        const content = view.state.doc.sliceString(this.from, this.to);
+        handleOpenDE({
+          source: { from: this.from, to: this.to, content },
+        });
       };
 
       return container;
@@ -186,23 +187,18 @@
    * Create regex matching pattern for the expression.
    * @example [[expression]]
    */
+
+  //  regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
+  //   decoration: (match) =>
+  //     Decoration.replace({
   const expressionMatcher = new MatchDecorator({
-    regexp: /\[\[([^\]]+)\]\]/g,
+    regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
     decoration: (match) => {
-      const name = match[1];
-
-      // Pick ID sequentially based on currentIndex
-      const dynamicItem = dynamicExpressionItems[currentIndex];
-      const id = dynamicItem?.id || "";
-
-      currentIndex++;
-
       return Decoration.replace({
         widget: new ExpressionWidget(
-          name,
+          match[1],
           match.index,
           match.index + match[0].length,
-          id,
         ),
         inclusive: false,
       });

@@ -206,35 +206,7 @@
     isDynamicExpressionContent.set(updatedItems);
   };
 
-  const handleOpenCurrentDynamicExpression = (
-    key: string,
-    index: number,
-    id: string,
-  ) => {
-    const itemIndex = $isDynamicExpressionContent.findIndex(
-      (item) =>
-        item?.id === id &&
-        item?.blockName === selectedBlock?.data?.blockName &&
-        item?.requestType === "headers" &&
-        item?.method === "request" &&
-        item?.key === key &&
-        item?.index === index,
-    );
-    if (itemIndex !== -1) {
-      const updatedItem = {
-        ...$isDynamicExpressionContent[itemIndex],
-        isCurrentOpen: true,
-      };
-
-      // Create a new array with the updated item
-      $isDynamicExpressionContent = [
-        ...$isDynamicExpressionContent.slice(0, itemIndex),
-        updatedItem,
-        ...$isDynamicExpressionContent.slice(itemIndex + 1),
-      ];
-    }
-    $isDynamicExpressionModalOpen = true;
-  };
+  export let handleOpenCurrentDynamicExpression;
 
   let DynamicExpressionParams;
 
@@ -299,11 +271,9 @@
     dynamicExpression={true}
     {getDEByKeyAndValue}
     blockName={selectedBlock?.data?.blockName}
-    {handleDynamicExpression}
-    {handleOpenCurrentDynamicExpression}
-    {handleRemoveDynamicExpression}
-    {handleDynamicNewExpression}
-    {handleRemoveDynamicExpressionKey}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "headers" });
+    }}
   />
   <div>
     {#if !isBulkEditActive}

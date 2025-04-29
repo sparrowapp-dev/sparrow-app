@@ -80,15 +80,17 @@
   } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
   import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
- import { HttpRequestAuthTypeBaseEnum, HttpRequestContentTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+  import {
+    HttpRequestAuthTypeBaseEnum,
+    HttpRequestContentTypeBaseEnum,
+  } from "@sparrow/common/types/workspace/http-request-base";
   import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
-  import { isDynamicExpressionModalOpen } from "../store/testflow";
+  // import { isDynamicExpressionModalOpen } from "../store/testflow";
   import { selectedRequestTypes } from "../store/testflow";
   import {
     isDynamicExpressionContent,
     updateDynamicExpressionValue,
   } from "../store/testflow";
-
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -115,6 +117,7 @@
   export let userRole;
   export let onUpdateEnvironment;
   export let runSingleNode;
+  export let onPreviewExpression;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -369,6 +372,107 @@
       }
     }
     return response;
+  };
+
+  let dynamicExpressionEditorContent = "";
+  let dynamicExpressionModal = {};
+  let handleOpenCurrentDynamicExpression = (obj) => {
+    dynamicExpressionModal = {};
+    dynamicExpressionModal = obj;
+    dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
+    isDynamicExpressionModalOpen = true;
+  };
+
+  $: console.log(selectedNodeId, "selectedNodeId");
+
+  const onInsertExpression = (newExpression) => {
+    nodes.update((_nodes) => {
+      const dbNodes = _nodes;
+      for (let index = 0; index < dbNodes.length; index++) {
+        if (dbNodes[index].id === selectedNodeId) {
+          if (dynamicExpressionModal.type === "url") {
+            //
+            // URL
+            //
+            const requestUrl = dbNodes[index].data.requestData.url;
+            let output = "";
+            if (dynamicExpressionModal?.source) {
+              output =
+                requestUrl.slice(0, dynamicExpressionModal.source.from) +
+                "[*$[" +
+                newExpression +
+                "]$*]" +
+                requestUrl.slice(dynamicExpressionModal.source.to);
+            } else {
+              output = requestUrl + "[*$[" + newExpression + "]$*]";
+            }
+            dbNodes[index].data.requestData.url = output;
+          } else if (dynamicExpressionModal.type === "headers") {
+            //
+            // Headers
+            //
+            const requestHeaders = dbNodes[index].data.requestData.headers;
+            for (let i = 0; i < requestHeaders.length; i++) {
+              if (dynamicExpressionModal.destination.index === i) {
+                if (dynamicExpressionModal.destination.row === "value") {
+                  let output = "";
+                  if (dynamicExpressionModal?.source) {
+                    output =
+                      requestHeaders[i].value.slice(
+                        0,
+                        dynamicExpressionModal.source.from,
+                      ) +
+                      "[*$[" +
+                      newExpression +
+                      "]$*]" +
+                      requestHeaders[i].value.slice(
+                        dynamicExpressionModal.source.to,
+                      );
+                  } else {
+                    output =
+                      requestHeaders[i].value + "[*$[" + newExpression + "]$*]";
+                  }
+                  requestHeaders[i].value = output;
+                  dbNodes[index].data.requestData.headers = requestHeaders;
+                }
+              }
+            }
+          } else if (dynamicExpressionModal.type === "parameters") {
+            //
+            // Parameters
+            //
+            const requestParams = dbNodes[index].data.requestData.queryParams;
+            for (let i = 0; i < requestParams.length; i++) {
+              if (dynamicExpressionModal.destination.index === i) {
+                if (dynamicExpressionModal.destination.row === "value") {
+                  let output = "";
+                  if (dynamicExpressionModal?.source) {
+                    output =
+                      requestParams[i].value.slice(
+                        0,
+                        dynamicExpressionModal.source.from,
+                      ) +
+                      "[*$[" +
+                      newExpression +
+                      "]$*]" +
+                      requestParams[i].value.slice(
+                        dynamicExpressionModal.source.to,
+                      );
+                  } else {
+                    output =
+                      requestParams[i].value + "[*$[" + newExpression + "]$*]";
+                  }
+                  requestParams[i].value = output;
+                  dbNodes[index].data.requestData.queryParams = requestParams;
+                }
+              }
+            }
+          }
+        }
+      }
+      return dbNodes;
+    });
+    isDynamicExpressionModalOpen = false;
   };
 
   /**
@@ -1219,7 +1323,7 @@
         expression,
       );
       expression = "";
-      isDynamicExpressionModalOpen.set(false);
+      // isDynamicExpressionModalOpen.set(false);
     }
   };
 
@@ -1236,21 +1340,15 @@
     }
   }
 
-  const setIsCurrentOpenFalse = () => {
-    isDynamicExpressionContent.update((items) =>
-      items.map((item) =>
-        item.isCurrentOpen ? { ...item, isCurrentOpen: false } : item,
-      ),
-    );
-  };
+  // const setIsCurrentOpenFalse = () => {
+  //   isDynamicExpressionContent.update((items) =>
+  //     items.map((item) =>
+  //       item.isCurrentOpen ? { ...item, isCurrentOpen: false } : item,
+  //     ),
+  //   );
+  // };
 
-  $: {
-    if ($isDynamicExpressionModalOpen === false) {
-      setTimeout(() => {
-        setIsCurrentOpenFalse();
-      }, 500);
-    }
-  }
+  let isDynamicExpressionModalOpen = false;
 </script>
 
 <div
@@ -1443,6 +1541,7 @@
         {onUpdateEnvironment}
         {runSingleNode}
         {testflowStore}
+        {handleOpenCurrentDynamicExpression}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -1530,13 +1629,13 @@
   type={"dark"}
   width={"851px"}
   zIndex={1000}
-  isOpen={$isDynamicExpressionModalOpen}
+  isOpen={isDynamicExpressionModalOpen}
   handleModalState={() => {
-    isDynamicExpressionModalOpen.set(false);
+    isDynamicExpressionModalOpen = false;
   }}
 >
   <TestflowDynamicExpression
-    {expression}
+    {dynamicExpressionEditorContent}
     requestApis={$nodes}
     selectedRequest={selectedAPI}
     {handleSelectApi}
@@ -1549,7 +1648,9 @@
     {handleAddingNested}
     {handleFunctionType}
     {handleExpressionChange}
+    {onPreviewExpression}
     {handleSetDynamicExpression}
+    {onInsertExpression}
   />
 </Modal>
 

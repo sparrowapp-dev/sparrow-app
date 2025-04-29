@@ -29,11 +29,7 @@
     index: number,
     id: string,
   ) => void;
-  export let handleOpenCurrentDynamicExpression: (
-    key: string,
-    index: number,
-    id: string,
-  ) => void;
+  export let handleOpenCurrentDynamicExpression;
   export let getDEByKeyAndValue: (
     key: string,
     value: string,
