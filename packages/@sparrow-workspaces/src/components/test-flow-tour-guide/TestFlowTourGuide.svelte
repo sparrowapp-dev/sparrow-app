@@ -89,12 +89,15 @@
 
     <!-- Buttons -->
     <div class="d-flex gap-2">
-      <Button
-        type="outline-secondary"
-        size="small"
-        title="Dismiss"
-        onClick={handleClose}
-      />
+      {#if !isLastStep}
+        <Button
+          type="outline-secondary"
+          size="small"
+          title="Dismiss"
+          disable={isLastStep ? true : false}
+          onClick={handleClose}
+        />
+      {/if}
       <Button
         type="primary"
         size="small"
