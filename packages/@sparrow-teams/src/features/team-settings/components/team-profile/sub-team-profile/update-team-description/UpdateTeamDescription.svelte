@@ -51,13 +51,18 @@
   textStyleProp={"font-size: var(--base-text)"}
   type={"primary"}
   loader={false}
-  onClick={() => {
-    toasts.success("Team updated successfully!");
-    onUpdateTeam([
-      TeamPropertyEnum.NAME,
-      TeamPropertyEnum.DESCRIPTION,
-      TeamPropertyEnum.IMAGE,
-    ]);
+  onClick={async () => {
+    try {
+      await onUpdateTeam([
+        TeamPropertyEnum.NAME,
+        TeamPropertyEnum.DESCRIPTION,
+        TeamPropertyEnum.IMAGE,
+      ]);
+      toasts.success("Team updated successfully!");
+    } catch (error) {
+      toasts.error("Failed to update team.");
+      console.error(error);
+    }
   }}
 />
 
