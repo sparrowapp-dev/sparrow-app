@@ -31,8 +31,6 @@
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
 
-  $: console.log(handleFunctionType);
-
   let tabs: {
     name: string;
     id: TFDynamicExpressionTabsEnum;

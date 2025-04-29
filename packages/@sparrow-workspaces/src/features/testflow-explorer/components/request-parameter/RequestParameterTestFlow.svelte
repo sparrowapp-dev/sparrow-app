@@ -216,7 +216,6 @@
     index: number,
     id: string,
   ) => {
-    console.log("The value we are getting ------------------>", key, index, id);
     const itemIndex = $isDynamicExpressionContent.findIndex(
       (item) =>
         item?.id === id &&
@@ -238,8 +237,6 @@
         updatedItem,
         ...$isDynamicExpressionContent.slice(itemIndex + 1),
       ];
-
-      console.log("Updated item:", updatedItem);
     }
     $isDynamicExpressionModalOpen = true;
   };
@@ -313,12 +310,6 @@
   isDynamicExpressionContent.subscribe(() => {
     setInitialParams();
   });
-
-  $: console.log(
-    "the values we are setting in the parameters.",
-    $isDynamicExpressionContent,
-    params,
-  );
 </script>
 
 <section class="w-100" style="">
