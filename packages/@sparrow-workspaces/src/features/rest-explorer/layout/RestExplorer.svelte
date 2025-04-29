@@ -559,6 +559,7 @@
                               />
 
                               <div class="d-flex">
+                                <!-- AI debugging trigger button -->
                                 <Button
                                   title="Help me debug"
                                   type={"secondary"}
