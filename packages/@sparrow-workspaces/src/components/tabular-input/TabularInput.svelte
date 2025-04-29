@@ -38,12 +38,14 @@
     key: string,
     value: string,
     index: number,
+    blockName: string,
   ) => void | undefined;
   export let handleDynamicNewExpression: (key: string, index: number) => void;
   export let handleRemoveDynamicExpressionKey: (
     key: string,
     index: number,
   ) => void;
+  export let blockName: string;
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
@@ -355,6 +357,7 @@
             isCheckBoxEditable={false}
             {dynamicExpression}
             {getDEByKeyAndValue}
+            {blockName}
             {handleDynamicExpression}
             {handleRemoveDynamicExpression}
             {handleOpenCurrentDynamicExpression}
@@ -377,6 +380,7 @@
             {isCheckBoxEditable}
             {dynamicExpression}
             {getDEByKeyAndValue}
+            {blockName}
             {handleDynamicExpression}
             {handleRemoveDynamicExpression}
             {handleOpenCurrentDynamicExpression}

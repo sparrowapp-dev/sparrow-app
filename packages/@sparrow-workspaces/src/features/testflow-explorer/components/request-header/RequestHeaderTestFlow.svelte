@@ -249,12 +249,13 @@
     key: string,
     value: string,
     index: number,
+    blockName: string,
   ): any => {
     const data = $isDynamicExpressionContent?.filter(
       (item: any) =>
-        item?.requestType === "queryParams" &&
+        item?.requestType === "headers" &&
         item?.method === "request" &&
-        item?.blockName === "Block 1" &&
+        item?.blockName === blockName &&
         item?.key === key &&
         item?.index === index,
     );
@@ -285,6 +286,7 @@
     onUpdateEnvironment={() => {}}
     dynamicExpression={true}
     {getDEByKeyAndValue}
+    blockName={selectedBlock?.data?.blockName}
     {handleDynamicExpression}
     {handleOpenCurrentDynamicExpression}
     {handleRemoveDynamicExpression}

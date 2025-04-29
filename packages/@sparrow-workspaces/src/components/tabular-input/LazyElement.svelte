@@ -42,6 +42,7 @@
     key: string,
     value: string,
     index: number,
+    blockName: string,
   ) => void | undefined;
 
   export let handleDynamicNewExpression: (key: string, index: number) => void;
@@ -49,6 +50,7 @@
     key: string,
     index: number,
   ) => void;
+  export let blockName: string;
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -76,6 +78,7 @@
     element?.key || "",
     element?.value || "",
     index,
+    blockName,
   );
 
   isDynamicExpressionModalOpen.subscribe(() => {
@@ -83,6 +86,7 @@
       element?.key || "",
       element?.value || "",
       index,
+      blockName,
     );
   });
 </script>
