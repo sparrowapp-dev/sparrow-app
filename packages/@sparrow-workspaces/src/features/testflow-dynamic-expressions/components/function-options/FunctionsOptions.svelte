@@ -22,8 +22,7 @@
       <div
         class="function-item d-flex flex-row justify-content-between align-items-center"
         on:click={() => {
-          console.log("----------inside the functions", item),
-            handleFunctionType(item.type, item);
+          handleFunctionType(item.type, item);
         }}
       >
         <div class="d-flex justify-content-start flex-column">

@@ -66,7 +66,6 @@
   };
 
   let handleOpenDE = (id: string) => {
-    console.log("this is where we are calling the DE", id, index, element.key);
     handleOpenCurrentDynamicExpression(element.key, index, id);
   };
 
