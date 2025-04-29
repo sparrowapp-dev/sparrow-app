@@ -54,6 +54,15 @@
       );
     });
 
+    for (const param of pairs) {
+      const cleanedValue = param.value
+        .replace(/\[\[.*?\]\]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      param.value = cleanedValue;
+    }
+
     // Iterate over the filtered dynamic expressions and update values
     for (const dynamicParam of keyWithValues) {
       if (dynamicParam.key.trim() !== "" && dynamicParam.value.trim() !== "") {
@@ -63,17 +72,22 @@
 
         if (existingParam) {
           // Step 1: Remove any existing [[...]] parts from the value
-          const cleanedValue = existingParam.value
+          const baseValue = existingParam.value
             .replace(/\[\[.*?\]\]/g, "")
             .trim();
 
-          // Step 2: Add the new dynamic value wrapped in [[...]]
-          const newDynamicValue = `[[${dynamicParam.value}]]`;
+          // Step 2: Prepare the new dynamic value wrapped in [[...]]
+          const newDynamicValue = `[[${dynamicParam.value.trim()}]]`;
 
-          // Step 3: Update the existingParam's value with the cleaned value + new dynamic value
-          existingParam.value = cleanedValue
-            ? `${cleanedValue} ${newDynamicValue}`
-            : newDynamicValue;
+          // Step 3: Check if value already includes this dynamic value to avoid duplicates
+          const alreadyHas = existingParam.value.includes(newDynamicValue);
+
+          // Step 4: Append if not already present
+          if (!alreadyHas) {
+            existingParam.value = baseValue
+              ? `${baseValue} ${newDynamicValue}`
+              : newDynamicValue;
+          }
         }
       }
     }
@@ -218,8 +232,6 @@
         updatedItem,
         ...$isDynamicExpressionContent.slice(itemIndex + 1),
       ];
-
-      console.log("Updated item:", updatedItem);
     }
     $isDynamicExpressionModalOpen = true;
   };

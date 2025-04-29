@@ -200,11 +200,6 @@
       const dynamicItem = dynamicExpressionItems[currentIndex];
       const id = dynamicItem?.id || "";
 
-      console.log(
-        "the maing values we are getting ---------------->",
-        id,
-        dynamicExpressionItems,
-      );
       currentIndex++;
 
       return Decoration.replace({
