@@ -301,6 +301,57 @@ async fn close_oauth_window(handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
+fn get_policy_config() -> Result<PolicyConfig, String> {
+    // For Windows
+    #[cfg(target_os = "windows")]
+    {
+        use winreg::enums::*;
+        use winreg::RegKey;
+
+        // Path to your app's policy in the registry
+        // Typically under HKLM\Software\Policies\YourCompany\YourApp
+        let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+        let policy_path = "Software\\Policies\\Sparrow";
+
+        // Try to open the key
+        match hklm.open_subkey(policy_path) {
+            Ok(key) => {
+                // Read specific policy value (e.g., "DisableSignIn")
+                let disable_sign_in: u32 = key.get_value("DisableSignIn").unwrap_or(0);
+
+                Ok(PolicyConfig {
+                    disable_sign_in: disable_sign_in == 1,
+                    // Add other policy settings as needed
+                })
+            }
+            Err(_) => {
+                // If key doesn't exist, return default values
+                Ok(PolicyConfig {
+                    disable_sign_in: false,
+                    // Add other default policy settings
+                })
+            }
+        }
+    }
+
+    // For non-Windows platforms, return default values
+    #[cfg(not(target_os = "windows"))]
+    {
+        Ok(PolicyConfig {
+            disable_sign_in: false,
+            // Add other default policy settings
+        })
+    }
+}
+
+// Define your policy configuration struct
+#[derive(serde::Serialize)]
+struct PolicyConfig {
+    disable_sign_in: bool,
+    // Add other policy settings as needed
+}
+
+#[tauri::command]
 async fn make_http_request(
     url: &str,
     method: &str,
@@ -1262,23 +1313,27 @@ fn main() {
             let _ = window.unminimize();
             let _ = window.show();
             let _ = window.set_focus();
-        
+
             // Emit general single-instance payload
-            let _ = app.emit(
-                "single-instance",
-                SingleInstancePayload {
-                    args: argv.clone(),
-                    cwd: _cwd,
-                },
-            ).unwrap();
+            let _ = app
+                .emit(
+                    "single-instance",
+                    SingleInstancePayload {
+                        args: argv.clone(),
+                        cwd: _cwd,
+                    },
+                )
+                .unwrap();
 
             if argv.len() > 1 {
-                let _ = app.emit(
-                    "deep-link-urls",
-                    Payload {
-                        url: argv[1].to_string(),
-                    },
-                ).unwrap();
+                let _ = app
+                    .emit(
+                        "deep-link-urls",
+                        Payload {
+                            url: argv[1].to_string(),
+                        },
+                    )
+                    .unwrap();
             } else {
                 // Handle the case where argv is empty or doesn't have enough elements
                 println!("No URL provided in command line arguments.");
@@ -1317,6 +1372,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
+            get_policy_config,
             get_git_branches,
             get_git_active_branch,
             fetch_file_command,

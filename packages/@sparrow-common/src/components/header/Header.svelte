@@ -23,6 +23,8 @@
   } from "./sub-component/UserProfileModal.svelte";
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
+  import { policyConfig, loadPolicyConfig } from "../../store/policyStore";
+
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -203,6 +205,7 @@
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
+  import type { from } from "rxjs";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -239,6 +242,7 @@
   let os = "";
   const osDetector = new OSDetector();
   onMount(() => {
+    loadPolicyConfig();
     os = osDetector.getOS();
     if (os === "windows") {
       isWindows = true;
@@ -342,13 +346,15 @@
                 </div>
               </div>
 
-              <Button
-                type="primary"
-                title="Create an Account or Sign In"
-                size="small"
-                onClick={onLoginUser}
-                customWidth={"100%"}
-              />
+              {#if !$policyConfig.disableSignIn}
+                <Button
+                  type="primary"
+                  title="Create an Account or Sign In"
+                  size="small"
+                  onClick={onLoginUser}
+                  customWidth={"100%"}
+                />
+              {/if}
             </div>
           </Select>
         </div>
@@ -382,7 +388,11 @@
           headerHeight={"28px"}
         >
           <div slot="pre-select" class="mb-1">
-            <div class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">{currentTeamName}</div>
+            <div
+              class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
+            >
+              {currentTeamName}
+            </div>
           </div>
           <div
             slot="post-select"
@@ -390,7 +400,10 @@
             style="justify-content: center; align-items:center;"
           >
             <div class="lower-underline"></div>
-            <div class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={handleViewWorkspaces}>
+            <div
+              class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+              on:click={handleViewWorkspaces}
+            >
               <span>View all Workspaces</span>
               <Button
                 type="teritiary-regular"
@@ -399,7 +412,10 @@
               />
             </div>
             <div class="lower-underline"></div>
-            <div class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={onCreateWorkspace}>
+            <div
+              class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+              on:click={onCreateWorkspace}
+            >
               <span>Create New Workspace</span>
               <div style="align-content: flex-end;">
                 <Button

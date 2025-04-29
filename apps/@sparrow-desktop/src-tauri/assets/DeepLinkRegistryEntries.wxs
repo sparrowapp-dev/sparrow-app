@@ -1,38 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Wix
-	xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Fragment>
-		<DirectoryRef Id="TARGETDIR">
-			<Component Id="DeepLinkRegistryEntries" Guid="24b24bc1-8389-4ac7-bde7-99f078440507">
-				<RegistryKey
+<Wix 
+ xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <DirectoryRef Id="TARGETDIR">
+      <Component Id="DeepLinkRegistryEntries" Guid="24b24bc1-8389-4ac7-bde7-99f078440507">
+        <RegistryKey
           Root="HKCR"
           Key="sparrow\shell\open\command"
           ForceCreateOnInstall="yes"
           ForceDeleteOnUninstall="yes"
         >
-					<RegistryValue
+          <RegistryValue
             Type="string"
             Value="&quot;[INSTALLDIR]Sparrow.exe&quot; &quot;%1&quot;"
             KeyPath="yes"
           />
-				</RegistryKey>
-				<RegistryKey 
+        </RegistryKey>
+        <RegistryKey 
           Root="HKCR"
           Key="sparrow"
           ForceCreateOnInstall="yes"
           ForceDeleteOnUninstall="yes"
         >
-					<RegistryValue
+          <RegistryValue
             Type="string"
             Value="Sparrow"
           />
-					<RegistryValue
+          <RegistryValue
             Type="string"
             Name="URL Protocol"
             Value=""
           />
-				</RegistryKey>
-			</Component>
-		</DirectoryRef> 
-	</Fragment>
+        </RegistryKey>
+      
+        <RegistryKey
+          Root="HKLM"
+          Key="SOFTWARE\Policies\Sparrow"
+          ForceCreateOnInstall="yes"
+          ForceDeleteOnUninstall="yes"
+        >
+          <RegistryValue
+            Type="integer"
+            Name="DisableSignIn"
+            Value="0"
+          />
+          <!-- Add more policy settings as needed -->
+        </RegistryKey>
+      </Component>
+
+    </DirectoryRef>
+  </Fragment>
 </Wix>

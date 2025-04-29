@@ -18,6 +18,6 @@
       "@app/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../../packages/@sparrow-common/src/store/policyStore.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

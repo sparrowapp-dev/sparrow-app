@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<policyDefinitions revision="1.0" schemaVersion="1.0">
+  <policyNamespaces>
+    <target prefix="sparrow" namespace="Company.Policies.Sparrow" />
+  </policyNamespaces>
+  <resources minRequiredRevision="1.0" />
+  <supportedOn>
+    <definitions>
+      <definition name="SUPPORTED_SPARROW" displayName="$(string.SUPPORTED_SPARROW)" />
+    </definitions>
+  </supportedOn>
+  <categories>
+    <category displayName="$(string.sparrow)" name="sparrow" />
+  </categories>
+  <policies>
+    <policy name="sparrow_Defaultshellopencommand" class="Both" displayName="$(string.sparrow_Defaultshellopencommand)" explainText="$(string.sparrow_Defaultshellopencommand_Explain)" key="SOFTWARE\Policies\Sparrow" presentation="$(presentation.sparrow_Defaultshellopencommand)">
+      <parentCategory ref="sparrow" />
+      <supportedOn ref="SUPPORTED_SPARROW" />
+      <elements>
+        <text id="sparrow_Defaultshellopencommand" valueName="" required="true" />
+      </elements>
+    </policy>
+    <policy name="sparrow_Default" class="Both" displayName="$(string.sparrow_Default)" explainText="$(string.sparrow_Default_Explain)" key="SOFTWARE\Policies\Sparrow" presentation="$(presentation.sparrow_Default)">
+      <parentCategory ref="sparrow" />
+      <supportedOn ref="SUPPORTED_SPARROW" />
+      <elements>
+        <text id="sparrow_Default" valueName="" required="true" />
+      </elements>
+    </policy>
+    <policy name="sparrow_URLProtocol" class="Both" displayName="$(string.sparrow_URLProtocol)" explainText="$(string.sparrow_URLProtocol_Explain)" key="SOFTWARE\Policies\Sparrow" presentation="$(presentation.sparrow_URLProtocol)">
+      <parentCategory ref="sparrow" />
+      <supportedOn ref="SUPPORTED_SPARROW" />
+      <elements>
+        <text id="sparrow_URLProtocol" valueName="URL Protocol" required="true" />
+      </elements>
+    </policy>
+    <policy name="SOFTWARE_DisableSignIn" class="Both" displayName="$(string.SOFTWARE_DisableSignIn)" explainText="$(string.SOFTWARE_DisableSignIn_Explain)" key="SOFTWARE\Policies\Sparrow" presentation="$(presentation.SOFTWARE_DisableSignIn)" valueName="DisableSignIn">
+      <parentCategory ref="sparrow" />
+      <supportedOn ref="SUPPORTED_SPARROW" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+    </policy>
+  </policies>
+</policyDefinitions>
