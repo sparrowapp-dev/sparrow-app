@@ -7,4 +7,5 @@ export {
   removeDynamicExpressionContent,
   updateIsCurrentExpression,
   updateDynamicExpressionValue,
+  requestBodyCursorPosition,
 } from "./testflow";

@@ -285,6 +285,7 @@
               method={selectedBlock?.data?.method}
               requestState={selectedBlock?.data?.requestData?.state}
               {environmentVariables}
+              {selectedBlock}
               onUpdateRequestState={handleUpdateRequestData}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}

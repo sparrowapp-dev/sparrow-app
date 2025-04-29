@@ -24,6 +24,10 @@
    * identifies Select disabled or not
    */
   export let disabled;
+  /**
+   * set the minimum width of the header in select button.
+   */
+  export let minHeaderWidth = "160px";
 
   $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
 </script>
@@ -42,5 +46,5 @@
   minBodyWidth={"150px"}
   variant={"secondary"}
   menuItem={"v2"}
-  minHeaderWidth={"160px"}
+  {minHeaderWidth}
 />

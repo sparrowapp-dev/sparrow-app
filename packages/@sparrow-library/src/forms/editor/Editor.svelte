@@ -11,6 +11,11 @@
   import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
   import { Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view";
   import { RangeSetBuilder } from "@codemirror/state";
+  import {
+    MatchDecorator,
+    WidgetType,
+    type DecorationSet,
+  } from "@codemirror/view";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -27,7 +32,11 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
-
+  export let isDynamicExpression: boolean = false;
+  export let handleOpenDE: (id: string) => void;
+  export let removeDynamicExpression: (id: string) => void | undefined;
+  export let handleSetCursor: (position: number) => void | undefined;
+  export let dynamicExpressionItems: any | undefined;
   const dispatch = createEventDispatcher();
 
   let componentClass = "";
@@ -35,9 +44,14 @@
   const lintConf = new Compartment(); // Compartment for linting
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
+  let currentIndex = 0;
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
+    if (update.docChanged || update.selectionSet) {
+      const cursorPos = update.state.selection.main.head;
+      handleSetCursor(cursorPos);
+    }
     if (update.docChanged) {
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
@@ -49,6 +63,82 @@
       }
     }
   });
+
+  class ExpressionWidget extends WidgetType {
+    constructor(
+      readonly name: string,
+      readonly from: number,
+      readonly to: number,
+      readonly id: string,
+    ) {
+      super();
+    }
+    toDOM(view: EditorView) {
+      const container = document.createElement("span");
+      container.className = "cm-expression-block";
+      const text = document.createElement("span");
+      text.textContent = this.name;
+      const close = document.createElement("span");
+      close.textContent = "❌";
+      close.className = "cm-expression-block-close";
+      close.onclick = (e) => {
+        e.stopPropagation();
+        view.dispatch({ changes: { from: this.from, to: this.to } });
+        removeDynamicExpression(this.id);
+      };
+      container.appendChild(text);
+      container.appendChild(close);
+      container.onclick = (e) => {
+        e.stopPropagation();
+        handleOpenDE(this.id);
+      };
+      return container;
+    }
+    ignoreEvent() {
+      return true;
+    }
+  }
+  const expressionMatcher = new MatchDecorator({
+    regexp: /\[\[([^\]]+)\]\]/g,
+    decoration: (match) => {
+      const name = match[1];
+      const dynamicItem = (dynamicExpressionItems || [])[currentIndex];
+      const id = dynamicItem?.id || "";
+      currentIndex++;
+      return Decoration.replace({
+        widget: new ExpressionWidget(
+          name,
+          match.index,
+          match.index + match[0].length,
+          id,
+        ),
+        inclusive: false,
+      });
+    },
+  });
+  const expressionPlugin = ViewPlugin.fromClass(
+    class {
+      placeholders: DecorationSet;
+      constructor(view: EditorView) {
+        currentIndex = 0;
+        this.placeholders = expressionMatcher.createDeco(view);
+      }
+      update(update: ViewUpdate) {
+        currentIndex = 0;
+        this.placeholders = expressionMatcher.updateDeco(
+          update,
+          this.placeholders,
+        );
+      }
+    },
+    {
+      decorations: (instance) => instance.placeholders,
+      provide: (plugin) =>
+        EditorView.atomicRanges.of((view) => {
+          return view.plugin(plugin)?.placeholders || Decoration.none;
+        }),
+    },
+  );
 
   const variableHighlighter = ViewPlugin.fromClass(
     class {
@@ -137,6 +227,10 @@
         : []), // Include autocompletion only if customSuggestions is true
     ];
 
+    if (isDynamicExpression) {
+      extensions.unshift(expressionPlugin);
+    }
+
     let state = EditorState.create({
       doc: value,
       extensions: extensions,
@@ -224,5 +318,27 @@
     width: 100%;
     height: 100%;
     margin-right: 1%;
+  }
+  :global(.cm-expression-block) {
+    display: inline-block;
+    background-color: var(--bg-ds-surface-300);
+    border-radius: 4px;
+    padding: 4px 8px 1px 8px;
+    cursor: pointer;
+  }
+  :global(.cm-expression-block span) {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--text-ds-neutral-800);
+  }
+  :global(.cm-expression-block-close) {
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: 4px;
+    color: var(--text-ds-danger-300);
   }
 </style>

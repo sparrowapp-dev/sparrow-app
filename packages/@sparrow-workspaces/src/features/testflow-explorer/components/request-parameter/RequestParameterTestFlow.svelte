@@ -98,28 +98,27 @@
     }
 
     // Add the Dynamic expression value
-    for (const dynamicParam of keyWithValues) {
-      if (dynamicParam.key.trim() !== "" && dynamicParam.value.trim() !== "") {
-        const existingParam = mergedArray.find(
-          (ele) => ele?.key.trim() === dynamicParam.key.trim(),
-        );
+    const indexValueMap = new Map();
 
-        if (existingParam) {
-          // Step 1: Remove any existing [[...]] part from the value (if it exists)
-          const cleanedValue = existingParam.value
-            .replace(/\[\[.*?\]\]/g, "")
-            .trim();
-
-          // Step 2: Check if the dynamic value already exists in the cleaned value
-          const newDynamicValue = `[[${dynamicParam.value}]]`;
-
-          // Step 3: Only add the value with [[...]] if it doesn't already exist
-          existingParam.value = cleanedValue
-            ? `${cleanedValue} ${newDynamicValue}`
-            : newDynamicValue;
+    keyWithValues.forEach((item, index) => {
+      if (item.value.trim() !== "" && item.index !== undefined) {
+        if (!indexValueMap.has(item.index)) {
+          indexValueMap.set(item.index, []);
         }
+        indexValueMap.get(item.index).push(item.value.trim());
       }
-    }
+    });
+
+    mergedArray.forEach((param: any, idx: number) => {
+      const dynamicValues = indexValueMap.get(idx);
+      if (dynamicValues && dynamicValues.length > 0) {
+        const baseValue = param.value.replace(/\[\[.*?\]\]/g, "").trim();
+        const dynamicText = dynamicValues
+          .map((v: string) => `[[${v}]]`)
+          .join(" ");
+        param.value = baseValue ? `${baseValue} ${dynamicText}` : dynamicText;
+      }
+    });
 
     // If nothing found, add an empty param
     if (mergedArray.length === 0) {

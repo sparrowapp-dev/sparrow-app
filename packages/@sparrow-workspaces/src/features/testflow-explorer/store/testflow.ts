@@ -1,6 +1,23 @@
 import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
 import { writable } from "svelte/store";
 
+export interface DynamicExpressionContent {
+  id: string;
+  blockName: string;
+  requestType: string;
+  key: string;
+  value: string;
+  method: string;
+  index: number;
+  cursor?: number;
+  isCurrentOpen: boolean;
+}
+
+export interface RequestBodyCursorPosition {
+  blockName: string;
+  cursor: number;
+}
+
 export const testFlowDataStore = writable<Map<string, TFDataStoreType>>(
   new Map(),
 );
@@ -9,18 +26,13 @@ export const isDynamicExpressionModalOpen = writable(false);
 
 export const selectedRequestTypes = writable({});
 
-export const isDynamicExpressionContent = writable([
-  {
-    id: "",
-    blockName: "",
-    requestType: "",
-    key: "",
-    value: "",
-    method: "",
-    index: 0,
-    isCurrentOpen: false,
-  },
-]);
+export const isDynamicExpressionContent = writable<DynamicExpressionContent[]>(
+  [],
+);
+
+export const requestBodyCursorPosition = writable<RequestBodyCursorPosition[]>(
+  [],
+);
 
 //This function will add the content into the store of Dynamic expression content.
 export const addDynamicExpressionContent = (
@@ -32,6 +44,7 @@ export const addDynamicExpressionContent = (
   method: string,
   index: number,
   isCurrentOpen: boolean,
+  cursor?: number,
 ) => {
   isDynamicExpressionContent.update((items) => {
     const itemIndex = items.findIndex(
@@ -58,6 +71,7 @@ export const addDynamicExpressionContent = (
           value,
           method,
           index,
+          cursor,
           isCurrentOpen,
         },
       ];

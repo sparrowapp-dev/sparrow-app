@@ -63,34 +63,29 @@
       param.value = cleanedValue;
     }
 
-    // Iterate over the filtered dynamic expressions and update values
-    for (const dynamicParam of keyWithValues) {
-      if (dynamicParam.key.trim() !== "" && dynamicParam.value.trim() !== "") {
-        const existingParam = updatedParams.find(
-          (ele) => ele?.key.trim() === dynamicParam.key.trim(),
-        );
+    const indexValueMap = new Map();
 
-        if (existingParam) {
-          // Step 1: Remove any existing [[...]] parts from the value
-          const baseValue = existingParam.value
-            .replace(/\[\[.*?\]\]/g, "")
-            .trim();
-
-          // Step 2: Prepare the new dynamic value wrapped in [[...]]
-          const newDynamicValue = `[[${dynamicParam.value.trim()}]]`;
-
-          // Step 3: Check if value already includes this dynamic value to avoid duplicates
-          const alreadyHas = existingParam.value.includes(newDynamicValue);
-
-          // Step 4: Append if not already present
-          if (!alreadyHas) {
-            existingParam.value = baseValue
-              ? `${baseValue} ${newDynamicValue}`
-              : newDynamicValue;
-          }
+    keyWithValues.forEach((item) => {
+      if (item.value.trim() !== "" && item.index !== undefined) {
+        if (!indexValueMap.has(item.index)) {
+          indexValueMap.set(item.index, []);
         }
+        indexValueMap.get(item.index).push(item.value.trim());
       }
-    }
+    });
+
+    // Step 2: Iterate through updatedParams and append corresponding values
+    updatedParams.forEach((param, idx) => {
+      const dynamicValues = indexValueMap.get(idx);
+      if (dynamicValues && dynamicValues.length > 0) {
+        // Remove existing [[...]] blocks
+        const baseValue = param.value.replace(/\[\[.*?\]\]/g, "").trim();
+        const dynamicText = dynamicValues
+          .map((v: string) => `[[${v}]]`)
+          .join(" ");
+        param.value = baseValue ? `${baseValue} ${dynamicText}` : dynamicText;
+      }
+    });
 
     // Call the headers change callback with the updated params
     onHeadersChange("headers", updatedParams);

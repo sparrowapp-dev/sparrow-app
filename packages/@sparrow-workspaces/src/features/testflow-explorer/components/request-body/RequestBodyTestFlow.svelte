@@ -14,6 +14,7 @@
   export let requestState: any = {};
   export let method;
   export let onUpdateRequestState;
+  export let selectedBlock;
 
   let isBodyBeautified = false;
 
@@ -34,6 +35,7 @@
   <RequestBodyNavigator
     {method}
     {requestState}
+    {selectedBlock}
     {updateBeautifiedState}
     onUpdateRequestState={handleUpdateRequestBody}
     onUpdateRequestBodyLanguage={handleUpdateRequestBody}
@@ -44,6 +46,7 @@
         onUpdateRequestBody={(e) => {
           onUpdateRequestState("raw", e);
         }}
+        {selectedBlock}
         lang={requestState?.requestBodyLanguage ?? "JSON"}
         value={body?.raw}
         {isBodyBeautified}
