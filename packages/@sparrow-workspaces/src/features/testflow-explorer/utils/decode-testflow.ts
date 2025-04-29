@@ -342,7 +342,7 @@ class DecodeTestflow {
    * @param environmentVariables - Array of objects containing key-value pairs for environment variables.
    * @returns {string} The text with placeholders replaced by environment variable values.
    */
-  private setEnvironmentVariables = (
+  public setEnvironmentVariables = (
     text: string,
     environmentVariables,
   ): string => {
@@ -401,7 +401,7 @@ class DecodeTestflow {
     return result;
   };
 
-  private setDynamicExpression2 = (
+  public setDynamicExpression2 = (
     text: string,
     response,
   ): string => {

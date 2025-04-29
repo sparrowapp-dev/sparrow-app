@@ -30,6 +30,7 @@
     label: string,
     blockName: string,
   ) => void;
+  export let onPreviewExpression;
 
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
@@ -87,6 +88,7 @@
       {onUpdateEnvironment}
       {selectedApiRequestType}
       {environmentVariables}
+      {onPreviewExpression}
     />
   </div>
   <div class="w-50">

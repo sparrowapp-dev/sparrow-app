@@ -423,6 +423,7 @@ export class TestflowExplorerPageViewModel {
           abortController: abortController,
           nodes: [],
           history: [],
+          runner:{},
           isRunHistoryEnable: false,
           isTestFlowRunning: true,
           isTestFlowSaveInProgress: false,
@@ -558,6 +559,7 @@ export class TestflowExplorerPageViewModel {
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
+
               });
 
               const responseHeader = this._decodeRequest.setResponseContentType(
@@ -688,6 +690,7 @@ export class TestflowExplorerPageViewModel {
           wsData.history = hs;
         }
         wsData.isTestFlowRunning = false;
+        wsData.runner = requestChainResponse;
         testFlowDataMap.set(progressiveTab.tabId, wsData);
       }
       return testFlowDataMap;
@@ -698,6 +701,74 @@ export class TestflowExplorerPageViewModel {
       );
     }
   };
+
+  private setEnvironmentVariables = (
+    text: string,
+    environmentVariables,
+  ): string => {
+    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, squareContent) => {
+      const updated = squareContent
+      .replace(/\\/g, '').replace(/"/g, `'`)
+      
+      .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
+        return `'{{${inner.trim()}}}'`;
+      });
+      return `[*$[${updated}]$*]`;
+    });
+
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+    return updatedText;
+  };
+
+  private setDynamicExpression2 = (
+    text: string,
+    response,
+  ): string => {
+    // return text;
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
+      try {
+        // Use Function constructor to evaluate with access to `response`
+        const fn = new Function("response", `
+          with (response) {
+            return (${expr});
+          }
+        `);
+        const s = fn(response);
+        if(typeof s === "string"){
+          return s;
+        }
+        if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
+          return `${JSON.stringify(s)}`; // serialize object
+        }
+        return s;
+      } catch (e) {
+        console.error("Eval error:", e.message);
+        return '';
+      }
+    });
+    return result;
+  };
+
+ public handlePreviewExpression = async(expression) => {
+
+  const progressiveTab = createDeepCopy(this._tab.getValue());
+  const environments = await this.getActiveEnvironments(
+    progressiveTab.path.workspaceId,
+  );
+
+  let runner = {};
+  testFlowDataStore.update((testFlowDataMap) => {
+    let wsData = testFlowDataMap.get(progressiveTab.tabId);
+    if (wsData) {
+      runner = wsData.runner;
+    } 
+    return testFlowDataMap;
+  });
+  return this.setDynamicExpression2(this.setEnvironmentVariables("[*$[" + expression + "]$*]", environments?.filtered || []), runner);
+ }
 
   /**
    * Runs a single test flow node and updates the testFlowDataStore

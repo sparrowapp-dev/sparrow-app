@@ -9,7 +9,9 @@
   export let handleExpressionChange: (value: string) => void;
   export let handleAddingNested: (value: string) => void;
   export let selectedApiRequestType: string;
+  export let onPreviewExpression;
 
+  let expressionPreviewResult = "";
   let data: any = {};
   let topLevelKeys: any[] = [];
 
@@ -68,7 +70,7 @@
 
   <div class="expression-textarea-editor">
     <Editor
-      lang={"text"}
+      lang={"JavaScript"}
       placeholder={"Select API data, functions, or variables from the panel."}
       bind:value={expression}
       on:change={handleCodeMirrorChange}
@@ -101,13 +103,21 @@
   <div
     class="expression-result-container d-flex flex-row justify-content-between align-items-center"
   >
-    <p class="expression-result-text m-0">Expression result</p>
+    <p class="expression-result-text m-0 w-100">
+      <Editor
+        lang={"JSON"}
+        placeholder={""}
+        bind:value={expressionPreviewResult}
+        on:change={() => {}}
+        isEditable={false}
+      />
+    </p>
     <Button
       type="link-primary"
       title="Run Preview"
       size="small"
-      onClick={() => {
-        console.log("Expression:", expression);
+      onClick={async () => {
+        expressionPreviewResult = (await onPreviewExpression(expression)) || "";
       }}
     />
   </div>

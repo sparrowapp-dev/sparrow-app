@@ -117,6 +117,7 @@
   export let userRole;
   export let onUpdateEnvironment;
   export let runSingleNode;
+  export let onPreviewExpression;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -376,8 +377,6 @@
   let dynamicExpressionEditorContent = "";
   let dynamicExpressionModal = {};
   let handleOpenCurrentDynamicExpression = (obj) => {
-    debugger;
-    // return;
     dynamicExpressionModal = {};
     dynamicExpressionModal = obj;
     dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
@@ -442,8 +441,6 @@
             //
             // Parameters
             //
-            // debugger;
-            // return;
             const requestParams = dbNodes[index].data.requestData.queryParams;
             for (let i = 0; i < requestParams.length; i++) {
               if (dynamicExpressionModal.destination.index === i) {
@@ -1651,6 +1648,7 @@
     {handleAddingNested}
     {handleFunctionType}
     {handleExpressionChange}
+    {onPreviewExpression}
     {handleSetDynamicExpression}
     {onInsertExpression}
   />
