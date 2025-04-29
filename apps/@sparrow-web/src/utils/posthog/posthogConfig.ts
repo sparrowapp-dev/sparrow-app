@@ -1,8 +1,9 @@
 import posthog from 'posthog-js'; 
+import constants from "@app/constants/constants";
 let isInitialized = false; 
 export const initPostHog = () => { 
   if (!isInitialized) { 
-    posthog.init(import.meta.env.VITE_POSTHOG_CONNECTION_API_KEY, { 
+    posthog.init(constants.ENABLE_POST_HOG, { 
 
       api_host: 'https://us.i.posthog.com', 
 
