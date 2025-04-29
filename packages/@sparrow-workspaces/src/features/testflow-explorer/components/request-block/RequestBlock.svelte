@@ -11,13 +11,14 @@
     ClockRegular,
     DeleteRegular,
     RenameRegular,
+    ArrowExportRegular,
+    ArrowImportRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { ArrowIcon } from "../../icons";
   import { ArrowSwapRegular } from "@sparrow/library/icons";
-
   import { InfoRegular } from "@sparrow/library/icons";
   import SelectApiRequest from "../select-api/SelectAPIRequest.svelte";
   import type { CollectionDocument } from "@app/database/database";
@@ -42,22 +43,22 @@
     name: string;
     method: string;
     onClick: (id: string) => void;
-    onUpdateSelectedAPI: (
-      id: string,
+    onContextMenu: (id: string, event: string) => void;
+    onOpenAddCustomRequestModal: (id: string) => void;
+    onOpenSaveNodeRequestModal: (
+      nodeId: string,
       name: string,
       requestId: string,
       collectionId: string,
       method: string,
-      folderId?: string,
+      folderId: string,
     ) => void;
-    onOpenDeleteModal: (id: string) => void;
+    updateBlockName: (field: string, value: string) => void;
     tabId: string;
     collections: Observable<CollectionDocument[]>;
     parentDrag: boolean;
   };
   export let selected;
-  export let blockName = "REST API Request";
-  export let updateBlockName: (name: string) => void;
 
   /**
    * The unique identifier for the current block.
@@ -65,9 +66,27 @@
   export let id;
 
   let isEditing = false;
-  let inputfield: any;
+  let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
   let isRunTextVisible = false; // State to track visibility of run text
+  let isDropHereVisible = false; // state to track if there is drag in test flow screen
+  let dataBlocksSubscriber: Unsubscriber;
+  let dataConnectorSubscriber: Unsubscriber;
+  let req = {
+    name: "",
+    method: "",
+  };
+  let isCreateBlockArrowHovered = false;
+  let moreOptionsMenu: boolean = false;
+  let testflowStore: TFDataStoreType;
+  let currentBlock: TFNodeStoreType | undefined;
+  const parseTime = new ParseTime();
+
+  const truncateName = (name: string, charLimit: number) => {
+    return name?.length > charLimit
+      ? name.substring(0, charLimit) + "..."
+      : name;
+  };
 
   /**
    * Updates the node when an API is selected.
@@ -85,7 +104,8 @@
     folderId?: string,
   ) => {
     isRunTextVisible = true;
-    data.onUpdateSelectedAPI(
+
+    data.onOpenSaveNodeRequestModal(
       id,
       name,
       requestId,
@@ -94,11 +114,6 @@
       folderId ?? "",
     );
   };
-
-  let isCreateBlockArrowHovered = false;
-
-  let testflowStore: TFDataStoreType;
-  let currentBlock: TFNodeStoreType | undefined;
 
   /**
    * Testflow store subscriber to get current node status
@@ -122,13 +137,6 @@
       currentBlock = undefined;
     }
   });
-  let isDropHereVisible = false; // state to track if there is drag in test flow screen
-  let dataBlocksSubscriber: Unsubscriber;
-  let dataConnectorSubscriber: Unsubscriber;
-  let req = {
-    name: "",
-    method: "",
-  };
 
   onMount(() => {
     // Subscribe to changes in the blocks
@@ -136,8 +144,9 @@
       _nodes.forEach((_node) => {
         if (_node.id === id) {
           setTimeout(() => {
-            req.name = _node?.data?.name;
-            req.method = _node?.data?.method;
+            req.name = _node?.data?.requestData?.name;
+            req.method = _node?.data?.requestData?.method;
+            blockName = _node?.data?.blockName;
           }, 10);
         }
       });
@@ -154,14 +163,13 @@
       }, 10);
     });
   });
+
   onDestroy(() => {
     // Clean up the subscription on component destruction
     testFlowDataStoreSubscriber();
     dataBlocksSubscriber();
     dataConnectorSubscriber();
   });
-
-  const parseTime = new ParseTime();
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -177,69 +185,58 @@
     return false;
   };
 
-  let moreOptionsMenu: boolean = false;
-
-  const handleOpenModal = () => {
-    moreOptionsMenu = !moreOptionsMenu;
-    data.onOpenDeleteModal(id);
-  };
-
-  const handleClick = (item) => {
+  const handleClick = (item: any) => {
     if (item.onClick) item.onClick();
   };
 
-  const handleClickOutsideBlock = () => {
-    moreOptionsMenu = false;
-  };
-
-  onMount(() => {
-    document.addEventListener("click", handleClickOutsideBlock);
-  });
-
-  onDestroy(() => {
-    document.removeEventListener("click", handleClickOutsideBlock);
-  });
-
-  const enableEditing = () => {
-    isEditing = true;
-    $: if (isEditing) {
-      setTimeout(() => inputfield?.focus(), 0);
-    }
-  };
-
-  const disableEditing = () => {
-    isEditing = false;
-    updateBlockName(blockName);
-  };
-
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      disableEditing();
-    }
-  };
-
   let moreOptions = [
-    // {
-    //   name: "Rename Block",
-    //   iconSize: "16px",
-    //   iconColor: "var(--icon-ds-neutral-50)",
-    //   Icon: RenameRegular,
-    //   onClick: enableEditing,
-    // },
+    {
+      name: "Rename Block",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: RenameRegular,
+      onClick: () => {
+        isEditing = true;
+      },
+    },
+    {
+      name: "Run From Here",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowExportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "run-from-here");
+      },
+    },
+    {
+      name: "Run Till Here",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowImportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "run-till-here");
+      },
+    },
     {
       name: "Delete",
       iconSize: "16px",
       iconColor: "var(--icon-ds-danger-300)",
       Icon: DeleteRegular,
-      onClick: handleOpenModal,
+      onClick: () => {
+        data.onContextMenu(id, "delete");
+      },
     },
   ];
+
+  const handleOpenAddCustomRequestModal = () => {
+    data.onOpenAddCustomRequestModal(id);
+  };
 </script>
 
 <div
   class="request-block position-relative"
   style={selected && !currentBlock?.response.status
-    ? "border: 1px solid var(--border-ds-primary-300);"
+    ? "outline: 1px solid var(--border-ds-primary-300);"
     : selected && currentBlock && checkIfRequestSucceed(currentBlock)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
@@ -279,17 +276,34 @@
         {/if}
       </div>
       {#if !isEditing}
-        <span class="px-1" style="padding-top: 3px; padding-bottom:3px;">
-          REST API Request
+        <span class="px-1" style="padding-top: 2px; padding-bottom:1px;">
+          {truncateName(blockName, 20)}
         </span>
       {:else}
         <input
-          bind:value={blockName}
-          bind:this={inputfield}
+          autofocus
           type="text"
           class="rename-input"
-          on:blur={disableEditing}
-          on:keydown={handleKeyDown}
+          on:input={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            data.updateBlockName("blockName", e?.target?.value);
+          }}
+          on:change={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          on:click={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          value={blockName}
+          on:blur={() => {
+            if (blockName.trim().length == 0) {
+              data.updateBlockName("blockName", "Untitled");
+            }
+            isEditing = false;
+          }}
         />
       {/if}
     </div>
@@ -297,32 +311,37 @@
       style="position: relative;"
       class="d-flex justify-content-center align-items-center"
       tabindex="0"
+      on:click={(e) => {
+        e.stopPropagation();
+        moreOptionsMenu = !moreOptionsMenu;
+      }}
       on:blur={() => {
-        moreOptionsMenu = false;
+        setTimeout(() => {
+          moreOptionsMenu = false;
+        }, 10);
       }}
     >
-      <Button
-        type="teritiary-regular"
-        id="moreOpitonsButton"
-        size="small"
-        iconSize={16}
-        startIcon={MoreHorizontalRegular}
-        onClick={() => {
-          moreOptionsMenu = !moreOptionsMenu;
-          event.stopPropagation();
-        }}
-      />
+      <span
+        class="p-1 rounded-1 more-option-btn"
+        style={moreOptionsMenu
+          ? "background-color: var(--bg-ds-surface-400) !important;"
+          : ""}
+      >
+        <MoreHorizontalRegular
+          size={"16px"}
+          color={"var(--icon-ds-neutral-100)"}
+        />
+      </span>
       {#if moreOptionsMenu}
         <div
           class="menu-container"
-          style="background-color: var(--bg-ds-surface-600); z-index:1000; border-radius:4px; width:150px; position:absolute; top:30px; right:-123px;"
+          style="background-color: var(--bg-ds-surface-600); z-index:1000; border-radius:4px; width:150px; position:absolute; top:30px; right:-126px;"
         >
           {#each moreOptions as item}
             <div
               class="menu-item d-flex align-items-center justify-content-start gap-2"
               style="color: {item.iconColor};"
               on:click={() => handleClick(item)}
-              tabindex={0}
             >
               <svelte:component
                 this={item.Icon}
@@ -359,6 +378,7 @@
         collectionData={data.collections}
         name={req.name}
         method={req.method}
+        {handleOpenAddCustomRequestModal}
       />
     </div>
     {#if !currentBlock?.response?.status}
@@ -465,21 +485,22 @@
   {#if !isDropHereVisible && isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
+        style="border-radius: 50%;"
         on:click={() => {
           data.onClick(id);
           isAddBlockVisible = false;
-          isCreateBlockArrowHovered = false;
-        }}
-        on:mouseenter={() => {
-          isCreateBlockArrowHovered = true;
-        }}
-        on:mouseleave={() => {
           isCreateBlockArrowHovered = false;
         }}
       >
         <span class="d-flex align-items-center">
           <span
             class="btnc position p-1 d-flex align-items-center justify-content-center"
+            on:mouseenter={() => {
+              isCreateBlockArrowHovered = true;
+            }}
+            on:mouseleave={() => {
+              isCreateBlockArrowHovered = false;
+            }}
           >
             <ArrowRightIcon
               height={"10px"}
@@ -669,7 +690,7 @@
     width: 150px;
     outline: none;
     border-radius: 4px !important;
-    padding: 4px 2px;
+    padding: 4px 3px;
     caret-color: var(--bg-ds-primary-300);
     font-family: "Inter", sans-serif;
     font-weight: 500;
@@ -712,8 +733,6 @@
     margin-bottom: 2px;
   }
   .status-icon {
-    padding-top: 2px;
-    padding-bottom: 1px;
     padding-left: 4px;
     padding-right: 2px;
   }
@@ -722,5 +741,8 @@
   }
   .response-text-fail {
     color: var(--text-ds-danger-300);
+  }
+  .more-option-btn:hover {
+    background-color: var(--bg-ds-surface-300);
   }
 </style>

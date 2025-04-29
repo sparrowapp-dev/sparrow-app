@@ -5,8 +5,9 @@
   export let isBodyBeautified = false;
   export let onUpdateRequestBody: (data: string) => void = () => {};
   export let updateBeautifiedState: (value: boolean) => void;
+
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
-    onUpdateRequestBody({ raw: e.detail });
+    onUpdateRequestBody(e.detail);
   };
 </script>
 
@@ -15,7 +16,7 @@
     bind:lang
     bind:value
     on:change={handleCodeMirrorChange}
-    isEditable={false}
+    isEditable={true}
     {isBodyBeautified}
     beautifySyntaxCallback={updateBeautifiedState}
   />

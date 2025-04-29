@@ -107,7 +107,7 @@ export default class WorkspaceExplorerViewModel {
    */
   private compareWorkspaceWithServer = new Debounce().debounce(
     this.compareWorkspaceWithServerDebounced,
-    1000,
+    0,
   );
 
   /**

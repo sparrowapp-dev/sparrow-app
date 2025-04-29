@@ -262,7 +262,7 @@
       const contentType = validateJSON(importData);
       if (response?.data?.status === ResponseStatusCode.OK) {
         handleImportJsonObject(
-          contentType,
+          ContentTypeEnum["application/json"],
           response?.data?.body,
           isActiveSyncEnabled,
         );

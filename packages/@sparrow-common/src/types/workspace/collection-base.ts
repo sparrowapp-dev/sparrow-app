@@ -52,17 +52,17 @@ export enum CollectionAuthTypeBaseEnum {
   BASIC_AUTH = "Basic Auth",
 }
 
-export interface CollectionAuthBaseInterface  {
+export interface CollectionAuthBaseInterface {
   bearerToken: string;
   basicAuth: {
     username: string;
     password: string;
-  },
+  };
   apiKey: {
     authKey: string;
     authValue: string;
     addTo: CollectionRequestAddToBaseEnum;
-  },
+  };
 }
 
 export interface CollectionBaseInterface {
@@ -77,7 +77,7 @@ export interface CollectionBaseInterface {
   activeSyncUrl?: string;
   localRepositoryPath?: string;
   workspaceId: string;
-  auth?: CollectionAuthBaseInterface,
+  auth?: CollectionAuthBaseInterface;
   selectedAuthType?: CollectionAuthTypeBaseEnum;
   branches?: Branch[];
   primaryBranch?: string;
@@ -86,6 +86,7 @@ export interface CollectionBaseInterface {
   updatedAt: string;
   createdBy: string;
   updatedBy: string;
+  syncedAt?: string;
 }
 
 export interface CollectionArgsBaseInterface {

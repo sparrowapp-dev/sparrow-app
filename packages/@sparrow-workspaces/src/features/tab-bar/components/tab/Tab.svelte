@@ -124,10 +124,8 @@
     onDragStart(index);
   }}
   tabindex="0"
-  class=" badge-container tab-container d-inline-block p-0 position-relative pt-1 individual-tab"
-  style="width: {tabWidth}px; height:35px; margin-left:{index === 0
-    ? '4px'
-    : ''}"
+  class=" badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
+  style="width: {tabWidth}px;  margin-left:{index === 0 ? '4px' : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
   on:contextmenu|preventDefault={(event) => handleRightClick(event, tab)}

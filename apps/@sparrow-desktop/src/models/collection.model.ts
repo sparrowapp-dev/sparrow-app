@@ -303,14 +303,14 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 10,
+  version: 11,
   properties: {
     collectionId: {
       type: "string",
       maxLength: 100,
     },
-    description:{
-      type:"string"
+    description: {
+      type: "string",
     },
     id: {
       type: "string",
@@ -395,6 +395,9 @@ export const collectionSchemaLiteral = {
       type: "string",
     },
     updatedAt: {
+      type: "date-time",
+    },
+    syncedAt: {
       type: "date-time",
     },
     createdBy: {

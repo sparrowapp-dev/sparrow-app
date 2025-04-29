@@ -302,7 +302,7 @@
             data={guestData}
             titleId={`${currentWorkspaceId}`}
             onclick={() => {}}
-            minHeaderWidth={"252px"}
+            minHeaderWidth={"160px"}
             isDropIconFilled={true}
             borderType={"none"}
             borderActiveType={"none"}
@@ -310,13 +310,14 @@
             headerTheme={"primary"}
             menuItem={"v2"}
             headerFontSize={"12px"}
-            maxHeaderWidth={"252px"}
+            maxHeaderWidth={"240px"}
             headerFontWeight={600}
             zIndex={200}
             bodyTheme={"surface"}
             borderRounded={"2px"}
             position={"absolute"}
             isHeaderCombined={true}
+            minBodyWidth={"240px"}
             maxBodyHeight={"300px"}
             placeholderText=" Hub / Workspace  "
             iconRequired={true}
@@ -357,7 +358,7 @@
           data={workspaceData}
           titleId={`${currentWorkspaceId}`}
           onclick={handleWorkspaceDropdown}
-          minHeaderWidth={"252px"}
+          minHeaderWidth={"160px"}
           isDropIconFilled={true}
           borderType={"none"}
           borderActiveType={"none"}
@@ -365,12 +366,13 @@
           headerTheme={"transparent"}
           menuItem={"v2"}
           headerFontSize={"12px"}
-          maxHeaderWidth={"252px"}
+          maxHeaderWidth={"240px"}
           zIndex={200}
           bodyTheme={"surface"}
           borderRounded={"2px"}
           position={"absolute"}
           isHeaderCombined={true}
+          minBodyWidth={"240px"}
           maxBodyHeight={"300px"}
           iconRequired={true}
           icon={WorkspaceRegular}

@@ -63,11 +63,10 @@
     isNearBottom = viewportHeight - buttonRect.bottom < 150 ? true : false;
 
     pos = {
-      x: buttonRect.right - 142 ,
+      x: buttonRect.left - 142 + (buttonRect.width / 2),
       y:
         buttonRect.top +
-        buttonRect.height +
-        (isNearBottom ? buttonRect.height : -buttonRect.height),
+        2*buttonRect.height + -buttonRect.height,
     };
 
     showMenu = true;
@@ -77,11 +76,6 @@
     showMenu = false;
   }
 
-  function handleRowClick(e: MouseEvent) {
-    if (e.currentTarget === e.target) {
-      console.log(`Row ${index} clicked`);
-    }
-  }
   function handleCloseAllMenus(e: CustomEvent) {
     if (e.detail.exceptRowId !== rowId) {
       showMenu = false;
@@ -103,7 +97,6 @@
   id={rowId}
   tabindex="0"
   class="position-relative invite-row-item cursor-pointer ellipsis"
-  on:click={handleRowClick}
   style="width:100%"
 >
   <td

@@ -370,7 +370,9 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
       );
     } else {
-      notifications.error("Failed to send invite. Please try again.");
+     notifications.error(
+             response?.message || "Failed to send invite. Please try again.",
+           );
     }
     return response;
   };
@@ -864,7 +866,7 @@ export class TeamExplorerPageViewModel {
     const response= await this.teamService.resendInvite(teamId, email, baseUrl);
     if (response.isSuccessful) { 
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite resent successfully!`);
+      notifications.success(`Invite resend successfully!`);
       return response;
     }
     else {
@@ -893,11 +895,11 @@ export class TeamExplorerPageViewModel {
     const response = await this.teamService.acceptInvite(teamId, baseUrl);
     if (response.isSuccessful) {
        this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite accepted successfully!`);
+      notifications.success(`You are now a member ${response?.data?.data.name} Hub.`);
       return response;
     }
     else {
-      notifications.error("Failed to accept invite. Please try again.");
+      notifications.error(`Failed to join the ${response?.data?.data.name} Hub. Please try again.`);
     }
   }
 
@@ -908,12 +910,11 @@ export class TeamExplorerPageViewModel {
       const teams = await this.teamRepository.getTeamsDocuments();
       await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
       await this.teamRepository.removeTeam(teamId);
-      notifications.success(`Invite ignored successfully!`);
-      debugger;
+      notifications.success(`Invite ignored. The hub has been removed from your panel.`);
       return response;
     }
     else {
-      notifications.error("Failed to ignore invite. Please try again.");
+      notifications.error(`Failed to ignore invite. Please try again.`);
     }
   }
 }

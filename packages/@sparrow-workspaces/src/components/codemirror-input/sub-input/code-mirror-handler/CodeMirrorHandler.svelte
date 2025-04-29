@@ -1,7 +1,13 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
   import { EditorView } from "codemirror";
-  import { EditorState, Compartment, EditorSelection } from "@codemirror/state";
+  import {
+    EditorState,
+    Compartment,
+    EditorSelection,
+    type TransactionSpec,
+    RangeSetBuilder,
+  } from "@codemirror/state";
   import { javascriptLanguage } from "@codemirror/lang-javascript";
   import {
     keymap,
@@ -9,6 +15,9 @@
     MatchDecorator,
     Decoration,
     placeholder as CreatePlaceHolder,
+    WidgetType,
+    type DecorationSet,
+    ViewUpdate,
   } from "@codemirror/view";
   import { undo, redo } from "@codemirror/commands";
   import { history, historyKeymap } from "@codemirror/commands";
@@ -16,10 +25,6 @@
    * input value
    */
   export let rawValue: string;
-  /**
-   * on change event
-   */
-  export let handleRawChange: () => void;
   /**
    * on focus event
    */
@@ -56,7 +61,7 @@
    */
   export let environmentAxisY;
   export let environmentAxisX;
-export let enableEnvironmentHighlighting = true;
+  export let enableEnvironmentHighlighting = true;
   /**
    * environment dialog box unique id
    */
@@ -83,18 +88,23 @@ export let enableEnvironmentHighlighting = true;
   const languageConf = new Compartment();
   let codeMirrorView: EditorView;
   let prevValue = "";
+
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
-    handleInputChange(userInput);
-    if (prevValue !== userInput) {
-      handleEnvironmentBox("", "");
-    }
-    prevValue = userInput;
-    if (rawValue?.length > 0) {
-      handleRawChange();
+    if (update.docChanged) {
+      const isAutoChange = update?.transactions?.some((transaction) =>
+        transaction?.annotations?.some((annotation) => annotation?.autoChange),
+      );
+      if (!isAutoChange) {
+        // only hits for input, blur etc type of events
+        handleInputChange(userInput);
+        if (prevValue !== userInput) {
+          handleEnvironmentBox("", "");
+        }
+        prevValue = userInput;
+      }
     }
     handleHighlightClass();
-
     if (inputWrapper) {
       const dialogboxWidth = 400;
       const dialogboxHeight = 170;
@@ -122,7 +132,94 @@ export let enableEnvironmentHighlighting = true;
   });
 
   /**
-   * Disable keys in codemirror
+   * Widget to render the dynamic expression.
+   */
+  class ExpressionWidget extends WidgetType {
+    constructor(
+      readonly name: string,
+      readonly from: number,
+      readonly to: number,
+    ) {
+      super();
+    }
+
+    toDOM(view: EditorView) {
+      const container = document.createElement("span");
+      container.className = "cm-expression-block";
+
+      const text = document.createElement("span");
+      text.textContent = this.name;
+
+      const close = document.createElement("span");
+      close.textContent = "❌";
+      close.className = "cm-expression-block-close";
+
+      close.onclick = (e) => {
+        e.stopPropagation();
+        view.dispatch({ changes: { from: this.from, to: this.to } });
+      };
+
+      container.appendChild(text);
+      container.appendChild(close);
+
+      container.onclick = (e) => {
+        e.stopPropagation();
+        // add click operation here
+      };
+
+      return container;
+    }
+
+    ignoreEvent() {
+      return true;
+    }
+  }
+
+  /**
+   * Create regex matching pattern for the expression.
+   * @example [[expression]]
+   */
+  const expressionMatcher = new MatchDecorator({
+    regexp: /\[\[(\w+)\]\]/g,
+    decoration: (match) =>
+      Decoration.replace({
+        widget: new ExpressionWidget(
+          match[1],
+          match.index,
+          match.index + match[0].length,
+        ),
+        inclusive: false,
+      }),
+  });
+
+  /**
+   * Create a decoration set for the expression matcher.
+   * @param view - The editor view instance.
+   */
+  const expressionPlugin = ViewPlugin.fromClass(
+    class {
+      placeholders: DecorationSet;
+      constructor(view: EditorView) {
+        this.placeholders = expressionMatcher.createDeco(view);
+      }
+      update(update: ViewUpdate) {
+        this.placeholders = expressionMatcher.updateDeco(
+          update,
+          this.placeholders,
+        );
+      }
+    },
+    {
+      decorations: (instance) => instance.placeholders,
+      provide: (plugin) =>
+        EditorView.atomicRanges.of((view) => {
+          return view.plugin(plugin)?.placeholders || Decoration.none;
+        }),
+    },
+  );
+
+  /**
+   * handle keyboard events in codemirror
    */
   const keyBinding = keymap.of([
     {
@@ -341,32 +438,35 @@ export let enableEnvironmentHighlighting = true;
     });
 
   export const environmentHighlightStyle = (
-  aggregateEnvs: AggregateEnvironment[],
-  enableHighlighting: boolean
-) => {
-  if (!enableHighlighting) {
-    return ViewPlugin.define(() => ({
-      decorations: Decoration.none,
-      update() {}
-    }), {
-      decorations: v => v.decorations,
-    });
-  }
-
-  const decorator = getMatchDecorator(aggregateEnvs);
-
-  return ViewPlugin.define(
-    (view) => ({
-      decorations: decorator.createDeco(view),
-      update(u) {
-        this.decorations = decorator.updateDeco(u, this.decorations);
-      },
-    }),
-    {
-      decorations: (v) => v.decorations,
+    aggregateEnvs: AggregateEnvironment[],
+    enableHighlighting: boolean,
+  ) => {
+    if (!enableHighlighting) {
+      return ViewPlugin.define(
+        () => ({
+          decorations: Decoration.none,
+          update() {},
+        }),
+        {
+          decorations: (v) => v.decorations,
+        },
+      );
     }
-  );
-};
+
+    const decorator = getMatchDecorator(aggregateEnvs);
+
+    return ViewPlugin.define(
+      (view) => ({
+        decorations: decorator.createDeco(view),
+        update(u) {
+          this.decorations = decorator.updateDeco(u, this.decorations);
+        },
+      }),
+      {
+        decorations: (v) => v.decorations,
+      },
+    );
+  };
 
   /**
    * Initialize code mirror editor
@@ -377,6 +477,7 @@ export let enableEnvironmentHighlighting = true;
       doc: value,
       extensions: [
         theme,
+        expressionPlugin,
         updateExtensionView,
         keyBinding,
         history(), // Add history extension
@@ -411,24 +512,25 @@ export let enableEnvironmentHighlighting = true;
     initializeAsync();
   });
 
-afterUpdate(() => {
-  if (codeMirrorView) {
-    if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
+  afterUpdate(() => {
+    if (codeMirrorView) {
+      if (rawValue?.toString() !== codeMirrorView.state.doc?.toString()) {
+        codeMirrorView.dispatch({
+          changes: {
+            from: 0,
+            to: codeMirrorView.state.doc.length,
+            insert: rawValue,
+          },
+          annotations: [{ autoChange: true }],
+        });
+      }
       codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: rawValue,
-        },
+        effects: languageConf.reconfigure([
+          environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
+        ]),
       });
     }
-    codeMirrorView.dispatch({
-      effects: languageConf.reconfigure([
-        environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
-      ]),
-    });
-  }
-});
+  });
 
   const destroyCodeMirrorEditor = () => {
     if (codeMirrorView) {
@@ -450,5 +552,30 @@ afterUpdate(() => {
     width: 100%;
     max-width: calc(100vw - 50px);
     min-width: 50%;
+  }
+
+  :global(.cm-expression-block) {
+    display: inline-block;
+    background-color: var(--bg-ds-neutral-50);
+    border-radius: 4px;
+    padding: 0px 6px;
+    cursor: pointer;
+  }
+
+  :global(.cm-expression-block span) {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+    color: var(--text-ds-neutral-800);
+  }
+
+  :global(.cm-expression-block-close) {
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: 4px;
+    color: var(--text-ds-danger-300);
   }
 </style>

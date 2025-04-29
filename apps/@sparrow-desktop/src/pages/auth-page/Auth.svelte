@@ -286,7 +286,7 @@
       >
       <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
       <a
-        href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
+        href={constants.CANNY_FEEDBACK_URL}
         class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
       >
     {:else}

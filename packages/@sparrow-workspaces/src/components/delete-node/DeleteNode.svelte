@@ -19,12 +19,6 @@
 <!-- Section for the modal content -->
 <section>
   <div>
-    <div
-      class="mb-3"
-      style="font-weight: 500 ; color:var(--text-secondary-100);"
-    >
-      Delete block?
-    </div>
     <!-- Prompt message for the user to confirm leaving the team -->
     <p class="text-fs-14 text-ds-font-weight-medium" style="color: var(--text-secondary-1000);">
       Are you sure you want to delete this block?

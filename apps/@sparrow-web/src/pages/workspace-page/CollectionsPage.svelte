@@ -8,6 +8,7 @@
     leftPanelWidth,
     rightPanelWidth,
     leftPanelCollapse,
+    updateActiveSyncStates,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -488,6 +489,7 @@
   let isAccessDeniedModalOpen = false;
   let isSyncReplaceModalOpen = false;
   let isSyncModalOpen = false;
+  let isCollectionSyncing = false;
 
   // Add userValidation state
   let userValidation = {
@@ -686,17 +688,36 @@
     activeSyncChanges = await _viewModel.handleCompareCollection(collectionId);
     if (activeSyncChanges?.percentChange > 75) {
       isSyncReplaceModalOpen = true;
-      isSyncChangesAvailable = true;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: true,
+        isloading: false,
+      });
     } else if (activeSyncChanges?.percentChange > 25) {
       isSyncModalOpen = true;
-      isSyncChangesAvailable = true;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: true,
+        isloading: false,
+      });
     } else if (activeSyncChanges?.percentChange > 0) {
-      isSyncChangesAvailable = true;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: true,
+      });
       await _viewModel.syncCollection(collectionId);
-      isSyncChangesAvailable = false;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: false,
+      });
     } else {
-      isSyncChangesAvailable = false;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: true,
+      });
       await _viewModel.syncCollection(collectionId);
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: false,
+      });
     }
   };
 </script>
@@ -719,7 +740,6 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
-          bind:isSyncChangesAvailable
           userCount={totalTeamCount}
           {refreshWorkspace}
           {refreshLoad}
@@ -1288,13 +1308,17 @@
   <div class="mt-2 mb-4">
     <p
       class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
-      The {activeSyncChanges?.name} collection has been updated in Swagger.
+      The <span style="font-weight: 600; color: var(--text-ds-neutral-50);"
+        >'{activeSyncChanges?.name}'</span
+      > collection has been updated in Swagger.
     </p>
   </div>
   <div class="mt-2 mb-4">
     <p
-      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       <span
         class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
@@ -1303,7 +1327,8 @@
       > New Requests Added
     </p>
     <p
-      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       <span
         class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
@@ -1312,7 +1337,8 @@
       > Requests Modified
     </p>
     <p
-      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       <span
         class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
@@ -1324,6 +1350,7 @@
   <div class="mt-2 mb-4">
     <p
       class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       Would you like to sync your collection with these changes?
     </p>
@@ -1344,12 +1371,23 @@
       title={"Sync Now"}
       size={"medium"}
       textClassProp={"fs-6"}
+      loader={isCollectionSyncing}
+      disable={isCollectionSyncing}
       type={"primary"}
       customWidth={"95px"}
       onClick={async () => {
+        isCollectionSyncing = true;
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: true,
+        });
         await _viewModel.syncCollection(activeSyncChanges.collectionId);
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: false,
+        });
+        isCollectionSyncing = false;
         isSyncModalOpen = false;
-        isSyncChangesAvailable = false;
       }}
     ></Button>
   </div>
@@ -1367,14 +1405,18 @@
   <div class="mt-2 mb-4">
     <p
       class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
-      The {activeSyncChanges?.name} collection has been significantly updated in
-      Swagger, with over 50% of its requests changed.
+      The <span style="font-weight: 600; color: var(--text-ds-neutral-50);"
+        >'{activeSyncChanges?.name}'</span
+      > collection has been significantly updated in Swagger, with over 75% of its
+      requests changed.
     </p>
   </div>
   <div class="mt-2 mb-4">
     <p
-      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       <span
         class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
@@ -1383,7 +1425,8 @@
       > New Requests Added
     </p>
     <p
-      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       <span
         class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
@@ -1392,7 +1435,8 @@
       > Requests Modified
     </p>
     <p
-      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       <span
         class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
@@ -1404,6 +1448,7 @@
   <div class="mt-2 mb-4">
     <p
       class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
     >
       Would you like to replace the existing collection or import as a new?
     </p>
@@ -1415,7 +1460,7 @@
       textClassProp={"fs-6"}
       size={"medium"}
       customWidth={"95px"}
-      type={"secondary"}
+      type={"teritiary-regular"}
       onClick={() => {
         isSyncReplaceModalOpen = false;
       }}
@@ -1424,12 +1469,23 @@
       <Button
         title={"Replace Collection"}
         textClassProp={"fs-6"}
+        loader={isCollectionSyncing}
+        disable={isCollectionSyncing}
         size={"medium"}
         type={"secondary"}
         onClick={async () => {
+          isCollectionSyncing = true;
+          updateActiveSyncStates(activeSyncChanges.collectionId, {
+            isChangesAvailable: false,
+            isloading: true,
+          });
           await _viewModel.replaceCollection(activeSyncChanges.collectionId);
+          updateActiveSyncStates(activeSyncChanges.collectionId, {
+            isChangesAvailable: false,
+            isloading: false,
+          });
+          isCollectionSyncing = false;
           isSyncReplaceModalOpen = false;
-          isSyncChangesAvailable = false;
         }}
       ></Button>
       <Button

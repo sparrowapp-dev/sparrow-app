@@ -11,7 +11,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
-  import { ListRegular } from "@sparrow/library/icons";
+  import { AddRegular, ListRegular, PeopleRegular } from "@sparrow/library/icons";
 
   import {
     TeamTabsEnum,
@@ -24,7 +24,6 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
-  import { sparrowIconBgIcon } from "@sparrow/library/assets";
 
   export let isWebApp = false;
 
@@ -251,6 +250,10 @@
     searchInviteQuery = event.detail.toLowerCase();
   };
 
+  $: activeTeamTab === TeamTabsEnum.INVITES && !openTeam?._data?.invites?.length  ?
+    onUpdateActiveTab(TeamTabsEnum.WORKSPACES): null;
+  
+
   /**
    *
    */
@@ -340,6 +343,7 @@
               <Button
                 title={`Invite`}
                 type={"secondary"}
+                startIcon={PeopleRegular}
                 onClick={() => {
                   isTeamInviteModalOpen = true;
                 }}
@@ -350,6 +354,7 @@
               <Button
                 title={`New Workspace`}
                 type={`primary`}
+                startIcon={AddRegular}
                 onClick={async () => {
                   await handleCreateNewWorkspace();
                 }}
@@ -542,7 +547,8 @@
             style="max-width: 492px; color:var(--bg-ds-neutral-300);"
           >
             <div class="text-center">
-              [Firstname] has invited you to be a member on the {openTeam?.name}.
+             {openTeam?._data?.description?.trim().split(" ")[0]
+} has invited you to be a member on the {openTeam?.name}.
               <br />
               Once you accept you will gain access to the workspaces within this
               hub.

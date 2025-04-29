@@ -162,8 +162,7 @@
   <div class="text-lightGray mb-1">
     <p class="text-ds-font-size-14 text-ds-font-weight-medium">
       Are you sure you want to delete this Environment? <span
-        style="font-weight:700;"
-        class="">"{env.name}"</span
+      class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{env.name}"</span
       >
       and all its variables will be removed and cannot be restored. It will also
       impact all the API requests that use the variables in this environment.
@@ -223,13 +222,6 @@
   style="margin-bottom:2px;"
   class="environment-tab"
   bind:this={environmentTabWrapper}
-  on:click|preventDefault={() => {
-    if (!isRenaming) {
-      if (!env.id.includes(UntrackedItems.UNTRACKED)) {
-        openEnvironment();
-      }
-    }
-  }}
 >
   <button
     tabindex="0"
@@ -246,6 +238,13 @@
       class="d-flex main-collection align-items-center"
       on:contextmenu|preventDefault={(e) => {
         rightClickContextMenu(e);
+      }}
+      on:click|preventDefault={() => {
+        if (!isRenaming) {
+          if (!env.id.includes(UntrackedItems.UNTRACKED)) {
+            openEnvironment();
+          }
+        }
       }}
     >
       <button

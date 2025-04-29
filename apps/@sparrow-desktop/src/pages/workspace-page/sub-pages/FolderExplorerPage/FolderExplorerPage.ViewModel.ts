@@ -297,7 +297,7 @@ class FolderExplorerPage {
     let totalWebSocket = 0;
     let totalGraphQl = 0;
     let totalSocketIo = 0;
-    const folder = await this.getFolder(collection, tab.id);
+    const folder = await this.getFolder(collection, this._tab.getValue().id);
     if (folder?.items) {
       folder.items.forEach((item: any) => {
         if (item.type === ItemType.REQUEST) {

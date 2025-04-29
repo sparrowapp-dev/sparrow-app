@@ -19,6 +19,9 @@ export class RequestTabAdapter {
   private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : HttpRequestContentTypeBaseEnum => {
     let contentType = HttpRequestContentTypeBaseEnum["text/plain"];
     switch (bodyType) {
+      case RequestDatasetEnum.NONE:
+        contentType = HttpRequestContentTypeBaseEnum["none"];
+        break;
       case RequestDataTypeEnum.JSON:
         contentType = HttpRequestContentTypeBaseEnum["application/json"];
         break;
@@ -48,6 +51,10 @@ export class RequestTabAdapter {
     let requestBodyNavigation = RequestDatasetEnum.RAW;
     let requestBodyLanguage = RequestDataTypeEnum.TEXT;
     switch (header) {
+      case HttpRequestContentTypeBaseEnum["none"]:
+        requestBodyNavigation = RequestDatasetEnum.NONE;
+        requestBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
       case HttpRequestContentTypeBaseEnum["application/json"]:
         requestBodyNavigation = RequestDatasetEnum.RAW;
         requestBodyLanguage = RequestDataTypeEnum.JSON;

@@ -26,7 +26,7 @@
   export let isFirstCollectionExpand = false;
   export let onCompareCollection;
   export let onSyncCollection;
-  export let isSyncChangesAvailable = false;
+  let isSyncChangesAvailable = false;
 
   import {
     openedComponent,
@@ -73,6 +73,10 @@
   import type { CollectionBaseInterface } from "@sparrow/common/types/workspace/collection-base";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
   import CircleSmallFilled from "../../../../../../@sparrow-library/src/icons/CircleSmallFilled.svelte";
+  import {
+    activeSyncStore,
+    updateActiveSyncStates,
+  } from "../../../../stores/active-sync";
 
   let deletedIds: string[] = [];
   let requestCount = 0;
@@ -93,6 +97,7 @@
   let inputField: HTMLInputElement;
   let collectionTabWrapper: HTMLElement;
   let isEnableSyncButton = false;
+  let isSyncing = false;
 
   /**
    * Handle position of the context menu
@@ -294,8 +299,13 @@
         onCompareCollection(collection.id)
           .then((result) => {
             activeSyncChanges = result;
+            console.log("changes ---->", activeSyncChanges);
             if (activeSyncChanges.percentChange > 0) {
-              isSyncChangesAvailable = true;
+              // isSyncChangesAvailable = true;
+              updateActiveSyncStates(collection.id, {
+                isChangesAvailable: true,
+                isloading: false,
+              });
               isEnableSyncButton = true;
             }
           })
@@ -312,16 +322,17 @@
     };
   });
 
+  activeSyncStore.subscribe((syncState) => {
+    const state = syncState.get(collection.id);
+    if (state) {
+      isSyncChangesAvailable = state.isChangesAvailable;
+      isSyncing = state.isloading;
+    }
+  });
+
   onDestroy(() => {
     clearInterval(intervalId); // Clean-up to avoid memory leaks
   });
-  $: {
-    if (isSyncChangesAvailable) {
-      console.log("isSyncChangesAvailable changed", isSyncChangesAvailable);
-    } else {
-      console.log("isSyncChangesAvailable", isSyncChangesAvailable);
-    }
-  }
 </script>
 
 <svelte:window
@@ -344,7 +355,7 @@
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Collection? Everything in <span
-        class="text-whiteColor fw-bold">"{collection.name}"</span
+      class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{collection.name}"</span
       >
       will be removed.
     </p>
@@ -406,7 +417,9 @@
 
 {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
-    xAxis={collectionTabWrapper.getBoundingClientRect().right - 119}
+    xAxis={collection.activeSync
+      ? collectionTabWrapper.getBoundingClientRect().right - 115
+      : collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
       collectionTabWrapper.getBoundingClientRect().top + 20,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
@@ -548,7 +561,9 @@
 >
   <button
     tabindex="-1"
-    class="d-flex main-collection align-items-center bg-transparent border-0 gap:2px;"
+    class="d-flex {collection?.activeSync
+      ? 'main-collection-sync'
+      : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
@@ -673,8 +688,17 @@
       </Tooltip>
     {/if}
 
-    {#if collection?.activeSync && isSyncChangesAvailable}
-      <CircleSmallFilled color="var(--icon-ds-danger-300)" />
+    {#if collection?.activeSync && isSyncChangesAvailable && !isSyncing}
+      <Tooltip
+        title={"Changes available for this collection."}
+        placement={"top-center"}
+        distance={10}
+        zIndex={701}
+      >
+        <CircleSmallFilled color="var(--icon-ds-danger-300)" />
+      </Tooltip>
+    {:else if isSyncing}
+      <Spinner size={"15px"} />
     {/if}
     {#if isActiveSyncEnabled && collection?.activeSync}
       <div style="width: 55px">
@@ -731,7 +755,7 @@
       ></div>
     {/if}
     <div class="">
-      {#if isSyncChangesAvailable && isEnableSyncButton}
+      {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <div class="ps-5" style="height: 32px; ">
           <div
             style="background-color: var(--bg-ds-primary-800); align-items:center; justify-content:space-between; border-radius:4px;"
@@ -803,6 +827,7 @@
             : "Add Folder"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -829,6 +854,7 @@
             : "Add REST API"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -853,6 +879,7 @@
             : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -883,6 +910,7 @@
             : "Add WebSocket"}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -908,6 +936,7 @@
             : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
           placement={collection?.activeSync ? "top-left" : "bottom-center"}
           distance={12}
+          zIndex={1000}
         >
           <div
             class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
@@ -1122,6 +1151,9 @@
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-collection {
+    width: calc(100% - 55px);
+  }
+  .main-collection-sync {
     width: calc(100% - 119px);
   }
   .active-collection-tab {
