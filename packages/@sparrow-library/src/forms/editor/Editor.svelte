@@ -8,10 +8,15 @@
   import { placeholder as CreatePlaceHolder } from "@codemirror/view";
   import { linter } from "@codemirror/lint";
   import type { Diagnostic } from "@codemirror/lint";
+  import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
+  import { Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view";
+  import { RangeSetBuilder } from "@codemirror/state";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
   export let value = "";
+  export let customSuggestions = false;
+  export let suggestions: { label: string; type: string }[] = [];
   export let isEditable = true;
   export let isFormatted = false;
   export let isBodyBeautified = false;
@@ -45,6 +50,45 @@
     }
   });
 
+  const variableHighlighter = ViewPlugin.fromClass(
+    class {
+      decorations;
+      constructor(view: any) {
+        this.decorations = this.buildDecorations(view);
+      }
+      update(update: ViewUpdate) {
+        if (update.docChanged || update.viewportChanged) {
+          this.decorations = this.buildDecorations(update.view);
+        }
+      }
+      buildDecorations(view: EditorView) {
+        const builder = new RangeSetBuilder();
+        for (let { from, to } of view.visibleRanges) {
+          const text = view.state.doc.sliceString(from, to);
+          const regex = /{{(.*?)}}/g;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            const start = from + match.index + 2; // skip {{
+            const end = from + match.index + match[0].length - 2; // skip }}
+            builder.add(
+              start,
+              end,
+              Decoration.mark({
+                class: "cm-variable-highlight",
+              }),
+            );
+          }
+        }
+        return builder.finish();
+      }
+
+      destroy() {}
+    },
+    {
+      decorations: (v: any) => v.decorations,
+    },
+  );
+
   // Create diagnostics based on the error message
   function createDiagnostics(doc: string): Diagnostic[] {
     if (isErrorVisible && errorMessage) {
@@ -64,6 +108,16 @@
     createDiagnostics(view.state.doc.toString()),
   );
 
+  function dotCompletionSource(context: CompletionContext) {
+    const before = context.matchBefore(/\./);
+    if (!before || (before.from === context.pos && !context.explicit))
+      return null;
+    return {
+      from: context.pos,
+      options: suggestions,
+    };
+  }
+
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
@@ -75,6 +129,12 @@
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
+      ...(customSuggestions
+        ? [
+            autocompletion({ override: [dotCompletionSource] }),
+            variableHighlighter,
+          ]
+        : []), // Include autocompletion only if customSuggestions is true
     ];
 
     let state = EditorState.create({

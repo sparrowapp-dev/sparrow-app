@@ -21,6 +21,31 @@
     value: "",
   };
   export let environmentVariables;
+  export let handleDynamicExpression:
+    | ((key: string, index: number, id: string) => void)
+    | undefined = undefined;
+  export let handleRemoveDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleOpenCurrentDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let getDEByKeyAndValue: (
+    key: string,
+    value: string,
+    index: number,
+    blockName: string,
+  ) => void | undefined;
+  export let handleDynamicNewExpression: (key: string, index: number) => void;
+  export let handleRemoveDynamicExpressionKey: (
+    key: string,
+    index: number,
+  ) => void;
+  export let blockName: string;
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
@@ -30,6 +55,7 @@
   export let isTopHeaderRequired = true;
   export let isInputBoxEditable = true;
   export let bulkEditPlaceholder = "";
+  export let dynamicExpression = false;
   // export let type: "file" | "text" = "text";
 
   let enableKeyValueHighlighting = true;
@@ -46,7 +72,6 @@
   let pairsContainer: HTMLElement;
 
   const theme = new TabularInputTheme().build();
-  
 
   $: {
     if (keyValue) {
@@ -273,7 +298,10 @@
           />
         </div>
 
-        <div class="d-flex gap-0" style="width: calc(100% - 188px);">
+        <div
+          class="d-flex gap-0"
+          style="width: calc(100% - {dynamicExpression ? '220px' : '188px'});"
+        >
           <div
             class="w-50 position-relative header-text"
             style="padding-left: 6px;"
@@ -327,6 +355,14 @@
             deleteParam={() => {}}
             isInputBoxEditable={false}
             isCheckBoxEditable={false}
+            {dynamicExpression}
+            {getDEByKeyAndValue}
+            {blockName}
+            {handleDynamicExpression}
+            {handleRemoveDynamicExpression}
+            {handleOpenCurrentDynamicExpression}
+            {handleDynamicNewExpression}
+            {handleRemoveDynamicExpressionKey}
           />
         {/if}
         {#each pairs as element, index (index)}
@@ -342,6 +378,13 @@
             {deleteParam}
             {isInputBoxEditable}
             {isCheckBoxEditable}
+            {dynamicExpression}
+            {getDEByKeyAndValue}
+            {blockName}
+            {handleDynamicExpression}
+            {handleRemoveDynamicExpression}
+            {handleOpenCurrentDynamicExpression}
+            {handleDynamicNewExpression}
           />
         {/each}
       </div>

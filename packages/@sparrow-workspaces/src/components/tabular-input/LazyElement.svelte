@@ -8,9 +8,11 @@
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
+  import { DeleteRegular, MathFormulaRegular } from "@sparrow/library/icons";
+  import { isDynamicExpressionModalOpen } from "../../features/testflow-explorer/store/testflow";
 
   export let element;
+  export let dynamicExpression = false;
   export let index;
   export let pairs;
   export let theme;
@@ -22,6 +24,33 @@
   export let deleteParam;
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
+  export let handleRemoveDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleOpenCurrentDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleDynamicExpression:
+    | ((key: string, index: number, id?: string) => void)
+    | undefined = undefined;
+
+  export let getDEByKeyAndValue: (
+    key: string,
+    value: string,
+    index: number,
+    blockName: string,
+  ) => void | undefined;
+
+  export let handleDynamicNewExpression: (key: string, index: number) => void;
+  export let handleRemoveDynamicExpressionKey: (
+    key: string,
+    index: number,
+  ) => void;
+  export let blockName: string;
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -35,6 +64,31 @@
     isInView = detail.inView;
     scrollDirection = detail?.scrollDirection?.vertical;
   };
+
+  let handleOpenDE = (id: string) => {
+    console.log("this is where we are calling the DE", id, index, element.key);
+    handleOpenCurrentDynamicExpression(element.key, index, id);
+  };
+
+  let removeDynamicExpression = (id: string) => {
+    handleRemoveDynamicExpression(element.key, index, id);
+  };
+
+  let dynamicExpressionItems = getDEByKeyAndValue(
+    element?.key || "",
+    element?.value || "",
+    index,
+    blockName,
+  );
+
+  isDynamicExpressionModalOpen.subscribe(() => {
+    dynamicExpressionItems = getDEByKeyAndValue(
+      element?.key || "",
+      element?.value || "",
+      index,
+      blockName,
+    );
+  });
 </script>
 
 <div
@@ -66,7 +120,9 @@
 
     <div
       class="d-flex"
-      style="width: calc(100% - 64px); height:27px; margin-bottom:0px;"
+      style="width: calc(100% - {dynamicExpression
+        ? '62px'
+        : '64px'}); height:27px; margin-bottom:0px;"
     >
       <div class="w-50 position-relative text-ds-font-weight-medium">
         <CodeMirrorInput
@@ -79,7 +135,6 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-          
         />
       </div>
       <div
@@ -96,37 +151,48 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
+          {handleOpenDE}
+          {dynamicExpressionItems}
+          {removeDynamicExpression}
         />
       </div>
     </div>
-    <div
-      style="width:16px;"
-      class="ms-3 d-flex justify-content-center align-items-center"
-    >
-      <div class="d-flex" style="width:16px;">
-        <div class="d-flex">
-          {#if pairs.length - 1 != index}
-            <!-- lists first to last second row -->
-            {#if isInputBoxEditable}
-              <Tooltip
-                title={"Delete"}
-                placement={"bottom-center"}
-                distance={10}
-              >
-                <div class="button-container">
-                  <Button
-                    buttonClassProp=""
-                    size="extra-small"
-                    type="teritiary-regular"
-                    startIcon={DeleteRegular}
-                    onClick={() => deleteParam(index)}
-                  />
-                </div>
-              </Tooltip>
-            {/if}
-          {/if}
-        </div>
-      </div>
+
+    <div class="ms-1 d-flex align-items-center justify-content-between gap-1">
+      {#if pairs.length - 1 != index && isInputBoxEditable}
+        {#if dynamicExpression}
+          <Tooltip
+            title="Insert dynamic"
+            placement="bottom-center"
+            distance={10}
+          >
+            <div class="button-container">
+              <Button
+                size="extra-small"
+                type="teritiary-regular"
+                startIcon={MathFormulaRegular}
+                onClick={() => {
+                  isDynamicExpressionModalOpen.set(true);
+                  handleDynamicNewExpression(element?.key, index);
+                }}
+              />
+            </div>
+          </Tooltip>
+        {/if}
+        <Tooltip title="Delete" placement="bottom-center" distance={10}>
+          <div class="button-container">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={DeleteRegular}
+              onClick={() => {
+                deleteParam(index);
+                handleRemoveDynamicExpressionKey(element.key, index);
+              }}
+            />
+          </div>
+        </Tooltip>
+      {/if}
     </div>
   {/if}
   {#if !isInView}

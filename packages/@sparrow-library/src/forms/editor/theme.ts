@@ -177,6 +177,10 @@ export const basicTheme = EditorView.theme({
     fontFamily: EditorFont,
     backgroundColor: "transparent",
   },
+  ".cm-variable-highlight": {
+    color: "#D75CA7",
+    fontWeight: "bold",
+  },
 });
 
 const editorColors = {
