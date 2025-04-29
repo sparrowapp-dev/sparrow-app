@@ -346,19 +346,16 @@ class DecodeTestflow {
     text: string,
     environmentVariables,
   ): string => {
-    let updatedText = text.replace(/\[\[(.*?)\]\]/g, (_, squareContent) => {
+    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, squareContent) => {
       const updated = squareContent
       .replace(/\\/g, '').replace(/"/g, `'`)
       
       .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
         return `'{{${inner.trim()}}}'`;
       });
-      return `[[${updated}]]` 
+      return `[*$[${updated}]$*]`;
     });
-    // if(text.includes("sdfg")){
-    //   debugger;
 
-    // }
     environmentVariables.forEach((element) => {
       const regex = new RegExp(`{{(${element.key})}}`, "g");
       updatedText = updatedText.replace(regex, element.value);
@@ -377,7 +374,7 @@ class DecodeTestflow {
     response,
   ): string => {
     // return text;
-    const result = text.replace(/\[\[(.*?)\]\]/g, (_, expr) => {
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
       try {
         // Use Function constructor to evaluate with access to `response`
         const fn = new Function("response", `
@@ -409,7 +406,7 @@ class DecodeTestflow {
     response,
   ): string => {
     // return text;
-    const result = text.replace(/\[\[(.*?)\]\]/g, (_, expr) => {
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
       try {
         // Use Function constructor to evaluate with access to `response`
         const fn = new Function("response", `

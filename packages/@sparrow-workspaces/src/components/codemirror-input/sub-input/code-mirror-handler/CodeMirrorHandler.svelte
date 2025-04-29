@@ -180,7 +180,7 @@
    * @example [[expression]]
    */
   const expressionMatcher = new MatchDecorator({
-    regexp: /\[\[(\w+)\]\]/g,
+    regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
     decoration: (match) =>
       Decoration.replace({
         widget: new ExpressionWidget(

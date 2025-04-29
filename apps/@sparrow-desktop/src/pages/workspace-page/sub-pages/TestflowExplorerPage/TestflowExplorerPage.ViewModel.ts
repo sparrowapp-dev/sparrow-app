@@ -564,8 +564,14 @@ export class TestflowExplorerPageViewModel {
                 formattedHeaders,
               );
 
-            
-                console.log(decodeData[4]);
+              const reqParam = {};
+              const params = new URL(decodeData[0]).searchParams;
+              
+              
+              for (const [key, value] of params.entries()) {
+                reqParam[key] = value;
+              }
+                
                 const headersObject = Object.fromEntries(
                   JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
                 );
@@ -598,7 +604,7 @@ export class TestflowExplorerPageViewModel {
                     url: decodeData[0],
                     headers: headersObject || {},
                     body:reqBody,
-                    parameters:{}
+                    parameters:reqParam || {}
                   }
                 }
            
