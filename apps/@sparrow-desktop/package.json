@@ -57,6 +57,7 @@
     "js-yaml": "^4.1.0",
     "jsoneditor": "^9.10.3",
     "marked": "^13.0.2",
+    "posthog-js": "1.236.7",
     "mixpanel-browser": "^2.48.1",
     "monaco-editor": "^0.44.0",
     "path": "^0.12.7",
