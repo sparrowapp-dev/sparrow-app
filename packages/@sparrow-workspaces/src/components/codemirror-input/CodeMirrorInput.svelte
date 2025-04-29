@@ -32,6 +32,9 @@
   export { componentClass as class };
   export let userRole: WorkspaceRole | undefined = undefined;
   export let isFocusedOnMount = false;
+  export let handleOpenDE: (id: string) => void | undefined;
+  export let removeDynamicExpression: (id: string) => void | undefined;
+  export let dynamicExpressionItems: any | undefined;
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
@@ -117,6 +120,9 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
+  {handleOpenDE}
+  {removeDynamicExpression}
+  {dynamicExpressionItems}
   {enableEnvironmentHighlighting}
 />
 

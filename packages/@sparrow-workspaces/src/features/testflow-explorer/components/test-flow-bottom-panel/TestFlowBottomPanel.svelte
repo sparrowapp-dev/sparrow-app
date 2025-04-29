@@ -272,6 +272,7 @@
               params={selectedBlock?.data?.requestData?.queryParams ?? []}
               authParameter={{}}
               isBulkEditActive={false}
+              {selectedBlock}
               onUpdateRequestState={handleUpdateRequestData}
               {environmentVariables}
             />
@@ -291,6 +292,7 @@
               authHeader={{}}
               {environmentVariables}
               onHeadersChange={handleUpdateRequestData}
+              {selectedBlock}
               isBulkEditActive={false}
             />
           {:else if requestNavigation === RequestSectionEnum.AUTHORIZATION}

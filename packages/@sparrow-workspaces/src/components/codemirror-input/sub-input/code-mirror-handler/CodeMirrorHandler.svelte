@@ -68,6 +68,9 @@
   export let id;
   export let componentClass;
   export let isFocusedOnMount = false;
+  export let handleOpenDE: (id: string) => void;
+  export let removeDynamicExpression: (id: string) => void | undefined;
+  export let dynamicExpressionItems: any | undefined;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -139,6 +142,7 @@
       readonly name: string,
       readonly from: number,
       readonly to: number,
+      readonly id: string,
     ) {
       super();
     }
@@ -157,6 +161,8 @@
       close.onclick = (e) => {
         e.stopPropagation();
         view.dispatch({ changes: { from: this.from, to: this.to } });
+
+        removeDynamicExpression(this.id);
       };
 
       container.appendChild(text);
@@ -164,7 +170,7 @@
 
       container.onclick = (e) => {
         e.stopPropagation();
-        // add click operation here
+        handleOpenDE(this.id);
       };
 
       return container;
@@ -174,24 +180,44 @@
       return true;
     }
   }
+  let currentIndex = 0;
 
   /**
    * Create regex matching pattern for the expression.
    * @example [[expression]]
    */
+
+  //  regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
+  //   decoration: (match) =>
+  //     Decoration.replace({
   const expressionMatcher = new MatchDecorator({
-    regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
-    decoration: (match) =>
-      Decoration.replace({
+    // regexp: /\[\[([^\]]+)\]\]/g,
+    regexp: /\[\[([^\]]+)\]\]/g,
+    decoration: (match) => {
+      const name = match[1];
+
+      // Pick ID sequentially based on currentIndex
+      const dynamicItem = dynamicExpressionItems[currentIndex];
+      const id = dynamicItem?.id || "";
+
+      console.log(
+        "the maing values we are getting ---------------->",
+        id,
+        dynamicExpressionItems,
+      );
+      currentIndex++;
+
+      return Decoration.replace({
         widget: new ExpressionWidget(
-          match[1],
+          name,
           match.index,
           match.index + match[0].length,
+          id,
         ),
         inclusive: false,
-      }),
+      });
+    },
   });
-
   /**
    * Create a decoration set for the expression matcher.
    * @param view - The editor view instance.
@@ -200,9 +226,11 @@
     class {
       placeholders: DecorationSet;
       constructor(view: EditorView) {
+        currentIndex = 0;
         this.placeholders = expressionMatcher.createDeco(view);
       }
       update(update: ViewUpdate) {
+        currentIndex = 0;
         this.placeholders = expressionMatcher.updateDeco(
           update,
           this.placeholders,
