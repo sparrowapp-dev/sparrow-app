@@ -70,7 +70,6 @@
         item?.method === "request"
       );
     });
-
     // Add params only if key doesn't already exist
     for (const param of urlParams) {
       if (
@@ -87,16 +86,23 @@
       }
     }
 
+    for (const param of mergedArray) {
+      const cleanedValue = param.value
+        .replace(/\[\[.*?\]\]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      param.value = cleanedValue;
+    }
+
     // Add the Dynamic expression value
     for (const dynamicParam of keyWithValues) {
-      console.log("dyn--------------------------------->", dynamicParam);
       if (dynamicParam.key.trim() !== "" && dynamicParam.value.trim() !== "") {
         const existingParam = mergedArray.find(
           (ele) => ele?.key.trim() === dynamicParam.key.trim(),
         );
 
         if (existingParam) {
-          console.log("This is the existing params", existingParam);
           // Step 1: Remove any existing [[...]] part from the value (if it exists)
           const cleanedValue = existingParam.value
             .replace(/\[\[.*?\]\]/g, "")
