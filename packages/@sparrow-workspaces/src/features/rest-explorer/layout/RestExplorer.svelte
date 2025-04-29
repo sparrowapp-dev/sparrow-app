@@ -326,8 +326,6 @@
     try {
       switch (target) {
         case RequestSectionEnum.REQUEST_BODY: {
-          console.log(`Changing ${target} :> `);
-
           // For testing, remove while raising PR
           // requestBodyType = "URL Encoded" as RequestDatasetEnum;
           // requestBodyType = "Form Data" as RequestDatasetEnum;
@@ -341,7 +339,6 @@
         }
         case RequestSectionEnum.HEADERS:
         case RequestSectionEnum.PARAMETERS: {
-          // console.log(`Changing ${target} ::>> `);
           const newData = convertJsonToKeyValPairs(JSON.parse(modifiedContent));
 
           // Auto navigating to request navigator tab
