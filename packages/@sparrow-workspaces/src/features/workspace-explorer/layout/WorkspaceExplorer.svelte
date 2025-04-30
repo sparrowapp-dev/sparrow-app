@@ -118,6 +118,7 @@
     <WorkspaceUpdates
       workspaceUpdatesList={$workspaceUpdatesList}
       {onWorkspaceUpdateScroll}
+      {isSharedWorkspace}
     />
     <hr />
     <CollectionCount {collectionLength} />

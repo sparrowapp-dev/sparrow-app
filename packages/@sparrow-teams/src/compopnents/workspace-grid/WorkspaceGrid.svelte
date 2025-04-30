@@ -5,9 +5,9 @@
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
   import { ArrowForward, LockClosedRegular } from "@sparrow/library/icons";
-  import MoreVerticalRegular from "@sparrow/library/icons";
+  import { MoreVerticalRegular } from "@sparrow/library/icons";
   // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
-  import Tags from "@sparrow/library/ui";
+  import { Tag } from "@sparrow/library/ui";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -142,7 +142,7 @@
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
       <div class="d-flex" style="justify-content: space-between;">
-        <Tags text="Private" type="cyan" endIcon={LockClosedRegular} />
+        <Tag text="Private" type="cyan" endIcon={LockClosedRegular} />
         <button
           class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
             ? 'threedot-active'
@@ -182,9 +182,7 @@
         class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         style="color:var(--text-secondary-200)"
       >
-        {workspace?.description
-          ? workspace.description
-          : "No summary added"}
+        {workspace?.description ? workspace.description : "No summary added"}
       </p>
 
       <div class="d-flex justify-content-between">
