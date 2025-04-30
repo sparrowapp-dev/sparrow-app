@@ -13,23 +13,8 @@
   export let dynamicExpressionEditorContent;
   export let onInsertExpression;
   let expression = dynamicExpressionEditorContent;
-  console.log(expression);
-  export let selectedApiRequestType: string;
-  export let selectedRequest: any;
-  export let handleSetDynamicExpression: () => void;
-  export let handleSelectApi: (data: any) => void;
   export let handleAddingNested: (value: string) => void;
-  export let handleRemoveSelectApi: () => void;
-  export let handleExpressionChange: (value: string) => void;
-  export let handleSelectVariable: (requestVariable: any) => void;
-  export let handleFunctionType: (label: string, data: any) => void;
-  export let onUpdateEnvironment: any;
-  export let handleSelectRequestType: (
-    requestData: any,
-    type: string,
-    label: string,
-    blockName: string,
-  ) => void;
+
   export let onPreviewExpression;
 
   let currentTabId: TFDynamicExpressionTabsEnum =
@@ -55,6 +40,7 @@
   ];
 
   let responseNavigation = "Dynamic Content";
+  let selectedApiRequestType: string = "";
 
   onMount(() => {
     tabs = refreshTabs();
@@ -75,20 +61,15 @@
   $: currentOpenItem = $isDynamicExpressionContent.find(
     (item) => item.isCurrentOpen,
   );
-  // $: expression = currentOpenItem?.value || "";
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px;">
   <div class="w-50">
     <ExpressionEditor
       bind:expression
-      {handleAddingNested}
-      {selectedRequest}
-      {handleExpressionChange}
-      {onUpdateEnvironment}
-      {selectedApiRequestType}
-      {environmentVariables}
       {onPreviewExpression}
+      {handleAddingNested}
+      bind:selectedApiRequestType
     />
   </div>
   <div class="w-50">
@@ -107,16 +88,13 @@
         {#key currentTabId}
           {#if currentTabId === TFDynamicExpressionTabsEnum.DYNAMICCONTENT}
             <DynamicContent
+              bind:expression
               {requestApis}
-              {selectedRequest}
-              {handleSelectApi}
-              {handleRemoveSelectApi}
-              {handleSelectRequestType}
               {environmentVariables}
-              {handleSelectVariable}
+              bind:selectedApiRequestType
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
-            <FunctionsOptions {handleFunctionType} />
+            <FunctionsOptions bind:expression />
           {/if}
         {/key}
       </div>
@@ -128,10 +106,10 @@
   style="margin-top: 24px;"
 >
   <div>
-    <p style="margin: 0px;">
+    <!-- <p style="margin: 0px;">
       {currentOpenItem?.blockName} > {currentOpenItem?.method} > {currentOpenItem?.requestType}
       > {currentOpenItem?.key}
-    </p>
+    </p> -->
   </div>
   <div>
     <Button

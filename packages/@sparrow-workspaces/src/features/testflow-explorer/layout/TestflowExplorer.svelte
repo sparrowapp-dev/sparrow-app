@@ -1197,152 +1197,10 @@
   let selectedAPI: any;
   let expression: string = "";
   let selectedApiRequestType: any = "";
-  let previousSelectedApi: any;
-
-  const handleSelectApi = (data: any) => {
-    previousSelectedApi = selectedAPI;
-    selectedAPI = data;
-  };
-
-  const handleRemoveSelectApi = () => {
-    selectedAPI = null;
-  };
-
-  const handleSelectRequestType = (
-    requestType: any,
-    type: string,
-    label: string,
-    blockName: string,
-  ) => {
-    selectedApiRequestType = type;
-    if (
-      checkingPrevious(previousSelectedApi, blockName) &&
-      !hasTwoOrMoreDots(expression)
-    ) {
-      expression = blockName + "." + label;
-    } else {
-      const currentExpresion = blockName + "." + label;
-      if (!hasFourParentheses(expression)) {
-        expression = "(" + expression + ")" + "(" + currentExpresion + ")";
-        return;
-      }
-      expression = expression + "(" + currentExpresion + ")";
-    }
-  };
-
-  function checkingPrevious(
-    previousSelectedApi: any,
-    blockName: string,
-  ): boolean {
-    if (!previousSelectedApi) {
-      return true;
-    }
-    return previousSelectedApi.blockName === blockName;
-  }
-
-  function hasTwoOrMoreDots(expression: string) {
-    // Count the number of dots in the string
-    const dotCount = (expression.match(/\./g) || []).length;
-    return dotCount >= 2;
-  }
-
-  function hasFourParentheses(expression: string): boolean {
-    const openParenCount = (expression.match(/\(/g) || []).length;
-    const closeParenCount = (expression.match(/\)/g) || []).length;
-
-    return openParenCount >= 2 && closeParenCount >= 2;
-  }
-
-  const handleFunctionType = (label: string, data: any) => {
-    if (expression !== "") {
-      label = label.slice(0, -2);
-      expression = expression.trim();
-      let value = removeFunctionCall(expression);
-      expression = label + "(" + extractContent(value) + ")";
-    } else {
-      expression = label;
-    }
-  };
-
-  function extractContent(expression: string) {
-    if (
-      expression.includes(".") &&
-      !expression.includes("(") &&
-      !expression.includes("{")
-    ) {
-      return expression.trim();
-    }
-    const pattern = /\((.*?)\)|\{\{(.*?)\}\}|,/g;
-    let result = [];
-    let match;
-    while ((match = pattern.exec(expression)) !== null) {
-      result.push(match[1] || match[2]);
-    }
-    return result.filter(Boolean).join(", ");
-  }
-
-  function removeFunctionCall(expression: string): string {
-    // Pattern to match function() -> "" (empty string)
-    const functionPattern = /function\(\)/g;
-
-    // Pattern to match value(asasdasd) -> asasdasd
-    const valuePattern = /value\(([^)]*)\)/g;
-
-    // Check if the expression contains any of our patterns
-    const hasFunctionPattern = functionPattern.test(expression);
-    // Reset the regex lastIndex after testing
-    functionPattern.lastIndex = 0;
-
-    const hasValuePattern = valuePattern.test(expression);
-    // Reset the regex lastIndex after testing
-    valuePattern.lastIndex = 0;
-
-    // If it's normal text (doesn't match our patterns), return it directly
-    if (!hasFunctionPattern && !hasValuePattern) {
-      return expression.trim();
-    }
-
-    // Otherwise apply our replacements
-    let result = expression.replace(functionPattern, "");
-    result = result.replace(valuePattern, "$1");
-
-    return result.trim();
-  }
-
-  const handleSelectVariable = (requestVariable: any) => {
-    expression = expression + "{{" + requestVariable.key + "}}";
-  };
-
-  const handleExpressionChange = (value: string) => {
-    expression = value;
-  };
 
   const handleAddingNested = (value: string) => {
     if (selectedApiRequestType === "body") {
       expression = expression + value;
-    }
-  };
-
-  const handleSetDynamicExpression = () => {
-    const currentOpenItem = $isDynamicExpressionContent.find(
-      (item) => item.isCurrentOpen,
-    );
-    if (
-      currentOpenItem?.blockName &&
-      currentOpenItem?.requestType &&
-      currentOpenItem?.method
-    ) {
-      updateDynamicExpressionValue(
-        currentOpenItem?.id,
-        currentOpenItem?.blockName,
-        currentOpenItem?.requestType,
-        currentOpenItem?.key,
-        currentOpenItem?.method,
-        currentOpenItem?.index,
-        expression,
-      );
-      expression = "";
-      // isDynamicExpressionModalOpen.set(false);
     }
   };
 
@@ -1656,20 +1514,10 @@
   <TestflowDynamicExpression
     {dynamicExpressionEditorContent}
     requestApis={$nodes}
-    selectedRequest={selectedAPI}
-    {handleSelectApi}
-    {handleRemoveSelectApi}
-    {environmentVariables}
-    {handleSelectVariable}
-    {handleSelectRequestType}
-    {selectedApiRequestType}
-    {onUpdateEnvironment}
-    {handleAddingNested}
-    {handleFunctionType}
-    {handleExpressionChange}
-    {onPreviewExpression}
-    {handleSetDynamicExpression}
     {onInsertExpression}
+    {handleAddingNested}
+    {environmentVariables}
+    {onPreviewExpression}
   />
 </Modal>
 

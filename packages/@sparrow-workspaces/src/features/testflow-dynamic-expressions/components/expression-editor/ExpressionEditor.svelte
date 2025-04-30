@@ -5,8 +5,6 @@
   import { selectedRequestTypes } from "../../../testflow-explorer/store";
 
   export let expression = "";
-  console.log(expression);
-  export let handleExpressionChange: (value: string) => void;
   export let handleAddingNested: (value: string) => void;
   export let selectedApiRequestType: string;
   export let onPreviewExpression;
