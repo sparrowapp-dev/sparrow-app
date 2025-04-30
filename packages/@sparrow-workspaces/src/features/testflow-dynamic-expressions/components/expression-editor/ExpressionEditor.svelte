@@ -10,6 +10,7 @@
   export let onPreviewExpression;
 
   let expressionPreviewResult = "";
+  let expressionErrorResult = "";
   let data: any = {};
   let topLevelKeys: any[] = [];
 
@@ -114,11 +115,28 @@
       type="link-primary"
       title="Run Preview"
       size="small"
+      disable={!expression}
       onClick={async () => {
-        expressionPreviewResult = (await onPreviewExpression(expression)) || "";
+        expressionPreviewResult = "";
+        expressionErrorResult = "";
+        const res = await onPreviewExpression(expression);
+        if (res.status === "pass") {
+          if (res.message === undefined) {
+            expressionPreviewResult = "undefined";
+          } else if (res.message === null) {
+            expressionPreviewResult = "null";
+          } else {
+            expressionPreviewResult = res.result;
+          }
+        } else {
+          expressionErrorResult = res.result;
+        }
       }}
     />
   </div>
+  <p class="text-fs-12" style="color: var(--text-ds-danger-300)">
+    {expressionErrorResult}
+  </p>
 </div>
 
 <style>

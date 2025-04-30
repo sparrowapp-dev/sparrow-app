@@ -726,8 +726,9 @@ export class TestflowExplorerPageViewModel {
   private setDynamicExpression2 = (
     text: string,
     response,
-  ): string => {
+  ): any => {
     // return text;
+    let status = "fail";
     const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
       try {
         // Use Function constructor to evaluate with access to `response`
@@ -738,18 +739,22 @@ export class TestflowExplorerPageViewModel {
         `);
         const s = fn(response);
         if(typeof s === "string"){
+          status = "pass";
           return s;
         }
         if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
+          status = "pass";
           return `${JSON.stringify(s)}`; // serialize object
         }
+        status = "pass";
         return s;
       } catch (e) {
+        status = "fail";
         console.error("Eval error:", e.message);
-        return '';
+        return e.message;
       }
     });
-    return result;
+    return {result, status};
   };
 
  public handlePreviewExpression = async(expression) => {
