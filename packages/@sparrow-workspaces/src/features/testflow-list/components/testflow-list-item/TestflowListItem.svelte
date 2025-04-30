@@ -162,7 +162,10 @@
       class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Flow?
-      <span class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{flow.name}"</span>
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{flow.name}"</span
+      >
       and all its blocks will be removed and cannot be restored.
     </p>
   </div>
@@ -274,7 +277,7 @@
     </div>
     {#if flow._id.includes(UntrackedItems.UNTRACKED)}
       <Spinner size={"15px"} />
-    {:else if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+    {:else if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
       <Tooltip
         placement="bottom-center"
         title="More"

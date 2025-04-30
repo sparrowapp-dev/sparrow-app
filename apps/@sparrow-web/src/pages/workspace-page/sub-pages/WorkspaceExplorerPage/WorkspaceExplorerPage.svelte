@@ -27,6 +27,7 @@
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;
   let workspaceID = tab._data.path.workspaceId;
+  let workspaceType = "";
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -64,6 +65,7 @@
     users: [],
     description: "",
   };
+  let isSharedWorkspace = false;
   /**
    * Subscribes to the active workspace and updates the current workspace details
    * and also updates current team details associated with that workspace.
@@ -82,6 +84,8 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        isSharedWorkspace = value._data.isShared;
+        workspaceType = value._data?.workspaceType || "PRIVATE";
       }
     },
   );
@@ -111,6 +115,8 @@
 <WorkspaceExplorer
   bind:userRole
   tab={_viewModel.tab}
+  {isSharedWorkspace}
+  {workspaceType}
   {workspaceUpdatesList}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,
@@ -124,6 +130,8 @@
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}
+  onMakeWorkspacePublic={_viewModel.handleWorkspaceVisibility}
+  onShareWorkspace={_viewModel.handleShareWorkspace}
 />
 
 <Modal

@@ -166,6 +166,7 @@ export class TeamsViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -183,6 +184,7 @@ export class TeamsViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,
@@ -207,7 +209,11 @@ export class TeamsViewModel {
           return _workspace._id;
         }),
       );
-      if (!isAnyWorkspaceActive) {
+      const sharedWorkspce =
+        await this.workspaceRepository.findWorkspaceByTeamId(
+          "sharedWorkspaceTeam",
+        );
+      if (!isAnyWorkspaceActive && !sharedWorkspce) {
         this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
       }
@@ -274,6 +280,15 @@ export class TeamsViewModel {
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
     await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
+    const sharedTeam = await this.teamRepository.getTeamDoc(
+      "sharedWorkspaceTeam",
+    );
+    if (sharedTeam && res?._data.team?.teamId !== "sharedWorkspaceTeam") {
+      await this.workspaceRepository.deleteWorkspacesByTeamId(
+        "sharedWorkspaceTeam",
+      );
+      await this.teamRepository.removeTeam("sharedWorkspaceTeam");
+    }
     navigate("collections");
   };
 
@@ -292,6 +307,21 @@ export class TeamsViewModel {
   public handleApiClick = async (api: any): void => {
     await this.tabRepository.activeTab(api.id, api.path.workspaceId);
     await this.workspaceRepository.setActiveWorkspace(api.path.workspaceId);
+    const sharedTeam = await this.teamRepository.getTeamDoc(
+      "sharedWorkspaceTeam",
+    );
+    const prevWorkspace = await this.workspaceRepository.readWorkspace(
+      api.path.workspaceId,
+    );
+    if (
+      sharedTeam &&
+      prevWorkspace?._data.team?.teamId !== "sharedWorkspaceTeam"
+    ) {
+      await this.workspaceRepository.deleteWorkspacesByTeamId(
+        "sharedWorkspaceTeam",
+      );
+      await this.teamRepository.removeTeam("sharedWorkspaceTeam");
+    }
     moveNavigation("right");
     navigate("collections");
   };
