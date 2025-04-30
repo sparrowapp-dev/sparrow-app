@@ -7,7 +7,7 @@
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
-  import { posthogClient, initPostHog } from "@app/utils/posthog/posthogConfig";
+  import { initPostHog } from "@app/utils/posthog/posthogConfig";
   export let url = "/";
 
   onMount(async () => {
