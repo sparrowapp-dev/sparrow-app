@@ -322,6 +322,14 @@
     // For testing, remove while raising PR
     // target = "Parameters";
     // target = "Headers";
+    if (
+      isMergeViewEnableForHeaders ||
+      isMergeViewEnableForParams ||
+      isMergeViewEnableForRequestBody
+    ) {
+      notifications.error("Please accept the current suggested changes first.");
+      return;
+    }
 
     try {
       switch (target) {
