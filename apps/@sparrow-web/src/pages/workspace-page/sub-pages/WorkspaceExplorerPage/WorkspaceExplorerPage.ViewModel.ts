@@ -580,10 +580,10 @@ export default class WorkspaceExplorerViewModel {
       notifications.success(
         `Workspace published! ‘${progressiveTab.name}’ is now public.`,
       );
-      return;
     } else {
       notifications.error("Failed. The workspace could not be published.");
     }
+    return response;
   };
 
   public handleShareWorkspace = async () => {

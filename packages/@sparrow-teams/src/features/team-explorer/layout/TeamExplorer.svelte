@@ -11,7 +11,11 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
-  import { AddRegular, ListRegular, PeopleRegular } from "@sparrow/library/icons";
+  import {
+    AddRegular,
+    ListRegular,
+    PeopleRegular,
+  } from "@sparrow/library/icons";
 
   import {
     TeamTabsEnum,
@@ -250,9 +254,9 @@
     searchInviteQuery = event.detail.toLowerCase();
   };
 
-  $: activeTeamTab === TeamTabsEnum.INVITES && !openTeam?._data?.invites?.length  ?
-    onUpdateActiveTab(TeamTabsEnum.WORKSPACES): null;
-  
+  $: activeTeamTab === TeamTabsEnum.INVITES && !openTeam?._data?.invites?.length
+    ? onUpdateActiveTab(TeamTabsEnum.WORKSPACES)
+    : null;
 
   /**
    *
@@ -293,7 +297,7 @@
                 >{openTeam?.name || ""}
               </span>
               <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
-              {#if !isGuestUser}
+              {#if !isGuestUser && openTeam?.teamId !== "sharedWorkspaceTeam"}
                 {#if userRole !== "owner"}
                   <div
                     class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
@@ -547,8 +551,8 @@
             style="max-width: 492px; color:var(--bg-ds-neutral-300);"
           >
             <div class="text-center">
-             {openTeam?._data?.description?.trim().split(" ")[0]
-} has invited you to be a member on the {openTeam?.name}.
+              {openTeam?._data?.description?.trim().split(" ")[0]} has invited you
+              to be a member on the {openTeam?.name}.
               <br />
               Once you accept you will gain access to the workspaces within this
               hub.
@@ -557,28 +561,25 @@
 
           <div class="d-flex" style="gap:12px;">
             <Button
-            type="primary"
-             title="Accept"
-             onClick={async() => {
+              type="primary"
+              title="Accept"
+              onClick={async () => {
                 isInviteAcceptProgress = true;
                 await onAcceptInvite(openTeam?.teamId);
                 isInviteAcceptProgress = false;
-
-             }}
-             loader={isInviteAcceptProgress}
+              }}
+              loader={isInviteAcceptProgress}
             />
-           
+
             <Button
-            type="secondary"
-             title="Ignore"
-             onClick={async() => {
+              type="secondary"
+              title="Ignore"
+              onClick={async () => {
                 isInviteIgnoreProgress = true;
                 await onIgnoreInvite(openTeam?.teamId);
                 isInviteIgnoreProgress = false;
-                
-             }}
-             loader={isInviteIgnoreProgress}
-             
+              }}
+              loader={isInviteIgnoreProgress}
             />
           </div>
         </div>
