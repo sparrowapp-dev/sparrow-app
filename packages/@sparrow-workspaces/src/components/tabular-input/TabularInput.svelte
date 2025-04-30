@@ -5,7 +5,7 @@
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "../";
-  import { onMount } from "svelte";
+  import { afterUpdate, onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
@@ -45,8 +45,21 @@
   let isValidSyntax = true;
   let pairsContainer: HTMLElement;
 
+  // This is a flag to determine if we should scroll to the bottom
+  let shouldScrollToBottom = false;
+
+  // This is for scrolling into view when a new row is added and the component updates
+  afterUpdate(() => {
+    if (shouldScrollToBottom && pairsContainer) {
+      const lastRow = pairsContainer.lastElementChild;
+      if (lastRow) {
+        lastRow.scrollIntoView({ behavior: "auto", block: "end" });
+      }
+      shouldScrollToBottom = false;
+    }
+  });
+
   const theme = new TabularInputTheme().build();
-  
 
   $: {
     if (keyValue) {
@@ -77,20 +90,6 @@
     }
   };
 
-  /**
-   * Scrolls the container to bring the newly added row into view
-   */
-  const scrollToNewRow = () => {
-    setTimeout(() => {
-      if (pairsContainer) {
-        const lastRow = pairsContainer.lastElementChild;
-        if (lastRow) {
-          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-      }
-    }, 100);
-  };
-
   const updateParam = async (index: number): Promise<void> => {
     pairs = pairs;
     if (
@@ -103,10 +102,9 @@
     ) {
       pairs[pairs.length - 1].checked = true;
       pairs.push({ key: "", value: "", checked: false });
+      shouldScrollToBottom = true;
       pairs = pairs;
       callback(pairs);
-
-      scrollToNewRow();
     } else {
       callback(pairs);
     }
