@@ -7,7 +7,7 @@
   import { Modal } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import { DeleteWorkspace } from "@sparrow/common/features";
+  import { DeleteWorkspace, PublicWorkspace } from "@sparrow/common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
   import { user } from "@app/store/auth.store";
@@ -28,6 +28,7 @@
   let selectedTeam: TeamDocument;
   let workspaceID = tab._data.path.workspaceId;
   let workspaceType = "";
+  let isWorkspacePublicModalOpen = false;
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -130,7 +131,7 @@
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}
-  onMakeWorkspacePublic={_viewModel.handleWorkspaceVisibility}
+  onMakeWorkspacePublic={() => (isWorkspacePublicModalOpen = true)}
   onShareWorkspace={_viewModel.handleShareWorkspace}
 />
 
@@ -174,6 +175,28 @@
         await _viewModel.handleDeleteWorkspace(selectedWorkspace);
       if (response?.isSuccessful) {
         isDeleteWorkspaceModalOpen = false;
+      }
+    }}
+  />
+</Modal>
+
+<Modal
+  title={"Make it public"}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isWorkspacePublicModalOpen}
+  handleModalState={(flag) => {
+    isWorkspacePublicModalOpen = flag;
+  }}
+>
+  <PublicWorkspace
+    bind:isWorkspacePublicModalOpen
+    workspace={currentWorkspace}
+    onMakePublicWorkspace={async () => {
+      const response = await _viewModel.handleWorkspaceVisibility();
+      if (response?.isSuccessful) {
+        isWorkspacePublicModalOpen = false;
       }
     }}
   />
