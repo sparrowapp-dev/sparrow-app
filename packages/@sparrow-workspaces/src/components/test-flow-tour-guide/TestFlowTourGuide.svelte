@@ -101,7 +101,7 @@
       <Button
         type="primary"
         size="small"
-        title={isLastStep ? "Done" : "Next"}
+        title={isLastStep ? "Finish" : "Next"}
         onClick={handleNext}
       />
     </div>
