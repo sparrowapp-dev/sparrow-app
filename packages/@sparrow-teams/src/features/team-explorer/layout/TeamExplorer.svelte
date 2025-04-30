@@ -13,7 +13,9 @@
   import { Avatar } from "@sparrow/library/ui";
   import {
     AddRegular,
+    GlobeRegular,
     ListRegular,
+    LockClosedRegular,
     PeopleRegular,
   } from "@sparrow/library/icons";
 
@@ -128,6 +130,7 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+  let selectedFilter = "All";
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -264,6 +267,13 @@
   onDestroy(() => {
     selectedViewSubscribe();
   });
+
+  const getFilteredWorkspaces = () => {
+    if (selectedFilter === "All") {
+      return workspaces; // Return all workspaces
+    }
+    return workspaces.filter((workspace) => workspace.workspacetype === selectedFilter);
+  };
 </script>
 
 {#if openTeam}
@@ -415,7 +425,48 @@
           {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
             <div class="h-100 d-flex flex-column">
               {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
-                <div class="">
+                <div
+                  class="d-flex align-items-center" 
+                  style="gap: 20px; justify-content:space-between; align-items:center;"
+                >
+                  <div class="d-flex align-items-center" style="gap: 12px; margin-bottom: 12px;">
+                    <span
+                      role="button"
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center ${
+                        selectedFilter === "All"
+                          ? "bg-tertiary-500 text-secondary-100"
+                          : ""
+                      }`}
+                      on:click={() => (selectedFilter = "All")}
+                    >
+                      All
+                    </span>
+
+                    <span
+                      role="button"
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
+                        selectedFilter === "Private"
+                          ? "bg-tertiary-500 text-secondary-100"
+                          : ""
+                      }`}
+                      on:click={() => (selectedFilter = "Private")}
+                    >
+                      <LockClosedRegular size="16px" />
+                      Private
+                    </span>
+                    <span
+                      role="button"
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
+                        selectedFilter === "Public"
+                          ? "bg-tertiary-500 text-secondary-100"
+                          : ""
+                      }`}
+                      on:click={() => (selectedFilter = "Public")}
+                    >
+                      <GlobeRegular size="16px" />
+                      Public
+                    </span>
+                  </div>
                   <div class={`d-flex  rounded  align-items-center mb-3`}>
                     <Search
                       variant={"primary"}
@@ -438,12 +489,12 @@
                     bind:isGuestUser
                     {searchQuery}
                     {openTeam}
-                    data={workspaces.filter((elem) => {
+                    data={getFilteredWorkspaces().filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
                         elem?.name?.toLowerCase().includes(searchQuery)
                       );
-                    }) || []}
+                    }) || []}  
                     {onSwitchWorkspace}
                     {onDeleteWorkspace}
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
@@ -457,7 +508,7 @@
                     {openInDesktop}
                     {isWebEnvironment}
                     {searchQuery}
-                    workspaces={workspaces.filter((elem) => {
+                    workspaces={getFilteredWorkspaces().filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
                         elem?.name?.toLowerCase().includes(searchQuery)
@@ -682,5 +733,10 @@
   }
   .teams-menu__right {
     display: flex;
+  }
+
+  .btn-formatter {
+    outline: none;
+    border: none;
   }
 </style>
