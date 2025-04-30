@@ -70,7 +70,7 @@
     </div>
   </div>
 
-  <div class="request-url">
+  <div class="request-url gap-2">
     <HttpUrlSection
       {requestUrl}
       onUpdateRequestUrl={(e) => {
@@ -88,7 +88,7 @@
       bind:dispatcher
     />
     <Button
-      size="extra-small"
+      size="medium"
       type="teritiary-regular"
       startIcon={MathFormulaRegular}
       onClick={() => {
