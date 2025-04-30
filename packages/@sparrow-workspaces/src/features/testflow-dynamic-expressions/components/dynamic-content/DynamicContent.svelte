@@ -169,7 +169,7 @@
         {#if variable?.environment !== "Global Variables"}
           <div
             class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block"
-            style="height: 28px; border-radius: 4px; cursor: pointer;"
+            style="height: 28px; border-radius: 4px; cursor: pointer; margin-bottom:4px; margin-top:4px;"
             on:mouseenter={() => (hoveredVariableKey = variable.key)}
             on:mouseleave={() => (hoveredVariableKey = null)}
             on:click={() => {
@@ -181,6 +181,7 @@
               <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
             {/if}
           </div>
+          <hr class="request-line" />
         {/if}
       {/each}
 
@@ -192,7 +193,7 @@
         {#if variable?.environment === "Global Variables"}
           <div
             class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block"
-            style="height: 28px; border-radius: 4px; cursor: pointer;"
+            style="height: 28px; border-radius: 4px; cursor: pointer; margin-bottom:4px; margin-top:4px;"
             on:click={() => {
               handleSelectVariable(variable);
             }}
@@ -200,6 +201,7 @@
             <span style="font-size: 12px;">{variable?.key}</span>
             <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
           </div>
+          <hr class="request-line" />
         {/if}
       {/each}
     </div>
