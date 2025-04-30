@@ -95,6 +95,7 @@
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
           {userRole}
+          workspaceName={$tab?.name}
           {onUpdateWorkspaceDescription}
           workspaceDescription={$tab?.description}
           {workspaceType}

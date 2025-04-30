@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { InfoRegular, SettingsRegular } from "@sparrow/library/icons";
+  import { InfoRegular,PeopleRegular } from "@sparrow/library/icons";
   import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
@@ -46,13 +46,13 @@
         : 'transparent'} "
     >
       <div>
-        <SettingsRegular size="20px" color="var(--icon-secondary-200)" />
+        <PeopleRegular size="20px" color="var(--icon-secondary-200)" />
       </div>
       <div
         class="text-ds-font-size-12 text-ds-font-weight-semi-bold text-ds-line-height-130"
         style="padding-top: 2px;"
       >
-        Workspace Settings
+        Members
       </div>
     </div>
   {/if}
