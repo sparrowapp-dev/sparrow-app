@@ -6,45 +6,64 @@
   } from "@sparrow/library/icons";
   import { Accordion, Button } from "@sparrow/library/ui";
   export let requestApis: any = [];
+  export let expression = "";
   export let environmentVariables: any;
-  export let handleSelectApi: (data: any) => void;
-  export let handleSelectVariable: (requestVariable: any) => void;
-  export let handleSelectRequestType: (
-    requestData: any,
-    type: string,
-    label: string,
-    blockName: string,
-  ) => void;
-  export let handleRemoveSelectApi: () => void;
-  export let selectedRequest: any;
+  export let selectedApiRequestType: string;
+  let selectedAPI: any = null;
+  let hoverdIndexRequest: number | null = null;
+  let hoveredVariableKey: string | null = null;
   const requestTypes = [
-    {
-      requestType: "response.body",
-      label: "response.body",
-    },
-    {
-      requestType: "response.header",
-      label: "response.header",
-    },
-    {
-      requestType: "body",
-      label: "request.body",
-    },
-    {
-      requestType: "headers",
-      label: "request.header",
-    },
-    {
-      requestType: "queryParams",
-      label: "request.parameters",
-    },
+    { requestType: "response.body", label: "response.body" },
+    { requestType: "response.headers", label: "response.headers" },
+    { requestType: "request.body", label: "request.body" },
+    { requestType: "request.headers", label: "request.headers" },
+    { requestType: "request.parameters", label: "request.parameters" },
   ];
+
+  const handleSelectApi = (data: any) => {
+    selectedAPI = data;
+  };
+
+  const handleRemoveSelectApi = () => {
+    selectedApiRequestType = "";
+    selectedAPI = null;
+  };
+
+  const handleSelectVariable = (requestVariable: any) => {
+    expression = expression + `{{${requestVariable.key}}}`;
+  };
+
+  function hasTwoOrMoreDots(expr: string): boolean {
+    return (expr.match(/\./g) || []).length >= 2;
+  }
+
+  function hasFourParentheses(expr: string): boolean {
+    const open = (expr.match(/\(/g) || []).length;
+    const close = (expr.match(/\)/g) || []).length;
+    return open >= 2 && close >= 2;
+  }
+
+  const handleSelectRequestType = (requestType: string, blockName: string) => {
+    if (requestType === "request.body" || requestType === "response.body") {
+      selectedApiRequestType = "body";
+    }
+    if (!hasTwoOrMoreDots(expression)) {
+      expression = `${blockName}.${requestType}`;
+    } else {
+      const current = `${blockName}.${requestType}`;
+      if (!hasFourParentheses(expression)) {
+        expression = `(${expression})(${current})`;
+        return;
+      }
+      expression += `(${current})`;
+    }
+  };
 </script>
 
 <div>
   <Accordion position="right">
     <div class="d-flex align-items-center" slot="accordion-field">
-      {#if selectedRequest}
+      {#if selectedAPI}
         <div
           class="d-flex justify-conten-start align-items-center"
           style="gap: 6px;"
@@ -61,10 +80,10 @@
             style="gap: 6px;"
           >
             <p style="margin: 0px;" class="request-block-method">
-              {selectedRequest?.requestData?.method}
+              {selectedAPI?.requestData?.method}
             </p>
             <p style="margin: 0px;" class="request-block-name text-center">
-              {selectedRequest?.blockName}
+              {selectedAPI?.blockName}
             </p>
           </div>
         </div>
@@ -77,28 +96,28 @@
       slot="accordion-content"
       style="padding: 4px 8px; height: 146px; overflow-y: auto"
     >
-      {#if selectedRequest}
+      {#if selectedAPI}
         <div class="" style="gap: 2px;">
-          {#each requestTypes as type}
+          {#each requestTypes as type, index}
             <div
               class="d-flex flex-row justify-content-between align-items-start request-type-block"
-              style="height:28px; border-radius:4px; padding:5px 8px; cursor: pointer;"
-              on:click={() => {
+              style="height:28px; border-radius:4px; padding:5px 8px; cursor: pointer; margin-bottom:4px; margin-top:4px;"
+              on:mouseenter={() => (hoverdIndexRequest = index)}
+              on:mouseleave={() => (hoverdIndexRequest = null)}
+              on:click={() =>
                 handleSelectRequestType(
-                  selectedRequest?.requestData,
                   type.requestType,
-                  type.label,
-                  selectedRequest?.blockName,
-                );
-              }}
+                  selectedAPI?.blockName,
+                )}
             >
               <div class="d-flex justify-content-start align-items-center">
-                <p style="margin: 0px;" class="">
-                  {type.label}
-                </p>
+                <p style="margin: 0px;">{type.label}</p>
               </div>
-              <AddRegular size="16px" color={"var(--icon-ds-neutral-50)"} />
+              {#if hoverdIndexRequest === index}
+                <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
+              {/if}
             </div>
+            <hr class="request-line" />
           {/each}
         </div>
       {:else}
@@ -151,12 +170,16 @@
           <div
             class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block"
             style="height: 28px; border-radius: 4px; cursor: pointer;"
+            on:mouseenter={() => (hoveredVariableKey = variable.key)}
+            on:mouseleave={() => (hoveredVariableKey = null)}
             on:click={() => {
               handleSelectVariable(variable);
             }}
           >
             <span style="font-size: 12px;">{variable?.key}</span>
-            <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
+            {#if hoveredVariableKey === variable.key}
+              <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
+            {/if}
           </div>
         {/if}
       {/each}
@@ -212,5 +235,9 @@
     line-height: 130%;
     letter-spacing: 0%;
     color: var(--bg-ds-neutral-50);
+  }
+  .request-line {
+    border: 1px solid var(--bg-ds-surface-400);
+    margin: 0px;
   }
 </style>

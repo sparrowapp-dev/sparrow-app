@@ -3,8 +3,9 @@
   import { AddRegular } from "@sparrow/library/icons";
   import { FunctionOptionData } from "../../utils";
 
+  export let expression: string;
   let data = FunctionOptionData;
-  export let handleFunctionType: (label: string, data: any) => void;
+  let hoveredFunctionType: string | null = null;
   let searchFunction = "";
   $: filteredData = searchFunction
     ? data.filter(
@@ -13,6 +14,14 @@
           item.description.toLowerCase().includes(searchFunction.toLowerCase()),
       )
     : data;
+
+  const handleFunctionType = (functionItem: any) => {
+    if (expression.endsWith(".")) {
+      expression += functionItem.type;
+    } else {
+      expression += "." + functionItem.type;
+    }
+  };
 </script>
 
 <div class="functions-container d-flex flex-column">
@@ -21,8 +30,10 @@
     {#each filteredData as item}
       <div
         class="function-item d-flex flex-row justify-content-between align-items-center"
+        on:mouseenter={() => (hoveredFunctionType = item.type)}
+        on:mouseleave={() => (hoveredFunctionType = null)}
         on:click={() => {
-          handleFunctionType(item.type, item);
+          handleFunctionType(item);
         }}
       >
         <div class="d-flex justify-content-start flex-column">
@@ -31,9 +42,11 @@
             {item.description}
           </p>
         </div>
-        <div style="margin-right: 6px;">
-          <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
-        </div>
+        {#if hoveredFunctionType === item.type}
+          <div style="margin-right: 6px;">
+            <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
+          </div>
+        {/if}
       </div>
     {/each}
   </div>
