@@ -71,7 +71,7 @@
   /**
    * Scrolls the container to bring the newly added row into view
    */
-  const scrollToNewRow = async () => {
+  const scrollToNewRow = () => {
     setTimeout(() => {
       if (pairsContainer) {
         const lastRow = pairsContainer.lastElementChild;
@@ -79,7 +79,7 @@
           lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
         }
       }
-    }, 0);
+    }, 50);
   };
 
   const updateParam = async (index: number): Promise<void> => {
@@ -100,7 +100,7 @@
       pairs = pairs;
       callback(pairs);
 
-      await scrollToNewRow();
+      scrollToNewRow();
     } else {
       callback(pairs);
     }
