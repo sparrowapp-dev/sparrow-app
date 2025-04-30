@@ -9,7 +9,7 @@ import { version } from "../src-tauri/tauri.conf.json";
 
 
 // // Initialize Sentry
-if (constants.APP_ENVIRONMENT !== 'LOCAL-FE') {
+if (constants.APP_ENVIRONMENT !== 'LOCAL-FE'&& (constants.SENTRY_DSN && constants.APP_ENVIRONMENT)) {
   Sentry.init({
     dsn: constants.SENTRY_DSN,
     environment: constants.APP_ENVIRONMENT, // Set the environment
