@@ -78,23 +78,23 @@
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
     if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 8);
+      return filteredWorkspaces.slice(0, 5);
     } else {
-      const startIndex = 8 + (currPage - 2) * 9;
-      return filteredWorkspaces.slice(startIndex, startIndex + 9); //will check the start index based on current page
+      const startIndex = 5 + (currPage - 2) * 6;
+      return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
     }
   })();
 
   // This will calculate the total number of pages
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
-    if (total <= 8) return 1;
-    return Math.ceil((total - 8) / 9) + 1;
+    if (total <= 5) return 1;
+    return Math.ceil((total - 5) / 6) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 8 + (currPage - 2) * 9 + 1;
+  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
   $: endIndex = Math.min(
-    currPage === 1 ? 8 : startIndex + 8,
+    currPage === 1 ? 5 : startIndex + 5,
     filteredWorkspaces.length,
   );
 

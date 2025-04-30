@@ -4,10 +4,15 @@
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
-  import { ArrowForward, LockClosedRegular } from "@sparrow/library/icons";
+  import {
+    ArrowForward,
+    GlobeRegular,
+    LockClosedRegular,
+  } from "@sparrow/library/icons";
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
   import { Tag } from "@sparrow/library/ui";
+  import { WorkspaceType } from "@sparrow/common/enums";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -130,6 +135,16 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
+    <button
+      bind:this={workspaceTabWrapper}
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
+        ? 'threedot-active'
+        : ''}"
+      style="top:26px; right:15px;"
+      on:click={(e) => rightClickContextMenu(e)}
+    >
+      <MoreVerticalRegular />
+    </button>
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"
@@ -142,15 +157,19 @@
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
       <div class="d-flex" style="justify-content: space-between;">
-        <Tag text="Private" type="cyan" endIcon={LockClosedRegular} />
-        <button
-          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
-            ? 'threedot-active'
-            : ''}"
-          on:click={(e) => rightClickContextMenu(e)}
-        >
-          <MoreVerticalRegular />
-        </button>
+        {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+          <Tag
+            text={WorkspaceType.PUBLIC}
+            type="green"
+            endIcon={GlobeRegular}
+          />
+        {:else}
+          <Tag
+            text={WorkspaceType.PRIVATE}
+            type="cyan"
+            endIcon={LockClosedRegular}
+          />
+        {/if}
       </div>
 
       <div
