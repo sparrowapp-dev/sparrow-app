@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Editor } from "@sparrow/library/forms";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
+  import { Button } from "@sparrow/library/ui";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" = "Text";
   export let value = "";
   export let isBodyBeautified = false;
@@ -9,6 +11,9 @@
   const handleCodeMirrorChange = (e: CustomEvent<string>) => {
     onUpdateRequestBody(e.detail);
   };
+
+  export let handleOpenCurrentDynamicExpression;
+  export let dispatcher;
 </script>
 
 <div class="request-body position-relative">
@@ -19,5 +24,12 @@
     isEditable={true}
     {isBodyBeautified}
     beautifySyntaxCallback={updateBeautifiedState}
+    bind:dispatcher
+    handleOpenDE={(obj) => {
+      handleOpenCurrentDynamicExpression({
+        ...obj,
+        type: "raw",
+      });
+    }}
   />
 </div>

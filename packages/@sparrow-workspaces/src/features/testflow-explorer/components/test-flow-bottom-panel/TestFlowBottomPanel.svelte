@@ -286,6 +286,7 @@
               requestState={selectedBlock?.data?.requestData?.state}
               {environmentVariables}
               onUpdateRequestState={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow

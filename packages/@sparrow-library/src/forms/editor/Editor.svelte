@@ -5,7 +5,12 @@
   import handleCodeMirrorSyntaxFormat from "./editor";
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
-  import { placeholder as CreatePlaceHolder } from "@codemirror/view";
+  import {
+    placeholder as CreatePlaceHolder,
+    MatchDecorator,
+    WidgetType,
+    type DecorationSet,
+  } from "@codemirror/view";
   import { linter } from "@codemirror/lint";
   import type { Diagnostic } from "@codemirror/lint";
   import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
@@ -27,6 +32,8 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
+  export let handleOpenDE;
+  export let dispatcher;
 
   const dispatch = createEventDispatcher();
 
@@ -49,6 +56,163 @@
       }
     }
   });
+
+  /**
+   * Widget to render the dynamic expression.
+   */
+  class ExpressionWidget extends WidgetType {
+    constructor(
+      readonly name: string,
+      readonly from: number,
+      readonly to: number,
+      // readonly id: string,
+    ) {
+      super();
+    }
+
+    toDOM(view: EditorView) {
+      const container = document.createElement("span");
+      container.className = "cm-expression-block";
+
+      const text = document.createElement("span");
+      text.textContent = this.name;
+
+      const close = document.createElement("span");
+      close.textContent = "❌";
+      close.className = "cm-expression-block-close";
+
+      close.onclick = (e) => {
+        e.stopPropagation();
+        view.dispatch({ changes: { from: this.from, to: this.to } });
+
+        // removeDynamicExpression(this.id);
+      };
+
+      container.appendChild(text);
+      container.appendChild(close);
+
+      container.onclick = (e) => {
+        e.stopPropagation();
+        const pos = view.posAtDOM(container);
+        const content = view.state.doc.sliceString(
+          pos,
+          pos + this.to - this.from,
+        );
+        handleOpenDE({
+          source: {
+            from: pos,
+            to: pos + this.to - this.from,
+            content,
+          },
+          dispatch: view.dispatch,
+        });
+      };
+
+      // Handle dragging
+      container.setAttribute("draggable", "true");
+      container.addEventListener("dragstart", (e) => {
+        e.stopPropagation();
+        const content = view.state.doc.sliceString(this.from, this.to);
+        e.dataTransfer?.setData("application/x-expression", content);
+        e.dataTransfer?.setData("text/plain", content); // fallback
+        e.dataTransfer?.setData("text/from", String(this.from));
+        e.dataTransfer?.setData("text/to", String(this.to));
+      });
+      return container;
+    }
+
+    ignoreEvent() {
+      return true;
+    }
+  }
+
+  export const dragDropPlugin = ViewPlugin.fromClass(
+    class {
+      constructor(view: EditorView) {
+        this.view = view;
+
+        this.handleDrop = this.handleDrop.bind(this);
+        view.dom.addEventListener("drop", this.handleDrop);
+      }
+
+      handleDrop(event: DragEvent) {
+        event.preventDefault();
+
+        const content = event.dataTransfer?.getData("application/x-expression");
+        const from = parseInt(
+          event.dataTransfer?.getData("text/from") || "",
+          10,
+        );
+        const to = parseInt(event.dataTransfer?.getData("text/to") || "", 10);
+
+        if (!content || isNaN(from) || isNaN(to)) return;
+
+        const pos = this.view.posAtCoords({
+          x: event.clientX,
+          y: event.clientY,
+        });
+        if (pos == null) return;
+
+        // Remove original
+        this.view.dispatch({ changes: { from, to } });
+      }
+
+      destroy() {
+        this.view.dom.removeEventListener("drop", this.handleDrop);
+      }
+    },
+  );
+
+  let currentIndex = 0;
+
+  /**
+   * Create regex matching pattern for the expression.
+   * @example [[expression]]
+   */
+
+  //  regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
+  //   decoration: (match) =>
+  //     Decoration.replace({
+  const expressionMatcher = new MatchDecorator({
+    regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
+    decoration: (match) => {
+      return Decoration.replace({
+        widget: new ExpressionWidget(
+          match[1],
+          match.index,
+          match.index + match[0].length,
+        ),
+        inclusive: false,
+      });
+    },
+  });
+  /**
+   * Create a decoration set for the expression matcher.
+   * @param view - The editor view instance.
+   */
+  const expressionPlugin = ViewPlugin.fromClass(
+    class {
+      placeholders: DecorationSet;
+      constructor(view: EditorView) {
+        currentIndex = 0;
+        this.placeholders = expressionMatcher.createDeco(view);
+      }
+      update(update: ViewUpdate) {
+        currentIndex = 0;
+        this.placeholders = expressionMatcher.updateDeco(
+          update,
+          this.placeholders,
+        );
+      }
+    },
+    {
+      decorations: (instance) => instance.placeholders,
+      provide: (plugin) =>
+        EditorView.atomicRanges.of((view) => {
+          return view.plugin(plugin)?.placeholders || Decoration.none;
+        }),
+    },
+  );
 
   const variableHighlighter = ViewPlugin.fromClass(
     class {
@@ -123,6 +287,8 @@
     extensions = [
       basicSetup,
       basicTheme,
+      expressionPlugin,
+      dragDropPlugin,
       languageConf.of([]),
       lintConf.of([]), // Add lint compartment
       updateExtensionView,
@@ -145,6 +311,7 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
+    dispatcher = codeMirrorView.dispatch;
   }
 
   function destroyCodeMirrorEditor() {
