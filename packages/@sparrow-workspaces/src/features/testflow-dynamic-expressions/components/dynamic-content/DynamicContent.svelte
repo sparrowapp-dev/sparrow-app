@@ -5,6 +5,7 @@
     ChevronRightRegular,
   } from "@sparrow/library/icons";
   import { Accordion, Button } from "@sparrow/library/ui";
+  import { getMethodStyle } from "@sparrow/common/utils";
 
   export let requestApis: any = [];
   export let expression = "";
@@ -105,12 +106,18 @@
             class="d-flex flex-row align-items-center justify-content-start"
             style="gap: 6px;"
           >
-            <p style="margin: 0px;" class="request-block-method">
+            <p
+              class="request-block-method text-{getMethodStyle(
+                selectedAPI?.requestData?.method,
+              )}"
+              style="margin:0px;"
+            >
               {selectedAPI?.requestData?.method}
             </p>
+
             <p
-              style="margin: 0px; color:var(--bg-ds-neutral-50);"
-              class="request-block-name text-center"
+              class="request-block-name"
+              style="margin: 0; color: var(--bg-ds-neutral-50);"
             >
               {selectedAPI?.blockName}
             </p>
@@ -161,15 +168,22 @@
             >
               <div
                 class="d-flex justify-content-start align-items-center"
-                style="gap:8px;"
+                style="gap: 8px;"
               >
-                <p style="margin: 0px;" class="request-block-method">
+                <p
+                  class="request-block-method text-{getMethodStyle(
+                    requestApi?.data?.requestData?.method,
+                  )}"
+                  style="margin: 0;"
+                >
                   {requestApi?.data?.requestData?.method}
                 </p>
-                <p style="margin: 0px;" class="request-block-name text-center">
+
+                <p class="request-block-name" style="margin: 0;">
                   {requestApi?.data?.blockName}
                 </p>
               </div>
+
               <Button
                 type="teritiary-regular"
                 size="extra-small"
@@ -238,21 +252,22 @@
 </div>
 
 <style>
+  .request-block-method {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 1;
+    margin-top: 3px;
+  }
+
   .request-block-name {
     font-family: "Inter", sans-serif;
     font-weight: 400;
     font-size: 14px;
-    line-height: 143%;
-    letter-spacing: 0;
-  }
-  .request-block-method {
-    font-family: "Roboto", sans-serif;
-    font-weight: 700;
-    font-size: 12px;
     line-height: 1;
-    letter-spacing: normal;
-    font-variant: small-caps;
+    text-align: left;
   }
+
   .request-api-block:hover {
     background-color: var(--bg-ds-surface-400);
   }
