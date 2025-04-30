@@ -484,7 +484,6 @@
 
     // If in merge view mode, update the newModifiedPairs
     if (showMergeView) {
-      newModifiedPairs = newPairs;
       diffPairs = calculateDiff();
       diffBulkText = diffPairsToBulkText();
       checkForChanges();
