@@ -24,11 +24,6 @@
   export let deleteParam;
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
-  export let handleRemoveDynamicExpression: (
-    key: string,
-    index: number,
-    id: string,
-  ) => void;
   export let handleOpenCurrentDynamicExpression;
 
   let isInView: boolean = false;
