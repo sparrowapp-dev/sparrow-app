@@ -2,13 +2,14 @@
   import { infoColorBlueIcon as infoIcon } from "@sparrow/library/assets";
   import { crossIcon } from "@sparrow/library/assets";
   import { RequestDataset } from "@sparrow/common/enums";
-  import { notifications } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import {
     requestBodySubTypes,
     requestBodyTypes,
   } from "../../../../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
 
   export let method = "GET";
   export let onUpdateRequestState;
@@ -26,6 +27,8 @@
 
   let isDeleteMessage = true;
   let isGetMessage = true;
+  export let dispatcher;
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <div>
@@ -102,15 +105,29 @@
   </div>
   <div>
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
-      <div
-        on:click={() => {
-          updateBeautifiedState(true);
-          notifications.success("Code formatted successfully.");
-        }}
-        role="button"
-        class="icon-container d-flex align-items-center justify-content-center border-radius-2"
-      >
-        <img src={BeautifyIcon} style="height:10px; width:10px;" />
+      <div class="d-flex ms-3">
+        <Button
+          size="small"
+          type="secondary"
+          startIcon={MathFormulaRegular}
+          title={"Insert Dynamic Content"}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "raw",
+              dispatch: dispatcher,
+            });
+          }}
+        />
+        <!-- <div
+          on:click={() => {
+            updateBeautifiedState(true);
+            notifications.success("Code formatted successfully.");
+          }}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={BeautifyIcon} style="height:10px; width:10px;" />
+        </div> -->
       </div>
     {/if}
   </div>

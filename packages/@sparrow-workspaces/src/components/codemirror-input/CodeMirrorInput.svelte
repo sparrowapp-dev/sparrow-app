@@ -28,6 +28,8 @@
    * unique id used to focus codemirror input
    */
   export let codeId = "";
+
+  export let dispatcher;
   let componentClass = "";
   export { componentClass as class };
   export let userRole: WorkspaceRole | undefined = undefined;
@@ -124,6 +126,7 @@
   {removeDynamicExpression}
   {dynamicExpressionItems}
   {enableEnvironmentHighlighting}
+  bind:dispatcher
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}

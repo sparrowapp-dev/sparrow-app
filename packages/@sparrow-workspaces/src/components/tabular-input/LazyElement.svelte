@@ -24,11 +24,6 @@
   export let deleteParam;
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
-  export let handleRemoveDynamicExpression: (
-    key: string,
-    index: number,
-    id: string,
-  ) => void;
   export let handleOpenCurrentDynamicExpression;
 
   let isInView: boolean = false;
@@ -44,13 +39,7 @@
     scrollDirection = detail?.scrollDirection?.vertical;
   };
 
-  let handleOpenDE = (obj: any) => {
-    handleOpenCurrentDynamicExpression(obj);
-  };
-
-  let removeDynamicExpression = (id: string) => {
-    handleRemoveDynamicExpression(element.key, index, id);
-  };
+  let dispatcher: any;
 </script>
 
 <div
@@ -113,6 +102,7 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
+          bind:dispatcher
           handleOpenDE={(obj) => {
             handleOpenCurrentDynamicExpression({
               ...obj,
@@ -145,6 +135,7 @@
                       row: "value",
                       index: index,
                     },
+                    dispatch: dispatcher,
                   });
                 }}
               />
