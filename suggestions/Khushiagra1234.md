@@ -43,6 +43,6 @@
 ---  
 
 **Proof I've Starred the Repo:**  
-![Screenshot showing I starred the repo]
+![Screenshot showing I starred the repo] https://github.com/Khushiagra1234/sparrow-app/commit/659738ed267a62692529c7c1b17fed5611d1bf80#diff-065ac300dac235af6538632c4c96a9755fb035af9a39468b66bbb2686e2909b7
 
 *P.S. These suggestions come from my own experience building web apps. I'd love to discuss them further!*  
