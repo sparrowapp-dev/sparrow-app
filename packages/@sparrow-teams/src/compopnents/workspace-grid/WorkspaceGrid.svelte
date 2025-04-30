@@ -4,7 +4,10 @@
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
-  import { ArrowForward } from "@sparrow/library/icons";
+  import { ArrowForward, LockClosedRegular } from "@sparrow/library/icons";
+  import MoreVerticalRegular from "@sparrow/library/icons";
+  // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
+  import Tags from "@sparrow/library/ui";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -88,6 +91,29 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
+  const formateUpdateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const months = Math.floor(days / 30); // Approximation
+
+    if (seconds < 60) {
+      return "just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (months) {
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      return ``;
+    }
+  };
 </script>
 
 <svelte:window
@@ -104,17 +130,6 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
-    <button
-      bind:this={workspaceTabWrapper}
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
-        ? 'threedot-active'
-        : ''}"
-      style="top:26px; right:15px;"
-      on:click={(e) => rightClickContextMenu(e)}
-    >
-      <ThreeDotIcon />
-    </button>
-
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"
@@ -126,6 +141,18 @@
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
+      <div class="d-flex" style="justify-content: space-between;">
+        <Tags text="Private" type="cyan" endIcon={LockClosedRegular} />
+        <button
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          on:click={(e) => rightClickContextMenu(e)}
+        >
+          <MoreVerticalRegular />
+        </button>
+      </div>
+
       <div
         class="d-flex overflow-hidden justify-content-between"
         style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
@@ -152,39 +179,50 @@
         </span>
       </p>
       <p
-        class="teams-workspace__date mb-0"
-        style={`${
-          showMenu ? "color: var(--sparrow-text-color) !important;" : null
-        }`}
+        class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style="color:var(--text-secondary-200)"
       >
-        <span
-          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-          style=" color:var(--text-secondary-200)"
-          >Last updated on
-        </span><span
-          class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
-          style=" color:var(--text-ds-neutral-50)"
-          >{formatDateInString(workspace?.updatedAt)}</span
-        >
+        {workspace?.description
+          ? workspace.description
+          : "No summary added"}
       </p>
 
-      {#if isWebEnvironment}
-        <button
-          class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
-          on:click|stopPropagation={() => {
-            openInDesktop(workspace._id);
-          }}
+      <div class="d-flex justify-content-between">
+        <p
+          class="teams-workspace__date mb-0"
+          style={`${
+            showMenu ? "color: var(--sparrow-text-color) !important;" : null
+          }`}
         >
-          Open in Desktop
-          <div class="arrow-up">
-            <ArrowForward
-              width={"19px"}
-              height={"19px"}
-              color={"var(--icon-primary-300)"}
-            />
-          </div>
-        </button>
-      {/if}
+          <span
+            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+            style=" color:var(--text-secondary-200)"
+            >Last updated
+          </span><span
+            class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
+            style=" color:var(--text-ds-neutral-50)"
+            >{formateUpdateTime(workspace?.updatedAt)}</span
+          >
+        </p>
+
+        {#if isWebEnvironment}
+          <button
+            class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+            on:click|stopPropagation={() => {
+              openInDesktop(workspace._id);
+            }}
+          >
+            Open in Desktop
+            <div class="arrow-up">
+              <ArrowForward
+                width={"19px"}
+                height={"19px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
+          </button>
+        {/if}
+      </div>
     </div>
   </Card>
 </div>
@@ -258,9 +296,6 @@
   }
 
   .open-desktop-btn {
-    position: absolute;
-    top: 24px;
-    right: 40px;
     font-size: 12px;
     font-weight: 500;
     background-color: var(--color-primary);
