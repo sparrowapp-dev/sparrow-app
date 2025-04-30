@@ -48,6 +48,7 @@
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
   export let onSyncCollection;
+  export let isSharedWorkspace = false;
 
   /**
    * Icons and images
@@ -499,7 +500,9 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable || collection?.activeSync}
+              disable={!isCollectionEditable ||
+                collection?.activeSync ||
+                isSharedWorkspace}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -512,7 +515,9 @@
           </Dropdown>
         </div>
         <Button
-          disable={$tab?.isSaved || !isCollectionEditable ? true : false}
+          disable={$tab?.isSaved || !isCollectionEditable
+            ? true
+            : false || isSharedWorkspace}
           startIcon={SaveRegular}
           type={"secondary"}
           onClick={() => {

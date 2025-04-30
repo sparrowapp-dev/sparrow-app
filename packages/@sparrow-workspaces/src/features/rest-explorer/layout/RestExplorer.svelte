@@ -86,7 +86,7 @@
     CaretDownFilled,
   } from "@sparrow/library/icons";
 
-  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
+  import { SparrowSecondaryIcon, SparkleFilled } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
   import { AIChatInterface } from "../../chat-bot/components";
@@ -149,19 +149,13 @@
   const loading = writable<boolean>(false);
 
   // Props for showing merge/diff view in RequestBody, Headers and Params
+  let isAIDebugBtnEnable = false;
   let isMergeViewEnableForRequestBody = false;
   let isMergeViewEnableForParams = false;
   let isMergeViewEnableForHeaders = false;
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
-
-  // ToDo: For testing only, should be removed while raising PR
-  $: if (storeData) {
-    const { bodyFormatter, navigation, size, time, ...restData } =
-      storeData.response;
-    console.log("Req. Res :>> ", restData);
-  }
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -424,6 +418,77 @@
   const sleep = (ms: number): Promise<void> => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
+
+  const handleOnClickAIDebug = async () => {
+    isAIDebugBtnEnable = false;
+
+    // adjusting the panel layout
+    if ($tabsSplitterDirection != "horizontal") {
+      tabsSplitterDirection.set("horizontal");
+      isChatbotOpenInCurrTab.set(true);
+    }
+
+    const isResponseGenerating =
+      $tab?.property?.request?.state?.isChatbotGeneratingResponse;
+
+    if (!isResponseGenerating) {
+      onUpdateAiConversation([
+        ...$tab?.property?.request?.ai?.conversations,
+        {
+          message: "Help me debug",
+          messageId: "",
+          type: "Sender",
+          isLiked: false,
+          isDisliked: false,
+          status: true,
+        },
+      ]);
+
+      const debugPrompt = `
+        I am getting the below mentioned error when i send request, 
+        can you help me debug this error, let me know if i need to 
+        change anyhing in the request to solve this issue. here's 
+        the error response i am getting while sending the request, 
+        I've stringified the response. 
+        Response: ${JSON.stringify(storeData.response)}`;
+
+      // ToDo: Enable scroller
+      // Scroller for user prompt
+      // setTimeout(() => {
+      //   if (scrollList) scrollList("bottom", -1, "smooth");
+      // }, 10);
+
+      await onGenerateAiResponse(debugPrompt);
+
+      // ToDo: Enable scroller
+      // Scroller for AI response
+      // setTimeout(() => {
+      //   if (scrollList) scrollList("bottom", -1, "smooth");
+      // }, 10);
+
+      onUpdateRequestState({ isChatbotActive: true });
+    }
+
+    // ToDo: Register mixpanel event for "Help me debug" action
+    // MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
+  };
+
+  /**
+   * Checks whether the response status code indicates a client error (HTTP 4xx).
+   * @returns {boolean} - Returns true if the status code is between 400 and 499, otherwise false.
+   */
+  const isClientError = () => {
+    const status = storeData?.response?.status;
+    const code = parseInt(status?.split(" ")[0]);
+    return code >= 400 && code < 500;
+  };
+
+  $: {
+    if (storeData) {
+      if (isClientError()) isAIDebugBtnEnable = true;
+      else isAIDebugBtnEnable = false;
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -673,7 +738,7 @@
                             style="gap:12px"
                           >
                             <div
-                              class="d-flex"
+                              class="d-flex justify-content-between"
                               style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                             >
                               <ResponseNavigator
@@ -683,7 +748,19 @@
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
                               />
-                              <ResponseStatus response={storeData.response} />
+
+                              <div class="d-flex">
+                                <!-- AI debugging trigger button -->
+                                <Button
+                                  title="Help me debug"
+                                  type={"secondary"}
+                                  startIcon={SparkleFilled}
+                                  disable={!isAIDebugBtnEnable}
+                                  onClick={handleOnClickAIDebug}
+                                ></Button>
+
+                                <ResponseStatus response={storeData.response} />
+                              </div>
                             </div>
                             <div
                               class="flex-grow-1 d-flex flex-column"

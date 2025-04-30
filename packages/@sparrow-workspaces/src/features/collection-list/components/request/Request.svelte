@@ -78,6 +78,7 @@
   export let userRole;
   export let activeTabType;
   export let isWebApp;
+  export let isSharedWorkspace = false;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -242,7 +243,7 @@
   </div></Modal
 >
 
-{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -411,7 +412,7 @@
 
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
     {#if isDragging}
       <span class="threedot-icon-container d-flex">
         <Button

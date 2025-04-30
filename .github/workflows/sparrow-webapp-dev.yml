@@ -41,6 +41,7 @@ jobs:
                 --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET=${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
                 --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
                 --build-arg VITE_WEB_CANNY_FEEDBACK_URL=${{ vars.VITE_WEB_CANNY_FEEDBACK_URL }} \
+                --build-arg VITE_WEB_SPARROW_WEB_APP_URL=${{ vars.VITE_WEB_SPARROW_WEB_APP_URL }} \
                 -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
                docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}

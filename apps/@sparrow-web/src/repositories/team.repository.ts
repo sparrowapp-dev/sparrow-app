@@ -178,7 +178,10 @@ export class TeamRepository {
     const selectedTeamsToBeDeleted = teamsJSON
       ?.filter((_team) => {
         for (let i = 0; i < _teamIds.length; i++) {
-          if (_teamIds[i] === _team.teamId) {
+          if (
+            _teamIds[i] === _team.teamId ||
+            _team.teamId === "sharedWorkspaceTeam"
+          ) {
             return false;
           }
         }

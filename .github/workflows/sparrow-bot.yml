@@ -20,7 +20,7 @@ jobs:
       - name: Run Sparrow Bot Stale
         uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
           command: stale
   
   pr-title:
@@ -34,7 +34,7 @@ jobs:
       - name: Run Sparrow Bot PR Title Validation
         uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
           command: pr-title
           pr-title: ${{ github.event.pull_request.title }}
           pr-number: ${{ github.event.pull_request.number }}
@@ -51,7 +51,7 @@ jobs:
       - name: Run Sparrow Bot Auto Label
         uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PR_GITHUB_TOKEN }}
           command: auto-label
           issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
           content: ${{ github.event.issue.body || github.event.pull_request.body }}

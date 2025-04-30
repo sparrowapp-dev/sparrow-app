@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
+  import { Button, notifications } from "@sparrow/library/ui";
 
   /**
    * The description of the workspace.
    */
   export let workspaceDescription: string = "";
+  const maxChars = 100;
+  export let workspaceName: string = ""; // Shared workspace name
+
 
   /**
    * Function to update the workspace description.
@@ -18,10 +22,22 @@
    */
   export let userRole;
 
+  export let workspaceType: WorkspaceType = WorkspaceType.PRIVATE;
+  export let onMakeWorkspacePublic;
+  export let onShareWorkspace;
+  export let isWorkspaceSharing = false;
+  let isWorkspaceUpdating = false;
+
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    onUpdateWorkspaceDescription(target.value);
+    if (target.value.length <= maxChars) {
+      workspaceDescription = target.value; // Update the description if within the limit
+      onUpdateWorkspaceDescription(workspaceDescription); // Call the update function
+    } else {
+      workspaceDescription = target.value.slice(0, maxChars); // Trim the value to the limit
+    }
   };
+
 </script>
 
 <div
@@ -29,14 +45,71 @@
   style="padding-top:0; gap:16px !important; "
 >
   <div class="h-100">
-    <textarea
-      disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-      id="updateWorkspaceDescField"
-      class=" border-0 text-ds-font-size-12 input-outline shadow-none w-100 p-2"
-      value={workspaceDescription || ""}
-      placeholder="Describe this workspace's objectives or add links to generate API documentation. Start typing."
-      on:input={handleInputDescription}
-    />
+    <div class="d-flex flex-column" style="gap:24px">
+      <div class="d-flex flex-column" style="gap:8px">
+        <span class="textarea-header">
+          Workspace Name
+          <span style="color: var(--text-ds-danger-400)">*</span>
+        </span>
+        <textarea
+          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          id="workspaceNameField"
+          class=" border-0 text-ds-font-size-12 input-outline shadow-none w-50 p-1"
+          style="height: 28px; overflow:hidden;"
+          bind:value={workspaceName}
+          placeholder="Write your workspace name"
+        />
+      </div>
+      <div class="d-flex flex-column" style="gap:8px">
+        <span class="textarea-header">Workspace Summary</span>
+        <div class="d-flex flex-column" style="gap:4px">
+          <textarea
+            disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+            id="updateWorkspaceDescField"
+            class=" border-0 text-ds-font-size-12 input-outline shadow-none w-50 p-2"
+            bind:value={workspaceDescription}
+            placeholder="Write a short summary about your workspace"
+            on:input={handleInputDescription}
+          />
+          <div
+            class="d-flex justify-content-between w-50"
+            style="margin-bottom: 20px;"
+          >
+            <span class="textarea-header">Max {maxChars} characters</span>
+            <span class="textarea-header">{workspaceDescription.length}/{maxChars}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {#if workspaceType === WorkspaceType.PUBLIC}
+      <Button
+        title={isWorkspaceSharing ? "Link Copied" : "Share workspace"}
+        type={"secondary"}
+        onClick={async () => {
+          await onShareWorkspace();
+          isWorkspaceSharing = true;
+          setTimeout(() => {
+            isWorkspaceSharing = false;
+          }, 2000);
+        }}
+      ></Button>
+    {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN}
+      <Button
+        title="Make it public"
+        type={"secondary"}
+        loader={isWorkspaceUpdating}
+        disable={isWorkspaceUpdating}
+        onClick={async () => {
+          isWorkspaceUpdating = true;
+          await onMakeWorkspacePublic();
+          isWorkspaceUpdating = false;
+        }}
+      ></Button>
+    {/if}
+    <div class="textarea-header w-50 mt-3"
+      >This means anyone with the link can view your workspace and its contents.</div
+    >
   </div>
 </div>
 
@@ -51,5 +124,9 @@
   textarea:focus,
   textarea:hover {
     border: 1px solid var(--border-primary-300) !important;
+  }
+  .textarea-header {
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
   }
 </style>

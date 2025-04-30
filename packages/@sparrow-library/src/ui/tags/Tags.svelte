@@ -8,6 +8,8 @@
     | "grey"
     | "pink" = "grey";
   export let text: string = "Tag";
+  export let iconSize = 16;
+  export let endIcon;
 
   const convertCasing = (sentence: string) => {
     let sen =
@@ -16,6 +18,7 @@
     if (total_words.length > 5) sen = total_words.slice(0, 5).join(" ") + "...";
     return sen;
   };
+  console.log(endIcon, "ff");
 
   const colorPalette = {
     cyan: {
@@ -71,7 +74,27 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;"
-  class="text-ds-font-weight-medium text-ds-line-height-150 text-ds-font-size-12"
+  class="text-ds-font-weight-medium text-ds-line-height-150 text-ds-font-size-12 d-flex align-items-center"
 >
-  {convertCasing(text)}
+  <span class="text-content">{convertCasing(text)}</span>
+  {#if endIcon}
+    <svelte:component
+      this={endIcon}
+      height={`${iconSize}px`}
+      width={`${iconSize}px`}
+      size={`${iconSize}px`}
+      useParentColor={true}
+      class="end-icon"
+    />
+  {/if}
 </button>
+
+<style>
+  .text-content {
+    margin-right: 4px; /* Add space between text and icon */
+  }
+
+  .end-icon {
+    flex-shrink: 0; /* Prevent the icon from shrinking */
+  }
+</style>

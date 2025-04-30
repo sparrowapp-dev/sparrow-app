@@ -39,6 +39,11 @@
    */
   export let userRole;
 
+  /**
+   * Indicate whether workspace is public or not.
+   */
+  export let isSharedWorkspace = false;
+
   const handleInputName = (event: Event) => {
     onUpdateWorkspaceName(event.detail, "");
   };
@@ -94,7 +99,7 @@
               startIcon={PeopleRegular}
               size={"medium"}
               type={"primary"}
-              title={"Invite"}
+              title={"Invite collaborators"}
               onClick={() => {
                 isWorkspaceInviteModalOpen = true;
               }}
@@ -103,14 +108,18 @@
           </div>
         {/if}
 
-        <Button
-          disable={isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          startIcon={SaveRegular}
-          type={"secondary"}
-          onClick={() => {
-            onSaveWorkspace();
-          }}
-        />
+        {#if !isSharedWorkspace}
+          <Button
+            disable={isSaved ||
+              userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              isSharedWorkspace}
+            startIcon={SaveRegular}
+            type={"secondary"}
+            onClick={() => {
+              onSaveWorkspace();
+            }}
+          />
+        {/if}
       </div>
     </div>
   </div>
