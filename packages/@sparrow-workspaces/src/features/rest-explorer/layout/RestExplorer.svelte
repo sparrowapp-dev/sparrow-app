@@ -141,6 +141,8 @@
   export let collection;
   const loading = writable<boolean>(false);
 
+  let isAIDebugBtnEnable = false;
+
   // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
@@ -248,6 +250,8 @@
   });
 
   const handleOnClickAIDebug = async () => {
+    isAIDebugBtnEnable = false;
+
     // adjusting the panel layout
     if ($tabsSplitterDirection != "horizontal") {
       tabsSplitterDirection.set("horizontal");
@@ -308,6 +312,13 @@
     const code = parseInt(status?.split(" ")[0]);
     return code >= 400 && code < 500;
   };
+
+  $: {
+    if (storeData) {
+      if (isClientError()) isAIDebugBtnEnable = true;
+      else isAIDebugBtnEnable = false;
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -564,7 +575,7 @@
                                   title="Help me debug"
                                   type={"secondary"}
                                   startIcon={SparkleFilled}
-                                  disable={!isClientError()}
+                                  disable={!isAIDebugBtnEnable}
                                   onClick={handleOnClickAIDebug}
                                 ></Button>
 
