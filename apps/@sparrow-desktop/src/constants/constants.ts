@@ -26,6 +26,7 @@ const constants = {
   DOCS_URL: import.meta.env.VITE_SPARROW_DOCS,
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_APP_ENVIRONMENT_PATH,
   SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_SPARROW_AI_WEBSOCKET,
+  SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
 };
 
 export default constants;

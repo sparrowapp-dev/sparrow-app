@@ -307,7 +307,7 @@
                 >{openTeam?.name || ""}
               </span>
               <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
-              {#if !isGuestUser}
+              {#if !isGuestUser && openTeam?.teamId !== "sharedWorkspaceTeam"}
                 {#if userRole !== "owner"}
                   <div
                     class="ms-2 d-flex justify-content-center align-items-center mt-2 moreOption-icon rounded"
