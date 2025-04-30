@@ -45,7 +45,7 @@
     />
     {#if workspaceType === WorkspaceType.PUBLIC}
       <Button
-        title="Share collection"
+        title="Share workspace"
         type={"secondary"}
         onClick={async () => {
           await onShareWorkspace();
