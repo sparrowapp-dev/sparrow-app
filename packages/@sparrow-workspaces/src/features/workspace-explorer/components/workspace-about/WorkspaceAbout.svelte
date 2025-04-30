@@ -9,7 +9,6 @@
   const maxChars = 100;
   export let workspaceName: string = ""; // Shared workspace name
 
-
   /**
    * Function to update the workspace description.
    * @param workspaceId - The ID of the workspace.
@@ -36,7 +35,6 @@
       workspaceDescription = target.value.slice(0, maxChars); // Trim the value to the limit
     }
   };
-
 </script>
 
 <div
@@ -74,13 +72,27 @@
             class="d-flex justify-content-between w-50"
             style="margin-bottom: 20px;"
           >
-            <span class="textarea-header">Max {maxChars} characters</span>
-            <span class="textarea-header">{workspaceDescription.length}/{maxChars}</span>
+            <span class="description">Max {maxChars} characters</span>
+            <span class="description"
+              >{workspaceDescription.length}/{maxChars}</span
+            >
           </div>
         </div>
       </div>
     </div>
-
+    <div class="flex flex-column" style="gap:8px;">
+      <span
+        class="textarea-header"
+        >Make you Workspace public</span
+      >
+      <div
+        class="w-50 mb-3"
+        style="color: var(--text-ds-neutral-400); font-size: 12px;"
+      >
+        This means anyone with the link can view your workspace and its
+        contents.
+      </div>
+    </div>
     {#if workspaceType === WorkspaceType.PUBLIC}
       <Button
         title="Share workspace"
@@ -102,9 +114,6 @@
         }}
       ></Button>
     {/if}
-    <div class="textarea-header w-50 mt-3"
-      >This means anyone with the link can view your workspace and its contents.</div
-    >
   </div>
 </div>
 
@@ -122,6 +131,13 @@
   }
   .textarea-header {
     font-size: 12px;
-    color: var(--text-ds-neutral-300);
+    color: var(--text-ds-neutral-200);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .description{
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+    font-weight: 400;
   }
 </style>
