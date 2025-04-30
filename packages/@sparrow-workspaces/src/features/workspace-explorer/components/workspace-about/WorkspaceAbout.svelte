@@ -24,6 +24,7 @@
   export let workspaceType: WorkspaceType = WorkspaceType.PRIVATE;
   export let onMakeWorkspacePublic;
   export let onShareWorkspace;
+  export let isWorkspaceSharing = false;
   let isWorkspaceUpdating = false;
 
   const handleInputDescription = (event: Event) => {
@@ -95,10 +96,14 @@
     </div>
     {#if workspaceType === WorkspaceType.PUBLIC}
       <Button
-        title="Share workspace"
+        title={isWorkspaceSharing ? "Link Copied" : "Share workspace"}
         type={"secondary"}
         onClick={async () => {
           await onShareWorkspace();
+          isWorkspaceSharing = true;
+          setTimeout(() => {
+            isWorkspaceSharing = false;
+          }, 2000);
         }}
       ></Button>
     {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN}

@@ -341,7 +341,9 @@ export async function handleLogin(url: string) {
       if (workspaceData.isSuccessful) {
         const res = workspaceData?.data?.data;
         await createPublicTeamWorkspace(clientUser, res);
-        await workspaceRepository.setActiveWorkspace(workspaceId);
+        setTimeout(async () => {
+          await workspaceRepository.setActiveWorkspace(workspaceId);
+        }, 1000);
       }
     }
     return;
