@@ -10,6 +10,8 @@
   export let handleOpenCurrentDynamicExpression;
 
   const theme = new UrlInputTheme().build();
+
+  export let dispatcher;
 </script>
 
 <div style="position:relative; width:100%">
@@ -27,6 +29,7 @@
         {userRole}
         handleOpenDE={handleOpenCurrentDynamicExpression}
         isFocusedOnMount={false}
+        bind:dispatcher
       />
     </div>
   </div>

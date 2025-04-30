@@ -1,8 +1,9 @@
 <script lang="ts">
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
-  import { RadioButton } from "@sparrow/library/ui";
+  import { Button, RadioButton } from "@sparrow/library/ui";
   import { CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
   export let apiData;
   export let callback;
   export let environmentVariables;
@@ -18,6 +19,10 @@
     apiData.addTo = event.target.value;
     callback({ apiKey: apiData });
   };
+
+  export let handleOpenCurrentDynamicExpression;
+  let authKeyDispatcher;
+  let authValueDispatcher;
 </script>
 
 <p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
@@ -63,6 +68,24 @@
           {disabled}
           {environmentVariables}
           {onUpdateEnvironment}
+          bind:dispatcher={authKeyDispatcher}
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              type: "authKey",
+            });
+          }}
+        />
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={MathFormulaRegular}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "authKey",
+              dispatch: authKeyDispatcher,
+            });
+          }}
         />
       </div>
     </div>
@@ -83,6 +106,24 @@
           {disabled}
           {environmentVariables}
           {onUpdateEnvironment}
+          bind:dispatcher={authValueDispatcher}
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              type: "authValue",
+            });
+          }}
+        />
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={MathFormulaRegular}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "authValue",
+              dispatch: authValueDispatcher,
+            });
+          }}
         />
       </div>
     </div>

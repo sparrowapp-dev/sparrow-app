@@ -305,6 +305,7 @@
               {environmentVariables}
               requestStateAuth={selectedBlock?.data?.requestData?.state}
               onUpdateRequestAuth={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
             />
           {/if}
         </div>

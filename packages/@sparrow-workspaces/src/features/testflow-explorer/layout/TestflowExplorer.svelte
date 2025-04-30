@@ -386,6 +386,25 @@
   $: console.log(selectedNodeId, "selectedNodeId");
 
   const onInsertExpression = (newExpression) => {
+    if (dynamicExpressionModal?.source) {
+      dynamicExpressionModal.dispatch({
+        changes: {
+          from: dynamicExpressionModal.source.from,
+          to: dynamicExpressionModal.source.to,
+          insert: "[*$[" + newExpression + "]$*]",
+        },
+      });
+    } else {
+      dynamicExpressionModal.dispatch({
+        changes: {
+          from: 0,
+          to: 0,
+          insert: "[*$[" + newExpression + "]$*]",
+        },
+      });
+    }
+    isDynamicExpressionModalOpen = false;
+    return;
     nodes.update((_nodes) => {
       const dbNodes = _nodes;
       for (let index = 0; index < dbNodes.length; index++) {
@@ -787,7 +806,7 @@
           id: targetNode,
           type: "requestBlock",
           data: {
-            blockName: `Block ${targetNode - 1}`,
+            blockName: `block${targetNode - 1}`,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string, _options = undefined) {

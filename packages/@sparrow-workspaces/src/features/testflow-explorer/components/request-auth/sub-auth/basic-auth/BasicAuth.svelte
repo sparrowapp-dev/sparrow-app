@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { BasicAuth } from "@sparrow/common/interfaces/request.interface";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
+  import { Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
 
@@ -13,6 +15,10 @@
   const handleInput = () => {
     callback({ basicAuth: basicAuth });
   };
+
+  export let handleOpenCurrentDynamicExpression;
+  let usernameDispatcher;
+  let passwordDispatcher;
 </script>
 
 <div class="w-100">
@@ -30,6 +36,24 @@
           {environmentVariables}
           {onUpdateEnvironment}
           {disabled}
+          bind:dispatcher={usernameDispatcher}
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              type: "username",
+            });
+          }}
+        />
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={MathFormulaRegular}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "username",
+              dispatch: usernameDispatcher,
+            });
+          }}
         />
       </div>
     </div>
@@ -49,6 +73,24 @@
           {environmentVariables}
           {onUpdateEnvironment}
           {disabled}
+          bind:dispatcher={passwordDispatcher}
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              type: "password",
+            });
+          }}
+        />
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={MathFormulaRegular}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "password",
+              dispatch: passwordDispatcher,
+            });
+          }}
         />
       </div>
     </div>

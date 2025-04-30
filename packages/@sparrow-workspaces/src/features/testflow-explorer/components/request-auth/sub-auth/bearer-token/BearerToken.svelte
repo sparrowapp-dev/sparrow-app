@@ -1,6 +1,8 @@
 <script lang="ts">
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
+  import { Button } from "@sparrow/library/ui";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
 
   export let bearerToken: string;
   export let callback;
@@ -12,6 +14,9 @@
   const handleInput = () => {
     callback({ bearerToken: bearerToken });
   };
+
+  let dispatcher;
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <div class="d-flex flex-column w-100">
@@ -28,6 +33,24 @@
         {environmentVariables}
         {onUpdateEnvironment}
         {disabled}
+        bind:dispatcher
+        handleOpenDE={(obj) => {
+          handleOpenCurrentDynamicExpression({
+            ...obj,
+            type: "bearerToken",
+          });
+        }}
+      />
+      <Button
+        size="extra-small"
+        type="teritiary-regular"
+        startIcon={MathFormulaRegular}
+        onClick={() => {
+          handleOpenCurrentDynamicExpression({
+            type: "bearerToken",
+            dispatch: dispatcher,
+          });
+        }}
       />
     </div>
   </div>

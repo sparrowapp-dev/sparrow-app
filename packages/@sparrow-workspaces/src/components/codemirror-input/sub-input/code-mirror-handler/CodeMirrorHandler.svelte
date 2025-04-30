@@ -69,6 +69,7 @@
   export let componentClass;
   export let isFocusedOnMount = false;
   export let handleOpenDE;
+  export let dispatcher;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -170,10 +171,25 @@
         e.stopPropagation();
         const content = view.state.doc.sliceString(this.from, this.to);
         handleOpenDE({
-          source: { from: this.from, to: this.to, content },
+          source: {
+            from: this.from,
+            to: this.to,
+            content,
+          },
+          dispatch: view.dispatch,
         });
       };
 
+      // Handle dragging
+      container.setAttribute("draggable", "true");
+      container.addEventListener("dragstart", (e) => {
+        e.stopPropagation();
+        const content = view.state.doc.sliceString(this.from, this.to);
+        e.dataTransfer?.setData("application/x-expression", content);
+        e.dataTransfer?.setData("text/plain", content); // fallback
+        e.dataTransfer?.setData("text/from", String(this.from));
+        e.dataTransfer?.setData("text/to", String(this.to));
+      });
       return container;
     }
 
@@ -181,6 +197,44 @@
       return true;
     }
   }
+
+  export const dragDropPlugin = ViewPlugin.fromClass(
+    class {
+      constructor(view: EditorView) {
+        this.view = view;
+
+        this.handleDrop = this.handleDrop.bind(this);
+        view.dom.addEventListener("drop", this.handleDrop);
+      }
+
+      handleDrop(event: DragEvent) {
+        event.preventDefault();
+
+        const content = event.dataTransfer?.getData("application/x-expression");
+        const from = parseInt(
+          event.dataTransfer?.getData("text/from") || "",
+          10,
+        );
+        const to = parseInt(event.dataTransfer?.getData("text/to") || "", 10);
+
+        if (!content || isNaN(from) || isNaN(to)) return;
+
+        const pos = this.view.posAtCoords({
+          x: event.clientX,
+          y: event.clientY,
+        });
+        if (pos == null) return;
+
+        // Remove original
+        this.view.dispatch({ changes: { from, to } });
+      }
+
+      destroy() {
+        this.view.dom.removeEventListener("drop", this.handleDrop);
+      }
+    },
+  );
+
   let currentIndex = 0;
 
   /**
@@ -492,6 +546,7 @@
       extensions: [
         theme,
         expressionPlugin,
+        dragDropPlugin,
         updateExtensionView,
         keyBinding,
         history(), // Add history extension
@@ -506,6 +561,7 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
+    dispatcher = codeMirrorView.dispatch;
   }
   onMount(() => {
     const initializeAsync = () => {
