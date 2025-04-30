@@ -99,7 +99,7 @@
               startIcon={PeopleRegular}
               size={"medium"}
               type={"primary"}
-              title={"Invite"}
+              title={"Invite collaborators"}
               onClick={() => {
                 isWorkspaceInviteModalOpen = true;
               }}
