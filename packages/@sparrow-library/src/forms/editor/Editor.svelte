@@ -32,12 +32,9 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
-<<<<<<< HEAD
   export let cursorPosition: number | null = null;
-=======
   export let handleOpenDE;
   export let dispatcher;
->>>>>>> design-system
 
   const dispatch = createEventDispatcher();
 
