@@ -206,6 +206,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -223,6 +224,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,
@@ -370,9 +372,9 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
       );
     } else {
-     notifications.error(
-             response?.message || "Failed to send invite. Please try again.",
-           );
+      notifications.error(
+        response?.message || "Failed to send invite. Please try again.",
+      );
     }
     return response;
   };
@@ -858,63 +860,67 @@ export class TeamExplorerPageViewModel {
     return response;
   };
 
-  public resendInvite = async (
-    teamId: string,
-    email: string,
-  ) => {
+  public resendInvite = async (teamId: string, email: string) => {
     const baseUrl = await this.constructBaseUrl(teamId);
-    const response= await this.teamService.resendInvite(teamId, email, baseUrl);
-    if (response.isSuccessful) { 
+    const response = await this.teamService.resendInvite(
+      teamId,
+      email,
+      baseUrl,
+    );
+    if (response.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
       notifications.success(`Invite resend successfully!`);
       return response;
-    }
-    else {
+    } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
-  }
+  };
 
-  public withdrawInvite = async (
-  teamId: string,
-  email: string,
-  ) => {
+  public withdrawInvite = async (teamId: string, email: string) => {
     const baseUrl = await this.constructBaseUrl(teamId);
-    const response = await this.teamService.withdrawInvite(teamId, email, baseUrl);
-    if(response?.isSuccessful) {
+    const response = await this.teamService.withdrawInvite(
+      teamId,
+      email,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
       notifications.success(`Invite withdrawn successfully!`);
-        return response;
-    }
-    else {
+      return response;
+    } else {
       notifications.error("Failed to withdraw invite. Please try again.");
     }
-  }
+  };
 
-  public acceptInvite = async (teamId: string) => { 
+  public acceptInvite = async (teamId: string) => {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.acceptInvite(teamId, baseUrl);
     if (response.isSuccessful) {
-       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`You are now a member ${response?.data?.data.name} Hub.`);
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(
+        `You are now a member ${response?.data?.data.name} Hub.`,
+      );
       return response;
+    } else {
+      notifications.error(
+        `Failed to join the ${response?.data?.data.name} Hub. Please try again.`,
+      );
     }
-    else {
-      notifications.error(`Failed to join the ${response?.data?.data.name} Hub. Please try again.`);
-    }
-  }
+  };
 
-  public ignoreInvite = async (teamId: string) => { 
+  public ignoreInvite = async (teamId: string) => {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.ignoreInvite(teamId, baseUrl);
-    if (response.isSuccessful) { 
+    if (response.isSuccessful) {
       const teams = await this.teamRepository.getTeamsDocuments();
       await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
       await this.teamRepository.removeTeam(teamId);
-      notifications.success(`Invite ignored. The hub has been removed from your panel.`);
+      notifications.success(
+        `Invite ignored. The hub has been removed from your panel.`,
+      );
       return response;
-    }
-    else {
+    } else {
       notifications.error(`Failed to ignore invite. Please try again.`);
     }
-  }
+  };
 }

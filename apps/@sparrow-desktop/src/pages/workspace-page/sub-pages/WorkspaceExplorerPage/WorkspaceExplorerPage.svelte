@@ -27,6 +27,7 @@
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;
   let workspaceID = tab._data.path.workspaceId;
+  let workspaceType = "";
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -82,6 +83,7 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        workspaceType = value._data?.workspaceType || "PRIVATE";
       }
     },
   );
@@ -112,6 +114,7 @@
   bind:userRole
   tab={_viewModel.tab}
   {workspaceUpdatesList}
+  {workspaceType}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,
   )?.length}
@@ -124,6 +127,8 @@
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}
+  onMakeWorkspacePublic={_viewModel.handleWorkspaceVisibility}
+  onShareWorkspace={_viewModel.handleShareWorkspace}
 />
 
 <Modal

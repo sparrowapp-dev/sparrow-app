@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
+  import { Button, notifications } from "@sparrow/library/ui";
 
   /**
    * The description of the workspace.
@@ -17,6 +18,11 @@
    * Role of user in active workspace
    */
   export let userRole;
+
+  export let workspaceType: WorkspaceType = WorkspaceType.PRIVATE;
+  export let onMakeWorkspacePublic;
+  export let onShareWorkspace;
+  let isWorkspaceUpdating = false;
 
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -37,6 +43,27 @@
       placeholder="Describe this workspace's objectives or add links to generate API documentation. Start typing."
       on:input={handleInputDescription}
     />
+    {#if workspaceType === WorkspaceType.PUBLIC}
+      <Button
+        title="Share collection"
+        type={"secondary"}
+        onClick={async () => {
+          await onShareWorkspace();
+        }}
+      ></Button>
+    {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN}
+      <Button
+        title="Make it public"
+        type={"secondary"}
+        loader={isWorkspaceUpdating}
+        disable={isWorkspaceUpdating}
+        onClick={async () => {
+          isWorkspaceUpdating = true;
+          await onMakeWorkspacePublic();
+          isWorkspaceUpdating = false;
+        }}
+      ></Button>
+    {/if}
   </div>
 </div>
 

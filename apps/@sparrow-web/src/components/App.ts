@@ -1,6 +1,6 @@
 import constants from "../constants/constants";
 import { navigate } from "svelte-navigator";
-import { jwtDecode, setAuthJwt, getAuthJwt } from "../utils/jwt";
+import { jwtDecode, setAuthJwt, getAuthJwt, getClientUser } from "../utils/jwt";
 import { isGuestUserActive, setUser } from "../store/auth.store";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "../utils/mixpanel/MixpanelEvent";
@@ -12,11 +12,24 @@ import { v4 as uuidv4 } from "uuid";
 import { TeamRepository } from "src/repositories/team.repository";
 import { EnvironmentRepository } from "src/repositories/environment.repository";
 import { WorkspaceRepository } from "src/repositories/workspace.repository";
+import { WorkspaceService } from "src/services/workspace.service";
+import { CollectionService } from "src/services/collection.service";
+import { CollectionRepository } from "src/repositories/collection.repository";
+import { createDeepCopy } from "@sparrow/common/utils";
+import { EnvironmentService } from "src/services/environment.service";
+import { TestflowRepository } from "src/repositories/testflow.repository";
+import { TestflowService } from "src/services/testflow.service";
 const _guideRepository = new GuideRepository();
 const guestUserRepository = new GuestUserRepository();
 const teamRepository = new TeamRepository();
 const environmentRepository = new EnvironmentRepository();
 const workspaceRepository = new WorkspaceRepository();
+const workspaceService = new WorkspaceService();
+const collectionService = new CollectionService();
+const collectionRepository = new CollectionRepository();
+const environmentService = new EnvironmentService();
+const testflowRepository = new TestflowRepository();
+const testflowService = new TestflowService();
 
 export const sendUserDataToMixpanel = (userDetails: {
   _id: string;
@@ -35,19 +48,21 @@ const getGuestUserState = async () => {
   const response = await guestUserRepository.findOne({
     name: "guestUser",
   });
-  return response?.getLatest().toMutableJSON().isGuestUser;
+  return response?.getLatest().toMutableJSON();
 };
 
 /**
  * add guest user in local db
  */
 const addGuestUser = async () => {
-  await guestUserRepository.insert({
+  const guestUser = {
     id: uuidv4(),
     name: "guestUser",
     isGuestUser: true,
     isBannerActive: true,
-  });
+  };
+  await guestUserRepository.insert(guestUser);
+  return guestUser;
 };
 
 /**
@@ -127,14 +142,183 @@ const createGuestUserTeamWorkspace = async () => {
   _guideRepository.insert({ isActive: true, id: "collection-guide" });
 };
 
+const createPublicTeamWorkspace = async (user: any, workspaceData: any) => {
+  const teamId = "sharedWorkspaceTeam";
+  const dummyTeam = {
+    teamId: teamId,
+    name: "Shared Workspaces",
+    workspaces: [{ name: workspaceData.name, workspaceId: workspaceData._id }],
+    users: [{ id: user.id, name: user.name, email: "", role: "member" }],
+    owner: user.id,
+    admins: [],
+    isActiveTeam: true,
+    isOpen: true,
+    isNewInvite: false,
+    createdAt: new Date().toISOString(),
+    createdBy: user.id,
+    updatedAt: new Date().toISOString(),
+    updatedBy: user.id,
+  };
+  const {
+    _id,
+    name,
+    description,
+    workspaceType,
+    users,
+    admins,
+    team,
+    createdAt,
+    createdBy,
+    collection,
+    updatedAt,
+    updatedBy,
+    isNewInvite,
+  } = workspaceData;
+  const item = {
+    _id,
+    name,
+    description,
+    workspaceType: "PUBLIC",
+    isShared: true,
+    users: [
+      {
+        email: user?.email,
+        id: user?.id,
+        name: user?.name,
+        role: "viewer",
+      },
+    ],
+    collections: collection ? collection : [],
+    admins: admins,
+    team: {
+      teamId: teamId,
+      teamName: "Shared Workspaces",
+      hubUrl: "",
+    },
+    environmentId: "",
+    isActiveWorkspace: false,
+    createdAt,
+    createdBy,
+    updatedAt,
+    updatedBy,
+    isNewInvite,
+  };
+  const existingWorkspace = await workspaceRepository.readWorkspace(
+    workspaceData._id,
+  );
+  if (existingWorkspace) {
+    await workspaceRepository.setActiveWorkspace(workspaceData._id);
+    return;
+  }
+  const existingTeam = await teamRepository.getTeamDoc(teamId);
+  if (existingTeam) {
+    await teamRepository.removeTeam(teamId);
+    await workspaceRepository.deleteWorkspacesByTeamId(teamId);
+  }
+  await teamRepository.createTeam(dummyTeam);
+  await workspaceRepository.addWorkspace(item);
+  await fetchCollections(workspaceData._id);
+  await refreshEnvironment(workspaceData._id);
+  await refreshTestflow(workspaceData._id);
+};
+
+/**
+ * Fetch collections from services and insert to repository
+ * @param workspaceId - id of current workspace
+ */
+const fetchCollections = async (
+  workspaceId: string,
+): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
+  const res = await collectionService.fetchPublicCollection(
+    workspaceId,
+    constants.API_URL,
+  );
+  if (res?.isSuccessful && res?.data?.data) {
+    const collections = res.data.data;
+    await collectionRepository.bulkInsertData(
+      workspaceId,
+      collections?.map((_collection: any) => {
+        const collection = createDeepCopy(_collection);
+        collection["workspaceId"] = workspaceId;
+        collection["id"] = _collection._id;
+        if (!collection?.description) collection.description = "";
+        delete collection._id;
+        return collection;
+      }),
+    );
+  }
+
+  return {};
+};
+
+/**
+ * @description - refreshes environment data with sync to mongo server
+ * @param workspaceId - workspace Id to which environment belongs
+ * @returns
+ */
+const refreshEnvironment = async (
+  workspaceId: string,
+): Promise<{
+  environmentTabsToBeDeleted?: string[];
+}> => {
+  const response = await environmentService.fetchAllPublicEnvironments(
+    workspaceId,
+    constants.API_URL,
+  );
+  if (response?.isSuccessful && response?.data?.data) {
+    const environments = response.data.data;
+    await environmentRepository.refreshEnvironment(
+      environments?.map((_environment: any) => {
+        const environment = createDeepCopy(_environment);
+        environment["id"] = environment._id;
+        environment["workspaceId"] = workspaceId;
+        delete environment._id;
+        return environment;
+      }),
+    );
+  }
+  return {};
+};
+
+/**
+ * @description - refreshes testflow data with sync to mongo server
+ * @param workspaceId - workspace Id to which testflow belongs
+ * @returns
+ */
+const refreshTestflow = async (
+  workspaceId: string,
+): Promise<{
+  testflowTabsToBeDeleted?: string[];
+}> => {
+  const response = await testflowService.fetchAllPublicTestflow(
+    workspaceId,
+    constants.API_URL,
+  );
+  if (response?.isSuccessful && response?.data?.data) {
+    const testflows = response.data.data;
+    await testflowRepository.refreshTestflow(
+      testflows?.map((_testflow: any) => {
+        const testflow = createDeepCopy(_testflow);
+        testflow["workspaceId"] = workspaceId;
+        return testflow;
+      }),
+    );
+  }
+  return {};
+};
+
 export async function handleLogin(url: string) {
   const tokens = getAuthJwt();
+  const urlParams = new URLSearchParams(url.split("?")[1]);
+  const workspaceId = urlParams.get("workspaceId");
+  const clientUser = getClientUser();
+
   if ((!tokens[0] || !tokens[1]) && !url) {
-    const guestUser = await getGuestUserState();
-    if (guestUser) {
+    let guestUser = await getGuestUserState();
+    if (guestUser?.isGuestUser) {
       return;
     } else {
-      await addGuestUser();
+      guestUser = await addGuestUser();
       await createGuestUserTeamWorkspace();
       isGuestUserActive.set(true);
       navigate("/guest/collections");
@@ -151,6 +335,15 @@ export async function handleLogin(url: string) {
   }
   if (tokens[0] && tokens[1]) {
     // handles case if account already running in app
+    if (workspaceId) {
+      const workspaceData =
+        await workspaceService.fetchPublicWorkspace(workspaceId);
+      if (workspaceData.isSuccessful) {
+        const res = workspaceData?.data?.data;
+        await createPublicTeamWorkspace(clientUser, res);
+        await workspaceRepository.setActiveWorkspace(workspaceId);
+      }
+    }
     return;
   }
   const params = new URLSearchParams(url.split("?")[1]);
