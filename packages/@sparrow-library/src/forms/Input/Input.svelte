@@ -32,6 +32,8 @@
   export let value = "";
   export let maxlength = 500;
   export let id = "";
+  export let startIcon;
+  export let startIconProps = {};
   let enterPressed = false;
 
   const dispatch = createEventDispatcher();
@@ -98,6 +100,13 @@
 </script>
 
 <div class="position-relative">
+  <!-- Render startIcon if provided -->
+
+  {#if startIcon}
+    <div class="input-icon">
+      <svelte:component this={startIcon} {...startIconProps} />
+    </div>
+  {/if}
   <input
     {id}
     {value}
@@ -106,7 +115,7 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`${variant} ${size} ${textStyle} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
+    class={`${variant} ${size} ${textStyle} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""} ${startIcon ? "has-icon" : ""}`}
     style="width: {width};"
     {placeholder}
     {disabled}
@@ -114,6 +123,25 @@
 </div>
 
 <style lang="scss">
+  .input-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .input-icon {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    color: var(--text-ds-neutral-400);
+    pointer-events: none; /* Prevent interaction with the icon */
+    z-index: 2;
+  }
+
+  /* Add padding to inputs with icons */
+  .has-icon {
+    padding-left: 36px !important; /* Make space for the icon */
+  }
   .stroke {
     color: var(--text-ds-neutral-50);
     background-color: transparent;
@@ -317,5 +345,23 @@
   .large {
     height: 40px;
     padding: 8px;
+  }
+
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .input-icon {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    color: var(--text-ds-neutral-400);
+    pointer-events: none; /* Prevent interaction with the icon */
+  }
+
+  .input {
+    padding-left: 36px; /* Add padding to avoid overlap with the icon */
   }
 </style>

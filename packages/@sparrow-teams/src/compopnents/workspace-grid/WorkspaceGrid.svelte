@@ -203,42 +203,46 @@
       >
         {workspace?.description ? workspace.description : "No summary added"}
       </p>
-
-      <div class="d-flex justify-content-between">
-        <p
-          class="teams-workspace__date mb-0"
-          style={`${
-            showMenu ? "color: var(--sparrow-text-color) !important;" : null
-          }`}
-        >
-          <span
-            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-            style=" color:var(--text-secondary-200)"
-            >Last updated
-          </span><span
-            class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
-            style=" color:var(--text-ds-neutral-50)"
-            >{formateUpdateTime(workspace?.updatedAt)}</span
+      <div class="d-flex flex-column" style="gap:16px">
+        <div
+          style="border-bottom: 1px solid var(--border-ds-surface-100);"
+        ></div>
+        <div class="d-flex justify-content-between">
+          <p
+            class="teams-workspace__date mb-0"
+            style={`${
+              showMenu ? "color: var(--sparrow-text-color) !important;" : null
+            }`}
           >
-        </p>
+            <span
+              class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+              style=" color:var(--text-secondary-200)"
+              >Last updated
+            </span><span
+              class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
+              style=" color:var(--text-ds-neutral-50)"
+              >{formateUpdateTime(workspace?.updatedAt)}</span
+            >
+          </p>
 
-        {#if isWebEnvironment}
-          <button
-            class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
-            on:click|stopPropagation={() => {
-              openInDesktop(workspace._id);
-            }}
-          >
-            Open in Desktop
-            <div class="arrow-up">
-              <ArrowForward
-                width={"19px"}
-                height={"19px"}
-                color={"var(--icon-primary-300)"}
-              />
-            </div>
-          </button>
-        {/if}
+          {#if isWebEnvironment}
+            <button
+              class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+              on:click|stopPropagation={() => {
+                openInDesktop(workspace._id);
+              }}
+            >
+              Open in Desktop
+              <div class="arrow-up">
+                <ArrowForward
+                  width={"19px"}
+                  height={"19px"}
+                  color={"var(--icon-primary-300)"}
+                />
+              </div>
+            </button>
+          {/if}
+        </div>
       </div>
     </div>
   </Card>

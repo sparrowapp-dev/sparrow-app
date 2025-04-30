@@ -234,3 +234,5 @@ export { default as ArrowExpandRegular } from "./ArrowExpandRegular.svelte"
 export { default as SettingsRegular } from "./SettingsRegular.svelte";
 export { default as MoreVerticalRegular } from "./MoreVerticalRegular.svelte";
 export { default as MathFormulaRegular } from "./MathFormulaRegular.svelte";
+export { default as XIcon } from "./XIcon.svelte";
+export { default as LinkedIn } from "./LinkedIn.svelte";
