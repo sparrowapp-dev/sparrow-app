@@ -152,7 +152,7 @@ const createPublicTeamWorkspace = async (user: any, workspaceData: any) => {
     owner: user.id,
     admins: [],
     isActiveTeam: true,
-    isOpen: true,
+    isOpen: false,
     isNewInvite: false,
     createdAt: new Date().toISOString(),
     createdBy: user.id,
