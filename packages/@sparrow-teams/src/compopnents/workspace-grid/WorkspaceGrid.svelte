@@ -91,7 +91,7 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
-  const syncedTimeAgo = (dateString: string) => {
+  const formateUpdateTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
@@ -201,7 +201,7 @@
           </span><span
             class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
             style=" color:var(--text-ds-neutral-50)"
-            >{syncedTimeAgo(workspace?.updatedAt)}</span
+            >{formateUpdateTime(workspace?.updatedAt)}</span
           >
         </p>
 
