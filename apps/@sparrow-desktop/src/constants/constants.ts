@@ -28,6 +28,7 @@ const constants = {
   SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_SPARROW_AI_WEBSOCKET,
   SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
   APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
+  SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
 };
 
 export default constants;

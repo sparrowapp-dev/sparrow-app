@@ -3,3 +3,8 @@ export enum WorkspaceMemberRole {
   EDITOR = "editor",
   VIEWER = "viewer",
 }
+
+export enum WorkspaceType {
+  PRIVATE = "PRIVATE",
+  PUBLIC = "PUBLIC",
+}

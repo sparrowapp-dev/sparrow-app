@@ -67,6 +67,7 @@
    * Role of user in workspace
    */
   export let userRole;
+  export let isSharedWorkspace = false;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -141,8 +142,10 @@
     style="color: var(--text-ds-neutral-100); line-height:20px;"
   >
     <p>
-      Are you sure you want to delete this WebSocket? <span class="text-ds-font-weight-semi-bold"
-      style="color: var(--text-ds-neutral-50);">"{api.name}"</span>
+      Are you sure you want to delete this WebSocket? <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{api.name}"</span
+      >
       will be removed and cannot be restored.
     </p>
   </div>
@@ -186,7 +189,7 @@
   </div></Modal
 >
 
-{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -309,7 +312,7 @@
 
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
     <Tooltip
       title={"More"}
       show={!showMenu}

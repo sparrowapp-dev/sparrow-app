@@ -288,7 +288,10 @@
       >
       <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
       <a
-        href={constants.CANNY_FEEDBACK_URL}
+      role="button"
+      on:click={async () => {
+        await open(constants.CANNY_FEEDBACK_URL);
+      }}
         class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
       >
     {:else}
@@ -303,7 +306,7 @@
       <a
         role="button"
         on:click={async () => {
-          await open(externalHelpLink);
+          await open(constants.CANNY_FEEDBACK_URL);
         }}
         class="px-2 link-button sparrow-fs-12">Report Issue</a
       >
