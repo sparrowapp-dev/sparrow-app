@@ -58,35 +58,37 @@
 
     <div class="position-relative" style="padding-bottom: 40px;">
       <div class="position-absolute top-0 auth-input-container">
-        <CodeMirrorInput
-          bind:value={apiData.authKey}
-          onUpdateInput={() => {
-            handleAuthChange();
-          }}
-          placeholder={"Enter auth key"}
-          {theme}
-          {disabled}
-          {environmentVariables}
-          {onUpdateEnvironment}
-          bind:dispatcher={authKeyDispatcher}
-          handleOpenDE={(obj) => {
-            handleOpenCurrentDynamicExpression({
-              ...obj,
-              type: "authKey",
-            });
-          }}
-        />
-        <Button
-          size="extra-small"
-          type="teritiary-regular"
-          startIcon={MathFormulaRegular}
-          onClick={() => {
-            handleOpenCurrentDynamicExpression({
-              type: "authKey",
-              dispatch: authKeyDispatcher,
-            });
-          }}
-        />
+        <div class="d-flex gap-2">
+          <CodeMirrorInput
+            bind:value={apiData.authKey}
+            onUpdateInput={() => {
+              handleAuthChange();
+            }}
+            placeholder={"Enter auth key"}
+            {theme}
+            {disabled}
+            {environmentVariables}
+            {onUpdateEnvironment}
+            bind:dispatcher={authKeyDispatcher}
+            handleOpenDE={(obj) => {
+              handleOpenCurrentDynamicExpression({
+                ...obj,
+                type: "authKey",
+              });
+            }}
+          />
+          <Button
+            size="medium"
+            type="teritiary-regular"
+            startIcon={MathFormulaRegular}
+            onClick={() => {
+              handleOpenCurrentDynamicExpression({
+                type: "authKey",
+                dispatch: authKeyDispatcher,
+              });
+            }}
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -96,35 +98,37 @@
 
     <div class="position-relative" style="padding-bottom: 40px;">
       <div class="position-absolute top-0 auth-input-container">
-        <CodeMirrorInput
-          bind:value={apiData.authValue}
-          onUpdateInput={() => {
-            handleAuthChange();
-          }}
-          placeholder={"Enter auth value"}
-          {theme}
-          {disabled}
-          {environmentVariables}
-          {onUpdateEnvironment}
-          bind:dispatcher={authValueDispatcher}
-          handleOpenDE={(obj) => {
-            handleOpenCurrentDynamicExpression({
-              ...obj,
-              type: "authValue",
-            });
-          }}
-        />
-        <Button
-          size="extra-small"
-          type="teritiary-regular"
-          startIcon={MathFormulaRegular}
-          onClick={() => {
-            handleOpenCurrentDynamicExpression({
-              type: "authValue",
-              dispatch: authValueDispatcher,
-            });
-          }}
-        />
+        <div class="d-flex gap-2">
+          <CodeMirrorInput
+            bind:value={apiData.authValue}
+            onUpdateInput={() => {
+              handleAuthChange();
+            }}
+            placeholder={"Enter auth value"}
+            {theme}
+            {disabled}
+            {environmentVariables}
+            {onUpdateEnvironment}
+            bind:dispatcher={authValueDispatcher}
+            handleOpenDE={(obj) => {
+              handleOpenCurrentDynamicExpression({
+                ...obj,
+                type: "authValue",
+              });
+            }}
+          />
+          <Button
+            size="medium"
+            type="teritiary-regular"
+            startIcon={MathFormulaRegular}
+            onClick={() => {
+              handleOpenCurrentDynamicExpression({
+                type: "authValue",
+                dispatch: authValueDispatcher,
+              });
+            }}
+          />
+        </div>
       </div>
     </div>
   </div>

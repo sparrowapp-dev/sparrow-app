@@ -23,35 +23,37 @@
   <div style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Token</p>
     <div class="position-relative auth-input-container mb-3">
-      <CodeMirrorInput
-        bind:value={bearerToken}
-        onUpdateInput={() => {
-          handleInput();
-        }}
-        placeholder={"Token"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        {disabled}
-        bind:dispatcher
-        handleOpenDE={(obj) => {
-          handleOpenCurrentDynamicExpression({
-            ...obj,
-            type: "bearerToken",
-          });
-        }}
-      />
-      <Button
-        size="extra-small"
-        type="teritiary-regular"
-        startIcon={MathFormulaRegular}
-        onClick={() => {
-          handleOpenCurrentDynamicExpression({
-            type: "bearerToken",
-            dispatch: dispatcher,
-          });
-        }}
-      />
+      <div class="d-flex gap-2">
+        <CodeMirrorInput
+          bind:value={bearerToken}
+          onUpdateInput={() => {
+            handleInput();
+          }}
+          placeholder={"Token"}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          {disabled}
+          bind:dispatcher
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              type: "bearerToken",
+            });
+          }}
+        />
+        <Button
+          size="medium"
+          type="teritiary-regular"
+          startIcon={MathFormulaRegular}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "bearerToken",
+              dispatch: dispatcher,
+            });
+          }}
+        />
+      </div>
     </div>
   </div>
 </div>
