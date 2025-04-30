@@ -14,7 +14,7 @@
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { singleInstanceHandler } from "@app/utils/singleinstance/app.singleinstance";
   import { AppViewModel } from "./app.ViewModel";
-  import { posthogClient, initPostHog } from "@app/utils/posthog/posthogConfig";
+  import { initPostHog } from "@app/utils/posthog/posthogConfig";
   import { getScaleFactor, setScaleFactorToDb } from "@app/utils/zoom";
   import { listen } from "@tauri-apps/api/event";
   import { invoke } from "@tauri-apps/api/core";
