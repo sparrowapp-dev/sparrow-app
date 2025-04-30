@@ -5,8 +5,9 @@
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
   import { ArrowForward, LockClosedRegular } from "@sparrow/library/icons";
-  import MoreVerticalRegular from "../../../../@sparrow-library/src/icons/MoreVerticalRegular.svelte";
-  import Tags from "../../../../@sparrow-library/src/ui/tags/Tags.svelte";
+  import MoreVerticalRegular from "@sparrow/library/icons";
+  // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
+  import Tags from "@sparrow/library/ui";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
