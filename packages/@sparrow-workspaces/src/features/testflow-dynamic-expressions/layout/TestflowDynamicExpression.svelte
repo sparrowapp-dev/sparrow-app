@@ -14,6 +14,7 @@
   export let onInsertExpression;
   let expression = dynamicExpressionEditorContent;
   export let handleAddingNested: (value: string) => void;
+  export let selectedBlock;
 
   export let onPreviewExpression;
 
@@ -61,6 +62,7 @@
   $: currentOpenItem = $isDynamicExpressionContent.find(
     (item) => item.isCurrentOpen,
   );
+  let cursorPosition: number | null = 0;
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px;">
@@ -70,6 +72,7 @@
       {onPreviewExpression}
       {handleAddingNested}
       bind:selectedApiRequestType
+      bind:cursorPosition
     />
   </div>
   <div class="w-50">
@@ -89,9 +92,11 @@
           {#if currentTabId === TFDynamicExpressionTabsEnum.DYNAMICCONTENT}
             <DynamicContent
               bind:expression
+              {selectedBlock}
               {requestApis}
               {environmentVariables}
               bind:selectedApiRequestType
+              bind:cursorPosition
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
             <FunctionsOptions bind:expression />
@@ -128,5 +133,6 @@
     background-color: var(--bg-ds-surface-500);
     padding: 12px;
     border-radius: 4px;
+    height: "440px";
   }
 </style>
