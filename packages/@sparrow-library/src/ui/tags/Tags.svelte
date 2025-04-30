@@ -18,7 +18,6 @@
     if (total_words.length > 5) sen = total_words.slice(0, 5).join(" ") + "...";
     return sen;
   };
-  console.log(endIcon, "ff");
 
   const colorPalette = {
     cyan: {

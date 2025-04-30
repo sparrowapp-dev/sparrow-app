@@ -268,12 +268,18 @@
     selectedViewSubscribe();
   });
 
-  const getFilteredWorkspaces = () => {
-    if (selectedFilter === "All") {
-      return workspaces; // Return all workspaces
+  let filteredWorkspaces = [];
+  $: {
+    if (selectedFilter !== "All") {
+      filteredWorkspaces = workspaces.filter(
+        (workspace) =>
+          workspace.workspaceType.toLowerCase() ===
+          selectedFilter.toLowerCase(),
+      );
+    } else {
+      filteredWorkspaces = workspaces;
     }
-    return workspaces.filter((workspace) => workspace.workspacetype === selectedFilter);
-  };
+  }
 </script>
 
 {#if openTeam}
@@ -426,10 +432,13 @@
             <div class="h-100 d-flex flex-column">
               {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
                 <div
-                  class="d-flex align-items-center" 
+                  class="d-flex align-items-center"
                   style="gap: 20px; justify-content:space-between; align-items:center;"
                 >
-                  <div class="d-flex align-items-center" style="gap: 12px; margin-bottom: 12px;">
+                  <div
+                    class="d-flex align-items-center"
+                    style="gap: 12px; margin-bottom: 12px;"
+                  >
                     <span
                       role="button"
                       class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center ${
@@ -489,12 +498,12 @@
                     bind:isGuestUser
                     {searchQuery}
                     {openTeam}
-                    data={getFilteredWorkspaces().filter((elem) => {
+                    data={filteredWorkspaces.filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
                         elem?.name?.toLowerCase().includes(searchQuery)
                       );
-                    }) || []}  
+                    }) || []}
                     {onSwitchWorkspace}
                     {onDeleteWorkspace}
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
@@ -508,7 +517,7 @@
                     {openInDesktop}
                     {isWebEnvironment}
                     {searchQuery}
-                    workspaces={getFilteredWorkspaces().filter((elem) => {
+                    workspaces={filteredWorkspaces.filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
                         elem?.name?.toLowerCase().includes(searchQuery)
