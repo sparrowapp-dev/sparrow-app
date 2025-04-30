@@ -427,9 +427,9 @@
               {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
                 <div
                   class="d-flex align-items-center" 
-                  style="gap: 80px; justify-content:space-between; align-items:center;"
+                  style="gap: 20px; justify-content:space-between; align-items:center;"
                 >
-                  <div class="d-flex align-items-center" style="gap: 48px; margin-bottom: 12px;">
+                  <div class="d-flex align-items-center" style="gap: 12px; margin-bottom: 12px;">
                     <span
                       role="button"
                       class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center ${
