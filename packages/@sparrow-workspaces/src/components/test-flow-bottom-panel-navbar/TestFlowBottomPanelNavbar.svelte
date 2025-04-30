@@ -30,6 +30,8 @@
       requestUrl = selectedBlock?.data?.requestData?.url ?? "";
     }
   }
+
+  let dispatcher;
 </script>
 
 <div class="header-container">
@@ -83,6 +85,7 @@
           type: "url",
         });
       }}
+      bind:dispatcher
     />
     <Button
       size="extra-small"
@@ -91,6 +94,7 @@
       onClick={() => {
         handleOpenCurrentDynamicExpression({
           type: "url",
+          dispatch: dispatcher,
         });
       }}
     />
