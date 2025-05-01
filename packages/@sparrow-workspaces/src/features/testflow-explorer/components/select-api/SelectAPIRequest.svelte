@@ -273,7 +273,29 @@
     <div
       style="display: flex; align-items: center; padding: 5px 0px; gap: 6px;"
     >
-      {#if $currentStep >= 6 && $isTestFlowTourGuideOpen}
+      {#if $currentStep == 6 && $isTestFlowTourGuideOpen}
+        <!-- First row: GET -->
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span
+            class="request-icon text-success"
+            style="font-size: 9px; font-weight: 600; text-align: center;"
+          >
+            GET
+          </span>
+        </div>
+      {/if}
+
+      {#if $currentStep == 7 && $isTestFlowTourGuideOpen}
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span
+            class="request-icon text-success"
+            style="font-size: 9px; font-weight: 600; text-align: center;"
+          >
+            GET
+          </span>
+        </div>
+      {/if}
+      {#if $currentStep < 6 && $isTestFlowTourGuideOpen}
         <div style="display: flex; align-items: center; gap: 6px;">
           <span
             class="request-icon text-{getMethodStyle(method)}"
@@ -300,7 +322,11 @@
         <input
           class="search-box"
           type="text"
-          placeholder="Select API Request"
+          placeholder={$currentStep === 6
+            ? "Select-Api"
+            : $currentStep === 7
+              ? "pet-hospitality"
+              : "Select API Request"}
           bind:value={selectApiName}
           on:input={searchApis}
           on:click|stopPropagation={handleInputClick}

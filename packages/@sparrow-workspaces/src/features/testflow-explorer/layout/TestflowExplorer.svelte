@@ -1186,6 +1186,69 @@
         {testflowStore}
       />
     </div>
+  {:else if $isTestFlowTourGuideOpen && $currentStep === 6}
+    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+      <!-- Request Response Nav -->
+      <TestFlowBottomPanel
+        selectedBlock={{
+          data: {
+            name: "Sample API",
+            method: "GET",
+            blockName: "Block 1",
+            requestData: {
+              name: "Sample API",
+              method: "GET",
+              state: {
+                requestBodyLanguage: RequestDataTypeEnum.TEXT,
+                requestBodyNavigation: RequestDatasetEnum.NONE,
+                requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+                requestNavigation: RequestSectionEnum.PARAMETERS,
+                responseNavigation: ResponseSectionEnum.RESPONSE,
+                responseBodyLanguage: RequestDataTypeEnum.TEXT,
+                responseBodyFormatter: ResponseFormatterEnum.PRETTY,
+                requestExtensionNavigation: "",
+                requestLeftSplitterWidthPercentage: 50,
+                requestRightSplitterWidthPercentage: 50,
+                isExposeEditDescription: true,
+                isSendRequestInProgress: false,
+                isSaveDescriptionInProgress: false,
+                isSaveRequestInProgress: false,
+                isParameterBulkEditActive: false,
+                isHeaderBulkEditActive: false,
+                isChatbotActive: false,
+                isChatbotSuggestionsActive: true,
+                isChatbotGeneratingResponse: false,
+                isDocGenerating: false,
+                isDocAlreadyGenerated: false,
+              },
+              url: "http://api.example.com/resource",
+              queryParams: [
+                {
+                  key: "Host",
+                  value: "/",
+                  checked: true,
+                },
+              ],
+              headers: [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ],
+            },
+          },
+        }}
+        {environmentVariables}
+        onClose={() => unselectNodes()}
+        onRedirect={onRedrectRequest}
+        {handleUpdateRequestData}
+        {isWebApp}
+        onClearResponse={() => {}}
+        {userRole}
+        {onUpdateEnvironment}
+      />
+    </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
     <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
       <!-- Request Response Nav -->
@@ -1221,7 +1284,7 @@
                 isDocGenerating: false,
                 isDocAlreadyGenerated: false,
               },
-              url: "https://sparrowapp.dev/api/v1/docs",
+              url: "http://api.example.com/resource",
               queryParams: [
                 {
                   key: "",
