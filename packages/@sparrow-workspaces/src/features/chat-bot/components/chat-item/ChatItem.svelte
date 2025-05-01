@@ -30,6 +30,8 @@
     CopyRegular,
     ThumbDislikeRegular,
   } from "@sparrow/library/icons";
+  import * as Sentry from "@sentry/svelte";
+
   export let message: string;
   export let messageId: string;
   export let type;
@@ -380,6 +382,7 @@
           await navigator.clipboard.writeText(code);
           notifications.success("Code copied to clipboard.");
         } catch (err) {
+          Sentry.captureException(err); 
           console.error("Failed to copy code: ", err);
         }
       }
@@ -415,6 +418,7 @@
       }, 5000);
       MixpanelEvent(Events.AI_Copy_Response);
     } catch (err) {
+      Sentry.captureException(err); 
       console.error("Failed to copy response: ", err);
     }
   };

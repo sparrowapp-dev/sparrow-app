@@ -21,6 +21,7 @@
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { CreateTeam } from "@sparrow/common/features";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
+  import * as Sentry from "@sentry/svelte";
 
   import {
     type SidebarItemBaseInterface,
@@ -310,6 +311,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     }
@@ -337,6 +339,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening collection:", error);
@@ -367,6 +370,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening folder:", error);
@@ -389,6 +393,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening workspace:", error);
@@ -418,6 +423,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening environment:", error);
@@ -447,6 +453,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error); 
       console.error("Error opening testflow:", error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
