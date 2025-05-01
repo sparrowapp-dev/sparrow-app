@@ -82,6 +82,7 @@
     <WorkspaceHeader
       {userRole}
       {isSharedWorkspace}
+      {workspaceType}
       bind:isWorkspaceInviteModalOpen
       {onDeleteWorkspace}
       {onUpdateWorkspaceName}
@@ -101,6 +102,7 @@
           {workspaceType}
           {onMakeWorkspacePublic}
           {onShareWorkspace}
+          {onUpdateWorkspaceName}
         />
       {:else if workspaceNavigatorId === "settings"}
         <WorkspaceSetting

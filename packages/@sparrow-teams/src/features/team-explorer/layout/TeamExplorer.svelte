@@ -120,6 +120,7 @@
   export let isGuestUser = false;
   export let onAddMember;
   export let openInDesktop;
+  export let onCopyLink;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -273,7 +274,7 @@
     if (selectedFilter !== "All") {
       filteredWorkspaces = workspaces.filter(
         (workspace) =>
-          workspace.workspaceType.toLowerCase() ===
+          workspace?.workspaceType?.toLowerCase() ===
           selectedFilter.toLowerCase(),
       );
     } else {
@@ -517,6 +518,7 @@
                     {openInDesktop}
                     {isWebEnvironment}
                     {searchQuery}
+                    {onCopyLink}
                     workspaces={filteredWorkspaces.filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
