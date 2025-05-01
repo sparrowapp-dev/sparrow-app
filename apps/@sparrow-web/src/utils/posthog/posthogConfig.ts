@@ -5,7 +5,7 @@ export const initPostHog = () => {
   if (!isInitialized) { 
     posthog.init(constants.ENABLE_POST_HOG, { 
 
-      api_host: 'https://us.i.posthog.com', 
+      api_host: constants.POSTHOG_API_URL, 
 
       person_profiles: 'always', 
 
