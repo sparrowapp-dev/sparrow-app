@@ -31,7 +31,6 @@
   export let newModifiedContent: string; // New content to show in merge view
   let hasChanges = false;
   let originalContent = value; // Store the original content for comparison
-  let previousMergeViewState = isMergeViewEnabled;
 
   const dispatch = createEventDispatcher();
 
@@ -62,7 +61,6 @@
         // only hits for input, blur etc type of events.
         const content = update.state.doc.toString(); // Get the new content
         dispatch("change", content); // Dispatch the new content to parent.
-        if (isMergeViewEnabled) checkForChanges();
       }
     }
   });
@@ -142,27 +140,31 @@
    * Apply changes from the modified content
    * This function accepts the changes and updates the original value
    */
-  const applyChanges = () => {
+  const applyChanges = async () => {
     if (!isMergeViewEnabled || !codeMirrorView) return;
+    isMergeViewLoading = true;
 
     const modifiedContent = codeMirrorView.state.doc.toString();
     dispatch("change", modifiedContent);
     value = modifiedContent; // Update the original value with the modified content
     originalContent = modifiedContent; // Update internal state
 
-    previousMergeViewState = false;
     isMergeViewEnabled = false;
     newModifiedContent = ""; // reset the content
     hasChanges = false;
     updateMergeView(); // Update the editor view
+
+    await sleep(1000);
+    isMergeViewLoading = false;
   };
 
   /**
    * Undo changes and revert to the original content
    * This function declines the changes and keeps the original value
    */
-  const undoChanges = () => {
+  const undoChanges = async () => {
     if (!isMergeViewEnabled || !codeMirrorView) return;
+    isMergeViewLoading = true;
 
     // Restore original content
     codeMirrorView.dispatch({
@@ -175,12 +177,13 @@
     });
     // dispatch("undoChanges", originalContent); // Notify parent that changes were declined
 
-    previousMergeViewState = false;
     isMergeViewEnabled = false;
-    isMergeViewLoading = false;
     newModifiedContent = "";
     hasChanges = false;
     updateMergeView(); // Update the editor view
+
+    await sleep(1000);
+    isMergeViewLoading = false;
   };
 
   // Function to check if there are actual changes between original and current content
@@ -214,47 +217,6 @@
     originalContent = value; // Store initial content as original
   });
 
-  // Handle changes to isMergeViewEnabled prop
-  $: if (codeMirrorView && isMergeViewEnabled !== previousMergeViewState) {
-    previousMergeViewState = isMergeViewEnabled;
-
-    if (isMergeViewEnabled) {
-      isMergeViewLoading = true;
-      originalContent = codeMirrorView.state.doc.toString(); // Store current content as original
-
-      if (newModifiedContent) {
-        // Apply new content if provided
-        codeMirrorView.dispatch({
-          changes: {
-            from: 0,
-            to: codeMirrorView.state.doc.length,
-            insert: newModifiedContent,
-          },
-          annotations: [{ autoChange: true }],
-        });
-        updateMergeView();
-
-        // Use setTimeout to allow the merge view to be rendered
-        // This is a workaround since the operation isn't really async
-        setTimeout(() => {
-          isMergeViewLoading = false;
-        }, 1000);
-      }
-    } else {
-      // If turning off merge view, restore original content
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: originalContent,
-        },
-        annotations: [{ autoChange: true }],
-      });
-    }
-
-    updateMergeView(); // ToDo: No need, remove it
-  }
-
   // Handle changes to newModifiedContent when in merge view
   $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
     isMergeViewLoading = true;
@@ -270,25 +232,23 @@
 
     // Use setTimeout to allow the merge view to be rendered
     // This is a workaround since the operation isn't really async
-    setTimeout(() => {
-      isMergeViewLoading = false;
-    }, 1000);
+    setTimeout(() => (isMergeViewLoading = false), 2000);
   }
+
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  // Show dummy loading
+  const showSyncLoading = async (delay: number) => {
+    isMergeViewLoading = true;
+    await sleep(delay);
+    isMergeViewLoading = false;
+  };
 
   // Run whenever component state changes
   afterUpdate(() => {
-    // Handling the mergeview state while component state changes
-    if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: value,
-        },
-        annotations: [{ autoChange: true }],
-      });
-    }
-
     handleCodeMirrorSyntaxFormat(
       codeMirrorView,
       languageConf,
