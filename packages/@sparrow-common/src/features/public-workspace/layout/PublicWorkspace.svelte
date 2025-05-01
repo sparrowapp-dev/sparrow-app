@@ -24,34 +24,63 @@
     errorMessage={inputNameError}
   >
     <p
-      style="color: var(--text-ds-neutral-200); margin-bottom:0px; margin-top:18px;"
+      style="color: var(--text-ds-neutral-200); margin-bottom:7px; margin-top:18px;"
       class="text-ds-font-size-14 text-ds-line-height-143"
     >
       Publish this workspace publicly?
     </p>
-    <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
+    <p
+      class="text-ds-font-size-12"
+      style="color: var(--text-ds-neutral-400); margin-bottom: 0px;"
+    >
       Anyone with the link can view this workspace, but only collaborators
       you've added can make changes. Active sync collections will remain private
       and will not be made public. You can unpublish the workspace at any time
-      to make it private again. By publishing, you agree to our <span
-        style="color: var(--text-ds-neutral-50); text-decoration: underline;"
-        >Terms of Service</span
-      >
-      and
-      <span
-        style="color: var(--text-ds-neutral-50); text-decoration: underline;"
-        >Privacy Policy</span
-      >.
+      to make it private again. By publishing, you agree to our
     </p>
+    <div class="d-flex" style="align-items:center;">
+      <Button
+        title="Terms of Service"
+        type={"link-secondary"}
+        onClick={() => {
+          "click dont save";
+        }}
+        size="small"
+        buttonClassProp="ps-0 pe-1"
+      />
+      <!-- <span
+        style="color: var(--text-ds-neutral-200); text-decoration: underline;"
+        >Terms of Service</span
+      > -->
+      <p
+        class="text-ds-font-size-12"
+        style="margin-top: 4px; margin-bottom:4px; color: var(--text-ds-neutral-400); "
+      >
+        and
+      </p>
+      <Button
+        title="Privacy Policy"
+        type={"link-secondary"}
+        onClick={() => {
+          "click dont save";
+        }}
+        size="small"
+        buttonClassProp="ps-1 pe-1"
+      />
+    </div>
+    <!-- <span
+        style="color: var(--text-ds-neutral-200); text-decoration: underline;"
+        >Privacy Policy</span
+      > -->
+
     <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
-      To proceed, type <span style="color: var(--text-ds-neutral-50);"
+      To proceed, type <span style="color: var(--text-ds-neutral-200);"
         >{workspace?.name}</span
       > below.
     </p>
 
     <Input
       bind:value={inputName}
-      height={"36px"}
       id={inputId}
       placeholder={"Type workspace name to proceed"}
       class="text-ds-font-size-14 bg-tertiary-300 text-ds-font-weight-medium px-2 border-radius-4"
@@ -61,13 +90,28 @@
       type={"text"}
       placeholderColor={"var(--text-secondary-200)"}
     />
-    <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
-      <span
-        style="color: var(--text-ds-neutral-50); text-decoration: underline;"
-        >Learn More</span
-      > how public workspaces work.
-    </p>
   </LabelField>
+
+  <div class="d-flex" style="align-items:center;">
+    <Button
+      title="Learn More"
+      type={"link-secondary"}
+      onClick={() => {
+        "click dont save";
+      }}
+      size="small"
+      buttonClassProp="ps-0 pe-1"
+    />
+    <p
+      class="text-ds-font-size-12"
+      style="color: var(--text-ds-neutral-400); margin-bottom: 0px;"
+    >
+      <!-- <span style="color: var(--text-ds-neutral-200); text-decoration: underline;"
+      >Learn More</span
+    >  -->
+      how public workspaces work.
+    </p>
+  </div>
   <br />
 
   <div

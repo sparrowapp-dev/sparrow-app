@@ -573,10 +573,10 @@ export default class WorkspaceExplorerViewModel {
         updatedata,
       );
       notifications.success(
-        `Workspace published! ‘${progressiveTab.name}’ is now public.`,
+        `Workspace published. ‘${progressiveTab.name}’ is now public.`,
       );
     } else {
-      notifications.error("Failed. The workspace could not be published.");
+      notifications.error("Failed to publish the workspace. Please try again.");
     }
     return response;
   };

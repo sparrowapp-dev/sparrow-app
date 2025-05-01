@@ -7,7 +7,9 @@
   import {
     ArrowForward,
     GlobeRegular,
+    LinkRegular,
     LockClosedRegular,
+    StatusSuccess,
   } from "@sparrow/library/icons";
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
@@ -21,6 +23,7 @@
   export let onAddMember;
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
+  export let onCopyLink;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -28,6 +31,7 @@
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
+  let isWorkspaceLinkCopied = false;
 
   const handleOpenWorkspace = async () => {
     onSwitchWorkspace(workspace._id);
@@ -135,6 +139,50 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
+    {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+      {#if isWorkspaceLinkCopied}
+        <p
+          class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
+          style="color: var(--text-ds-neutral-400); top:25px; right:60px;"
+        >
+          Copied
+        </p>
+        <button
+          bind:this={workspaceTabWrapper}
+          class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
+          style="top:28px; right:36px;"
+        >
+          <StatusSuccess
+            height="14"
+            width="14"
+            color="var(--icon-ds-success-400)"
+          />
+        </button>
+      {:else}
+        <!-- <div bind:this={workspaceTabWrapper}>
+          <span
+            class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
+            style="color: var(--text-ds-neutral-400); top:26px; right:65px;"
+          >
+            Copy Public Link
+          </span>
+        </div> -->
+        <button
+          bind:this={workspaceTabWrapper}
+          class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
+          style="top:27px; right:35px;"
+          on:click={async () => {
+            await onCopyLink(workspace._id);
+            isWorkspaceLinkCopied = true;
+            setTimeout(() => {
+              isWorkspaceLinkCopied = false;
+            }, 2000);
+          }}
+        >
+          <LinkRegular />
+        </button>
+      {/if}
+    {/if}
     <button
       bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
@@ -174,7 +222,9 @@
 
       <div
         class="d-flex overflow-hidden justify-content-between"
-        style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
+        style={isWebEnvironment
+          ? "width:calc(100% - 130px); margin-top:10px;"
+          : "margin-top:10px;"}
       >
         <h4 class="ellipsis overflow-hidden me-4">
           <span
@@ -203,6 +253,7 @@
       >
         {workspace?.description ? workspace.description : "No summary added"}
       </p>
+      <hr style="color: var(--border-ds-surface-100);" />
 
       <div class="d-flex justify-content-between">
         <p
@@ -222,7 +273,7 @@
           >
         </p>
 
-        {#if isWebEnvironment}
+        {#if isWebEnvironment && !workspace?.isShared}
           <button
             class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
             on:click|stopPropagation={() => {
@@ -298,6 +349,11 @@
     visibility: hidden;
     background-color: transparent;
   }
+  .public-link-icon {
+    padding: 2px;
+    visibility: hidden;
+    background-color: transparent;
+  }
   .workspace-card-outer:hover .threedot-icon-container {
     visibility: visible;
   }
@@ -306,6 +362,20 @@
   }
   .threedot-icon-container:active {
     background-color: var(--bg-tertiary-800) !important;
+  }
+  .public-link-icon:hover {
+    background-color: var(--bg-ds-surface-100) !important;
+    border-radius: 2px;
+    padding: 2px;
+  }
+  .workspace-card-outer:hover .public-link-icon {
+    visibility: visible;
+  }
+  .public-link-icon:active {
+    background-color: var(--bg-ds-surface-100) !important;
+  }
+  .workspace-card-outer:hover .public-link-txt {
+    visibility: visible;
   }
   .threedot-active {
     visibility: visible;

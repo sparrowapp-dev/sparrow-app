@@ -9,6 +9,8 @@
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
+  import { copyToClipBoard } from "@sparrow/common/utils";
+  import constants from "@app/constants/constants";
 
   let isWebEnvironment = false;
 
@@ -66,6 +68,11 @@
     workspaceDetails.users = users;
     isWorkspaceInviteModalOpen = true;
   };
+  const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
+    await copyToClipBoard(
+      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
+    );
+  };
 </script>
 
 <TeamExplorer
@@ -93,6 +100,7 @@
   onAcceptInvite={_viewModel.acceptInvite}
   onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
+  onCopyLink={handleCopyPublicWorkspaceLink}
 />
 
 <Modal

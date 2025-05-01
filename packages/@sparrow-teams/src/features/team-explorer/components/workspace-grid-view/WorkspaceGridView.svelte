@@ -47,6 +47,7 @@
   export let isGuestUser = false;
 
   export let isWorkspaceCreationInProgress = false;
+  export let onCopyLink;
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -153,6 +154,7 @@
               {onDeleteWorkspace}
               {openInDesktop}
               {isWebEnvironment}
+              {onCopyLink}
             />
           {/each}
         </div>
