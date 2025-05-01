@@ -89,6 +89,7 @@
   import { writable } from "svelte/store";
 
   import { Checkbox } from "@sparrow/library/forms";
+  import * as Sentry from "@sentry/svelte";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -529,6 +530,7 @@
       );
       refreshLoad = false;
     } catch (error) {
+      Sentry.captureException(error);
       refreshLoad = false;
     }
   };
