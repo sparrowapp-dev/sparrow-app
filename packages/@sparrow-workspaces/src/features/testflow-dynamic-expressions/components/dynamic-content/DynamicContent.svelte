@@ -81,6 +81,11 @@
 
     if (matchedIndex !== -1) {
       currentApis = requestApis.slice(0, matchedIndex + 1);
+      currentApis = currentApis.filter((item) => {
+        if (item?.data?.requestId !== undefined) {
+          return item;
+        }
+      });
     } else {
       currentApis = requestApis.slice(0, 1);
     }
@@ -206,7 +211,9 @@
       slot="accordion-content"
       style="padding: 4px 8px; height: 146px; overflow-y: auto"
     >
-      <p class="fw-semibold mb-1" style="font-size: 12px;">Dev Environment</p>
+      <p class="variable-header-title mb-1" style="font-size: 12px;">
+        Dev Environment
+      </p>
 
       {#each environmentVariables.filtered as variable (variable.key)}
         {#if variable?.environment !== "Global Variables"}
@@ -228,7 +235,7 @@
         {/if}
       {/each}
 
-      <p class="fw-semibold mt-2 mb-1" style="font-size: 12px;">
+      <p class="mt-2 mb-1 variable-header-title" style="font-size: 12px;">
         Global Environments
       </p>
 
@@ -280,17 +287,26 @@
     font-size: 12px;
     line-height: 130%;
     letter-spacing: 0%;
-    color: var(--bg-ds-neutral-50);
+    color: var(--text-ds-neutral-50);
   }
   .request-line {
-    border: 1px solid var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-surface-400);
     margin: 0px;
   }
   .de-header-name {
-    color: var(--text-ds-neutral-50);
+    color: var(--text-ds-neutral-200);
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
     line-height: 1.3;
+  }
+  .variable-header-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: var(--text-ds-neutral-300);
   }
 </style>
