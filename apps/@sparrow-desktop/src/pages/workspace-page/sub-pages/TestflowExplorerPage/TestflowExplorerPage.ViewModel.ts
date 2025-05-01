@@ -706,16 +706,14 @@ export class TestflowExplorerPageViewModel {
     text: string,
     environmentVariables,
   ): string => {
-    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, squareContent) => {
+    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, squareContent) => {
       const updated = squareContent
       .replace(/\\/g, '').replace(/"/g, `'`)
-      
       .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
         return `'{{${inner.trim()}}}'`;
       });
       return `[*$[${updated}]$*]`;
     });
-
     environmentVariables.forEach((element) => {
       const regex = new RegExp(`{{(${element.key})}}`, "g");
       updatedText = updatedText.replace(regex, element.value);
@@ -727,25 +725,29 @@ export class TestflowExplorerPageViewModel {
     text: string,
     response,
   ): any => {
-    // return text;
     let status = "fail";
-    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
+    let contentType = "Text";
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, expr) => {
       try {
+        const de = expr.replace(/'\{\{(.*?)\}\}'/g,"undefined"); // convert missing environments to undefined 
         // Use Function constructor to evaluate with access to `response`
         const fn = new Function("response", `
           with (response) {
-            return (${expr});
+            return (${de});
           }
         `);
         const s = fn(response);
         if(typeof s === "string"){
           status = "pass";
+          contentType = "Text";
           return s;
         }
         if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
           status = "pass";
+          contentType = "JSON"
           return `${JSON.stringify(s)}`; // serialize object
         }
+        contentType = "JavaScript"
         status = "pass";
         return s;
       } catch (e) {
@@ -754,7 +756,7 @@ export class TestflowExplorerPageViewModel {
         return e.message;
       }
     });
-    return {result, status};
+    return {result, status, contentType};
   };
 
  public handlePreviewExpression = async(expression) => {

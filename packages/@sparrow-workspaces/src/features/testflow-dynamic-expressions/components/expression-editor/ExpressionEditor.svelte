@@ -11,6 +11,7 @@
 
   let expressionPreviewResult = "";
   let expressionErrorResult = "";
+  let expressionResultContentType = "Text";
   let data: any = {};
   let topLevelKeys: any[] = [];
 
@@ -104,7 +105,7 @@
   >
     <p class="expression-result-text m-0 w-100">
       <Editor
-        lang={"JSON"}
+        lang={expressionResultContentType}
         placeholder={""}
         bind:value={expressionPreviewResult}
         on:change={() => {}}
@@ -119,15 +120,17 @@
       onClick={async () => {
         expressionPreviewResult = "";
         expressionErrorResult = "";
+        expressionResultContentType = "Text";
         const res = await onPreviewExpression(expression);
         if (res.status === "pass") {
-          if (res.message === undefined) {
+          if (res.result === undefined) {
             expressionPreviewResult = "undefined";
-          } else if (res.message === null) {
+          } else if (res.result === null) {
             expressionPreviewResult = "null";
           } else {
             expressionPreviewResult = res.result;
           }
+          expressionResultContentType = res.contentType;
         } else {
           expressionErrorResult = res.result;
         }
@@ -163,7 +166,7 @@
   }
 
   .expression-result-text {
-    color: var(--text-ds-neutral-400);
+    /* color: var(--text-ds-neutral-400); */
   }
 
   .expression-result-container {
