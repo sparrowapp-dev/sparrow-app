@@ -521,7 +521,7 @@
     isWebApp={true}
     bind:isCreateTeamModalOpen
     onMarketingRedirect={() => {
-      window.open(constants.WEB_MARKETING_URL, "_blank");
+      window.open(constants.MARKETING_URL, "_blank");
     }}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}

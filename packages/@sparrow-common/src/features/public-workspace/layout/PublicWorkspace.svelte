@@ -7,6 +7,9 @@
   export let isWorkspacePublicModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let onMakePublicWorkspace;
+  export let onRedirectTermsService;
+  export let onRedirectPrivacyPolicy;
+  export let onRedirectDocs;
   const inputId: string = "workspace-delete-input";
   let inputName = "";
   let inputNameError = "";
@@ -42,8 +45,9 @@
       <Button
         title="Terms of Service"
         type={"link-secondary"}
-        onClick={() => {
+        onClick={async () => {
           "click dont save";
+          await onRedirectTermsService();
         }}
         size="small"
         buttonClassProp="ps-0 pe-1"
@@ -61,8 +65,9 @@
       <Button
         title="Privacy Policy"
         type={"link-secondary"}
-        onClick={() => {
+        onClick={async () => {
           "click dont save";
+          await onRedirectPrivacyPolicy();
         }}
         size="small"
         buttonClassProp="ps-1 pe-1"
@@ -96,8 +101,9 @@
     <Button
       title="Learn More"
       type={"link-secondary"}
-      onClick={() => {
+      onClick={async () => {
         "click dont save";
+        await onRedirectDocs();
       }}
       size="small"
       buttonClassProp="ps-0 pe-1"

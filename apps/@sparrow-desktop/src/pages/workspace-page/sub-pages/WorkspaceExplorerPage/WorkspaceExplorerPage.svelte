@@ -11,6 +11,8 @@
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
   import { user } from "@app/store/auth.store";
+  import constants from "@app/constants/constants";
+  import { open } from "@tauri-apps/plugin-shell";
 
   export let collectionList;
   export let tab;
@@ -195,6 +197,15 @@
       if (response?.isSuccessful) {
         isWorkspacePublicModalOpen = false;
       }
+    }}
+    onRedirectTermsService={() => {
+      open(`${constants.MARKETING_URL}/terms-of-service`);
+    }}
+    onRedirectPrivacyPolicy={() => {
+      open(`${constants.MARKETING_URL}/privacy-policy`);
+    }}
+    onRedirectDocs={() => {
+      open(`${constants.DOCS_URL}`);
     }}
   />
 </Modal>
