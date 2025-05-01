@@ -1286,7 +1286,7 @@
 >
   <DownloadApp
     onInstallRedirect={() => {
-      window.open(constants.WEB_MARKETING_URL, "_blank");
+      window.open(constants.MARKETING_URL, "_blank");
     }}
     onGithubRedirect={() => {
       window.open(constants.SPARROW_GITHUB, "_blank");
