@@ -230,3 +230,8 @@ export type TFDataStoreType = {
   isTestFlowRunning: boolean;
   isTestFlowSaveInProgress: boolean;
 };
+
+export enum TFDynamicExpressionTabsEnum {
+  DYNAMICCONTENT = "Dynamic Content",
+  FUNCTIONS = "Functions",
+}

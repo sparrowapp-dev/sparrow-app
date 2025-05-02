@@ -21,6 +21,7 @@
   } from "@codemirror/view";
   import { undo, redo } from "@codemirror/commands";
   import { history, historyKeymap } from "@codemirror/commands";
+  import { MathFormulaFunction } from "@sparrow/library/assets";
   /**
    * input value
    */
@@ -68,6 +69,8 @@
   export let id;
   export let componentClass;
   export let isFocusedOnMount = false;
+  export let handleOpenDE;
+  export let dispatcher;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -139,11 +142,20 @@
       readonly name: string,
       readonly from: number,
       readonly to: number,
+      // readonly id: string,
     ) {
       super();
     }
 
     toDOM(view: EditorView) {
+      const imgWrapper = document.createElement("span");
+      imgWrapper.className = "cm-expression-block-img";
+
+      const img = document.createElement("img");
+      img.src = MathFormulaFunction;
+      img.alt = "Expression Icon";
+      imgWrapper.appendChild(img);
+
       const container = document.createElement("span");
       container.className = "cm-expression-block";
 
@@ -157,16 +169,37 @@
       close.onclick = (e) => {
         e.stopPropagation();
         view.dispatch({ changes: { from: this.from, to: this.to } });
+
+        // removeDynamicExpression(this.id);
       };
 
+      container.appendChild(imgWrapper);
       container.appendChild(text);
       container.appendChild(close);
 
       container.onclick = (e) => {
         e.stopPropagation();
-        // add click operation here
+        const content = view.state.doc.sliceString(this.from, this.to);
+        handleOpenDE({
+          source: {
+            from: this.from,
+            to: this.to,
+            content,
+          },
+          dispatch: view.dispatch,
+        });
       };
 
+      // Handle dragging
+      container.setAttribute("draggable", "true");
+      container.addEventListener("dragstart", (e) => {
+        e.stopPropagation();
+        const content = view.state.doc.sliceString(this.from, this.to);
+        e.dataTransfer?.setData("application/x-expression", content);
+        e.dataTransfer?.setData("text/plain", content); // fallback
+        e.dataTransfer?.setData("text/from", String(this.from));
+        e.dataTransfer?.setData("text/to", String(this.to));
+      });
       return container;
     }
 
@@ -175,23 +208,62 @@
     }
   }
 
+  export const dragDropPlugin = ViewPlugin.fromClass(
+    class {
+      constructor(view: EditorView) {
+        this.view = view;
+
+        this.handleDrop = this.handleDrop.bind(this);
+        view.dom.addEventListener("drop", this.handleDrop);
+      }
+
+      handleDrop(event: DragEvent) {
+        event.preventDefault();
+
+        const content = event.dataTransfer?.getData("application/x-expression");
+        const from = parseInt(
+          event.dataTransfer?.getData("text/from") || "",
+          10,
+        );
+        const to = parseInt(event.dataTransfer?.getData("text/to") || "", 10);
+
+        if (!content || isNaN(from) || isNaN(to)) return;
+
+        const pos = this.view.posAtCoords({
+          x: event.clientX,
+          y: event.clientY,
+        });
+        if (pos == null) return;
+
+        // Remove original
+        this.view.dispatch({ changes: { from, to } });
+      }
+
+      destroy() {
+        this.view.dom.removeEventListener("drop", this.handleDrop);
+      }
+    },
+  );
+
+  let currentIndex = 0;
+
   /**
    * Create regex matching pattern for the expression.
    * @example [[expression]]
    */
   const expressionMatcher = new MatchDecorator({
-    regexp: /\[\[(\w+)\]\]/g,
-    decoration: (match) =>
-      Decoration.replace({
+    regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
+    decoration: (match) => {
+      return Decoration.replace({
         widget: new ExpressionWidget(
           match[1],
           match.index,
           match.index + match[0].length,
         ),
         inclusive: false,
-      }),
+      });
+    },
   });
-
   /**
    * Create a decoration set for the expression matcher.
    * @param view - The editor view instance.
@@ -200,9 +272,11 @@
     class {
       placeholders: DecorationSet;
       constructor(view: EditorView) {
+        currentIndex = 0;
         this.placeholders = expressionMatcher.createDeco(view);
       }
       update(update: ViewUpdate) {
+        currentIndex = 0;
         this.placeholders = expressionMatcher.updateDeco(
           update,
           this.placeholders,
@@ -478,6 +552,7 @@
       extensions: [
         theme,
         expressionPlugin,
+        dragDropPlugin,
         updateExtensionView,
         keyBinding,
         history(), // Add history extension
@@ -492,6 +567,7 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
+    dispatcher = codeMirrorView.dispatch;
   }
   onMount(() => {
     const initializeAsync = () => {
@@ -556,10 +632,11 @@
 
   :global(.cm-expression-block) {
     display: inline-block;
-    background-color: var(--bg-ds-neutral-50);
+    background-color: var(--bg-ds-surface-300);
     border-radius: 4px;
     padding: 0px 6px;
     cursor: pointer;
+    text-align: center;
   }
 
   :global(.cm-expression-block span) {
@@ -569,13 +646,25 @@
     white-space: nowrap;
     display: inline-block;
     vertical-align: middle;
-    color: var(--text-ds-neutral-800);
+    color: var(--text-ds-neutral-50);
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-left: 2px;
+    vertical-align: middle;
   }
 
   :global(.cm-expression-block-close) {
     cursor: pointer;
     font-size: 0.8em;
     margin-left: 4px;
-    color: var(--text-ds-danger-300);
+    color: var(--text-ds-neutral-50);
+    padding-left: 2px;
+    border-left: 1px solid var(--bg-ds-surface-50);
+  }
+  :global(.cm-expression-block-img) {
+    width: 12;
+    height: 14;
   }
 </style>

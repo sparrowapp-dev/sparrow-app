@@ -42,7 +42,7 @@ import type {
 } from "@sparrow/common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
-import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
+import { DecodeTestflow } from "@sparrow/workspaces/features/testflow-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 import {
@@ -55,7 +55,6 @@ import {
 } from "../../../../../../../packages/@sparrow-common/src/utils/testFlow.helper";
 import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
-import type { EnvironmentDocType } from "@app/models/environment.model";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
 
@@ -75,7 +74,7 @@ export class TestflowExplorerPageViewModel {
   /**
    * Utils
    */
-  private _decodeRequest = new DecodeRequest();
+  private _decodeRequest = new DecodeTestflow();
 
   /**
    * Constructor to initialize the TestflowExplorerPageViewModel class
@@ -425,6 +424,7 @@ export class TestflowExplorerPageViewModel {
           abortController: abortController,
           nodes: [],
           history: [],
+          runner:{},
           isRunHistoryEnable: false,
           isTestFlowRunning: true,
           isTestFlowSaveInProgress: false,
@@ -447,6 +447,8 @@ export class TestflowExplorerPageViewModel {
       expand: false,
     };
 
+    let requestChainResponse = {};
+
     // Sequential execution
     for (const element of runningNodes) {
       if (element?.type === "requestBlock" && element?.data?.requestId) {
@@ -466,13 +468,13 @@ export class TestflowExplorerPageViewModel {
           request,
         );
 
-        // Extract the auth data from the API request
-        const collectionAuth = extractAuthData(request);
+
+
 
         const decodeData = this._decodeRequest.init(
           adaptedRequest.property.request,
           environments?.filtered || [],
-          collectionAuth,
+          requestChainResponse
         );
         const start = Date.now();
 
@@ -494,7 +496,7 @@ export class TestflowExplorerPageViewModel {
             );
             if (existingTestFlowData) {
               let resData: TFHistoryAPIResponseStoreType;
-              if (response.isSuccessful) {
+              // if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
                   JSON.stringify(response),
                 ).length;
@@ -536,35 +538,88 @@ export class TestflowExplorerPageViewModel {
                   time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
-              } else {
-                resData = {
-                  body: "",
-                  headers: [],
-                  status: ResponseStatusCode.ERROR,
-                  time: duration,
-                  size: 0,
-                };
-                failedRequests++;
-                totalTime += duration;
-                const req = {
-                  method: request?.request?.method as string,
-                  name: request?.name as string,
-                  status: ResponseStatusCode.ERROR,
-                  time: new ParseTime().convertMilliseconds(duration),
-                };
-                history.requests.push(req);
-              }
+              // } else {
+              //   resData = {
+              //     body: "",
+              //     headers: [],
+              //     status: ResponseStatusCode.ERROR,
+              //     time: duration,
+              //     size: 0,
+              //   };
+              //   failedRequests++;
+              //   totalTime += duration;
+              //   const req = {
+              //     method: request?.request?.method as string,
+              //     name: request?.name as string,
+              //     status: ResponseStatusCode.ERROR,
+              //     time: new ParseTime().convertMilliseconds(duration),
+              //   };
+              //   history.requests.push(req);
+              // }
               existingTestFlowData.nodes.push({
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
+
               });
+
+              const responseHeader = this._decodeRequest.setResponseContentType(
+                formattedHeaders,
+              );
+
+              const reqParam = {};
+              const params = new URL(decodeData[0]).searchParams;
+              
+              
+              for (const [key, value] of params.entries()) {
+                reqParam[key] = value;
+              }
+                
+                const headersObject = Object.fromEntries(
+                  JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
+                );
+                
+
+                let reqBody;
+                if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
+                  try{
+                    reqBody = JSON.parse(decodeData[3]);
+                  }
+                  catch(e){
+                    reqBody = {};
+                  }
+                }
+                else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
+                  const formDataObject = Object.fromEntries(
+                    JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
+                  );
+                  reqBody = formDataObject || {}
+                }
+                else{
+                  reqBody = decodeData[3];
+                }
+                requestChainResponse[element.data.blockName] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    url: decodeData[0],
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+           
+           
+
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
           });
         } catch (error) {
+          console.error(error);
           Sentry.captureException(error);
           if (error?.name === "AbortError") {
             break;
@@ -587,6 +642,19 @@ export class TestflowExplorerPageViewModel {
                 response: resData,
                 request: adaptedRequest,
               });
+
+              requestChainResponse[element.data.blockName] = {
+                response: {
+                  body: {},
+                  headers:{}
+                },
+                request: {
+                  url: decodeData[0],
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
@@ -613,6 +681,8 @@ export class TestflowExplorerPageViewModel {
       history.status = "pass";
     }
 
+
+    console.log(requestChainResponse);
     testFlowDataStore.update((testFlowDataMap) => {
       const wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
@@ -622,6 +692,7 @@ export class TestflowExplorerPageViewModel {
           wsData.history = hs;
         }
         wsData.isTestFlowRunning = false;
+        wsData.runner = requestChainResponse;
         testFlowDataMap.set(progressiveTab.tabId, wsData);
       }
       return testFlowDataMap;
@@ -632,6 +703,81 @@ export class TestflowExplorerPageViewModel {
       );
     }
   };
+
+  private setEnvironmentVariables = (
+    text: string,
+    environmentVariables,
+  ): string => {
+    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, squareContent) => {
+      const updated = squareContent
+      .replace(/\\/g, '').replace(/"/g, `'`)
+      .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
+        return `'{{${inner.trim()}}}'`;
+      });
+      return `[*$[${updated}]$*]`;
+    });
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+    return updatedText;
+  };
+
+  private setDynamicExpression2 = (
+    text: string,
+    response,
+  ): any => {
+    let status = "fail";
+    let contentType = "Text";
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, expr) => {
+      try {
+        const de = expr.replace(/'\{\{(.*?)\}\}'/g,"undefined"); // convert missing environments to undefined 
+        // Use Function constructor to evaluate with access to `response`
+        const fn = new Function("response", `
+          with (response) {
+            return (${de});
+          }
+        `);
+        const s = fn(response);
+        if(typeof s === "string"){
+          status = "pass";
+          contentType = "Text";
+          return s;
+        }
+        if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
+          status = "pass";
+          contentType = "JSON"
+          return `${JSON.stringify(s)}`; // serialize object
+        }
+        contentType = "JavaScript"
+        status = "pass";
+        return s;
+      } catch (e) {
+        status = "fail";
+        console.error("Eval error:", e.message);
+        return e.message;
+      }
+    });
+    return {result, status, contentType};
+  };
+
+ public handlePreviewExpression = async(expression) => {
+
+  const progressiveTab = createDeepCopy(this._tab.getValue());
+  const environments = await this.getActiveEnvironments(
+    progressiveTab.path.workspaceId,
+  );
+
+  let runner = {};
+  testFlowDataStore.update((testFlowDataMap) => {
+    let wsData = testFlowDataMap.get(progressiveTab.tabId);
+    if (wsData) {
+      runner = wsData.runner;
+    } 
+    return testFlowDataMap;
+  });
+  return this.setDynamicExpression2(this.setEnvironmentVariables("[*$[" + expression + "]$*]", environments?.filtered || []), runner);
+ }
 
   /**
    * Runs a single test flow node and updates the testFlowDataStore
@@ -681,11 +827,9 @@ export class TestflowExplorerPageViewModel {
       request,
     );
 
-    const collectionAuth = extractAuthData(request);
     const decodeData = this._decodeRequest.init(
       adaptedRequest.property.request,
       environments?.filtered || [],
-      collectionAuth,
     );
 
     const start = Date.now();

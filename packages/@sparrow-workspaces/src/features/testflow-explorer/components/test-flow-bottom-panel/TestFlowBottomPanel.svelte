@@ -38,6 +38,7 @@
   export let isWebApp = false;
   export let runSingleNode;
   export let testflowStore;
+  export let handleOpenCurrentDynamicExpression;
 
   let responseLoader = false;
   let height = 300;
@@ -245,6 +246,7 @@
       {userRole}
       {onUpdateEnvironment}
       {handleClickTestButton}
+      {handleOpenCurrentDynamicExpression}
       isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
   </div>
@@ -274,8 +276,10 @@
               params={selectedBlock?.data?.requestData?.queryParams ?? []}
               authParameter={{}}
               isBulkEditActive={false}
+              {selectedBlock}
               onUpdateRequestState={handleUpdateRequestData}
               {environmentVariables}
+              {handleOpenCurrentDynamicExpression}
             />
           {:else if requestNavigation === RequestSectionEnum.REQUEST_BODY}
             <RequestBodyTestFlow
@@ -284,6 +288,7 @@
               requestState={selectedBlock?.data?.requestData?.state}
               {environmentVariables}
               onUpdateRequestState={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow
@@ -293,6 +298,8 @@
               authHeader={{}}
               {environmentVariables}
               onHeadersChange={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
+              {selectedBlock}
               isBulkEditActive={false}
             />
           {:else if requestNavigation === RequestSectionEnum.AUTHORIZATION}
@@ -301,6 +308,7 @@
               {environmentVariables}
               requestStateAuth={selectedBlock?.data?.requestData?.state}
               onUpdateRequestAuth={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
             />
           {/if}
         </div>

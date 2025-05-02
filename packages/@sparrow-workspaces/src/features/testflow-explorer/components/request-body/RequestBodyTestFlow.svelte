@@ -28,6 +28,9 @@
     requestState = { ...requestState, [key]: value };
     onUpdateRequestState(key, value);
   };
+  export let handleOpenCurrentDynamicExpression;
+
+  let dispatcher;
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -37,6 +40,8 @@
     {updateBeautifiedState}
     onUpdateRequestState={handleUpdateRequestBody}
     onUpdateRequestBodyLanguage={handleUpdateRequestBody}
+    bind:dispatcher
+    {handleOpenCurrentDynamicExpression}
   />
   <div style="flex:1; overflow:auto;">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
@@ -48,6 +53,8 @@
         value={body?.raw}
         {isBodyBeautified}
         {updateBeautifiedState}
+        bind:dispatcher
+        {handleOpenCurrentDynamicExpression}
       />
     {:else if requestState.requestBodyNavigation === RequestDataset.NONE}
       <None />
@@ -59,6 +66,7 @@
           onUpdateRequestState("urlencoded", pairs);
         }}
         onUpdateEnvironment={() => {}}
+        {handleOpenCurrentDynamicExpression}
       />
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
@@ -70,6 +78,7 @@
           onUpdateRequestState("formdata", { text: pairs, file: [] });
         }}
         onUpdateEnvironment={() => {}}
+        {handleOpenCurrentDynamicExpression}
       />
     {/if}
   </div>

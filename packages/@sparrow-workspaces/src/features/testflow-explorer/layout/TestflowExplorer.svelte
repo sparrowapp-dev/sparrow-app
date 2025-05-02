@@ -80,13 +80,17 @@
   } from "../../../../../@sparrow-common/src/utils/testFlow.helper";
   import SaveNode from "../../../components/save-node-modal/SaveNode.svelte";
   import TestFlowBottomPanel from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
-
   import {
     HttpRequestAuthTypeBaseEnum,
     HttpRequestContentTypeBaseEnum,
   } from "@sparrow/common/types/workspace/http-request-base";
-   import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
-
+  import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
+  // import { isDynamicExpressionModalOpen } from "../store/testflow";
+  import { selectedRequestTypes } from "../store/testflow";
+  import {
+    isDynamicExpressionContent,
+    updateDynamicExpressionValue,
+  } from "../store/testflow";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -113,6 +117,7 @@
   export let userRole;
   export let onUpdateEnvironment;
   export let runSingleNode;
+  export let onPreviewExpression;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -367,6 +372,126 @@
       }
     }
     return response;
+  };
+
+  let dynamicExpressionEditorContent = "";
+  let dynamicExpressionModal = {};
+  let handleOpenCurrentDynamicExpression = (obj) => {
+    dynamicExpressionModal = {};
+    dynamicExpressionModal = obj;
+    dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
+    isDynamicExpressionModalOpen = true;
+  };
+
+  $: console.log(selectedNodeId, "selectedNodeId");
+
+  const onInsertExpression = (newExpression) => {
+    if (dynamicExpressionModal?.source) {
+      dynamicExpressionModal.dispatch({
+        changes: {
+          from: dynamicExpressionModal.source.from,
+          to: dynamicExpressionModal.source.to,
+          insert: "[*$[" + newExpression + "]$*]",
+        },
+      });
+    } else {
+      dynamicExpressionModal.dispatch({
+        changes: {
+          from: 0,
+          to: 0,
+          insert: "[*$[" + newExpression + "]$*]",
+        },
+      });
+    }
+    isDynamicExpressionModalOpen = false;
+    return;
+    nodes.update((_nodes) => {
+      const dbNodes = _nodes;
+      for (let index = 0; index < dbNodes.length; index++) {
+        if (dbNodes[index].id === selectedNodeId) {
+          if (dynamicExpressionModal.type === "url") {
+            //
+            // URL
+            //
+            const requestUrl = dbNodes[index].data.requestData.url;
+            let output = "";
+            if (dynamicExpressionModal?.source) {
+              output =
+                requestUrl.slice(0, dynamicExpressionModal.source.from) +
+                "[*$[" +
+                newExpression +
+                "]$*]" +
+                requestUrl.slice(dynamicExpressionModal.source.to);
+            } else {
+              output = requestUrl + "[*$[" + newExpression + "]$*]";
+            }
+            dbNodes[index].data.requestData.url = output;
+          } else if (dynamicExpressionModal.type === "headers") {
+            //
+            // Headers
+            //
+            const requestHeaders = dbNodes[index].data.requestData.headers;
+            for (let i = 0; i < requestHeaders.length; i++) {
+              if (dynamicExpressionModal.destination.index === i) {
+                if (dynamicExpressionModal.destination.row === "value") {
+                  let output = "";
+                  if (dynamicExpressionModal?.source) {
+                    output =
+                      requestHeaders[i].value.slice(
+                        0,
+                        dynamicExpressionModal.source.from,
+                      ) +
+                      "[*$[" +
+                      newExpression +
+                      "]$*]" +
+                      requestHeaders[i].value.slice(
+                        dynamicExpressionModal.source.to,
+                      );
+                  } else {
+                    output =
+                      requestHeaders[i].value + "[*$[" + newExpression + "]$*]";
+                  }
+                  requestHeaders[i].value = output;
+                  dbNodes[index].data.requestData.headers = requestHeaders;
+                }
+              }
+            }
+          } else if (dynamicExpressionModal.type === "parameters") {
+            //
+            // Parameters
+            //
+            const requestParams = dbNodes[index].data.requestData.queryParams;
+            for (let i = 0; i < requestParams.length; i++) {
+              if (dynamicExpressionModal.destination.index === i) {
+                if (dynamicExpressionModal.destination.row === "value") {
+                  let output = "";
+                  if (dynamicExpressionModal?.source) {
+                    output =
+                      requestParams[i].value.slice(
+                        0,
+                        dynamicExpressionModal.source.from,
+                      ) +
+                      "[*$[" +
+                      newExpression +
+                      "]$*]" +
+                      requestParams[i].value.slice(
+                        dynamicExpressionModal.source.to,
+                      );
+                  } else {
+                    output =
+                      requestParams[i].value + "[*$[" + newExpression + "]$*]";
+                  }
+                  requestParams[i].value = output;
+                  dbNodes[index].data.requestData.queryParams = requestParams;
+                }
+              }
+            }
+          }
+        }
+      }
+      return dbNodes;
+    });
+    isDynamicExpressionModalOpen = false;
   };
 
   /**
@@ -1069,7 +1194,38 @@
       selectNode(_id);
     }
   };
-  let isDynamicExpressionModalOpen = true;
+  let selectedAPI: any;
+  let expression: string = "";
+  let selectedApiRequestType: any = "";
+
+  const handleAddingNested = (value: string) => {
+    if (selectedApiRequestType === "body") {
+      expression = expression + value;
+    }
+  };
+
+  $: {
+    if (selectedAPI && selectedApiRequestType) {
+      const data: any = selectedAPI?.requestData[selectedApiRequestType];
+      if (data && selectedApiRequestType === "body") {
+        // selectedRequestTypes.set(data);
+      } else if (data && selectedApiRequestType === "headers") {
+        // selectedRequestTypes.set(data);
+      } else if (data && selectedApiRequestType === "queryParams") {
+        // selectedRequestTypes.set(data);
+      }
+    }
+  }
+
+  // const setIsCurrentOpenFalse = () => {
+  //   isDynamicExpressionContent.update((items) =>
+  //     items.map((item) =>
+  //       item.isCurrentOpen ? { ...item, isCurrentOpen: false } : item,
+  //     ),
+  //   );
+  // };
+
+  let isDynamicExpressionModalOpen = false;
 </script>
 
 <div
@@ -1262,6 +1418,7 @@
         {onUpdateEnvironment}
         {runSingleNode}
         {testflowStore}
+        {handleOpenCurrentDynamicExpression}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -1347,14 +1504,22 @@
 <Modal
   title={"Insert Dynamic Content"}
   type={"dark"}
-  width={"540px"}
+  width={"851px"}
   zIndex={1000}
   isOpen={isDynamicExpressionModalOpen}
-  handleModalState={(flag = false) => {
+  handleModalState={() => {
     isDynamicExpressionModalOpen = false;
   }}
 >
-  <TestflowDynamicExpression />
+  <TestflowDynamicExpression
+    {dynamicExpressionEditorContent}
+    requestApis={$nodes}
+    {onInsertExpression}
+    {handleAddingNested}
+    {selectedBlock}
+    {environmentVariables}
+    {onPreviewExpression}
+  />
 </Modal>
 
 <Modal

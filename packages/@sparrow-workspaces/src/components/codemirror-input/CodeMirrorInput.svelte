@@ -28,10 +28,15 @@
    * unique id used to focus codemirror input
    */
   export let codeId = "";
+
+  export let dispatcher;
   let componentClass = "";
   export { componentClass as class };
   export let userRole: WorkspaceRole | undefined = undefined;
   export let isFocusedOnMount = false;
+  export let handleOpenDE;
+  export let removeDynamicExpression: (id: string) => void | undefined;
+  export let dynamicExpressionItems: any | undefined;
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
@@ -117,7 +122,11 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
+  {handleOpenDE}
+  {removeDynamicExpression}
+  {dynamicExpressionItems}
   {enableEnvironmentHighlighting}
+  bind:dispatcher
 />
 
 {#if trackParanthesis.length === 2 && filterData.length > 0}
