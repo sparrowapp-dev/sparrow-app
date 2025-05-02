@@ -142,7 +142,10 @@
         }}
       />
     </div>
-    <p class="text-fs-12 mb-0" style="color: var(--text-ds-danger-300)">
+    <p
+      class="text-fs-12 mb-0 ellipsis-5"
+      style="color: var(--text-ds-danger-300)"
+    >
       {expressionErrorResult}
     </p>
   </div>
@@ -153,7 +156,7 @@
     background-color: var(--bg-ds-surface-500);
     padding: 12px;
     border-radius: 4px;
-    height: 440px;
+    /* height: 440px; */
   }
 
   .expression-title-text,
@@ -204,5 +207,13 @@
 
   .m-0 {
     margin: 0 !important;
+  }
+
+  .ellipsis-5 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
