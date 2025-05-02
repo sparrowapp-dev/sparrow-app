@@ -20,6 +20,7 @@ import { EnvironmentService } from "src/services/environment.service";
 import { TestflowRepository } from "src/repositories/testflow.repository";
 import { TestflowService } from "src/services/testflow.service";
 import { TabRepository } from "src/repositories/tab.repository";
+import { identifyUser } from "src/utils/posthog/posthogConfig";
 const _guideRepository = new GuideRepository();
 const guestUserRepository = new GuestUserRepository();
 const teamRepository = new TeamRepository();
@@ -460,6 +461,7 @@ export async function handleLogin(url: string) {
   }
   // handles case if token exist in url
   const userDetails = jwtDecode(accessToken);
+  identifyUser(userDetails.email);
   setAuthJwt(constants.AUTH_TOKEN, accessToken);
   setAuthJwt(constants.REF_TOKEN, refreshToken);
   setUser(jwtDecode(accessToken));

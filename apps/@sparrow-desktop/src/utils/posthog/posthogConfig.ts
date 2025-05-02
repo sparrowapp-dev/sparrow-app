@@ -26,4 +26,13 @@ export const captureEvent = (
   } 
   posthog.capture(eventName, properties); 
 }; 
+
+
+export const identifyUser = (userId: string): void => {
+  if (!posthog) {
+    console.error('PostHog is not initialized');
+    return;
+  }
+  posthog.identify(userId);
+};
 export const posthogClient = posthog; 
