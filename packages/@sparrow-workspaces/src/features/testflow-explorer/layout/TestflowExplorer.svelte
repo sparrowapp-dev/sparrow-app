@@ -806,7 +806,7 @@
           id: targetNode,
           type: "requestBlock",
           data: {
-            blockName: `block${targetNode - 1}`,
+            blockName: `Block ${targetNode - 1}`,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string, _options = undefined) {
