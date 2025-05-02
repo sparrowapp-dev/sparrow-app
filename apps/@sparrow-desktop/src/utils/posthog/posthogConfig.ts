@@ -3,7 +3,7 @@ import constants from '@app/constants/constants';
 let isInitialized = false; 
 export const initPostHog = () => { 
   if (!isInitialized) { 
-    posthog.init(constants.ENABLE_POST_HOG, { 
+    posthog.init(constants.POSTHOG_CONNECTION_API_KEY, { 
 
       api_host: constants.POSTHOG_API_URL, 
 
