@@ -16,6 +16,7 @@
   import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
   import { Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view";
   import { RangeSetBuilder } from "@codemirror/state";
+  import { MathFormulaFunction } from "@sparrow/library/assets";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -73,6 +74,13 @@
     }
 
     toDOM(view: EditorView) {
+      const imgWrapper = document.createElement("span");
+      imgWrapper.className = "cm-expression-block-img";
+      const img = document.createElement("img");
+      img.src = MathFormulaFunction;
+      img.alt = "Expression Icon";
+      imgWrapper.appendChild(img);
+
       const container = document.createElement("span");
       container.className = "cm-expression-block";
 
@@ -90,6 +98,7 @@
         // removeDynamicExpression(this.id);
       };
 
+      container.appendChild(imgWrapper);
       container.appendChild(text);
       container.appendChild(close);
 
