@@ -67,81 +67,85 @@
   class="expression-editor d-flex flex-column"
   style="max-width: 540px; min-width: 240px; gap: 8px;"
 >
-  <p class="expression-title-text m-0">Expression Editor</p>
-
-  <div class="expression-textarea-editor">
-    <Editor
-      lang={"JavaScript"}
-      placeholder={"Select API data, functions, or variables from the panel."}
-      bind:value={expression}
-      on:change={handleCodeMirrorChange}
-      isEditable={true}
-      bind:cursorPosition
-    />
+  <div class="d-flex flex-column" style="gap: 8px;">
+    <p class="expression-title-text m-0">Expression Editor</p>
+    <div>
+      <div class="expression-textarea-editor">
+        <Editor
+          lang={"JavaScript"}
+          placeholder={"Select API data, functions, or variables from the panel."}
+          bind:value={expression}
+          on:change={handleCodeMirrorChange}
+          isEditable={true}
+          isEnterKeyNotAllowed={true}
+          bind:cursorPosition
+        />
+      </div>
+      <div>
+        {#if Array.isArray(topLevelKeys) && topLevelKeys.length > 0}
+          {#each topLevelKeys as value}
+            <div
+              class="cursor-pointer hover:bg-light p-1"
+              on:click={() => {
+                if (selectedApiRequestType !== "body") {
+                  handleSetProperties(value.value);
+                } else {
+                  const content = data[value];
+                  handleSetProperties(content, value);
+                }
+              }}
+            >
+              <p class="m-0">
+                {selectedApiRequestType === "body" ? value : value.key}
+              </p>
+            </div>
+          {/each}
+        {/if}
+      </div>
+    </div>
   </div>
-
   <div>
-    {#if Array.isArray(topLevelKeys) && topLevelKeys.length > 0}
-      {#each topLevelKeys as value}
-        <div
-          class="cursor-pointer hover:bg-light p-1"
-          on:click={() => {
-            if (selectedApiRequestType !== "body") {
-              handleSetProperties(value.value);
+    <div
+      class="expression-result-container d-flex flex-row justify-content-between align-items-center"
+    >
+      <div class="expression-result-text m-0" style="height:30px;">
+        <Editor
+          lang={expressionResultContentType}
+          placeholder={"Expression result"}
+          bind:value={expressionPreviewResult}
+          on:change={() => {}}
+          isEditable={false}
+        />
+      </div>
+      <Button
+        type="link-primary"
+        title="Run Preview"
+        size="small"
+        disable={!expression}
+        onClick={async () => {
+          expressionPreviewResult = "";
+          expressionErrorResult = "";
+          expressionResultContentType = "Text";
+          const res = await onPreviewExpression(expression);
+          if (res.status === "pass") {
+            if (res.result === undefined) {
+              expressionPreviewResult = "undefined";
+            } else if (res.result === null) {
+              expressionPreviewResult = "null";
             } else {
-              const content = data[value];
-              handleSetProperties(content, value);
+              expressionPreviewResult = res.result;
             }
-          }}
-        >
-          <p class="m-0">
-            {selectedApiRequestType === "body" ? value : value.key}
-          </p>
-        </div>
-      {/each}
-    {/if}
-  </div>
-
-  <div
-    class="expression-result-container d-flex flex-row justify-content-between align-items-center"
-  >
-    <div class="expression-result-text m-0" style="height:30px;">
-      <Editor
-        lang={expressionResultContentType}
-        placeholder={"Expression result"}
-        bind:value={expressionPreviewResult}
-        on:change={() => {}}
-        isEditable={false}
+            expressionResultContentType = res.contentType;
+          } else {
+            expressionErrorResult = res.result;
+          }
+        }}
       />
     </div>
-    <Button
-      type="link-primary"
-      title="Run Preview"
-      size="small"
-      disable={!expression}
-      onClick={async () => {
-        expressionPreviewResult = "";
-        expressionErrorResult = "";
-        expressionResultContentType = "Text";
-        const res = await onPreviewExpression(expression);
-        if (res.status === "pass") {
-          if (res.result === undefined) {
-            expressionPreviewResult = "undefined";
-          } else if (res.result === null) {
-            expressionPreviewResult = "null";
-          } else {
-            expressionPreviewResult = res.result;
-          }
-          expressionResultContentType = res.contentType;
-        } else {
-          expressionErrorResult = res.result;
-        }
-      }}
-    />
+    <p class="text-fs-12" style="color: var(--text-ds-danger-300)">
+      {expressionErrorResult}
+    </p>
   </div>
-  <p class="text-fs-12" style="color: var(--text-ds-danger-300)">
-    {expressionErrorResult}
-  </p>
 </div>
 
 <style>

@@ -7,6 +7,7 @@
   import { createEventDispatcher } from "svelte";
   import {
     placeholder as CreatePlaceHolder,
+    keymap,
     MatchDecorator,
     WidgetType,
     type DecorationSet,
@@ -24,6 +25,7 @@
     "Text";
   export let value = "";
   export let customSuggestions = false;
+  export let isEnterKeyNotAllowed = false;
   export let suggestions: { label: string; type: string }[] = [];
   export let isEditable = true;
   export let isFormatted = false;
@@ -81,6 +83,16 @@
       }
     }
   });
+
+  const keyBindings = keymap.of([
+    {
+      key: "Enter",
+      run: () => {
+        return true;
+      },
+      preventDefault: true,
+    },
+  ]);
 
   /**
    * Widget to render the dynamic expression.
@@ -266,6 +278,7 @@
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
+      ...(isEnterKeyNotAllowed ? [keyBindings] : []),
       basicSetup,
       basicTheme,
       expressionPlugin,
