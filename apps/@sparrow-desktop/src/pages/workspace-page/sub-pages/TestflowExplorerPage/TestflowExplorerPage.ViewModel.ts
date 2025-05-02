@@ -598,7 +598,7 @@ export class TestflowExplorerPageViewModel {
                 else{
                   reqBody = decodeData[3];
                 }
-                requestChainResponse[element.data.blockName] = {
+                requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
                   response: {
                     body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
                     headers: response?.data?.headers
@@ -643,7 +643,7 @@ export class TestflowExplorerPageViewModel {
                 request: adaptedRequest,
               });
 
-              requestChainResponse[element.data.blockName] = {
+              requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
                 response: {
                   body: {},
                   headers:{}

@@ -26,10 +26,11 @@
   export let handleOpenCurrentDynamicExpression;
   export let dynamicExpression = false;
   let dispatcher: any;
+  export let customClass = "";
 </script>
 
 <div
-  class="pair-data-row w-100 d-flex align-items-center px-1"
+  class="pair-data-row w-100 d-flex align-items-center px-1 {customClass}"
   style="position:relative"
 >
   <div style="width:24px;" class="me-2">
@@ -77,7 +78,7 @@
               class="my-auto"
               style="cursor:pointer; height: 10px; width: 10px;"
               on:click={() => {
-                if (isInputBoxEditable) {
+                if (isInputBoxEditable && element.diffType !== "deleted") {
                   removeFormFile(index);
                 }
               }}

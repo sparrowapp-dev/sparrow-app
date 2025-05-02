@@ -570,108 +570,31 @@
     <!-- Showing Duplicate Fake Rows For Diff/Merge View -->
     {#if !isMergeViewLoading && showMergeView && hasChanges}
       {#each diffPairs as element, index (index)}
-        <div
-          class="pair-data-row w-100 d-flex align-items-center px-1 diff-row diff-{element.diffType}"
-          style="position:relative"
-        >
-          <div style=" width:24px;" class="me-2">
-            {#if diffPairs.length - 1 != index || !isInputBoxEditable}
-              <Checkbox
-                checked={element.checked}
-                on:input={() => {
-                  updateCheck(index);
-                }}
-                disabled={!isCheckBoxEditable}
-              />
-            {/if}
-          </div>
-
-          <div class="d-flex gap-0" style="width: calc(100% - 86px);">
-            <div class="w-50 d-flex align-items-center">
-              <div
-                class="position-absolute top-0"
-                style="width: calc(50% - 48px);"
-              >
-                <CodeMirrorInput
-                  bind:value={element.key}
-                  onUpdateInput={() => {
-                    updateParam(index);
-                  }}
-                  disabled={true}
-                  placeholder={"Add Key"}
-                  {theme}
-                  {environmentVariables}
-                  {onUpdateEnvironment}
-                />
-              </div>
-            </div>
-            {#if element.type === "file"}
-              <div class="w-50 position-relative d-flex align-items-center">
-                <div
-                  class="position-relative rounded p-1 d-flex backgroundColor"
-                >
-                  <div
-                    class="bg-keyValuePairColor d-flex h-fit rounded"
-                    style="padding: 1px 4px;"
-                  >
-                    <p style="font-size:10px;" class="mb-0 me-1">
-                      {element.value ? element.value : "corrupted-file"}
-                    </p>
-                    <img
-                      src={close}
-                      alt=""
-                      class="my-auto"
-                      style="cursor:pointer; height: 10px; width: 10px; {element.diffType ===
-                      'deleted'
-                        ? 'visibility: hidden;'
-                        : ''}"
-                      on:click={() => {
-                        if (
-                          isInputBoxEditable &&
-                          element.diffType !== "deleted"
-                        ) {
-                          removeFormFile(index);
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            {:else}
-              <div class="w-50 d-flex align-items-center">
-                <div
-                  class="position-absolute top-0 left-6"
-                  style="width: calc(50% - 48px);"
-                >
-                  <CodeMirrorInput
-                    bind:value={element.value}
-                    onUpdateInput={() => {
-                      updateParam(index);
-                    }}
-                    placeholder={"Add Value"}
-                    disabled={true}
-                    {theme}
-                    {environmentVariables}
-                    {onUpdateEnvironment}
-                  />
-                </div>
-              </div>
-            {/if}
-          </div>
-          <div
-            class="ms-1 d-flex align-items-center justify-content-between gap-1"
-            style="width:40px;"
-          >
-            {#if diffPairs.length - 1 != index}
-              {#if element.diffType !== "deleted"}
-                <!-- Hidden buttons in diff view, but kept for layout consistency -->
-                <div style="width:45px;" class="opacity-0"></div>
-              {:else}
-                <div style="width:45px;" class="opacity-0"></div>
-              {/if}
-            {/if}
-          </div>
-        </div>
+        <LazyElementFormData
+          element={{
+            key: element.key,
+            value: element.value,
+            checked: element.checked,
+            type: element.type,
+            base: element.base,
+            diffType: element.diffType,
+          }}
+          {index}
+          pairs={diffPairs}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          {updateParam}
+          {updateCheck}
+          {deleteParam}
+          isInputBoxEditable={false}
+          isCheckBoxEditable={true}
+          customClass={`diff-row diff-${element.diffType}`}
+          {uploadFormFile}
+          {removeFormFile}
+          {handleOpenCurrentDynamicExpression}
+          {dynamicExpression}
+        />
       {/each}
 
       <!-- Diff view action buttons -->
