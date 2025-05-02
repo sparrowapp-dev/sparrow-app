@@ -384,7 +384,7 @@
               classProps={"pe-0"}
             >
               {#each collectionListDocument as col}
-                {#if !(col?.toMutableJSON().activeSync && isSharedWorkspace)}
+                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace)}
                   <Collection
                     bind:userRole
                     {isSharedWorkspace}
