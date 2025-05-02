@@ -49,11 +49,15 @@
     return open >= 2 && close >= 2;
   }
 
-  const handleSelectRequestType = (requestType: string, blockName: string) => {
+  const handleSelectRequestType = (
+    requestType: string,
+    requestName: string,
+  ) => {
     if (requestType === "request.body" || requestType === "response.body") {
       selectedApiRequestType = "body";
     }
-    const current = `${blockName}.${requestType}`;
+    const sanitizedRequestName = requestName.replace(/[^a-zA-Z0-9_]/g, "_");
+    const current = `$$${sanitizedRequestName}.${requestType}`;
     if (cursorPosition !== null && expression) {
       expression =
         expression.slice(0, cursorPosition) +
@@ -148,7 +152,7 @@
               on:click={() =>
                 handleSelectRequestType(
                   type.requestType,
-                  selectedAPI?.blockName,
+                  selectedAPI?.requestData?.name,
                 )}
             >
               <div class="d-flex justify-content-start align-items-center">
@@ -184,8 +188,9 @@
                   {requestApi?.data?.requestData?.method}
                 </p>
 
-                <p class="request-block-name" style="margin: 0;">
-                  {requestApi?.data?.blockName}
+                <p class="request-block-title" style="margin: 0;">
+                  {requestApi?.data?.blockName} | {requestApi?.data?.requestData
+                    ?.name}
                 </p>
               </div>
 
@@ -260,6 +265,7 @@
 
 <style>
   .request-block-method {
+    color: var(--text-ds-neutral-50);
     font-family: "Inter", sans-serif;
     font-weight: 600;
     font-size: 10px;
@@ -268,11 +274,20 @@
   }
 
   .request-block-name {
+    color: var(--text-ds-neutral-50);
     font-family: "Inter", sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 1;
     text-align: left;
+  }
+
+  .request-block-title {
+    color: var(--text-ds-neutral-50);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.3;
   }
 
   .request-api-block:hover {
