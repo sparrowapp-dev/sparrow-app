@@ -25,6 +25,7 @@
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
   export let handleOpenCurrentDynamicExpression;
+  export let customClass = "";
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -45,7 +46,7 @@
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="pair-data-row d-flex align-items-center w-100"
+  class="pair-data-row d-flex align-items-center w-100 {customClass}"
   style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}

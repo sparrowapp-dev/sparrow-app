@@ -6,6 +6,7 @@
   import { relaunch } from "@tauri-apps/plugin-process";
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
+  import * as Sentry from "@sentry/svelte";
 
   let showProgressBar = false;
   let updateAvailable = false;
@@ -21,6 +22,7 @@
         updateAvailable = true;
       }
     } catch (error) {
+      Sentry.captureException(error); 
       console.error(error);
     }
   });
@@ -43,6 +45,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
+      Sentry.captureException(e); 
       notifications.error("Update Failed.");
       console.error(e);
     } finally {

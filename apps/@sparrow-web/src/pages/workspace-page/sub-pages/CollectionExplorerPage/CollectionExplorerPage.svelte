@@ -95,12 +95,13 @@
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
-
+  let isSharedWorkspace = false;
   const activeWorkspaceSubscribe = _viewModel.activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value.toMutableJSON();
       if (activeWorkspaceRxDoc) {
         currentWorkspace = activeWorkspaceRxDoc;
+        isSharedWorkspace = activeWorkspaceRxDoc.isShared;
         currentWorkspaceId = activeWorkspaceRxDoc._id;
         environmentId = activeWorkspaceRxDoc.environmentId as string;
         const clientUserId = getClientUser().id;
@@ -193,6 +194,7 @@
   bind:collection
   {environmentVariables}
   {onSyncCollection}
+  {isSharedWorkspace}
   onUpdateDescription={_viewModel.handleUpdateDescription}
   onItemCreated={_viewModel.handleCreateItem}
   onCreateAPIRequest={_viewModel.handleCreateRequest}

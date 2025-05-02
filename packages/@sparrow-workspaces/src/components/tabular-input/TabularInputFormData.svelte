@@ -2,6 +2,8 @@
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
   import { TabularInputTheme } from "../../utils";
+  import { CodeMirrorInput } from "..";
+  import { Button, notifications, Tooltip } from "@sparrow/library/ui";
   import { onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
@@ -26,6 +28,19 @@
   export let dynamicExpression;
 
   export let isWebApp = false;
+
+  // New props for merge/diff view
+  export let showMergeView = false;
+  export let isMergeViewLoading = false;
+  export let newModifiedPairs: {
+    key: string;
+    value: string;
+    checked: boolean;
+    type: "text" | "file";
+    base: string;
+  }[] = [];
+
+  let hasChanges = false;
   let pairs = keyValue;
   let controller: boolean = false;
   let pairsContainer: HTMLElement;
@@ -37,6 +52,270 @@
       identifySelectAllState();
     }
   }
+
+  // ************ Diff/Merge View Methods - Start ************
+
+  // Calculate diff between original and current data
+  type DiffType = "added" | "deleted" | "modified" | "unchanged";
+  type DiffPair = {
+    key: string;
+    value: string;
+    checked: boolean;
+    type: "text" | "file";
+    base: string;
+    diffType: DiffType;
+    originalIndex?: number;
+    currentIndex?: number;
+  };
+  let diffPairs: DiffPair[] = [];
+
+  // Function to calculate diff between original data (pairs) and new data (newModifiedPairs)
+  function calculateDiff(): DiffPair[] {
+    // If table data is empty but we have new data, then consider everything as an addition
+    // if (!pairs || pairs.length === 0) {
+    //   return newModifiedPairs.map((pair) => ({
+    //     ...pair,
+    //     diffType: "added",
+    //     currentIndex: newModifiedPairs.indexOf(pair),
+    //   }));
+    // }
+
+    const result: DiffPair[] = [];
+    const origMap = new Map();
+
+    // Create a map of original items using key as a unique identifier
+    pairs.forEach((pair, index) => {
+      origMap.set(pair.key, { pair, index });
+    });
+
+    // Check for modified or added items
+    newModifiedPairs.forEach((currentPair, currentIndex) => {
+      if (currentPair.key === "") return; // Skip empty rows
+
+      const originalEntry = origMap.get(currentPair.key);
+
+      if (originalEntry) {
+        // Key exists in both - check if value changed
+        if (
+          originalEntry.pair.value !== currentPair.value
+          // || // type and base should also be compared, disabling it temporaraliy
+          // originalEntry.pair.type !== currentPair.type ||
+          // originalEntry.pair.base !== currentPair.base
+        ) {
+          result.push({
+            ...currentPair,
+            diffType: "modified",
+            originalIndex: originalEntry.index,
+            currentIndex,
+          });
+
+          // Also add the original version to show what changed
+          result.push({
+            ...originalEntry.pair,
+            diffType: "deleted",
+            originalIndex: originalEntry.index,
+          });
+        } else {
+          // Unchanged
+          result.push({
+            ...currentPair,
+            diffType: "unchanged",
+            originalIndex: originalEntry.index,
+            currentIndex,
+          });
+        }
+
+        // Mark as processed
+        origMap.delete(currentPair.key);
+      } else {
+        // New item
+        result.push({
+          ...currentPair,
+          diffType: "added",
+          currentIndex,
+        });
+      }
+    });
+
+    // Add deleted items (those in original but not in current)
+    origMap.forEach(({ pair, index }) => {
+      if (pair.key !== "") {
+        // Skip empty rows
+        result.push({
+          ...pair,
+          diffType: "deleted",
+          originalIndex: index,
+        });
+      }
+    });
+
+    // Comparator: Custom Sorting Method for Sorting by original position to maintain a logical order
+    result.sort((a, b) => {
+      // First priority: Group items with the same key together
+      if (a.key === b.key) {
+        // When keys match, deleted comes before added
+        if (
+          a.diffType === "deleted" &&
+          (b.diffType === "added" || b.diffType === "modified")
+        ) {
+          return -1; // Deletion comes first
+        }
+        if (
+          (a.diffType === "added" || a.diffType === "modified") &&
+          b.diffType === "deleted"
+        ) {
+          return 1; // Addition comes second
+        }
+      }
+
+      // Second priority: Put completely new items at the end
+      const aIsNew = a.diffType === "added" && a.originalIndex === undefined;
+      const bIsNew = b.diffType === "added" && b.originalIndex === undefined;
+
+      if (aIsNew && !bIsNew) {
+        return 1; // a is new but b is not - push a to the end
+      } else if (!aIsNew && bIsNew) {
+        return -1; // b is new but a is not - push b to the end
+      }
+
+      // Then sort by original position for existing items
+      if (a.originalIndex !== undefined && b.originalIndex !== undefined) {
+        return a.originalIndex - b.originalIndex;
+      }
+
+      // Fall back to current position
+      if (a.currentIndex !== undefined && b.currentIndex !== undefined) {
+        return a.currentIndex - b.currentIndex;
+      }
+
+      return 0;
+    });
+
+    const lastEmptyRow: DiffPair = {
+      key: "",
+      value: "",
+      checked: false,
+      type: "text",
+      base: "",
+      diffType: "unchanged",
+      originalIndex: result.length - 1,
+      currentIndex: result.length - 1,
+    };
+
+    isMergeViewLoading = false;
+
+    // Check for changes after calculating diff
+    setTimeout(() => {
+      checkForChanges();
+    }, 0);
+
+    return [...result, lastEmptyRow];
+  }
+
+  /**
+   * Checks if there are any actual changes between the original data and the new data
+   * Sets hasChanges to true if there are added, deleted, or modified items
+   */
+  function checkForChanges(): boolean {
+    if (!diffPairs || diffPairs.length === 0) return false;
+
+    // Check if there are any changes (added, deleted, or modified items)
+    const changes = diffPairs.filter(
+      (pair) =>
+        pair.diffType === "added" ||
+        pair.diffType === "deleted" ||
+        pair.diffType === "modified",
+    );
+
+    // Update hasChanges state
+    hasChanges = changes.length > 0;
+
+    if (!hasChanges) {
+      undoChanges(); // resetting the mergeview states and props
+      notifications.success("You already have updated changes.");
+    }
+    return hasChanges;
+  }
+
+  const updateDiffPairsWithLoading = async () => {
+    isMergeViewLoading = true;
+    await sleep(2000);
+    diffPairs = calculateDiff();
+    checkForChanges();
+  };
+  $: if (showMergeView) updateDiffPairsWithLoading();
+
+  // Toggle merge view
+  const toggleMergeView = async (show: boolean) => {
+    showMergeView = show;
+    if (show) {
+      isMergeViewLoading = true;
+      await sleep(2000);
+      diffPairs = calculateDiff();
+      checkForChanges();
+    } else hasChanges = false;
+  };
+
+  // Function to apply all changes from diff view to the original data
+  const applyChanges = async () => {
+    if (!showMergeView) return;
+    isMergeViewLoading = true;
+    // Extract all valid pairs from diffPairs (excluding deleted ones)
+    const updatedPairs = diffPairs
+      .filter((pair) => pair.diffType !== "deleted")
+      .map((pair) => ({
+        key: pair.key,
+        value: pair.value,
+        checked: pair.checked || false,
+        type: pair.type,
+        base: pair.base,
+      }));
+
+    // Add an empty row at the end if needed
+    if (
+      updatedPairs.length > 0 &&
+      (updatedPairs[updatedPairs.length - 1].key !== "" ||
+        updatedPairs[updatedPairs.length - 1].value !== "")
+    ) {
+      updatedPairs.push({
+        key: "",
+        value: "",
+        checked: false,
+        type: "text",
+        base: "",
+      });
+    }
+
+    pairs = updatedPairs; // Update the pairs array with the new data
+    showMergeView = false; // Turn off merge view after applying changes
+    callback(pairs); // Notify parent component of the changes
+    newModifiedPairs = [];
+    hasChanges = false;
+
+    await sleep(2000);
+    isMergeViewLoading = false; // Reset loading state
+  };
+
+  // Function to undo all changes and revert to original state
+  const undoChanges = async () => {
+    if (!showMergeView) return;
+    showMergeView = false;
+    newModifiedPairs = [];
+    diffPairs = []; // Reset any potential changes by discarding diffPairs
+    callback(pairs); // Notify parent of unchanged data
+    hasChanges = false;
+
+    isMergeViewLoading = true;
+    await sleep(2000);
+    isMergeViewLoading = false; // Reset loading state
+  };
+
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  // ************ Diff/Merge View Methods - Ends ************
 
   /**
    * @description - calculates the select all checkbox state - weather checked or not
@@ -92,6 +371,12 @@
       });
       pairs = pairs;
       callback(pairs);
+
+      // Recalculate diff if merge view is active
+      if (showMergeView) {
+        diffPairs = calculateDiff();
+        checkForChanges();
+      }
 
       await scrollToNewRow();
     } else {
@@ -183,6 +468,11 @@
       // Reset the input to allow re-uploading the same file
       target.value = "";
     });
+
+    if (showMergeView) {
+      diffPairs = calculateDiff();
+      checkForChanges();
+    }
   });
 
   const removeFormFile = (index: number) => {
@@ -277,7 +567,120 @@
     style="display:block; position:relative;"
     bind:this={pairsContainer}
   >
-    {#if pairs}
+    <!-- Showing Duplicate Fake Rows For Diff/Merge View -->
+    {#if !isMergeViewLoading && showMergeView && hasChanges}
+      {#each diffPairs as element, index (index)}
+        <div
+          class="pair-data-row w-100 d-flex align-items-center px-1 diff-row diff-{element.diffType}"
+          style="position:relative"
+        >
+          <div style=" width:24px;" class="me-2">
+            {#if diffPairs.length - 1 != index || !isInputBoxEditable}
+              <Checkbox
+                checked={element.checked}
+                on:input={() => {
+                  updateCheck(index);
+                }}
+                disabled={!isCheckBoxEditable}
+              />
+            {/if}
+          </div>
+
+          <div class="d-flex gap-0" style="width: calc(100% - 86px);">
+            <div class="w-50 d-flex align-items-center">
+              <div
+                class="position-absolute top-0"
+                style="width: calc(50% - 48px);"
+              >
+                <CodeMirrorInput
+                  bind:value={element.key}
+                  onUpdateInput={() => {
+                    updateParam(index);
+                  }}
+                  disabled={true}
+                  placeholder={"Add Key"}
+                  {theme}
+                  {environmentVariables}
+                  {onUpdateEnvironment}
+                />
+              </div>
+            </div>
+            {#if element.type === "file"}
+              <div class="w-50 position-relative d-flex align-items-center">
+                <div
+                  class="position-relative rounded p-1 d-flex backgroundColor"
+                >
+                  <div
+                    class="bg-keyValuePairColor d-flex h-fit rounded"
+                    style="padding: 1px 4px;"
+                  >
+                    <p style="font-size:10px;" class="mb-0 me-1">
+                      {element.value ? element.value : "corrupted-file"}
+                    </p>
+                    <img
+                      src={close}
+                      alt=""
+                      class="my-auto"
+                      style="cursor:pointer; height: 10px; width: 10px; {element.diffType ===
+                      'deleted'
+                        ? 'visibility: hidden;'
+                        : ''}"
+                      on:click={() => {
+                        if (
+                          isInputBoxEditable &&
+                          element.diffType !== "deleted"
+                        ) {
+                          removeFormFile(index);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            {:else}
+              <div class="w-50 d-flex align-items-center">
+                <div
+                  class="position-absolute top-0 left-6"
+                  style="width: calc(50% - 48px);"
+                >
+                  <CodeMirrorInput
+                    bind:value={element.value}
+                    onUpdateInput={() => {
+                      updateParam(index);
+                    }}
+                    placeholder={"Add Value"}
+                    disabled={true}
+                    {theme}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
+                  />
+                </div>
+              </div>
+            {/if}
+          </div>
+          <div
+            class="ms-1 d-flex align-items-center justify-content-between gap-1"
+            style="width:40px;"
+          >
+            {#if diffPairs.length - 1 != index}
+              {#if element.diffType !== "deleted"}
+                <!-- Hidden buttons in diff view, but kept for layout consistency -->
+                <div style="width:45px;" class="opacity-0"></div>
+              {:else}
+                <div style="width:45px;" class="opacity-0"></div>
+              {/if}
+            {/if}
+          </div>
+        </div>
+      {/each}
+
+      <!-- Diff view action buttons -->
+      <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+        <Button title="Keep the Changes!!" type="primary" onClick={applyChanges}
+        ></Button>
+        <Button title="Undo" type="secondary" onClick={undoChanges}></Button>
+      </div>
+    {:else}
       {#each pairs as element, index}
         <LazyElementFormData
           {element}
@@ -315,5 +718,16 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
+  }
+  .pair-data-row:hover .button-container {
+    opacity: 1;
+    visibility: visible;
+  }
+  .button-container {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.1s ease-in-out,
+      visibility 0.1s;
   }
 </style>

@@ -59,6 +59,10 @@
    * Role of user in workspace
    */
   export let userRole;
+  /**
+   * Indicate if workspace is public or not
+   */
+  export let isSharedWorkspace = false;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -128,10 +132,15 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
     <p>
       Are you sure you want to delete this {SocketIORequestDefaultAliasBaseEnum.NAME}?
-      <span class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{socketIo.name}"</span>
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{socketIo.name}"</span
+      >
       will be removed and cannot be restored.
     </p>
   </div>
@@ -172,7 +181,7 @@
   </div></Modal
 >
 
-{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -297,7 +306,7 @@
 
   {#if socketIo.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
     <Tooltip
       title={"More"}
       show={!showMenu}

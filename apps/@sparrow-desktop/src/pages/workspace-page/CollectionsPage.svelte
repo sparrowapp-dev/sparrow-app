@@ -88,6 +88,7 @@
   import { remove } from "@tauri-apps/plugin-fs";
   import { Checkbox } from "@sparrow/library/forms";
   import { writable } from "svelte/store";
+  import * as Sentry from "@sentry/svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -524,6 +525,7 @@
       );
       refreshLoad = false;
     } catch (error) {
+      Sentry.captureException(error);
       refreshLoad = false;
     }
   };

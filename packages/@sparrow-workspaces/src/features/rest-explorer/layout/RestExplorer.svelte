@@ -27,7 +27,11 @@
 
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
-  import { Events } from "@sparrow/common/enums";
+  import {
+    Events,
+    RequestDataset,
+    RequestDataType,
+  } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
   import type {
@@ -52,6 +56,8 @@
     UpdateRequestUrlType,
   } from "@sparrow/workspaces/type";
   import {
+    RequestDatasetEnum,
+    RequestDataTypeEnum,
     RequestSectionEnum,
     ResponseSectionEnum,
     type KeyValue,
@@ -80,11 +86,12 @@
     CaretDownFilled,
   } from "@sparrow/library/icons";
 
-  import { SparrowSecondaryIcon } from "@sparrow/common/icons";
+  import { SparrowSecondaryIcon, SparkleFilled } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -140,6 +147,15 @@
   export let collectionAuth;
   export let collection;
   const loading = writable<boolean>(false);
+
+  // Props for showing merge/diff view in RequestBody, Headers and Params
+  let isAIDebugBtnEnable = false;
+  let isMergeViewEnableForRequestBody = false;
+  let isMergeViewEnableForParams = false;
+  let isMergeViewEnableForHeaders = false;
+  let isMergeViewLoading = false;
+  let newModifiedContent: string | KeyValuePair[];
+  let mergeViewRequestDatasetType: RequestDatasetEnum;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -246,6 +262,233 @@
   onDestroy(() => {
     isChatbotOpenInCurrTab.set(false);
   });
+
+  /**
+   * Enables the diff/merge view while having suggested changes by AI
+   * @param newContent The new changes suggested
+   * @param requestDatasetType Request Body dataset type (Raw, Binary, URL Encoded, Form Data)
+   * @param contentType Request Body dataset type (JSON, HTML, JavaScript, Text, XML)
+   */
+  const enabledMergeViewForReqBody = async (
+    newContent: string,
+    requestDatasetType: RequestDatasetEnum,
+    contentType: RequestDataTypeEnum,
+  ) => {
+    // Auto Navigation
+    onUpdateRequestState({
+      requestNavigation: RequestSectionEnum.REQUEST_BODY,
+    });
+    onUpdateRequestState({ requestBodyNavigation: requestDatasetType });
+    onUpdateRequestState({ requestBodyLanguage: contentType });
+
+    if (isMergeViewEnableForRequestBody) {
+      notifications.info("Please accept the current suggested changes first.");
+      return;
+    }
+
+    if (requestDatasetType === RequestDatasetEnum.RAW) {
+      newModifiedContent = newContent;
+    } else if (requestDatasetType === RequestDatasetEnum.URLENCODED) {
+      newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
+    } else if (requestDatasetType === RequestDatasetEnum.FORMDATA) {
+      newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
+    } else if (requestDatasetType === RequestDatasetEnum.BINARY) return;
+    else return;
+
+    mergeViewRequestDatasetType = requestDatasetType;
+    isMergeViewEnableForRequestBody = true;
+    // isMergeViewLoading = true;
+  };
+
+  /**
+   * Embeds the changes suggested by AI in request data
+   * @param target Where to insert the changes (Request Body or Headers or Parameters)
+   * @param language Language type of suggested code changes by AI (JSON, HTML, JavaScript, Text, XML)
+   * @param requestBodyType Request Body datas et type (Raw, Binary, URL Encoded, Form Data)
+   * @param modifiedContent The new content suggested by AI
+   */
+  const handleApplyChangeOnAISuggestion = async (
+    target: RequestSectionEnum,
+    language: RequestDataTypeEnum,
+    requestBodyType: RequestDatasetEnum,
+    modifiedContent,
+  ) => {
+    // For testing, remove while raising PR
+    // target = "Parameters";
+    // target = "Headers";
+    if (
+      isMergeViewEnableForHeaders ||
+      isMergeViewEnableForParams ||
+      isMergeViewEnableForRequestBody
+    ) {
+      notifications.error("Please accept the current suggested changes first.");
+      return;
+    }
+
+    try {
+      switch (target) {
+        case RequestSectionEnum.REQUEST_BODY: {
+          // For testing, remove while raising PR
+          // requestBodyType = "URL Encoded" as RequestDatasetEnum;
+          // requestBodyType = "Form Data" as RequestDatasetEnum;
+
+          enabledMergeViewForReqBody(
+            modifiedContent,
+            requestBodyType,
+            language,
+          );
+          break;
+        }
+        case RequestSectionEnum.HEADERS:
+        case RequestSectionEnum.PARAMETERS: {
+          const newData = convertJsonToKeyValPairs(JSON.parse(modifiedContent));
+
+          // Auto navigating to request navigator tab
+          onUpdateRequestState({
+            requestNavigation:
+              target === RequestSectionEnum.HEADERS
+                ? RequestSectionEnum.HEADERS
+                : RequestSectionEnum.PARAMETERS,
+          });
+
+          if (isMergeViewEnableForHeaders || isMergeViewEnableForParams) {
+            notifications.error(
+              "Please accept the current suggested changes first.",
+            );
+            return;
+          }
+
+          await sleep(500);
+          newModifiedContent = newData;
+          // isMergeViewLoading = true;
+          if (target === RequestSectionEnum.HEADERS)
+            isMergeViewEnableForHeaders = true;
+          else isMergeViewEnableForParams = true;
+          break;
+        }
+        default:
+          break;
+      }
+    } catch (err) {
+      console.log("Error which inserting AI suggestions: ", err);
+    }
+  };
+
+  /**
+   * Converts an object (data A) to an array of KeyValuePair objects (data B)
+   * @param {Record<string, any>} dataA - The input object to convert
+   * @param {boolean} defaultChecked - Default value for the checked property if not found in input (defaults to true)
+   * @returns {KeyValuePair[]} Array of objects conforming to KeyValuePair interface
+   */
+  const convertJsonToKeyValPairs = (
+    dataA: Record<string, any>,
+  ): KeyValuePair[] => {
+    // Check if input is valid
+    if (!dataA || typeof dataA !== "object" || Array.isArray(dataA)) {
+      throw new Error("Input must be a valid object");
+    }
+
+    const defaultChecked = true; // fallback value
+
+    // Get checked value from input if it exists
+    const checkedValue =
+      typeof dataA.checked === "boolean" ? dataA.checked : defaultChecked;
+
+    // Convert object to array of KeyValuePair objects
+    const dataB: KeyValuePair[] = Object.entries(dataA)
+      .filter(([key]) => key !== "checked") // Skip the checked property itself
+      .map(([key, value]) => {
+        // Convert value to string if it's not already
+        const stringValue =
+          Array.isArray(value) || (typeof value === "object" && value !== null)
+            ? JSON.stringify(value)
+            : String(value);
+
+        return {
+          key,
+          value: stringValue,
+          checked: checkedValue,
+        };
+      });
+
+    return dataB;
+  };
+
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  const handleOnClickAIDebug = async () => {
+    isAIDebugBtnEnable = false;
+
+    // adjusting the panel layout
+    if ($tabsSplitterDirection != "horizontal") {
+      tabsSplitterDirection.set("horizontal");
+      isChatbotOpenInCurrTab.set(true);
+    }
+
+    const isResponseGenerating =
+      $tab?.property?.request?.state?.isChatbotGeneratingResponse;
+
+    if (!isResponseGenerating) {
+      onUpdateAiConversation([
+        ...$tab?.property?.request?.ai?.conversations,
+        {
+          message: "Help me debug",
+          messageId: "",
+          type: "Sender",
+          isLiked: false,
+          isDisliked: false,
+          status: true,
+        },
+      ]);
+
+      const debugPrompt = `
+        I am getting the below mentioned error when i send request, 
+        can you help me debug this error, let me know if i need to 
+        change anyhing in the request to solve this issue. here's 
+        the error response i am getting while sending the request, 
+        I've stringified the response. 
+        Response: ${JSON.stringify(storeData.response)}`;
+
+      // ToDo: Enable scroller
+      // Scroller for user prompt
+      // setTimeout(() => {
+      //   if (scrollList) scrollList("bottom", -1, "smooth");
+      // }, 10);
+
+      await onGenerateAiResponse(debugPrompt);
+
+      // ToDo: Enable scroller
+      // Scroller for AI response
+      // setTimeout(() => {
+      //   if (scrollList) scrollList("bottom", -1, "smooth");
+      // }, 10);
+
+      onUpdateRequestState({ isChatbotActive: true });
+    }
+
+    // ToDo: Register mixpanel event for "Help me debug" action
+    // MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
+  };
+
+  /**
+   * Checks whether the response status code indicates a client error (HTTP 4xx).
+   * @returns {boolean} - Returns true if the status code is between 400 and 499, otherwise false.
+   */
+  const isClientError = () => {
+    const status = storeData?.response?.status;
+    const code = parseInt(status?.split(" ")[0]);
+    return code >= 400 && code < 500;
+  };
+
+  $: {
+    if (storeData) {
+      if (isClientError()) isAIDebugBtnEnable = true;
+      else isAIDebugBtnEnable = false;
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -394,6 +637,9 @@
                           authParameter={$requestAuthParameter}
                           {onUpdateEnvironment}
                           {environmentVariables}
+                          bind:isMergeViewEnabled={isMergeViewEnableForParams}
+                          bind:isMergeViewLoading
+                          bind:newModifiedContent
                         />
                       {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
                         <RequestBody
@@ -405,6 +651,10 @@
                           {onUpdateEnvironment}
                           {environmentVariables}
                           {isWebApp}
+                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
+                          bind:isMergeViewLoading
+                          bind:newModifiedContent
+                          {mergeViewRequestDatasetType}
                         />
                       {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                         <RequestHeaders
@@ -420,6 +670,9 @@
                           onHeadersChange={onUpdateHeaders}
                           onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
                           {isWebApp}
+                          bind:isMergeViewEnabled={isMergeViewEnableForHeaders}
+                          bind:isMergeViewLoading
+                          bind:newModifiedContent
                         />
                       {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
                         <RequestAuth
@@ -485,7 +738,7 @@
                             style="gap:12px"
                           >
                             <div
-                              class="d-flex"
+                              class="d-flex justify-content-between"
                               style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                             >
                               <ResponseNavigator
@@ -495,7 +748,19 @@
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
                               />
-                              <ResponseStatus response={storeData.response} />
+
+                              <div class="d-flex">
+                                <!-- AI debugging trigger button -->
+                                <Button
+                                  title="Help me debug"
+                                  type={"secondary"}
+                                  startIcon={SparkleFilled}
+                                  disable={!isAIDebugBtnEnable}
+                                  onClick={handleOnClickAIDebug}
+                                ></Button>
+
+                                <ResponseStatus response={storeData.response} />
+                              </div>
                             </div>
                             <div
                               class="flex-grow-1 d-flex flex-column"
@@ -512,6 +777,7 @@
                                     {onSaveResponse}
                                     {isWebApp}
                                     {isGuestUser}
+                                    {userRole}
                                   />
                                 {/if}
                                 <div
@@ -558,6 +824,7 @@
                 {onGenerateAiResponse}
                 {onStopGeneratingAIResponse}
                 {onToggleLike}
+                {handleApplyChangeOnAISuggestion}
               />
             </Pane>
           {/if}

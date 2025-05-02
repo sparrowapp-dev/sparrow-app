@@ -2,7 +2,12 @@
   import { onDestroy } from "svelte";
   import { marked } from "marked";
   import { notifications } from "@sparrow/library/ui";
-  import { copyIcon, tickIcon, ArrowExpand } from "../../assests";
+  import {
+    copyIcon,
+    tickIcon,
+    ArrowExpand,
+    ArrowTrendingSparkle,
+  } from "../../assests";
   import { tick } from "svelte";
 
   import hljs from "highlight.js";
@@ -12,7 +17,12 @@
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
-  import { MessageTypeEnum } from "@sparrow/common/types/workspace";
+  import {
+    MessageTypeEnum,
+    RequestDatasetEnum,
+    RequestDataTypeEnum,
+    RequestSectionEnum,
+  } from "@sparrow/common/types/workspace";
   import { ArrowSyncRegular, ThumbLikeRegular } from "@sparrow/library/icons";
   import {
     ThumbLikeFilled,
@@ -20,6 +30,8 @@
     CopyRegular,
     ThumbDislikeRegular,
   } from "@sparrow/library/icons";
+  import * as Sentry from "@sentry/svelte";
+
   export let message: string;
   export let messageId: string;
   export let type;
@@ -33,11 +45,70 @@
 
   export let onClickCodeBlockPreview;
 
+  export let handleApplyChangeOnAISuggestion;
+
   let showTickIcon: boolean = false;
+
+  /**
+   * Validates if the metadata sent by AI wrapped inside HTML comment
+   * Check if the metadata sent by AI is application user friendly (Matching with request data or not).
+   *
+   * @param target - The target value (Where to apply the change -> Req. Body or Headers or Parameters)
+   * @param language - The language value of the code suggested (Json, html, javascript etc) 
+   * @param type - The type value (Raw, url encoded, formdata)
+   * @returns boolean indicating if all values are valid according to the enums
+   */
+  const validateMetadata = (
+    target: RequestSectionEnum,
+    language: RequestDataTypeEnum,
+    type: RequestDatasetEnum,
+  ): boolean => {
+    // Check if target is valid - must match a value in RequestSectionEnum
+    const validTargets = Object.values(RequestSectionEnum);
+    if (!target || !validTargets.includes(target)) {
+      console.debug(
+        `Invalid target: ${target}, expected one of: ${validTargets.join(", ")}`,
+      );
+      return false;
+    }
+
+    // Check if language is valid - must match a value in RequestDataTypeEnum
+    const validLanguages = Object.values(RequestDataTypeEnum);
+    if (!language || !validLanguages.includes(language)) {
+      console.debug(
+        `Invalid language: ${language}, expected one of: ${validLanguages.join(", ")}`,
+      );
+      return false;
+    }
+
+    // Check if type is valid - must match a value in RequestDatasetEnum
+    const validTypes = Object.values(RequestDatasetEnum);
+    if (!type || !validTypes.includes(type)) {
+      console.debug(
+        `Invalid type: ${type}, expected one of: ${validTypes.join(", ")}`,
+      );
+      return false;
+    }
+
+    // For non-REQUEST_BODY targets, type should be NONE
+    if (
+      target !== RequestSectionEnum.REQUEST_BODY &&
+      type !== RequestDatasetEnum.NONE
+    ) {
+      console.log(
+        `Invalid type: ${type} for target: ${target}, expected ${RequestDatasetEnum.NONE}`,
+      );
+      return false;
+    }
+
+    // All checks passed
+    return true;
+  };
 
   /**
    * Decodes an HTML string by parsing it, processing <pre><code> elements, and wrapping them
    * in custom containers with additional copy paste functionality.
+   * Validates actionable code blocks against application enums.
    *
    * @param htmlString - The HTML string to decode and process.
    * @returns The processed HTML string.
@@ -46,39 +117,151 @@
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
-    // Select all <pre> elements
+    // First, process actionable code blocks
+    const preElements = doc.querySelectorAll("pre");
+    preElements.forEach((pre) => {
+      const codeElem = pre.querySelector("code");
+      if (!codeElem) return;
+
+      // Check if this pre element is preceded by an HTML comment
+      let previousNode = pre.previousSibling;
+      let isActionable = false;
+      let actionableTarget = "";
+      let actionableLanguage = "";
+      let actionableType = "";
+
+      // Look for HTML comment nodes that might contain actionable metadata
+      while (previousNode) {
+        // Check if it's a comment node
+        if (previousNode.nodeType === Node.COMMENT_NODE) {
+          const commentContent = previousNode.textContent || "";
+
+          // Check if this is a suggestion comment
+          if (commentContent.includes("suggestion:")) {
+            // Extract target from suggestion comment
+            const targetMatch = commentContent.match(/target=([^;]+)/);
+            if (targetMatch && targetMatch[1]) {
+              actionableTarget = targetMatch[1].trim();
+            }
+
+            // Extract language from suggestion comment
+            const langMatch = commentContent.match(/lang=([^;]+)/);
+            if (langMatch && langMatch[1]) {
+              actionableLanguage = langMatch[1].trim();
+            }
+
+            // Extract type from suggestion comment
+            const typeMatch = commentContent.match(/type=([^;]+)/);
+            if (typeMatch && typeMatch[1]) {
+              actionableType = typeMatch[1].trim();
+            }
+
+            // actionableTarget = "BSON";
+            // actionableType = ""
+            // actionableLanguage = ""
+
+            // Validate metadata against application enums
+            isActionable = validateMetadata(
+              actionableTarget as RequestSectionEnum,
+              actionableLanguage as RequestDataTypeEnum,
+              actionableType as RequestDatasetEnum,
+            );
+
+            // console.log("Found suggestion comment:", {
+            //   target: actionableTarget,
+            //   language: actionableLanguage,
+            //   type: actionableType,
+            //   isActionable: isActionable,
+            // });
+          }
+
+          // Remove the comment node after processing
+          const commentToRemove = previousNode;
+          previousNode = previousNode.previousSibling;
+          commentToRemove.parentNode?.removeChild(commentToRemove);
+          continue;
+        }
+
+        // If it's a whitespace text node, continue checking previous nodes
+        if (
+          previousNode.nodeType === Node.TEXT_NODE &&
+          previousNode.textContent?.trim() === ""
+        ) {
+          previousNode = previousNode.previousSibling;
+          continue;
+        }
+
+        // If we reach a non-comment, non-whitespace node, stop checking
+        break;
+      }
+
+      // If we found an actionable block that passed validation, mark it with the necessary metadata
+      if (isActionable) {
+        // Store the actionable metadata as a data attribute for later use
+        pre.setAttribute(
+          "data-actionable",
+          JSON.stringify({
+            target: actionableTarget,
+            language: actionableLanguage,
+            type: actionableType,
+          }),
+        );
+      }
+    });
+
+    // Now process all code blocks for syntax highlighting
     const codeElements = doc.querySelectorAll("pre > code");
-    const preElements = Array.from(codeElements)
+    const highlightedPreElements = Array.from(codeElements)
       .filter((elem) => {
         if (elem.innerHTML.trim()) return true;
         return false;
       })
       .map((codeElem) => codeElem.parentElement);
 
-    preElements.forEach((pre, index) => {
+    highlightedPreElements.forEach((pre, index) => {
       if (pre) {
         // Create a new container div
         const container = document.createElement("div");
         container.className = "wrapper";
         const lang = pre.querySelector("code")?.getAttribute("class");
         hljs.highlightBlock(pre.querySelector("code"));
+
+        // Check if this was an actionable block
+        const actionableData = pre.getAttribute("data-actionable");
+        let additionalButtons = "";
+
+        // Add a "Apply Change" button for actionable blocks
+        if (actionableData) {
+          additionalButtons = `
+        <button role="button" class="position-relative apply-change-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}" data-actionable='${actionableData}'>
+          <img src="${ArrowTrendingSparkle}" id="${index}">
+          <div class="codeBlock-action-btns-tooltip">Insert
+            <div class="codeBlock-action-btns-tooltip-square"></div>
+          </div>
+        </button>
+      `;
+        }
+
         // Adding code block action buttons like copy code and preview code
         container.innerHTML = `
-            <div class="code-header d-flex align-items-center justify-content-between">
-              <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-                <img src="${ArrowExpand}" id="${index}">
-                <div class="codeBlock-action-btns-tooltip">Preview
-                  <div class="codeBlock-action-btns-tooltip-square"></div>
-                </div>
-              </button>
-              <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
-                <img src="${copyIcon}" id="${index}">
-                <div class="codeBlock-action-btns-tooltip">Copy
-                  <div class="codeBlock-action-btns-tooltip-square"></div>
-                </div>
-              </button>
+        <div class="code-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            ${additionalButtons}
+            <button role="button" class="position-relative preview-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+              <img src="${ArrowExpand}" id="${index}">
+              <div class="codeBlock-action-btns-tooltip">Preview
+                <div class="codeBlock-action-btns-tooltip-square"></div>
+              </div>
+            </button>
+          </div>
+          <button role="button" class="position-relative copy-code-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}">
+            <img src="${copyIcon}" id="${index}">
+            <div class="codeBlock-action-btns-tooltip">Copy
+              <div class="codeBlock-action-btns-tooltip-square"></div>
             </div>
-          `;
+          </button>
+        </div>
+      `;
 
         pre.parentNode?.insertBefore(container, pre);
         container.appendChild(pre);
@@ -87,6 +270,62 @@
 
     const serializer = new XMLSerializer();
     return serializer.serializeToString(doc);
+  };
+
+  // Add the handleApplyChange function
+  const handleApplyChange = (event: MouseEvent) => {
+    const button = event.target as HTMLElement;
+    const actionableButton = button.closest("[data-actionable]");
+    const actionableData = actionableButton?.getAttribute("data-actionable");
+
+    if (actionableData) {
+      try {
+        const metaData = JSON.parse(actionableData);
+        const wrapper = actionableButton.closest(
+          ".wrapper",
+        ) as HTMLElement | null;
+
+        if (wrapper) {
+          const codeElement = wrapper.querySelector(
+            "pre code",
+          ) as HTMLElement | null;
+          if (codeElement) {
+            const codeContent = codeElement.textContent || "";
+
+            let target: RequestSectionEnum = metaData.target;
+            let language: RequestDataTypeEnum = metaData.language;
+            let requestBodyType: RequestDatasetEnum = metaData.type;
+
+            let modifiedContent =
+              language === RequestDataTypeEnum.JSON
+                ? JSON.stringify(JSON.parse(codeContent), null, 2)
+                : codeContent;
+
+            handleApplyChangeOnAISuggestion(
+              target,
+              language,
+              requestBodyType,
+              modifiedContent,
+            );
+
+            // Optional: Provide visual feedback that change was sent
+            const img = actionableButton?.querySelector("img");
+            if (img) {
+              const originalSrc = img?.src;
+              img.src = tickIcon;
+              img.classList.add("tick-icon");
+              setTimeout(() => {
+                img.src = originalSrc;
+                img.classList.remove("tick-icon");
+              }, 3000);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to apply change:", e);
+        notifications.error("Failed to apply change");
+      }
+    }
   };
 
   /**
@@ -143,6 +382,7 @@
           await navigator.clipboard.writeText(code);
           notifications.success("Code copied to clipboard.");
         } catch (err) {
+          Sentry.captureException(err); 
           console.error("Failed to copy code: ", err);
         }
       }
@@ -178,6 +418,7 @@
       }, 5000);
       MixpanelEvent(Events.AI_Copy_Response);
     } catch (err) {
+      Sentry.captureException(err); 
       console.error("Failed to copy response: ", err);
     }
   };
@@ -192,34 +433,46 @@
    */
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
-    // Add event listeners to all dynamically inserted wrappers
 
     setTimeout(() => {
       const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);
       const previewCodeBtns = document.querySelectorAll(
         `.preview-code-${messageId}`,
       );
+      const applyChangeBtns = document.querySelectorAll(
+        `.apply-change-${messageId}`,
+      );
 
       // Remove previous event listeners
       cleanUpListeners();
 
-      cleanUpListeners = () => {
-        copyCodeBtns.forEach((wrapper) => {
-          wrapper.removeEventListener("click", handleCopyCode);
-        });
-      };
-      copyCodeBtns.forEach((wrapper) => {
-        wrapper.addEventListener("click", handleCopyCode);
+      // Add listeners for copy code buttons
+      copyCodeBtns.forEach((btn) => {
+        btn.addEventListener("click", handleCopyCode);
       });
 
+      // Add listeners for preview code buttons
+      previewCodeBtns.forEach((btn) => {
+        btn.addEventListener("click", handleCodePreview);
+      });
+
+      // Add listeners for apply change buttons
+      applyChangeBtns.forEach((btn) => {
+        btn.addEventListener("click", handleApplyChange);
+      });
+
+      // Update cleanup function
       cleanUpListeners = () => {
-        previewCodeBtns.forEach((wrapper) => {
-          wrapper.removeEventListener("click", handleCodePreview);
+        copyCodeBtns.forEach((btn) => {
+          btn.removeEventListener("click", handleCopyCode);
+        });
+        previewCodeBtns.forEach((btn) => {
+          btn.removeEventListener("click", handleCodePreview);
+        });
+        applyChangeBtns.forEach((btn) => {
+          btn.removeEventListener("click", handleApplyChange);
         });
       };
-      previewCodeBtns.forEach((wrapper) => {
-        wrapper.addEventListener("click", handleCodePreview);
-      });
     }, 200);
   };
 

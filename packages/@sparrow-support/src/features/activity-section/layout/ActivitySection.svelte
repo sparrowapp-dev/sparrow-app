@@ -33,6 +33,7 @@
   import { Upvote } from "../../../components";
   import { Search } from "@sparrow/library/forms";
   import { Avatar } from "@sparrow/library/ui";
+  import * as Sentry from "@sentry/svelte";
 
   export let type = FeedbackType.ALL_CATEGORY;
   export let onInputFeedback;
@@ -113,6 +114,7 @@
       applyAllFilters();
       loading = false;
     } catch (error) {
+      Sentry.captureException(error); 
       loading = false;
     }
   };
