@@ -5,13 +5,19 @@
     ChevronRightRegular,
   } from "@sparrow/library/icons";
   import { Accordion, Button } from "@sparrow/library/ui";
+  import { getMethodStyle } from "@sparrow/common/utils";
+
   export let requestApis: any = [];
   export let expression = "";
   export let environmentVariables: any;
   export let selectedApiRequestType: string;
+  export let selectedBlock: any;
+  export let cursorPosition: number | null = 0;
+
   let selectedAPI: any = null;
   let hoverdIndexRequest: number | null = null;
   let hoveredVariableKey: string | null = null;
+
   const requestTypes = [
     { requestType: "response.body", label: "response.body" },
     { requestType: "response.headers", label: "response.headers" },
@@ -30,7 +36,7 @@
   };
 
   const handleSelectVariable = (requestVariable: any) => {
-    expression = expression + `{{${requestVariable.key}}}`;
+    expression = `${expression}{{${requestVariable.key}}}`;
   };
 
   function hasTwoOrMoreDots(expr: string): boolean {
@@ -47,17 +53,43 @@
     if (requestType === "request.body" || requestType === "response.body") {
       selectedApiRequestType = "body";
     }
+    const current = `${blockName}.${requestType}`;
+    if (cursorPosition !== null && expression) {
+      expression =
+        expression.slice(0, cursorPosition) +
+        current +
+        expression.slice(cursorPosition);
+      return;
+    }
     if (!hasTwoOrMoreDots(expression)) {
-      expression = `${blockName}.${requestType}`;
+      expression = current;
     } else {
-      const current = `${blockName}.${requestType}`;
       if (!hasFourParentheses(expression)) {
-        expression = `(${expression})(${current})`;
+        expression = `${expression}${current}`;
         return;
       }
-      expression += `(${current})`;
+      expression += current;
     }
   };
+
+  let currentApis: any[] = [];
+
+  $: {
+    const matchedIndex = requestApis.findIndex(
+      (api: any) => api?.data?.blockName === selectedBlock?.data?.blockName,
+    );
+
+    if (matchedIndex !== -1) {
+      currentApis = requestApis.slice(0, matchedIndex + 1);
+      currentApis = currentApis.filter((item) => {
+        if (item?.data?.requestId !== undefined) {
+          return item;
+        }
+      });
+    } else {
+      currentApis = requestApis.slice(0, 1);
+    }
+  }
 </script>
 
 <div>
@@ -79,16 +111,25 @@
             class="d-flex flex-row align-items-center justify-content-start"
             style="gap: 6px;"
           >
-            <p style="margin: 0px;" class="request-block-method">
+            <p
+              class="request-block-method text-{getMethodStyle(
+                selectedAPI?.requestData?.method,
+              )}"
+              style="margin:0px;"
+            >
               {selectedAPI?.requestData?.method}
             </p>
-            <p style="margin: 0px;" class="request-block-name text-center">
+
+            <p
+              class="request-block-name"
+              style="margin: 0; color: var(--bg-ds-neutral-50);"
+            >
               {selectedAPI?.blockName}
             </p>
           </div>
         </div>
       {:else}
-        <p style="margin:0px;">Previous API Request</p>
+        <p style="margin:0px;" class="de-header-name">Previous API Request</p>
       {/if}
     </div>
     <div
@@ -121,7 +162,7 @@
           {/each}
         </div>
       {:else}
-        {#each requestApis as requestApi, index}
+        {#each currentApis as requestApi, index}
           {#if index !== 0}
             <div
               class="d-flex flex-row justify-content-between align-items-center request-api-block"
@@ -132,15 +173,22 @@
             >
               <div
                 class="d-flex justify-content-start align-items-center"
-                style="gap:8px;"
+                style="gap: 8px;"
               >
-                <p style="margin: 0px;" class="request-block-method">
+                <p
+                  class="request-block-method text-{getMethodStyle(
+                    requestApi?.data?.requestData?.method,
+                  )}"
+                  style="margin: 0;"
+                >
                   {requestApi?.data?.requestData?.method}
                 </p>
-                <p style="margin: 0px;" class="request-block-name text-center">
+
+                <p class="request-block-name" style="margin: 0;">
                   {requestApi?.data?.blockName}
                 </p>
               </div>
+
               <Button
                 type="teritiary-regular"
                 size="extra-small"
@@ -157,13 +205,15 @@
   </Accordion>
   <Accordion position="right">
     <div class="d-flex align-items-center" slot="accordion-field">
-      <p style="margin:0px;">Variables</p>
+      <p style="margin: 0;" class="de-header-name">Variables</p>
     </div>
     <div
       slot="accordion-content"
       style="padding: 4px 8px; height: 146px; overflow-y: auto"
     >
-      <p class="fw-semibold mb-1" style="font-size: 12px;">Dev Environment</p>
+      <p class="variable-header-title mb-1" style="font-size: 12px;">
+        Dev Environment
+      </p>
 
       {#each environmentVariables.filtered as variable (variable.key)}
         {#if variable?.environment !== "Global Variables"}
@@ -185,7 +235,7 @@
         {/if}
       {/each}
 
-      <p class="fw-semibold mt-2 mb-1" style="font-size: 12px;">
+      <p class="mt-2 mb-1 variable-header-title" style="font-size: 12px;">
         Global Environments
       </p>
 
@@ -209,21 +259,22 @@
 </div>
 
 <style>
+  .request-block-method {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 1;
+    margin-top: 3px;
+  }
+
   .request-block-name {
     font-family: "Inter", sans-serif;
     font-weight: 400;
     font-size: 14px;
-    line-height: 143%;
-    letter-spacing: 0;
-  }
-  .request-block-method {
-    font-family: "Roboto", sans-serif;
-    font-weight: 700;
-    font-size: 12px;
     line-height: 1;
-    letter-spacing: normal;
-    font-variant: small-caps;
+    text-align: left;
   }
+
   .request-api-block:hover {
     background-color: var(--bg-ds-surface-400);
   }
@@ -236,10 +287,26 @@
     font-size: 12px;
     line-height: 130%;
     letter-spacing: 0%;
-    color: var(--bg-ds-neutral-50);
+    color: var(--text-ds-neutral-50);
   }
   .request-line {
-    border: 1px solid var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-surface-400);
     margin: 0px;
+  }
+  .de-header-name {
+    color: var(--text-ds-neutral-200);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .variable-header-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: var(--text-ds-neutral-300);
   }
 </style>

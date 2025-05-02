@@ -1516,6 +1516,7 @@
     requestApis={$nodes}
     {onInsertExpression}
     {handleAddingNested}
+    {selectedBlock}
     {environmentVariables}
     {onPreviewExpression}
   />

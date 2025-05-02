@@ -32,6 +32,7 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
+  export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
 
@@ -52,6 +53,7 @@
       if (!isAutoChange) {
         // only hits for input, blur etc type of events.
         const content = update.state.doc.toString(); // Get the new content
+        cursorPosition = update.state.selection.main.head;
         dispatch("change", content); // Dispatch the new content to parent.
       }
     }
@@ -279,6 +281,13 @@
         event.stopPropagation();
       }
     });
+    codeMirrorEditorDiv.addEventListener(
+      "blur",
+      () => {
+        cursorPosition = null;
+      },
+      true,
+    );
   });
 
   // Run whenever component state changes
