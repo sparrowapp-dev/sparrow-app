@@ -8,6 +8,7 @@
     WorkspaceSetting,
     WorkspaceUpdates,
   } from "../components";
+  import { WorkspaceType } from "@sparrow/common/enums";
 
   /**
    * The length of collections related to the workspace.
@@ -67,6 +68,10 @@
   let workspaceNavigatorId: string = "about";
 
   export let onSaveWorkspace;
+  export let workspaceType: WorkspaceType = WorkspaceType.PRIVATE;
+  export let isSharedWorkspace = false;
+  export let onMakeWorkspacePublic;
+  export let onShareWorkspace;
 </script>
 
 <div class="d-flex h-100" style="width: 100%;">
@@ -76,6 +81,8 @@
   >
     <WorkspaceHeader
       {userRole}
+      {isSharedWorkspace}
+      {workspaceType}
       bind:isWorkspaceInviteModalOpen
       {onDeleteWorkspace}
       {onUpdateWorkspaceName}
@@ -89,8 +96,13 @@
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
           {userRole}
+          workspaceName={$tab?.name}
           {onUpdateWorkspaceDescription}
           workspaceDescription={$tab?.description}
+          {workspaceType}
+          {onMakeWorkspacePublic}
+          {onShareWorkspace}
+          {onUpdateWorkspaceName}
         />
       {:else if workspaceNavigatorId === "settings"}
         <WorkspaceSetting
@@ -108,6 +120,7 @@
     <WorkspaceUpdates
       workspaceUpdatesList={$workspaceUpdatesList}
       {onWorkspaceUpdateScroll}
+      {isSharedWorkspace}
     />
     <hr />
     <CollectionCount {collectionLength} />

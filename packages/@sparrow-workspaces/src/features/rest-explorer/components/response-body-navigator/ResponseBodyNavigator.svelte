@@ -26,6 +26,7 @@
     SaveRegular,
   } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let response;
   export let apiState;
@@ -35,6 +36,7 @@
   export let isGuestUser;
   export let onSaveResponse;
   export let path;
+  export let userRole;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -244,7 +246,7 @@
             Clear
           </button>
         </div>
-        {#if path?.collectionId}
+        {#if path?.collectionId && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <!-- Save button -->
           <Button
             startIcon={SaveRegular}

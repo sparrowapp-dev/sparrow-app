@@ -48,6 +48,7 @@
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
   export let onSyncCollection;
+  export let isSharedWorkspace = false;
 
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
@@ -509,7 +510,9 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable || collection?.activeSync}
+              disable={!isCollectionEditable ||
+                collection?.activeSync ||
+                isSharedWorkspace}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -522,7 +525,9 @@
           </Dropdown>
         </div>
         <Button
-          disable={$tab?.isSaved || !isCollectionEditable ? true : false}
+          disable={$tab?.isSaved || !isCollectionEditable
+            ? true
+            : false || isSharedWorkspace}
           startIcon={SaveRegular}
           type={"secondary"}
           onClick={() => {
@@ -579,15 +584,17 @@
           ?.collectionNavigation}
         {onUpdateCollectionState}
       />
-      <div class="d-flex" style="align-items: center;">
-        <ArrowSyncRegular size="12px" />
-        <p
-          style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
-          class="text-ds-font-size-12"
-        >
-          Synced {syncedTimeAgo(collection?.syncedAt)}
-        </p>
-      </div>
+      {#if collection?.activeSync}
+        <div class="d-flex" style="align-items: center;">
+          <ArrowSyncRegular size="12px" />
+          <p
+            style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
+            class="text-ds-font-size-12"
+          >
+            Synced {syncedTimeAgo(collection?.syncedAt)}
+          </p>
+        </div>
+      {/if}
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div

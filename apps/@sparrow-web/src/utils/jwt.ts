@@ -1,4 +1,5 @@
 import constants from "../constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 const jwtDecode = (jwt: string) : {
   email: string;
@@ -8,6 +9,7 @@ const jwtDecode = (jwt: string) : {
   try {
     return JSON.parse(window.atob(jwt.split(".")[1]));
   } catch (err) {
+    Sentry.captureException(err); 
     return {
       email: "",
       name: "",

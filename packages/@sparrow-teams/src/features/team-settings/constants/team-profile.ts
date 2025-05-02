@@ -15,7 +15,7 @@ export const NAME_CONFIG = {
 };
 
 export const DESCRIPTION_CONFIG = {
-  TITLE: `About`,
+  TITLE: `Hub Summary`,
   MAX_TEXT_SIZE: 500,
   PLACEHOLDER: `Write a little about your hub`,
 };

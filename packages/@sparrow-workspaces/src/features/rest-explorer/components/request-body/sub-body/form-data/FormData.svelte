@@ -7,6 +7,10 @@
   export let onUpdateEnvironment;
   export let isWebApp = false;
 
+  export let isMergeViewEnabled = false;
+  export let isMergeViewLoading = false;
+  export let newModifiedContent: KeyValuePair[];
+
   const handleFormDataChange = (pairs) => {
     onUpdateRequestBody({
       formdata: pairs,
@@ -21,5 +25,8 @@
     {environmentVariables}
     {onUpdateEnvironment}
     {isWebApp}
+    bind:isMergeViewLoading
+    bind:showMergeView={isMergeViewEnabled}
+    bind:newModifiedPairs={newModifiedContent}
   />
 </section>
