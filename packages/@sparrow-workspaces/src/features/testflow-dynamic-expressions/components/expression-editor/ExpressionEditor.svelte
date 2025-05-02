@@ -189,7 +189,7 @@
     border: none;
     border-radius: 4px;
     color: var(--text-ds-neutral-50);
-    height: 250px;
+    height: 253px;
     outline: none;
     caret-color: var(--bg-ds-primary-300);
     resize: none;
