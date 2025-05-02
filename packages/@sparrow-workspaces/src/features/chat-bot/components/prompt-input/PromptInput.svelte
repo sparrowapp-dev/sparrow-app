@@ -63,7 +63,6 @@
     on:keydown={(event) => {
       // isTyping = true;
       if (event.key === "Enter" && prompt && !isResponseGenerating) {
-        console.log("sending prompt:>> ");
         sendPrompt(prompt);
         onUpdateAiPrompt("");
         captureEvent("ai_chatbot_send_button_clicked", {
