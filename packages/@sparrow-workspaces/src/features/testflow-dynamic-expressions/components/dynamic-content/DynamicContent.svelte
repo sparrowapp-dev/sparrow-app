@@ -56,7 +56,8 @@
     if (requestType === "request.body" || requestType === "response.body") {
       selectedApiRequestType = "body";
     }
-    const current = `$$${requestName}.${requestType}`;
+    const sanitizedRequestName = requestName.replace(/[^a-zA-Z0-9_]/g, "_");
+    const current = `$$${sanitizedRequestName}.${requestType}`;
     if (cursorPosition !== null && expression) {
       expression =
         expression.slice(0, cursorPosition) +
