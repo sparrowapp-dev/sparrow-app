@@ -106,9 +106,9 @@
   </div>
   <div>
     <div
-      class="expression-result-container d-flex flex-row justify-content-between align-items-center"
+      class="expression-result-container d-flex flex-row justify-content-between"
     >
-      <div class="expression-result-text m-0" style="height:30px;">
+      <div class="expression-result-text m-0" style="height:120px;">
         <Editor
           lang={expressionResultContentType}
           placeholder={"Expression result"}
@@ -142,7 +142,10 @@
         }}
       />
     </div>
-    <p class="text-fs-12" style="color: var(--text-ds-danger-300)">
+    <p
+      class="text-fs-12 mb-0 ellipsis-5"
+      style="color: var(--text-ds-danger-300)"
+    >
       {expressionErrorResult}
     </p>
   </div>
@@ -186,7 +189,7 @@
     border: none;
     border-radius: 4px;
     color: var(--text-ds-neutral-50);
-    height: 340px;
+    height: 250px;
     outline: none;
     caret-color: var(--bg-ds-primary-300);
     resize: none;
@@ -204,5 +207,13 @@
 
   .m-0 {
     margin: 0 !important;
+  }
+
+  .ellipsis-5 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>
