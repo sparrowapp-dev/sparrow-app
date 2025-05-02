@@ -4,7 +4,17 @@
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
-  import { ArrowForward } from "@sparrow/library/icons";
+  import {
+    ArrowForward,
+    GlobeRegular,
+    LinkRegular,
+    LockClosedRegular,
+    StatusSuccess,
+  } from "@sparrow/library/icons";
+  import { MoreVerticalRegular } from "@sparrow/library/icons";
+  // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
+  import { Tag } from "@sparrow/library/ui";
+  import { WorkspaceType } from "@sparrow/common/enums";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -13,6 +23,7 @@
   export let onAddMember;
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
+  export let onCopyLink;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -20,6 +31,7 @@
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
+  let isWorkspaceLinkCopied = false;
 
   const handleOpenWorkspace = async () => {
     onSwitchWorkspace(workspace._id);
@@ -88,6 +100,29 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
+  const formateUpdateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const months = Math.floor(days / 30); // Approximation
+
+    if (seconds < 60) {
+      return "just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (months) {
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      return ``;
+    }
+  };
 </script>
 
 <svelte:window
@@ -104,6 +139,50 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
+    {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+      {#if isWorkspaceLinkCopied}
+        <p
+          class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
+          style="color: var(--text-ds-neutral-400); top:25px; right:60px;"
+        >
+          Copied
+        </p>
+        <button
+          bind:this={workspaceTabWrapper}
+          class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
+          style="top:28px; right:36px;"
+        >
+          <StatusSuccess
+            height="14"
+            width="14"
+            color="var(--icon-ds-success-400)"
+          />
+        </button>
+      {:else}
+        <!-- <div bind:this={workspaceTabWrapper}>
+          <span
+            class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
+            style="color: var(--text-ds-neutral-400); top:26px; right:65px;"
+          >
+            Copy Public Link
+          </span>
+        </div> -->
+        <button
+          bind:this={workspaceTabWrapper}
+          class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
+          style="top:27px; right:35px;"
+          on:click={async () => {
+            await onCopyLink(workspace._id);
+            isWorkspaceLinkCopied = true;
+            setTimeout(() => {
+              isWorkspaceLinkCopied = false;
+            }, 2000);
+          }}
+        >
+          <LinkRegular />
+        </button>
+      {/if}
+    {/if}
     <button
       bind:this={workspaceTabWrapper}
       class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
@@ -112,9 +191,8 @@
       style="top:26px; right:15px;"
       on:click={(e) => rightClickContextMenu(e)}
     >
-      <ThreeDotIcon />
+      <MoreVerticalRegular />
     </button>
-
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"
@@ -126,9 +204,27 @@
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
+      <div class="d-flex" style="justify-content: space-between;">
+        {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+          <Tag
+            text={WorkspaceType.PUBLIC}
+            type="green"
+            endIcon={GlobeRegular}
+          />
+        {:else}
+          <Tag
+            text={WorkspaceType.PRIVATE}
+            type="cyan"
+            endIcon={LockClosedRegular}
+          />
+        {/if}
+      </div>
+
       <div
         class="d-flex overflow-hidden justify-content-between"
-        style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
+        style={isWebEnvironment
+          ? "width:calc(100% - 130px); margin-top:10px;"
+          : "margin-top:10px;"}
       >
         <h4 class="ellipsis overflow-hidden me-4">
           <span
@@ -152,39 +248,49 @@
         </span>
       </p>
       <p
-        class="teams-workspace__date mb-0"
-        style={`${
-          showMenu ? "color: var(--sparrow-text-color) !important;" : null
-        }`}
+        class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style="color:var(--text-secondary-200)"
       >
-        <span
-          class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-          style=" color:var(--text-secondary-200)"
-          >Last updated on
-        </span><span
-          class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
-          style=" color:var(--text-ds-neutral-50)"
-          >{formatDateInString(workspace?.updatedAt)}</span
-        >
+        {workspace?.description ? workspace.description : "No summary added"}
       </p>
+      <hr style="color: var(--border-ds-surface-100);" />
 
-      {#if isWebEnvironment}
-        <button
-          class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
-          on:click|stopPropagation={() => {
-            openInDesktop(workspace._id);
-          }}
+      <div class="d-flex justify-content-between">
+        <p
+          class="teams-workspace__date mb-0"
+          style={`${
+            showMenu ? "color: var(--sparrow-text-color) !important;" : null
+          }`}
         >
-          Open in Desktop
-          <div class="arrow-up">
-            <ArrowForward
-              width={"19px"}
-              height={"19px"}
-              color={"var(--icon-primary-300)"}
-            />
-          </div>
-        </button>
-      {/if}
+          <span
+            class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+            style=" color:var(--text-secondary-200)"
+            >Last updated
+          </span><span
+            class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
+            style=" color:var(--text-ds-neutral-50)"
+            >{formateUpdateTime(workspace?.updatedAt)}</span
+          >
+        </p>
+
+        {#if isWebEnvironment && !workspace?.isShared}
+          <button
+            class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
+            on:click|stopPropagation={() => {
+              openInDesktop(workspace._id);
+            }}
+          >
+            Open in Desktop
+            <div class="arrow-up">
+              <ArrowForward
+                width={"19px"}
+                height={"19px"}
+                color={"var(--icon-primary-300)"}
+              />
+            </div>
+          </button>
+        {/if}
+      </div>
     </div>
   </Card>
 </div>
@@ -243,6 +349,11 @@
     visibility: hidden;
     background-color: transparent;
   }
+  .public-link-icon {
+    padding: 2px;
+    visibility: hidden;
+    background-color: transparent;
+  }
   .workspace-card-outer:hover .threedot-icon-container {
     visibility: visible;
   }
@@ -252,15 +363,26 @@
   .threedot-icon-container:active {
     background-color: var(--bg-tertiary-800) !important;
   }
+  .public-link-icon:hover {
+    background-color: var(--bg-ds-surface-100) !important;
+    border-radius: 2px;
+    padding: 2px;
+  }
+  .workspace-card-outer:hover .public-link-icon {
+    visibility: visible;
+  }
+  .public-link-icon:active {
+    background-color: var(--bg-ds-surface-100) !important;
+  }
+  .workspace-card-outer:hover .public-link-txt {
+    visibility: visible;
+  }
   .threedot-active {
     visibility: visible;
     background-color: var(--bg-tertiary-800) !important;
   }
 
   .open-desktop-btn {
-    position: absolute;
-    top: 24px;
-    right: 40px;
     font-size: 12px;
     font-weight: 500;
     background-color: var(--color-primary);

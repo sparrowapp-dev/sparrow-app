@@ -168,6 +168,9 @@ export class RxDB {
           10: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
+          11: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -421,6 +424,9 @@ export class RxDB {
             return oldDoc;
           },
           4: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },

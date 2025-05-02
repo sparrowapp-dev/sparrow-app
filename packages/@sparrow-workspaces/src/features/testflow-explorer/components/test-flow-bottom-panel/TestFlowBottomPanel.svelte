@@ -25,6 +25,7 @@
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { Loader } from "@sparrow/library/ui";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
+  import * as Sentry from "@sentry/svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -135,6 +136,7 @@
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
     } catch (err) {
+      Sentry.captureException(err); 
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
       responseLoader = false;

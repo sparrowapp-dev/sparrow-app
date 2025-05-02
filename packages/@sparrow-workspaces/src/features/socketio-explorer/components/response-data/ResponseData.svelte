@@ -18,6 +18,7 @@
   import { Dropdown, Tooltip } from "@sparrow/library/ui";
   import { Select } from "@sparrow/library/forms";
   import { WithButtonV4 } from "@sparrow/workspaces/hoc";
+  import * as Sentry from "@sentry/svelte";
 
   export let webSocket;
   export let onSearchMessage;
@@ -133,9 +134,11 @@
           return;
         }
       } catch (e) {
+        Sentry.captureException(e);
         throw "Not able to parse JSON";
       }
     } catch (e) {
+      Sentry.captureException(e);
       onUpdateContentType(RequestDataTypeEnum.TEXT);
       return;
     }
