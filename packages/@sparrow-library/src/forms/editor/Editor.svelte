@@ -289,6 +289,7 @@
   <div class="d-flex justify-content-end mt-3 me-0 gap-2">
     <Button
       title={"Keep the Changes"}
+      size={"small"}
       type={"primary"}
       onClick={() => {
         "click applyChanges";
@@ -298,6 +299,7 @@
 
     <Button
       title={"Undo"}
+      size={"small"}
       type={"secondary"}
       onClick={() => {
         "click undoChanges";

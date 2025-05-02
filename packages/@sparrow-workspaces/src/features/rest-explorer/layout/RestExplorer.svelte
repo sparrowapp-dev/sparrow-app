@@ -751,13 +751,24 @@
 
                               <div class="d-flex">
                                 <!-- AI debugging trigger button -->
-                                <Button
-                                  title="Help me debug"
-                                  type={"secondary"}
-                                  startIcon={SparkleFilled}
-                                  disable={!isAIDebugBtnEnable}
-                                  onClick={handleOnClickAIDebug}
-                                ></Button>
+                                <div
+                                  class="d-flex"
+                                  style="height: 32px;
+                                  {isAIDebugBtnEnable
+                                    ? 'border: 2px solid #316CF6;'
+                                    : ''} border-radius: 4px; background-color: {isAIDebugBtnEnable
+                                    ? '#272935;'
+                                    : '#14181f'}"
+                                >
+                                  <Button
+                                    title="Help me debug"
+                                    size={"small"}
+                                    type={"secondary"}
+                                    startIcon={SparkleFilled}
+                                    disable={!isAIDebugBtnEnable}
+                                    onClick={handleOnClickAIDebug}
+                                  ></Button>
+                                </div>
 
                                 <ResponseStatus response={storeData.response} />
                               </div>
