@@ -207,19 +207,4 @@
       opacity 0.1s ease-in-out,
       visibility 0.1s;
   }
-
-  /* Diff/Merge View: Style for new row added */
-  .diff-row.diff-added {
-    background-color: var(--bg-ds-success-800) !important ;
-  }
-
-  /* Diff/Merge View: Style for row modified */
-  .diff-row.diff-modified {
-    background-color: var(--bg-ds-success-800) !important ;
-  }
-
-  /* Diff/Merge View: Style for new row deleted */
-  .diff-row.diff-deleted {
-    background-color: var(--bg-ds-danger-800) !important;
-  }
 </style>
