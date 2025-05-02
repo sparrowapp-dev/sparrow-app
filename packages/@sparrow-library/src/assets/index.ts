@@ -146,4 +146,3 @@ export { default as tickGreyIcon } from "./tick-grey.svg";
 export { default as folderIcon3 } from "./folderIcon3.svg";
 export { default as Collection } from "./EmptyCollectionIcon.svg";
 export { default as MathFormulaFunction } from "./MathFormulaFunction.svg";
-export {default as DismissIcon} from "./dismiss.svg";

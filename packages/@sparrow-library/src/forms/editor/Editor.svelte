@@ -20,7 +20,6 @@
   import { RangeSetBuilder } from "@codemirror/state";
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { unifiedMergeView } from "@codemirror/merge";
-  import { DismissIcon } from "@sparrow/library/assets";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -121,13 +120,8 @@
       text.textContent = this.name;
 
       const close = document.createElement("span");
-      close.className = "cm-expression-block-close-span";
-
-      const closeIcon = document.createElement("img");
-      closeIcon.src = DismissIcon;
-      closeIcon.alt = "Expression Close Icon";
-      closeIcon.className = "cm-expression-block-close-img";
-      close.append(closeIcon);
+      close.textContent = "❌";
+      close.className = "cm-expression-block-close";
 
       close.onclick = (e) => {
         const pos = view.posAtDOM(container);
@@ -417,6 +411,13 @@
         event.stopPropagation();
       }
     });
+    codeMirrorEditorDiv.addEventListener(
+      "blur",
+      () => {
+        cursorPosition = null;
+      },
+      true,
+    );
     originalContent = value; // Store initial content as original
   });
 
@@ -539,21 +540,5 @@
   /* styling for added text */
   .merge-view :global(.cm-changedText) {
     background: var(--bg-ds-success-700);
-  }
-  :global(.cm-expression-block) {
-    height: 20px;
-  }
-
-  :global(.cm-expression-block-close-img) {
-    padding-left: 1px;
-    border-left: 1px solid var(--border-ds-neutral-50);
-    margin-bottom: 1px;
-  }
-  :global(.cm-expression-block-img) {
-    margin-bottom: 2px;
-  }
-  :global(.cm-expression-block-close-span) {
-    align-content: center;
-    margin: 0px;
   }
 </style>
