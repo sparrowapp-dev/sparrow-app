@@ -251,10 +251,6 @@
    * Create regex matching pattern for the expression.
    * @example [[expression]]
    */
-
-  //  regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
-  //   decoration: (match) =>
-  //     Decoration.replace({
   const expressionMatcher = new MatchDecorator({
     regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
     decoration: (match) => {

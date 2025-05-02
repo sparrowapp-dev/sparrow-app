@@ -346,7 +346,7 @@ class DecodeTestflow {
     text: string,
     environmentVariables,
   ): string => {
-    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, squareContent) => {
+    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, squareContent) => {
       const updated = squareContent
       .replace(/\\/g, '').replace(/"/g, `'`)
       
@@ -374,12 +374,13 @@ class DecodeTestflow {
     response,
   ): string => {
     // return text;
-    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, expr) => {
       try {
+        const de = expr.replace(/'\{\{(.*?)\}\}'/g,"undefined"); // convert missing environments to undefined 
         // Use Function constructor to evaluate with access to `response`
         const fn = new Function("response", `
           with (response) {
-            return (${expr});
+            return (${de});
           }
         `);
          const s = fn(response);
@@ -406,12 +407,14 @@ class DecodeTestflow {
     response,
   ): string => {
     // return text;
-    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/g, (_, expr) => {
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, expr) => {
       try {
+        const de = expr.replace(/'\{\{(.*?)\}\}'/g,"undefined"); // convert missing environments to undefined 
+        
         // Use Function constructor to evaluate with access to `response`
         const fn = new Function("response", `
           with (response) {
-            return (${expr});
+            return (${de});
           }
         `);
         const s = fn(response);

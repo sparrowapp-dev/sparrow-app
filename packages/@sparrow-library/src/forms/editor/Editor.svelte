@@ -172,9 +172,6 @@
    * @example [[expression]]
    */
 
-  //  regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
-  //   decoration: (match) =>
-  //     Decoration.replace({
   const expressionMatcher = new MatchDecorator({
     regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
     decoration: (match) => {
@@ -216,45 +213,6 @@
     },
   );
 
-  const variableHighlighter = ViewPlugin.fromClass(
-    class {
-      decorations;
-      constructor(view: any) {
-        this.decorations = this.buildDecorations(view);
-      }
-      update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) {
-          this.decorations = this.buildDecorations(update.view);
-        }
-      }
-      buildDecorations(view: EditorView) {
-        const builder = new RangeSetBuilder();
-        for (let { from, to } of view.visibleRanges) {
-          const text = view.state.doc.sliceString(from, to);
-          const regex = /{{(.*?)}}/g;
-          let match;
-          while ((match = regex.exec(text)) !== null) {
-            const start = from + match.index + 2; // skip {{
-            const end = from + match.index + match[0].length - 2; // skip }}
-            builder.add(
-              start,
-              end,
-              Decoration.mark({
-                class: "cm-variable-highlight",
-              }),
-            );
-          }
-        }
-        return builder.finish();
-      }
-
-      destroy() {}
-    },
-    {
-      decorations: (v: any) => v.decorations,
-    },
-  );
-
   // Create diagnostics based on the error message
   function createDiagnostics(doc: string): Diagnostic[] {
     if (isErrorVisible && errorMessage) {
@@ -274,16 +232,6 @@
     createDiagnostics(view.state.doc.toString()),
   );
 
-  function dotCompletionSource(context: CompletionContext) {
-    const before = context.matchBefore(/\./);
-    if (!before || (before.from === context.pos && !context.explicit))
-      return null;
-    return {
-      from: context.pos,
-      options: suggestions,
-    };
-  }
-
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
@@ -297,12 +245,6 @@
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
-      ...(customSuggestions
-        ? [
-            autocompletion({ override: [dotCompletionSource] }),
-            variableHighlighter,
-          ]
-        : []), // Include autocompletion only if customSuggestions is true
     ];
 
     let state = EditorState.create({
