@@ -6,6 +6,7 @@
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
 
   const inputId = "input-team-description";
+  let maxChars = 100;
   const blurInputField = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(inputId) as HTMLInputElement;
@@ -39,6 +40,13 @@
         onUpdateTeam(TeamPropertyEnum.DESCRIPTION);
       }}
     />
+  </div>
+  <div
+    class="d-flex justify-content-between"
+    style="margin-top: 2px; width:398px"
+  >
+    <span class="description">Max {maxChars} characters</span>
+    <span class="description">{teamDescription.length}/{maxChars}</span>
   </div>
 </div>
 
@@ -82,5 +90,10 @@
     width: 398px;
     border-radius: 4px;
     margin-left: 1px;
+  }
+  .description {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+    font-weight: 400;
   }
 </style>
