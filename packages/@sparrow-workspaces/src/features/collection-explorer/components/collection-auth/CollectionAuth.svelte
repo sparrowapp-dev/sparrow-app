@@ -10,24 +10,14 @@
   export let onUpdateRequestState;
   export let onUpdateEnvironment;
 
-  const handlecollection_auth_set = ({
+  const handleCollectionAuthEvent = ({
+    eventName,
     collectionAuthNavigation,
   }: {
+    eventName: string;
     collectionAuthNavigation: string;
   }) => {
-    captureEvent("collection_auth_set", {
-      component: "CollectionAuth",
-      button_text: collectionAuthNavigation,
-      destination: collectionAuthNavigation,
-    });
-  };
-
-  const handlecollection_auth_removed = ({
-    collectionAuthNavigation,
-  }: {
-    collectionAuthNavigation: string;
-  }) => {
-    captureEvent("collection_auth_removed", {
+    captureEvent(eventName, {
       component: "CollectionAuth",
       button_text: collectionAuthNavigation,
       destination: collectionAuthNavigation,
@@ -65,11 +55,10 @@
             onclick={(id = "") => {
               onUpdateRequestState({ collectionAuthNavigation: id });
 
-              if (id == "No Auth") {
-                handlecollection_auth_removed({ collectionAuthNavigation: id });
-              } else {
-                handlecollection_auth_set({ collectionAuthNavigation: id });
-              }
+              handleCollectionAuthEvent({
+                eventName: "collection_auth_set",
+                collectionAuthNavigation: id,
+              });
             }}
             disabled={false}
           />

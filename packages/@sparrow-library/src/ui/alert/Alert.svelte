@@ -32,11 +32,7 @@
       componentClass = "errorClass";
   }
 
-  const handlecollection_try_response = ({
-    event_name,
-  }: {
-    event_name: string;
-  }) => {
+  const handleAlert_try_response = ({ event_name }: { event_name: string }) => {
     captureEvent("try_response", {
       component: "Alert",
       button_text: event_name,
@@ -98,12 +94,11 @@
       {#if ctaShow}
         <div>
           <Button
-            try_response
             type="outline-secondary"
             size="small"
             title={ctaTitle}
             onClick={() => {
-              handlecollection_try_response({
+              handleAlert_try_response({
                 event_name: ctaTitle + "Clicked!",
               });
               onClick();
