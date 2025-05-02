@@ -120,6 +120,7 @@
     <Button
       title="Insert Dynamic Content"
       type="primary"
+      disable={!expression}
       size="medium"
       onClick={() => {
         onInsertExpression(expression);
