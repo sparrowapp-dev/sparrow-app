@@ -20,6 +20,7 @@
   import { RangeSetBuilder } from "@codemirror/state";
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { unifiedMergeView } from "@codemirror/merge";
+  import { DismissIcon } from "@sparrow/library/assets";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -122,14 +123,20 @@
       text.textContent = this.name;
 
       const close = document.createElement("span");
-      close.textContent = "❌";
-      close.className = "cm-expression-block-close";
+      close.className = "cm-expression-block-close-span";
+
+      const closeIcon = document.createElement("img");
+      closeIcon.src = DismissIcon;
+      closeIcon.alt = "Expression Close Icon";
+      closeIcon.className = "cm-expression-block-close-img";
+      close.append(closeIcon);
 
       close.onclick = (e) => {
+        const pos = view.posAtDOM(container);
         e.stopPropagation();
-        view.dispatch({ changes: { from: this.from, to: this.to } });
-
-        // removeDynamicExpression(this.id);
+        view.dispatch({
+          changes: { from: pos, to: pos + this.to - this.from },
+        });
       };
 
       container.appendChild(imgWrapper);
@@ -137,8 +144,8 @@
       container.appendChild(close);
 
       container.onclick = (e) => {
-        e.stopPropagation();
         const pos = view.posAtDOM(container);
+        e.stopPropagation();
         const content = view.state.doc.sliceString(
           pos,
           pos + this.to - this.from,
@@ -156,12 +163,16 @@
       // Handle dragging
       container.setAttribute("draggable", "true");
       container.addEventListener("dragstart", (e) => {
+        const pos = view.posAtDOM(container);
         e.stopPropagation();
-        const content = view.state.doc.sliceString(this.from, this.to);
+        const content = view.state.doc.sliceString(
+          pos,
+          pos + this.to - this.from,
+        );
         e.dataTransfer?.setData("application/x-expression", content);
         e.dataTransfer?.setData("text/plain", content); // fallback
-        e.dataTransfer?.setData("text/from", String(this.from));
-        e.dataTransfer?.setData("text/to", String(this.to));
+        e.dataTransfer?.setData("text/from", String(pos));
+        e.dataTransfer?.setData("text/to", String(pos + this.to - this.from));
       });
       return container;
     }
@@ -198,8 +209,7 @@
         });
         if (pos == null) return;
 
-        // Remove original
-        this.view.dispatch({ changes: { from, to } });
+        if (pos >= from && pos <= to) return;
       }
 
       destroy() {
@@ -404,13 +414,6 @@
         event.stopPropagation();
       }
     });
-    codeMirrorEditorDiv.addEventListener(
-      "blur",
-      () => {
-        cursorPosition = null;
-      },
-      true,
-    );
     originalContent = value; // Store initial content as original
   });
 
@@ -574,5 +577,21 @@
   /* styling for added text */
   .merge-view :global(.cm-changedText) {
     background: var(--bg-ds-success-700);
+  }
+  :global(.cm-expression-block) {
+    height: 20px;
+  }
+
+  :global(.cm-expression-block-close-img) {
+    padding-left: 1px;
+    border-left: 1px solid var(--border-ds-neutral-50);
+    margin-bottom: 1px;
+  }
+  :global(.cm-expression-block-img) {
+    margin-bottom: 2px;
+  }
+  :global(.cm-expression-block-close-span) {
+    align-content: center;
+    margin: 0px;
   }
 </style>

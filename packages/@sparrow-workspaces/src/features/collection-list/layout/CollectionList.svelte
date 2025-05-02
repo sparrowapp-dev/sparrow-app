@@ -384,25 +384,27 @@
               classProps={"pe-0"}
             >
               {#each collectionListDocument as col}
-                <Collection
-                  bind:userRole
-                  {isSharedWorkspace}
-                  {onItemCreated}
-                  {onItemDeleted}
-                  {onItemRenamed}
-                  {onItemOpened}
-                  {onBranchSwitched}
-                  {onRefetchCollection}
-                  {userRoleInWorkspace}
-                  {activeTabPath}
-                  {activeTabType}
-                  collection={col?.toMutableJSON()}
-                  {activeTabId}
-                  bind:isFirstCollectionExpand
-                  {isWebApp}
-                  {onCompareCollection}
-                  {onSyncCollection}
-                />
+                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace)}
+                  <Collection
+                    bind:userRole
+                    {isSharedWorkspace}
+                    {onItemCreated}
+                    {onItemDeleted}
+                    {onItemRenamed}
+                    {onItemOpened}
+                    {onBranchSwitched}
+                    {onRefetchCollection}
+                    {userRoleInWorkspace}
+                    {activeTabPath}
+                    {activeTabType}
+                    collection={col?.toMutableJSON()}
+                    {activeTabId}
+                    bind:isFirstCollectionExpand
+                    {isWebApp}
+                    {onCompareCollection}
+                    {onSyncCollection}
+                  />
+                {/if}
               {/each}
             </List>
           {/if}

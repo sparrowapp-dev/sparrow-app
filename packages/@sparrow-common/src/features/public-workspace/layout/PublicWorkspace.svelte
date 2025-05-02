@@ -30,7 +30,7 @@
       style="color: var(--text-ds-neutral-200); margin-bottom:7px; margin-top:18px;"
       class="text-ds-font-size-14 text-ds-line-height-143"
     >
-      Publish this workspace publicly?
+      Publish "{workspace?.name}" workspace
     </p>
     <p
       class="text-ds-font-size-12"
@@ -38,8 +38,7 @@
     >
       Anyone with the link can view this workspace, but only collaborators
       you've added can make changes. Active sync collections will remain private
-      and will not be made public. You can unpublish the workspace at any time
-      to make it private again. By publishing, you agree to our
+      and will not be made public. By publishing, you agree to our
     </p>
     <div class="d-flex" style="align-items:center;">
       <Button
@@ -80,7 +79,7 @@
 
     <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
       To proceed, type <span style="color: var(--text-ds-neutral-200);"
-        >{workspace?.name}</span
+        >workspace name</span
       > below.
     </p>
 

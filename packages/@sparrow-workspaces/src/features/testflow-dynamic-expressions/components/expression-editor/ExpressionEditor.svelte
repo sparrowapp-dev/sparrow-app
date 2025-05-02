@@ -156,7 +156,7 @@
     background-color: var(--bg-ds-surface-500);
     padding: 12px;
     border-radius: 4px;
-    height: 440px;
+    /* height: 440px; */
   }
 
   .expression-title-text,
