@@ -107,7 +107,7 @@
           {
             name: "DeepSeek",
             id: "deepseek",
-            disabled: true,
+            disabled: false,
             hide: false,
           },
         ]}
