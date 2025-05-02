@@ -20,7 +20,7 @@
     ViewUpdate,
   } from "@codemirror/view";
   import { undo, redo } from "@codemirror/commands";
-  import { history, historyKeymap } from "@codemirror/commands";
+  import { history, historyKeymap, defaultKeymap } from "@codemirror/commands";
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { DismissIcon } from "@sparrow/library/assets";
   /**
@@ -562,7 +562,7 @@
         updateExtensionView,
         keyBinding,
         history(), // Add history extension
-        keymap.of(historyKeymap),
+        keymap.of([...historyKeymap, ...defaultKeymap]),
         languageConf.of(javascriptLanguage),
         EditorState.readOnly.of(disabled ? true : false),
         handleEventsRegister,
