@@ -188,10 +188,13 @@
         disabled: isGuestUser === true ? true : false,
       },
       {
-        name: "Settings",
+        name: "Hub Information",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
-        visible: openTeam?.owner === userId || isGuestUser === true,
+        visible:
+          (openTeam?.owner === userId &&
+            openTeam.teamId !== "sharedWorkspaceTeam") ||
+          isGuestUser === true,
         disabled: isGuestUser === true ? true : false,
       },
     ];

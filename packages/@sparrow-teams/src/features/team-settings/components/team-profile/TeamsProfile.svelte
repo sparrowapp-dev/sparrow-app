@@ -93,7 +93,7 @@
 </script>
 
 <div class="settings-content h-100">
-  <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} />
+  <!-- <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} /> -->
   <UpdateTeamName
     bind:teamName
     onUpdateTeam={handleUpdateTeam}

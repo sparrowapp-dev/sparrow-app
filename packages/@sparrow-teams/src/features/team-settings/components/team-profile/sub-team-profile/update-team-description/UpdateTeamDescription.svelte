@@ -16,7 +16,7 @@
 
 <div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mt-2 fs-12 text-textColor">
+    <p class="team-title mt-p fs-12 text-textColor mb-1">
       {DESCRIPTION_CONFIG.TITLE}
     </p>
   </div>
@@ -81,5 +81,6 @@
     background-color: var(--bg-ds-surface-600);
     width: 398px;
     border-radius: 4px;
+    margin-left: 1px;
   }
 </style>
