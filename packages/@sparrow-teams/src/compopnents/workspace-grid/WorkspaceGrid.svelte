@@ -159,14 +159,14 @@
           />
         </button>
       {:else}
-        <!-- <div bind:this={workspaceTabWrapper}>
+        <div bind:this={workspaceTabWrapper}>
           <span
             class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
             style="color: var(--text-ds-neutral-400); top:26px; right:65px;"
           >
             Copy Public Link
           </span>
-        </div> -->
+        </div>
         <button
           bind:this={workspaceTabWrapper}
           class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
@@ -373,6 +373,10 @@
   }
   .public-link-icon:active {
     background-color: var(--bg-ds-surface-100) !important;
+  }
+  .public-link-txt {
+    visibility: hidden;
+    background-color: transparent;
   }
   .workspace-card-outer:hover .public-link-txt {
     visibility: visible;
