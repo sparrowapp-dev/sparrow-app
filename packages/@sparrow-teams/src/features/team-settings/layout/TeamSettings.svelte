@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SettingsNavigator, TeamProfile } from "../components";
+  import { SettingsNavigator, TeamLinks, TeamProfile } from "../components";
   import { TeamSettingsTabsEnum } from "../types";
   export let openTeam;
   export let onUpdateTeam;
@@ -10,18 +10,20 @@
 <div class="h-100">
   <section class="h-100">
     <div class="d-flex h-100">
-      <div class="h-100 d-flex flex-column" style="width: 250px;">
+      <div class="h-100 d-flex flex-column w-50">
         <div style="flex:1; overflow:auto;">
-          <SettingsNavigator bind:activeTeamSettingsTabId />
+          <!-- <SettingsNavigator bind:activeTeamSettingsTabId /> -->
+          <TeamProfile {openTeam} {onUpdateTeam} />
         </div>
       </div>
       <div
         class="h-100 mx-2"
         style="border-right: 1px solid var(--border-color);"
       ></div>
-      <div class="h-100 d-flex flex-column" style="width: calc(100% - 250px);">
-        <div style="flex:1; overflow:auto;" class="ps-5 pe-1">
-          {#if activeTeamSettingsTabId === TeamSettingsTabsEnum.TEAM_PROFILE}
+      <div class="h-100 d-flex flex-column w-50">
+        <TeamLinks {openTeam} {onUpdateTeam} />
+        <!-- <div style="flex:1; overflow:auto;" class="ps-5 pe-1"> -->
+        <!-- {#if activeTeamSettingsTabId === TeamSettingsTabsEnum.TEAM_PROFILE}
             <TeamProfile {openTeam} {onUpdateTeam} />
           {:else if activeTeamSettingsTabId === TeamSettingsTabsEnum.AUTHENTICATION}
             Authentication
@@ -29,8 +31,8 @@
             Identity Provider
           {:else if activeTeamSettingsTabId === TeamSettingsTabsEnum.PLUGINS}
             Plugins
-          {/if}
-        </div>
+          {/if} -->
+        <!-- </div> -->
       </div>
     </div>
   </section>

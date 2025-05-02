@@ -7,6 +7,9 @@ export interface CurrentTeam {
 export interface Team {
   name: string;
   description?: string;
+  xUrl?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
   logo?: logoDto;
   workspaces?: WorkspaceDto[];
   users: UserDto[];
