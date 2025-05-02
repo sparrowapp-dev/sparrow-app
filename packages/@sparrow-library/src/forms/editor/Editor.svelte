@@ -132,10 +132,11 @@
       close.append(closeIcon);
 
       close.onclick = (e) => {
+        const pos = view.posAtDOM(container);
         e.stopPropagation();
-        view.dispatch({ changes: { from: this.from, to: this.to } });
-
-        // removeDynamicExpression(this.id);
+        view.dispatch({
+          changes: { from: pos, to: pos + this.to - this.from },
+        });
       };
 
       container.appendChild(imgWrapper);
@@ -143,8 +144,8 @@
       container.appendChild(close);
 
       container.onclick = (e) => {
-        e.stopPropagation();
         const pos = view.posAtDOM(container);
+        e.stopPropagation();
         const content = view.state.doc.sliceString(
           pos,
           pos + this.to - this.from,
@@ -162,12 +163,16 @@
       // Handle dragging
       container.setAttribute("draggable", "true");
       container.addEventListener("dragstart", (e) => {
+        const pos = view.posAtDOM(container);
         e.stopPropagation();
-        const content = view.state.doc.sliceString(this.from, this.to);
+        const content = view.state.doc.sliceString(
+          pos,
+          pos + this.to - this.from,
+        );
         e.dataTransfer?.setData("application/x-expression", content);
         e.dataTransfer?.setData("text/plain", content); // fallback
-        e.dataTransfer?.setData("text/from", String(this.from));
-        e.dataTransfer?.setData("text/to", String(this.to));
+        e.dataTransfer?.setData("text/from", String(pos));
+        e.dataTransfer?.setData("text/to", String(pos + this.to - this.from));
       });
       return container;
     }
@@ -204,8 +209,7 @@
         });
         if (pos == null) return;
 
-        // Remove original
-        this.view.dispatch({ changes: { from, to } });
+        if (pos >= from && pos <= to) return;
       }
 
       destroy() {
