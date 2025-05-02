@@ -241,8 +241,8 @@
         });
         if (pos == null) return;
 
-        // If dropped at the same location, do nothing
-        if (pos >= from && pos <= to) return;
+        // Remove original
+        this.view.dispatch({ changes: { from, to } });
       }
 
       destroy() {
