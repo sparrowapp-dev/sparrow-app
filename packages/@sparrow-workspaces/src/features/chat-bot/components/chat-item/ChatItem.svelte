@@ -54,7 +54,7 @@
    * Check if the metadata sent by AI is application user friendly (Matching with request data or not).
    *
    * @param target - The target value (Where to apply the change -> Req. Body or Headers or Parameters)
-   * @param language - The language value of the code suggested (Json, html, javascript etc) 
+   * @param language - The language value of the code suggested (Json, html, javascript etc)
    * @param type - The type value (Raw, url encoded, formdata)
    * @returns boolean indicating if all values are valid according to the enums
    */
@@ -235,8 +235,7 @@
           additionalButtons = `
         <button role="button" class="position-relative apply-change-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}" data-actionable='${actionableData}'>
           <img src="${ArrowTrendingSparkle}" id="${index}">
-          <div class="codeBlock-action-btns-tooltip">Insert
-            <div class="codeBlock-action-btns-tooltip-square"></div>
+          <div class="codeBlock-action-btns-tooltip">Insert Suggestions<div class="codeBlock-action-btns-tooltip-square"></div>
           </div>
         </button>
       `;

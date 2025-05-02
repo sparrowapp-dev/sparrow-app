@@ -202,13 +202,6 @@
       currentIndex: result.length - 1,
     };
 
-    isMergeViewLoading = false;
-
-    // Check for changes after calculating diff
-    setTimeout(() => {
-      checkForChanges();
-    }, 0);
-
     return [...result, lastEmptyRow];
   }
 
@@ -242,6 +235,7 @@
     await sleep(2000);
     diffPairs = calculateDiff();
     checkForChanges();
+    isMergeViewLoading = false;
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 
@@ -267,8 +261,8 @@
         key: pair.key,
         value: pair.value,
         checked: pair.checked || false,
-        type: pair.type,
-        base: pair.base,
+        type: pair.type || "text",
+        base: pair.base || "",
       }));
 
     // Add an empty row at the end if needed
@@ -599,9 +593,18 @@
 
       <!-- Diff view action buttons -->
       <div class="d-flex justify-content-end mt-3 me-0 gap-2">
-        <Button title="Keep the Changes!!" type="primary" onClick={applyChanges}
+        <Button
+          title="Keep the Changes"
+          size={"small"}
+          type="primary"
+          onClick={applyChanges}
         ></Button>
-        <Button title="Undo" type="secondary" onClick={undoChanges}></Button>
+        <Button
+          title="Undo"
+          size={"small"}
+          type="secondary"
+          onClick={undoChanges}
+        ></Button>
       </div>
     {:else}
       {#each pairs as element, index}
