@@ -212,13 +212,6 @@
       currentIndex: result.length - 1,
     };
 
-    isMergeViewLoading = false;
-
-    // Check for changes after calculating diff
-    setTimeout(() => {
-      checkForChanges();
-    }, 0);
-
     return [...result, lastEmptyRow];
   }
 
@@ -272,6 +265,7 @@
     diffPairs = calculateDiff();
     diffBulkText = diffPairsToBulkText();
     checkForChanges();
+    isMergeViewLoading = false;
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 
@@ -710,10 +704,15 @@
           <div class="d-flex justify-content-end mt-3 me-0 gap-2">
             <Button
               title={"Keep the Changes!!"}
+              size={"small"}
               type={"primary"}
               onClick={applyChanges}
             ></Button>
-            <Button title={"Undo"} type={"secondary"} onClick={undoChanges}
+            <Button
+              title={"Undo"}
+              size={"small"}
+              type={"secondary"}
+              onClick={undoChanges}
             ></Button>
           </div>
         {:else}
