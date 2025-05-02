@@ -1,4 +1,5 @@
 import { notifications } from "@sparrow/library/ui";
+import * as Sentry from "@sentry/svelte";
 
 /**
  * @description - Initiates a file download by creating a Blob and triggering a download action.
@@ -42,6 +43,7 @@ const handleDownloadResponse = async (
 
     return "success";
   } catch (error) {
+    Sentry.captureException(error); 
     notifications.error("Failed to export file.");
 
     return "failed";

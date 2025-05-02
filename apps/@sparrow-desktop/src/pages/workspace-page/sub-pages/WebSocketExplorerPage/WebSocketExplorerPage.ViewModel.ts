@@ -60,6 +60,7 @@ import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer
 import { InitTab } from "@sparrow/common/factory";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import constants from "@app/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 class RestExplorerViewModel {
   /**
@@ -272,6 +273,7 @@ class RestExplorerViewModel {
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
+      Sentry.captureException(error);
       notifications.error(
         "Failed to update the documentation. Please try again",
       );

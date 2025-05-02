@@ -3,7 +3,8 @@ import {
   CollectionAuthTypeBaseEnum,
   CollectionRequestAddToBaseEnum,
 } from "../types/workspace/collection-base";
-import { HttpRequestAuthTypeBaseEnum } from "../types/workspace/http-request-base";
+import { HttpRequestAuthTypeBaseEnum, HttpRequestContentTypeBaseEnum } from "../types/workspace/http-request-base";
+import { RequestDatasetEnum, RequestDataTypeEnum } from "../types/workspace/http-request-tab";
 
 export const defaultAuthValue = {
   bearerToken: "",
@@ -171,7 +172,68 @@ export const defaultState = {
   isDocAlreadyGenerated: false,
 };
 
+
+const unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : HttpRequestContentTypeBaseEnum => {
+  let contentType = HttpRequestContentTypeBaseEnum["text/plain"];
+  switch (bodyType) {
+    case RequestDatasetEnum.NONE:
+      contentType = HttpRequestContentTypeBaseEnum["none"];
+      break;
+    case RequestDataTypeEnum.JSON:
+      contentType = HttpRequestContentTypeBaseEnum["application/json"];
+      break;
+    case RequestDataTypeEnum.XML:
+      contentType = HttpRequestContentTypeBaseEnum["application/xml"];
+      break;
+    case RequestDataTypeEnum.HTML:
+      contentType = HttpRequestContentTypeBaseEnum["text/html"];
+      break;
+    case RequestDataTypeEnum.JAVASCRIPT:
+      contentType = HttpRequestContentTypeBaseEnum["application/javascript"];
+      break;
+    case RequestDataTypeEnum.TEXT:
+      contentType = HttpRequestContentTypeBaseEnum["text/plain"];
+      break;
+    case RequestDatasetEnum.URLENCODED:
+      contentType = HttpRequestContentTypeBaseEnum["application/x-www-form-urlencoded"];
+      break;
+    case RequestDatasetEnum.FORMDATA:
+      contentType = HttpRequestContentTypeBaseEnum["multipart/form-data"];
+      break;
+  }
+  return contentType;
+};
+
+
+const unsetAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
+  let authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+  switch (auth) {
+    case HttpRequestAuthTypeBaseEnum.NO_AUTH:
+      authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+      break;
+    case HttpRequestAuthTypeBaseEnum.API_KEY:
+      authType = HttpRequestAuthTypeBaseEnum.API_KEY;
+      break;
+    case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
+      authType = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
+      break;
+    case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
+      authType = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+      break;
+    case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
+      authType = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
+      break;
+        
+  }
+  return authType;
+};
+
 export const transformRequestData = (input: any) => {
+  const bodyType =
+  input.data.requestData?.state.requestBodyNavigation ===
+RequestDatasetEnum.RAW
+  ? input.data.requestData?.state.requestBodyLanguage
+  : input.data.requestData?.state.requestBodyNavigation;
   return {
     id: input.data.requestId || "",
     name: input.data.name || "",
@@ -183,7 +245,12 @@ export const transformRequestData = (input: any) => {
     updatedBy: "",
     createdAt: "",
     updatedAt: "",
-    request: input.data.requestData,
+    request: {
+      ...input.data.requestData,
+      selectedRequestBodyType: unsetBodyType(bodyType as RequestDataTypeEnum | RequestDatasetEnum),
+      selectedRequestAuthType: unsetAuthType(
+                    input.data.requestData?.state?.requestAuthNavigation as HttpRequestAuthTypeBaseEnum,),
+    } 
   };
 };
 

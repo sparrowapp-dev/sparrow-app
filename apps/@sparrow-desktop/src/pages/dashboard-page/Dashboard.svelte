@@ -41,6 +41,7 @@
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import { GlobalSearch } from "@sparrow/common/features";
+  import * as Sentry from "@sentry/svelte";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -288,6 +289,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error("Update Failed.");
       console.error(e);
     } finally {
@@ -399,6 +401,7 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
+      Sentry.captureException(error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening collection:", error);

@@ -10,7 +10,7 @@ import { TabRepository } from "./tab.repository";
 import { Sleep } from "@sparrow/common/utils";
 
 export class WorkspaceRepository {
-  constructor() { }
+  constructor() {}
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
@@ -241,6 +241,7 @@ export class WorkspaceRepository {
       if (data?.name) value.name = data.name;
       if (data?.description !== null && data?.description !== undefined)
         value.description = data.description;
+      if (data?.workspaceType) value.workspaceType = data.workspaceType;
       if (data?.team) value.team = data.team;
       if (data?.environmentId) value.environmentId = data.environmentId;
       if (data?.users) value.users = data.users;
@@ -414,25 +415,27 @@ export class WorkspaceRepository {
     });
   };
 
-  public searchWorkspaces = async (searchQuery: string): Promise<WorkspaceDocument[]> => {
+  public searchWorkspaces = async (
+    searchQuery: string,
+  ): Promise<WorkspaceDocument[]> => {
     if (!searchQuery.trim()) {
       // If search query is empty, return recently updated workspaces
       return await RxDB.getInstance()
         .rxdb.workspace.find({
-          sort: [{ updatedAt: 'desc' }],
+          sort: [{ updatedAt: "desc" }],
         })
         .exec();
     }
 
     // If there's a search query, filter workspaces by name or description
-    const searchRegex = new RegExp(searchQuery, 'i');
+    const searchRegex = new RegExp(searchQuery, "i");
     return await RxDB.getInstance()
       .rxdb.workspace.find({
         selector: {
           $or: [
             { name: { $regex: searchRegex } },
-            { description: { $regex: searchRegex } }
-          ]
+            { description: { $regex: searchRegex } },
+          ],
         },
       })
       .exec();
@@ -441,7 +444,7 @@ export class WorkspaceRepository {
   public getRecentWorkspaces = async (): Promise<WorkspaceDocument[]> => {
     return await RxDB.getInstance()
       .rxdb.workspace.find({
-        sort: [{ updatedAt: 'desc' }],
+        sort: [{ updatedAt: "desc" }],
       })
       .exec();
   };

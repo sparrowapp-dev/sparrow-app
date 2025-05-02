@@ -178,7 +178,10 @@ export class TeamRepository {
     const selectedTeamsToBeDeleted = teamsJSON
       ?.filter((_team) => {
         for (let i = 0; i < _teamIds.length; i++) {
-          if (_teamIds[i] === _team.teamId) {
+          if (
+            _teamIds[i] === _team.teamId ||
+            _team.teamId === "sharedWorkspaceTeam"
+          ) {
             return false;
           }
         }
@@ -247,6 +250,9 @@ export class TeamRepository {
       if (data.name || data.name === "") value.name = data.name;
       if (data.description || data.description === "")
         value.description = data.description;
+      if (data.xUrl) value.xUrl = data.xUrl;
+      if (data.githubUrl) value.githubUrl = data.githubUrl;
+      if (data.linkedinUrl) value.linkedinUrl = data.linkedinUrl;
       if (data.workspaces) value.workspaces = data.workspaces;
       if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;

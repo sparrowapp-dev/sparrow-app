@@ -9,6 +9,7 @@
   const handleFormDataChange = (pairs: any) => {
     onUpdateRequestBody(pairs);
   };
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <section class="w-100">
@@ -20,5 +21,9 @@
     isCheckBoxEditable={true}
     isInputBoxEditable={true}
     isTopHeaderRequired={true}
+    dynamicExpression={true}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "formdata" });
+    }}
   />
 </section>

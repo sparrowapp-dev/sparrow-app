@@ -7,10 +7,12 @@
   import { Modal } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import { DeleteWorkspace } from "@sparrow/common/features";
+  import { DeleteWorkspace, PublicWorkspace } from "@sparrow/common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
   import { user } from "@app/store/auth.store";
+  import constants from "@app/constants/constants";
+  import { open } from "@tauri-apps/plugin-shell";
 
   export let collectionList;
   export let tab;
@@ -27,6 +29,8 @@
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;
   let workspaceID = tab._data.path.workspaceId;
+  let workspaceType = "";
+  let isWorkspacePublicModalOpen = false;
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -82,6 +86,7 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        workspaceType = value._data?.workspaceType || "PRIVATE";
       }
     },
   );
@@ -112,6 +117,7 @@
   bind:userRole
   tab={_viewModel.tab}
   {workspaceUpdatesList}
+  {workspaceType}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,
   )?.length}
@@ -124,6 +130,8 @@
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}
+  onMakeWorkspacePublic={() => (isWorkspacePublicModalOpen = true)}
+  onShareWorkspace={_viewModel.handleShareWorkspace}
 />
 
 <Modal
@@ -167,6 +175,37 @@
       if (response?.isSuccessful) {
         isDeleteWorkspaceModalOpen = false;
       }
+    }}
+  />
+</Modal>
+
+<Modal
+  title={"Publish Workspace"}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isWorkspacePublicModalOpen}
+  handleModalState={(flag) => {
+    isWorkspacePublicModalOpen = flag;
+  }}
+>
+  <PublicWorkspace
+    bind:isWorkspacePublicModalOpen
+    workspace={currentWorkspace}
+    onMakePublicWorkspace={async () => {
+      const response = await _viewModel.handleWorkspaceVisibility();
+      if (response?.isSuccessful) {
+        isWorkspacePublicModalOpen = false;
+      }
+    }}
+    onRedirectTermsService={() => {
+      open(`${constants.MARKETING_URL}/terms-of-service`);
+    }}
+    onRedirectPrivacyPolicy={() => {
+      open(`${constants.MARKETING_URL}/privacy-policy`);
+    }}
+    onRedirectDocs={() => {
+      open(`${constants.DOCS_URL}`);
     }}
   />
 </Modal>

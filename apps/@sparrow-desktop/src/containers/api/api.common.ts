@@ -21,6 +21,7 @@ import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explore
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { version } from "../../../src-tauri/tauri.conf.json";
+import * as Sentry from "@sentry/svelte";
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const tabRepository = new TabRepository();
@@ -149,6 +150,7 @@ const makeRequest = async (
   } catch (e) {
     const endTime = performance.now(); // End timing
     const duration = endTime - startTime; // Calculate duration in milliseconds
+    Sentry.captureException(e);
     appInsights.trackDependencyData({
       id: uuidv4(),
       target: url,
@@ -225,11 +227,13 @@ const sendMessage = async (tab_id: string, message: string) => {
           return webSocketDataMap;
         });
       } catch (e) {
+        Sentry.captureException(e); 
         console.error(e);
         return error("error");
       }
     })
     .catch((e) => {
+      Sentry.captureException(e);
       console.error(e);
       return error("error");
     });
@@ -700,6 +704,7 @@ const connectWebSocket = async (
           return webSocketDataMap;
         });
       } catch (e) {
+        Sentry.captureException(e);
         console.error(e);
         notifications.error(
           "Failed to fetch WebSocket response. Please try again.",
@@ -708,6 +713,7 @@ const connectWebSocket = async (
       }
     })
     .catch((e) => {
+      Sentry.captureException(e);
       console.error(e);
       // Store the error state in websocket
       webSocketDataStore.update((webSocketDataMap) => {
@@ -1065,6 +1071,7 @@ const makeGraphQLRequest = async (
   } catch (err) {
     const endTime = performance.now();
     const duration = endTime - startTime;
+    Sentry.captureException(err);
     appInsights.trackDependencyData({
       id: uuidv4(),
       name: "RPC Duration Metric",

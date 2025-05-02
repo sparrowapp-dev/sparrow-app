@@ -8,9 +8,11 @@
     Options,
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
+  import { DeleteRegular, MathFormulaRegular } from "@sparrow/library/icons";
+  import { isDynamicExpressionModalOpen } from "../../features/testflow-explorer/store/testflow";
 
   export let element;
+  export let dynamicExpression = false;
   export let index;
   export let pairs;
   export let theme;
@@ -22,6 +24,8 @@
   export let deleteParam;
   export let isInputBoxEditable;
   export let isCheckBoxEditable;
+  export let handleOpenCurrentDynamicExpression;
+  export let customClass = "";
 
   let isInView: boolean = false;
   let scrollDirection: ScrollDirection | any;
@@ -35,12 +39,14 @@
     isInView = detail.inView;
     scrollDirection = detail?.scrollDirection?.vertical;
   };
+
+  let dispatcher: any;
 </script>
 
 <div
   use:inview={options}
   on:inview_change={handleChange}
-  class="pair-data-row d-flex align-items-center w-100"
+  class="pair-data-row d-flex align-items-center w-100 {customClass}"
   style="padding-right:1rem; padding-left: 4px;"
 >
   {#if isInView}
@@ -66,7 +72,9 @@
 
     <div
       class="d-flex"
-      style="width: calc(100% - 64px); height:27px; margin-bottom:0px;"
+      style="width: calc(100% - {dynamicExpression
+        ? '62px'
+        : '64px'}); height:27px; margin-bottom:0px;"
     >
       <div class="w-50 position-relative text-ds-font-weight-medium">
         <CodeMirrorInput
@@ -79,7 +87,6 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
-          
         />
       </div>
       <div
@@ -96,37 +103,59 @@
           {theme}
           {environmentVariables}
           {onUpdateEnvironment}
+          bind:dispatcher
+          handleOpenDE={(obj) => {
+            handleOpenCurrentDynamicExpression({
+              ...obj,
+              destination: {
+                row: "value",
+                index: index,
+              },
+            });
+          }}
         />
       </div>
     </div>
-    <div
-      style="width:16px;"
-      class="ms-3 d-flex justify-content-center align-items-center"
-    >
-      <div class="d-flex" style="width:16px;">
-        <div class="d-flex">
-          {#if pairs.length - 1 != index}
-            <!-- lists first to last second row -->
-            {#if isInputBoxEditable}
-              <Tooltip
-                title={"Delete"}
-                placement={"bottom-center"}
-                distance={10}
-              >
-                <div class="button-container">
-                  <Button
-                    buttonClassProp=""
-                    size="extra-small"
-                    type="teritiary-regular"
-                    startIcon={DeleteRegular}
-                    onClick={() => deleteParam(index)}
-                  />
-                </div>
-              </Tooltip>
-            {/if}
-          {/if}
-        </div>
-      </div>
+
+    <div class="ms-1 d-flex align-items-center justify-content-between gap-1">
+      {#if pairs.length - 1 != index && isInputBoxEditable}
+        {#if dynamicExpression}
+          <Tooltip
+            title="Insert dynamic"
+            placement="bottom-center"
+            distance={10}
+          >
+            <div class="button-container">
+              <Button
+                size="extra-small"
+                type="teritiary-regular"
+                startIcon={MathFormulaRegular}
+                onClick={() => {
+                  handleOpenCurrentDynamicExpression({
+                    destination: {
+                      row: "value",
+                      index: index,
+                    },
+                    dispatch: dispatcher,
+                  });
+                }}
+              />
+            </div>
+          </Tooltip>
+        {/if}
+        <Tooltip title="Delete" placement="bottom-center" distance={10}>
+          <div class="button-container">
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={DeleteRegular}
+              onClick={() => {
+                deleteParam(index);
+              }}
+            />
+          </div>
+        </Tooltip>
+      {/if}
     </div>
   {/if}
   {#if !isInView}
@@ -177,5 +206,20 @@
     transition:
       opacity 0.1s ease-in-out,
       visibility 0.1s;
+  }
+
+  /* Diff/Merge View: Style for new row added */
+  .diff-row.diff-added {
+    background-color: var(--bg-ds-success-800) !important ;
+  }
+
+  /* Diff/Merge View: Style for row modified */
+  .diff-row.diff-modified {
+    background-color: var(--bg-ds-success-800) !important ;
+  }
+
+  /* Diff/Merge View: Style for new row deleted */
+  .diff-row.diff-deleted {
+    background-color: var(--bg-ds-danger-800) !important;
   }
 </style>

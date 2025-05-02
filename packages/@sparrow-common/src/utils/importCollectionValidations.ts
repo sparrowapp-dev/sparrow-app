@@ -1,4 +1,5 @@
 import yaml from "js-yaml";
+import * as Sentry from "@sentry/svelte";
 export function isUrlValid(str: string) {
   const pattern = new RegExp(
     "^(https?:\\/\\/)?" + // protocol
@@ -53,6 +54,7 @@ export const validateClientJSON = (jsonString = "") => {
     JSON.parse(jsonString);
     return true;
   } catch (error) {
+    Sentry.captureException(error); 
     return false;
   }
 };
@@ -68,6 +70,7 @@ export const validateClientXML = (yamlString = "") => {
       !Array.isArray(parsedYaml)
     );
   } catch (error) {
+    Sentry.captureException(error); 
     return false;
   }
 };
@@ -78,11 +81,13 @@ export const validateImportBody = (data: string) => {
     JSON.parse(data);
     return (contentType = ContentTypeEnum["application/json"]);
   } catch (jsonError) {
+    Sentry.captureException(jsonError); 
     if (jsonError instanceof SyntaxError) {
       try {
         yaml.load(data);
         return (contentType = ContentTypeEnum["text/plain"]);
       } catch (yamlError) {
+        Sentry.captureException(yamlError);
         return contentType;
       }
     } else {

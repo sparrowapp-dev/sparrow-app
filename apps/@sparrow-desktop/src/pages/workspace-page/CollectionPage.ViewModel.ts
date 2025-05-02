@@ -130,6 +130,7 @@ import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspac
 import { WorkspaceService } from "@app/services/workspace.service";
 import constants from "@app/constants/constants";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
+import * as Sentry from "@sentry/svelte";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -3848,6 +3849,7 @@ export default class CollectionsViewModel {
         return;
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error(errMessage);
       return;
     }
@@ -6467,6 +6469,7 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to sync collection. Please try again.");
     }
@@ -6510,6 +6513,7 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to replace collection. Please try again.");
     }

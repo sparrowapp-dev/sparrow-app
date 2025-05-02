@@ -1,5 +1,5 @@
 <script>
-  import { ArrowOutwardIcon } from "@sparrow/library/icons";
+  import { ArrowOutwardIcon, MathFormulaRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
@@ -21,6 +21,7 @@
   export let onUpdateEnvironment;
   export let handleClickTestButton;
   export let isTestFlowRuning = false;
+  export let handleOpenCurrentDynamicExpression;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -29,6 +30,8 @@
       requestUrl = selectedBlock?.data?.requestData?.url ?? "";
     }
   }
+
+  let dispatcher;
 </script>
 
 <div class="header-container">
@@ -67,7 +70,7 @@
     </div>
   </div>
 
-  <div class="request-url">
+  <div class="request-url gap-2">
     <HttpUrlSection
       {requestUrl}
       onUpdateRequestUrl={(e) => {
@@ -76,6 +79,24 @@
       {onUpdateEnvironment}
       {userRole}
       {environmentVariables}
+      handleOpenCurrentDynamicExpression={(obj) => {
+        handleOpenCurrentDynamicExpression({
+          ...obj,
+          type: "url",
+        });
+      }}
+      bind:dispatcher
+    />
+    <Button
+      size="medium"
+      type="teritiary-regular"
+      startIcon={MathFormulaRegular}
+      onClick={() => {
+        handleOpenCurrentDynamicExpression({
+          type: "url",
+          dispatch: dispatcher,
+        });
+      }}
     />
   </div>
 
