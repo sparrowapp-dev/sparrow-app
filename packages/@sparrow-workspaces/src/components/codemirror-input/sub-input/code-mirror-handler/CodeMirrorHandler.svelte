@@ -164,7 +164,19 @@
 
       container.onclick = (e) => {
         e.stopPropagation();
+<<<<<<< Updated upstream
         // add click operation here
+=======
+        const content = view.state.doc.sliceString(this.from, this.to);
+        handleOpenDE({
+          source: {
+            from: this.from,
+            to: this.to,
+            content,
+          },
+          dispatch: view,
+        });
+>>>>>>> Stashed changes
       };
 
       return container;
@@ -492,6 +504,10 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
+<<<<<<< Updated upstream
+=======
+    dispatcher = codeMirrorView;
+>>>>>>> Stashed changes
   }
   onMount(() => {
     const initializeAsync = () => {

@@ -287,6 +287,42 @@
     return response;
   };
 
+<<<<<<< Updated upstream
+=======
+  let dynamicExpressionEditorContent = "";
+  let dynamicExpressionModal = {};
+  let handleOpenCurrentDynamicExpression = (obj) => {
+    dynamicExpressionModal = {};
+    dynamicExpressionModal = obj;
+    dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
+    isDynamicExpressionModalOpen = true;
+  };
+
+  $: console.log(selectedNodeId, "selectedNodeId");
+
+  const onInsertExpression = (newExpression) => {
+    if (dynamicExpressionModal?.source) {
+      dynamicExpressionModal.dispatch.dispatch({
+        changes: {
+          from: dynamicExpressionModal.source.from,
+          to: dynamicExpressionModal.source.to,
+          insert: "[*$[" + newExpression + "]$*]",
+        },
+      });
+    } else {
+      dynamicExpressionModal.dispatch.dispatch({
+        changes: {
+          from:
+            dynamicExpressionModal?.dispatch?.state?.selection?.main?.from || 0,
+          to: dynamicExpressionModal?.dispatch?.state?.selection?.main?.to || 0,
+          insert: "[*$[" + newExpression + "]$*]",
+        },
+      });
+    }
+    isDynamicExpressionModalOpen = false;
+  };
+
+>>>>>>> Stashed changes
   /**
    * Updates the selected API in a specific node.
    * @param id - Node ID.
