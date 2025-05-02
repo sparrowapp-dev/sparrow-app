@@ -11,6 +11,7 @@
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
+
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";

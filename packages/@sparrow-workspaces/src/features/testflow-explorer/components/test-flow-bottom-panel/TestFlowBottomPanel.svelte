@@ -6,8 +6,17 @@
     CheckmarkCircleRegular,
     ErrorCircleRegular,
     ArrowSwapRegular,
+    ChevronDownRegular,
+    CopyRegular,
+    ArrowDownloadRegular,
+    ClockRegular,
+    DustbinIcon,
   } from "@sparrow/library/icons";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
+  import {
+    currentStep,
+    isTestFlowTourGuideOpen,
+  } from "../../../../stores/guide.tour";
   import {
     RequestBodyTestFlow,
     RequestHeaderTestFlow,
@@ -25,6 +34,8 @@
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { Loader } from "@sparrow/library/ui";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
+  import { ConnectableObservable } from "rxjs";
+  import WithButtonV6 from "../../../../hoc/WithButtonV6.svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -308,6 +319,107 @@
     <!-- Response Pane -->
     <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
       <div class="response-pane-container">
+        {#if $currentStep == 7}
+          <div class="d-flex flex-column" style="height: 100%;">
+            <div class="d-flex mb-3 align-items-center">
+              <div
+                class="me-4 fw-bold"
+                style="border-bottom: 3px solid blue; display: inline-block;"
+              >
+                Body
+              </div>
+              <div class="me-4 d-flex align-items-center">
+                Headers
+                <span class="badge bg-secondary ms-2">18</span>
+              </div>
+
+              <div class="ms-auto d-flex align-items-center">
+                <span class="text-success">200</span>
+
+                <span
+                  class="text-success ms-2 d-inline-flex align-items-center"
+                >
+                  <ClockRegular class="me-1" /> 1629 ms
+                </span>
+
+                <span class="ms-2">402</span>
+              </div>
+            </div>
+
+            <div class="d-flex mb-3 align-items-center">
+              <!-- Left content group -->
+              <div class="d-flex">
+                <div class="me-4 fw-bold" style="display: inline-block;">
+                  Text
+                </div>
+
+                <div class="me-4">Preview</div>
+
+                <div class="me-4 d-flex align-items-center">
+                  Html
+                  <ChevronDownRegular
+                    size={"16px"}
+                    color={"var(--icon-ds-neutral-100)"}
+                  />
+                </div>
+              </div>
+
+              <!-- Right content group (buttons) -->
+              <div class="d-flex align-items-end ms-auto">
+                <WithButtonV6
+                  icon={CopyRegular}
+                  onClick={null}
+                  disable={false}
+                  loader={false}
+                />
+
+                <WithButtonV6
+                  icon={ArrowDownloadRegular}
+                  onClick={null}
+                  disable={false}
+                  loader={false}
+                />
+              </div>
+            </div>
+            <div
+              class="d-flex p-3 rounded"
+              style="border: 1px solid #ccc; font-family: monospace;"
+            >
+              <!-- Line numbers -->
+              <div class="text-end pe-3" style="color: #6c757d;">
+                <div>1</div>
+                <div>2</div>
+                <div>3</div>
+                <div>4</div>
+                <div>5</div>
+              </div>
+
+              <!-- JSON content -->
+              <div class="flex-grow-1">
+                <div>{"{"}</div>
+                <div class="ms-3">"error": {"{"}</div>
+
+                <div class="d-flex ps-5">
+                  <span class="text-primary">"name":</span>
+                  <span class="ms-2" style="color: #9c6644;"
+                    >"Authentication Error",</span
+                  >
+                </div>
+
+                <div class="d-flex ps-5">
+                  <span class="text-primary">"message":</span>
+                  <span class="ms-2" style="color: #9c6644;"
+                    >"Invalid API Key"</span
+                  >
+                </div>
+
+                <div class="ms-3">{"}"},</div>
+                <div>{"}"}</div>
+              </div>
+            </div>
+          </div>
+        {/if}
+
         {#if (!responseLoader && selectedNodeResponse === undefined) || selectedNodeResponse?.response?.status === ""}
           <div class="dumy-response-container">
             <SparrowLogo />
