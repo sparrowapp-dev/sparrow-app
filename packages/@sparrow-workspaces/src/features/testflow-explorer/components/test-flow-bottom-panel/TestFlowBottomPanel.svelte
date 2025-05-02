@@ -11,6 +11,7 @@
     ArrowDownloadRegular,
     ClockRegular,
     DustbinIcon,
+    BoxIcon,
   } from "@sparrow/library/icons";
   import { RequestSectionEnum } from "@sparrow/common/types/workspace";
   import {
@@ -339,8 +340,11 @@
                 <span
                   class="text-success ms-2 d-inline-flex align-items-center"
                 >
-                  <ClockRegular class="me-1" /> 1629 ms
+                  <ClockRegular class="me-1" />
+                  <span class="me-2">1629 ms</span>
                 </span>
+
+                <BoxIcon />
 
                 <span class="ms-2">402</span>
               </div>

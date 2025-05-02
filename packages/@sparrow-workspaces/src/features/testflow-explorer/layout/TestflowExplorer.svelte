@@ -1259,7 +1259,7 @@
             method: "GET",
             blockName: "Block 1",
             requestData: {
-              name: "Sample API",
+              name: "pet-hospitality",
               method: "GET",
               state: {
                 requestBodyLanguage: RequestDataTypeEnum.TEXT,
