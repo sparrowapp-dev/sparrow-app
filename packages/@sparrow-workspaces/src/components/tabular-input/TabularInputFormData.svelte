@@ -266,8 +266,8 @@
         key: pair.key,
         value: pair.value,
         checked: pair.checked || false,
-        type: pair.type,
-        base: pair.base,
+        type: pair.type || "text",
+        base: pair.base || "",
       }));
 
     // Add an empty row at the end if needed
