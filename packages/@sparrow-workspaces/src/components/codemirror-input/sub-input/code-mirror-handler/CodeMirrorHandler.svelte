@@ -21,6 +21,7 @@
   } from "@codemirror/view";
   import { undo, redo } from "@codemirror/commands";
   import { history, historyKeymap } from "@codemirror/commands";
+  import { MathFormulaFunction } from "@sparrow/library/assets";
   /**
    * input value
    */
@@ -147,6 +148,14 @@
     }
 
     toDOM(view: EditorView) {
+      const imgWrapper = document.createElement("span");
+      imgWrapper.className = "cm-expression-block-img";
+
+      const img = document.createElement("img");
+      img.src = MathFormulaFunction;
+      img.alt = "Expression Icon";
+      imgWrapper.appendChild(img);
+
       const container = document.createElement("span");
       container.className = "cm-expression-block";
 
@@ -164,6 +173,7 @@
         // removeDynamicExpression(this.id);
       };
 
+      container.appendChild(imgWrapper);
       container.appendChild(text);
       container.appendChild(close);
 
@@ -626,10 +636,11 @@
 
   :global(.cm-expression-block) {
     display: inline-block;
-    background-color: var(--bg-ds-neutral-50);
+    background-color: var(--bg-ds-surface-300);
     border-radius: 4px;
     padding: 0px 6px;
     cursor: pointer;
+    text-align: center;
   }
 
   :global(.cm-expression-block span) {
@@ -639,13 +650,25 @@
     white-space: nowrap;
     display: inline-block;
     vertical-align: middle;
-    color: var(--text-ds-neutral-800);
+    color: var(--text-ds-neutral-50);
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-left: 2px;
+    vertical-align: middle;
   }
 
   :global(.cm-expression-block-close) {
     cursor: pointer;
     font-size: 0.8em;
     margin-left: 4px;
-    color: var(--text-ds-danger-300);
+    color: var(--text-ds-neutral-50);
+    padding-left: 2px;
+    border-left: 1px solid var(--bg-ds-surface-50);
+  }
+  :global(.cm-expression-block-img) {
+    width: 12;
+    height: 14;
   }
 </style>

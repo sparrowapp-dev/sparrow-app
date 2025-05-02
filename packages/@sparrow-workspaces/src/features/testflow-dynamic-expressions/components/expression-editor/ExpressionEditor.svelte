@@ -8,6 +8,7 @@
   export let handleAddingNested: (value: string) => void;
   export let selectedApiRequestType: string;
   export let onPreviewExpression;
+  export let cursorPosition: number | null = 0;
 
   let expressionPreviewResult = "";
   let expressionErrorResult = "";
@@ -74,6 +75,7 @@
       bind:value={expression}
       on:change={handleCodeMirrorChange}
       isEditable={true}
+      bind:cursorPosition
     />
   </div>
 
@@ -102,15 +104,15 @@
   <div
     class="expression-result-container d-flex flex-row justify-content-between align-items-center"
   >
-    <p class="expression-result-text m-0 w-100">
+    <div class="expression-result-text m-0" style="height:30px;">
       <Editor
         lang={"JSON"}
-        placeholder={""}
+        placeholder={"Expression result"}
         bind:value={expressionPreviewResult}
         on:change={() => {}}
         isEditable={false}
       />
-    </p>
+    </div>
     <Button
       type="link-primary"
       title="Run Preview"
