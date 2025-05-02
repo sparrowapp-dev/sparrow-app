@@ -98,10 +98,10 @@
 
 <div>
   <Accordion position="right">
-    <div class="d-flex align-items-center" slot="accordion-field">
+    <div class="d-flex align-items-center ellipsis" slot="accordion-field">
       {#if selectedAPI}
         <div
-          class="d-flex justify-conten-start align-items-center"
+          class="d-flex justify-conten-start align-items-center ellipsis"
           style="gap: 6px;"
         >
           <Button
@@ -112,7 +112,7 @@
             onClick={handleRemoveSelectApi}
           />
           <div
-            class="d-flex flex-row align-items-center justify-content-start"
+            class="d-flex flex-row align-items-center justify-content-start ellipsis"
             style="gap: 6px;"
           >
             <p
@@ -124,7 +124,7 @@
               {selectedAPI?.requestData?.method}
             </p>
 
-            <p class="de-header-name" style="margin: 0;">
+            <p class="de-header-name ellipsis" style="margin: 0;">
               {selectedAPI?.blockName} | {selectedAPI?.requestData?.name}
             </p>
           </div>
@@ -173,7 +173,7 @@
               }}
             >
               <div
-                class="d-flex justify-content-start align-items-center"
+                class="d-flex justify-content-start align-items-center ellipsis"
                 style="gap: 8px;"
               >
                 <p
@@ -185,7 +185,7 @@
                   {requestApi?.data?.requestData?.method}
                 </p>
 
-                <p class="request-block-title" style="margin: 0;">
+                <p class="request-block-title ellipsis" style="margin: 0;">
                   {requestApi?.data?.blockName} | {requestApi?.data?.requestData
                     ?.name}
                 </p>
@@ -220,7 +220,7 @@
       {#each environmentVariables.filtered as variable (variable.key)}
         {#if variable?.environment !== "Global Variables"}
           <div
-            class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block"
+            class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block ellipsis"
             style="height: 28px; border-radius: 4px; cursor: pointer; margin-bottom:4px; margin-top:4px;"
             on:mouseenter={() => (hoveredVariableKey = variable.key)}
             on:mouseleave={() => (hoveredVariableKey = null)}
@@ -228,7 +228,9 @@
               handleSelectVariable(variable);
             }}
           >
-            <span style="font-size: 12px;">{variable?.key}</span>
+            <span style="font-size: 12px;" class="ellipsis"
+              >{variable?.key}</span
+            >
             {#if hoveredVariableKey === variable.key}
               <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
             {/if}
@@ -244,7 +246,7 @@
       {#each environmentVariables.filtered as variable (variable.key)}
         {#if variable?.environment === "Global Variables"}
           <div
-            class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block"
+            class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block ellipsis"
             style="height: 28px; border-radius: 4px; cursor: pointer; margin-bottom:4px; margin-top:4px;"
             on:mouseenter={() => (hoveredVariableKey = variable.key)}
             on:mouseleave={() => (hoveredVariableKey = null)}
@@ -252,7 +254,9 @@
               handleSelectVariable(variable);
             }}
           >
-            <span style="font-size: 12px;">{variable?.key}</span>
+            <span style="font-size: 12px;" class="ellipsis"
+              >{variable?.key}</span
+            >
             {#if hoveredVariableKey === variable.key}
               <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
             {/if}

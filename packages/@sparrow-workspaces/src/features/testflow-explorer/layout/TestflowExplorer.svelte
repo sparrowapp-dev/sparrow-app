@@ -383,11 +383,9 @@
     isDynamicExpressionModalOpen = true;
   };
 
-  $: console.log(selectedNodeId, "selectedNodeId");
-
   const onInsertExpression = (newExpression) => {
     if (dynamicExpressionModal?.source) {
-      dynamicExpressionModal.dispatch({
+      dynamicExpressionModal.dispatch.dispatch({
         changes: {
           from: dynamicExpressionModal.source.from,
           to: dynamicExpressionModal.source.to,
@@ -395,102 +393,16 @@
         },
       });
     } else {
-      dynamicExpressionModal.dispatch({
+      dynamicExpressionModal.dispatch.dispatch({
         changes: {
-          from: 0,
-          to: 0,
+          from:
+            dynamicExpressionModal?.dispatch?.state?.selection?.main?.from || 0,
+          to: dynamicExpressionModal?.dispatch?.state?.selection?.main?.to || 0,
+
           insert: "[*$[" + newExpression + "]$*]",
         },
       });
     }
-    isDynamicExpressionModalOpen = false;
-    return;
-    nodes.update((_nodes) => {
-      const dbNodes = _nodes;
-      for (let index = 0; index < dbNodes.length; index++) {
-        if (dbNodes[index].id === selectedNodeId) {
-          if (dynamicExpressionModal.type === "url") {
-            //
-            // URL
-            //
-            const requestUrl = dbNodes[index].data.requestData.url;
-            let output = "";
-            if (dynamicExpressionModal?.source) {
-              output =
-                requestUrl.slice(0, dynamicExpressionModal.source.from) +
-                "[*$[" +
-                newExpression +
-                "]$*]" +
-                requestUrl.slice(dynamicExpressionModal.source.to);
-            } else {
-              output = requestUrl + "[*$[" + newExpression + "]$*]";
-            }
-            dbNodes[index].data.requestData.url = output;
-          } else if (dynamicExpressionModal.type === "headers") {
-            //
-            // Headers
-            //
-            const requestHeaders = dbNodes[index].data.requestData.headers;
-            for (let i = 0; i < requestHeaders.length; i++) {
-              if (dynamicExpressionModal.destination.index === i) {
-                if (dynamicExpressionModal.destination.row === "value") {
-                  let output = "";
-                  if (dynamicExpressionModal?.source) {
-                    output =
-                      requestHeaders[i].value.slice(
-                        0,
-                        dynamicExpressionModal.source.from,
-                      ) +
-                      "[*$[" +
-                      newExpression +
-                      "]$*]" +
-                      requestHeaders[i].value.slice(
-                        dynamicExpressionModal.source.to,
-                      );
-                  } else {
-                    output =
-                      requestHeaders[i].value + "[*$[" + newExpression + "]$*]";
-                  }
-                  requestHeaders[i].value = output;
-                  dbNodes[index].data.requestData.headers = requestHeaders;
-                }
-              }
-            }
-          } else if (dynamicExpressionModal.type === "parameters") {
-            //
-            // Parameters
-            //
-            const requestParams = dbNodes[index].data.requestData.queryParams;
-            for (let i = 0; i < requestParams.length; i++) {
-              if (dynamicExpressionModal.destination.index === i) {
-                if (dynamicExpressionModal.destination.row === "value") {
-                  let output = "";
-                  if (dynamicExpressionModal?.source) {
-                    output =
-                      requestParams[i].value.slice(
-                        0,
-                        dynamicExpressionModal.source.from,
-                      ) +
-                      "[*$[" +
-                      newExpression +
-                      "]$*]" +
-                      requestParams[i].value.slice(
-                        dynamicExpressionModal.source.to,
-                      );
-                  } else {
-                    output =
-                      requestParams[i].value + "[*$[" + newExpression + "]$*]";
-                  }
-                  requestParams[i].value = output;
-                  dbNodes[index].data.requestData.queryParams = requestParams;
-                }
-              }
-            }
-          }
-        }
-      }
-      return dbNodes;
-    });
     isDynamicExpressionModalOpen = false;
   };
 

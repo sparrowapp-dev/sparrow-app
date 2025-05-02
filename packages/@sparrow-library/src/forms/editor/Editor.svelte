@@ -154,7 +154,7 @@
             to: pos + this.to - this.from,
             content,
           },
-          dispatch: view.dispatch,
+          dispatch: view,
         });
       };
 
@@ -308,7 +308,7 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
-    dispatcher = codeMirrorView.dispatch;
+    dispatcher = codeMirrorView;
   }
 
   function destroyCodeMirrorEditor() {

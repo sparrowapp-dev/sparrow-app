@@ -192,7 +192,7 @@
             to: this.to,
             content,
           },
-          dispatch: view.dispatch,
+          dispatch: view,
         });
       };
 
@@ -573,7 +573,7 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
-    dispatcher = codeMirrorView.dispatch;
+    dispatcher = codeMirrorView;
   }
   onMount(() => {
     const initializeAsync = () => {
