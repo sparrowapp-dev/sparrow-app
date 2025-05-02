@@ -72,9 +72,9 @@
   };
 
   onMount(() => {
-    scrollableContainer.addEventListener("scroll", handleScroll);
+    scrollableContainer?.addEventListener("scroll", handleScroll);
     return () => {
-      scrollableContainer.removeEventListener("scroll", handleScroll);
+      scrollableContainer?.removeEventListener("scroll", handleScroll);
     };
   });
 </script>
