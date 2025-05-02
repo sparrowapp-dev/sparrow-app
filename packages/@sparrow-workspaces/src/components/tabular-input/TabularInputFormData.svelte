@@ -207,13 +207,6 @@
       currentIndex: result.length - 1,
     };
 
-    isMergeViewLoading = false;
-
-    // Check for changes after calculating diff
-    setTimeout(() => {
-      checkForChanges();
-    }, 0);
-
     return [...result, lastEmptyRow];
   }
 
@@ -247,6 +240,7 @@
     await sleep(2000);
     diffPairs = calculateDiff();
     checkForChanges();
+    isMergeViewLoading = false;
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 

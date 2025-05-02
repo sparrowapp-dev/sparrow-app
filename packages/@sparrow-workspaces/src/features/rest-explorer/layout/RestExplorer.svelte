@@ -444,13 +444,13 @@
         },
       ]);
 
-      const debugPrompt = `
-        I am getting the below mentioned error when i send request, 
-        can you help me debug this error, let me know if i need to 
-        change anyhing in the request to solve this issue. here's 
-        the error response i am getting while sending the request, 
-        I've stringified the response. 
-        Response: ${JSON.stringify(storeData.response)}`;
+      // The prompt in the below format is required to trigger the 4xx error debugging instructions for AI model
+      const debugPrompt = `[DEBUG_4XX_ERROR_REQUEST]
+        I am getting the below mentioned error when I send request. 
+        Can you help me debug this error and tell me what changes I need to make in my request to solve this issue.
+        Error Response (${storeData.response.status || "4xx"}): ${JSON.stringify(storeData?.response)}
+        Please analyze this error and provide suggestions to fix it following your strict error debugging protocol. I need formatted suggestions that can be directly applied to my request configuration.
+        [/DEBUG_4XX_ERROR_REQUEST]`;
 
       // ToDo: Enable scroller
       // Scroller for user prompt
