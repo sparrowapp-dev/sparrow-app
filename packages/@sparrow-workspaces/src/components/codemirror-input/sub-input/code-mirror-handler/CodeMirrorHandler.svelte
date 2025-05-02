@@ -22,7 +22,6 @@
   import { undo, redo } from "@codemirror/commands";
   import { history, historyKeymap } from "@codemirror/commands";
   import { MathFormulaFunction } from "@sparrow/library/assets";
-  import { DismissIcon } from "@sparrow/library/assets";
   /**
    * input value
    */
@@ -164,13 +163,8 @@
       text.textContent = this.name;
 
       const close = document.createElement("span");
-      close.className = "cm-expression-block-close-span";
-
-      const closeIcon = document.createElement("img");
-      closeIcon.src = DismissIcon;
-      closeIcon.alt = "Expression Close Icon";
-      closeIcon.className = "cm-expression-block-close-img";
-      close.append(closeIcon);
+      close.textContent = "❌";
+      close.className = "cm-expression-block-close";
 
       close.onclick = (e) => {
         e.stopPropagation();
@@ -663,24 +657,14 @@
 
   :global(.cm-expression-block-close) {
     cursor: pointer;
+    font-size: 0.8em;
     margin-left: 4px;
+    color: var(--text-ds-neutral-50);
     padding-left: 2px;
-  }
-  :global(.cm-expression-block) {
-    height: 20px;
-  }
-
-  :global(.cm-expression-block-close-img) {
-    padding-left: 1px;
-    cursor: pointer;
-    border-left: 1px solid var(--border-ds-neutral-50);
-    margin-bottom: 1px;
+    border-left: 1px solid var(--bg-ds-surface-50);
   }
   :global(.cm-expression-block-img) {
-    margin-bottom: 2px;
-  }
-  :global(.cm-expression-block-close-span) {
-    align-content: center;
-    margin: 0px;
+    width: 12;
+    height: 14;
   }
 </style>

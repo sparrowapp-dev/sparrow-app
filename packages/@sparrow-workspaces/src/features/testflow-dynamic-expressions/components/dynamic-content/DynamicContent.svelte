@@ -124,8 +124,11 @@
               {selectedAPI?.requestData?.method}
             </p>
 
-            <p class="de-header-name" style="margin: 0;">
-              {selectedAPI?.blockName} | {selectedAPI?.requestData?.name}
+            <p
+              class="request-block-name"
+              style="margin: 0; color: var(--bg-ds-neutral-50);"
+            >
+              {selectedAPI?.blockName}
             </p>
           </div>
         </div>
@@ -246,16 +249,12 @@
           <div
             class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 request-type-block"
             style="height: 28px; border-radius: 4px; cursor: pointer; margin-bottom:4px; margin-top:4px;"
-            on:mouseenter={() => (hoveredVariableKey = variable.key)}
-            on:mouseleave={() => (hoveredVariableKey = null)}
             on:click={() => {
               handleSelectVariable(variable);
             }}
           >
             <span style="font-size: 12px;">{variable?.key}</span>
-            {#if hoveredVariableKey === variable.key}
-              <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
-            {/if}
+            <AddRegular size="16px" color="var(--icon-ds-neutral-50)" />
           </div>
           <hr class="request-line" />
         {/if}
