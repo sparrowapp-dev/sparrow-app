@@ -269,11 +269,10 @@
   <div class="d-flex justify-content-end mt-3 me-0 gap-2">
     <Button
       title={"Keep the Changes"}
-      size={"small"}
       type={"primary"}
       onClick={applyChanges}
     />
-    <Button title={"Undo"} size={"small"} type={"secondary"} onClick={undoChanges} />
+    <Button title={"Undo"} type={"secondary"} onClick={undoChanges} />
   </div>
 {/if}
 
