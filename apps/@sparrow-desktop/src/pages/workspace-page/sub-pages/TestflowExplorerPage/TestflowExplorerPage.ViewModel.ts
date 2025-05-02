@@ -598,7 +598,6 @@ export class TestflowExplorerPageViewModel {
                 else{
                   reqBody = decodeData[3];
                 }
-                // debugger;
                 requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
                   response: {
                     body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
