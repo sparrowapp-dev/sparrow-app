@@ -99,6 +99,6 @@
     onUpdateTeam={handleUpdateTeam}
     {isTeamNameInvalid}
   />
-  <TeamOwner {ownerDetails} />
   <UpdateTeamDescription bind:teamDescription onUpdateTeam={handleUpdateTeam} />
+  <TeamOwner {ownerDetails} />
 </div>
