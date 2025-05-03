@@ -17,6 +17,7 @@
   export let selectedBlock;
 
   export let onPreviewExpression;
+  export let dynamicExpressionPath: string = "";
 
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
@@ -62,6 +63,15 @@
   $: currentOpenItem = $isDynamicExpressionContent.find(
     (item) => item.isCurrentOpen,
   );
+  $: {
+    if (
+      dynamicExpressionPath === "raw" ||
+      dynamicExpressionPath === "urlencoded" ||
+      dynamicExpressionPath === "formdata"
+    ) {
+      dynamicExpressionPath = "body" + " > " + dynamicExpressionPath;
+    }
+  }
   let cursorPosition: number | null = 0;
 </script>
 
@@ -111,10 +121,9 @@
   style="margin-top: 24px;"
 >
   <div>
-    <!-- <p style="margin: 0px;">
-      {currentOpenItem?.blockName} > {currentOpenItem?.method} > {currentOpenItem?.requestType}
-      > {currentOpenItem?.key}
-    </p> -->
+    <p style="margin: 0px;" class="dynamic-path-title">
+      Location: {selectedBlock?.data?.blockName} > {dynamicExpressionPath}
+    </p>
   </div>
   <div>
     <Button
@@ -135,5 +144,13 @@
     padding: 12px;
     border-radius: 4px;
     /* height: "440px"; */
+  }
+  .dynamic-path-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0px;
+    color: #82858a;
   }
 </style>
