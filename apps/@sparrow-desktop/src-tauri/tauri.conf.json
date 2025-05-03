@@ -58,6 +58,11 @@
         "componentRefs": ["DeepLinkRegistryEntries"]
       }
     },
+    "linux": {
+      "deb": {
+        "desktopTemplate": "./assets/LinuxDeeplink.template"
+      }
+    },
     "macOS": {
       "dmg": {
         "background": "./icons/background.png",
