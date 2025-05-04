@@ -88,7 +88,7 @@
   import { remove } from "@tauri-apps/plugin-fs";
   import { Checkbox } from "@sparrow/library/forms";
   import { writable } from "svelte/store";
-  import Spinner from "../../../../../packages/@sparrow-library/src/ui/spinner/Spinner.svelte";
+  import {Spinner} from "@sparrow/library/ui";
 
   const _viewModel = new CollectionsViewModel();
 
