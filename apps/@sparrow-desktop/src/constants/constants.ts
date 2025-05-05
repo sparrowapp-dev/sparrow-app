@@ -1,6 +1,8 @@
 const constants = {
   API_URL: import.meta.env.VITE_API_URL,
   ENABLE_MIX_PANEL: import.meta.env.VITE_ENABLE_MIX_PANEL,
+  POSTHOG_API_URL: import.meta.env.VITE_POSTHOG_API_URL,
+  POSTHOG_CONNECTION_API_KEY: import.meta.env.VITE_POSTHOG_CONNECTION_API_KEY,
   MIX_PANEL_TOKEN: import.meta.env.VITE_MIX_PANEL_TOKEN,
   API_SEND_TIMEOUT: import.meta.env.VITE_API_TIMEOUT,
   RXDB_DB_NAME: "sparrow-db",

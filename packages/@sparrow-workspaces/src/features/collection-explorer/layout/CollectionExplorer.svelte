@@ -50,6 +50,8 @@
   export let onSyncCollection;
   export let isSharedWorkspace = false;
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
   /**
    * Icons and images
    */
@@ -144,6 +146,14 @@
       updateLastUpdateAndCount();
     }
   }
+
+  const handlecollection_collection_saved = ({ name }: { name: string }) => {
+    captureEvent("collection_saved", {
+      component: "CollectionExplorer",
+      button_text: name,
+      destination: name,
+    });
+  };
 
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -522,6 +532,7 @@
           type={"secondary"}
           onClick={() => {
             onSaveCollection();
+            handlecollection_collection_saved({ name: "Collection Saved" });
           }}
         />
       </div>
