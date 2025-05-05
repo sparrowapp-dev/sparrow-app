@@ -75,7 +75,7 @@
   let cursorPosition: number | null = 0;
 </script>
 
-<div class="d-flex justify-content-between" style="gap: 12px;">
+<div class="d-flex justify-content-between" style="gap: 12px; margin-top:16px;">
   <div class="w-50">
     <ExpressionEditor
       bind:expression
