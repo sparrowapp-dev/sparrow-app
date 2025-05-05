@@ -21,6 +21,7 @@
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { unifiedMergeView } from "@codemirror/merge";
   import { DismissIcon } from "@sparrow/library/assets";
+  import MergeViewNavigation from "./MergeViewNavigation.svelte";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -64,7 +65,7 @@
       original: original,
       highlightChanges: true,
       gutter: false,
-      mergeControls: false,
+      mergeControls: true,
     });
   }
 
@@ -101,7 +102,6 @@
       readonly name: string,
       readonly from: number,
       readonly to: number,
-      // readonly id: string,
     ) {
       super();
     }
@@ -500,8 +500,8 @@
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if hasChanges}
-  <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+{#if !isMergeViewLoading && hasChanges}
+  <div class="d-flex justify-content-end mt-3 me-0 gap-2 merge-view-act-btns">
     <Button
       title={"Keep the Changes"}
       size={"small"}
@@ -521,6 +521,11 @@
         undoChanges();
       }}
     ></Button>
+
+    <!-- Add the MergeViewNavigation component before the action buttons -->
+    <!-- {#if isMergeViewEnabled} -->
+    <MergeViewNavigation editorView={codeMirrorView} {isMergeViewEnabled} />
+    <!-- {/if} -->
   </div>
 {/if}
 
@@ -529,6 +534,12 @@
     width: 100%;
     height: 100%;
     margin-right: 1%;
+  }
+
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 10px;
+    z-index: 10;
   }
 
   /* Style for customizing the css for codemirror merge view */
@@ -552,6 +563,18 @@
   .merge-view :global(.cm-changedText) {
     background: var(--bg-ds-success-700);
   }
+
+  /* Add any additional styles needed for merge view navigation */
+  :global(.cm-merge-highlighted-change) {
+    outline: 2px solid #3b82f6;
+    /* outline-offset: 2px; */
+    /* border-radius: 3px; */
+    /* transition: all 0.2s ease-in-out; */
+    /* box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); */
+    position: relative;
+    z-index: 1;
+  }
+
   :global(.cm-expression-block) {
     height: 20px;
   }
