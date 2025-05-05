@@ -47,7 +47,7 @@
 <div>
   <div
     class={componentClass}
-    style="width: {containerWidth}; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
+    style="max-width: {containerWidth}; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
   >
     <div
       class="d-flex align-items-start flex-row"
