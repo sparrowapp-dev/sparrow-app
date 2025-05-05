@@ -12,6 +12,9 @@
   export let ctaShow = false;
   export let onClick = () => {};
   export let varient: "error" | "success" | "warning" | "info" = "error";
+  export let containerWidth = "543px";
+  export let closeIconRequired = false;
+  export let onClickClose = () => {};
 
   let componentClass;
   switch (varient) {
@@ -35,7 +38,7 @@
 <div>
   <div
     class={componentClass}
-    style="width: 543px; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
+    style="width: {containerWidth}; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
   >
     <div
       class="d-flex align-items-start flex-row"
@@ -90,6 +93,18 @@
             title={ctaTitle}
             onClick={() => {
               onClick();
+            }}
+          />
+        </div>
+      {/if}
+      {#if closeIconRequired}
+        <div>
+          <Button
+            size="small"
+            type="teritiary-regular"
+            startIcon={DismissRegular}
+            onClick={() => {
+              onClickClose();
             }}
           />
         </div>
