@@ -444,7 +444,9 @@
         class:select-logo-active={isOpen}
         style={disabled ? "opacity: 0.5 !important" : ""}
       >
-        <CaretDownFilled size={"16px"} color={"var(--icon-ds-neutral-100)"} />
+        {#if titleId !== "owner"}
+          <CaretDownFilled size="16px" color="var(--icon-ds-neutral-100)" />
+        {/if}
       </span>
     </div>
   </div>
