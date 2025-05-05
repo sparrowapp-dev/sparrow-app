@@ -5,6 +5,7 @@
   import { Button } from "../button";
   import { SparrowLogo } from "@sparrow/common/images";
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let description = "Could not Send Request";
   export let heading = "";
   export let icon;
@@ -33,6 +34,14 @@
     default:
       componentClass = "errorClass";
   }
+
+  const handleAlert_try_response = ({ event_name }: { event_name: string }) => {
+    captureEvent("try_response", {
+      component: "Alert",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
 </script>
 
 <div>
@@ -92,6 +101,9 @@
             size="small"
             title={ctaTitle}
             onClick={() => {
+              handleAlert_try_response({
+                event_name: ctaTitle + "Clicked!",
+              });
               onClick();
             }}
           />

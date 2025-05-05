@@ -3,7 +3,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import * as Sentry from "@sentry/svelte";
-
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
@@ -116,6 +116,17 @@
     }, 100);
   };
 
+  const handlecollection_set_auth = ({
+    event_name,
+  }: {
+    event_name: string;
+  }) => {
+    captureEvent("open_collection_auth", {
+      component: "Collection",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
   const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
       `show-more-collection-${collection.id}`,
@@ -312,7 +323,7 @@
             }
           })
           .catch((error) => {
-            Sentry.captureException(error); 
+            Sentry.captureException(error);
             console.error("Error during interval compare:", error);
           });
       },
@@ -454,12 +465,14 @@
         //     : true,
       },
       {
-        onClick: () =>
+        onClick: () => {
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
             navigation: CollectionNavigationTabEnum.AUTH,
-          }),
+          });
+          handlecollection_set_auth({ event_name: "Set Auth Clicked" });
+        },
         displayText: "Set Auth",
         disabled: false,
         hidden: false,
