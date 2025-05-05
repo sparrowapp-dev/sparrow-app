@@ -135,7 +135,7 @@
   const addButtonData = [
     {
       name: "Leave Hub",
-      color: "red",
+      color: "var(--dangerColor)",
       onclick: () => handleLeaveTeam(),
     },
   ];

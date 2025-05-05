@@ -110,7 +110,7 @@
           class="d-flex align-items-center p-2 rounded-1 gap-2 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
             : ''} {disable ? 'option-button-disable' : ''} "
-          style={`red !important`}
+          style={`color: ${item.color};`}
           on:click={() => item.onclick()}
           tabindex={0}
         >
