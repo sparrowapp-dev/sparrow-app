@@ -1,7 +1,6 @@
 <script lang="ts">
   import { afterUpdate, onMount } from "svelte";
   import { scale } from "svelte/transition";
-  import { quintOut, backInOut } from "svelte/easing";
 
   export let isBackgroundClickable = true;
 
@@ -29,6 +28,7 @@
     subTitle?: string;
     startIcon?: any;
     endIcon?: any;
+    backgroundColor?: string;
   }[];
 
   export let horizontalPosition: "left" | "right" = "right";
@@ -110,7 +110,7 @@
           class="d-flex align-items-center p-2 rounded-1 gap-2 w-100 option-button {item?.isHoverConstant
             ? 'hover-effect'
             : ''} {disable ? 'option-button-disable' : ''} "
-          style="color: {item.color};"
+          style={`red !important`}
           on:click={() => item.onclick()}
           tabindex={0}
         >
@@ -189,7 +189,7 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
-    color: var(--text-ds-neutral-50);
+    color: var(--dangerColor);
   }
   .option-subtitle {
     font-family: "Inter", sans-serif;
