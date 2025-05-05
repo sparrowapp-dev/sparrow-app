@@ -159,50 +159,39 @@
           {/each}
         </div>
       </div>
-      <div
-        class="bottom-0 d-flex justify-content-between mt-3"
-        style="width:53%;"
-      >
-        <div class="tab-head" style="width: 189.46px;">
-          {#if filteredWorkspaces.length > 0}
+      {#if filteredWorkspaces.length > 0}
+        <div class="bottom-0 d-flex justify-content-between" style="width:53%;">
+          <div class="tab-head" style="width: 189.46px;">
             Showing {startIndex} - {endIndex} of {filteredWorkspaces.length}
-          {:else}
-            No workspaces to display
-          {/if}
+          </div>
+          <div class="tab-head tab-change">
+            <button
+              on:click={() => setPageWithinBounds(1)}
+              class="bg-transparent border-0"
+            >
+              <ChevronDoubleLeftRegular color={"var(--bg-ds-neutral-100)"} />
+            </button>
+            <button
+              on:click={() => setPageWithinBounds(currPage - 1)}
+              class="bg-transparent border-0"
+            >
+              <ChevronLeftRegular color={"var(--bg-ds-neutral-100)"} />
+            </button>
+            <button
+              on:click={() => setPageWithinBounds(currPage + 1)}
+              class="bg-transparent border-0"
+            >
+              <ChevronRightRegular color={"var(--bg-ds-neutral-100)"} />
+            </button>
+            <button
+              on:click={() => setPageWithinBounds(totalPages)}
+              class="bg-transparent border-0"
+            >
+              <ChevronDoubleRightRegular color={"var(--bg-ds-neutral-100)"} />
+            </button>
+          </div>
         </div>
-        <div class="tab-head tab-change">
-          <button
-            on:click={() => setPageWithinBounds(1)}
-            class="bg-transparent border-0"
-            disabled={currPage === 1 || filteredWorkspaces.length === 0}
-          >
-            <ChevronDoubleLeftRegular color={"var(--bg-ds-neutral-100)"} />
-          </button>
-          <button
-            on:click={() => setPageWithinBounds(currPage - 1)}
-            class="bg-transparent border-0"
-            disabled={currPage === 1 || filteredWorkspaces.length === 0}
-          >
-            <ChevronLeftRegular color={"var(--bg-ds-neutral-100)"} />
-          </button>
-          <button
-            on:click={() => setPageWithinBounds(currPage + 1)}
-            class="bg-transparent border-0"
-            disabled={currPage === totalPages ||
-              filteredWorkspaces.length === 0}
-          >
-            <ChevronRightRegular color={"var(--bg-ds-neutral-100)"} />
-          </button>
-          <button
-            on:click={() => setPageWithinBounds(totalPages)}
-            class="bg-transparent border-0"
-            disabled={currPage === totalPages ||
-              filteredWorkspaces.length === 0}
-          >
-            <ChevronDoubleRightRegular color={"var(--bg-ds-neutral-100)"} />
-          </button>
-        </div>
-      </div>
+      {/if}
     {:else}
       <div class="container">
         <div class="sparrow-logo">
