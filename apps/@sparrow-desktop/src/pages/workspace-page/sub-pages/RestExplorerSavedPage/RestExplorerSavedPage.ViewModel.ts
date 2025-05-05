@@ -68,6 +68,7 @@ import {
 import { InitTab } from "@sparrow/common/factory";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
 import constants from "@app/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 export class RestExplorerSavedViewModel {
   /**
@@ -323,6 +324,7 @@ export class RestExplorerSavedViewModel {
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
+      Sentry.captureException(error);
       notifications.error(
         "Failed to update the documentation. Please try again",
       );

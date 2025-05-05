@@ -7,10 +7,11 @@
   import { Modal } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import { DeleteWorkspace } from "@sparrow/common/features";
+  import { DeleteWorkspace, PublicWorkspace } from "@sparrow/common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
   import { user } from "@app/store/auth.store";
+  import constants from "src/constants/constants";
 
   export let collectionList;
   export let tab;
@@ -27,6 +28,8 @@
   let selectedWorkspace: WorkspaceDocument;
   let selectedTeam: TeamDocument;
   let workspaceID = tab._data.path.workspaceId;
+  let workspaceType = "";
+  let isWorkspacePublicModalOpen = false;
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -64,6 +67,7 @@
     users: [],
     description: "",
   };
+  let isSharedWorkspace = false;
   /**
    * Subscribes to the active workspace and updates the current workspace details
    * and also updates current team details associated with that workspace.
@@ -82,6 +86,8 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        isSharedWorkspace = value._data.isShared;
+        workspaceType = value._data?.workspaceType || "PRIVATE";
       }
     },
   );
@@ -111,6 +117,8 @@
 <WorkspaceExplorer
   bind:userRole
   tab={_viewModel.tab}
+  {isSharedWorkspace}
+  {workspaceType}
   {workspaceUpdatesList}
   collectionLength={$collectionList?.filter(
     (value) => value.workspaceId === currentWorkspace?.id,
@@ -124,6 +132,8 @@
   {currentWorkspace}
   {onRemoveUserFromWorkspace}
   {onChangeUserRoleAtWorkspace}
+  onMakeWorkspacePublic={() => (isWorkspacePublicModalOpen = true)}
+  onShareWorkspace={_viewModel.handleShareWorkspace}
 />
 
 <Modal
@@ -167,6 +177,37 @@
       if (response?.isSuccessful) {
         isDeleteWorkspaceModalOpen = false;
       }
+    }}
+  />
+</Modal>
+
+<Modal
+  title={"Make it public"}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isWorkspacePublicModalOpen}
+  handleModalState={(flag) => {
+    isWorkspacePublicModalOpen = flag;
+  }}
+>
+  <PublicWorkspace
+    bind:isWorkspacePublicModalOpen
+    workspace={currentWorkspace}
+    onMakePublicWorkspace={async () => {
+      const response = await _viewModel.handleWorkspaceVisibility();
+      if (response?.isSuccessful) {
+        isWorkspacePublicModalOpen = false;
+      }
+    }}
+    onRedirectTermsService={() => {
+      open(`${constants.MARKETING_URL}/terms-of-service`);
+    }}
+    onRedirectPrivacyPolicy={() => {
+      open(`${constants.MARKETING_URL}/privacy-policy`);
+    }}
+    onRedirectDocs={() => {
+      open(`${constants.DOCS_URL}`);
     }}
   />
 </Modal>

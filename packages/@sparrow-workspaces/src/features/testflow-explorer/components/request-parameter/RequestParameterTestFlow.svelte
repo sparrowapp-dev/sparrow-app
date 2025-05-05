@@ -4,10 +4,21 @@
   import { createDeepCopy } from "@sparrow/common/utils";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@sparrow/common/enums";
+  import { Events, ItemType } from "@sparrow/common/enums";
   import { extractQueryParams } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import {
+    addDynamicExpressionContent,
+    isDynamicExpressionModalOpen,
+  } from "../../store";
+  import {
+    isDynamicExpressionContent,
+    updateIsCurrentExpression,
+  } from "../../store";
+
+  export let handleOpenCurrentDynamicExpression;
 
   export let requestUrl;
+  export let selectedBlock;
   export let params;
   export let environmentVariables;
   export let authParameter;
@@ -54,7 +65,13 @@
   const setInitialParams = () => {
     const urlParams = extractQueryParams(requestUrl);
     const mergedArray = params;
-
+    const keyWithValues = $isDynamicExpressionContent.filter((item) => {
+      return (
+        item?.blockName === selectedBlock?.data?.blockName &&
+        item?.requestType === "queryParams" &&
+        item?.method === "request"
+      );
+    });
     // Add params only if key doesn't already exist
     for (const param of urlParams) {
       if (
@@ -71,6 +88,39 @@
       }
     }
 
+    for (const param of mergedArray) {
+      const cleanedValue = param.value
+        .replace(/\[\[.*?\]\]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      param.value = cleanedValue;
+    }
+
+    // Add the Dynamic expression value
+    for (const dynamicParam of keyWithValues) {
+      if (dynamicParam.key.trim() !== "" && dynamicParam.value.trim() !== "") {
+        const existingParam = mergedArray.find(
+          (ele) => ele?.key.trim() === dynamicParam.key.trim(),
+        );
+
+        if (existingParam) {
+          // Step 1: Remove any existing [[...]] part from the value (if it exists)
+          const cleanedValue = existingParam.value
+            .replace(/\[\[.*?\]\]/g, "")
+            .trim();
+
+          // Step 2: Check if the dynamic value already exists in the cleaned value
+          const newDynamicValue = `[[${dynamicParam.value}]]`;
+
+          // Step 3: Only add the value with [[...]] if it doesn't already exist
+          existingParam.value = cleanedValue
+            ? `${cleanedValue} ${newDynamicValue}`
+            : newDynamicValue;
+        }
+      }
+    }
+
     // If nothing found, add an empty param
     if (mergedArray.length === 0) {
       queryParams = [{ key: "", value: "", checked: true }];
@@ -83,6 +133,154 @@
     if (requestUrl !== "") {
       setInitialParams();
     }
+  });
+
+  function generateUniqueId() {
+    return "_" + Math.random().toString(36).substr(2, 9);
+  }
+
+  const checkIfExists = (
+    id: string,
+    blockName: string,
+    requestType: string,
+    key: string,
+    method: string,
+    index: number,
+  ) => {
+    const items = $isDynamicExpressionContent;
+    return items.some(
+      (item) =>
+        item.blockName === blockName &&
+        item.requestType === requestType &&
+        item.key === key &&
+        item.method === method &&
+        item.index === index,
+    );
+  };
+
+  const handleDynamicExpression = (key: string, index: number, id: string) => {
+    if (id) {
+      if (
+        checkIfExists(
+          id,
+          selectedBlock?.data?.blockName,
+          "queryParams",
+          key,
+          "request",
+          index,
+        )
+      ) {
+        updateIsCurrentExpression(
+          id,
+          selectedBlock?.data?.blockName,
+          "queryParams",
+          "request",
+          key,
+          index,
+        );
+        return;
+      }
+    }
+    addDynamicExpressionContent(
+      generateUniqueId(),
+      selectedBlock?.data?.blockName,
+      "queryParams",
+      key,
+      "",
+      "request",
+      index,
+      true,
+    );
+  };
+
+  const handleRemoveDynamicExpression = (
+    key: string,
+    index: number,
+    id: string,
+  ) => {
+    const updatedItems = $isDynamicExpressionContent.filter(
+      (item) =>
+        !(
+          item?.id === id &&
+          item?.blockName === selectedBlock?.data?.blockName &&
+          item?.requestType === "queryParams" &&
+          item?.method === "request" &&
+          item?.key === key &&
+          item?.index === index
+        ),
+    );
+
+    isDynamicExpressionContent.set(updatedItems);
+  };
+
+  let DynamicExpressionParams;
+
+  const getDEByKeyAndValue = (
+    key: string,
+    value: string,
+    index: number,
+    blockName: string,
+  ): any => {
+    const data = $isDynamicExpressionContent?.filter(
+      (item: any) =>
+        item?.requestType === "queryParams" &&
+        item?.method === "request" &&
+        item?.blockName === blockName &&
+        item?.key === key &&
+        item?.index === index,
+    );
+    return data;
+  };
+
+  const handleDynamicNewExpression = (key: string, index: number) => {
+    addDynamicExpressionContent(
+      generateUniqueId(),
+      selectedBlock?.data?.blockName,
+      "queryParams",
+      key,
+      "",
+      "request",
+      index,
+      true,
+    );
+  };
+
+  const handleRemoveDynamicExpressionKey = (key: string, index: number) => {
+    const updatedItems = $isDynamicExpressionContent.filter(
+      (item) =>
+        !(
+          item?.blockName === selectedBlock?.data?.blockName &&
+          item?.requestType === "queryParams" &&
+          item?.method === "request" &&
+          item?.key === key &&
+          item?.index === index
+        ),
+    );
+
+    isDynamicExpressionContent.set(updatedItems);
+  };
+
+  $: {
+    const paramsWithDE = $isDynamicExpressionContent.filter(
+      (item) =>
+        item?.blockName === selectedBlock?.data?.blockName &&
+        item?.requestType === "queryParams" &&
+        item?.method === "request",
+    );
+    // Now create the final params array
+    DynamicExpressionParams = params.map((param: any) => {
+      const matchingDE = paramsWithDE.filter(
+        (deItem) => deItem.key === param.key,
+      );
+      return {
+        ...param,
+        DE: matchingDE,
+      };
+    });
+  }
+
+  isDynamicExpressionContent.subscribe(() => {
+    setInitialParams();
   });
 </script>
 
@@ -100,5 +298,9 @@
     callback={handleParamsChange}
     onUpdateEnvironment={() => {}}
     {environmentVariables}
+    dynamicExpression={true}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "parameters" });
+    }}
   />
 </section>
