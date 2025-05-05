@@ -39,7 +39,7 @@
       <div class="d-flex align-items-center gap-3">
         <Tooltip
           title="HTTP Status - {response.status}"
-          placement={"bottom-center"}
+          placement={"top-center"}
           zIndex={500}
         >
           <span
