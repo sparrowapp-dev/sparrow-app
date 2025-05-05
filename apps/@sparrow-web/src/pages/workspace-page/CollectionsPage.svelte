@@ -90,7 +90,7 @@
 
   import { Checkbox } from "@sparrow/library/forms";
   import * as Sentry from "@sentry/svelte";
-  import {Spinner} from "@sparrow/library/ui";
+  import { Spinner } from "@sparrow/library/ui";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
