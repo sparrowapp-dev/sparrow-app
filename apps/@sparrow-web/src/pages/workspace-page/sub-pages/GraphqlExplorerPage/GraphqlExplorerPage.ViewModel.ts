@@ -1008,11 +1008,12 @@ class GraphqlExplorerViewModel {
       // Create a map of secondItems for quick lookup by name
       const secondMap = new Map();
       for (const secondItem of secondItems) {
-        secondMap.set(secondItem.name, secondItem);
+                const compositeKey = `${secondItem.itemType}:${secondItem.name}`;
+                secondMap.set(compositeKey, secondItem);
       }
 
       for (const firstItem of firstItems) {
-        const secondItem = secondMap.get(firstItem.name);
+        const secondItem = secondMap.get(firstItem.itemType + ":" + firstItem.name);
 
         // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
         if (firstItem.isSelected && !secondItem) {
