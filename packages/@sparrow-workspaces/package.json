@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/workspaces",
-  "version": "2.23",
+  "version": "2.22.1",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
