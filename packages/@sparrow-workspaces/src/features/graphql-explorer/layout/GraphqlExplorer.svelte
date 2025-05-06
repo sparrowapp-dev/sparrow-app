@@ -45,6 +45,7 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
+  import { Alert } from "@sparrow/library/ui";
 
   export let tab;
   export let collections;
@@ -423,33 +424,31 @@
                 </div> -->
                 <div style="flex:1; overflow: auto;">
                   {#if $tab.property.graphql.state.isRequestSchemaFetched}
-                    <GenerateQuery
-                      schema={$tab.property.graphql.schema}
-                      updateSchema={handleUpdateSchema}
-                      requestOperationSection={$tab.property.graphql?.state
-                        ?.operationNavigation}
-                      onUpdateRequestState={handleUpdateRequestState}
-                      operationSearch={$tab.property.graphql?.operationSearch}
-                      {updateOperationSearch}
-                      onRefreshSchema={handleFetchSchema}
-                      {isSchemaFetching}
-                    />
-                  {:else}
-                    <div style="flex: 1;">
-                      <div class="error-message">
-                        <div class="error-icon">
-                          <WarningIcon
-                            height="16"
-                            width="16"
-                            color="var(--icon-danger-200)"
-                          />
-                        </div>
-                        <span class="error-text"
-                          >"Unable to load schema. Please check the URL and try
-                          again."</span
-                        >
+                    {#if $tab.property.graphql.schema.length > 0}
+                      <GenerateQuery
+                        schema={$tab.property.graphql.schema}
+                        updateSchema={handleUpdateSchema}
+                        requestOperationSection={$tab.property.graphql?.state
+                          ?.operationNavigation}
+                        onUpdateRequestState={handleUpdateRequestState}
+                        operationSearch={$tab.property.graphql?.operationSearch}
+                        {updateOperationSearch}
+                        onRefreshSchema={handleFetchSchema}
+                        {isSchemaFetching}
+                      />
+                    {:else}
+                      <div
+                        class="d-flex justify-content-center align-items-center" style="margin-top: 44px;"
+                      >
+                        <Alert
+                          varient="error"
+                          description={"Unable to load schema. Please check the URL and try again."}
+                          heading={"Error"}
+                          ctaShow={true}
+                          onClick={handleFetchSchema}
+                        />
                       </div>
-                    </div>
+                    {/if}
                   {/if}
                 </div>
               </div>
