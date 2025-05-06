@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { CrossIcon, DismissRegular } from "@sparrow/library/icons";
+  import {
+    CrossIcon,
+    DismissRegular,
+    QuestionCircleRegular,
+  } from "@sparrow/library/icons";
 
   import { scale, fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
@@ -20,6 +24,8 @@
    */
   export let handleModalState: (flag: boolean) => void;
   export let description: string;
+  export let helpingIcon: boolean = false;
+  export let onClickIcon: () => void;
 
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -74,11 +80,25 @@
           {/if}
           <div class="flex-column">
             {#if title}
-              <h3
-                class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold ellipsis"
-              >
-                {title}
-              </h3>
+              <div class="d-flex flex-row align-items-center" style="gap: 8px;">
+                <h3
+                  class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold ellipsis"
+                >
+                  {title}
+                </h3>
+                {#if helpingIcon}
+                  <div class="" style="margin-bottom: 6px;">
+                    <Button
+                      type="teritiary-regular"
+                      size="small"
+                      startIcon={QuestionCircleRegular}
+                      onClick={() => {
+                        onClickIcon();
+                      }}
+                    />
+                  </div>
+                {/if}
+              </div>
             {/if}
             {#if description}
               <h3 class="sparrow-modal-description fw-normal ellipsis">
