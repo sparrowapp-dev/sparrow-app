@@ -13,28 +13,26 @@
   export let onNext;
   export let onClose;
   export let isPuleCircleRequired = true;
+  export let isLastStep = false;
+
   let containerTopX = 0;
   let containerLeftX = 0;
   let containerHeight = 0;
   let containerWidth = 0;
-  export let isLastStep = false;
 
   let top = 0;
   let left = 0;
   let targetElement;
 
-  // Close function handler
   function handleClose() {
     if (onClose) onClose();
   }
 
-  // Next function handler
-  function handleNext() {
+  function handleNext(event) {
     event.stopPropagation();
     if (onNext) onNext();
   }
 
-  // Find the target element's position and set the popup accordingly
   function updatePosition() {
     if (targetId) {
       targetElement = document.getElementById(targetId);
@@ -45,9 +43,6 @@
         containerLeftX = rect.left + window.scrollX;
         containerHeight = rect.height;
         containerWidth = rect.width;
-
-        top = containerTopX;
-        left = containerLeftX;
 
         document.documentElement.style.setProperty(
           "--containerTopX",
@@ -65,11 +60,35 @@
           "--containerHeight",
           `${containerHeight}px`,
         );
+        switch (tipPosition) {
+          case "right-center":
+            top = rect.top + rect.height / 3 - 20;
+            left = rect.left + rect.width + 20;
+            break;
+          case "left-center":
+            top = rect.top + rect.height / 2 - 20;
+            left = rect.left - 352 - 20;
+            break;
+          case "top-center":
+            top = rect.top - 100;
+            left = rect.left + rect.width / 2 - 176;
+            break;
+          case "bottom-center":
+            top = rect.top + rect.height + 10;
+            left = rect.left + rect.width / 2 - 176;
+            break;
+          case "center":
+            top = rect.top + rect.height / 2 - 150;
+            left = rect.left + rect.width / 2 - 176;
+            break;
+          default:
+            top = rect.top - 80;
+            left = rect.left;
+        }
       }
     }
   }
 
-  // Run the position update logic when the component mounts
   onMount(() => {
     updatePosition();
     window.addEventListener("resize", updatePosition);

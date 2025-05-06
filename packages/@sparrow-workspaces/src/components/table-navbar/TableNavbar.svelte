@@ -69,24 +69,24 @@
   </div>
 
   {#if $isTestFlowTourGuideOpen && $currentStep == 7}
-    <div style="position:absolute; bottom:250px; right:318px;">
-      <TestFlowTourGuide
-        isLastStep={true}
-        isPuleCircleRequired={false}
-        title="You Did it!"
-        pulsePosition={{ top: "210px", left: "250px" }}
-        description={`Congratulations! Your test flow is running successfully. You can re-run API at any time to update values as needed.`}
-        tipPosition="bottom-right"
-        stepCount="7/7"
-        onNext={() => {
-          currentStep.set(-1);
-          isTestFlowTourGuideOpen.set(false);
-        }}
-        onClose={() => {
-          isTestFlowTourGuideOpen.set(false);
-        }}
-      />
-    </div>
+    <!-- <div style="position:absolute; bottom:250px; right:318px;"> -->
+    <TestFlowTourGuide
+      isLastStep={true}
+      isPuleCircleRequired={false}
+      title="You Did it!"
+      pulsePosition={{ top: "210px", left: "250px" }}
+      description={`Congratulations! Your test flow is running successfully. You can re-run API at any time to update values as needed.`}
+      tipPosition="bottom-right"
+      stepCount="7/7"
+      onNext={() => {
+        currentStep.set(-1);
+        isTestFlowTourGuideOpen.set(false);
+      }}
+      onClose={() => {
+        isTestFlowTourGuideOpen.set(false);
+      }}
+    />
+    <!-- </div> -->
   {/if}
 </div>
 

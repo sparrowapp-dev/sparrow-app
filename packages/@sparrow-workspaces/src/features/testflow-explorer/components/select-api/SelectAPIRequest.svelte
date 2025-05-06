@@ -350,6 +350,7 @@
   </div>
 
   <div
+    id="sampleAPI-open"
     class="dropdown-options px-1"
     style="overflow:auto; display: {isOpen
       ? 'block'

@@ -645,9 +645,9 @@
           <TestFlowTourGuide
             targetId="addButton"
             title="Welcome to Test Flow!"
+            tipPosition="right-center"
             pulsePosition={{ top: "-58px", left: "14px" }}
             description={`Let's begin by creating your first flow. Click the '+ Add' button to get started`}
-            tipPosition="top-left"
             stepCount="1/7"
             onNext={() => {
               currentStep.set(2);
