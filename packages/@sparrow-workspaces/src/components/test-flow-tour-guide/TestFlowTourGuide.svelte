@@ -13,7 +13,10 @@
   export let onNext;
   export let onClose;
   export let isPuleCircleRequired = true;
-
+  let containerTopX = 0;
+  let containerLeftX = 0;
+  let containerHeight = 0;
+  let containerWidth = 0;
   export let isLastStep = false;
 
   let top = 0;
@@ -35,10 +38,33 @@
   function updatePosition() {
     if (targetId) {
       targetElement = document.getElementById(targetId);
+      console.log(targetElement);
       if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
-        top = rect.top + window.scrollY;
-        left = rect.left + window.scrollX;
+        containerTopX = rect.top + window.scrollY;
+        containerLeftX = rect.left + window.scrollX;
+        containerHeight = rect.height;
+        containerWidth = rect.width;
+
+        top = containerTopX;
+        left = containerLeftX;
+
+        document.documentElement.style.setProperty(
+          "--containerTopX",
+          `${containerTopX}px`,
+        );
+        document.documentElement.style.setProperty(
+          "--containerLeftX",
+          `${containerLeftX}px`,
+        );
+        document.documentElement.style.setProperty(
+          "--containerWidth",
+          `${containerWidth}px`,
+        );
+        document.documentElement.style.setProperty(
+          "--containerHeight",
+          `${containerHeight}px`,
+        );
       }
     }
   }
@@ -47,16 +73,21 @@
   onMount(() => {
     updatePosition();
     window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition);
   });
 
   onDestroy(() => {
     window.removeEventListener("resize", updatePosition);
+    window.removeEventListener("scroll", updatePosition);
   });
 </script>
 
 <!-- Overlay to block user interaction -->
-<div class="overlay"></div>
 
+<div class="overlay-top"></div>
+<div class="overlay-left"></div>
+<div class="overlay-right"></div>
+<div class="overlay-bottom"></div>
 <!-- Popup positioned based on the target element -->
 <div class="popup p-4" style="top: {top}px; left: {left}px;">
   {#if isPuleCircleRequired}
@@ -109,14 +140,43 @@
 </div>
 
 <style>
-  .overlay {
+  .overlay-top {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* Dim background */
-    opacity: 50%;
+    height: var(--containerTopX);
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+  }
+
+  .overlay-left {
+    position: fixed;
+    top: var(--containerTopX);
+    left: 0;
+    width: var(--containerLeftX);
+    height: var(--containerHeight);
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+  }
+
+  .overlay-right {
+    position: fixed;
+    top: var(--containerTopX);
+    left: calc(var(--containerLeftX) + var(--containerWidth));
+    width: calc(100vw - var(--containerLeftX) - var(--containerWidth));
+    height: var(--containerHeight);
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+  }
+
+  .overlay-bottom {
+    position: fixed;
+    top: calc(var(--containerTopX) + var(--containerHeight));
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--containerTopX) - var(--containerHeight));
+    background: rgba(0, 0, 0, 0.65);
     z-index: 10000;
   }
 

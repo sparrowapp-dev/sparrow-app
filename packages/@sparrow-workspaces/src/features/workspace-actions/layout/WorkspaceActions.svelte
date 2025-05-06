@@ -668,7 +668,7 @@
             : '266px'}; left:220px; z-index:9999;"
         >
           <TestFlowTourGuide
-            targetId="addButton"
+            targetId="dropdown-container-open"
             title="Add Your Flow"
             description={`Click 'Add Test Flow' to instantly create a new flow. It's that simple--your workspace is ready!`}
             tipPosition="left-top"

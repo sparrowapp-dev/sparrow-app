@@ -1036,6 +1036,7 @@
             />
           {:else}
             <Button
+              id="run-btn"
               type="primary"
               size="medium"
               startIcon={PlayFilled}
@@ -1117,6 +1118,7 @@
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
       <div style="position:absolute; top:260px; left:265px; z-index:1000;">
         <TestFlowTourGuide
+          targetId="add-block-open"
           title="Add Your First Block"
           description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
           pulsePosition={{ top: "-64px", left: "30px" }}
