@@ -1116,28 +1116,29 @@
     </SvelteFlow>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
-        <TestFlowTourGuide
-          targetId="add-block-open"
-          title="Add Your First Block"
-          description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
-          pulsePosition={{ top: "-64px", left: "30px" }}
-          tipPosition="top-left"
-          stepCount="3/7"
-          onNext={() => {
-            currentStep.set(4);
-            createNewNode("1");
-          }}
-          onClose={() => {
-            isTestFlowTourGuideOpen.set(false);
-          }}
-        />
-      </div>
+      <!-- <div style="position:absolute; top:260px; left:265px; z-index:1000;"> -->
+      <TestFlowTourGuide
+        targetId="add-block-open"
+        title="Add Your First Block"
+        description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
+        pulsePosition={{ top: "-64px", left: "30px" }}
+        tipPosition="top-left"
+        stepCount="3/7"
+        onNext={() => {
+          currentStep.set(4);
+          createNewNode("1");
+        }}
+        onClose={() => {
+          isTestFlowTourGuideOpen.set(false);
+        }}
+      />
+      <!-- </div> -->
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
       <div style="position:absolute; top:232px; left:638px; z-index:1000;">
         <TestFlowTourGuide
+          targetId="request-div"
           title="Select an API"
           description={`Block added--nice! Now, click the dropdown to select an API. Don't have one? No worries, a sample API is available for you to use.`}
           tipPosition="left-top"

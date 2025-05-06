@@ -38,7 +38,7 @@
   function updatePosition() {
     if (targetId) {
       targetElement = document.getElementById(targetId);
-      console.log(targetElement);
+
       if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
         containerTopX = rect.top + window.scrollY;
