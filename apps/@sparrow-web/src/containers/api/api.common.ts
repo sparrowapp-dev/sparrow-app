@@ -29,7 +29,7 @@ import {
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { Base64Converter, Sleep, StatusCode } from "@sparrow/common/utils";
 import { version } from "../../../package.json";
-import * as Sentry from "@sentry/svelte";
+
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -175,7 +175,6 @@ const makeRequest = async (
         type: "HTTP",
       },
     });
-    Sentry.captureException(e); 
     if (
       e.response?.data?.statusCode === 401 &&
       e.response?.data?.message === ErrorMessages.ExpiredToken
@@ -263,7 +262,6 @@ const sendMessage = async (tab_id: string, message: string) => {
       return webSocketDataMap;
     });
   } catch (e) {
-    Sentry.captureException(e)
     console.error(e);
     notifications.error("Failed to send message");
     return error("error");
@@ -494,7 +492,6 @@ const connectWebSocket = async (
       if (signal?.aborted) {
         return;
       }
-      Sentry.captureException(error);
       console.error("WebSocket connection error:", error);
       webSocketDataStore.update((webSocketDataMap) => {
         webSocketDataMap.delete(tabId);
@@ -1324,7 +1321,6 @@ const makeGraphQLRequest = async (
         type: "PROXY_GRAPHQL",
       },
     });
-    Sentry.captureException(err);
     if (_signal?.aborted) {
       // Check if request is aborted after request fails
       throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
