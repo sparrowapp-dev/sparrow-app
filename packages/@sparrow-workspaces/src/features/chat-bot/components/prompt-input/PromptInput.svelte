@@ -5,6 +5,7 @@
   import { Select } from "@sparrow/library/forms";
   import { Button, Tooltip } from "@sparrow/library/ui";
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let placeholder = "";
   export let sendPrompt;
   export let prompt: string = "";
@@ -62,10 +63,15 @@
     on:keydown={(event) => {
       // isTyping = true;
       if (event.key === "Enter" && prompt && !isResponseGenerating) {
-        console.log("sending prompt:>> ");
         sendPrompt(prompt);
         onUpdateAiPrompt("");
-
+        captureEvent("ai_chatbot_send_button_clicked", {
+          component: "PromptInput",
+          message_length: prompt.length,
+          selected_engine: "GPT-4o",
+          timestamp: new Date().toISOString(),
+          response_time: null,
+        });
         isTyping = false;
         isPromptBoxFocused = false;
         event.target.blur();
@@ -108,7 +114,7 @@
             name: "DeepSeek",
             id: "deepseek",
             disabled: true,
-            hide: true,
+            hide: false,
           },
         ]}
         titleId={"azure-ai"}

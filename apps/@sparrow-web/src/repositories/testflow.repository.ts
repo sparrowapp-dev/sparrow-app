@@ -106,7 +106,7 @@ export class TestflowRepository {
     _testflows: TFRxDocumentType[],
   ): Promise<void> => {
     if ((_testflows?.length || 0) > 0) {
-      await this.rxdb?.bulkUpsert(_testflows);
+      await RxDB.getInstance()?.rxdb?.testflow?.bulkUpsert(_testflows);
     }
     return;
   };

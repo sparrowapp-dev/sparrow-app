@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.22.0",
+  "version": "2.22.1",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -54,8 +54,9 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-xml": "^6.0.2",
     "@codemirror/language": "^6.10.0",
-    "@codemirror/state": "^6.4.0",
     "@codemirror/lint": "^6.8.4",
+    "@codemirror/merge": "^6.10.0",
+    "@codemirror/state": "^6.4.0",
     "@editorjs/code": "^2.9.0",
     "@editorjs/editorjs": "^2.30.4",
     "@editorjs/header": "^2.8.7",
@@ -65,6 +66,7 @@
     "@editorjs/underline": "^1.1.0",
     "@lezer/highlight": "^1.2.0",
     "@microsoft/applicationinsights-web": "^3.3.1",
+    "@sentry/svelte": "^9.14.0",
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/cli": "2.0.0-beta.18",
     "@tauri-apps/plugin-deep-link": "^2.2.0",
@@ -165,19 +167,19 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.22.0.dmg"
+              "label": "Sparrow_2.22.1.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.22.0.exe"
+              "label": "Sparrow_2.22.1.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.22.0.msi"
+              "label": "Sparrow_2.22.1.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.22.0_x64_en-US.msi.zip"
+              "label": "Sparrow_2.22.1_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",

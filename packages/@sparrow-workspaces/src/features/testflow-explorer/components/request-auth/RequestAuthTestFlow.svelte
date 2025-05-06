@@ -45,6 +45,7 @@
       onUpdateRequestAuth("bearerToken", data?.bearerToken);
     }
   };
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -79,6 +80,7 @@
         callback={onChangeRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
+        {handleOpenCurrentDynamicExpression}
       />
     {:else if requestStateAuth?.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.BEARER_TOKEN}
       <BearerToken
@@ -86,6 +88,7 @@
         callback={onChangeRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
+        {handleOpenCurrentDynamicExpression}
       />
     {:else if requestStateAuth?.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.BASIC_AUTH}
       <BasicAuth
@@ -93,6 +96,7 @@
         callback={onChangeRequestAuth}
         {environmentVariables}
         {onUpdateEnvironment}
+        {handleOpenCurrentDynamicExpression}
       />
     {/if}
   </section>

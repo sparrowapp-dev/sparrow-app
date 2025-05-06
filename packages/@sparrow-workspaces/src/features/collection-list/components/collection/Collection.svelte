@@ -2,7 +2,8 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-
+  import * as Sentry from "@sentry/svelte";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
@@ -26,6 +27,7 @@
   export let isFirstCollectionExpand = false;
   export let onCompareCollection;
   export let onSyncCollection;
+  export let isSharedWorkspace = false;
   let isSyncChangesAvailable = false;
 
   import {
@@ -114,6 +116,17 @@
     }, 100);
   };
 
+  const handlecollection_set_auth = ({
+    event_name,
+  }: {
+    event_name: string;
+  }) => {
+    captureEvent("open_collection_auth", {
+      component: "Collection",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
   const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(
       `show-more-collection-${collection.id}`,
@@ -310,6 +323,7 @@
             }
           })
           .catch((error) => {
+            Sentry.captureException(error);
             console.error("Error during interval compare:", error);
           });
       },
@@ -355,7 +369,8 @@
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
       Are you sure you want to delete this Collection? Everything in <span
-      class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">"{collection.name}"</span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{collection.name}"</span
       >
       will be removed.
     </p>
@@ -415,7 +430,7 @@
   </div></Modal
 >
 
-{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
   <Options
     xAxis={collection.activeSync
       ? collectionTabWrapper.getBoundingClientRect().right - 115
@@ -450,12 +465,14 @@
         //     : true,
       },
       {
-        onClick: () =>
+        onClick: () => {
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
             navigation: CollectionNavigationTabEnum.AUTH,
-          }),
+          });
+          handlecollection_set_auth({ event_name: "Set Auth Clicked" });
+        },
         displayText: "Set Auth",
         disabled: false,
         hidden: false,
@@ -589,7 +606,8 @@
       type="teritiary-regular"
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
       onClick={(e) => {
-        // visibility = !visibility;
+        e.stopPropagation();
+        visibility = !visibility;
       }}
     />
     {#if isRenaming}
@@ -642,7 +660,7 @@
       title="More options"
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
       > -->
-    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if !collection?.activeSync}
         <Tooltip
           title={"Add Options"}
@@ -688,7 +706,7 @@
       </Tooltip>
     {/if}
 
-    {#if collection?.activeSync && isSyncChangesAvailable && !isSyncing}
+    {#if collection?.activeSync && isSyncChangesAvailable && !isSyncing && !isSharedWorkspace}
       <Tooltip
         title={"Changes available for this collection."}
         placement={"top-center"}
@@ -755,7 +773,7 @@
       ></div>
     {/if}
     <div class="">
-      {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
         <div class="ps-5" style="height: 32px; ">
           <div
             style="background-color: var(--bg-ds-primary-800); align-items:center; justify-content:space-between; border-radius:4px;"
@@ -794,6 +812,7 @@
       {#each collection.items as explorer}
         <Folder
           {userRole}
+          {isSharedWorkspace}
           {onItemCreated}
           {onItemDeleted}
           {onItemRenamed}
@@ -820,7 +839,7 @@
     {/if}
 
     <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
         <Tooltip
           title={collection?.activeSync
             ? "Adding folders is disabled for active sync collections."

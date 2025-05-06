@@ -37,6 +37,7 @@
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
   import { ConnectableObservable } from "rxjs";
   import WithButtonV6 from "../../../../hoc/WithButtonV6.svelte";
+  import * as Sentry from "@sentry/svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -49,6 +50,7 @@
   export let isWebApp = false;
   export let runSingleNode;
   export let testflowStore;
+  export let handleOpenCurrentDynamicExpression;
 
   let responseLoader = false;
   let height = 300;
@@ -146,6 +148,7 @@
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
     } catch (err) {
+      Sentry.captureException(err);
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
       responseLoader = false;
@@ -255,6 +258,7 @@
       {userRole}
       {onUpdateEnvironment}
       {handleClickTestButton}
+      {handleOpenCurrentDynamicExpression}
       isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
   </div>
@@ -284,8 +288,10 @@
               params={selectedBlock?.data?.requestData?.queryParams ?? []}
               authParameter={{}}
               isBulkEditActive={false}
+              {selectedBlock}
               onUpdateRequestState={handleUpdateRequestData}
               {environmentVariables}
+              {handleOpenCurrentDynamicExpression}
             />
           {:else if requestNavigation === RequestSectionEnum.REQUEST_BODY}
             <RequestBodyTestFlow
@@ -294,6 +300,7 @@
               requestState={selectedBlock?.data?.requestData?.state}
               {environmentVariables}
               onUpdateRequestState={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow
@@ -303,6 +310,8 @@
               authHeader={{}}
               {environmentVariables}
               onHeadersChange={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
+              {selectedBlock}
               isBulkEditActive={false}
             />
           {:else if requestNavigation === RequestSectionEnum.AUTHORIZATION}
@@ -311,6 +320,7 @@
               {environmentVariables}
               requestStateAuth={selectedBlock?.data?.requestData?.state}
               onUpdateRequestAuth={handleUpdateRequestData}
+              {handleOpenCurrentDynamicExpression}
             />
           {/if}
         </div>

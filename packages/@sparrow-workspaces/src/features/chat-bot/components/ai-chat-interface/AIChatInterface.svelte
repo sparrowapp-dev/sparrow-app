@@ -23,6 +23,7 @@
   export let regenerateAiResponse;
   export let onUpdateRequestState;
   export let onStopGeneratingAIResponse;
+  export let handleApplyChangeOnAISuggestion;
   export let scrollList;
 
   let chatContainer: HTMLElement;
@@ -201,6 +202,7 @@
                         ? true
                         : false}
                       {isResponseGenerating}
+                      {handleApplyChangeOnAISuggestion}
                     />
                   </div>
                 {/each}

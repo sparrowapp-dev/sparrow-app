@@ -48,6 +48,9 @@
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
   export let onSyncCollection;
+  export let isSharedWorkspace = false;
+
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   /**
    * Icons and images
@@ -143,6 +146,14 @@
       updateLastUpdateAndCount();
     }
   }
+
+  const handlecollection_collection_saved = ({ name }: { name: string }) => {
+    captureEvent("collection_saved", {
+      component: "CollectionExplorer",
+      button_text: name,
+      destination: name,
+    });
+  };
 
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -499,7 +510,9 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable || collection?.activeSync}
+              disable={!isCollectionEditable ||
+                collection?.activeSync ||
+                isSharedWorkspace}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -512,11 +525,14 @@
           </Dropdown>
         </div>
         <Button
-          disable={$tab?.isSaved || !isCollectionEditable ? true : false}
+          disable={$tab?.isSaved || !isCollectionEditable
+            ? true
+            : false || isSharedWorkspace}
           startIcon={SaveRegular}
           type={"secondary"}
           onClick={() => {
             onSaveCollection();
+            handlecollection_collection_saved({ name: "Collection Saved" });
           }}
         />
       </div>
@@ -568,15 +584,17 @@
           ?.collectionNavigation}
         {onUpdateCollectionState}
       />
-      <div class="d-flex" style="align-items: center;">
-        <ArrowSyncRegular size="12px" />
-        <p
-          style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
-          class="text-ds-font-size-12"
-        >
-          Synced {syncedTimeAgo(collection?.syncedAt)}
-        </p>
-      </div>
+      {#if collection?.activeSync}
+        <div class="d-flex" style="align-items: center;">
+          <ArrowSyncRegular size="12px" />
+          <p
+            style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
+            class="text-ds-font-size-12"
+          >
+            Synced {syncedTimeAgo(collection?.syncedAt)}
+          </p>
+        </div>
+      {/if}
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div

@@ -11,6 +11,10 @@ export interface WorkspacePutBody {
   description?: string;
 }
 
+export interface WorkspaceTypePatchBody {
+  workspaceType?: string;
+}
+
 export interface InvalidWorkspacePostBody {
   name: boolean;
   id: boolean;

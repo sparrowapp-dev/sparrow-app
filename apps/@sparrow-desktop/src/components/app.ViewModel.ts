@@ -20,6 +20,7 @@ import { Events } from "@sparrow/common/enums";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import * as Sentry from "@sentry/svelte";
 interface DeepLinkHandlerWindowsPayload {
   payload: {
     url: string;
@@ -213,6 +214,12 @@ export class AppViewModel {
       const existingAccessToken = localStorage.getItem("AUTH_TOKEN");
       const workspaceId = params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
+
+      // If running in Sparrow Edge mode and a valid access token already exists,
+      // skip further login logic to avoid overriding the existing user session.
+      if (isSparrowEdge === "true" && existingAccessToken) {
+        return;
+      }
       if (isSparrowEdge === "true" && !existingAccessToken) {
         await this.addGuestUser();
         setTimeout(async () => {
@@ -232,6 +239,7 @@ export class AppViewModel {
       }
       await this.handleLoginAndWorkspaceSwitchThrottler(url, workspaceId);
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
     }
   }
@@ -267,6 +275,7 @@ export class AppViewModel {
         console.warn("Unsupported platform for deep linking:", os);
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error registering deep link handler:", error);
     }
   }

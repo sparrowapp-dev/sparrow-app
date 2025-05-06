@@ -96,6 +96,7 @@
   export let onSyncCollection;
 
   let isExpandCollectionLine = false;
+  let isSharedWorkspace = false;
   // export let handleExpandCollectionLine;
 
   $: {
@@ -183,6 +184,7 @@
     if (currentWorkspace) {
       currentWorkspace.subscribe((value) => {
         activeWorkspace = value;
+        isSharedWorkspace = value?.isShared || false;
         collectionListDocument = collectionListDocument?.filter(
           (value) => value.workspaceId === activeWorkspace?._id,
         );
@@ -283,7 +285,7 @@
         </span>
       </div>
 
-      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
         <Tooltip
           title={"Add Collection"}
           placement={"bottom-center"}
@@ -339,6 +341,7 @@
                 {#each collectionFilter as col}
                   <Collection
                     bind:userRole
+                    {isSharedWorkspace}
                     {onItemCreated}
                     {onItemDeleted}
                     {onItemRenamed}
@@ -381,24 +384,27 @@
               classProps={"pe-0"}
             >
               {#each collectionListDocument as col}
-                <Collection
-                  bind:userRole
-                  {onItemCreated}
-                  {onItemDeleted}
-                  {onItemRenamed}
-                  {onItemOpened}
-                  {onBranchSwitched}
-                  {onRefetchCollection}
-                  {userRoleInWorkspace}
-                  {activeTabPath}
-                  {activeTabType}
-                  collection={col?.toMutableJSON()}
-                  {activeTabId}
-                  bind:isFirstCollectionExpand
-                  {isWebApp}
-                  {onCompareCollection}
-                  {onSyncCollection}
-                />
+                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace)}
+                  <Collection
+                    bind:userRole
+                    {isSharedWorkspace}
+                    {onItemCreated}
+                    {onItemDeleted}
+                    {onItemRenamed}
+                    {onItemOpened}
+                    {onBranchSwitched}
+                    {onRefetchCollection}
+                    {userRoleInWorkspace}
+                    {activeTabPath}
+                    {activeTabType}
+                    collection={col?.toMutableJSON()}
+                    {activeTabId}
+                    bind:isFirstCollectionExpand
+                    {isWebApp}
+                    {onCompareCollection}
+                    {onSyncCollection}
+                  />
+                {/if}
               {/each}
             </List>
           {/if}

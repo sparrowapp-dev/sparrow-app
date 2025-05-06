@@ -130,7 +130,7 @@ import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspac
 import { WorkspaceService } from "src/services/workspace.service";
 import constants from "src/constants/constants";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
-
+import * as Sentry from "@sentry/svelte";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -3858,6 +3858,7 @@ export default class CollectionsViewModel {
         return;
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error(errMessage);
       return;
     }
@@ -5875,10 +5876,12 @@ export default class CollectionsViewModel {
     }
   };
 
-  public setupRedirect = () => {
+  public setupRedirect = async () => {
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
-    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email}`;
+    const isGuestUser = await this.getGuestUserState();
+    const isSparrowEdge = isGuestUser ? "&isSparrowEdge=true" : "";
+    const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email${isSparrowEdge}`;
     window.location.href = sparrowRedirect;
   };
 
@@ -6502,6 +6505,7 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to sync collection. Please try again.");
     }
@@ -6545,6 +6549,7 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to replace collection. Please try again.");
     }

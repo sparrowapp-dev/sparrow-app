@@ -240,6 +240,7 @@ export class WorkspaceRepository {
       if (data?.name) value.name = data.name;
       if (data?.description !== null && data?.description !== undefined)
         value.description = data.description;
+      if (data?.workspaceType) value.workspaceType = data.workspaceType;
       if (data?.team) value.team = data.team;
       if (data?.environmentId) value.environmentId = data.environmentId;
       if (data?.users) value.users = data.users;
@@ -303,7 +304,10 @@ export class WorkspaceRepository {
     const selectedWorkspacesToBeDeleted = workspacesJSON
       ?.filter((_workspace) => {
         for (let i = 0; i < _workspaceIds.length; i++) {
-          if (_workspaceIds[i] === _workspace._id) {
+          if (
+            _workspaceIds[i] === _workspace._id ||
+            _workspace.team?.teamId === "sharedWorkspaceTeam"
+          ) {
             return false;
           }
         }
@@ -353,6 +357,21 @@ export class WorkspaceRepository {
       .exec();
     return await workspace.remove();
   };
+
+  public deleteWorkspacesByTeamId = async (teamId: string): Promise<any> => {
+    const workspaces = await RxDB.getInstance()
+      .rxdb.workspace.find({
+        selector: {
+          "team.teamId": teamId,
+        },
+      })
+      .exec();
+
+    const removePromises = workspaces.map((workspace) => workspace.remove());
+
+    return Promise.all(removePromises);
+  };
+
   public addUserInWorkspace = async (
     workspaceId: string,
     addUsersInWorkspaceDto: addUsersInWorkspace[],

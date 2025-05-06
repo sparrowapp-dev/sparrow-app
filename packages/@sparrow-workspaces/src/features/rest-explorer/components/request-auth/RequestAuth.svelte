@@ -7,6 +7,7 @@
   import { Button } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let auth;
   export let environmentVariables;
   export let requestStateAuth;
@@ -16,6 +17,17 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
+  const handlecollection_restapi_auth_changed = ({
+    requestAuthNavigation,
+  }: {
+    requestAuthNavigation: string;
+  }) => {
+    captureEvent("restapi_auth_changed", {
+      component: "RequestAuth",
+      button_text: requestAuthNavigation,
+      destination: requestAuthNavigation,
+    });
+  };
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -51,6 +63,9 @@
             titleId={requestStateAuth}
             onclick={(id = "") => {
               onUpdateRequestState({ requestAuthNavigation: id });
+              handlecollection_restapi_auth_changed({
+                requestAuthNavigation: id,
+              });
             }}
             disabled={false}
           />

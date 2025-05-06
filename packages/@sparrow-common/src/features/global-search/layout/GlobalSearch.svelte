@@ -19,6 +19,7 @@
   import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
   import RecentItems from "../components/RecentItems/RecentItems.svelte";
   import { OSDetector } from "@sparrow/common/utils";
+  import * as Sentry from "@sentry/svelte";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -121,6 +122,7 @@
       handleSearch();
       decidingKey();
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error fetching workspace details:", error);
     }
   });
