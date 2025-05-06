@@ -109,7 +109,7 @@
               bind:cursorPosition
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
-            <FunctionsOptions bind:expression />
+            <FunctionsOptions bind:expression bind:cursorPosition />
           {/if}
         {/key}
       </div>
