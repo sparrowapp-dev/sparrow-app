@@ -429,90 +429,76 @@
           </Select>
         {/if}
       </div>
-    {/if}
-              {#if !$policyConfig.disableSignIn}
-                <Button
-                  type="primary"
-                  title="Create an Account or Sign In"
-                  size="small"
-                  onClick={onLoginUser}
-                  customWidth={"100%"}
-                />
-              {/if}
-            </div>
-          </Select>
-        </div>
-      {:else if currentWorkspaceId}
-        <Select
-          id={"workspace-dropdown"}
-          data={workspaceData}
-          titleId={`${currentWorkspaceId}`}
-          onclick={handleWorkspaceDropdown}
-          minHeaderWidth={"160px"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={"hover-active"}
-          headerTheme={"transparent"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"240px"}
-          zIndex={200}
-          bodyTheme={"surface"}
-          borderRounded={"2px"}
-          position={"absolute"}
-          isHeaderCombined={true}
-          minBodyWidth={"240px"}
-          maxBodyHeight={"300px"}
-          iconRequired={true}
-          icon={WorkspaceRegular}
-          iconColor={"var(--icon-ds-neutral-100)"}
-          headerFontWeight={600}
-          showDescription={false}
-          headerHeight={"28px"}
-        >
-          <div slot="pre-select" class="mb-1">
-            <div
-              class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
-            >
-              {currentTeamName}
-            </div>
-          </div>
+    {:else if currentWorkspaceId}
+      <Select
+        id={"workspace-dropdown"}
+        data={workspaceData}
+        titleId={`${currentWorkspaceId}`}
+        onclick={handleWorkspaceDropdown}
+        minHeaderWidth={"160px"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        headerTheme={"transparent"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"240px"}
+        zIndex={200}
+        bodyTheme={"surface"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        isHeaderCombined={true}
+        minBodyWidth={"240px"}
+        maxBodyHeight={"300px"}
+        iconRequired={true}
+        icon={WorkspaceRegular}
+        iconColor={"var(--icon-ds-neutral-100)"}
+        headerFontWeight={600}
+        showDescription={false}
+        headerHeight={"28px"}
+      >
+        <div slot="pre-select" class="mb-1">
           <div
-            slot="post-select"
-            class="post-dropdown"
-            style="justify-content: center; align-items:center;"
+            class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
           >
-            <div class="lower-underline"></div>
-            <div
-              class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium"
-              on:click={handleViewWorkspaces}
-            >
-              <span>View all Workspaces</span>
+            {currentTeamName}
+          </div>
+        </div>
+        <div
+          slot="post-select"
+          class="post-dropdown"
+          style="justify-content: center; align-items:center;"
+        >
+          <div class="lower-underline"></div>
+          <div
+            class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+            on:click={handleViewWorkspaces}
+          >
+            <span>View all Workspaces</span>
+            <Button
+              type="teritiary-regular"
+              startIcon={ArrowRightRegular}
+              size="small"
+            />
+          </div>
+          <div class="lower-underline"></div>
+          <div
+            class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+            on:click={onCreateWorkspace}
+          >
+            <span>Create New Workspace</span>
+            <div style="align-content: flex-end;">
               <Button
                 type="teritiary-regular"
-                startIcon={ArrowRightRegular}
+                startIcon={AddRegular}
                 size="small"
               />
             </div>
-            <div class="lower-underline"></div>
-            <div
-              class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium"
-              on:click={onCreateWorkspace}
-            >
-              <span>Create New Workspace</span>
-              <div style="align-content: flex-end;">
-                <Button
-                  type="teritiary-regular"
-                  startIcon={AddRegular}
-                  size="small"
-                />
-              </div>
-            </div>
           </div>
-        </Select>
-      {/if}
-    </div>
+        </div>
+      </Select>
+    {/if}
   </div>
 
   <div

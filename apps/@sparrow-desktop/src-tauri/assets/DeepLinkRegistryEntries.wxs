@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Wix 
- xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
     <DirectoryRef Id="TARGETDIR">
       <Component Id="DeepLinkRegistryEntries" Guid="24b24bc1-8389-4ac7-bde7-99f078440507">
@@ -32,13 +31,8 @@
             Value=""
           />
         </RegistryKey>
-      
-      </Component>
-
-    </DirectoryRef>
-  </Fragment>
-        </RegistryKey>
-      
+        
+        <!-- Policy Registry Keys -->
         <RegistryKey
           Root="HKLM"
           Key="SOFTWARE\Policies\Sparrow"
@@ -50,22 +44,18 @@
             Name="DisableSignIn"
             Value="0"
           />
-
           <RegistryValue
             Type="integer"
             Name="DisableWorkspace"
             Value="0"
           />
-
           <RegistryValue
             Type="integer"
             Name="DisableActiveSync"
             Value="0"
           />
-          
         </RegistryKey>
       </Component>
-
     </DirectoryRef>
   </Fragment>
 </Wix>
