@@ -134,6 +134,9 @@ export class RxDB {
           1: function (oldDoc: WorkspaceDocument) {
             return oldDoc;
           },
+          2: function (oldDoc: WorkspaceDocument) {
+            return oldDoc;
+          },
         },
       },
       tab: {
@@ -263,6 +266,9 @@ export class RxDB {
           1: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
+          2: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
         },
       },
       activesidebartab: {
@@ -275,6 +281,9 @@ export class RxDB {
         schema: teamSchema,
         migrationStrategies: {
           1: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },

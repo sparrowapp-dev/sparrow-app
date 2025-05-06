@@ -78,6 +78,7 @@
   export let userRole;
   export let activeTabType;
   export let isWebApp;
+  export let isSharedWorkspace = false;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -194,10 +195,13 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
     <p>
       Are you sure you want to delete this Request? <span
-        class="text-whiteColor fw-bold">"{api.name}"</span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{api.name}"</span
       >
       will be removed and cannot be restored.
     </p>
@@ -239,7 +243,7 @@
   </div></Modal
 >
 
-{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
@@ -356,6 +360,10 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
+          onClick={(e) => {
+            e.stopPropagation();
+            expand = !expand;
+          }}
         />
       {:else}
         <div
@@ -404,7 +412,7 @@
 
   {#if api.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
-  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+  {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
     {#if isDragging}
       <span class="threedot-icon-container d-flex">
         <Button

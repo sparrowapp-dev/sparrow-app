@@ -24,9 +24,9 @@
         }}
         placeholder={"Token"}
         {theme}
+        disabled={true}
         {environmentVariables}
         {onUpdateEnvironment}
-        disabled={true}
       />
     </div>
   </div>

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { CodeMirrorInput } from "@sparrow/workspaces/components";
   import { AuthInputTheme } from "@sparrow/workspaces/utils";
-  import { RadioButton } from "@sparrow/library/ui";
+  import { Button, RadioButton } from "@sparrow/library/ui";
   import { CollectionRequestAddToBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
   export let apiData;
   export let callback;
   export let environmentVariables;
@@ -18,6 +19,10 @@
     apiData.addTo = event.target.value;
     callback({ apiKey: apiData });
   };
+
+  export let handleOpenCurrentDynamicExpression;
+  let authKeyDispatcher;
+  let authValueDispatcher;
 </script>
 
 <p class="text-fs-12 fw-bold mb-2">Add API Key to</p>
@@ -49,36 +54,82 @@
 </div>
 <div class="d-flex flex-column w-100">
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class=" mb-2 text-secondary-100">Key</p>
+    <p class="mb-2 text-secondary-100">Key</p>
 
-    <div class="position-relative auth-input-container">
-      <CodeMirrorInput
-        bind:value={apiData.authKey}
-        onUpdateInput={() => {
-          handleAuthChange();
-        }}
-        placeholder={"Enter auth key"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        {disabled}
-      />
+    <div class="position-relative" style="padding-bottom: 40px;">
+      <div class="position-absolute top-0 auth-input-container">
+        <div class="d-flex gap-2">
+          <CodeMirrorInput
+            bind:value={apiData.authKey}
+            onUpdateInput={() => {
+              handleAuthChange();
+            }}
+            placeholder={"Enter auth key"}
+            {theme}
+            {disabled}
+            {environmentVariables}
+            {onUpdateEnvironment}
+            bind:dispatcher={authKeyDispatcher}
+            handleOpenDE={(obj) => {
+              handleOpenCurrentDynamicExpression({
+                ...obj,
+                type: "authKey",
+              });
+            }}
+          />
+          <Button
+            size="medium"
+            type="teritiary-regular"
+            startIcon={MathFormulaRegular}
+            onClick={() => {
+              handleOpenCurrentDynamicExpression({
+                type: "authKey",
+                dispatch: authKeyDispatcher,
+              });
+            }}
+          />
+        </div>
+      </div>
     </div>
   </div>
+
   <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Value</p>
-    <div class="position-relative auth-input-container">
-      <CodeMirrorInput
-        bind:value={apiData.authValue}
-        onUpdateInput={() => {
-          handleAuthChange();
-        }}
-        placeholder={"Enter auth value"}
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        {disabled}
-      />
+
+    <div class="position-relative" style="padding-bottom: 40px;">
+      <div class="position-absolute top-0 auth-input-container">
+        <div class="d-flex gap-2">
+          <CodeMirrorInput
+            bind:value={apiData.authValue}
+            onUpdateInput={() => {
+              handleAuthChange();
+            }}
+            placeholder={"Enter auth value"}
+            {theme}
+            {disabled}
+            {environmentVariables}
+            {onUpdateEnvironment}
+            bind:dispatcher={authValueDispatcher}
+            handleOpenDE={(obj) => {
+              handleOpenCurrentDynamicExpression({
+                ...obj,
+                type: "authValue",
+              });
+            }}
+          />
+          <Button
+            size="medium"
+            type="teritiary-regular"
+            startIcon={MathFormulaRegular}
+            onClick={() => {
+              handleOpenCurrentDynamicExpression({
+                type: "authValue",
+                dispatch: authValueDispatcher,
+              });
+            }}
+          />
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -86,6 +137,7 @@
 <style>
   .auth-input-container {
     max-width: 615px;
+    width: 100%;
   }
 
   .radio {

@@ -1,6 +1,8 @@
 const constants = {
   API_URL: import.meta.env.VITE_API_URL,
   ENABLE_MIX_PANEL: import.meta.env.VITE_ENABLE_MIX_PANEL,
+  POSTHOG_API_URL: import.meta.env.VITE_POSTHOG_API_URL,
+  POSTHOG_CONNECTION_API_KEY: import.meta.env.VITE_POSTHOG_CONNECTION_API_KEY,
   MIX_PANEL_TOKEN: import.meta.env.VITE_MIX_PANEL_TOKEN,
   API_SEND_TIMEOUT: import.meta.env.VITE_API_TIMEOUT,
   RXDB_DB_NAME: "sparrow-db",
@@ -9,6 +11,7 @@ const constants = {
   WORKSPACE_LIMIT: 5,
   API_LIMIT: 5,
   SPARROW_SUPPORT_EMAIL: import.meta.env.VITE_SPARROW_SUPPORT_EMAIL,
+  CANNY_FEEDBACK_URL: import.meta.env.VITE_CANNY_FEEDBACK_URL,
   SPARROW_AUTH_URL: import.meta.env.VITE_AUTH_URL,
   SPARROW_GITHUB: import.meta.env.VITE_SPARROW_GITHUB,
   SPARROW_LINKEDIN: import.meta.env.VITE_SPARROW_LINKEDIN,
@@ -25,6 +28,10 @@ const constants = {
   DOCS_URL: import.meta.env.VITE_SPARROW_DOCS,
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_APP_ENVIRONMENT_PATH,
   SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_SPARROW_AI_WEBSOCKET,
+  SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
+  APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
+  SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
+  MARKETING_URL: import.meta.env.VITE_MARKETING_URL,
 };
 
 export default constants;

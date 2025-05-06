@@ -15,6 +15,7 @@
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
   import { save } from "@tauri-apps/plugin-dialog";
   import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
+  import * as Sentry from "@sentry/svelte";
 
   export let webSocket;
   export let onUpdateContentType;
@@ -50,7 +51,10 @@
           return "\n";
         }
         messageData = `${parse[1]}`;
-      } catch (e) {}
+      } catch (e) {
+        Sentry.captureException(e);
+        console.error(e);
+      }
 
       return messageData;
     }

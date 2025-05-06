@@ -315,7 +315,9 @@
   />
 </div>
 {#if selectedRole === TeamRole.TEAM_ADMIN}
-  <p class="invite-subheader text-textColor mt-1 mb-1 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">
+  <p
+    class="invite-subheader text-textColor mt-1 mb-1 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
+  >
     Admins will have access to all current and future hub workspaces.
   </p>
 {/if}
@@ -401,6 +403,9 @@
   }
   .error-text {
     margin-top: 4px;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
     margin-bottom: 0 !important;
     color: var(--error--color);
   }

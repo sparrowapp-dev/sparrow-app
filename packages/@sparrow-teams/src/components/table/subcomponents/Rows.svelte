@@ -2,8 +2,17 @@
   import { ThreeDotIcon } from "@sparrow/library/assets";
   import { UserProfileList } from "@sparrow/teams/compopnents";
   import { MenuView } from "@sparrow/teams/compopnents";
-  import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
-  import { Button } from "@sparrow/library/ui";
+  import {
+    TeamRole,
+    WorkspaceMemberRole,
+    WorkspaceType,
+  } from "@sparrow/common/enums";
+  import { Button, Tag } from "@sparrow/library/ui";
+  import {
+    GlobeRegular,
+    LockClosedRegular,
+    MoreVerticalRegular,
+  } from "@sparrow/library/icons";
 
   export let list;
   export let activeTeam;
@@ -165,7 +174,21 @@
   <td
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 position-relative"
   >
-    {#if isWebEnvironment}
+    {#if list?.workspaceType === WorkspaceType.PUBLIC}
+      <Tag text={WorkspaceType.PUBLIC} type="green" endIcon={GlobeRegular} />
+    {:else}
+      <Tag
+        text={WorkspaceType.PRIVATE}
+        type="cyan"
+        endIcon={LockClosedRegular}
+      />
+    {/if}
+  </td>
+
+  <td
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 position-relative"
+  >
+    {#if isWebEnvironment && !list?.isShared}
       <button
         class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
         on:click|stopPropagation={() => {
@@ -190,7 +213,7 @@
         onClick={(e) => {
           rightClickContextMenu(e);
         }}
-        startIcon={ThreeDotIcon}
+        startIcon={MoreVerticalRegular}
       />
     </div>
   </td>
@@ -223,13 +246,15 @@
   }
   .threedot-icon-container {
     visibility: visible;
-    background-color: transparent;
-    z-index: 2;
-    transform: rotate(90deg);
-    outline: none;
+    pointer-events: none;
+    transition:
+      visibility 0.3s ease,
+      opacity 0.3s ease;
   }
+
   tr:hover .threedot-icon-container {
     visibility: visible;
+    pointer-events: auto;
   }
 
   .tab-data {

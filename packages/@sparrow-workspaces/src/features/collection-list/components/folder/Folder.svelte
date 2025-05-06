@@ -97,6 +97,7 @@
    */
   export let userRole;
   export let isWebApp = false;
+  export let isSharedWorkspace = false;
 
   let expand: boolean = false;
   let deleteLoader: boolean = false;
@@ -237,7 +238,8 @@
     >
       <p>
         Are you sure you want to delete this Folder? Everything in <span
-          class="text-whiteColor fw-bold">"{explorer.name}"</span
+          class="text-ds-font-weight-semi-bold"
+          style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
         >
         will be removed.
       </p>
@@ -296,7 +298,7 @@
     </div></Modal
   >
 
-  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
@@ -458,6 +460,10 @@
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
+              onClick={(e) => {
+                e.stopPropagation();
+                expand = !expand;
+              }}
             />
           </span>
 
@@ -517,7 +523,7 @@
 
         {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
           <Spinner size={"15px"} />
-        {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
           {#if !collection?.activeSync}
             <Tooltip
               title={"Add REST API"}
@@ -581,6 +587,7 @@
           {#each explorer?.items || [] as exp}
             <svelte:self
               {userRole}
+              {isSharedWorkspace}
               {onItemCreated}
               {onItemDeleted}
               {onItemRenamed}
@@ -637,6 +644,7 @@
       <div style={`cursor: pointer; `}>
         <Request
           {userRole}
+          {isSharedWorkspace}
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -654,6 +662,7 @@
       <div style="cursor:pointer;">
         <WebSocket
           {userRole}
+          {isSharedWorkspace}
           api={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -667,6 +676,7 @@
       <div style="cursor:pointer;">
         <SocketIo
           {userRole}
+          {isSharedWorkspace}
           socketIo={explorer}
           {onItemRenamed}
           {onItemDeleted}
@@ -680,6 +690,7 @@
       <div style="cursor:pointer;">
         <Graphql
           {userRole}
+          {isSharedWorkspace}
           graphql={explorer}
           {onItemRenamed}
           {onItemDeleted}

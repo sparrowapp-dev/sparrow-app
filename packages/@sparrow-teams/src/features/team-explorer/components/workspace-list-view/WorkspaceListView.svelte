@@ -41,6 +41,7 @@
     "Collections",
     "Contributors",
     "Last Updated",
+    "Visibility",
     "",
     "",
   ];
@@ -79,8 +80,8 @@
         tableClassProps="table p-0 table-responsive w-100"
         tableStyleProp="max-height: 100%; "
         dataSearch="true"
-        tableHeaderClassProp="position-sticky top-0 z-2"
-        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);"
+        tableHeaderClassProp="position-sticky top-0"
+        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);z-index: 103;"
         contributorsCount={openTeam?.users?.length}
         headerObject={tableHeaderContent}
         onSortToggle={handleSortToggle}
@@ -113,12 +114,14 @@
         <p
           style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
         >
-          Welcome to Sparrow – where teamwork flows effortlessly.
+          Collaborate seamlessly with your team and manage your projects
+          effectively in Sparrow.
         </p>
         <p
           style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
         >
-          Sign up or log in to unlock powerful tools and stay organized!
+          Create an account or Sign in to access hubs, workspaces and unlock
+          powerful features today!
         </p>
       </div>
     {/if}

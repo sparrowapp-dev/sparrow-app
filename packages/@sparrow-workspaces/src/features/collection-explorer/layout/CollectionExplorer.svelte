@@ -48,6 +48,9 @@
   export let onUpdateCollectionState;
   export let onUpdateEnvironment;
   export let onSyncCollection;
+  export let isSharedWorkspace = false;
+
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   /**
    * Icons and images
@@ -144,6 +147,14 @@
     }
   }
 
+  const handlecollection_collection_saved = ({ name }: { name: string }) => {
+    captureEvent("collection_saved", {
+      component: "CollectionExplorer",
+      button_text: name,
+      destination: name,
+    });
+  };
+
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
     onUpdateDescription(target.value);
@@ -234,6 +245,30 @@
       if (isCollectionEditable && $tab && !$tab.isSaved) {
         onSaveCollection();
       }
+    }
+  };
+
+  const syncedTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const months = Math.floor(days / 30); // Approximation
+
+    if (seconds < 60) {
+      return "just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (months) {
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      return ``;
     }
   };
 
@@ -475,7 +510,9 @@
           >
             <Button
               id={`add-item-collection`}
-              disable={!isCollectionEditable || collection?.activeSync}
+              disable={!isCollectionEditable ||
+                collection?.activeSync ||
+                isSharedWorkspace}
               title={"New"}
               type={"primary"}
               onClick={() => {
@@ -488,11 +525,14 @@
           </Dropdown>
         </div>
         <Button
-          disable={$tab?.isSaved || !isCollectionEditable ? true : false}
+          disable={$tab?.isSaved || !isCollectionEditable
+            ? true
+            : false || isSharedWorkspace}
           startIcon={SaveRegular}
           type={"secondary"}
           onClick={() => {
             onSaveCollection();
+            handlecollection_collection_saved({ name: "Collection Saved" });
           }}
         />
       </div>
@@ -538,12 +578,23 @@
         </div>
       </div>
     {/if} -->
-    <div class="d-flex pb-3">
+    <div class="d-flex pb-3" style="justify-content: space-between;">
       <CollectionNavigator
         collectionNavigation={$tab?.property?.collection?.state
           ?.collectionNavigation}
         {onUpdateCollectionState}
       />
+      {#if collection?.activeSync}
+        <div class="d-flex" style="align-items: center;">
+          <ArrowSyncRegular size="12px" />
+          <p
+            style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
+            class="text-ds-font-size-12"
+          >
+            Synced {syncedTimeAgo(collection?.syncedAt)}
+          </p>
+        </div>
+      {/if}
     </div>
     {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
       <div

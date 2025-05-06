@@ -9,6 +9,7 @@
   const handleUrlEncodeChange = (pairs) => {
     onUpdateRequestBody(pairs);
   };
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <section class="w-100">
@@ -20,5 +21,9 @@
     isInputBoxEditable={true}
     isCheckBoxEditable={true}
     onToggleBulkEdit={() => {}}
+    dynamicExpression={true}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "urlencoded" });
+    }}
   />
 </section>

@@ -63,6 +63,21 @@ export class CollectionService {
     );
     return response;
   };
+
+  public fetchPublicCollection = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/public/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public addCollection = async (
     collection: CreateCollectionPostBody,
     baseUrl: string,

@@ -167,6 +167,6 @@
     bottom: 0;
     left: 0px;
     top: 0px;
-    z-index: 100;
+    z-index: 0;
   }
 </style>

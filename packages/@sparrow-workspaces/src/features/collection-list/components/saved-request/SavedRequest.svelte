@@ -5,6 +5,8 @@
   import { Button } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
+
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   // ---- Helper functions
@@ -85,6 +87,19 @@
     }
   }
 
+  const handleresponseEvent = ({
+    event_title,
+    event_name,
+  }: {
+    event_title: string;
+    event_name: string;
+  }) => {
+    captureEvent(event_title, {
+      component: "SavedRequest",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
   let newRequestName: string = "";
 
   const handleRenameInput = (event: Event) => {
@@ -130,10 +145,13 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium">
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
     <p>
       Are you sure you want to delete this response? <span
-        class="text-whiteColor fw-bold">"{api.name}"</span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{api.name}"</span
       >
       will be removed and cannot be restored.
     </p>
@@ -161,6 +179,10 @@
       type={"danger"}
       loader={deleteLoader}
       onClick={() => {
+        handleresponseEvent({
+          event_title: "delete_response",
+          event_name: "Delete Response",
+        });
         deleteLoader = true;
         onItemDeleted("saved_request", {
           workspaceId: collection.workspaceId,
@@ -202,6 +224,10 @@
       {
         onClick: () => {
           isRenaming = true;
+          handleresponseEvent({
+            event_title: "rename_response",
+            event_name: "Rename Response",
+          });
           setTimeout(() => inputField.focus(), 100);
         },
         displayText: `Rename Response`,
@@ -214,6 +240,10 @@
       },
       {
         onClick: () => {
+          handleresponseEvent({
+            event_title: "delete_response",
+            event_name: "Delete Response",
+          });
           isDeletePopup = true;
         },
         displayText: "Delete",

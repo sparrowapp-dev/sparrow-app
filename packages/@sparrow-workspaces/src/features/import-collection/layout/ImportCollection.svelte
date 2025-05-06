@@ -14,6 +14,7 @@
   import { TickMarkRoundedIcon as TickMark } from "@sparrow/library/assets";
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
+  import * as Sentry from "@sentry/svelte";
 
   export let currentWorkspaceId;
   export let onCloseModal;
@@ -89,7 +90,9 @@
             if (res?.isSuccessful) {
               isValidServerURL = true;
             }
-          } catch (e) {}
+          } catch (e) {
+            Sentry.captureException(e);
+          }
         }
       } else {
         isValidClientDeployedURL = true;
@@ -100,7 +103,9 @@
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
-          } catch (e) {}
+          } catch (e) {
+            Sentry.captureException(e);
+          }
         }
       }
     } else if (validateClientJSON(importData)) {
@@ -437,7 +442,9 @@
           currentBranch = activeResponse;
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      Sentry.captureException(e);
+    }
   };
 
   let repositoryBranch = "not exist";

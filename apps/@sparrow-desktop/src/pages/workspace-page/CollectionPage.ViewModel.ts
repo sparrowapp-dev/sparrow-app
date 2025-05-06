@@ -130,6 +130,7 @@ import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspac
 import { WorkspaceService } from "@app/services/workspace.service";
 import constants from "@app/constants/constants";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
+import * as Sentry from "@sentry/svelte";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -3493,6 +3494,7 @@ export default class CollectionsViewModel {
         );
         this.tabRepository.removeTab(requestResponse.id);
       }
+      notifications.success(`"${requestResponse.name}" Response deleted.`);
       return true;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -3527,6 +3529,7 @@ export default class CollectionsViewModel {
       this.handleRemoveTab(requestResponse.id);
 
       notifications.success(`"${requestResponse.name}" Response deleted.`);
+      
       MixpanelEvent(Events.DELETE_RESPONSE, {
         source: "Collection list",
       });
@@ -3846,6 +3849,7 @@ export default class CollectionsViewModel {
         return;
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error(errMessage);
       return;
     }
@@ -6450,6 +6454,7 @@ export default class CollectionsViewModel {
           updatedJSONWithSyncedAPIs.workspaceId as string,
           {
             items: updatedJSONWithSyncedAPIs.items,
+            syncedAt: new Date(),
           },
           baseUrl,
         );
@@ -6464,6 +6469,7 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to sync collection. Please try again.");
     }
@@ -6490,6 +6496,7 @@ export default class CollectionsViewModel {
             items: parsedJSON.data.data.items,
             name: parsedJSON.data.data.name,
             description: parsedJSON.data.data.description,
+            syncedAt: new Date(),
           },
           baseUrl,
         );
@@ -6506,6 +6513,7 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to replace collection. Please try again.");
     }

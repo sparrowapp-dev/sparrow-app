@@ -1,13 +1,13 @@
-name: Sparrow-web-dev
+name: Sparrow-web-prod
 on:
   push:
     branches:
-      - development
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: sparrow_web_Dev
+    environment: sparrow_web_Prod
     steps:
       - uses: actions/checkout@master
 
@@ -39,6 +39,12 @@ jobs:
                 --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
                 --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET=${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
                 --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
+                --build-arg VITE_WEB_CANNY_FEEDBACK_URL=${{ vars.VITE_WEB_CANNY_FEEDBACK_URL }} \
+                --build-arg VITE_WEB_SPARROW_WEB_APP_URL=${{ vars.VITE_WEB_SPARROW_WEB_APP_URL }} \
+                --build-arg VITE_WEB_SENTRY_DSN=${{ vars.VITE_WEB_SENTRY_DSN }} \
+                --build-arg VITE_WEB_APP_ENVIRONMENT=${{ vars.VITE_WEB_APP_ENVIRONMENT }} \
+                --build-arg VITE_WEB_POSTHOG_CONNECTION_API_KEY=${{ vars.VITE_WEB_POSTHOG_CONNECTION_API_KEY }} \
+                --build-arg VITE_WEB_POSTHOG_API_URL=${{ vars.VITE_WEB_POSTHOG_API_URL }} \
                 -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
                docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}
@@ -63,6 +69,6 @@ jobs:
       - uses: Azure/k8s-deploy@v4
         with:
           action: deploy
-          namespace: sparrow-dev
+          namespace: sparrow-prod
           manifests: |
             ./apps/@sparrow-web/deploymentManifests/deployment.yml

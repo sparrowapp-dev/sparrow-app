@@ -67,6 +67,7 @@ import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/coll
 import { parse, GraphQLError } from "graphql";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 import constants from "src/constants/constants";
+import * as Sentry from "@sentry/svelte";
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -295,7 +296,7 @@ class GraphqlExplorerViewModel {
    */
   private compareRequestWithServer = new Debounce().debounce(
     this.compareRequestWithServerDebounced,
-    1000,
+    0,
   );
 
   /**
@@ -366,6 +367,7 @@ class GraphqlExplorerViewModel {
         // Check if the query is valid by attempting to parse it
         parse(query);
       } catch (error) {
+        Sentry.captureException(error);
         console.error("not a valid query");
         return;
       }
@@ -400,6 +402,7 @@ class GraphqlExplorerViewModel {
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
+      Sentry.captureException(error);
       console.log("error", error);
     }
   };
@@ -1157,6 +1160,7 @@ class GraphqlExplorerViewModel {
           try {
             previousSchema = JSON.parse(progressiveTab.property.graphql.schema);
           } catch (error) {
+            Sentry.captureException(error); 
             console.log("Previous Schema not parsed", error);
           }
           const parsedSchema = await this.compareAndUpdateFetchedJson(
@@ -1174,6 +1178,7 @@ class GraphqlExplorerViewModel {
           notifications.success("Schema fetched successfully.");
         })
         .catch(async (error) => {
+          Sentry.captureException(error);
           console.error(error);
           const newProgressiveTab = createDeepCopy(this._tab.getValue());
           newProgressiveTab.property.graphql.state.isRequestSchemaFetched =
@@ -1190,6 +1195,7 @@ class GraphqlExplorerViewModel {
           }
         });
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
       const newProgressiveTab = createDeepCopy(this._tab.getValue());
       newProgressiveTab.property.graphql.state.isRequestSchemaFetched = false;
@@ -1714,6 +1720,7 @@ class GraphqlExplorerViewModel {
         });
       })
       .catch((error) => {
+        Sentry.captureException(error);
         console.error(error);
         // Handle cancellation or other errors
         if (error.name === "AbortError") {
@@ -2914,6 +2921,7 @@ class GraphqlExplorerViewModel {
         JSONSchema.Query.items = querySchema;
         await this.updateSchema(JSON.stringify(JSONSchema));
       } catch (e) {
+        Sentry.captureException(e); 
         console.error(e);
       }
     }
@@ -2930,6 +2938,7 @@ class GraphqlExplorerViewModel {
         JSONSchema.Mutation.items = querySchema;
         await this.updateSchema(JSON.stringify(JSONSchema));
       } catch (e) {
+        Sentry.captureException(e); 
         console.error(e);
       }
     }

@@ -60,6 +60,7 @@ import { InitTab } from "@sparrow/common/factory";
 import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/http-request-base";
 import constants from "src/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -209,7 +210,7 @@ class CollectionExplorerPage {
    */
   private compareCollectionWithServer = new Debounce().debounce(
     this.compareCollectionWithServerDebounced,
-    1000,
+    0,
   );
 
   public get activeWorkspace() {
@@ -628,6 +629,7 @@ class CollectionExplorerPage {
         return;
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error(errMessage);
       return;
     }
@@ -704,6 +706,7 @@ class CollectionExplorerPage {
         return false;
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error(errMessage);
       return false;
     }

@@ -29,6 +29,7 @@ import {
 } from "@sparrow/common/types/workspace/socket-io-request-tab";
 import { Base64Converter, Sleep, StatusCode } from "@sparrow/common/utils";
 import { version } from "../../../package.json";
+
 const tabRepository = new TabRepository();
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
@@ -1338,6 +1339,7 @@ const makeGraphQLRequest = async (
     }
     throw new Error(err as string);
   }
+
   if (_signal?.aborted) {
     // Check if request is aborted after request success
     throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");

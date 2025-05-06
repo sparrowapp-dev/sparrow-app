@@ -107,19 +107,23 @@
   </div>
   <div class="ps-2"></div>
 
-  <CodeMirrorInput
-    value={requestUrl}
-    onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter a URL"}
-    {theme}
-    {onUpdateEnvironment}
-    {environmentVariables}
-    codeId={"url"}
-    class={"input-url"}
-    {userRole}
-    isFocusedOnMount={true}
-    disabled={true}
-  />
+  <div class="w-100 d-flex align-items-center position-relative">
+    <div class="position-absolute top-0" style="width: calc(100% );">
+      <CodeMirrorInput
+        value={requestUrl}
+        onUpdateInput={onUpdateRequestUrl}
+        placeholder={"Enter a URL"}
+        {theme}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        codeId={"url"}
+        class={"input-url"}
+        {userRole}
+        isFocusedOnMount={false}
+        disabled={true}
+      />
+    </div>
+  </div>
 
   <span class="ps-2"></span>
   <Button

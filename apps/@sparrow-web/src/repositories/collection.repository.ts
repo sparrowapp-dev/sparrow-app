@@ -5,6 +5,7 @@ import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
+import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
   constructor() {}
 
@@ -33,6 +34,7 @@ export class CollectionRepository {
       if (data.name) value.name = data.name;
       if (data._id) value.id = data._id;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
+      if (data?.syncedAt) value.syncedAt = data.syncedAt;
       if (data.description !== undefined && data.description !== null)
         value.description = data.description;
       if (data.updatedBy) value.updatedBy = data.updatedBy;
@@ -904,6 +906,7 @@ export class CollectionRepository {
         },
       });
     } catch (error) {
+      Sentry.captureException(error); 
       console.error("Error updating block data:", error);
     }
   };
