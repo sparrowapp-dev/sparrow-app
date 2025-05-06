@@ -14,8 +14,17 @@ if (constants.APP_ENVIRONMENT !== 'LOCAL-FE'&& (constants.SENTRY_DSN && constant
     dsn: constants.SENTRY_DSN,
     environment: constants.APP_ENVIRONMENT, // Set the environment
     release: version,
-    beforeSend: (event) => {
-      return event;
+    beforeSend: (event,hint) => { 
+      const error = hint?.originalException;
+    // Axios or fetch errors often include a `status` or `response.status`
+      const status =
+      (error as any)?.status ||
+      (error as any)?.response?.status;
+
+      if (status >= 400 && status < 500) {
+        return null; // exclude 4xx errors from Sentry
+      }
+        return event;
     },
   });
 }
