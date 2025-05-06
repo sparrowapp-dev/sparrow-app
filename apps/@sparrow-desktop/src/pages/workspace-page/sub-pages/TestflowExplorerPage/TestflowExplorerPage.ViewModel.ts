@@ -57,6 +57,7 @@ import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
