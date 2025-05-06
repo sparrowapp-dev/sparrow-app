@@ -21,6 +21,8 @@ import { TeamRepository } from "@app/repositories/team.repository";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import * as Sentry from "@sentry/svelte";
+import { policyConfig } from "../../../../packages/@sparrow-common/src/store/policyStore";
+
 interface DeepLinkHandlerWindowsPayload {
   payload: {
     url: string;
@@ -205,7 +207,7 @@ export class AppViewModel {
     }
   };
 
-  // Private method to process deep link
+
   private async processDeepLink(url: string): Promise<void> {
     try {
       await getCurrentWindow().setFocus();
@@ -220,23 +222,62 @@ export class AppViewModel {
       if (isSparrowEdge === "true" && existingAccessToken) {
         return;
       }
+
+      // Get current policy settings
+      let policySettings: any;
+      policyConfig.subscribe(value => {
+        policySettings = value;
+      })();
+
+      if (policySettings?.disableSignIn) {
+        console.error({
+          title: "Access Denied",
+          content: "Sign-in has been disabled by organization policy"
+        });
+        return;
+      }
+
+      // Handle Sparrow Edge case
       if (isSparrowEdge === "true" && !existingAccessToken) {
+        // Check if sign-in is disabled by policy
+        
         await this.addGuestUser();
         setTimeout(async () => {
           await this.skipLoginHandler();
         }, 1000);
         return;
       }
-      const isValidUser = await this.validateUserAccess(currentUserAccessToken);
 
+      // Validate user access
+      const isValidUser = await this.validateUserAccess(currentUserAccessToken);
       if (!isValidUser) {
         console.error({
           title: "Access Denied",
-          content: "Please log out the current user before switching accounts",
+          content: "Please log out the current user before switching accounts"
         });
         userValidationStore.set({ isValid: false });
         return;
       }
+
+      // Check if sign-in is disabled when trying to log in
+      if (currentUserAccessToken && policySettings.disableSignIn) {
+        console.error({
+          title: "Access Denied",
+          content: "Sign-in has been disabled by organization policy"
+        });
+        return;
+      }
+
+      // Check if workspace switching is disabled when trying to switch workspaces
+      if (workspaceId && policySettings?.disableWorkspace) {
+        console.error({
+          title: "Access Denied",
+          content: "Workspace access has been disabled by organization policy"
+        });
+        return;
+      }
+
+      // If all policy checks pass, proceed with login and workspace switching
       await this.handleLoginAndWorkspaceSwitchThrottler(url, workspaceId);
     } catch (error) {
       Sentry.captureException(error);

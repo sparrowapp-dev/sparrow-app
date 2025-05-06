@@ -5,6 +5,8 @@ import { invoke } from "@tauri-apps/api/core";
 
 export const policyConfig = writable({
   disableSignIn: false,
+  disableWorkspace: false,
+  disableActiveSync: false,
   // Other policy settings
 });
 
@@ -14,6 +16,8 @@ export async function loadPolicyConfig() {
     const config = await invoke('get_policy_config');
     policyConfig.set({
       disableSignIn: config.disable_sign_in,
+      disableWorkspace: config.disable_workspace,
+      disableActiveSync: config.disable_active_sync
       // Map other properties
     });
   } catch (error) {

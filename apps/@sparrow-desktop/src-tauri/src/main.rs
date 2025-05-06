@@ -316,11 +316,15 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
         // Try to open the key
         match hklm.open_subkey(policy_path) {
             Ok(key) => {
-                // Read specific policy value (e.g., "DisableSignIn")
+                // Read specific policy value
                 let disable_sign_in: u32 = key.get_value("DisableSignIn").unwrap_or(0);
+                let disable_workspace: u32 = key.get_value("DisableWorkspace").unwrap_or(0);
+                let disable_active_sync: u32 = key.get_value("DisableActiveSync").unwrap_or(0);
 
                 Ok(PolicyConfig {
                     disable_sign_in: disable_sign_in == 1,
+                    disable_workspace: disable_workspace == 1,
+                    disable_active_sync: disable_active_sync == 1,
                     // Add other policy settings as needed
                 })
             }
@@ -328,7 +332,8 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
                 // If key doesn't exist, return default values
                 Ok(PolicyConfig {
                     disable_sign_in: false,
-                    // Add other default policy settings
+                    disable_workspace: false,
+                    disable_active_sync: false,
                 })
             }
         }
@@ -339,7 +344,8 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
     {
         Ok(PolicyConfig {
             disable_sign_in: false,
-            // Add other default policy settings
+            disable_workspace: false,
+            disable_active_sync: false, // Add other default policy settings
         })
     }
 }
@@ -348,7 +354,8 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
 #[derive(serde::Serialize)]
 struct PolicyConfig {
     disable_sign_in: bool,
-    // Add other policy settings as needed
+    disable_workspace: bool,
+    disable_active_sync: bool,
 }
 
 #[tauri::command]

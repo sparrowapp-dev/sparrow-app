@@ -2,6 +2,7 @@
   import { CrossIcon } from "@sparrow/library/icons";
   import { RocketIcon } from "@sparrow/library/icons";
   import { Link } from "svelte-navigator";
+  import { policyConfig } from "../../store/policyStore";
   export let isVisible = true;
   export let onClose;
   export let onClick;
@@ -15,16 +16,20 @@
       </div>
 
       <div>
-        <span class="txt-dark text-fs-14">Enjoying Sparrow?</span>
-        <span class="txt-light text-fs-14"
-          >Unlock the full power by creating an account or signing in.</span
-        >
+        {#if !$policyConfig.disableSignIn}
+          <span class="txt-dark text-fs-14">Enjoying Sparrow?</span>
+          <span class="txt-light text-fs-14"
+            >Unlock the full power by creating an account or signing in.</span
+          >
+        {/if}
       </div>
 
       <div class="buttons">
-        <button class="click-btn" on:click={onClick}>
-          <span> Create an Account or Sign In</span>
-        </button>
+        {#if !$policyConfig.disableSignIn}
+          <button class="click-btn" on:click={onClick}>
+            <span> Create an Account or Sign In</span>
+          </button>
+        {/if}
       </div>
     </div>
     <div class="cross-btn-div">

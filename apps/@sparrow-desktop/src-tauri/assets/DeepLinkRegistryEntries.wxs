@@ -33,6 +33,12 @@
           />
         </RegistryKey>
       
+      </Component>
+
+    </DirectoryRef>
+  </Fragment>
+        </RegistryKey>
+      
         <RegistryKey
           Root="HKLM"
           Key="SOFTWARE\Policies\Sparrow"
@@ -44,7 +50,19 @@
             Name="DisableSignIn"
             Value="0"
           />
-          <!-- Add more policy settings as needed -->
+
+          <RegistryValue
+            Type="integer"
+            Name="DisableWorkspace"
+            Value="0"
+          />
+
+          <RegistryValue
+            Type="integer"
+            Name="DisableActiveSync"
+            Value="0"
+          />
+          
         </RegistryKey>
       </Component>
 
