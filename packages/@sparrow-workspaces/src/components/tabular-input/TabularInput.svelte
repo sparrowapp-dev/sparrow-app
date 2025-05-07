@@ -12,6 +12,8 @@
     Information,
     CheckMarkIcon,
     ArrowUndoRegular,
+    ArrowUpFilled,
+    ArrowDownRegular,
   } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
@@ -975,8 +977,8 @@
               onClick={undoChanges}
             ></Button>
 
-            <!-- Navigation controls -->
-            <div class="diff-navigation">
+            <!-- Navigation controls - Previous -->
+            <!-- <div class="diff-navigation">
               <span class="diff-counter"
                 >{totalChanges === 0
                   ? "0 of 0"
@@ -998,6 +1000,37 @@
               >
                 ↓
               </button>
+            </div> -->
+
+            <!-- Navigation controls - Old -->
+            <div class="merge-view-navigation">
+              <div class="merge-navigation-counter-wrapper">
+                <div class="merge-navigation-controls">
+                  <span class="merge-nav-counter">
+                    {totalChanges === 0
+                      ? "0 of 0"
+                      : `${currentChangeIndex + 1} of ${totalChanges}`}
+                  </span>
+
+                  <button
+                    class="merge-nav-button"
+                    on:click={goToPreviousChange}
+                    disabled={totalChanges === 0}
+                    title="Previous change (Alt+Up)"
+                  >
+                    <ArrowUpFilled size={"16px"} color={"#D8D8D9"} />
+                  </button>
+
+                  <button
+                    class="merge-nav-button"
+                    on:click={goToNextChange}
+                    disabled={totalChanges === 0}
+                    title="Next change (Alt+Down)"
+                  >
+                    <ArrowDownRegular size={"16px"} color={"#D8D8D9"} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         {:else}
@@ -1207,5 +1240,92 @@
 
   :global(.highlighted) {
     border: 1px solid goldenrod !important;
+  }
+
+  /*  */
+  .merge-view-navigation {
+    display: inline-flex;
+
+    align-items: center;
+
+    margin-right: 12px;
+  }
+
+  .merge-navigation-counter-wrapper {
+    display: flex;
+
+    align-items: center;
+  }
+
+  .merge-navigation-controls {
+    display: flex;
+
+    align-items: center;
+
+    height: 28px;
+
+    border: 1px solid #222630;
+
+    border-radius: 4px;
+
+    background-color: #222630;
+
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .merge-nav-button {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    background: none;
+
+    cursor: pointer;
+
+    padding: 0;
+
+    width: 24px;
+
+    height: 100%;
+
+    color: #222630;
+
+    border-radius: 4px;
+
+    transition: background-color 0.2s;
+  }
+
+  .merge-nav-button:hover:not(:disabled) {
+    background-color: #383d4b;
+  }
+
+  .merge-nav-button:active:not(:disabled) {
+    background-color: #383d4b;
+  }
+
+  .merge-nav-button:disabled {
+    color: #9ca3af;
+
+    cursor: not-allowed;
+  }
+
+  .merge-nav-counter {
+    /* padding: 0 10px; */
+
+    font-size: 0.75rem;
+
+    font-weight: 500;
+
+    color: white;
+
+    min-width: 60px;
+
+    text-align: center;
+
+    user-select: none;
   }
 </style>
