@@ -1186,7 +1186,6 @@
             />
           {:else}
             <Button
-              id="run"
               type="primary"
               size="medium"
               startIcon={PlayFilled}
@@ -1208,7 +1207,7 @@
             title="Run Your Test Flow"
             pulsePosition={{ top: "-62px", left: "260px" }}
             description={`Almost there! With your blocks and API in place, go ahead and click 'Run' to execute your test flow.`}
-            tipPosition="center"
+            tipPosition="bottom-center"
             stepCount="6/7"
             onNext={async () => {
               currentStep.set(7);
@@ -1272,7 +1271,7 @@
         title="Add Your First Block"
         description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
         pulsePosition={{ top: "-64px", left: "30px" }}
-        tipPosition="center"
+        tipPosition="step-3"
         stepCount="3/7"
         onNext={() => {
           currentStep.set(4);

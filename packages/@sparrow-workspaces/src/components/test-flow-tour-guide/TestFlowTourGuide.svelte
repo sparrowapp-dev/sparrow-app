@@ -78,8 +78,12 @@
             left = rect.left + rect.width / 2 - 176;
             break;
           case "center":
-            top = rect.top + rect.height / 2 - 150;
-            left = rect.left + rect.width / 2 - 176;
+            top = rect.top + rect.height / 3 - 150;
+            left = rect.left + rect.width / 3 - 176;
+            break;
+          case "step-3":
+            top = 141.507;
+            left = 338.556;
             break;
           default:
             top = rect.top - 80;

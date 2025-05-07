@@ -675,10 +675,10 @@
             stepCount="2/7"
             pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
             onNext={() => {
-              currentStep.set(3);
               onCreateTestflow();
               isExpandTestflow.set(true);
               toggleTourGuideActive();
+              currentStep.set(3);
             }}
             onClose={() => {
               isTestFlowTourGuideOpen.set(false);
