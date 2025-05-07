@@ -12,6 +12,11 @@
    */
   export let onWorkspaceUpdateScroll;
 
+  /**
+   * Indicate whether workspace is shared or not.
+   */
+  export let isSharedWorkspace = false;
+
   // Reference to the scrollable container
   let scrollableContainer: HTMLDivElement;
 
@@ -67,9 +72,9 @@
   };
 
   onMount(() => {
-    scrollableContainer.addEventListener("scroll", handleScroll);
+    scrollableContainer?.addEventListener("scroll", handleScroll);
     return () => {
-      scrollableContainer.removeEventListener("scroll", handleScroll);
+      scrollableContainer?.removeEventListener("scroll", handleScroll);
     };
   });
 </script>
@@ -78,40 +83,42 @@
   style="border-bottom:1px solid #2A2C3C; margin-top:16px; margin-bottom:8px;"
 ></div>
 <div style="flex:1; overflow:auto;">
-  <div
-    class="ps-0 text-ds-font-size-12 text-ds-font-weight-semi-bold"
-    style="color: var( --text-secondary-200); padding:8px; "
-  >
-    Workspace Updates
-  </div>
-  <div style="flex:1; overflow:auto;" bind:this={scrollableContainer}>
-    <div class="h-100">
-      {#if workspaceUpdatesList && workspaceUpdatesList[0]?.updates}
-        {#each workspaceUpdatesList[0].updates as update}
-          <div class="d-flex">
-            <div class="me-2">
-              <Avatar
-                letter={update.detailsUpdatedBy.split("")[0][0]}
-                size="extra-small"
-                type="letter"
-                bgColor="background-color: var(--bg-ds-surface-600);"
-              />
-            </div>
-            <div
-              class="text-ds-font-size-12 text-ds-font-weight-medium"
-              style="color: var(--text-secondary-100); "
-            >
-              {update.message}
+  {#if !isSharedWorkspace}
+    <div
+      class="ps-0 text-ds-font-size-12 text-ds-font-weight-semi-bold"
+      style="color: var( --text-secondary-200); padding:8px; "
+    >
+      Workspace Updates
+    </div>
+    <div style="flex:1; overflow:auto;" bind:this={scrollableContainer}>
+      <div class="h-100">
+        {#if workspaceUpdatesList && workspaceUpdatesList[0]?.updates}
+          {#each workspaceUpdatesList[0].updates as update}
+            <div class="d-flex">
+              <div class="me-2">
+                <Avatar
+                  letter={update.detailsUpdatedBy.split("")[0][0]}
+                  size="extra-small"
+                  type="letter"
+                  bgColor="background-color: var(--bg-ds-surface-600);"
+                />
+              </div>
               <div
-                class="d-flex mt-1 text-ds-font-size-12 text-ds-font-weight-regular"
-                style="color: var( --text-secondary-200); justify-content:space-between"
+                class="text-ds-font-size-12 text-ds-font-weight-medium"
+                style="color: var(--text-secondary-100); "
               >
-                <p>{timeAgo(update.createdAt)}</p>
+                {update.message}
+                <div
+                  class="d-flex mt-1 text-ds-font-size-12 text-ds-font-weight-regular"
+                  style="color: var( --text-secondary-200); justify-content:space-between"
+                >
+                  <p>{timeAgo(update.createdAt)}</p>
+                </div>
               </div>
             </div>
-          </div>
-        {/each}
-      {/if}
+          {/each}
+        {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>

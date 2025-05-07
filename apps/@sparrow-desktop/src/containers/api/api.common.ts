@@ -21,6 +21,7 @@ import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explore
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { version } from "../../../src-tauri/tauri.conf.json";
+
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const tabRepository = new TabRepository();

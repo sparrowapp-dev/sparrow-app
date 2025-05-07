@@ -2,7 +2,7 @@
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { userValidationStore } from "@app/store/deviceSync.store";
-
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   // ---- Store
   import {
     leftPanelWidth,
@@ -89,6 +89,7 @@
   import { writable } from "svelte/store";
 
   import { Checkbox } from "@sparrow/library/forms";
+  import * as Sentry from "@sentry/svelte";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -339,6 +340,19 @@
   /**
    * Handle save functionality on close confirmation popup
    */
+
+  const handlecollection_document_response = ({
+    event_name,
+  }: {
+    event_name: string;
+  }) => {
+    captureEvent("document_response", {
+      component: "CollectionsPage",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
+
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
@@ -529,6 +543,7 @@
       );
       refreshLoad = false;
     } catch (error) {
+      Sentry.captureException(error);
       refreshLoad = false;
     }
   };
@@ -1010,6 +1025,9 @@
       customWidth={"95px"}
       disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
       onClick={() => {
+        handlecollection_document_response({
+          event_name: "Response Doc Saved!",
+        });
         handlePopupSave();
       }}
     ></Button>
@@ -1286,7 +1304,7 @@
 >
   <DownloadApp
     onInstallRedirect={() => {
-      window.open(constants.WEB_MARKETING_URL, "_blank");
+      window.open(constants.MARKETING_URL, "_blank");
     }}
     onGithubRedirect={() => {
       window.open(constants.SPARROW_GITHUB, "_blank");

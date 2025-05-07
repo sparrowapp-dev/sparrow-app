@@ -15,6 +15,8 @@
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { BackIcon } from "@sparrow/library/icons";
   import { navigate } from "svelte-navigator";
+  import constants from "src/constants/constants";
+  import { copyToClipBoard } from "@sparrow/common/utils";
 
   export let activeTeamTab;
   export let onUpdateActiveTab;
@@ -149,6 +151,12 @@
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
   });
+
+  const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
+    await copyToClipBoard(
+      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
+    );
+  };
 </script>
 
 {#if isWorkspaceOpen}
@@ -227,6 +235,7 @@
     onResendInvite={_viewModel.resendInvite}
     onAcceptInvite={_viewModel.acceptInvite}
     onIgnoreInvite={_viewModel.ignoreInvite}
+    onCopyLink={handleCopyPublicWorkspaceLink}
   />
 {/if}
 

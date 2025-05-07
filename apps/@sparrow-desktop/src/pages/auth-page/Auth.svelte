@@ -32,6 +32,8 @@
   import { leftIconIcon } from "@sparrow/library/assets";
   import { jwtDecode } from "@app/utils/jwt";
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
+  import * as Sentry from "@sentry/svelte";
+  import { identifyUser } from "@app/utils/posthog/posthogConfig";
   let isEntry = false;
   let isHover = false;
   let externalSparrowLink =
@@ -201,9 +203,9 @@
           on:blur={async () => {}}
         />
         {#if isTokenErrorMessage}
-          <div class="text-danger-200 text-fs-12 text-ds-line-height-100"
-            >The entered code is invalid or expired. Please enter a valid code.</div
-          >
+          <div class="text-danger-200 text-fs-12 text-ds-line-height-100">
+            The entered code is invalid or expired. Please enter a valid code.
+          </div>
         {/if}
       </div>
 
@@ -215,6 +217,8 @@
             const accessToken = params.get("accessToken");
             const refreshToken = params.get("refreshToken");
             const userDetails = jwtDecode(accessToken);
+
+            identifyUser(userDetails.email);
             const apiUrl = constants.API_URL;
             const userId = userDetails?._id;
             const userEmail = userDetails?.email;
@@ -234,6 +238,7 @@
               isTokenErrorMessage = false;
               handleLoginV2(token);
             } catch (e) {
+              Sentry.captureException(e);
               isTokenErrorMessage = true;
             } finally {
               isTokenValidationLoading = false;
@@ -286,10 +291,10 @@
       >
       <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
       <a
-      role="button"
-      on:click={async () => {
-        await open(constants.CANNY_FEEDBACK_URL);
-      }}
+        role="button"
+        on:click={async () => {
+          await open(constants.CANNY_FEEDBACK_URL);
+        }}
         class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
       >
     {:else}

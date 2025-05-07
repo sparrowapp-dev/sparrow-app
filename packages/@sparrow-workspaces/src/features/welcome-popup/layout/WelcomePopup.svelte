@@ -1,9 +1,25 @@
 <script>
   import { Button } from "@sparrow/library/ui";
   import SparrowLogo from "../icons/SparrowIconLogo.svelte";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
   export let onClickExplore;
   export let onClickTour;
   export let loader = false;
+  const handletake_tour = () => {
+    captureEvent("take_tour", {
+      component: "WelcomePopup",
+      button_text: "Take a walkthrough",
+      destination: "Take a walkthrough",
+    });
+  };
+  const handle_dismiss_tour = () => {
+    captureEvent("dismiss_tour", {
+      component: "WelcomePopup",
+      button_text: "Explore Yourself",
+      destination: "Explore Yourself",
+    });
+  };
 </script>
 
 <div class="d-flex row align-items-center" style="padding: 0; gap:2px;">
@@ -25,14 +41,20 @@
       title="Explore Myself"
       size="small"
       type="secondary"
-      onClick={onClickExplore}
+      onClick={() => {
+        onClickExplore();
+        handletake_tour();
+      }}
     />
     <Button
       title="Take A Walkthrough"
       size="small"
       type="primary"
       {loader}
-      onClick={onClickTour}
+      onClick={() => {
+        onClickTour();
+        handle_dismiss_tour();
+      }}
     />
   </div>
 </div>

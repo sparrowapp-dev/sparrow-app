@@ -207,7 +207,7 @@
         </p>
       </span>
     </div>
-    {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+    {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
       <Tooltip
         title={"Add Environment"}
         placement={"bottom-center"}
@@ -279,7 +279,7 @@
         </div>
         <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" />
       {/if}
-      {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData}
+      {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData && !currentWorkspace?.isShared}
         <div class={`pb-2 px-1`}>
           <p
             class={`add-env-desc-text mt-2 mb-3 text-fs-12 mb-0 fw-normal text-center`}

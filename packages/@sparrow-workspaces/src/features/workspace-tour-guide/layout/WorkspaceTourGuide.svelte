@@ -1,6 +1,8 @@
 <script>
   import DefaultTourGuide from "../components/default-tour-guide/DefaultTourGuide.svelte";
   import { defaultTourGuideContent, totalSteps } from "../utils";
+
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     defaultCurrentStep,
     isDefaultTourGuideClose,
@@ -9,6 +11,14 @@
   $: currentStepData = defaultTourGuideContent.find(
     (step) => step.stepCount === $defaultCurrentStep,
   );
+
+  const handle_finish_tour = () => {
+    captureEvent("finish_tour", {
+      component: "WorkspaceTourGuide",
+      button_text: "Finish",
+      destination: "Finish",
+    });
+  };
 </script>
 
 <div>
@@ -22,6 +32,7 @@
       tipPosition="bottom-center"
       rightButtonName="Close"
       onNext={() => {
+        handle_finish_tour();
         isDefaultTourGuideClose.set(false);
         isDefaultTourGuideOpen.set(false);
       }}

@@ -1,4 +1,4 @@
-name: Production Release
+name: Production Desktop App Release
 
 on:
   push:
@@ -28,6 +28,12 @@ env:
   VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
   VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
   VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
+  VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
+  VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
+  VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+  VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
+  VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
+  VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
 
@@ -111,6 +117,55 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      - name: Post Windows Build Links to Teams
+        run: |
+          $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+          $msiFileName = $msiFile.Name
+          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          
+          $body = @{
+            "type" = "message"
+            "attachments" = @(
+              @{
+                "contentType" = "application/vnd.microsoft.card.adaptive"
+                "content" = @{
+                  "type" = "AdaptiveCard"
+                  "body" = @(
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "🚀 New Windows Build Available"
+                      "weight" = "bolder"
+                      "size" = "large"
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Branch: development"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Download Link:"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = $msiUrl
+                      "color" = "accent"
+                      "wrap" = $true
+                    }
+                  )
+                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+                  "version" = "1.2"
+                }
+              }
+            )
+          }
+          
+          $jsonBody = $body | ConvertTo-Json -Depth 10
+          
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+        shell: pwsh
 
   release_macos:
     runs-on: macos-latest
@@ -176,7 +231,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Download MSI files from S3 bucket
+      - name: Post macOS Build Links to Teams
         run: |
           mkdir msi_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"

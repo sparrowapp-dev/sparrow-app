@@ -41,6 +41,7 @@
     "Collections",
     "Contributors",
     "Last Updated",
+    "Visibility",
     "",
     "",
   ];

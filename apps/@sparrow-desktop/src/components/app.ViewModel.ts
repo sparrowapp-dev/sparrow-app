@@ -20,6 +20,7 @@ import { Events } from "@sparrow/common/enums";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import * as Sentry from "@sentry/svelte";
 interface DeepLinkHandlerWindowsPayload {
   payload: {
     url: string;
@@ -238,6 +239,7 @@ export class AppViewModel {
       }
       await this.handleLoginAndWorkspaceSwitchThrottler(url, workspaceId);
     } catch (error) {
+      Sentry.captureException(error);
       console.error(error);
     }
   }
@@ -273,6 +275,7 @@ export class AppViewModel {
         console.warn("Unsupported platform for deep linking:", os);
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error registering deep link handler:", error);
     }
   }

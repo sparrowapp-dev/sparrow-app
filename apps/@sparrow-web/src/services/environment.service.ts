@@ -22,6 +22,18 @@ export class EnvironmentService {
     return response;
   };
 
+  public fetchAllPublicEnvironments = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/workspace/public/${workspaceId}/environment`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
   public fetchEnvironment = async (
     workspaceId: string,
     environmentId: string,
