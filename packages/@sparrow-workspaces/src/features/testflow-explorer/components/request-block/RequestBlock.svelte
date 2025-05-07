@@ -542,7 +542,7 @@
           <p
             class="dummy-dropdown d-flex align-items-center justify-content-between px-2 mb-0 text-fs-14 text-secondary-200"
           >
-            <span> Select API Request </span>
+            <span> Select API Request</span>
             <span
               ><ChevronDownRegular
                 size={"16px"}
@@ -745,5 +745,10 @@
   }
   .more-option-btn:hover {
     background-color: var(--bg-ds-surface-300);
+  }
+
+  .outline-success {
+    outline: 1px solid var(--border-ds-success-300);
+    border: none;
   }
 </style>

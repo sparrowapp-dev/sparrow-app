@@ -71,6 +71,7 @@
   {#if $isTestFlowTourGuideOpen && $currentStep == 7}
     <div style="position:absolute; top:1000px; left:-1000px;">
       <TestFlowTourGuide
+        targetId="requestDiv"
         isLastStep={true}
         isPuleCircleRequired={false}
         title="You Did it!"

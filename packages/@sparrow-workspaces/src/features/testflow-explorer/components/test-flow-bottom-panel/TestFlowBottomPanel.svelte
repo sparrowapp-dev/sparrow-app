@@ -54,6 +54,9 @@
 
   let responseLoader = false;
   let height = 300;
+  if ($currentStep == 6 || $currentStep == 7) {
+    height = 10;
+  }
   let minHeight = 100;
   let isResizing = false;
   let isResizingActive = false;

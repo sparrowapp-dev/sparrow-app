@@ -96,7 +96,7 @@
   </h2>
   <p
     class="text-fs-13"
-    style="line-height: 19.5px; font-weight: 300; color: #e5e5e5"
+    style="line-height: 19.5px; font-weight: 300; color: var(--text-neutral-300)"
   >
     {@html description}
   </p>
@@ -188,20 +188,22 @@
     background-color: #1d212b;
     border-radius: 8px;
     padding: 16px;
-    width: 352px;
+    width: 360px;
+    height: 140px;
     font-family: Arial, sans-serif;
     z-index: 100000;
-    border: 0.3px solid var(--border-tertiary-190);
+    box-sizing: border-box;
   }
 
   .popup h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 12px;
     color: var(--text-primary-300);
   }
 
   .popup p {
-    margin: 8px 0;
+    font-size: 12;
+    margin: 4px 0;
   }
 
   .popup .close-icon {
