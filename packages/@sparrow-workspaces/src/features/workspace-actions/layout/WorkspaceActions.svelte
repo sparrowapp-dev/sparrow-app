@@ -641,11 +641,10 @@
       </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+        <div style="position:fixed; top:100px; left:250px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
             title="Welcome to Test Flow!"
-            tipPosition="right-center"
             pulsePosition={{ top: "-58px", left: "14px" }}
             description={`Let's begin by creating your first flow. Click the '+ Add' button to get started`}
             stepCount="1/7"
@@ -662,16 +661,11 @@
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div
-          style="position:fixed; top:{isWebApp
-            ? '234px'
-            : '266px'}; left:220px; z-index:9999;"
-        >
+        <div style="position:fixed; top:300px; left:500px; z-index:9999;">
           <TestFlowTourGuide
             targetId="dropdown-container-open"
             title="Add Your Flow"
             description={`Click 'Add Test Flow' to instantly create a new flow. It's that simple--your workspace is ready!`}
-            tipPosition="left-top"
             stepCount="2/7"
             pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
             onNext={() => {

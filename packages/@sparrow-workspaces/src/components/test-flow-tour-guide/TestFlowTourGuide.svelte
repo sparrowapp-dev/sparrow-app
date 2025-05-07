@@ -60,35 +60,6 @@
           "--containerHeight",
           `${containerHeight}px`,
         );
-        switch (tipPosition) {
-          case "right-center":
-            top = rect.top + rect.height / 3 - 20;
-            left = rect.left + rect.width + 20;
-            break;
-          case "left-center":
-            top = rect.top + rect.height / 2 - 20;
-            left = rect.left - 352 - 20;
-            break;
-          case "top-center":
-            top = rect.top - 100;
-            left = rect.left + rect.width / 2 - 176;
-            break;
-          case "bottom-center":
-            top = rect.top + rect.height + 10;
-            left = rect.left + rect.width / 2 - 176;
-            break;
-          case "center":
-            top = rect.top + rect.height / 3 - 150;
-            left = rect.left + rect.width / 3 - 176;
-            break;
-          case "step-3":
-            top = 141.507;
-            left = 338.556;
-            break;
-          default:
-            top = rect.top - 80;
-            left = rect.left;
-        }
       }
     }
   }
@@ -106,7 +77,7 @@
 </script>
 
 <!-- Overlay to block user interaction -->
-
+<div class="overlay"></div>
 <div class="overlay-top"></div>
 <div class="overlay-left"></div>
 <div class="overlay-right"></div>
@@ -163,6 +134,15 @@
 </div>
 
 <style>
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+  }
   .overlay-top {
     position: fixed;
     top: 0;

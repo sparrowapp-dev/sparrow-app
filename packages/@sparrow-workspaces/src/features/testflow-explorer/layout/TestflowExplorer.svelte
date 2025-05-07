@@ -1186,6 +1186,7 @@
             />
           {:else}
             <Button
+              id="run"
               type="primary"
               size="medium"
               startIcon={PlayFilled}
@@ -1201,22 +1202,22 @@
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
-          <!-- <div style="position:absolute;  top:60px; right:320px"> -->
-          <TestFlowTourGuide
-            targetId="run"
-            title="Run Your Test Flow"
-            pulsePosition={{ top: "-62px", left: "260px" }}
-            description={`Almost there! With your blocks and API in place, go ahead and click 'Run' to execute your test flow.`}
-            tipPosition="bottom-center"
-            stepCount="6/7"
-            onNext={async () => {
-              currentStep.set(7);
-            }}
-            onClose={() => {
-              isTestFlowTourGuideOpen.set(false);
-            }}
-          />
-          <!-- </div> -->
+          <div style="position:absolute;  top:60px; right:320px">
+            <TestFlowTourGuide
+              targetId="run"
+              title="Run Your Test Flow"
+              pulsePosition={{ top: "-62px", left: "260px" }}
+              description={`Almost there! With your blocks and API in place, go ahead and click 'Run' to execute your test flow.`}
+              tipPosition="bottom-center"
+              stepCount="6/7"
+              onNext={async () => {
+                currentStep.set(7);
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
         {/if}
       </div>
       <div style="margin-right: 5px;">
@@ -1265,61 +1266,59 @@
     </SvelteFlow>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <!-- <div style="position:absolute; top:260px; left:265px; z-index:1000;"> -->
-      <TestFlowTourGuide
-        targetId="add-block-open"
-        title="Add Your First Block"
-        description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
-        pulsePosition={{ top: "-64px", left: "30px" }}
-        tipPosition="step-3"
-        stepCount="3/7"
-        onNext={() => {
-          currentStep.set(4);
-          createNewNode("1");
-        }}
-        onClose={() => {
-          isTestFlowTourGuideOpen.set(false);
-        }}
-      />
-      <!-- </div> -->
+      <div style="position:absolute; top:200px; left:400px; z-index:1000;">
+        <TestFlowTourGuide
+          targetId="add-block-open"
+          title="Add Your First Block"
+          description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
+          pulsePosition={{ top: "-64px", left: "30px" }}
+          stepCount="3/7"
+          onNext={() => {
+            currentStep.set(4);
+            createNewNode("1");
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <!-- <div style="position:absolute; top:232px; left:638px; z-index:1000;"> -->
-      <TestFlowTourGuide
-        targetId="requestDiv"
-        title="Select an API"
-        description={`Block added--nice! Now, click the dropdown to select an API. Don't have one? No worries, a sample API is available for you to use.`}
-        tipPosition="center"
-        stepCount="4/7"
-        pulsePosition={{ top: "8px", left: "-150px" }}
-        onNext={() => {
-          currentStep.set(5);
-        }}
-        onClose={() => {
-          isTestFlowTourGuideOpen.set(false);
-        }}
-      />
-      <!-- </div> -->
+      <div style="position:absolute; top:200px; left:630px; z-index:1000;">
+        <TestFlowTourGuide
+          targetId="requestDiv"
+          title="Select an API"
+          description={`Block added--nice! Now, click the dropdown to select an API. Don't have one? No worries, a sample API is available for you to use.`}
+          stepCount="4/7"
+          pulsePosition={{ top: "8px", left: "-150px" }}
+          onNext={() => {
+            currentStep.set(5);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <!-- <div style="position:absolute; top:265px; left:632px; z-index:1000;"> -->
-      <TestFlowTourGuide
-        targetId="sampleAPI-open"
-        title="Sample API Ready"
-        description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
-        tipPosition="center"
-        stepCount="5/7"
-        pulsePosition={{ top: "10px", left: "-145px" }}
-        onNext={() => {
-          currentStep.set(6);
-        }}
-        onClose={() => {
-          isTestFlowTourGuideOpen.set(false);
-        }}
-      />
-      <!-- </div> -->
+      <div style="position:absolute; top:265px; left:632px; z-index:1000;">
+        <TestFlowTourGuide
+          targetId="sampleAPI-open"
+          title="Sample API Ready"
+          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
+          tipPosition="center"
+          stepCount="5/7"
+          pulsePosition={{ top: "10px", left: "-145px" }}
+          onNext={() => {
+            currentStep.set(6);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
     {/if}
   </div>
   <!-- Open the bottom panel when it contains the data -->
@@ -1341,7 +1340,7 @@
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 6}
-    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+    <div style="background-color: transparent; margin: 0px 13px 12px 13px;">
       <!-- Request Response Nav -->
       <TestFlowBottomPanel
         selectedBlock={{

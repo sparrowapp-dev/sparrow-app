@@ -131,7 +131,6 @@
         title="You Did it!"
         pulsePosition={{ top: "210px", left: "250px" }}
         description={`Congratulations! Your test flow is running successfully. You can re-run API at any time to update values as needed.`}
-        tipPosition="bottom-right"
         stepCount="7/7"
         onNext={() => {
           currentStep.set(-1);
