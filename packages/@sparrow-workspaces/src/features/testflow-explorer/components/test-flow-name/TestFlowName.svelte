@@ -1,18 +1,18 @@
 <script lang="ts">
   import { CodeMirrorInput } from "../../../../components";
-  import { AuthInputTheme } from "../../../../utils";
+  import { TestFlowNameTheme} from "../../../../utils";
   export let onUpdateTestFlowName: (
     testFlowName: string,
     value: string,
   ) => void;
   export let testFlowName: string;
 
-  const theme = new AuthInputTheme().build();
+  const theme = new  TestFlowNameTheme().build();
 </script>
 
 <div
   class="d-flex align-items-center justify-content-center text-fs-12  position-relative"
-  style="width: 90px;"
+  style="max-width: 500px; min-width: 90px;"
 >
  
     <CodeMirrorInput
@@ -23,7 +23,7 @@
     placeholder={""}
     {theme}
     enableEnvironmentHighlighting={false}
-  />
+      />
  </div>
 
 <style>
