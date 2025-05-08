@@ -633,7 +633,6 @@
     } else if (currentChangeIndex < 0 && totalChanges > 0) {
       currentChangeIndex = 0;
     }
-    console.log("changedPairIndices", changedPairIndices);
   }
 
   /**
@@ -688,7 +687,7 @@
   /**
    * Accept a specific change (either added or modified)
    */
-  function acceptChange(index: number): void {
+  const acceptChange = async (index: number) => {
     if (index < 0 || index >= diffPairs.length) return;
 
     const change = diffPairs[index];
@@ -734,29 +733,30 @@
       }
     }
 
-    setTimeout(() => {
-      // Update navigation indices
-      updateChangedIndices();
+    // ToDo: Will remove these setTimeouts whiling pushing to production
+    // setTimeout(() => {
 
-      // Update both diff bulk text and regular bulk text
-      diffBulkText = diffPairsToBulkText();
-      // bulkText = pairsToBulkText(pairs);
+    updateChangedIndices(); // Update navigation indices
+    diffBulkText = diffPairsToBulkText(); // Update both diff bulk text and regular bulk text
+    // bulkText = pairsToBulkText(pairs);
 
-      // Notify parent of changes
-      callback(pairs);
+    callback(pairs); // Notify parent of changes
 
-      // If no more changes, potentially disable merge view
-      if (totalChanges === 0) {
-        showMergeView = false;
-        hasChanges = false;
-      }
-    }, 200); // Reduced timeout for better responsiveness
-  }
+    // If no more changes, potentially disable merge view
+    if (totalChanges === 0) {
+      isMergeViewLoading = true;
+      await sleep(2000);
+      showMergeView = false;
+      hasChanges = false;
+      isMergeViewLoading = false;
+    }
+    // }, 200); // Reduced timeout for better responsiveness
+  };
 
   /**
    * Reject a specific change
    */
-  function rejectChange(index: number): void {
+  const rejectChange = async (index: number) => {
     if (index < 0 || index >= diffPairs.length) return;
 
     const change = diffPairs[index];
@@ -792,27 +792,23 @@
       diffPairs = [...diffPairs]; // Trigger reactivity
     }
 
-    setTimeout(() => {
-      // Update navigation indices
-      updateChangedIndices();
+    // setTimeout(() => {
 
-      // Update both diff bulk text and regular bulk text
-      diffBulkText = diffPairsToBulkText();
-      bulkText = pairsToBulkText(pairs);
+    updateChangedIndices(); // Update navigation indices
+    diffBulkText = diffPairsToBulkText(); // Update both diff bulk text and regular bulk text
+    // bulkText = pairsToBulkText(pairs);
+    callback(pairs); // Notify parent of changes
 
-      console.log("pairs", pairs);
-      console.log("diffBulkText", diffBulkText);
-      console.log("bulkText", bulkText);
-      // Notify parent of changes
-      callback(pairs);
-
-      // If no more changes, potentially disable merge view
-      if (totalChanges === 0) {
-        showMergeView = false;
-        hasChanges = false;
-      }
-    }, 200); // Reduced timeout for better responsiveness
-  }
+    // If no more changes, potentially disable merge view
+    if (totalChanges === 0) {
+      isMergeViewLoading = true;
+      await sleep(2000);
+      showMergeView = false;
+      hasChanges = false;
+      isMergeViewLoading = false;
+    }
+    // }, 200); // Reduced timeout for better responsiveness
+  };
 
   // ********** Diff/Merge Navigate & Accept per Line - End **********
 </script>
