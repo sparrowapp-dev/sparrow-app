@@ -703,7 +703,7 @@
 
           <div class="d-flex justify-content-end mt-3 me-0 gap-2">
             <Button
-              title={"Keep the Changes!!"}
+              title={"Keep the Changes"}
               size={"small"}
               type={"primary"}
               onClick={applyChanges}

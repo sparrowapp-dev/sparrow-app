@@ -114,7 +114,7 @@
             name: "DeepSeek",
             id: "deepseek",
             disabled: true,
-            hide: false,
+            hide: true,
           },
         ]}
         titleId={"azure-ai"}
