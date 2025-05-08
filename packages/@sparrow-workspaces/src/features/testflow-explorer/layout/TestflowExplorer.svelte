@@ -406,6 +406,27 @@
     isDynamicExpressionModalOpen = false;
   };
 
+  const dfs = (adj: any[], start: number, visited = new Set()) => {
+    if (visited.has(start)) return;
+
+    nodes.update((nodes) => {
+      for (let i = 0; i < nodes.length; i++) {
+        if (Number(nodes[i].id) === start) {
+          nodes[i].position = {
+            x: nodes[i].position.x + 350,
+            y: nodes[i].position.y,
+          };
+        }
+      }
+      return nodes;
+    });
+    visited.add(start);
+
+    for (const neighbor of adj[start]) {
+      dfs(adj, neighbor, visited);
+    }
+  };
+
   /**
    * Updates the selected API in a specific node.
    * @param id - Node ID.
@@ -674,7 +695,11 @@
    * Creates a new node and connects it to the existing node.
    * @param _id - The ID of the existing node.
    */
-  const createNewNode = async (_id: string, _requestData = undefined) => {
+  const createNewNode = async (
+    _id: string,
+    _requestData = undefined,
+    _direction = "add-block-after",
+  ) => {
     if (!_id) return;
 
     let requestData;
@@ -694,20 +719,20 @@
       return;
     }
 
-    if (checkIfEdgesExist(_id)) {
-      return;
-    }
+    // if (checkIfEdgesExist(_id)) {
+    //   return;
+    // }
 
-    const targetNode = findNextNodeId($nodes);
+    const newNodeId = findNextNodeId($nodes);
 
     nodes.update((_nodes: Node[] | any[]) => {
       let nextNodePosition;
       // Find the next node position based on the current node's position
       for (let i = 0; i < _nodes?.length; i++) {
         if (_nodes[i].id === _id) {
-          const additionValue = i === 0 ? 0 : 50;
+          // const additionValue = i === 0 ? 0 : 50;
           nextNodePosition = {
-            x: _nodes[i].position.x + 300 + additionValue,
+            x: _nodes[i].position.x,
             y: _nodes[i].position.y,
           };
         }
@@ -715,10 +740,10 @@
       return [
         ...(_nodes || []),
         {
-          id: targetNode,
+          id: newNodeId,
           type: "requestBlock",
           data: {
-            blockName: `Block ${targetNode - 1}`,
+            blockName: `Block ${newNodeId - 1}`,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string, _options = undefined) {
@@ -735,6 +760,11 @@
                 _event === "run-till-here"
               ) {
                 partialRun(id, _event);
+              } else if (
+                _event === "add-block-before" ||
+                _event === "add-block-after"
+              ) {
+                createNewNode(id, undefined, _event);
               }
             },
             onOpenAddCustomRequestModal: function (id: string) {
@@ -773,17 +803,114 @@
         },
       ];
     });
-    edges.update((edges) => {
-      return [
-        ...edges,
-        {
-          id: "xy-edge__" + _id + "-" + targetNode,
-          source: _id,
-          target: targetNode,
-          deletable: false,
-        },
-      ];
-    });
+    // edges.update((edges) => {
+    //   return [
+    //     ...edges,
+    //     {
+    //       id: "xy-edge__" + _id + "-" + newNodeId,
+    //       source: _id,
+    //       target: newNodeId,
+    //       deletable: false,
+    //     },
+    //   ];
+    // });
+
+    ////////////////////////////////////////////////////////////
+    if (_direction === "add-block-after") {
+      let destinationId: string;
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          if (edges[i].source === _id) {
+            // afterward block exist
+            destinationId = edges[i].target;
+            edges[i].target = newNodeId;
+            edges[i].id = "xy-edge__" + _id + "-" + newNodeId;
+          }
+        }
+        if (destinationId) {
+          // afterward block exist
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + newNodeId + "-" + destinationId,
+              source: newNodeId,
+              target: destinationId,
+              deletable: false,
+            },
+          ];
+        } else {
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + _id + "-" + newNodeId,
+              source: _id,
+              target: newNodeId,
+              deletable: false,
+            },
+          ];
+        }
+      });
+
+      let maxNodeId = 1;
+      nodes.update((nodes) => {
+        for (let i = 0; i < nodes.length; i++) {
+          maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+        }
+        return nodes;
+      });
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          graph[Number(edges[i].source)].push(Number(edges[i].target));
+        }
+        return edges;
+      });
+      dfs(graph, Number(newNodeId));
+      // debugger;
+    } else if (_direction === "add-block-before") {
+      let destinationId: any;
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          if (edges[i].target === _id) {
+            destinationId = edges[i].source;
+            edges[i].source = newNodeId;
+            edges[i].id = "xy-edge__" + newNodeId + "-" + _id;
+          }
+        }
+        return [
+          ...edges,
+          {
+            id: "xy-edge__" + destinationId + "-" + newNodeId,
+            source: destinationId,
+            target: newNodeId,
+            deletable: false,
+          },
+        ];
+      });
+
+      let maxNodeId = 1;
+      nodes.update((nodes) => {
+        for (let i = 0; i < nodes.length; i++) {
+          maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+        }
+        return nodes;
+      });
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          graph[Number(edges[i].source)].push(Number(edges[i].target));
+        }
+        return edges;
+      });
+      dfs(graph, Number(_id));
+      // debugger;
+    }
   };
 
   /**
@@ -816,6 +943,11 @@
                 _event === "run-till-here"
               ) {
                 partialRun(id, _event);
+              } else if (
+                _event === "add-block-before" ||
+                _event === "add-block-after"
+              ) {
+                createNewNode(id, undefined, _event);
               }
             },
             onOpenAddCustomRequestModal: function (id: string) {
