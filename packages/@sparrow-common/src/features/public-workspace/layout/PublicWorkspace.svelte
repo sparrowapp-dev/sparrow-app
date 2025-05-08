@@ -30,7 +30,7 @@
       style="color: var(--text-ds-neutral-200); margin-bottom:7px; margin-top:18px;"
       class="text-ds-font-size-14 text-ds-line-height-143"
     >
-      Publish "{workspace?.name}" workspace
+      Publish "{workspace?.name}" Workspace
     </p>
     <p
       class="text-ds-font-size-12"
@@ -136,7 +136,7 @@
         }}
       />
       <Button
-        title={"Make Public"}
+        title={"Publish"}
         textStyleProp={"font-size: 16px"}
         loaderSize={18}
         type={"primary"}
