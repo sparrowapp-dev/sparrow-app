@@ -575,7 +575,7 @@
       (node) => node.id === id,
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
-    countNextDeletedNode(id);
+    // countNextDeletedNode(id);
   };
 
   /**
