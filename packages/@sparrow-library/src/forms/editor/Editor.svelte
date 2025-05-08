@@ -501,7 +501,7 @@
 />
 
 {#if hasChanges}
-  <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+  <div class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns">
     <Button
       title={"Keep the Changes"}
       size={"small"}
@@ -532,6 +532,11 @@
   }
 
   /* Style for customizing the css for codemirror merge view */
+
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 4px;
+  }
 
   /* styling for added row */
   .merge-view :global(.cm-changedLine) {

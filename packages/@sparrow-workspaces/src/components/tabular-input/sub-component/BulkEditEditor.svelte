@@ -266,7 +266,7 @@
 />
 
 {#if !isMergeViewLoading && isMergeViewEnabled}
-  <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+  <div class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns">
     <Button
       title={"Keep the Changes"}
       size={"small"}
@@ -313,5 +313,10 @@
   .merge-view :global(.cm-changedText) {
     /* background: #14522e !important; */
     background: var(--bg-ds-success-700) !important;
+  }
+
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 4px;
   }
 </style>
