@@ -534,7 +534,7 @@
   /* Style for customizing the css for codemirror merge view */
 
   .merge-view-act-btns {
-    position: sticky;
+    position: sticky; /* fix the position so that it will not go down with scroll down */
     bottom: 4px;
   }
 
