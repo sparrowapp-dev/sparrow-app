@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Spinner } from "@sparrow/library/ui";
+  import { Spinner, Tag, Toggle } from "@sparrow/library/ui";
   import { Select } from "@sparrow/library/forms";
   import {
     debounce,
@@ -14,6 +14,7 @@
   import { TickMarkRoundedIcon as TickMark } from "@sparrow/library/assets";
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
+  import * as Sentry from "@sentry/svelte";
 
   export let currentWorkspaceId;
   export let onCloseModal;
@@ -64,6 +65,7 @@
     isValidServerXML = false,
     isValidServerDeployedURL = false;
 
+  let isActiveSyncEnabled = false;
   const handleInputField = async () => {
     isimportDataLoading = true;
     isValidClientURL = false;
@@ -88,7 +90,9 @@
             if (res?.isSuccessful) {
               isValidServerURL = true;
             }
-          } catch (e) {}
+          } catch (e) {
+            Sentry.captureException(e);
+          }
         }
       } else {
         isValidClientDeployedURL = true;
@@ -99,7 +103,9 @@
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
-          } catch (e) {}
+          } catch (e) {
+            Sentry.captureException(e);
+          }
         }
       }
     } else if (validateClientJSON(importData)) {
@@ -159,85 +165,40 @@
     supportedFileTypes: string[],
   ) => {
     isInputDataTouched = true;
-
     const targetFile = e?.target?.files || e?.dataTransfer?.files;
-    const file = targetFile?.[0];
 
-    // File existence check
-    if (!file) {
-      uploadCollection.file.invalid = true;
-      return;
-    }
-
-    // Size validation
-    if (file.size > maxSize * 1024) {
+    if (targetFile && targetFile[0].size > maxSize * 1024) {
       uploadCollection.file.showFileSizeError = true;
       uploadCollection.file.invalid = true;
       return;
     }
-
-    // Type validation
-    const fileType = `.${file.name.split(".").pop().toLowerCase()}`;
+    const fileType = `.${(targetFile && targetFile[0]?.name)
+      .split(".")
+      .pop()
+      .toLowerCase()}`;
     if (!supportedFileTypes.includes(fileType)) {
       uploadCollection.file.showFileTypeError = true;
       uploadCollection.file.invalid = true;
       return;
     }
-
-    // Reset error states
     uploadCollection.file.showFileSizeError = false;
     uploadCollection.file.showFileTypeError = false;
     uploadCollection.file.invalid = false;
-    uploadCollection.file.value = file;
+    uploadCollection.file.value = targetFile && targetFile[0];
 
-    // Read file content
+    // Read the file content
     const reader = new FileReader();
-
     reader.onload = async (event) => {
-      try {
-        const fileContent = event.target?.result;
-
-        if (
-          !fileContent ||
-          typeof fileContent !== "string" ||
-          fileContent.trim().length === 0
-        ) {
-          uploadCollection.file.invalid = true;
-          uploadCollection.file.value = [];
-          return;
-        }
-
-        // Basic JSON check (can adjust for XML if needed)
-        const parsed = JSON.parse(fileContent);
-
-        // Optional: Check for Postman collection schema
-        const isPostman = parsed?.info?.schema?.includes("postman.com");
-
-        if (!isPostman) {
-          uploadCollection.file.invalid = true;
-          uploadCollection.file.value = [];
-          return;
-        }
-
-        // Custom validation
-        const res = await validateFileUpload(fileContent);
-
-        uploadCollection.file.invalid = !res;
-        if (!res) uploadCollection.file.value = [];
-      } catch (err) {
-        console.error("File read or validation error:", err);
+      const fileContent = event.target?.result;
+      const res = await validateFileUpload(fileContent);
+      if (res) {
+        uploadCollection.file.invalid = false;
+      } else {
         uploadCollection.file.invalid = true;
         uploadCollection.file.value = [];
       }
     };
-
-    reader.onerror = () => {
-      uploadCollection.file.invalid = true;
-      uploadCollection.file.value = [];
-      console.error("FileReader failed to read the file.");
-    };
-
-    reader.readAsText(file);
+    reader.readAsText(targetFile ? targetFile[0] : "");
   };
 
   const handleLogoReset = (e: any) => {
@@ -265,70 +226,127 @@
     }
   };
 
-  const validateJSON = (data: any) => {
+  const validateJSON = (data) => {
     return validateImportBody(data);
   };
 
   let isLoading = false;
   const handleImport = async () => {
-    try {
-      isLoading = true;
-      isInputDataTouched = true;
-
-      if (activeSync) {
-        isRepositoryPathTouched = true;
-      }
-
-      if (isRepositoryPath) {
-        isRepositoryBranchTouched = true;
-      }
-
-      if (importType === "text" && importData === "") {
-        isTextEmpty = true;
-      }
-
-      if (importType === "text" && importData) {
-        if (
-          (isValidClientJSON && isValidServerJSON) ||
-          (isValidClientXML && isValidServerXML)
-        ) {
-          // Handle imports using JSON / XML textarea
-          const contentType = validateJSON(importData);
-          handleImportJsonObject(contentType, importData);
-        } else if (isValidClientDeployedURL && isValidServerDeployedURL) {
-          // Handle imports using deployed URL
-          const response = await onGetOapiTextFromURL(importData);
-          if (response?.data?.status === ResponseStatusCode.OK) {
-            const contentType = validateJSON(importData);
-            handleImportJsonObject(contentType, response?.data?.body);
-          }
-        } else if (isValidClientURL && isValidServerURL) {
-          // Handle imports using localhost URL
-          const response = await onGetOapiTextFromURL(importData);
-          if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
-            const contentType = validateJSON(response?.data?.body);
-            handleImportJsonObject(contentType, response?.data?.body);
-          }
-        }
-      } else if (importType === "file") {
-        // Handle file imports
-        if (uploadCollection?.file?.value?.length !== 0) {
-          handleFileUpload(uploadCollection?.file?.value);
-        } else {
-          uploadCollection.file.invalid = true;
-          uploadCollection.file.showFileSizeError = false;
-          uploadCollection.file.showFileTypeError = false;
-        }
-      }
-    } catch (error) {
-      console.error("Error during import process:", error);
-      notifications.error("An error occurred during the import process.");
-    } finally {
-      isLoading = false;
+    isLoading = true;
+    isInputDataTouched = true;
+    if (activeSync) {
+      isRepositoryPathTouched = true;
     }
+    if (isRepositoryPath) {
+      isRepositoryBranchTouched = true;
+    }
+    if (importType === "text" && importData === "") {
+      isTextEmpty = true;
+    }
+    if (
+      importType === "text" &&
+      importData &&
+      ((isValidClientJSON && isValidServerJSON) ||
+        (isValidClientXML && isValidServerXML))
+    ) {
+      /**
+       * Handle imports using JSON / XML textarea
+       */
+      const contentType = validateJSON(importData);
+      handleImportJsonObject(contentType, importData);
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientDeployedURL &&
+      isValidServerDeployedURL
+    ) {
+      /**
+       * Handle imports using deployed URL
+       */
+      const response = await onGetOapiTextFromURL(importData);
+      const contentType = validateJSON(importData);
+      if (response?.data?.status === ResponseStatusCode.OK) {
+        handleImportJsonObject(
+          ContentTypeEnum["application/json"],
+          response?.data?.body,
+          isActiveSyncEnabled,
+        );
+      }
+    } else if (
+      importType === "text" &&
+      importData &&
+      isValidClientURL &&
+      isValidServerURL
+    ) {
+      /**
+       * Handle imports using localhost URL
+       */
+      const response = await onGetOapiTextFromURL(importData);
+      if (!activeSync && response?.data?.status === ResponseStatusCode.OK) {
+        const contentType = validateJSON(response?.data?.body);
+        handleImportJsonObject(
+          contentType,
+          response?.data?.body,
+          isActiveSyncEnabled,
+        );
+      }
+
+      // else if (
+      //   activeSync &&
+      //   response?.data?.status === ResponseStatusCode.OK &&
+      //   isRepositoryPath &&
+      //   repositoryBranch &&
+      //   repositoryPath &&
+      //   repositoryBranch !== "not exist" &&
+      //   currentBranch
+      // ) {
+      //   if (
+      //     getBranchList
+      //       .map((elem) => {
+      //         return elem.name;
+      //       })
+      //       .includes(currentBranch)
+      //   ) {
+      //     const requestBody = {
+      //       urlData: {
+      //         data: JSON.parse(response.data.response),
+      //         headers: response.data.headers,
+      //       },
+      //       url: importUrl,
+      //       primaryBranch: repositoryBranch,
+      //       currentBranch: currentBranch,
+      //       localRepositoryPath: repositoryPath,
+      //     };
+      //     handleImportUrl(requestBody);
+      //   } else {
+      //     notifications.error(
+      //       `Can't import local branch. Please push ${currentBranch} to remote first.`,
+      //     );
+      //   }
+      // }
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length !== 0
+    ) {
+      handleFileUpload(uploadCollection?.file?.value);
+      isLoading = false;
+      return;
+    } else if (
+      importType === "file" &&
+      uploadCollection?.file?.value?.length === 0
+    ) {
+      uploadCollection.file.invalid = true;
+      uploadCollection.file.showFileSizeError = false;
+      uploadCollection.file.showFileTypeError = false;
+    }
+    isLoading = false;
   };
 
-  const handleImportJsonObject = async (contentType, importJSON) => {
+  const handleImportJsonObject = async (
+    contentType,
+    importJSON,
+    activeSyncEnabled = false,
+  ) => {
     if (!contentType) {
       progressBar.isLoading = false;
       isSyntaxError = true;
@@ -341,6 +359,8 @@
       currentWorkspaceId,
       importJSON,
       contentType,
+      activeSyncEnabled,
+      importData,
     );
     if (response.isSuccessful) {
       progressBar.title = ProgressTitle.FETCHING_DATA;
@@ -422,7 +442,9 @@
           currentBranch = activeResponse;
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      Sentry.captureException(e);
+    }
   };
 
   let repositoryBranch = "not exist";
@@ -514,7 +536,9 @@
 {#if importType === "text"}
   <div>
     <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-      Paste your OAS text or Swagger/Localhost Link
+      Paste OAS Text or Swagger/Localhost Link <span class="required-mark"
+        >*</span
+      >
     </p>
   </div>
   <div class="textarea-div rounded border-0 position-relative">
@@ -528,7 +552,7 @@
       on:blur={() => {
         isInputDataTouched = true;
       }}
-      placeholder={"Example - OpenAPI JSON text or http://localhost:8080/api-docs-json"}
+      placeholder={"Eg: OpenAPI JSON text or http://localhost:8080/api/docs-json "}
       bind:value={importData}
       class="text-area mb-0 border-0 text-fs-12 rounded bg-tertiary-300 pe-4 ps-2 pb-2 pt-2"
       style={!isValidServerDeployedURL &&
@@ -758,7 +782,38 @@
     {/if}
   </div>
 {/if}
-
+{#if isValidServerDeployedURL || isValidServerURL}
+  <div
+    class="d-flex"
+    style="justify-content: space-between; align-items:flex-start; margin-top:10px;"
+  >
+    <div>
+      <div class="d-flex">
+        <p
+          class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+          style="color: var(--text-ds-neutral-200); margin-bottom:0px; margin-right:8px;"
+        >
+          Enable active sync
+        </p>
+        <Tag type="cyan" text={"Beta"} />
+      </div>
+      <p
+        class="text-ds-font-size-12 text-ds-font-weight-medium"
+        style="color: var(--text-ds-neutral-400);"
+      >
+        Keeps your Sparrow collection in sync with your Swagger in real-time.
+        While edits are allowed, adding or deleting APIs is disabled to maintain
+        consistency.
+      </p>
+    </div>
+    <Toggle
+      isActive={isActiveSyncEnabled}
+      onChange={() => {
+        isActiveSyncEnabled = !isActiveSyncEnabled;
+      }}
+    />
+  </div>
+{/if}
 <div
   class="d-flex flex-column align-items-center justify-content-end rounded mt-4"
 >
@@ -789,6 +844,15 @@
       onCloseModal();
     }}>Create Empty Collection</button
   >
+</div>
+<div style="margin-top: 20px; justify-content:center" class="d-flex">
+  <p
+    class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
+    style="color: var(--text-ds-neutral-300); text-align: center;"
+  >
+    For active sync, only swagger or localhost links are supported. Uploading
+    files or pasting OpenAPI JSON text will create a normal collection.
+  </p>
 </div>
 
 <style lang="scss">
@@ -1063,5 +1127,9 @@
   input:checked + .slider:before {
     background-color: var(--send-button);
     transform: translateX(16px);
+  }
+  .required-mark {
+    color: var(--text-ds-danger-400);
+    font-family: "Inter", sans-serif;
   }
 </style>
