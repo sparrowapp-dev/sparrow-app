@@ -126,7 +126,7 @@
             <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
           {/if}
-          {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
+          <!-- {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
               class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
               style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
@@ -144,7 +144,7 @@
                 >
               {/if}
             </div>
-          {/if}
+          {/if} -->
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
               {onAddMember}

@@ -365,7 +365,7 @@
                 </p>
               {/if}
               <Button
-                title={`Invite`}
+                title={`Invite collaborators`}
                 type={"secondary"}
                 startIcon={PeopleRegular}
                 onClick={() => {
@@ -484,11 +484,11 @@
                     <Search
                       variant={"primary"}
                       id="search-input"
-                      size="medium"
+                      size="small"
                       placeholder="Search workspaces in {openTeam?.name}"
                       on:input={handleSearchInput}
                       bind:value={searchQuery}
-                      customWidth={"450px"}
+                      customWidth={"320px"}
                     />
                   </div>
                 </div>

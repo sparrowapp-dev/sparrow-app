@@ -65,7 +65,7 @@
     border: 1px solid {colorPalette[type]?.border};
     border-radius: 2px;
     padding: 0px 4px;
-    height: 18px;
+    height: 20px;
     text-align: center;
     font-family: Inter, sans-serif;
     width: fit-content;
