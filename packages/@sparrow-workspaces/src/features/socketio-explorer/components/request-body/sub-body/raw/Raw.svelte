@@ -16,7 +16,6 @@
     bind:value
     on:change={handleCodeMirrorChange}
     isEditable={true}
-    autofocus={true}
     {isBodyBeautified}
     beautifySyntaxCallback={updateBeautifiedState}
     placeholder={"Message"}

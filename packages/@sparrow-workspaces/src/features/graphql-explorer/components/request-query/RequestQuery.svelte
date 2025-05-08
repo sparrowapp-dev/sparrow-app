@@ -44,7 +44,6 @@
             bind:value
             on:change={handleCodeMirrorChange}
             isEditable={true}
-            autofocus={true}
             class="m-0"
             {isBodyBeautified}
             beautifySyntaxCallback={updateBeautifiedState}
