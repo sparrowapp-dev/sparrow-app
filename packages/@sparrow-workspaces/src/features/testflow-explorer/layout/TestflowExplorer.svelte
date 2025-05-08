@@ -956,26 +956,48 @@
    * the `nodes` and `edges` stores, and performs necessary cleanup actions.
    * @param id - The ID of the node to delete.
    */
-  const handleDeleteNode = (id: string) => {
+  const handleDeleteNode = (idToDelete: string) => {
+    const deletedIndex = Number(idToDelete);
+
+    // Update nodes
     nodes.update((_nodes) => {
-      const remainingNodes = _nodes.filter(
-        (node) => Number(node.id) < Number(id),
-      );
-      return remainingNodes;
+      const nodeIndex = _nodes.findIndex((node) => node.id === idToDelete);
+      if (nodeIndex === -1) {
+        console.error("Node not found.");
+        return;
+      }
+
+      const removeNode = _nodes[nodeIndex];
+      const itemsBeforeIndex = _nodes.slice(0, nodeIndex);
+      const itemsAfterIndex = _nodes.slice(nodeIndex + 1);
+
+      let prevId = removeNode.id;
+      let prevPos = removeNode.position;
+
+      const updatedItems = itemsAfterIndex.map((node) => {
+        const updatedNode = {
+          ...node,
+          id: `${prevId}`,
+          position: { x: prevPos.x, y: prevPos.y },
+        };
+        prevId = node.id;
+        prevPos = node.position;
+        return updatedNode;
+      });
+
+      const updatedAllNodes = [...itemsBeforeIndex, ...updatedItems];
+      return updatedAllNodes;
     });
 
+    // Update edges
     edges.update((_edges) => {
-      const remainingEdges = _edges.filter(
-        (edge) =>
-          Number(edge.source) !== Number(id) &&
-          Number(edge.target) < Number(id),
-      );
-      return remainingEdges;
+      const updatedEdges = _edges.slice(0, -1);
+      return updatedEdges;
     });
 
+    // Cleanup
     deleteNodeResponse($tab.tabId, selectedNodeId);
     unselectNodes();
-
     isDeleteNodeModalOpen = false;
   };
 
