@@ -74,7 +74,7 @@
     background-color: transparent !important;
   }
   .settings-team-description:hover {
-    outline: 1px solid var(--border-primary-300);
+    outline: 1px solid var(--border-ds-neutral-300);
   }
   .settings-team-description:focus {
     outline: 1px solid var(--border-primary-300);

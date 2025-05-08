@@ -1,6 +1,6 @@
 export const DESCRIPTION_CONFIG = {
-  TITLE: `About`,
-  MAX_TEXT_SIZE: 500,
-  DESCRIPTION: "Max 500 characters",
-  PLACEHOLDER: `Write a little about your hub`,
+  TITLE: `Hub Summary`,
+  MAX_TEXT_SIZE: 100,
+  DESCRIPTION: "Max 100 characters",
+  PLACEHOLDER: `Write a short summary about your hub`,
 };

@@ -1,5 +1,5 @@
 export const ICON_CONFIG = {
-  DESCRIPTION: `Upload or drag and drop your image. For best results, use a square image under 2 MB in size. Supported formats: .jpg, .jpeg, .png .`,
+  DESCRIPTION: `Upload or drag and drop your image. For best results, use a square image under 2 MB in size. Supported formats: .jpg, .jpeg, .png.`,
   FILE_TYPES: [".jpg", ".jpeg", ".png"],
   MAX_FILE_SIZE_KB: 2048,
   SIZE_EXCEED_ERROR_MESSAGE: `The size of the file you are trying to upload is more than 2 MB.`,
@@ -11,13 +11,13 @@ export const ICON_CONFIG = {
 export const NAME_CONFIG = {
   TITLE: `Hub Name`,
   MAX_TEXT_SIZE: 500,
-  PLACEHOLDER: `Hub name`,
+  PLACEHOLDER: `Enter your hub name`,
 };
 
 export const DESCRIPTION_CONFIG = {
   TITLE: `Hub Summary`,
-  MAX_TEXT_SIZE: 500,
-  PLACEHOLDER: `Write a little about your hub`,
+  MAX_TEXT_SIZE: 100,
+  PLACEHOLDER: `Write a short summary about your hub`,
 };
 
 export const OWNER_CONFIG = {

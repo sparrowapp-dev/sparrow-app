@@ -76,6 +76,7 @@
             {#if title}
               <h3
                 class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold ellipsis"
+                style="color: var(--text-ds-neutral-50);"
               >
                 {title}
               </h3>
