@@ -641,13 +641,13 @@
       </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+        <div style="position:fixed; top:100px; left:250px; z-index:9999;">
           <TestFlowTourGuide
             targetId="addButton"
-            title="Getting Started  🎉"
+            title="Welcome to Test Flow!"
             pulsePosition={{ top: "-58px", left: "14px" }}
-            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
-            tipPosition="top-left"
+            description={`Let's begin by creating your first flow. Click the '+ Add' button to get started`}
+            stepCount="1/7"
             onNext={() => {
               currentStep.set(2);
               addButtonMenu = true;
@@ -661,22 +661,18 @@
       {/if}
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
-        <div
-          style="position:fixed; top:{isWebApp
-            ? '234px'
-            : '266px'}; left:220px; z-index:9999;"
-        >
+        <div style="position:fixed; top:300px; left:500px; z-index:9999;">
           <TestFlowTourGuide
-            targetId="addButton"
-            title="Add Your Flow 🌊"
-            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
-            tipPosition="left-top"
+            targetId="dropdown-container-open"
+            title="Add Your Flow"
+            description={`Click 'Add Test Flow' to instantly create a new flow. It's that simple--your workspace is ready!`}
+            stepCount="2/7"
             pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
             onNext={() => {
-              currentStep.set(3);
               onCreateTestflow();
               isExpandTestflow.set(true);
               toggleTourGuideActive();
+              currentStep.set(3);
             }}
             onClose={() => {
               isTestFlowTourGuideOpen.set(false);

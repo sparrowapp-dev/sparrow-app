@@ -278,6 +278,8 @@ $theme-green-00A86B: #00a86b;
   --text-primary-500: #{$theme-blue-87b9f7};
   --text-primary-600: #{$theme-blue-007bff};
 
+
+  --text-neutral-300: #{$theme-gray-9B9DA1};
   --text-secondary-50: #{$theme-grey-999999};
   --text-secondary-100: #{$theme-grey-ffffff};
   --text-secondary-110: #{$theme-grey-F5F5F5};
@@ -519,60 +521,57 @@ $theme-green-00A86B: #00a86b;
 
 // $button-color: linear-gradient(270deg, #6147ff -1.72%, #1193f0 100%);
 
-$theme-colors: map-merge(
-  $theme-colors,
-  (
-    "primaryColor": $theme-blue-3670F7,
-    "recentApiText": $sparrow-recentApiText,
+$theme-colors: map-merge($theme-colors,
+    ("primaryColor": $theme-blue-3670F7,
+      "recentApiText": $sparrow-recentApiText,
 
-    "secondaryColor": $sparrow-yellow,
-    "blackColor": $sparrow-black,
-    "successColor": $sparrow-success,
-    "borderColor": $sparrow-error,
-    "defaultColor": $sparrow-default,
-    "dangerColor": $sparrow-danger,
-    "whiteColor": $sparrow-white,
-    "lightGray": $sparrow-light-gray,
-    "backgroundColor": $sparrow-background,
-    "backgroundLight": $sparrow-background-light,
-    "backgroundDark": $sparrow-background-dark,
-    "backgroundDropdown": $sparrow-background-dropdown,
-    "plusButton": $sparrow-plusbutton,
-    "lightBackground": $sparrow-border-color,
-    "requestBodyColor": $sparrow-request-body,
-    "labelColor": $sparrow-send-button,
-    "buttonBackColor": $sparrow-button-background,
-    "buttonColor": $sparrow-button-color,
-    "redColor": $sparrow-gradient,
-    "getColor": $sparrow-get,
-    "putColor": $sparrow-put,
-    "postColor": $sparrow-post,
-    "deleteColor": $sparrow-delete,
-    "headColor": $sparrow-head,
-    "patchColor": $sparrow-patc,
-    "optionsColor": $sparrow-opt,
-    "textColor": $sparrow-text-color,
-    "keyValuePairColor": $sparrow-key-value-pair,
-    "dullBackground": $sparrow-dull-background,
-    "sparrowBottomBorder": $sparrow-bottom-border,
-    "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
-    "dropdownBorderColor": $sparrow-dropdown-border-color,
-    "activeSyncBtn": $sparrow-active-sync,
-    "dropdownButton": $sparrow-dropdown,
-    "dropdownHover": $sparrow-dropdown-hover,
-    "dropdownContainer": $sparrow-dropdown-container,
-    "dropdownOptionHover": $sparrow-dropdown-option-hover,
-    "dropdownOptionActive": $sparrow-dropdown-option-active,
-    "saveButtonLine": $sparrow-send-button-line,
+      "secondaryColor": $sparrow-yellow,
+      "blackColor": $sparrow-black,
+      "successColor": $sparrow-success,
+      "borderColor": $sparrow-error,
+      "defaultColor": $sparrow-default,
+      "dangerColor": $sparrow-danger,
+      "whiteColor": $sparrow-white,
+      "lightGray": $sparrow-light-gray,
+      "backgroundColor": $sparrow-background,
+      "backgroundLight": $sparrow-background-light,
+      "backgroundDark": $sparrow-background-dark,
+      "backgroundDropdown": $sparrow-background-dropdown,
+      "plusButton": $sparrow-plusbutton,
+      "lightBackground": $sparrow-border-color,
+      "requestBodyColor": $sparrow-request-body,
+      "labelColor": $sparrow-send-button,
+      "buttonBackColor": $sparrow-button-background,
+      "buttonColor": $sparrow-button-color,
+      "redColor": $sparrow-gradient,
+      "getColor": $sparrow-get,
+      "putColor": $sparrow-put,
+      "postColor": $sparrow-post,
+      "deleteColor": $sparrow-delete,
+      "headColor": $sparrow-head,
+      "patchColor": $sparrow-patc,
+      "optionsColor": $sparrow-opt,
+      "textColor": $sparrow-text-color,
+      "keyValuePairColor": $sparrow-key-value-pair,
+      "dullBackground": $sparrow-dull-background,
+      "sparrowBottomBorder": $sparrow-bottom-border,
+      "emailInviteBackgroundColor": $sparrow-email-invite-bg-color,
+      "dropdownBorderColor": $sparrow-dropdown-border-color,
+      "activeSyncBtn": $sparrow-active-sync,
+      "dropdownButton": $sparrow-dropdown,
+      "dropdownHover": $sparrow-dropdown-hover,
+      "dropdownContainer": $sparrow-dropdown-container,
+      "dropdownOptionHover": $sparrow-dropdown-option-hover,
+      "dropdownOptionActive": $sparrow-dropdown-option-active,
+      "saveButtonLine": $sparrow-send-button-line,
 
-    "sparrowBgContainer": $sparrow-bg-container,
-    "sparrowBgContainerBorder": $sparrow-bg-container-border,
-    "sparrowBgContainerOne": $sparrow-bg-container-one,
-    "sparrowBgContainerTwo": $sparrow-bg-container-two,
-    "sparrowBgContainerThree": $sparrow-bg-container-three,
-    "sparrowBgContainerFour": $sparrow-bg-container-four,
-  )
-);
+      "sparrowBgContainer": $sparrow-bg-container,
+      "sparrowBgContainerBorder": $sparrow-bg-container-border,
+      "sparrowBgContainerOne": $sparrow-bg-container-one,
+      "sparrowBgContainerTwo": $sparrow-bg-container-two,
+      "sparrowBgContainerThree": $sparrow-bg-container-three,
+      "sparrowBgContainerFour": $sparrow-bg-container-four,
+    ));
 
 // Define a map for font sizes in pixels
 $sparrow-font-sizes: (

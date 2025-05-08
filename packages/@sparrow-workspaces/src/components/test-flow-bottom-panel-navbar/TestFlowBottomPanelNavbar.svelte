@@ -124,14 +124,15 @@
   {/if}
 
   {#if $isTestFlowTourGuideOpen && $currentStep == 7}
-    <div style="position:absolute; bottom:260px; right:300px;">
+    <div style="position:absolute; top:-150px; left:620px;">
       <TestFlowTourGuide
+        targetId="requestDiv"
         isLastStep={true}
         isPuleCircleRequired={false}
-        title="Congratulations! 🎊"
+        title="You Did it!"
         pulsePosition={{ top: "210px", left: "250px" }}
-        description={`Great work! You’ve got one successful running flow.`}
-        tipPosition="bottom-right"
+        description={`Congratulations! Your test flow is running successfully. You can re-run API at any time to update values as needed.`}
+        stepCount="7/7"
         onNext={() => {
           currentStep.set(-1);
           isTestFlowTourGuideOpen.set(false);

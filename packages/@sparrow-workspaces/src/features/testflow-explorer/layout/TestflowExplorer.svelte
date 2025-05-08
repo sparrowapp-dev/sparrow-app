@@ -1186,6 +1186,7 @@
             />
           {:else}
             <Button
+              id="run"
               type="primary"
               size="medium"
               startIcon={PlayFilled}
@@ -1203,11 +1204,12 @@
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
           <div style="position:absolute;  top:60px; right:320px">
             <TestFlowTourGuide
-              targetId="run-btn"
-              title="Ready, Set, Run 🏃🏻‍♂️"
+              targetId="run"
+              title="Run Your Test Flow"
               pulsePosition={{ top: "-62px", left: "260px" }}
-              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! <br/> Alternatively, you can use the "Start" play button to initiate the flow as well.`}
-              tipPosition="top-right"
+              description={`Almost there! With your blocks and API in place, go ahead and click 'Run' to execute your test flow.`}
+              tipPosition="bottom-center"
+              stepCount="6/7"
               onNext={async () => {
                 currentStep.set(7);
               }}
@@ -1264,12 +1266,13 @@
     </SvelteFlow>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
+      <div style="position:absolute; top:200px; left:400px; z-index:1000;">
         <TestFlowTourGuide
-          title="One Block At A Time 🧱"
+          targetId="add-block-open"
+          title="Add Your First Block"
+          description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
           pulsePosition={{ top: "-64px", left: "30px" }}
-          description={`Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there.`}
-          tipPosition="top-left"
+          stepCount="3/7"
           onNext={() => {
             currentStep.set(4);
             createNewNode("1");
@@ -1282,11 +1285,12 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:232px; left:638px; z-index:1000;">
+      <div style="position:absolute; top:200px; left:630px; z-index:1000;">
         <TestFlowTourGuide
-          title="Block Added! 👏 "
-          description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
-          tipPosition="left-top"
+          targetId="requestDiv"
+          title="Select an API"
+          description={`Block added--nice! Now, click the dropdown to select an API. Don't have one? No worries, a sample API is available for you to use.`}
+          stepCount="4/7"
           pulsePosition={{ top: "8px", left: "-150px" }}
           onNext={() => {
             currentStep.set(5);
@@ -1301,9 +1305,11 @@
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
       <div style="position:absolute; top:265px; left:632px; z-index:1000;">
         <TestFlowTourGuide
-          title="Sample API waiting...⏱️"
-          description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
-          tipPosition="left-top"
+          targetId="sampleAPI-open"
+          title="Sample API Ready"
+          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
+          tipPosition="center"
+          stepCount="5/7"
           pulsePosition={{ top: "10px", left: "-145px" }}
           onNext={() => {
             currentStep.set(6);
@@ -1333,8 +1339,8 @@
         {handleOpenCurrentDynamicExpression}
       />
     </div>
-  {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
-    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+  {:else if $isTestFlowTourGuideOpen && $currentStep === 6}
+    <div style="background-color: transparent; margin: 0px 13px 12px 13px;">
       <!-- Request Response Nav -->
       <TestFlowBottomPanel
         selectedBlock={{
@@ -1368,7 +1374,70 @@
                 isDocGenerating: false,
                 isDocAlreadyGenerated: false,
               },
-              url: "https://sparrowapp.dev/api/v1/docs",
+              url: "http://api.example.com/resource",
+              queryParams: [
+                {
+                  key: "Host",
+                  value: "/",
+                  checked: true,
+                },
+              ],
+              headers: [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ],
+            },
+          },
+        }}
+        {environmentVariables}
+        onClose={() => unselectNodes()}
+        onRedirect={onRedrectRequest}
+        {handleUpdateRequestData}
+        {isWebApp}
+        onClearResponse={() => {}}
+        {userRole}
+        {onUpdateEnvironment}
+      />
+    </div>
+  {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
+    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+      <!-- Request Response Nav -->
+      <TestFlowBottomPanel
+        selectedBlock={{
+          data: {
+            name: "Sample API",
+            method: "GET",
+            blockName: "Block 1",
+            requestData: {
+              name: "pet-hospitality",
+              method: "GET",
+              state: {
+                requestBodyLanguage: RequestDataTypeEnum.TEXT,
+                requestBodyNavigation: RequestDatasetEnum.NONE,
+                requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+                requestNavigation: RequestSectionEnum.PARAMETERS,
+                responseNavigation: ResponseSectionEnum.RESPONSE,
+                responseBodyLanguage: RequestDataTypeEnum.TEXT,
+                responseBodyFormatter: ResponseFormatterEnum.PRETTY,
+                requestExtensionNavigation: "",
+                requestLeftSplitterWidthPercentage: 50,
+                requestRightSplitterWidthPercentage: 50,
+                isExposeEditDescription: true,
+                isSendRequestInProgress: false,
+                isSaveDescriptionInProgress: false,
+                isSaveRequestInProgress: false,
+                isParameterBulkEditActive: false,
+                isHeaderBulkEditActive: false,
+                isChatbotActive: false,
+                isChatbotSuggestionsActive: true,
+                isChatbotGeneratingResponse: false,
+                isDocGenerating: false,
+                isDocAlreadyGenerated: false,
+              },
+              url: "http://api.example.com/resource",
               queryParams: [
                 {
                   key: "",

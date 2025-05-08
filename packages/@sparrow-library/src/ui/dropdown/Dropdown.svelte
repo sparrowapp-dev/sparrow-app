@@ -101,6 +101,7 @@
       class="dropdown-container p-1 rounded-1 position-fixed
       "
       style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 9999;"
+      id="dropdown-container-open"
     >
       <!--
       Menu item

@@ -118,8 +118,12 @@
             data.onClick(id);
           }}
         >
-          <span class="btnc py-1 px-3 d-flex align-items-center">
-            <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
+          <span
+            id="add-block-open"
+            class="btnc py-1 px-3 d-flex align-items-center"
+          >
+            <span class="text-fs-16 me-2">+</span>
+            <span>Add Block</span>
           </span>
         </span>
       </div>
