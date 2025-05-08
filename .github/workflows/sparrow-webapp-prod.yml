@@ -43,6 +43,8 @@ jobs:
                 --build-arg VITE_WEB_SPARROW_WEB_APP_URL=${{ vars.VITE_WEB_SPARROW_WEB_APP_URL }} \
                 --build-arg VITE_WEB_SENTRY_DSN=${{ vars.VITE_WEB_SENTRY_DSN }} \
                 --build-arg VITE_WEB_APP_ENVIRONMENT=${{ vars.VITE_WEB_APP_ENVIRONMENT }} \
+                --build-arg VITE_WEB_POSTHOG_CONNECTION_API_KEY=${{ vars.VITE_WEB_POSTHOG_CONNECTION_API_KEY }} \
+                --build-arg VITE_WEB_POSTHOG_API_URL=${{ vars.VITE_WEB_POSTHOG_API_URL }} \
                 -t sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} .
 
                docker push sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }}

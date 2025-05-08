@@ -1,4 +1,4 @@
-name: Production Release
+name: Production Desktop App Release
 
 on:
   push:
@@ -32,6 +32,8 @@ env:
   VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
   VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
   VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
+  VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
+  VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
 
