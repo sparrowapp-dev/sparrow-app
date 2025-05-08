@@ -2414,6 +2414,12 @@ class RestExplorerViewModel {
       auth: componentData.property.request.auth,
     };
 
+    const rawConversations = componentData?.property?.request?.ai?.conversations || [];
+    const formattedConversations = rawConversations.map(({ type, message }) => ({
+      role: type === 'Sender' ? 'user' : 'assistant',
+      content: message
+    }));
+
     try {
       const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
@@ -2426,6 +2432,9 @@ class RestExplorerViewModel {
         userEmail,
         prompt,
         JSON.stringify(apiData),
+        formattedConversations,
+        "deepseek",
+        "chat"
       );
 
       if (!socketResponse) {
@@ -2500,15 +2509,15 @@ class RestExplorerViewModel {
 
             // Handle streaming responses
             if (response.stream_status) {
-              const { stream_status, messages, thread_id } = response;
+              const { stream_status, messages, thread_Id } = response;
 
               // Handle thread ID on stream start if not already set
               if (stream_status === STREAMING_STATES.START) {
                 // console.log("** stream started ** ");
                 const thisTabThreadId =
                   componentData?.property?.request?.ai?.threadId;
-                if (!thisTabThreadId && thread_id) {
-                  await this.updateRequestAIThread(thread_id);
+                if (!thisTabThreadId && thread_Id) {
+                  await this.updateRequestAIThread(thread_Id);
                 }
 
                 // Create empty message container that will be updated with chunks

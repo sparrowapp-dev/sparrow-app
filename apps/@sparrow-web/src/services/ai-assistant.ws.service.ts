@@ -333,6 +333,9 @@ export class AiAssistantWebSocketService {
     userEmail: string,
     prompt: string,
     apiContext: string,
+    conversation,
+    model,
+    activity
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -340,7 +343,14 @@ export class AiAssistantWebSocketService {
       emailId: userEmail,
       userInput: prompt,
       apiData: apiContext,
+      conversation,
+      model,
+      activity
     };
+
+    console.debug("Sending message:", message);
+    // return true;
+
 
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send message");
