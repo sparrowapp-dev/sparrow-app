@@ -3,6 +3,7 @@ import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 import type {
   WorkspacePostBody,
   WorkspacePutBody,
+  WorkspaceTypePatchBody,
   addUsersInWorkspacePayload,
 } from "@sparrow/common/dto";
 import type { WorkspaceRole } from "@sparrow/common/enums";
@@ -129,6 +130,33 @@ export class WorkspaceService {
       "DELETE",
       `${baseUrl}/api/workspace/${workspaceId}/user/${userId}`,
       {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public fetchPublicWorkspace = async (workspaceId: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/public/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateWorkspaceType = async (
+    workspaceId: string,
+    workspace: WorkspaceTypePatchBody,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${baseUrl}/api/workspace/${workspaceId}`,
+      {
+        body: workspace,
         headers: getAuthHeaders(),
       },
     );

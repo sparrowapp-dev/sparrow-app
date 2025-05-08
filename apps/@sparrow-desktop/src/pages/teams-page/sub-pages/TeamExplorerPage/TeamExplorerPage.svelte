@@ -9,6 +9,8 @@
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
+  import { copyToClipBoard } from "@sparrow/common/utils";
+  import constants from "@app/constants/constants";
 
   let isWebEnvironment = false;
 
@@ -21,6 +23,7 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   user.subscribe(async (value) => {
@@ -65,6 +68,11 @@
     workspaceDetails.users = users;
     isWorkspaceInviteModalOpen = true;
   };
+  const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
+    await copyToClipBoard(
+      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
+    );
+  };
 </script>
 
 <TeamExplorer
@@ -87,7 +95,12 @@
   onRemoveUserFromWorkspace={_viewModel.removeUserFromWorkspace}
   onChangeUserRoleAtWorkspace={_viewModel.changeUserRoleAtWorkspace}
   onUpdateTeam={_viewModel.updateTeam}
+  onWithDrawInvite={_viewModel.withdrawInvite}
+  onResendInvite={_viewModel.resendInvite}
+  onAcceptInvite={_viewModel.acceptInvite}
+  onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
+  onCopyLink={handleCopyPublicWorkspaceLink}
 />
 
 <Modal

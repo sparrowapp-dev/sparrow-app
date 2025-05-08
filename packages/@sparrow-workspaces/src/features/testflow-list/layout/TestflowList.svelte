@@ -199,7 +199,8 @@
       zIndex={701}
     >
       <span
-        class="{loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER
+        class="{loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER ||
+        currentWorkspace?.isShared
           ? 'd-none'
           : ''} add-icon-container d-flex"
       >
@@ -229,7 +230,7 @@
   --  Testflow Empty screen 
   -->
       {#if filteredflows && flows.length === 0 && !searchData}
-        {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER}
+        {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
           <div class={`pb-2 px-2`}>
             <p
               class={`add-env-desc-text mb-3 text-ds-font-size-12  text-ds-font-weight-regular text-center`}

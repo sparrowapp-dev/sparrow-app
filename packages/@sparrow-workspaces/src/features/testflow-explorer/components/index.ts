@@ -3,6 +3,7 @@ export { default as RequestBlock } from "./request-block/RequestBlock.svelte";
 export { default as RequestBodyTestFlow } from "./request-body/RequestBodyTestFlow.svelte";
 export { default as RequestHeaderTestFlow } from "./request-header/RequestHeaderTestFlow.svelte";
 export { default as RequestParameterTestFlow } from "./request-parameter/RequestParameterTestFlow.svelte";
+export { default as RequestAuthorizationTestFlow } from "./request-auth/RequestAuthTestFlow.svelte";
 export { default as RunHistory } from "./run-history/RunHistory.svelte";
 export { default as RequestNavigatorTestFlow } from "./request-navigator/RequestNavigatorTestFlow.svelte";
 export { default as ResponseBody } from "./response-body/ResponseBody.svelte";
@@ -14,3 +15,5 @@ export { default as ResponseNavigator } from "./response-navigator/ResponseNavig
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
 export { default as TestFlowName } from "./test-flow-name/TestFlowName.svelte";
 export { default as SaveTestflow } from "./save-testflow/SaveTestflow.svelte";
+export { default as TestFlowBottomPanel } from "../components/test-flow-bottom-panel/TestFlowBottomPanel.svelte";
+export { default as HttpUrlSection } from "./http-url-section/HttpUrlSection.svelte";

@@ -131,4 +131,65 @@ export class TeamService {
     );
     return response;
   };
+
+  public resendInvite = async (
+    teamId: string,
+    email: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/team/${teamId}/invite/resend/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+   public withdrawInvite = async (
+    teamId: string,
+    email: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/team/${teamId}/invite/not-accepted/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public acceptInvite = async (
+    teamId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/team/${teamId}/invite/user/accept`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public ignoreInvite= async (
+     teamId: string,
+     baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/team/${teamId}/invite/not-accepted`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+    }
+
 }
+
+

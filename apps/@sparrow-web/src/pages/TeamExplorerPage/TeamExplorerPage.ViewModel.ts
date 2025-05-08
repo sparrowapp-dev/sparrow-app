@@ -169,6 +169,9 @@ export class TeamExplorerPageViewModel {
           name,
           users,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           description,
           logo,
           workspaces,
@@ -191,6 +194,9 @@ export class TeamExplorerPageViewModel {
           name,
           users,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           description,
           logo,
           workspaces: updatedWorkspaces,
@@ -237,6 +243,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -254,6 +261,7 @@ export class TeamExplorerPageViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,
@@ -374,6 +382,18 @@ export class TeamExplorerPageViewModel {
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
     await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
+    const sharedTeam = await this.teamRepository.getTeamDoc(
+      "sharedWorkspaceTeam",
+    );
+    if (
+      sharedTeam &&
+      prevWorkspace?._data.team?.teamId !== "sharedWorkspaceTeam"
+    ) {
+      await this.workspaceRepository.deleteWorkspacesByTeamId(
+        "sharedWorkspaceTeam",
+      );
+      await this.teamRepository.removeTeam("sharedWorkspaceTeam");
+    }
     // Disabling the switching of workspace in web
     navigate("collections");
   };
@@ -404,7 +424,9 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
       );
     } else {
-      notifications.error("Failed to send invite. Please try again.");
+      notifications.error(
+        response?.message || "Failed to send invite. Please try again.",
+      );
     }
     return response;
   };
@@ -872,5 +894,69 @@ export class TeamExplorerPageViewModel {
     const refreshToken = localStorage.getItem("REF_TOKEN");
     const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email&workspaceID=${_workspaceId}`;
     window.location.href = sparrowRedirect;
+  };
+
+  public resendInvite = async (teamId: string, email: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.resendInvite(
+      teamId,
+      email,
+      baseUrl,
+    );
+    if (response.isSuccessful) {
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(`Invite resent successfully!`);
+      return response;
+    } else {
+      notifications.error("Failed to resend invite. Please try again.");
+    }
+  };
+
+  public withdrawInvite = async (teamId: string, email: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.withdrawInvite(
+      teamId,
+      email,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(`Invite withdrawn successfully!`);
+      return response;
+    } else {
+      notifications.error("Failed to withdraw invite. Please try again.");
+    }
+  };
+
+  public acceptInvite = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.acceptInvite(teamId, baseUrl);
+    if (response.isSuccessful) {
+      this.teamRepository.modifyTeam(teamId, response.data.data);
+      notifications.success(
+        `You are now a member ${response?.data?.data.name} Hub.`,
+      );
+      return response;
+    } else {
+      notifications.error(
+        `Failed to join the ${response?.data?.data.name} Hub. Please try again.`,
+      );
+    }
+  };
+
+  public ignoreInvite = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.ignoreInvite(teamId, baseUrl);
+    if (response.isSuccessful) {
+      const teams = await this.teamRepository.getTeamsDocuments();
+      await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
+      await this.teamRepository.removeTeam(teamId);
+      notifications.success(
+        `Invite ignored. The hub has been removed from your panel.`,
+      );
+      return response;
+    } else {
+      notifications.error("Failed to ignore invite. Please try again.");
+    }
   };
 }

@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import { Button } from "@sparrow/library/ui";
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let TitleName: string = "";
   export let DescriptionContent: string = "";
   export let CardNumber: number = 0;
@@ -98,6 +99,13 @@
     window.removeEventListener("resize", updatePosition);
     window.removeEventListener("scroll", updatePosition);
   });
+  const handle_dismiss_tour = () => {
+    captureEvent("dismiss_tour", {
+      component: "DeafultTourGuide",
+      button_text: "Dismiss",
+      destination: "Dismiss",
+    });
+  };
 </script>
 
 <div class="mainComponent"></div>
@@ -135,7 +143,10 @@
           type="outline-secondary"
           size="small"
           title="Dismiss"
-          onClick={handleClose}
+          onClick={() => {
+            handleClose();
+            handle_dismiss_tour();
+          }}
         />
       {/if}
       <Button

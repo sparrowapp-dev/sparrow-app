@@ -6,11 +6,10 @@
   export let environmentVariables;
   export let onUpdateEnvironment;
 
-  const handleFormDataChange = (pairs) => {
-    onUpdateRequestBody({
-      formdata: pairs,
-    });
+  const handleFormDataChange = (pairs: any) => {
+    onUpdateRequestBody(pairs);
   };
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <section class="w-100">
@@ -19,8 +18,12 @@
     callback={handleFormDataChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    isCheckBoxEditable={false}
-    isInputBoxEditable={false}
+    isCheckBoxEditable={true}
+    isInputBoxEditable={true}
     isTopHeaderRequired={true}
+    dynamicExpression={true}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "formdata" });
+    }}
   />
 </section>

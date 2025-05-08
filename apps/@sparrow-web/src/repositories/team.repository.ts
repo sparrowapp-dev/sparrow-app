@@ -57,6 +57,9 @@ export class TeamRepository {
     return RxDB.getInstance().rxdb.team.find().sort({ index: "asc" }).$;
   };
 
+  public getTeamsDocuments = (): Observable<TeamDocument[]> => {
+    return RxDB.getInstance().rxdb.team.find().sort({ index: "asc" }).exec();
+  };
   /**
    * Check whether the team is active
    */
@@ -175,7 +178,10 @@ export class TeamRepository {
     const selectedTeamsToBeDeleted = teamsJSON
       ?.filter((_team) => {
         for (let i = 0; i < _teamIds.length; i++) {
-          if (_teamIds[i] === _team.teamId) {
+          if (
+            _teamIds[i] === _team.teamId ||
+            _team.teamId === "sharedWorkspaceTeam"
+          ) {
             return false;
           }
         }
@@ -244,11 +250,15 @@ export class TeamRepository {
       if (data.name || data.name === "") value.name = data.name;
       if (data.description || data.description === "")
         value.description = data.description;
+      if (data.xUrl) value.xUrl = data.xUrl;
+      if (data.githubUrl) value.githubUrl = data.githubUrl;
+      if (data.linkedinUrl) value.linkedinUrl = data.linkedinUrl;
       if (data.workspaces) value.workspaces = data.workspaces;
       if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;
       if (data.owner) value.owner = data.owner;
       if (data.admins) value.admins = data.admins;
+      if (data.invites) value.invites = data.invites;
       if (data.createdAt) value.createdAt = data.createdAt;
       if (data.updatedAt) value.updatedAt = data.updatedAt;
       if (data.updatedBy) value.updatedBy = data.updatedBy;

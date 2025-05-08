@@ -11,6 +11,7 @@ import { GuideRepository } from "../../../../repositories/guide.repository";
 
 import { isUserFirstSignUp } from "@app/store/user.store";
 import { isFirstTimeInTestFlow } from "@sparrow/workspaces/stores";
+import { identifyUser } from "@app/utils/posthog/posthogConfig";
 
 //------------------------------MixPanel-------------------------------//
 
@@ -38,6 +39,8 @@ export async function handleLoginV2(url: string) {
 
   if (accessToken && refreshToken) {
     const userDetails = jwtDecode(accessToken);
+    
+    identifyUser(userDetails.email);
     setAuthJwt(constants.AUTH_TOKEN, accessToken);
     setAuthJwt(constants.REF_TOKEN, refreshToken);
     setUser(jwtDecode(accessToken));

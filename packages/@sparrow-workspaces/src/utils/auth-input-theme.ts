@@ -1,4 +1,5 @@
 import { EditorView } from "@codemirror/view";
+
 export class AuthInputTheme {
   private theme;
   constructor() {
@@ -17,6 +18,8 @@ export class AuthInputTheme {
         paddingTop: "8px",
         borderRadius: "4px",
         backgroundColor: "var(--bg-ds-surface-600)",
+        overflowY: "auto",
+        overflowX: "hidden",
       },
       ".cm-panels": {
         backgroundColor: "var(--blackColor)",
@@ -63,18 +66,57 @@ export class AuthInputTheme {
         fontSize: "12px",
         fontWeight: 500,
       },
-      "&.cm-editor:hover": {
-        border: "1px solid var(--border-ds-neutral-300)",
-      },
-      "&.cm-editor.cm-focused": {
-        border: "1px solid var(--border-ds-primary-300)",
-        "border-radius": "4px",
+      "&.cm-editor": {
+        maxHeight: "164px !important",
+        minHeight: "32px !important",
+
+        "&:hover": {
+          border: "1px solid var(--border-ds-neutral-300)",
+        },
+        "&.cm-focused": {
+          border: "1px solid var(--border-ds-primary-300)",
+          borderRadius: "4px",
+          height: "auto !important",
+          maxHeight: "164px !important",
+          minHeight: "32px !important",
+          position: "absolute", // Keep this for expanding behavior
+          zIndex: "10",
+          width: "100%",
+        },
+        "&.cm-focused .cm-scroller": {
+          overflow: "hidden !important",
+        },
+        "&.cm-focused .cm-content": {
+          whiteSpace: "pre-wrap !important",
+          wordBreak: "break-all !important",
+          maxHeight: "164px !important",
+          minHeight: "32px !important",
+          width: "100% !important",
+        },
+        "&.cm-focused .cm-line": {
+          width: "100% !important",
+          maxWidth: "100% !important",
+          display: "block !important",
+          boxSizing: "border-box !important",
+          paddingLeft: "10px",
+          paddingRight: "14px",
+        },
       },
       ".cm-scroller::-webkit-scrollbar": {
-        display: "none",
+        width: "10px",
+        height: "0px !important",
+      },
+      ".cm-scroller::-webkit-scrollbar-thumb": {
+        backgroundColor: "var(--border-ds-neutral-300)",
+        borderRadius: "8px",
+      },
+      ".cm-scroller::-webkit-scrollbar-horizontal": {
+        display: "none !important",
+        height: "0 !important",
       },
     });
   }
+
   public build() {
     return this.theme;
   }

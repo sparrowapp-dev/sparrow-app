@@ -11,6 +11,7 @@
     defaultCurrentStep,
     isDefaultTourGuideOpen,
     isDefaultTourGuideClose,
+    updateActiveSyncStates,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -87,6 +88,7 @@
   import { remove } from "@tauri-apps/plugin-fs";
   import { Checkbox } from "@sparrow/library/forms";
   import { writable } from "svelte/store";
+  import * as Sentry from "@sentry/svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -483,6 +485,10 @@
   let autoRefreshEnable: boolean = true;
   let refreshLoad: boolean = false;
   let isAccessDeniedModalOpen = false;
+  let isSyncReplaceModalOpen = false;
+  let isSyncModalOpen = false;
+  let isCollectionSyncing = false;
+  let isReplaceCollectionModalOpen = false;
 
   // Add userValidation state
   let userValidation = {
@@ -519,6 +525,7 @@
       );
       refreshLoad = false;
     } catch (error) {
+      Sentry.captureException(error);
       refreshLoad = false;
     }
   };
@@ -635,6 +642,53 @@
       ? `${name.substring(0, maxLength)}...`
       : name;
   };
+  let activeSyncChanges = {
+    addedCount: 0,
+    deletedCount: 0,
+    modifiedCount: 0,
+    percentChange: 0,
+    added: [],
+    deleted: [],
+    modified: [],
+    name: "",
+    collectionId: "",
+  };
+  const handleSyncCollection = async (collectionId: string) => {
+    activeSyncChanges = await _viewModel.handleCompareCollection(collectionId);
+    if (activeSyncChanges?.percentChange > 75) {
+      isSyncReplaceModalOpen = true;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: true,
+        isloading: false,
+      });
+    } else if (activeSyncChanges?.percentChange > 25) {
+      isSyncModalOpen = true;
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: true,
+        isloading: false,
+      });
+    } else if (activeSyncChanges?.percentChange > 0) {
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: true,
+      });
+      await _viewModel.syncCollection(collectionId);
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: false,
+      });
+    } else {
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: true,
+      });
+      await _viewModel.syncCollection(collectionId);
+      updateActiveSyncStates(collectionId, {
+        isChangesAvailable: false,
+        isloading: false,
+      });
+    }
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -697,6 +751,8 @@
           onOpenTestflow={_viewModel3.handleOpenTestflow}
           appVersion={version}
           bind:isFirstCollectionExpand
+          onCompareCollection={_viewModel.handleCompareCollection}
+          onSyncCollection={handleSyncCollection}
         />
       </Pane>
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
@@ -733,7 +789,10 @@
                 {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>
-                      <CollectionExplorerPage tab={$activeTab} />
+                      <CollectionExplorerPage
+                        tab={$activeTab}
+                        onSyncCollection={handleSyncCollection}
+                      />
                     </div>
                   </Motion>
                 {:else if $activeTab?.type === TabTypeEnum.FOLDER}
@@ -954,7 +1013,7 @@
   >
     <div class="py-4">
       <p class=" mb-4">
-        You don't seem to have access to this resourse. Please check if you are
+        You don't seem to have access to this resource. Please check if you are
         using the right account.
       </p>
     </div>
@@ -988,11 +1047,19 @@
       }
     }}
     currentWorkspaceId={$currentWorkspace?._id}
-    onImportOapiText={async (currentWorkspaceId, importJSON, contentType) => {
+    onImportOapiText={async (
+      currentWorkspaceId,
+      importJSON,
+      contentType,
+      activeSyncEnabled,
+      importData,
+    ) => {
       const response = await _viewModel.importJSONObject(
         currentWorkspaceId,
         importJSON,
         contentType,
+        activeSyncEnabled,
+        importData,
       );
       if (response.isSuccessful) {
         setTimeout(() => {
@@ -1150,6 +1217,258 @@
     onRenameCollection={_viewModel.handleSaveAsRenameCollection}
     onRenameFolder={_viewModel.handleSaveAsRenameFolder}
   />
+</Modal>
+
+<Modal
+  title={"Sync Collection"}
+  zIndex={1000}
+  isOpen={isSyncModalOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isSyncModalOpen = false;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      The <span style="font-weight: 600; color: var(--text-ds-neutral-50);"
+        >'{activeSyncChanges?.name}'</span
+      > collection has been updated in Swagger.
+    </p>
+  </div>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      <span
+        class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-primary-300);"
+        >{activeSyncChanges.addedCount}</span
+      > New Requests Added
+    </p>
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      <span
+        class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-primary-300);"
+        >{activeSyncChanges.modifiedCount}</span
+      > Requests Modified
+    </p>
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      <span
+        class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-primary-300);"
+        >{activeSyncChanges.deletedCount}</span
+      > Request Deleted
+    </p>
+  </div>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      Would you like to sync your collection with these changes?
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isSyncModalOpen = false;
+      }}
+    ></Button>
+    <Button
+      title={"Sync Now"}
+      size={"medium"}
+      loader={isCollectionSyncing}
+      disable={isCollectionSyncing}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"95px"}
+      onClick={async () => {
+        isCollectionSyncing = true;
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: true,
+        });
+        await _viewModel.syncCollection(activeSyncChanges.collectionId);
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: false,
+        });
+        isCollectionSyncing = false;
+        isSyncModalOpen = false;
+      }}
+    ></Button>
+  </div>
+</Modal>
+
+<Modal
+  title={"Sync Collection"}
+  zIndex={1000}
+  isOpen={isSyncReplaceModalOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isSyncReplaceModalOpen = false;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      The <span style="font-weight: 600; color: var(--text-ds-neutral-50);"
+        >'{activeSyncChanges?.name}'</span
+      > collection has been significantly updated in Swagger, with over 75% of its
+      requests changed.
+    </p>
+  </div>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      <span
+        class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-primary-300);"
+        >{activeSyncChanges.addedCount}</span
+      > New Requests Added
+    </p>
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      <span
+        class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-primary-300);"
+        >{activeSyncChanges.modifiedCount}</span
+      > Requests Modified
+    </p>
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      <span
+        class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-primary-300);"
+        >{activeSyncChanges.deletedCount}</span
+      > Request Deleted
+    </p>
+  </div>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      Would you like to replace the existing collection or import as a new?
+    </p>
+  </div>
+
+  <div class="d-flex gap-2" style="justify-content: space-between;">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"teritiary-regular"}
+      onClick={() => {
+        isSyncReplaceModalOpen = false;
+      }}
+    ></Button>
+    <div class="d-flex gap-2">
+      <Button
+        title={"Replace Collection"}
+        textClassProp={"fs-6"}
+        loader={isCollectionSyncing}
+        disable={isCollectionSyncing}
+        size={"medium"}
+        type={"secondary"}
+        onClick={async () => {
+          isSyncReplaceModalOpen = false;
+          isReplaceCollectionModalOpen = true;
+        }}
+      ></Button>
+      <Button
+        title={"Import as New"}
+        size={"medium"}
+        textClassProp={"fs-6"}
+        type={"primary"}
+        onClick={async () => {
+          isImportCollectionPopup = true;
+          isSyncReplaceModalOpen = false;
+        }}
+      ></Button>
+    </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Replace Existing Collection"}
+  zIndex={1000}
+  isOpen={isReplaceCollectionModalOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isReplaceCollectionModalOpen = false;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+      style="color: var(--text-ds-neutral-100);"
+    >
+      This will overwrite your current collection with the latest version. Any
+      additional changes that you made in the collection will be overwritten.
+      Are you sure you want to continue?
+    </p>
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isReplaceCollectionModalOpen = false;
+      }}
+    ></Button>
+    <Button
+      title={"Replace Collection"}
+      size={"medium"}
+      loader={isCollectionSyncing}
+      disable={isCollectionSyncing}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"155px"}
+      onClick={async () => {
+        isCollectionSyncing = true;
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: true,
+        });
+        await _viewModel.replaceCollection(activeSyncChanges.collectionId);
+        updateActiveSyncStates(activeSyncChanges.collectionId, {
+          isChangesAvailable: false,
+          isloading: false,
+        });
+        isCollectionSyncing = false;
+        isReplaceCollectionModalOpen = false;
+      }}
+    ></Button>
+  </div>
 </Modal>
 
 <style>

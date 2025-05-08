@@ -15,6 +15,18 @@ export class TestflowService {
     return response;
   };
 
+  public fetchAllPublicTestflow = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/workspace/public/${workspaceId}/testflow`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
   public fetchTestflow = async (_workspaceId: string, _testflowId: string) => {
     const response = await makeRequest(
       "GET",
@@ -41,11 +53,13 @@ export class TestflowService {
           y: number;
         };
         data: {
+          blockName: string;
           requestId: string;
           collectionId: string;
           folderId: string;
-          method: string;
-          name: String;
+          workspaceId: string;
+          isDeleted: boolean;
+          requestData: object;
         };
       }[];
     },

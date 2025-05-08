@@ -14,46 +14,52 @@
   };
 </script>
 
-<ToastContainer width={"fit-content"} let:data>
-  <div
-    class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
-    style="height: {data.title === undefined ? '68px' : '84px'};"
-  >
-    <div class="w-100 content-wrapper d-flex column gap-4">
-      <div class="d-flex">
-        <span class="icon">
-          <span class="icon-backdrop icon-backdrop-{data.type}" />
-          <div
-            class="bg-circle d-flex justify-content-center align-items-center"
-          >
-            <div class="bg-circle-{data.type}">
-              <svelte:component this={getIcon(data.type)} />
+<div class= "custom-toast-container">
+  <ToastContainer width={"fit-content"} let:data>
+    <div
+      class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
+      style="height: {data.title === undefined ? '68px' : '84px'};"
+    >
+      <div class="w-100 content-wrapper d-flex column gap-4">
+        <div class="d-flex">
+          <span class="icon">
+            <span class="icon-backdrop icon-backdrop-{data.type}" />
+            <div
+              class="bg-circle d-flex justify-content-center align-items-center"
+            >
+              <div class="bg-circle-{data.type}">
+                <svelte:component this={getIcon(data.type)} />
+              </div>
             </div>
-          </div>
+          </span>
+        </div>
+        <div class="d-flex row gap-1">
+          {#if data.title !== undefined}
+            <p class="data-title text-fs-14">{data.title}</p>
+          {/if}
+          <span class="description">{data.description}</span>
+        </div>
+      </div>
+      <div
+        class="close-icon-large d-flex align-items-center justify-content-center"
+      >
+        <span
+          data-notification-btn
+          role="button"
+          on:click={() => data.remove()}
+        >
+          <CloseIcon />
         </span>
       </div>
-      <div class="d-flex row gap-1">
-        {#if data.title !== undefined}
-          <p class="data-title text-fs-14">{data.title}</p>
-        {/if}
-        <span class="description">{data.description}</span>
-      </div>
+      {#if data.duration > 0}
+        <div
+          class="progress-bar progress-bar-{data.type}"
+          style="animation-duration: {data.duration}ms;"
+        ></div>
+      {/if}
     </div>
-    <div
-      class="close-icon-large d-flex align-items-center justify-content-center"
-    >
-      <span data-notification-btn role="button" on:click={() => data.remove()}>
-        <CloseIcon />
-      </span>
-    </div>
-    {#if data.duration > 0}
-      <div
-        class="progress-bar progress-bar-{data.type}"
-        style="animation-duration: {data.duration}ms;"
-      ></div>
-    {/if}
-  </div>
-</ToastContainer>
+  </ToastContainer>
+</div>
 
 <style>
   .custom-toast {
@@ -187,5 +193,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0;
+  }
+  .custom-toast-container {
+    position: fixed;
+    z-index: 10002 !important;
   }
 </style>

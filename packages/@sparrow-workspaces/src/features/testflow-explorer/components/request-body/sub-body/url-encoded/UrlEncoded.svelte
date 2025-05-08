@@ -7,8 +7,9 @@
   export let onUpdateEnvironment;
 
   const handleUrlEncodeChange = (pairs) => {
-    onUpdateRequestBody({ urlencoded: pairs });
+    onUpdateRequestBody(pairs);
   };
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <section class="w-100">
@@ -17,8 +18,12 @@
     callback={handleUrlEncodeChange}
     {environmentVariables}
     {onUpdateEnvironment}
-    isInputBoxEditable={false}
-    isCheckBoxEditable={false}
+    isInputBoxEditable={true}
+    isCheckBoxEditable={true}
     onToggleBulkEdit={() => {}}
+    dynamicExpression={true}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "urlencoded" });
+    }}
   />
 </section>

@@ -4,23 +4,36 @@
     KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
-  import { CodeMirrorInput } from "../";
-  import { onMount, tick } from "svelte";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { onMount } from "svelte";
+  import { Tooltip, Button, notifications } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
   import { Toggle } from "@sparrow/library/ui";
 
-  // exports
-  export let keyValue: KeyValuePair[];
-  export let callback: (pairs: KeyValuePair[]) => void;
-  export let readable: { key: string; value: string } = {
-    key: "",
-    value: "",
-  };
   export let environmentVariables;
+  export let handleDynamicExpression:
+    | ((key: string, index: number, id: string) => void)
+    | undefined = undefined;
+  export let handleRemoveDynamicExpression: (
+    key: string,
+    index: number,
+    id: string,
+  ) => void;
+  export let handleOpenCurrentDynamicExpression;
+  export let getDEByKeyAndValue: (
+    key: string,
+    value: string,
+    index: number,
+    blockName: string,
+  ) => void | undefined;
+  export let handleDynamicNewExpression: (key: string, index: number) => void;
+  export let handleRemoveDynamicExpressionKey: (
+    key: string,
+    index: number,
+  ) => void;
+  export let blockName: string;
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
@@ -30,13 +43,29 @@
   export let isTopHeaderRequired = true;
   export let isInputBoxEditable = true;
   export let bulkEditPlaceholder = "";
+  export let dynamicExpression = false;
   // export let type: "file" | "text" = "text";
 
+  // exports
+  export let keyValue: KeyValuePair[];
+  export let callback: (pairs: KeyValuePair[]) => void;
+  export let readable: { key: string; value: string } = {
+    key: "",
+    value: "",
+  };
+
+  // New props for merge/diff view **anish
+  export let showMergeView = false;
+  export let isMergeViewLoading = false;
+  export let newModifiedPairs: KeyValuePair[] = [];
+
+  let hasChanges = false;
   let enableKeyValueHighlighting = true;
   let pairs: KeyValuePair[] = keyValue;
   let controller: boolean = false;
 
   let bulkText = "";
+  let diffBulkText = ""; // contains new modified content for comparision for bulk editor
   let bulkToggle = isBulkEditActive;
 
   let isErrorIconHovered = false;
@@ -47,6 +76,280 @@
 
   const theme = new TabularInputTheme().build();
 
+  // ********** Diff/Merge View Methods - Start **********
+
+  // Calculate diff between original and current data **anish
+  type DiffType = "added" | "deleted" | "modified" | "unchanged";
+  type DiffPair = KeyValuePair & {
+    diffType: DiffType;
+    originalIndex?: number;
+    currentIndex?: number;
+  };
+  let diffPairs: DiffPair[] = []; // contains new modified content for comparision for TabularInput
+
+  // Funtion to calculate diff. b/w origional data (pairs) and new data (newModifiedPairs)
+  function calculateDiff(): DiffPair[] {
+    // If table data is empty but we have new data, then consider everything as an addition
+    // if (!pairs || pairs.length === 0) {
+    //   return newModifiedPairs.map((pair) => ({
+    //     ...pair,
+    //     diffType: "added",
+    //     currentIndex: newModifiedPairs.indexOf(pair),
+    //   }));
+    // }
+
+    const result: DiffPair[] = [];
+    const origMap = new Map();
+
+    // Create a map of original items using key as a unique identifier
+    pairs.forEach((pair, index) => {
+      origMap.set(pair.key, { pair, index });
+    });
+    // Check for modified or added items
+    newModifiedPairs.forEach((currentPair, currentIndex) => {
+      if (currentPair.key === "") return; // Skip empty rows
+
+      const originalEntry = origMap.get(currentPair.key);
+
+      if (originalEntry) {
+        // Key exists in both - check if value changed
+        if (originalEntry.pair.value !== currentPair.value) {
+          result.push({
+            ...currentPair,
+            diffType: "modified",
+            originalIndex: originalEntry.index,
+            currentIndex,
+          });
+
+          // Also add the original version to show what changed
+          result.push({
+            ...originalEntry.pair,
+            diffType: "deleted",
+            originalIndex: originalEntry.index,
+          });
+        } else {
+          // Unchanged
+          result.push({
+            ...currentPair,
+            diffType: "unchanged",
+            originalIndex: originalEntry.index,
+            currentIndex,
+          });
+        }
+
+        // Mark as processed
+        origMap.delete(currentPair.key);
+      } else {
+        // New item
+        result.push({
+          ...currentPair,
+          diffType: "added",
+          currentIndex,
+        });
+      }
+    });
+
+    // Add deleted items (those in original but not in current)
+    origMap.forEach(({ pair, index }) => {
+      if (pair.key !== "") {
+        // Skip empty rows
+        result.push({
+          ...pair,
+          diffType: "deleted",
+          originalIndex: index,
+        });
+      }
+    });
+
+    // Comparator: Custom sorting method for sorting by original position to maintain a logical order
+    result.sort((a, b) => {
+      // First priority: Group items with the same key together
+      if (a.key === b.key) {
+        // When keys match, deleted comes before added
+        if (
+          a.diffType === "deleted" &&
+          (b.diffType === "added" || b.diffType === "modified")
+        ) {
+          return -1; // Deletion comes first
+        }
+        if (
+          (a.diffType === "added" || a.diffType === "modified") &&
+          b.diffType === "deleted"
+        ) {
+          return 1; // Addition comes second
+        }
+      }
+
+      // Second priority: Put completely new items at the end
+      const aIsNew = a.diffType === "added" && a.originalIndex === undefined;
+      const bIsNew = b.diffType === "added" && b.originalIndex === undefined;
+
+      if (aIsNew && !bIsNew) {
+        return 1; // a is new but b is not - push a to the end
+      } else if (!aIsNew && bIsNew) {
+        return -1; // b is new but a is not - push b to the end
+      }
+
+      // Then sort by original position for existing items
+      if (a.originalIndex !== undefined && b.originalIndex !== undefined) {
+        return a.originalIndex - b.originalIndex;
+      }
+
+      // Fall back to current position
+      if (a.currentIndex !== undefined && b.currentIndex !== undefined) {
+        return a.currentIndex - b.currentIndex;
+      }
+
+      return 0;
+    });
+
+    const lastEmptyRow: DiffPair = {
+      key: "",
+      value: "",
+      checked: false,
+      diffType: "unchanged",
+      originalIndex: result.length - 1,
+      currentIndex: result.length - 1,
+    };
+
+    return [...result, lastEmptyRow];
+  }
+
+  /**
+   * Checks if there are any actual changes between the original data and the new data
+   * Sets hasChanges to true if there are added, deleted, or modified items
+   */
+  function checkForChanges(): boolean {
+    if (!diffPairs || diffPairs.length === 0) return false;
+
+    // Check if there are any changes (added, deleted, or modified items)
+    const changes = diffPairs.filter(
+      (pair) =>
+        pair.diffType === "added" ||
+        pair.diffType === "deleted" ||
+        pair.diffType === "modified",
+    );
+
+    // Update hasChanges state
+    hasChanges = changes.length > 0;
+
+    if (!hasChanges) {
+      undoChanges(); // resetting the mergeview states and props
+      notifications.success("You already have updated changes.");
+    }
+
+    return hasChanges;
+  }
+
+  // Convert diffPairs to bulk text format for BulkEditEditor
+  function diffPairsToBulkText(): string {
+    if (!diffPairs || !diffPairs.length) return "";
+
+    return diffPairs
+      .filter((pair) => pair.diffType !== "deleted" && (pair.key || pair.value))
+      .map((pair) => `${pair.key}:${pair.value}`)
+      .join("\n");
+  }
+
+  // Convert pairs to bulk text format
+  function pairsToBulkText(pairsToConvert: KeyValuePair[]): string {
+    return pairsToConvert
+      .filter((pair) => pair.key || pair.value)
+      .map((pair) => `${pair.key}:${pair.value}`)
+      .join("\n");
+  }
+
+  const updateDiffPairsWithLoading = async () => {
+    isMergeViewLoading = true;
+    await sleep(2000);
+    diffPairs = calculateDiff();
+    diffBulkText = diffPairsToBulkText();
+    checkForChanges();
+    isMergeViewLoading = false;
+  };
+  $: if (showMergeView) updateDiffPairsWithLoading();
+
+  // Toggle merge view **anish
+  const toggleMergeView = async (show: boolean) => {
+    showMergeView = show;
+    if (show) {
+      isMergeViewLoading = true;
+      await sleep(2000);
+      diffPairs = calculateDiff();
+      checkForChanges();
+
+      // Update bulk text to reflect diff if bulk edit is active
+      if (isBulkEditActive) {
+        bulkText = diffPairsToBulkText();
+      }
+    } else hasChanges = false; // Reset when merge view is disabled
+  };
+
+  // Function to apply all changes from diff view to the original data
+  const applyChanges = async () => {
+    if (!showMergeView) return;
+    isMergeViewLoading = true;
+    // Extract all valid pairs from diffPairs (excluding deleted ones)
+    const updatedPairs = diffPairs
+      .filter((pair) => pair.diffType !== "deleted")
+      .map((pair) => ({
+        key: pair.key,
+        value: pair.value,
+        checked: pair.checked || false,
+      }));
+
+    // Add an empty row at the end if needed
+    if (
+      updatedPairs.length > 0 &&
+      (updatedPairs[updatedPairs.length - 1].key !== "" ||
+        updatedPairs[updatedPairs.length - 1].value !== "")
+    ) {
+      updatedPairs.push({ key: "", value: "", checked: false });
+    }
+
+    pairs = updatedPairs; // Update the pairs array with the new data
+    showMergeView = false; // Turn off merge view after applying changes
+    callback(pairs); // Notify parent component of the changes
+    // newModifiedPairs = JSON.parse(JSON.stringify(pairs)); // Save current state for potential future comparison
+    newModifiedPairs = [];
+    hasChanges = false; // Reset after applying changes
+
+    await sleep(2000);
+    isMergeViewLoading = false; // Reset loading state
+  };
+
+  // Function to undo all changes and revert to original state
+  const undoChanges = async () => {
+    if (!showMergeView) return;
+    showMergeView = false;
+    newModifiedPairs = [];
+    diffPairs = []; // Reset any potential changes by discarding diffPairs
+    callback(pairs); // Notify parent of unchanged data
+    hasChanges = false; // Reset hasChanges after undoing changes
+
+    isMergeViewLoading = true;
+    await sleep(2000);
+    isMergeViewLoading = false; // Reset loading state
+  };
+
+  // Utility function to create a delay
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  // ********** Diff/Merge View Methods - End **********
+
+  onMount(() => {
+    handleBulkTextUpdate();
+
+    if (showMergeView) {
+      diffPairs = calculateDiff();
+      diffBulkText = diffPairsToBulkText();
+      checkForChanges();
+    }
+  });
+
+  // Update diff when inputs change
   $: {
     if (keyValue) {
       identifySelectAllState();
@@ -80,15 +383,14 @@
    * Scrolls the container to bring the newly added row into view
    */
   const scrollToNewRow = async () => {
-    await tick();
-
-    if (pairsContainer) {
-      const lastRow = pairsContainer.lastElementChild;
-
-      if (lastRow) {
-        lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+    setTimeout(() => {
+      if (pairsContainer) {
+        const lastRow = pairsContainer.lastElementChild;
+        if (lastRow) {
+          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
       }
-    }
+    }, 0);
   };
 
   const updateParam = async (index: number): Promise<void> => {
@@ -106,9 +408,114 @@
       pairs = pairs;
       callback(pairs);
 
+      // Recalculate diff if merge view is active (althrough will disable the edit while in merge view) **anish
+      if (showMergeView) {
+        diffPairs = calculateDiff();
+        diffBulkText = diffPairsToBulkText(); // ToDo: Calculate only if Bulk Edit mode is active (change in every place)
+        checkForChanges();
+      }
+
       await scrollToNewRow();
     } else {
       callback(pairs);
+    }
+  };
+
+  let isBulkEditLoaded = false;
+
+  /**
+   * Updates the bulk text based on the key-value pairs.
+   */
+  const handleBulkTextUpdate = () => {
+    // Define the syntax validation regex pattern (key:value)
+    const syntaxPattern = /^[^:]+:.+$/;
+
+    // Map each pair to a formatted line (key:value), validate syntax, and filter out invalid lines
+    const res = pairs
+      .map((elem) => {
+        // Create a line from key and value, or empty string if both are empty
+        const line = elem.key || elem.value ? `${elem.key}:${elem.value}` : "";
+
+        // Validate syntax for each non-empty line
+        if (line && !syntaxPattern.test(line)) {
+          isValidSyntax = false;
+        }
+
+        return line;
+      })
+      .filter((item) => item) // Filter out empty lines
+      .join("\n"); // Join lines with newline characters
+
+    // Update the bulkText with the formatted and validated text
+    bulkText = res;
+    isBulkEditLoaded = true;
+  };
+
+  const handleBulkTextarea = (event) => {
+    bulkText = event.detail;
+
+    // remove all empty lines
+    const res = bulkText.split("\n").filter((line) => line.trim() !== "");
+
+    // Pushing a blank string to add a blank key value at the end
+    res.push("");
+
+    // Define the syntax validation regex pattern (key:value)
+    const syntaxPattern = /^[^:]+:.+$/;
+
+    // Initialize isValidSyntax to true
+    isValidSyntax = true;
+
+    const newPairs = res.map((elem) => {
+      if (elem.length) {
+        const firstColonIndex = elem.indexOf(":");
+        let key, value;
+
+        if (firstColonIndex !== -1) {
+          key = elem.substring(0, firstColonIndex).trim();
+          value = elem.substring(firstColonIndex + 1).trim();
+        } else {
+          key = elem.trim();
+          value = "";
+        }
+
+        // Validate syntax for each non-empty line
+        if (elem && !syntaxPattern.test(elem)) {
+          isValidSyntax = false;
+        }
+
+        return {
+          key: key,
+          value: value,
+          checked: true,
+        };
+      } else {
+        return {
+          key: "",
+          value: "",
+          checked: false,
+        };
+      }
+    });
+
+    // If in merge view mode, update the newModifiedPairs
+    if (showMergeView) {
+      diffPairs = calculateDiff();
+      diffBulkText = diffPairsToBulkText();
+      checkForChanges();
+    } else {
+      pairs = newPairs;
+      callback(pairs);
+    }
+  };
+
+  const toggleBulkEdit = (event) => {
+    onToggleBulkEdit(event.target.checked);
+
+    // Update bulk text if toggling to bulk edit mode
+    if (event.target.checked) {
+      handleBulkTextUpdate();
+      diffBulkText = diffPairsToBulkText();
     }
   };
 
@@ -159,85 +566,6 @@
     callback(pairs);
   };
 
-  let isBulkEditLoaded = false;
-
-  /**
-   * Updates the bulk text based on the key-value pairs.
-   */
-  const handleBulkTextUpdate = () => {
-    // Define the syntax validation regex pattern (key:value)
-    const syntaxPattern = /^[^:]+:.+$/;
-
-    // Map each pair to a formatted line (key:value), validate syntax, and filter out invalid lines
-    const res = pairs
-      .map((elem) => {
-        // Create a line from key and value, or empty string if both are empty
-        const line = elem.key || elem.value ? `${elem.key}:${elem.value}` : "";
-
-        // Validate syntax for each non-empty line
-        if (line && !syntaxPattern.test(line)) {
-          isValidSyntax = false;
-        }
-
-        return line;
-      })
-      .filter((item) => item) // Filter out empty lines
-      .join("\n"); // Join lines with newline characters
-
-    // Update the bulkText with the formatted and validated text
-    bulkText = res;
-    isBulkEditLoaded = true;
-  };
-
-  const handleBulkTextarea = (event) => {
-    bulkText = event.detail;
-
-    // remove all empty lines
-    const res = bulkText.split("\n").filter((line) => line.trim() !== "");
-
-    // Pushing a blank string to add a blank key value at the end
-    res.push("");
-
-    // Define the syntax validation regex pattern (key:value)
-    const syntaxPattern = /^[^:]+:.+$/;
-
-    // Initialize isValidSyntax to true
-    isValidSyntax = true;
-
-    pairs = res.map((elem) => {
-      if (elem.length) {
-        const firstColonIndex = elem.indexOf(":");
-        let key, value;
-
-        if (firstColonIndex !== -1) {
-          key = elem.substring(0, firstColonIndex).trim();
-          value = elem.substring(firstColonIndex + 1).trim();
-        } else {
-          key = elem.trim();
-          value = "";
-        }
-
-        // Validate syntax for each non-empty line
-        if (elem && !syntaxPattern.test(elem)) {
-          isValidSyntax = false;
-        }
-
-        return {
-          key: key,
-          value: value,
-          checked: true,
-        };
-      } else {
-        return {
-          key: "",
-          value: "",
-          checked: false,
-        };
-      }
-    });
-    callback(pairs);
-  };
-
   const handleErrorHover = () => {
     isErrorIconHovered = !isErrorIconHovered;
   };
@@ -245,26 +573,18 @@
   const handleAutoGeneratedInfoHover = () => {
     isAutoGeneratedInfoHovered = !isAutoGeneratedInfoHovered;
   };
-
-  const toggleBulkEdit = (event) => {
-    onToggleBulkEdit(event.target.checked);
-  };
-
-  onMount(() => {
-    handleBulkTextUpdate();
-  });
 </script>
 
 <div>
   {#if !isBulkEditActive}
     <section class="mb-0 me-0 py-0 section-layout w-100" style="">
       <div
-        class=" d-flex align-items-center pair-header-row {!isTopHeaderRequired
+        class="d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
         style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
-        <div style=" width:24px; margin-right:12px" class="">
+        <div style="width:24px; margin-right:12px" class="">
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
@@ -273,7 +593,10 @@
           />
         </div>
 
-        <div class="d-flex gap-0" style="width: calc(100% - 188px);">
+        <div
+          class="d-flex gap-0"
+          style="width: calc(100% - {dynamicExpression ? '220px' : '188px'});"
+        >
           <div
             class="w-50 position-relative header-text"
             style="padding-left: 6px;"
@@ -289,7 +612,7 @@
         </div>
         <div style="width:140px;" class="ms-3 d-flex align-items-center">
           <div class="w-100 d-flex">
-            <div class="w-100 d-flex justify-content-end">
+            <div class="w-100 d-flex justify-content-end gap-2">
               {#if isBulkEditRequired}
                 <Toggle
                   bind:isActive={bulkToggle}
@@ -301,6 +624,14 @@
                   onChange={toggleBulkEdit}
                 />
               {/if}
+              <!-- <Toggle
+                isActive={showMergeView}
+                label="Show Diff"
+                fontSize="12px"
+                textColor="var(--text-ds-neutral-200)"
+                fontWeight="400"
+                onChange={() => toggleMergeView(!showMergeView)}
+              /> -->
             </div>
           </div>
         </div>
@@ -327,23 +658,87 @@
             deleteParam={() => {}}
             isInputBoxEditable={false}
             isCheckBoxEditable={false}
+            {dynamicExpression}
+            {getDEByKeyAndValue}
+            {blockName}
+            {handleDynamicExpression}
+            {handleRemoveDynamicExpression}
+            {handleOpenCurrentDynamicExpression}
+            {handleDynamicNewExpression}
+            {handleRemoveDynamicExpressionKey}
           />
         {/if}
-        {#each pairs as element, index (index)}
-          <LazyElement
-            {element}
-            {index}
-            {pairs}
-            {theme}
-            {environmentVariables}
-            {onUpdateEnvironment}
-            {updateParam}
-            {updateCheck}
-            {deleteParam}
-            {isInputBoxEditable}
-            {isCheckBoxEditable}
-          />
-        {/each}
+
+        <!-- Showing Duplicate Fake Rows For Diff/Merge View -->
+        {#if !isMergeViewLoading && showMergeView && hasChanges}
+          {#each diffPairs as element, index (index)}
+            <LazyElement
+              element={{
+                key: element.key,
+                value: element.value,
+                checked: element.checked,
+              }}
+              {index}
+              pairs={diffPairs}
+              {theme}
+              {environmentVariables}
+              {onUpdateEnvironment}
+              {updateParam}
+              {updateCheck}
+              {deleteParam}
+              isInputBoxEditable={false}
+              isCheckBoxEditable={true}
+              customClass={`diff-row diff-${element.diffType}`}
+              {dynamicExpression}
+              {getDEByKeyAndValue}
+              {blockName}
+              {handleDynamicExpression}
+              {handleRemoveDynamicExpression}
+              {handleOpenCurrentDynamicExpression}
+              {handleDynamicNewExpression}
+            />
+            <!-- isInputBoxEditable={element.diffType !== "deleted"} -->
+            <!-- isCheckBoxEditable={element.diffType !== "deleted"} -->
+          {/each}
+
+          <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+            <Button
+              title={"Keep the Changes!!"}
+              size={"small"}
+              type={"primary"}
+              onClick={applyChanges}
+            ></Button>
+            <Button
+              title={"Undo"}
+              size={"small"}
+              type={"secondary"}
+              onClick={undoChanges}
+            ></Button>
+          </div>
+        {:else}
+          {#each pairs as element, index (index)}
+            <LazyElement
+              {element}
+              {index}
+              {pairs}
+              {theme}
+              {environmentVariables}
+              {onUpdateEnvironment}
+              {updateParam}
+              {updateCheck}
+              {deleteParam}
+              {isInputBoxEditable}
+              {isCheckBoxEditable}
+              {dynamicExpression}
+              {getDEByKeyAndValue}
+              {blockName}
+              {handleDynamicExpression}
+              {handleRemoveDynamicExpression}
+              {handleOpenCurrentDynamicExpression}
+              {handleDynamicNewExpression}
+            />
+          {/each}
+        {/if}
       </div>
     </section>
   {:else}
@@ -447,6 +842,9 @@
               {enableKeyValueHighlighting}
               class={`sparrow-fs-18 me-0 outline-none`}
               placeholder={bulkEditPlaceholder}
+              bind:isMergeViewLoading
+              bind:isMergeViewEnabled={showMergeView}
+              bind:newModifiedContent={diffBulkText}
             />
           {/if}
         </div>
@@ -469,5 +867,31 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
+  }
+
+  .merge-view-label {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Diff/Merge View: Style for new row added */
+  :global(.diff-row.diff-added) {
+    /* background-color: #113b21 !important ; */
+    background-color: var(--bg-ds-success-800) !important ;
+  }
+
+  /* Diff/Merge View: Style for row modified */
+  :global(.diff-row.diff-modified) {
+    /* background-color: #113b21 !important ; */
+    background-color: var(--bg-ds-success-800) !important ;
+  }
+
+  /* Diff/Merge View: Style for new row deleted */
+  :global(.diff-row.diff-deleted) {
+    /* background-color: #3d1514 !important; */
+    background-color: var(--bg-ds-danger-800) !important;
   }
 </style>

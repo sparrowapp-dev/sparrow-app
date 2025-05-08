@@ -63,6 +63,21 @@ export class CollectionService {
     );
     return response;
   };
+
+  public fetchPublicCollection = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/public/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public addCollection = async (
     collection: CreateCollectionPostBody,
     baseUrl: string,
@@ -387,6 +402,21 @@ export class CollectionService {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
       },
     });
+    return response;
+  };
+
+  public parseOAPIJSONToCollection = async (
+    json: string,
+    contentType: ContentTypeEnum,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/parse-collection`,
+      {
+        body: json,
+        headers: { ...getAuthHeaders(), "Content-type": contentType },
+      },
+    );
     return response;
   };
 

@@ -4,7 +4,7 @@
   /**
    * input type
    */
-  export let variant: "primary" | "stroke" | "inline" = "primary";
+  export let variant: "primary" | "stroke" | "inline" | "secondary" = "primary";
   export let type: "text" | "password" = "text";
 
   export let isError = false;
@@ -32,6 +32,9 @@
   export let value = "";
   export let maxlength = 500;
   export let id = "";
+  export let startIcon;
+  export let iconSize = 16;
+  export let iconColor = "grey";
   let enterPressed = false;
 
   const dispatch = createEventDispatcher();
@@ -59,7 +62,7 @@
     }
   }
   const handleClick = () => {
-    if (value.length > 0) {
+    if (value && value?.length > 0) {
       enterPressed = true;
     }
   };
@@ -98,6 +101,17 @@
 </script>
 
 <div class="position-relative">
+  {#if startIcon}
+    <div class="input-icon">
+      <svelte:component
+        this={startIcon}
+        height={`${iconSize}px`}
+        width={`${iconSize}px`}
+        size={`${iconSize}px`}
+        color={`${iconColor}`}
+      />
+    </div>
+  {/if}
   <input
     {id}
     {value}
@@ -106,7 +120,7 @@
     on:keydown={onKeyPress}
     {type}
     {maxlength}
-    class={`${variant} ${size} ${textStyle} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""}`}
+    class={`${variant} ${size} ${textStyle} ${value ? "has-text" : ""} ${enterPressed ? "entered" : ""}  ${isError ? "isError" : ""} ${startIcon ? "has-icon" : ""}`}
     style="width: {width};"
     {placeholder}
     {disabled}
@@ -114,6 +128,23 @@
 </div>
 
 <style lang="scss">
+  .input-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .input-icon {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    color: var(--text-ds-neutral-400);
+    pointer-events: none; /* Prevent interaction with the icon */
+    z-index: 2;
+  }
+  /* Add padding to inputs with icons */
+  .has-icon {
+    padding-left: 36px !important; /* Make space for the icon */
+  }
   .stroke {
     color: var(--text-ds-neutral-50);
     background-color: transparent;
@@ -202,6 +233,51 @@
   }
   // when it have text and not focused
   .primary:not(:focus):hover {
+    border: 1px solid var(--border-ds-neutral-300);
+    border-radius: 4px;
+  }
+
+  /** secondary */
+  .secondary {
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    gap: 8px;
+    caret-color: var(--border-ds-primary-300);
+    line-height: 150%;
+  }
+
+  .secondary.isError {
+    border: 2px solid var(--border-ds-danger-300) !important;
+    border-radius: 4px;
+  }
+  .secondary::placeholder {
+    color: var(--text-ds-neutral-400) !important;
+  }
+  .secondary:focus {
+    outline: none;
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // during typing
+  .secondary.has-text {
+    border: 1px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text but not foucsed
+  .secondary.has-text:not(:focus) {
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+  // when it have text  and focused
+  .secondary.entered:focus {
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid var(--border-ds-primary-300);
+    border-radius: 4px;
+  }
+  // when it have text and not focused
+  .secondary:not(:focus):hover {
     border: 1px solid var(--border-ds-neutral-300);
     border-radius: 4px;
   }

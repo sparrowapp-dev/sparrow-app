@@ -5,6 +5,7 @@ import type {
   StreamPromptDto,
 } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
+import * as Sentry from "@sentry/svelte";
 
 /**
  * Service for managing WebSocket connections and communication
@@ -149,6 +150,7 @@ export class AiAssistantWebSocketService {
 
       return this.webSocket;
     } catch (error) {
+      Sentry.captureException(error); 
       console.error("Failed to create WebSocket connection:", error);
       this.scheduleReconnect();
       return null;
@@ -214,6 +216,7 @@ export class AiAssistantWebSocketService {
         this.triggerEvent(`assistant-response`, data);
       }
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error in parsing response:", error);
     }
   };
@@ -306,6 +309,7 @@ export class AiAssistantWebSocketService {
         try {
           callback(data);
         } catch (error) {
+          Sentry.captureException(error);
           console.error(`Error in event listener for '${eventName}':`, error);
         }
       });
@@ -347,6 +351,7 @@ export class AiAssistantWebSocketService {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error sending message:", error);
       return false;
     }
@@ -418,6 +423,7 @@ export class AiAssistantWebSocketService {
 
       return true;
     } catch (error) {
+      Sentry.captureException(error); 
       console.error("Error sending stop generation signal:", error);
       return false;
     }

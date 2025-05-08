@@ -37,5 +37,8 @@
   "rust-analyzer.linkedProjects": [
     "apps/@sparrow-desktop/src-tauri/Cargo.toml" // Update this path as needed
   ],
-  "rust-analyzer.server.path": null
+  "rust-analyzer.server.path": null,
+  "[yaml]": {
+    "editor.formatOnSave": false
+  }
 }

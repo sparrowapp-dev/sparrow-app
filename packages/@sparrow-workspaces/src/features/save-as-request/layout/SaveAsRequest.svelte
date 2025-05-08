@@ -130,7 +130,10 @@
     workspaceMeta.id = _workspace._id;
     workspaceMeta.name = _workspace.name;
     collection = value.filter((collectionDocument: CollectionDocument) => {
-      return collectionDocument.workspaceId === workspaceMeta.id;
+      return (
+        collectionDocument.workspaceId === workspaceMeta.id &&
+        !collectionDocument?.activeSync
+      );
     });
     directory = JSON.parse(JSON.stringify(collection));
     if (latestRoute.id) navigateToDirectory(latestRoute);
@@ -289,7 +292,7 @@
     --  left panel
     --
     -->
-    <div class="ps-3 row-left-section" style="height: 430px; overflow:auto;">
+    <div class="ps-3 row-left-section" style="height: 300px; overflow:auto;">
       <!-- 
               --
               shows current directory 
@@ -671,7 +674,7 @@
         </div>
         <div
           class="d-flex align-items-center justify-content-center"
-          style="height: 300px;"
+          style="height: 200px;"
         >
           {#if path.length > 0 && path[path.length - 1].type === ItemType.FOLDER}
             <p class="save-text-clr-empty text-center">This folder is empty</p>

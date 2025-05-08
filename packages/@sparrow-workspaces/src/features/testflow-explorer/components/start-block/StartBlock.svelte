@@ -85,7 +85,7 @@
         height={"14px"}
         width={"12px"}
         color={"var(--bg-ds-neutral-50)"}
-      /><span class="ms-2 text-fs-12">Start</span>
+      /><span class="ms-2 text-fs-12">Run</span>
     </span>
 
     <Handle type="source" position={Position.Right} />

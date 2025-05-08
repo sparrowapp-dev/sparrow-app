@@ -60,6 +60,7 @@ import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from 
 import { InitTab } from "@sparrow/common/factory";
 import type { GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/graphql-request-dto";
 import constants from "@app/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -209,7 +210,7 @@ class CollectionExplorerPage {
    */
   private compareCollectionWithServer = new Debounce().debounce(
     this.compareCollectionWithServerDebounced,
-    1000,
+    0,
   );
 
   public get activeWorkspace() {
@@ -629,6 +630,7 @@ class CollectionExplorerPage {
         return;
       }
     } catch (e) {
+      Sentry.captureException(e); 
       notifications.error(errMessage);
       return;
     }
@@ -705,6 +707,7 @@ class CollectionExplorerPage {
         return false;
       }
     } catch (e) {
+      Sentry.captureException(e); 
       notifications.error(errMessage);
       return false;
     }

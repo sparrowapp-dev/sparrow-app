@@ -135,6 +135,8 @@
   export let refreshLoad = false;
   export let refreshWorkspace: () => void;
   export let userCount = 0;
+  export let onCompareCollection;
+  export let onSyncCollection;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -567,7 +569,7 @@
         }}
         placeholder={"Search"}
       />
-      {#if userCount > 1}
+      {#if userCount > 1 && !activeWorkspace?.isShared}
         <Tooltip title={"Refresh"} placement={"bottom-center"}>
           <Button
             type="secondary"
@@ -599,7 +601,7 @@
         New dropdown button for adding new api, collection and import Curl
       -->
       <div id="options-container">
-        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
           <Dropdown
             zIndex={600}
             buttonId="addButton"
@@ -720,6 +722,8 @@
           {isWebApp}
           {ActiveTab}
           {handleTabUpdate}
+          {onCompareCollection}
+          {onSyncCollection}
         />
       </div>
 

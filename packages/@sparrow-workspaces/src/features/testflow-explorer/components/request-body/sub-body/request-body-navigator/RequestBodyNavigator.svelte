@@ -1,25 +1,34 @@
 <script lang="ts">
   import { infoColorBlueIcon as infoIcon } from "@sparrow/library/assets";
   import { crossIcon } from "@sparrow/library/assets";
-  import { Select } from "@sparrow/library/forms";
-  import { RequestDataType, RequestDataset } from "@sparrow/common/enums";
-  import { notifications } from "@sparrow/library/ui";
+  import { RequestDataset } from "@sparrow/common/enums";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { WithSelect } from "@sparrow/workspaces/hoc";
-  export let method = "";
+  import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
+  import {
+    requestBodySubTypes,
+    requestBodyTypes,
+  } from "../../../../../../../../@sparrow-common/src/utils/testFlow.helper";
+  import { MathFormulaRegular } from "@sparrow/library/icons";
+
+  export let method = "GET";
   export let onUpdateRequestState;
+  export let onUpdateRequestBodyLanguage;
   export let updateBeautifiedState: (value: boolean) => void;
   export let requestState;
+
   let handleDropdown = (tab: string) => {
-    // collectionsMethods.updateRequestState(tab, "dataset");
-    onUpdateRequestState({ requestBodyNavigation: tab });
+    onUpdateRequestState("requestBodyNavigation", tab);
   };
 
   let handleRawDropDown = (tab: string) => {
-    // collectionsMethods.updateRequestState(tab, "raw");
-    onUpdateRequestState({ requestBodyLanguage: tab });
+    onUpdateRequestBodyLanguage("requestBodyLanguage", tab);
   };
+
   let isDeleteMessage = true;
   let isGetMessage = true;
+  export let dispatcher;
+  export let handleOpenCurrentDynamicExpression;
 </script>
 
 <div>
@@ -76,65 +85,50 @@
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash124"}
-      data={[
-        {
-          name: "none",
-          id: RequestDataset.NONE,
-        },
-        {
-          name: "form-data",
-          id: RequestDataset.FORMDATA,
-        },
-        {
-          name: "x-www-form-urlencoded",
-          id: RequestDataset.URLENCODED,
-        },
-        {
-          name: "raw",
-          id: RequestDataset.RAW,
-        },
-        {
-          name: "binary",
-          id: RequestDataset.BINARY,
-          disabled: true,
-        },
-      ]}
+      data={requestBodyTypes}
       titleId={requestState.requestBodyNavigation}
       onclick={handleDropdown}
       zIndex={499}
-      disabled={true}
+      disabled={false}
     />
     <span class="pe-3" />
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       <WithSelect
         id={"hash987"}
-        data={[
-          {
-            name: "HTML",
-            id: RequestDataType.HTML,
-          },
-          {
-            name: "JSON",
-            id: RequestDataType.JSON,
-          },
-          {
-            name: "JavaScript",
-            id: RequestDataType.JAVASCRIPT,
-          },
-          {
-            name: "Text",
-            id: RequestDataType.TEXT,
-          },
-          {
-            name: "XML",
-            id: RequestDataType.XML,
-          },
-        ]}
+        data={requestBodySubTypes}
         titleId={requestState.requestBodyLanguage}
         onclick={handleRawDropDown}
         zIndex={499}
-        disabled={true}
+        disabled={false}
       />
+    {/if}
+  </div>
+  <div>
+    {#if requestState.requestBodyNavigation === RequestDataset.RAW}
+      <div class="d-flex ms-3">
+        <Button
+          size="small"
+          type="secondary"
+          startIcon={MathFormulaRegular}
+          title={"Insert Dynamic Content"}
+          onClick={() => {
+            handleOpenCurrentDynamicExpression({
+              type: "raw",
+              dispatch: dispatcher,
+            });
+          }}
+        />
+        <!-- <div
+          on:click={() => {
+            updateBeautifiedState(true);
+            notifications.success("Code formatted successfully.");
+          }}
+          role="button"
+          class="icon-container d-flex align-items-center justify-content-center border-radius-2"
+        >
+          <img src={BeautifyIcon} style="height:10px; width:10px;" />
+        </div> -->
+      </div>
     {/if}
   </div>
 </div>

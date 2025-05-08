@@ -3,6 +3,7 @@ import {
   workspaceLevelPermissions,
   workspaceLevelRolePermisson,
 } from "../constants/permissions.constant";
+import * as Sentry from "@sentry/svelte";
 //get path for url
 export function getPathFromUrl(url: string) {
   try {
@@ -10,6 +11,7 @@ export function getPathFromUrl(url: string) {
     const urlObject = new URL(sanitizedUrl);
     return urlObject.pathname;
   } catch (error) {
+    Sentry.captureException(error); 
     console.error("Invalid URL:", url);
   }
   return "";

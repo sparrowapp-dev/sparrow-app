@@ -161,6 +161,9 @@ export class DashboardViewModel {
           _id,
           name,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           users,
           description,
           logo,
@@ -173,7 +176,7 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
         } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
         }));
@@ -183,6 +186,9 @@ export class DashboardViewModel {
           teamId: _id,
           name,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           users,
           description,
           logo,
@@ -230,6 +236,19 @@ export class DashboardViewModel {
   // Function to set a workspace as active
   public activateWorkspace = async (id: string): Promise<void> => {
     await this.workspaceRepository.setActiveWorkspace(id);
+    const sharedTeam = await this.teamRepository.getTeamDoc(
+      "sharedWorkspaceTeam",
+    );
+    const prevWorkspace = await this.workspaceRepository.readWorkspace(id);
+    if (
+      sharedTeam &&
+      prevWorkspace?._data.team?.teamId !== "sharedWorkspaceTeam"
+    ) {
+      await this.workspaceRepository.deleteWorkspacesByTeamId(
+        "sharedWorkspaceTeam",
+      );
+      await this.teamRepository.removeTeam("sharedWorkspaceTeam");
+    }
     return;
   };
 
@@ -251,6 +270,7 @@ export class DashboardViewModel {
           name,
           hubUrl,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -269,6 +289,7 @@ export class DashboardViewModel {
           name,
           hubUrl,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,
@@ -469,6 +490,15 @@ export class DashboardViewModel {
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, ws);
     await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
+    const sharedTeam = await this.teamRepository.getTeamDoc(
+      "sharedWorkspaceTeam",
+    );
+    if (sharedTeam && ws?._data.team?.teamId !== "sharedWorkspaceTeam") {
+      await this.workspaceRepository.deleteWorkspacesByTeamId(
+        "sharedWorkspaceTeam",
+      );
+      await this.teamRepository.removeTeam("sharedWorkspaceTeam");
+    }
     navigate("collections");
   };
 

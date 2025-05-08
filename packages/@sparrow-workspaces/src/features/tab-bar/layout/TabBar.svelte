@@ -3,7 +3,7 @@
   import { AngleRightIcon } from "@sparrow/library/icons";
   import { AngleLeftIcon } from "@sparrow/library/icons";
   import { PlusIcon } from "@sparrow/library/icons";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
 
   // ---- Interface
   import type { TabDocument } from "@app/database/database";
@@ -186,34 +186,26 @@
     {/if}
 
     <div
-      class="d-flex ps-1 align-items-center justify-content-center my-auto"
+      class="d-flex align-items-center justify-content-center my-auto"
       style="height: 24px; gap:8px;  padding:4px 8px; "
     >
       {#if tabList.length <= 0}
-        <span
-          style="color: var(--text-ds-neutral-300); font-size:12px; line-height:18px; font-weight:500;"
-        >
-          New Request
+        <span>
         </span>
       {/if}
       <Tooltip
-        title={"New"}
+        title={"New Request"}
         placement={"bottom-center"}
         distance={10}
         zIndex={20}
       >
-        <button
-          on:click={onNewTabRequested}
-          role="button"
-          class="d-flex layout my-auto relative top-2 align-items-center border-radius-2 p-0 justify-content-center py-auto"
-          style="height:26px; width:28px; background-color: transparent; border:0px; border-left:1px solid var(--bg-ds-surface-100); border-top-left-radius:0px; border-bottom-left-radius:0px;   "
-        >
-          <PlusIcon
-            height={"21px"}
-            width={"21px"}
-            color="var(--bg-ds-neutral-100)"
-          />
-        </button>
+      <Button
+      type="teritiary-regular"
+      startIcon={PlusIcon}
+      onClick={onNewTabRequested}
+      size="small"
+
+      />
       </Tooltip>
     </div>
     <div class="d-flex ms-auto my-auto {!tabList.length ? 'd-none' : ''}">
@@ -352,7 +344,7 @@
     transition: all 300ms;
   }
   .tabbar {
-    height: 35px;
+    height: 100%;
     background-color: var(--sparrow-black);
   }
 

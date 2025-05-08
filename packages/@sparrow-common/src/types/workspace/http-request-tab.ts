@@ -46,6 +46,7 @@ export enum RequestDatasetEnum {
   FORMDATA = "Form Data",
   URLENCODED = "URL Encoded",
   RAW = "Raw",
+  BINARY = "Binary",
   NONE = "None",
 }
 

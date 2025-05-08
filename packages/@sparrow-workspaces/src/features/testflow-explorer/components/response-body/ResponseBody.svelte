@@ -4,7 +4,6 @@
     RequestDataTypeEnum,
     ResponseFormatterEnum,
   } from "@sparrow/common/types/workspace";
-  // import { SparrowLogo } from "../../assets/images";
   export let response;
   export let apiState;
 
@@ -26,25 +25,23 @@
   <div
     class="w-100 position-relative {apiState.responseBodyFormatter ===
     ResponseFormatterEnum.PREVIEW
-      ? 'h-100'
+      ? 'h-100 overflow-hidden'
       : ''}"
   >
-    {#if apiState.responseBodyLanguage === RequestDataTypeEnum.IMAGE}
+    {#if response.responseContentType === RequestDataTypeEnum.IMAGE}
       <!-- 
         --
         -- Reponse content-type set to image,
         -- 
       -->
-      <!-- <SparrowLogo /> -->
+      <img src={response.body} alt="" />
     {:else if apiState.responseBodyFormatter === ResponseFormatterEnum.PREVIEW}
       <!-- 
         --
         -- Reponse content-type set to HTML preview,
         -- 
       -->
-      <iframe
-        srcdoc={response.body}
-        style="width: 100%; height: calc(100% - 10px);"
+      <iframe srcdoc={response.body} style="width: 100%; height: calc(100%);"
       ></iframe>
     {:else}
       <!-- 
@@ -68,7 +65,7 @@
   }
 
   .response-body {
-    overflow-y: hidden;
+    overflow-y: auto;
     transition: overflow 0.3s ease-in-out;
   }
 

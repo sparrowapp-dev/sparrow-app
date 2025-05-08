@@ -174,6 +174,9 @@ export class DashboardViewModel {
           _id,
           name,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           users,
           description,
           logo,
@@ -186,7 +189,7 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
         } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
         }));
@@ -196,6 +199,9 @@ export class DashboardViewModel {
           teamId: _id,
           name,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           users,
           description,
           logo,
@@ -263,6 +269,7 @@ export class DashboardViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -280,6 +287,7 @@ export class DashboardViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,

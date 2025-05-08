@@ -23,6 +23,7 @@
   export let regenerateAiResponse;
   export let onUpdateRequestState;
   export let onStopGeneratingAIResponse;
+  export let handleApplyChangeOnAISuggestion;
   export let scrollList;
 
   let chatContainer: HTMLElement;
@@ -56,6 +57,8 @@
   let codeBlockHtml = ""; // will hold HTML string for preview
 
   const handleCodePreview = async (codeBlock: HTMLElement) => {
+    const codeBlockTag = codeBlock.querySelector("code.hljs") as HTMLElement;
+    if (codeBlockTag) codeBlockTag.style.maxWidth = "100%";
     codeBlockHtml = codeBlock.outerHTML; // get its full HTML
     isCodePreviewOpened = true;
 
@@ -199,6 +202,7 @@
                         ? true
                         : false}
                       {isResponseGenerating}
+                      {handleApplyChangeOnAISuggestion}
                     />
                   </div>
                 {/each}

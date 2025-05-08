@@ -9,7 +9,6 @@ import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import {
-  TabPersistenceTypeEnum,
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 
@@ -20,6 +19,7 @@ import {
   isTestFlowTourGuideOpen,
 } from "@sparrow/workspaces/stores";
 import constants from "@app/constants/constants";
+import { TestflowTabAdapter } from "@app/adapter";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -89,11 +89,13 @@ export class TestflowViewModel {
           id: "1",
           type: "startBlock",
           data: {
+            blockName: "startBlock",
             collectionId: "",
             requestId: "",
             folderId: "",
-            method: "",
-            name: "",
+            name:"",
+            method:"",
+            requestData: null,
           },
           position: { x: 100, y: 200 },
         },
@@ -141,12 +143,13 @@ export class TestflowViewModel {
               folderId: "",
               method: "",
               name: "",
+              requestData: null,
+              blockName: "startBlock",
             },
           },
-        ],
-      },
-      baseUrl,
-    );
+          
+      ],
+    }, baseUrl);
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -168,7 +171,6 @@ export class TestflowViewModel {
       let isFirstTimeUsingTestFlow = false;
       isFirstTimeInTestFlow.subscribe((value) => {
         isFirstTimeUsingTestFlow = value;
-        console.log("isFirstTimeUsingTestFlow", isFirstTimeUsingTestFlow);
       });
       if (isFirstTimeUsingTestFlow) {
         currentStep.set(3);
@@ -302,16 +304,8 @@ export class TestflowViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       _testflow.workspaceId,
     );
-
-    const initTestflowTab = this.initTab.testflow(
-      _testflow._id,
-      currentWorkspace._id,
-    );
-    initTestflowTab.updateName(_testflow.name);
-    initTestflowTab.setNodes(_testflow.nodes);
-    initTestflowTab.setEdges(_testflow.edges);
-    initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
-    this.tabRepository.createTab(initTestflowTab.getValue());
+    const testflowTab = new TestflowTabAdapter().adapt(currentWorkspace._id, _testflow.toMutableJSON());
+    this.tabRepository.createTab(testflowTab);
   };
 
   private constructBaseUrl = async (_id: string) => {
@@ -384,6 +378,8 @@ export class TestflowViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentTestflow?.path?.workspaceId as string,
     );
+
+    const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -392,9 +388,8 @@ export class TestflowViewModel {
       await this.testflowRepository.updateTestflow(
         currentTestflow?.id as string,
         {
-          name: currentTestflow.name,
-          nodes: currentTestflow?.property?.testflow?.nodes,
-          edges: currentTestflow?.property?.testflow?.edges,
+          ...unadaptedTestflow,
+          updatedAt: new Date().toISOString(),
         },
       );
       notifications.success(
@@ -408,11 +403,7 @@ export class TestflowViewModel {
     const response = await this.testflowService.updateTestflow(
       activeWorkspace._id,
       currentTestflow?.id as string,
-      {
-        name: currentTestflow.name,
-        nodes: currentTestflow?.property?.testflow?.nodes,
-        edges: currentTestflow?.property?.testflow?.edges,
-      },
+      unadaptedTestflow,
       baseUrl,
     );
     if (response.isSuccessful) {

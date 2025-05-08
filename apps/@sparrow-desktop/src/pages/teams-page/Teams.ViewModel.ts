@@ -73,6 +73,9 @@ export class TeamsViewModel {
           name,
           users,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           description,
           logo,
           workspaces,
@@ -83,8 +86,9 @@ export class TeamsViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          invites,
         } = elem;
-        const updatedWorkspaces = workspaces.map((workspace) => ({
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
           name: workspace.name,
         }));
@@ -94,6 +98,9 @@ export class TeamsViewModel {
           teamId: _id,
           name,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           users,
           description,
           logo,
@@ -107,6 +114,7 @@ export class TeamsViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          invites,
         };
         data.push(item);
       }
@@ -307,6 +315,7 @@ export class TeamsViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -324,6 +333,7 @@ export class TeamsViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,

@@ -1,8 +1,14 @@
 <script lang="ts">
-  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
   import { Input } from "@sparrow/library/forms";
-  import { Button } from "@sparrow/library/ui";
-  import { PeopleRegular, SaveRegular } from "@sparrow/library/icons";
+  import { Button, Tag } from "@sparrow/library/ui";
+  import {
+    GlobeRegular,
+    LockClosedRegular,
+    PeopleRegular,
+    SaveRegular,
+  } from "@sparrow/library/icons";
+  import { onDestroy, onMount } from "svelte";
   /**
    * The name of the workspace.
    */
@@ -38,6 +44,11 @@
    */
   export let userRole;
 
+  /**
+   * Indicate whether workspace is public or not.
+   */
+  export let isSharedWorkspace = false;
+
   const handleInputName = (event: Event) => {
     onUpdateWorkspaceName(event.detail, "");
   };
@@ -47,27 +58,67 @@
   export let onSaveWorkspace;
 
   export let isSaved;
+
+  export let workspaceType: WorkspaceType = WorkspaceType.PRIVATE;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      if (userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSaved) {
+        onSaveWorkspace();
+      }
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
 </script>
 
 <section>
   <div class="About d-flex flex-column h-100" style="gap:16px !important; ">
     <div class="d-flex" style="justify-content: space-between;">
       <div
-        class="ellipsis w-auto"
-        style="font-weight: 700; color:var(--text-secondary-100);"
+        class="ellipsis w-auto d-flex"
+        style="font-weight: 700; color:var(--text-secondary-100); align-items:center;"
       >
-        <Input
-          width={"398px"}
+        <!-- <Input
+          width={"200px"}
           placeholder={""}
           type={"text"}
           value={workspaceName}
           variant={"inline"}
           id="renameInputFieldWorkspace"
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+          disabled={true}
           maxlength={100}
           on:input={handleInputName}
           on:blur={handleBlurName}
-        />
+        /> -->
+        <p
+          style="color: var(--text-ds-neutral-50); margin:0px;"
+          class="text-ds-font-size-20 text-ds-font-weight-semi-bold ellipsis"
+        >
+          {workspaceName}
+        </p>
+        <div style="margin-left: 10px;">
+          {#if workspaceType === WorkspaceType.PUBLIC}
+            <Tag
+              text={WorkspaceType.PUBLIC}
+              type="green"
+              endIcon={GlobeRegular}
+            />
+          {:else}
+            <Tag
+              text={WorkspaceType.PRIVATE}
+              type="cyan"
+              endIcon={LockClosedRegular}
+            />
+          {/if}
+        </div>
       </div>
       <div class="d-flex gap-2">
         {#if userRole === WorkspaceRole.WORKSPACE_ADMIN}
@@ -76,7 +127,7 @@
               startIcon={PeopleRegular}
               size={"medium"}
               type={"primary"}
-              title={"Invite"}
+              title={"Invite collaborators"}
               onClick={() => {
                 isWorkspaceInviteModalOpen = true;
               }}
@@ -85,14 +136,18 @@
           </div>
         {/if}
 
-        <Button
-          disable={isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          startIcon={SaveRegular}
-          type={"secondary"}
-          onClick={() => {
-            onSaveWorkspace();
-          }}
-        />
+        {#if !isSharedWorkspace}
+          <Button
+            disable={isSaved ||
+              userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+              isSharedWorkspace}
+            startIcon={SaveRegular}
+            type={"secondary"}
+            onClick={() => {
+              onSaveWorkspace();
+            }}
+          />
+        {/if}
       </div>
     </div>
   </div>

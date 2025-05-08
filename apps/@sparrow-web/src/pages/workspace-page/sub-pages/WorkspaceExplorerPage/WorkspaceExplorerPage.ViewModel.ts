@@ -1,8 +1,13 @@
 import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
-import { Events, WorkspaceRole } from "@sparrow/common/enums";
+import { Events, WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { createDeepCopy, Debounce, throttle } from "@sparrow/common/utils";
+import {
+  copyToClipBoard,
+  createDeepCopy,
+  Debounce,
+  throttle,
+} from "@sparrow/common/utils";
 import type {
   TabDocument,
   TeamDocument,
@@ -107,7 +112,7 @@ export default class WorkspaceExplorerViewModel {
    */
   private compareWorkspaceWithServer = new Debounce().debounce(
     this.compareWorkspaceWithServerDebounced,
-    1000,
+    0,
   );
 
   /**
@@ -422,6 +427,7 @@ export default class WorkspaceExplorerViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           admins,
           team,
@@ -439,6 +445,7 @@ export default class WorkspaceExplorerViewModel {
           _id,
           name,
           description,
+          workspaceType,
           users,
           collections: collection ? collection : [],
           admins: admins,
@@ -550,5 +557,40 @@ export default class WorkspaceExplorerViewModel {
     }
     MixpanelEvent(Events.Workspace_Role_Changed);
     return response;
+  };
+
+  public handleWorkspaceVisibility = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(progressiveTab.id);
+    const response = await this.workspaceService.updateWorkspaceType(
+      progressiveTab.id,
+      {
+        workspaceType: WorkspaceType.PUBLIC,
+      },
+      baseUrl,
+    );
+    if (response.isSuccessful) {
+      const updatedata = {
+        workspaceType: WorkspaceType.PUBLIC,
+      };
+      await this.workspaceRepository.updateWorkspace(
+        progressiveTab.id,
+        updatedata,
+      );
+      notifications.success(
+        `Workspace published. ‘${progressiveTab.name}’ is now public.`,
+      );
+    } else {
+      notifications.error("Failed to publish the workspace. Please try again.");
+    }
+    return response;
+  };
+
+  public handleShareWorkspace = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    await copyToClipBoard(
+      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
+    );
+    notifications.success("Link Copied.");
   };
 }
