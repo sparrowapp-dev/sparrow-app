@@ -53,7 +53,7 @@
     changes = groupChanges(rawChanges, editorView);
 
     totalChanges = changes.length;
-    console.log("Changes detected:", rawChanges, totalChanges, changes);
+    
 
     // Reset the current index if needed
     if (currentChangeIndex >= totalChanges) {
