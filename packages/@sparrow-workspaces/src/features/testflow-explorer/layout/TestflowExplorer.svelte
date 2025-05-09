@@ -171,6 +171,7 @@
   let updateNodeMethod: string;
   let updateNodeUrl: string;
   let updateNodeFolderId: any;
+  let dynamicExpressionDeleteWarning: boolean = false;
   // Flag to control whether nodes are draggable
   let isNodesDraggable = true;
   let isNodeDeletable = false;
@@ -1093,40 +1094,126 @@
   const handleDeleteNode = (idToDelete: string) => {
     const deletedIndex = Number(idToDelete);
 
-    // Update nodes
     nodes.update((_nodes) => {
-      const nodeIndex = _nodes.findIndex((node) => node.id === idToDelete);
-      if (nodeIndex === -1) {
-        console.error("Node not found.");
-        return;
+      let shouldPreserve = false;
+      const nodeToDelete = _nodes.find((n) => n.id === idToDelete);
+      let nameToCheck = nodeToDelete?.data?.requestData?.name;
+      if (nameToCheck) {
+        nameToCheck = nameToCheck.replace(/\s+/g, "_");
+        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g; // Matches [*$[ ... ]$*]
+        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g; // Matches $$Delete_Pet.response.headers
+        for (const otherNode of _nodes) {
+          if (otherNode.id === idToDelete) continue;
+          const stringified = JSON.stringify(
+            otherNode?.data?.requestData || {},
+          );
+          const expressionMatches = [...stringified.matchAll(expressionRegex)];
+          for (const exprMatch of expressionMatches) {
+            const contentInside = exprMatch[1];
+            const varMatches = [...contentInside.matchAll(variableRegex)];
+            for (const vMatch of varMatches) {
+              const fullVar = vMatch[1];
+              const baseVar = fullVar.split(".")[0];
+              if (baseVar === nameToCheck) {
+                shouldPreserve = true;
+                dynamicExpressionDeleteWarning = true;
+                break;
+              }
+            }
+            if (shouldPreserve) break;
+          }
+          if (shouldPreserve) break;
+        }
       }
-
-      const removeNode = _nodes[nodeIndex];
-      const itemsBeforeIndex = _nodes.slice(0, nodeIndex);
-      const itemsAfterIndex = _nodes.slice(nodeIndex + 1);
-
-      let prevId = removeNode.id;
-      let prevPos = removeNode.position;
-
-      const updatedItems = itemsAfterIndex.map((node) => {
-        const updatedNode = {
-          ...node,
-          id: `${prevId}`,
-          position: { x: prevPos.x, y: prevPos.y },
-        };
-        prevId = node.id;
-        prevPos = node.position;
-        return updatedNode;
-      });
-
-      const updatedAllNodes = [...itemsBeforeIndex, ...updatedItems];
-      return updatedAllNodes;
+      return shouldPreserve
+        ? _nodes
+        : _nodes.filter((node) => node.id !== idToDelete);
     });
 
-    // Update edges
+    if (dynamicExpressionDeleteWarning) {
+      isDeleteNodeModalOpen = false;
+      return;
+    }
+
     edges.update((_edges) => {
-      const updatedEdges = _edges.slice(0, -1);
-      return updatedEdges;
+      const incomingEdge = _edges.find((edge) => edge.target === idToDelete);
+      const outgoingEdge = _edges.find((edge) => edge.source === idToDelete);
+      let newEdge = [];
+      if (incomingEdge && outgoingEdge) {
+        // Reconnect source of incomingEdge to target of outgoingEdge
+        newEdge.push({
+          id: `xy-edge__${incomingEdge.source}-${outgoingEdge.target}`,
+          source: incomingEdge.source,
+          target: outgoingEdge.target,
+          deletable: false,
+          selected: false,
+        });
+      }
+      const filteredEdges = _edges.filter((edge) => {
+        if (edge.source === idToDelete || edge.target === idToDelete) {
+          if (!outgoingEdge && edge.target === idToDelete) return false;
+          // If it's an incoming or outgoing edge, remove it
+          if (edge.source === idToDelete || edge.target === idToDelete)
+            return false;
+        }
+        return true;
+      });
+
+      return [...filteredEdges, ...newEdge];
+    });
+
+    nodes.update((_nodes) => {
+      const nodeMap = new Map<string, Node>(
+        _nodes.map((node) => [node.id, { ...node }]),
+      );
+
+      // Step 1: Build adjacency list and in-degree map
+      const adj: Record<string, string[]> = {};
+      const inDegree: Record<string, number> = {};
+
+      $edges.forEach(
+        ({ source, target }: { source: string; target: string }) => {
+          if (!adj[source]) adj[source] = [];
+          adj[source].push(target);
+          inDegree[target] = (inDegree[target] || 0) + 1;
+          if (!(source in inDegree)) inDegree[source] = 0;
+        },
+      );
+
+      // Step 2: Topological Sort
+      const queue: string[] = [];
+      for (const id in inDegree) {
+        if (inDegree[id] === 0) {
+          queue.push(id);
+          const root = nodeMap.get(id);
+          if (root) {
+            root.position.x = 100; // Initial X for root node
+            root.position.y = 200; // Optional fixed Y
+          }
+        }
+      }
+
+      while (queue.length) {
+        const nodeId = queue.shift()!;
+        const sourceNode = nodeMap.get(nodeId);
+        if (!sourceNode) continue;
+
+        const children = adj[nodeId] || [];
+        for (const childId of children) {
+          const childNode = nodeMap.get(childId);
+          if (!childNode) continue;
+          childNode.position.x = sourceNode.position.x + 350;
+          childNode.position.y = sourceNode.position.y;
+
+          // Decrease in-degree and enqueue if ready
+          inDegree[childId]--;
+          if (inDegree[childId] === 0) {
+            queue.push(childId);
+          }
+        }
+      }
+
+      return Array.from(nodeMap.values());
     });
 
     // Cleanup
@@ -1609,6 +1696,26 @@
       isDeleteNodeModalOpen = flag;
     }}
   />
+</Modal>
+
+<Modal
+  title="Warning Dynamic Expression"
+  type="dark"
+  width={"540px"}
+  zIndex={1000}
+  isOpen={dynamicExpressionDeleteWarning}
+  handleModalState={(flag = false) => {
+    isDeleteNodeModalOpen = false;
+    dynamicExpressionDeleteWarning = flag;
+  }}
+>
+  <p
+    class="text-fs-14 text-ds-font-weight-medium"
+    style="color: var(--text-secondary-1000); margin-top:20px;"
+  >
+    The block is currently in use and must be removed from all dependent dynamic
+    expressions before it can be deleted.
+  </p>
 </Modal>
 
 <Modal
