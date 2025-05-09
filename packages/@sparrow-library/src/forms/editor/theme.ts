@@ -177,7 +177,8 @@ export const basicTheme = EditorView.theme({
     backgroundColor: "#316CF6",
     alignItems: "center",
     justifyContent: "flex-end",
-    gap: "2px"
+    gap: "2px",
+    margin: "0 5px 0 0"
   },
 
   ".cm-chunkButtons button[name='accept']": {
@@ -191,7 +192,7 @@ export const basicTheme = EditorView.theme({
     fontSize: "0",
     backgroundSize: "12px 12px",
     width: "20px",
-    height: "20px",
+    height: "17.92px",
     margin: "0"
   },
   ".cm-chunkButtons button[name='accept']:hover": {
@@ -208,8 +209,8 @@ export const basicTheme = EditorView.theme({
     fontSize: "0",
     backgroundSize: "12px 12px",
     width: "20px",
-    height: "20px",
-    margin: "0"
+    height: "17.92px",
+    margin: "0",
   },
   ".cm-chunkButtons button[name='reject']:hover": {
     // background: "#1859f1",
