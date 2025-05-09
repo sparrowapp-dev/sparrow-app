@@ -11,6 +11,7 @@
     CollectionIcon,
     SocketIoIcon,
     GraphIcon,
+    MockCollection,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -49,6 +50,24 @@
         label="Collection"
         iconColor="var(--text-primary-300)"
         iconSize={"18px"}
+        onClick={() => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+          isExpandCollection = true;
+        }}
+      />
+    {/if}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
+        icon={MockCollection}
+        label="Mock Collection"
+        iconColor="var(--text-primary-300)"
+        iconSize={"20px"}
         onClick={() => {
           if (isGuestUser) {
             onItemCreated("collection", {

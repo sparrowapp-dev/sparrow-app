@@ -75,7 +75,7 @@
     white-space: nowrap;"
   class="text-ds-font-weight-medium text-ds-line-height-150 text-ds-font-size-12 d-flex align-items-center"
 >
-  <span class="text-content">{convertCasing(text)}</span>
+  <span class={endIcon ? "text-content" : ""}>{convertCasing(text)}</span>
   {#if endIcon}
     <svelte:component
       this={endIcon}

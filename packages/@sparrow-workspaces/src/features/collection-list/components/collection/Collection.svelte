@@ -29,6 +29,7 @@
   export let onSyncCollection;
   export let isSharedWorkspace = false;
   let isSyncChangesAvailable = false;
+  export let isMockCollection = false;
 
   import {
     openedComponent,
@@ -652,6 +653,11 @@
       </div>
     {/if}
   </button>
+  {#if isMockCollection}
+    <div style="display: flex;">
+      <Tag type="green" text={"Mock"} />
+    </div>
+  {/if}
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
@@ -834,7 +840,9 @@
           ? '0'
           : '0'} text-secondary-300"
       >
-        This collection is empty
+        {isMockCollection
+          ? "This mock collection is empty"
+          : "This collection is empty"}
       </p>
     {/if}
 
@@ -892,94 +900,100 @@
           </div>
         </Tooltip>
 
-        <Tooltip
-          title={collection?.activeSync
-            ? "Adding requests is disabled for active sync collections."
-            : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-          placement={collection?.activeSync ? "top-left" : "bottom-center"}
-          distance={12}
-          zIndex={1000}
-        >
-          <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-            style="height: 24px; width: 24px;"
-            role="button"
-            on:click={() => {
-              if (!collection?.activeSync) {
-                onItemCreated("socketioCollection", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                });
-                MixpanelEvent(Events.Collection_SocketIO, {
-                  description: "Created Socket.IO inside collection.",
-                });
-              }
-            }}
+        {#if !isMockCollection}
+          <Tooltip
+            title={collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
+            placement={collection?.activeSync ? "top-left" : "bottom-center"}
+            distance={12}
+            zIndex={1000}
           >
-            <SocketIoIcon
-              height={"13px"}
-              width={"13px"}
-              color={"var(--request-arc)"}
-            />
-          </div>
-        </Tooltip>
-        <Tooltip
-          title={collection?.activeSync
-            ? "Adding requests is disabled for active sync collections."
-            : "Add WebSocket"}
-          placement={collection?.activeSync ? "top-left" : "bottom-center"}
-          distance={12}
-          zIndex={1000}
-        >
-          <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-            style="height: 24px; width: 24px;"
-            role="button"
-            on:click={() => {
-              if (!collection?.activeSync) {
-                onItemCreated("websocketCollection", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                });
-                MixpanelEvent(Events.Collection_WebSocket);
-              }
-            }}
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px;"
+              role="button"
+              on:click={() => {
+                if (!collection?.activeSync) {
+                  onItemCreated("socketioCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_SocketIO, {
+                    description: "Created Socket.IO inside collection.",
+                  });
+                }
+              }}
+            >
+              <SocketIoIcon
+                height={"13px"}
+                width={"13px"}
+                color={"var(--request-arc)"}
+              />
+            </div>
+          </Tooltip>
+          <Tooltip
+            title={collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : "Add WebSocket"}
+            placement={collection?.activeSync ? "top-left" : "bottom-center"}
+            distance={12}
+            zIndex={1000}
           >
-            <SocketIcon height="12px" width="16px" color="var(--request-arc)" />
-          </div>
-        </Tooltip>
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px;"
+              role="button"
+              on:click={() => {
+                if (!collection?.activeSync) {
+                  onItemCreated("websocketCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_WebSocket);
+                }
+              }}
+            >
+              <SocketIcon
+                height="12px"
+                width="16px"
+                color="var(--request-arc)"
+              />
+            </div>
+          </Tooltip>
 
-        <Tooltip
-          title={collection?.activeSync
-            ? "Adding requests is disabled for active sync collections."
-            : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-          placement={collection?.activeSync ? "top-left" : "bottom-center"}
-          distance={12}
-          zIndex={1000}
-        >
-          <div
-            class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-            style="height: 24px; width: 24px;"
-            role="button"
-            on:click={() => {
-              if (!collection?.activeSync) {
-                onItemCreated("graphqlCollection", {
-                  workspaceId: collection.workspaceId,
-                  collection,
-                });
-                MixpanelEvent(Events.Collection_GraphQL, {
-                  description: "Created GraphQL inside collection.",
-                });
-              }
-            }}
+          <Tooltip
+            title={collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
+            placement={collection?.activeSync ? "top-left" : "bottom-center"}
+            distance={12}
+            zIndex={1000}
           >
-            <GraphIcon
-              height={"13px"}
-              width={"13px"}
-              color={"var(--request-arc)"}
-            />
-          </div>
-        </Tooltip>
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px;"
+              role="button"
+              on:click={() => {
+                if (!collection?.activeSync) {
+                  onItemCreated("graphqlCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  MixpanelEvent(Events.Collection_GraphQL, {
+                    description: "Created GraphQL inside collection.",
+                  });
+                }
+              }}
+            >
+              <GraphIcon
+                height={"13px"}
+                width={"13px"}
+                color={"var(--request-arc)"}
+              />
+            </div>
+          </Tooltip>
+        {/if}
       {/if}
     </div>
     <!-- {#if showFolderAPIButtons}
