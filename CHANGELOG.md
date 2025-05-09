@@ -1,3 +1,18 @@
+# [2.24.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.23.0...v2.24.0) (2025-05-09)
+
+
+### Bug Fixes
+
+* add patch v2-23-1 ([825ca0b](https://github.com/sparrowapp-dev/sparrow-app/commit/825ca0be430e21510e3bb0a148096fa7f47b7f52))
+* fixed the typo and disabled the deepseek option ([fd3f099](https://github.com/sparrowapp-dev/sparrow-app/commit/fd3f099ad55e489230a4394afcda0f10c2068004))
+* fixed type in workspace [] ([c8ac4fd](https://github.com/sparrowapp-dev/sparrow-app/commit/c8ac4fd83d230ace8348d166956836fbe91f30ef))
+* fixed UI issue ([2b5c65b](https://github.com/sparrowapp-dev/sparrow-app/commit/2b5c65bf8f0056e189d0f46f503d6c2bfac5deda))
+
+
+### Features
+
+* update docker-compose and add Nginx configuration for SSL and reverse proxy ([43b9f8b](https://github.com/sparrowapp-dev/sparrow-app/commit/43b9f8bfc77e57d4928172d8a94ddaf6ada4284c))
+
 # [2.23.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.22.1...v2.23.0) (2025-05-06)
 
 
