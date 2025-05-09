@@ -172,7 +172,9 @@
   let updateNodeUrl: string;
   let updateNodeFolderId: any;
   // Flag to control whether nodes are draggable
-  let isNodesDraggable = false;
+  let isNodesDraggable = true;
+  let isNodeDeletable = false;
+  let isEdgeDeletable = true;
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let collectionListDocument: CollectionDocument[];
@@ -798,7 +800,7 @@
             requestData: requestData || createBlankRequestObject("", "", ""),
           },
           position: nextNodePosition,
-          deletable: false,
+          deletable: isNodeDeletable,
           draggable: isNodesDraggable, // Disable dragging for this node
         },
       ];
@@ -810,7 +812,7 @@
     //       id: "xy-edge__" + _id + "-" + newNodeId,
     //       source: _id,
     //       target: newNodeId,
-    //       deletable: false,
+    //       deletable: isEdgeDeletable,
     //     },
     //   ];
     // });
@@ -835,7 +837,7 @@
               id: "xy-edge__" + newNodeId + "-" + destinationId,
               source: newNodeId,
               target: destinationId,
-              deletable: false,
+              deletable: isEdgeDeletable,
             },
           ];
         } else {
@@ -845,7 +847,7 @@
               id: "xy-edge__" + _id + "-" + newNodeId,
               source: _id,
               target: newNodeId,
-              deletable: false,
+              deletable: isEdgeDeletable,
             },
           ];
         }
@@ -886,7 +888,7 @@
             id: "xy-edge__" + destinationId + "-" + newNodeId,
             source: destinationId,
             target: newNodeId,
-            deletable: false,
+            deletable: isEdgeDeletable,
           },
         ];
       });
@@ -984,8 +986,8 @@
             x: dbNodes[i].position.x,
             y: dbNodes[i].position.y,
           },
-          deletable: dbNodes[i].id === "1" ? false : false,
-          draggable: isNodesDraggable, // Disable dragging for this node
+          deletable: dbNodes[i].id === "1" ? false : isNodeDeletable,
+          draggable: dbNodes[i].id === "1" ? false : isNodesDraggable, // Disable dragging for this node
         });
       }
       return res;
@@ -998,7 +1000,7 @@
           id: dbEdges[i].id,
           source: dbEdges[i].source,
           target: dbEdges[i].target,
-          deletable: false,
+          deletable: isEdgeDeletable,
         });
       }
       return res;
