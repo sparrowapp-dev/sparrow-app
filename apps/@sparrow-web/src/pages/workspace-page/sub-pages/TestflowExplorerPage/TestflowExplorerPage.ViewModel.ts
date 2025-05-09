@@ -62,7 +62,7 @@ import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
 
 export class TestflowExplorerPageViewModel {
-  private _tab = new BehaviorSubject<Partial<Tab>>({});
+   private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
   
   private collectionRepository = new CollectionRepository();
@@ -1561,5 +1561,13 @@ export class TestflowExplorerPageViewModel {
       }
       return response;
     }
+  };
+
+  /**
+   * @description - This function will redirect to the sparrow docs of testflow.
+   */
+  public redirectDocsTestflow = async () => {
+    window.open(constants.DOCS_URL, "_blank");
+    return;
   };
 }

@@ -118,6 +118,7 @@
   export let onUpdateEnvironment;
   export let runSingleNode;
   export let onPreviewExpression;
+  export let redirectDocsTestflow: () => void;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -1661,6 +1662,10 @@
   type={"dark"}
   width={"851px"}
   zIndex={1000}
+  helpingIcon={true}
+  onClickHelpIcon={() => {
+    redirectDocsTestflow();
+  }}
   isOpen={isDynamicExpressionModalOpen}
   handleModalState={() => {
     isDynamicExpressionModalOpen = false;
