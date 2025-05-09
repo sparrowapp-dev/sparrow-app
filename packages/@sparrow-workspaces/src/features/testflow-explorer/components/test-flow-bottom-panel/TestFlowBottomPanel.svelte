@@ -150,10 +150,11 @@
   };
 
   const extractPlaceholders = (url: string): string[] => {
-    return [...url.matchAll(/\{\{(.*?)\}\}/g)].map((match) => match[1]);
+    return [...url.matchAll(/{{\s*([\w.-]+)\s*}}/g)].map((match) => match[1]);
   };
 
   const checkEnvironmentVariableExistValue = (items: string[]): boolean => {
+    console.log("This are the Item----------->", items);
     const filteredVariables = environmentVariables?.filtered;
     if (!filteredVariables && items.length > 0) return true;
     if (items.length === 0) return false;
@@ -195,7 +196,7 @@
         }
       }
       const selectedEnvs = extractPlaceholders(
-        selectedBlock?.data?.requestData?.url,
+        JSON.stringify(selectedBlock?.data?.requestData),
       );
 
       isAnyEnvVariableMissing =
