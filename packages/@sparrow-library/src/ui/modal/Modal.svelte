@@ -25,7 +25,7 @@
   export let handleModalState: (flag: boolean) => void;
   export let description: string;
   export let helpingIcon: boolean = false;
-  export let onClickIcon: () => void;
+  export let onClickHelpIcon: () => void;
 
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -93,7 +93,7 @@
                       size="small"
                       startIcon={QuestionCircleRegular}
                       onClick={() => {
-                        onClickIcon();
+                        onClickHelpIcon();
                       }}
                     />
                   </div>

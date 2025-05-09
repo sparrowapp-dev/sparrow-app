@@ -1420,7 +1420,7 @@
   width={"851px"}
   zIndex={1000}
   helpingIcon={true}
-  onClickIcon={() => {
+  onClickHelpIcon={() => {
     redirectDocsTestflow();
   }}
   isOpen={isDynamicExpressionModalOpen}
