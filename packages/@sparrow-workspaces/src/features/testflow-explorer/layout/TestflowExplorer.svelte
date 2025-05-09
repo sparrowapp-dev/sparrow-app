@@ -377,10 +377,12 @@
 
   let dynamicExpressionEditorContent = "";
   let dynamicExpressionModal = {};
+  let dynamicExpressionPath: string = "";
   let handleOpenCurrentDynamicExpression = (obj) => {
     dynamicExpressionModal = {};
     dynamicExpressionModal = obj;
     dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
+    dynamicExpressionPath = obj?.type;
     isDynamicExpressionModalOpen = true;
   };
 
@@ -1672,6 +1674,7 @@
     {selectedBlock}
     {environmentVariables}
     {onPreviewExpression}
+    {dynamicExpressionPath}
   />
 </Modal>
 
