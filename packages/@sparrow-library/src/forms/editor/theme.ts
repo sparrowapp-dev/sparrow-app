@@ -170,7 +170,18 @@ export const basicTheme = EditorView.theme({
   ".cm-activeLineGutter": {
     backgroundColor: "transparent",
   },
-
+  ".cm-changedLine":{
+    background: "var(--bg-ds-success-800) !important",
+  },
+  ".cm-changedText":{
+    background: "var(--bg-ds-success-700) !important",
+  },
+  ".cm-deletedChunk":{
+    backgroundColor: "var(--bg-ds-danger-800) !important",
+  },
+  ".cm-deletedText":{
+    backgroundColor: "var(--bg-ds-danger-700) !important",
+  },
   ".cm-chunkButtons": {
     display: "none",
     // display: "flex",
