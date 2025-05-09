@@ -118,6 +118,7 @@
   export let onUpdateEnvironment;
   export let runSingleNode;
   export let onPreviewExpression;
+  export let redirectDocsTestflow: () => void;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -379,10 +380,12 @@
 
   let dynamicExpressionEditorContent = "";
   let dynamicExpressionModal = {};
+  let dynamicExpressionPath: string = "";
   let handleOpenCurrentDynamicExpression = (obj) => {
     dynamicExpressionModal = {};
     dynamicExpressionModal = obj;
     dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
+    dynamicExpressionPath = obj?.type;
     isDynamicExpressionModalOpen = true;
   };
 
@@ -1661,6 +1664,10 @@
   type={"dark"}
   width={"851px"}
   zIndex={1000}
+  helpingIcon={true}
+  onClickHelpIcon={() => {
+    redirectDocsTestflow();
+  }}
   isOpen={isDynamicExpressionModalOpen}
   handleModalState={() => {
     isDynamicExpressionModalOpen = false;
@@ -1674,6 +1681,7 @@
     {selectedBlock}
     {environmentVariables}
     {onPreviewExpression}
+    {dynamicExpressionPath}
   />
 </Modal>
 
