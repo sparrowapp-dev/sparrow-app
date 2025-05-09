@@ -522,10 +522,7 @@
       }}
     ></Button>
 
-    <!-- Add the MergeViewNavigation component before the action buttons -->
-    <!-- {#if isMergeViewEnabled} -->
     <MergeViewNavigation editorView={codeMirrorView} {isMergeViewEnabled} />
-    <!-- {/if} -->
   </div>
 {/if}
 

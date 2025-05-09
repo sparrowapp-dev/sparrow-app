@@ -132,8 +132,7 @@ export function scrollToChange(editorView: EditorView, change: MergeChange): voi
     })
   });
 
-  // Highlight the change visually
-  highlightChange(change);
+  highlightChange(change); // Highlight the change visually
 }
 
 /**

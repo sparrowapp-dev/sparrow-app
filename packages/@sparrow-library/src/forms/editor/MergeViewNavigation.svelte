@@ -45,30 +45,22 @@
       currentChangeIndex = 0;
       return;
     }
-
-    // Find all changes in the document using our utility
-    const rawChanges = findMergeViewChanges(editorView);
-
-    // Group nearby changes to avoid navigating through small segments
-    changes = groupChanges(rawChanges, editorView);
-
+    const rawChanges = findMergeViewChanges(editorView); // Find all changes in the document using our utility
+    changes = groupChanges(rawChanges, editorView); // Group nearby changes to avoid navigating through small segments
     totalChanges = changes.length;
-    
 
     // Reset the current index if needed
     if (currentChangeIndex >= totalChanges) {
       currentChangeIndex = totalChanges > 0 ? 0 : 0;
     }
 
-    // If we have changes, highlight the current one
-    // setTimeout(() => {
-    //   if (changes.length > 0) {
-    //     console.log("Scrolling to current change:", changes);
-    //     scrollToCurrentChange();
-    //   }
-    // }, 2000); // Increased timeout to ensure DOM is fully updated
     if (changes.length > 0) {
       scrollToCurrentChange();
+    } else {
+      isMergeViewEnabled = false;
+      currentChangeIndex = 0;
+      changes = [];
+      totalChanges = 0;
     }
   }
 
