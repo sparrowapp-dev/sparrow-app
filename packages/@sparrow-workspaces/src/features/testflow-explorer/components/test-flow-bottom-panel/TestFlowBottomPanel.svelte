@@ -154,7 +154,6 @@
   };
 
   const checkEnvironmentVariableExistValue = (items: string[]): boolean => {
-    console.log("This are the Item----------->", items);
     const filteredVariables = environmentVariables?.filtered;
     if (!filteredVariables && items.length > 0) return true;
     if (items.length === 0) return false;
