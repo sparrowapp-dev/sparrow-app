@@ -666,20 +666,40 @@
       const rows = pairsContainer.querySelectorAll(".diff-row");
 
       if (rows && rows[rowIndex]) {
+        // First, hide all diff-actions elements
         rows.forEach((row) => {
-          row.classList.remove("highlighted");
+          // row.classList.remove("highlighted");
+
+          // Find the next sibling that has the diff-actions class
+          const diffActions = row.nextElementSibling?.classList.contains(
+            "diff-actions",
+          )
+            ? row.nextElementSibling
+            : null;
+
+          // Hide all diff-actions
+          if (diffActions) {
+            diffActions.style.display = "none";
+          }
         });
 
         rows[rowIndex].scrollIntoView({ behavior: "smooth", block: "center" });
 
         // Add the highlight class after a small delay to ensure scrolling has finished
         setTimeout(() => {
-          rows[rowIndex].classList.add("highlighted"); // Highlight the row
+          // rows[rowIndex].classList.add("highlighted"); // Highlight the row
 
-          setTimeout(() => {
-            rows[rowIndex].classList.remove("highlighted");
-          }, 1600);
-        }, 300);
+          // Show the diff-actions for the highlighted row if it exists
+          const highlightedRowActions = rows[
+            rowIndex
+          ].nextElementSibling?.classList.contains("diff-actions")
+            ? rows[rowIndex].nextElementSibling
+            : null;
+
+          if (highlightedRowActions) {
+            highlightedRowActions.style.display = "flex";
+          }
+        }, 20);
       }
     }
   }
@@ -751,6 +771,8 @@
       isMergeViewLoading = false;
     }
     // }, 200); // Reduced timeout for better responsiveness
+
+    scrollToChange(changedPairIndices[0]);
   };
 
   /**
@@ -808,6 +830,8 @@
       isMergeViewLoading = false;
     }
     // }, 200); // Reduced timeout for better responsiveness
+
+    scrollToChange(changedPairIndices[0]);
   };
 
   // ********** Diff/Merge Navigate & Accept per Line - End **********
@@ -1199,8 +1223,9 @@
   .diff-actions {
     position: absolute;
     right: 12px;
-    transform: translateY(-100%);
-    display: flex;
+    transform: translateY(-103%);
+    /* display: flex; */
+    display: none;
     /* gap: 4px; */
     align-items: center;
     background-color: #316cf6;
