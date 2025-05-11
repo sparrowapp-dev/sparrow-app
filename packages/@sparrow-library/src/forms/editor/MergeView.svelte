@@ -6,7 +6,7 @@
   import { Compartment } from "@codemirror/state";
   import { Button, notifications } from "@sparrow/library/ui";
   import { createEventDispatcher } from "svelte";
-
+  import MergeViewNavigation from "./MergeViewNavigation.svelte";
   // ****************************** Props ******************************
 
   // For merge view
@@ -172,13 +172,11 @@
       }}
     ></Button>
 
-    <!-- <MergeViewNavigation
-      {mergeConf}
+    <MergeViewNavigation
       editorView={codeMirrorView}
       bind:isMergeViewEnabled
-      bind:newModifiedContent
-      bind:isMergeViewLoading
-    /> -->
+      onApplyChanges={applyChanges}
+    />
   </div>
 {/if}
 

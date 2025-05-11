@@ -13,7 +13,6 @@
   import {
     findMergeViewChanges,
     scrollToChange,
-    setupChangeNavigation,
     groupChanges,
   } from "./mergeViewUtils";
 
@@ -30,11 +29,11 @@
 
   export let editorView: EditorView | null = null;
   export let isMergeViewEnabled = false;
+  export let onApplyChanges: () => void = () => {}; // Callback to apply changes
 
   let totalChanges = 0;
   let currentChangeIndex = 0;
   let changes: MergeChange[] = [];
-  let cleanupFunction: (() => void) | null = null;
 
   // Function to detect and process all changes in the merge view
   function detectChanges() {
@@ -56,12 +55,7 @@
 
     if (changes.length > 0) {
       scrollToCurrentChange();
-    } else {
-      isMergeViewEnabled = false;
-      currentChangeIndex = 0;
-      changes = [];
-      totalChanges = 0;
-    }
+    } else onApplyChanges(); // Finally apply the changes done by user selection (accept/reject)
   }
 
   // Navigate to the next change
@@ -81,7 +75,6 @@
   // Scroll the editor to show the current change
   function scrollToCurrentChange() {
     if (!editorView || changes.length === 0) return;
-
     const change = changes[currentChangeIndex];
     scrollToChange(editorView, change);
   }
@@ -98,18 +91,6 @@
 
   // Setup editor and keyboard shortcuts
   onMount(() => {
-    if (editorView && isMergeViewEnabled) {
-      // Set up keyboard navigation and store the cleanup function
-      cleanupFunction = setupChangeNavigation(
-        editorView,
-        goToNextChange,
-        goToPreviousChange,
-      );
-
-      // Initial detection
-      setTimeout(detectChanges, 300);
-    }
-
     // Observe DOM changes to detect when merge view content is updated
     const observer = new MutationObserver(() => {
       if (isMergeViewEnabled && editorView) {
@@ -131,29 +112,7 @@
   });
 
   // Clean up keyboard handlers
-  onDestroy(() => {
-    if (cleanupFunction) {
-      cleanupFunction();
-    }
-  });
-
-  // Watch for merge view changes and re-initialize when enabled
-  $: if (isMergeViewEnabled && editorView) {
-    setTimeout(detectChanges, 300);
-
-    // If we previously cleaned up the key handlers, reinstall them
-    if (!cleanupFunction) {
-      cleanupFunction = setupChangeNavigation(
-        editorView,
-        goToNextChange,
-        goToPreviousChange,
-      );
-    }
-  } else if (!isMergeViewEnabled && cleanupFunction) {
-    // Clean up when merge view is disabled
-    cleanupFunction();
-    cleanupFunction = null;
-  }
+  onDestroy(() => {});
 </script>
 
 {#if isMergeViewEnabled}
