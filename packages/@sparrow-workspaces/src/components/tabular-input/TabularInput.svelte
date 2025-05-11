@@ -545,6 +545,10 @@
     if (event.target.checked) {
       handleBulkTextUpdate();
       diffBulkText = diffPairsToBulkText();
+    } else {
+      setTimeout(() => {
+        scrollToChange(changedPairIndices[0]);
+      }, 30);
     }
   };
 
@@ -641,7 +645,6 @@
   function goToNextChange(): void {
     if (totalChanges > 0) {
       currentChangeIndex = (currentChangeIndex + 1) % totalChanges;
-
       scrollToChange(changedPairIndices[currentChangeIndex]);
     }
   }
@@ -653,7 +656,6 @@
     if (totalChanges > 0) {
       currentChangeIndex =
         (currentChangeIndex - 1 + totalChanges) % totalChanges;
-
       scrollToChange(changedPairIndices[currentChangeIndex]);
     }
   }
@@ -997,32 +999,7 @@
               onClick={undoChanges}
             ></Button>
 
-            <!-- Navigation controls - Previous -->
-            <!-- <div class="diff-navigation">
-              <span class="diff-counter"
-                >{totalChanges === 0
-                  ? "0 of 0"
-                  : `${currentChangeIndex + 1} of ${totalChanges}`}</span
-              >
-              <button
-                class="diff-nav-btn"
-                disabled={totalChanges === 0}
-                on:click={goToPreviousChange}
-                title="Previous change"
-              >
-                ↑
-              </button>
-              <button
-                class="diff-nav-btn"
-                disabled={totalChanges === 0}
-                on:click={goToNextChange}
-                title="Next change"
-              >
-                ↓
-              </button>
-            </div> -->
-
-            <!-- Navigation controls - Old -->
+            <!-- MergeView Navigation controls - Old -->
             <div class="merge-view-navigation">
               <div class="merge-navigation-counter-wrapper">
                 <div class="merge-navigation-controls">

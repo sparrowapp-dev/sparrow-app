@@ -100,6 +100,62 @@ export const basicTheme = EditorView.theme({
   ".cm-activeLineGutter": {
     backgroundColor: "transparent",
   },
+  ".cm-changedLine":{
+    background: "var(--bg-ds-success-800) !important",
+  },
+  ".cm-changedText":{
+    background: "var(--bg-ds-success-700) !important",
+  },
+  ".cm-deletedChunk":{
+    backgroundColor: "var(--bg-ds-danger-800) !important",
+  },
+  ".cm-deletedText":{
+    backgroundColor: "var(--bg-ds-danger-700) !important",
+  },
+  ".cm-chunkButtons": {
+    display: "none",
+    // display: "flex",
+    backgroundColor: "#316CF6",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "2px",
+    margin: "0 5px 0 0"
+  },
+
+  ".cm-chunkButtons button[name='accept']": {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    position: "relative",
+    backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,<svg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M11.8639 0.656087C12.0533 0.857041 12.0439 1.17348 11.8429 1.36288L3.91309 8.83678C3.67573 9.0605 3.30311 9.05361 3.07417 8.82126L0.393838 6.10093C0.200027 5.90422 0.202372 5.58765 0.399074 5.39384C0.595777 5.20003 0.912351 5.20237 1.10616 5.39908L3.51192 7.84073L11.1571 0.635166C11.358 0.445766 11.6745 0.455133 11.8639 0.656087Z' fill='%23D8D8D9'/></svg>\")",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "calc(50% + 1.2px) calc(50% + 1px)", /* Shifted 1px to the right */
+    fontSize: "0",
+    backgroundSize: "12px 12px",
+    width: "20px",
+    height: "20px",
+    margin: "0"
+  },
+  ".cm-chunkButtons button[name='accept']:hover": {
+    // background: "#1859f1",
+  },
+  ".cm-chunkButtons button[name='reject']": {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    position: "relative",
+    backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,<svg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M0 0.416667C0 0.186548 0.183165 0 0.409111 0C0.635057 0 0.818221 0.186548 0.818221 0.416667V3.61885L3.41284 0.976311C4.69098 -0.325437 6.76325 -0.325437 8.04139 0.976311C9.31954 2.27806 9.31954 4.38861 8.04139 5.69036L3.92973 9.87796C3.76996 10.0407 3.51093 10.0407 3.35116 9.87796C3.19139 9.71524 3.19139 9.45142 3.35116 9.2887L7.46282 5.1011C8.42143 4.12479 8.42143 2.54188 7.46282 1.56557C6.50422 0.589256 4.95001 0.589256 3.99141 1.56557L1.43748 4.16667H4.50022C4.72616 4.16667 4.90933 4.35321 4.90933 4.58333C4.90933 4.81345 4.72616 5 4.50022 5H0.490933C0.219799 5 0 4.77614 0 4.5V0.416667Z' fill='%23D8D8D9'/></svg>\")",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "calc(50% + 1.2px) calc(50% + 1px)", /* Shifted 1px to the right */
+    fontSize: "0",
+    backgroundSize: "12px 12px",
+    width: "20px",
+    height: "20px",
+    margin: "0",
+  },
+  ".cm-chunkButtons button[name='reject']:hover": {
+    // background: "#1859f1",
+  },
   span: {
     fontFamily: EditorFont,
   },

@@ -7,14 +7,14 @@
   import { Button, notifications } from "@sparrow/library/ui";
   import { createEventDispatcher } from "svelte";
   import MergeViewNavigation from "./MergeViewNavigation.svelte";
-  // ****************************** Props ******************************
 
+  // ****************************** Props ******************************
   // For merge view
   export let mergeConf: Compartment;
   export let codeMirrorView: EditorView;
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
-  export let newModifiedContent: string; // New content to show in merge view
+  export let newModifiedContent: string; // New content to compare while in mergeView
   export let value: string;
   export let originalContent = value; // Store the original content for comparison
   let hasChanges = false;
