@@ -20,6 +20,7 @@ export { Sleep } from "./sleep";
 export { Base64Converter } from "./base64Converter";
 export { InitSavedRequestTab } from "./init-saved-request";
 export { StatusCode } from "./status-code";
+export { InitLLMAIRequestTab } from "./init-llm-ai-request-tab";
 export * from "./auth.helper";
 export * from "./common.helper";
 export * from "./conversion.helper";

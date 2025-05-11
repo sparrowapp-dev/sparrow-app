@@ -148,7 +148,7 @@ export default class CollectionsViewModel {
   private movedTabStartIndex = 0;
   private movedTabEndIndex = 0;
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Get the guest user state
@@ -392,6 +392,21 @@ export default class CollectionsViewModel {
     if (ws) {
       this.tabRepository.createTab(
         this.initTab.graphQl("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+    } else {
+      console.error("No active workspace found!");
+    }
+  };
+
+  /**
+   * Create graphql new tab with untracked id
+   */
+  private createLLMRequestNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    if (ws) {
+      this.tabRepository.createTab(
+        this.initTab.llm_ai("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
     } else {
@@ -1403,20 +1418,20 @@ export default class CollectionsViewModel {
   ) => {
     const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
     const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch: _collection.activeSync
-          ? _collection.currentBranch
-          : undefined,
-        source: _collection.activeSync ? "USER" : undefined,
-        items: {
-          name: socketIoTab.getValue().name,
-          type: CollectionItemTypeBaseEnum.SOCKETIO,
-          description: "",
-          socketio: {},
-        },
-      };
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync
+        ? _collection.currentBranch
+        : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: socketIoTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.SOCKETIO,
+        description: "",
+        socketio: {},
+      },
+    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1494,20 +1509,20 @@ export default class CollectionsViewModel {
   ) => {
     const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
     const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch: _collection.activeSync
-          ? _collection.currentBranch
-          : undefined,
-        source: _collection.activeSync ? "USER" : undefined,
-        items: {
-          name: graphqlTab.getValue().name,
-          type: CollectionItemTypeBaseEnum.GRAPHQL,
-          description: "",
-          graphql: {},
-        },
-      };
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync
+        ? _collection.currentBranch
+        : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: graphqlTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        description: "",
+        graphql: {},
+      },
+    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1832,30 +1847,30 @@ export default class CollectionsViewModel {
     const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
 
     const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch:
-          _collection.activeSync && _folder.source === "USER"
-            ? _collection.currentBranch
-            : undefined,
-        source:
-          _collection.activeSync && _folder.source === "USER"
-            ? _folder.source
-            : undefined,
-        folderId: _folder.id,
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch:
+        _collection.activeSync && _folder.source === "USER"
+          ? _collection.currentBranch
+          : undefined,
+      source:
+        _collection.activeSync && _folder.source === "USER"
+          ? _folder.source
+          : undefined,
+      folderId: _folder.id,
+      items: {
+        name: _folder.name,
+        type: CollectionItemTypeBaseEnum.FOLDER,
+        id: _folder.id,
         items: {
-          name: _folder.name,
-          type: CollectionItemTypeBaseEnum.FOLDER,
-          id: _folder.id,
-          items: {
-            name: socketIoTab.getValue().name,
-            type: CollectionItemTypeBaseEnum.SOCKETIO,
-            description: "",
-            socketio: {},
-          },
+          name: socketIoTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.SOCKETIO,
+          description: "",
+          socketio: {},
         },
-      };
+      },
+    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1941,30 +1956,30 @@ export default class CollectionsViewModel {
     const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
 
     const graphqlInFolderPayload: GraphqlRequestCreateUpdateInFolderPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch:
-          _collection.activeSync && _folder.source === "USER"
-            ? _collection.currentBranch
-            : undefined,
-        source:
-          _collection.activeSync && _folder.source === "USER"
-            ? _folder.source
-            : undefined,
-        folderId: _folder.id,
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch:
+        _collection.activeSync && _folder.source === "USER"
+          ? _collection.currentBranch
+          : undefined,
+      source:
+        _collection.activeSync && _folder.source === "USER"
+          ? _folder.source
+          : undefined,
+      folderId: _folder.id,
+      items: {
+        name: _folder.name,
+        type: CollectionItemTypeBaseEnum.FOLDER,
+        id: _folder.id,
         items: {
-          name: _folder.name,
-          type: CollectionItemTypeBaseEnum.FOLDER,
-          id: _folder.id,
-          items: {
-            name: graphqlTab.getValue().name,
-            type: CollectionItemTypeBaseEnum.GRAPHQL,
-            description: "",
-            graphql: {},
-          },
+          name: graphqlTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
+          description: "",
+          graphql: {},
         },
-      };
+      },
+    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -4376,6 +4391,8 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
+      case "LLM-Request-Tab":
+        await this.createLLMRequestNewTab();
         break;
     }
     return response;
@@ -5369,8 +5386,8 @@ export default class CollectionsViewModel {
         ...userSource,
         items: itemSource,
       } as
-        | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
-        | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
       baseUrl,
     );
 

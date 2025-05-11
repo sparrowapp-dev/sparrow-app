@@ -839,6 +839,12 @@
                       <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
                     </div>
                   </Motion>
+                {:else if $activeTab?.type === ItemType.LLM_AI_REQUEST}
+                  <Motion {...scaleMotionProps} let:motion>
+                    <div class="h-100" use:motion>
+                      <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
+                    </div>
+                  </Motion>
                 {:else if $activeTab?.type === ItemType.COLLECTION}
                   <Motion {...scaleMotionProps} let:motion>
                     <div class="h-100" use:motion>

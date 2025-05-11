@@ -36,6 +36,7 @@
     SocketIoIcon,
     GraphIcon,
     ChevronDoubleLeftRegular,
+    AISparkleRegularIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -310,6 +311,13 @@
             });
             showImportCurlPopup();
           },
+        },
+        {
+          name: `Add LLM Request`,
+          icon: AISparkleRegularIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "20px",
+          onclick: () => onItemCreated("LLM-Request-Tab", {}),
         },
         {
           name: "Add WebSocket",
