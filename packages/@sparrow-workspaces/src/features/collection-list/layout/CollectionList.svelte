@@ -213,7 +213,7 @@
     isHovered = false;
   };
 
-  const isMock = true;
+  const isMock = true; // check mock collection
   let showAddItemMenu = false;
   let collectionTabWrapper: HTMLElement;
   let noOfColumns = 180;
