@@ -218,6 +218,24 @@
       },
     },
     {
+      name: "Add block after",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowExportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "add-block-after");
+      },
+    },
+    {
+      name: "Add block before",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowImportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "add-block-before");
+      },
+    },
+    {
       name: "Delete",
       iconSize: "16px",
       iconColor: "var(--icon-ds-danger-300)",

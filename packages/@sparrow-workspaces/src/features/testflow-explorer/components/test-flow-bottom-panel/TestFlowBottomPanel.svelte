@@ -23,7 +23,7 @@
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import { Loader } from "@sparrow/library/ui";
+  import { Alert, Loader } from "@sparrow/library/ui";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
   import * as Sentry from "@sentry/svelte";
 
@@ -50,6 +50,7 @@
   let responseNavigation = "Response";
   let requestNavigation = "Parameters";
   let apiState;
+  let isAnyEnvVariableMissing = false;
 
   const handleResponseState = (_state) => {
     responseState = {
@@ -136,7 +137,7 @@
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
     } catch (err) {
-      Sentry.captureException(err); 
+      Sentry.captureException(err);
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
       responseLoader = false;
@@ -148,8 +149,30 @@
     responseBodyFormatter: "Pretty",
   };
 
+  const extractPlaceholders = (url: string): string[] => {
+    return [...url.matchAll(/{{\s*([\w.-]+)\s*}}/g)].map((match) => match[1]);
+  };
+
+  const checkEnvironmentVariableExistValue = (items: string[]): boolean => {
+    const filteredVariables = environmentVariables?.filtered;
+    if (!filteredVariables && items.length > 0) return true;
+    if (items.length === 0) return false;
+    for (let i = 0; i < items.length; i++) {
+      const matchingItem = filteredVariables.find(
+        (variable: any) => variable.key === items[i],
+      );
+      // If any item is not found, return true
+      if (!matchingItem) {
+        return true;
+      }
+    }
+    // All items matched and have valid values
+    return false;
+  };
+
   $: {
     if (selectedBlock) {
+      isAnyEnvVariableMissing = false;
       apiState = selectedBlock?.data?.requestData?.state;
       requestNavigation =
         selectedBlock?.data?.requestData?.state?.requestNavigation;
@@ -171,6 +194,12 @@
             .responseContentType as string;
         }
       }
+      const selectedEnvs = extractPlaceholders(
+        JSON.stringify(selectedBlock?.data?.requestData),
+      );
+
+      isAnyEnvVariableMissing =
+        checkEnvironmentVariableExistValue(selectedEnvs);
     }
   }
 </script>
@@ -249,6 +278,21 @@
       {handleOpenCurrentDynamicExpression}
       isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
+    {#if isAnyEnvVariableMissing}
+      <div class="" style="margin-top: 8px;">
+        <Alert
+          heading="Unresolved Environment Variables"
+          description="This request uses environment variables, but no environment is selected or the required variables are missing. Select or update the environment to ensure all variables are defined."
+          varient="warning"
+          ctaShow={false}
+          containerWidth={"1155px"}
+          closeIconRequired={true}
+          onClickClose={() => {
+            isAnyEnvVariableMissing = false;
+          }}
+        />
+      </div>
+    {/if}
   </div>
 
   <Splitpanes
