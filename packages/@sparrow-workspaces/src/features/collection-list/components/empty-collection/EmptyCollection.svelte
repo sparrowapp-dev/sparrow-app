@@ -21,6 +21,7 @@
   export let isGuestUser;
   export let currentWorkspace;
   export let onItemCreated;
+  export let isMockCollection = false;
 
   let currentWorkspaceId;
   currentWorkspace.subscribe((value) => {
@@ -36,15 +37,16 @@
         class="text-fs-12 text-center w-100"
         style="color: var(--text-ds-neutral-400)"
       >
-        Build your API workflow and organize it with collections. Add a
-        collection or import a cURL command to get started.
+        {isMockCollection
+          ? "Create mock collections to test and organize your API without a live server."
+          : "Build your API workflow and organize it with collections. Add a collection or import a cURL command to get started."}
       </p>
     {/if}
     <div class="w-100 mt-2" style="display: flex; flex-direction:column; ">
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <span class="mb-2">
           <Button
-            title="Add Collection"
+            title={isMockCollection ? "Add Mock Collection" : "Add Collection"}
             type="secondary"
             size="small"
             customWidth="100%"
@@ -64,15 +66,17 @@
         </span>
       {/if}
 
-      <Button
-        title="Import cURL"
-        onClick={() => {
-          onImportCurlPopup();
-        }}
-        type="primary"
-        size="small"
-        customWidth="100%"
-      />
+      {#if !isMockCollection}
+        <Button
+          title="Import cURL"
+          onClick={() => {
+            onImportCurlPopup();
+          }}
+          type="primary"
+          size="small"
+          customWidth="100%"
+        />
+      {/if}
     </div>
   </List>
 </div>

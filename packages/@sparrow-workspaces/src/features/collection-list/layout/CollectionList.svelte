@@ -6,7 +6,7 @@
   } from "@sparrow/library/assets";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { Button, List } from "@sparrow/library/ui";
+  import { Button, List, Options } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -212,7 +212,76 @@
   const handleMouseOut = () => {
     isHovered = false;
   };
+
+  const isMock = true; // check mock collection
+  let showAddItemMenu = false;
+  let collectionTabWrapper: HTMLElement;
+  let noOfColumns = 180;
+
+  const rightClickContextMenu = () => {
+    setTimeout(() => {
+      showAddItemMenu = !showAddItemMenu;
+    }, 100);
+  };
+
+  const handleSelectClick = (event: MouseEvent) => {
+    const selectElement = document.getElementById(`add-item-collection`);
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
+  };
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
+
+{#if showAddItemMenu}
+  <Options
+    xAxis={collectionTabWrapper.getBoundingClientRect().right + 5}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top - 0,
+      collectionTabWrapper.getBoundingClientRect().bottom + 2,
+    ]}
+    zIndex={701}
+    menuItems={[
+      {
+        onClick: () => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+          isExpandCollection.set(true);
+        },
+        displayText: "Add Collection",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+          isExpandCollection.set(true);
+        },
+        displayText: "Add Mock Collection",
+        disabled: false,
+        hidden: false,
+      },
+    ]}
+    {noOfColumns}
+  />
+{/if}
 
 <div
   style="height:100%; overflow:hidden"
@@ -256,6 +325,7 @@
       <div
         class=" d-flex align-items-center"
         style="width: calc(100% - 30px);  padding: 4px 2px; height:32px; "
+        bind:this={collectionTabWrapper}
       >
         <span style=" display: flex; margin-right:4px;">
           <Button
@@ -287,14 +357,15 @@
 
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
         <Tooltip
-          title={"Add Collection"}
+          title={"Add Options"}
           placement={"bottom-center"}
           distance={13}
-          show={isHovered}
+          show={!showAddItemMenu}
           zIndex={701}
         >
           <span style="display:flex;" class="add-icon-container">
             <Button
+              id="add-item-collection"
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
@@ -302,13 +373,7 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
-                isExpandCollection.set(true);
-                isGuestUser
-                  ? onItemCreated("collection", {
-                      workspaceId: currentWorkspaceId,
-                      collection: collectionList,
-                    })
-                  : showImportCollectionPopup();
+                rightClickContextMenu(e);
               }}
             />
           </span>
@@ -407,6 +472,40 @@
                 {/if}
               {/each}
             </List>
+            {#if isMock}
+              <hr style="margin: 0px; margin-left: 2rem !important;" />
+              <List
+                bind:scrollList
+                height={"auto"}
+                overflowY={"auto"}
+                classProps={"pe-0"}
+              >
+                {#each collectionListDocument as col}
+                  {#if isMock}
+                    <Collection
+                      isMockCollection={true}
+                      bind:userRole
+                      {isSharedWorkspace}
+                      {onItemCreated}
+                      {onItemDeleted}
+                      {onItemRenamed}
+                      {onItemOpened}
+                      {onBranchSwitched}
+                      {onRefetchCollection}
+                      {userRoleInWorkspace}
+                      {activeTabPath}
+                      {activeTabType}
+                      collection={col?.toMutableJSON()}
+                      {activeTabId}
+                      bind:isFirstCollectionExpand
+                      {isWebApp}
+                      {onCompareCollection}
+                      {onSyncCollection}
+                    />
+                  {/if}
+                {/each}
+              </List>
+            {/if}
           {/if}
         {:else}
           {#if searchData.length === 0}
@@ -434,6 +533,22 @@
           {/if}
         {/if}
       </div>
+      {#if !isMock}
+        <hr style="margin: 0.5rem; margn-left: 2rem !important;" />
+        <EmptyCollection
+          bind:userRole
+          isMockCollection={true}
+          {onItemCreated}
+          {collectionList}
+          {userRoleInWorkspace}
+          {currentWorkspace}
+          handleCreateApiRequest={() => onItemCreated("request", {})}
+          onImportCollectionPopup={showImportCollectionPopup}
+          isAddCollectionDisabled={isGuestUser}
+          onImportCurlPopup={showImportCurlPopup}
+          {isGuestUser}
+        />
+      {/if}
     {/if}
   </div>
 </div>
