@@ -298,7 +298,7 @@
     <!-- <div >
       <WorkspaceRegular />
     </div> -->
-    {#if $policyConfig.hubCreationAllowed}
+    {#if $policyConfig.enableLogin}
       <div class="no-drag" style="margin-left: 8px;" id="workspace-container">
         {#if isGuestUser}
           <div style="display: flex;">
