@@ -33,7 +33,10 @@
   let dispatcher;
 </script>
 
-<div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
+<div
+  class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative"
+  style="overflow: auto;"
+>
   <RequestBodyNavigator
     {method}
     {requestState}
