@@ -546,9 +546,11 @@
       handleBulkTextUpdate();
       diffBulkText = diffPairsToBulkText();
     } else {
-      setTimeout(() => {
-        scrollToChange(changedPairIndices[0]);
-      }, 30);
+      if (showMergeView) {
+        setTimeout(() => {
+          scrollToChange(changedPairIndices[currentChangeIndex]);
+        }, 30);
+      }
     }
   };
 

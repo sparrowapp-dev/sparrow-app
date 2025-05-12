@@ -315,7 +315,7 @@
   ) => {
     // For testing, remove while raising PR
     // target = "Parameters";
-    // target = "Headers";
+    target = "Headers";
     if (
       isMergeViewEnableForHeaders ||
       isMergeViewEnableForParams ||
