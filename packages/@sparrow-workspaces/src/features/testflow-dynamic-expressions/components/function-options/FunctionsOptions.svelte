@@ -17,11 +17,7 @@
     : data;
 
   const handleFunctionType = (functionItem: any) => {
-    if (
-      cursorPosition !== null &&
-      expression !== null &&
-      cursorPosition < expression.length
-    ) {
+    if (cursorPosition && cursorPosition < expression.length) {
       expression =
         expression.slice(0, cursorPosition) +
         functionItem.type +
