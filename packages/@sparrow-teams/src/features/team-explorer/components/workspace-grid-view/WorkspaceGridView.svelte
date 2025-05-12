@@ -16,6 +16,7 @@
     ChevronLeftRegular,
     ChevronRightRegular,
   } from "@sparrow/library/icons";
+  import { WorkspaceType } from "@sparrow/common/enums";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -48,6 +49,9 @@
 
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
+  export let selectedFilter;
+  
+
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -145,6 +149,38 @@
               {/if}
             </div>
           {/if} -->
+          {#if workspaces.length === 0}
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              {#if selectedFilter === WorkspaceType.PUBLIC}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+                >
+                  Public workspaces let you share your APIs and tools with the
+                </p>
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  community. Create one to start collaborating openly.
+                </p>
+              {:else}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+                >
+                  Welcome to Sparrow! Let's create your first workspace to
+                  unlock
+                </p>
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  powerful tools and bring your team together in one organized
+                  space.
+                </p>
+              {/if}
+            </div>
+          {/if}
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
               {onAddMember}

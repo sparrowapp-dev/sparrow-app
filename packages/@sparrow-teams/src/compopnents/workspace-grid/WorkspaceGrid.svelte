@@ -267,7 +267,7 @@
       >
         {workspace?.description ? workspace.description : "No summary added"}
       </p>
-      <hr style="color: var(--border-ds-surface-100);" />
+      <hr style="color: var(--border-ds-surface-50);" />
 
       <div class="d-flex justify-content-between">
         <p

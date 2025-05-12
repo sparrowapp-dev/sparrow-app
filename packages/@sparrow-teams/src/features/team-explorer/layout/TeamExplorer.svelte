@@ -30,7 +30,7 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
-
+  
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -131,7 +131,9 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
-  let selectedFilter = "All";
+
+  export let selectedFilter = "All";
+
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -533,6 +535,7 @@
                     bind:isWorkspaceCreationInProgress
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
+                    {selectedFilter}
                   />
                   <!--Enabled in next phase-->
                 {/if}
