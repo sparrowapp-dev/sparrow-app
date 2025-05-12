@@ -356,8 +356,9 @@
           displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -372,8 +373,9 @@
           displayText: "Add WebSocket",
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -388,8 +390,9 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -404,8 +407,9 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -615,45 +619,24 @@
             </Tooltip>
           {/if}
 
-          {#if isMockCollection}
-            <Tooltip
-              title={"More"}
-              placement={"bottom-center"}
-              zIndex={701}
-              distance={17}
-              show={!showMockMenu}
-            >
-              <span class="threedot-icon-container rounded d-flex">
-                <Button
-                  id={`show-more-folder-${explorer.id}`}
-                  size="extra-small"
-                  customWidth={"24px"}
-                  type="teritiary-regular"
-                  startIcon={MoreHorizontalRegular}
-                  onClick={rightClickContextMenuMock}
-                />
-              </span>
-            </Tooltip>
-          {:else}
-            <Tooltip
-              title={"More"}
-              placement={"bottom-center"}
-              zIndex={701}
-              distance={17}
-              show={!showMenu}
-            >
-              <span class="threedot-icon-container rounded d-flex">
-                <Button
-                  id={`show-more-folder-${explorer.id}`}
-                  size="extra-small"
-                  customWidth={"24px"}
-                  type="teritiary-regular"
-                  startIcon={MoreHorizontalRegular}
-                  onClick={rightClickContextMenu}
-                />
-              </span>
-            </Tooltip>
-          {/if}
+          <Tooltip
+            title={"More"}
+            placement={"bottom-center"}
+            zIndex={701}
+            distance={17}
+            show={!showMenu}
+          >
+            <span class="threedot-icon-container rounded d-flex">
+              <Button
+                id={`show-more-folder-${explorer.id}`}
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                startIcon={MoreHorizontalRegular}
+                onClick={rightClickContextMenu}
+              />
+            </span>
+          </Tooltip>
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
