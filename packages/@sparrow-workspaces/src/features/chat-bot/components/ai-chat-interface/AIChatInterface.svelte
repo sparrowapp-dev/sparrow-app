@@ -13,6 +13,7 @@
   import { Modal } from "@sparrow/library/ui";
   import { tick } from "svelte";
   import { isChatbotOpenInCurrTab } from "../../../../stores";
+  import { policyConfig } from "../../../../../../@sparrow-common/src/store/policyStore";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -95,7 +96,7 @@
   ></div>
 </Modal>
 
-{#if true}
+{#if $policyConfig.enableAIAssistance}
   <div class="ai-chat-panel h-100">
     <div
       class="d-flex flex-column h-100 chat-box"
