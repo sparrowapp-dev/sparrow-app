@@ -57,9 +57,10 @@ import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class TestflowExplorerPageViewModel {
-  private _tab = new BehaviorSubject<Partial<Tab>>({});
+ private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
@@ -1551,5 +1552,13 @@ export class TestflowExplorerPageViewModel {
         return testFlowDataMap;
       });
     }
+  };
+
+  /**
+   * @description - This function will redirect to the sparrow docs of testflow.
+   */
+  public redirectDocsTestflow = async () => {
+    await open(constants.DOCS_URL);
+    return;
   };
 }
