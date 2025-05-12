@@ -102,6 +102,7 @@
   let expand: boolean = false;
   let deleteLoader: boolean = false;
   let showMenu: boolean = false;
+  let showMockMenu: boolean = false;
   let isFolderPopup: boolean = false;
   let noOfColumns = 180;
   let isRenaming = false;
@@ -113,6 +114,7 @@
   let folderTabWrapper: HTMLElement;
 
   let verticalFolderLine = false;
+  export let isMockCollection = false;
 
   $: {
     if (explorer.type === "FOLDER") {
@@ -176,12 +178,19 @@
     }, 100);
   }
 
+  function rightClickContextMenuMock() {
+    setTimeout(() => {
+      showMockMenu = !showMockMenu;
+    }, 100);
+  }
+
   function handleSelectClick(event: MouseEvent) {
     const selectElement = document.getElementById(
       `show-more-folder-${explorer.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
+      showMockMenu = false;
     }
   }
 
@@ -417,6 +426,61 @@
     />
   {/if}
 
+  {#if showMockMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+    <Options
+      xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
+      yAxis={[
+        folderTabWrapper.getBoundingClientRect().top - 0,
+        folderTabWrapper.getBoundingClientRect().bottom + 5,
+      ]}
+      zIndex={500}
+      menuItems={[
+        {
+          onClick: () => {
+            expand = true;
+            if (expand) {
+              onItemOpened("folder", {
+                workspaceId: collection.workspaceId,
+                collection,
+                folder: explorer,
+              });
+            }
+          },
+          displayText: "Open Folder",
+          disabled: false,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            expand = false;
+            isRenaming = true;
+          },
+          displayText: "Rename Folder",
+          disabled: false,
+          // hidden:
+          //   !collection.activeSync ||
+          //   (explorer?.source === "USER" && collection.activeSync)
+          //     ? false
+          //     : true,
+          hidden: false,
+        },
+        {
+          onClick: () => {
+            isFolderPopup = true;
+          },
+          displayText: "Delete",
+          disabled: false,
+          hidden:
+            !collection.activeSync ||
+            (explorer?.source === "USER" && collection.activeSync)
+              ? false
+              : true,
+        },
+      ]}
+      {noOfColumns}
+    />
+  {/if}
+
   {#if explorer}
     {#if explorer.type === "FOLDER"}
       <div
@@ -551,24 +615,45 @@
             </Tooltip>
           {/if}
 
-          <Tooltip
-            title={"More"}
-            placement={"bottom-center"}
-            zIndex={701}
-            distance={17}
-            show={!showMenu}
-          >
-            <span class="threedot-icon-container rounded d-flex">
-              <Button
-                id={`show-more-folder-${explorer.id}`}
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-                startIcon={MoreHorizontalRegular}
-                onClick={rightClickContextMenu}
-              />
-            </span>
-          </Tooltip>
+          {#if isMockCollection}
+            <Tooltip
+              title={"More"}
+              placement={"bottom-center"}
+              zIndex={701}
+              distance={17}
+              show={!showMockMenu}
+            >
+              <span class="threedot-icon-container rounded d-flex">
+                <Button
+                  id={`show-more-folder-${explorer.id}`}
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  startIcon={MoreHorizontalRegular}
+                  onClick={rightClickContextMenuMock}
+                />
+              </span>
+            </Tooltip>
+          {:else}
+            <Tooltip
+              title={"More"}
+              placement={"bottom-center"}
+              zIndex={701}
+              distance={17}
+              show={!showMenu}
+            >
+              <span class="threedot-icon-container rounded d-flex">
+                <Button
+                  id={`show-more-folder-${explorer.id}`}
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  startIcon={MoreHorizontalRegular}
+                  onClick={rightClickContextMenu}
+                />
+              </span>
+            </Tooltip>
+          {/if}
         {/if}
       </div>
       <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">

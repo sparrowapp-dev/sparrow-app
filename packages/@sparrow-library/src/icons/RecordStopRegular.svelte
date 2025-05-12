@@ -5,7 +5,7 @@
 </script>
 
 <i
-  class="icon-ic_fluent_database_stack_16_regular"
+  class="icon-ic_fluent_record_stop_20_regular"
   style="font-size:{size}; color:{finalColor}; display: flex; justify-content:center; align-items:center;"
 ></i>
 

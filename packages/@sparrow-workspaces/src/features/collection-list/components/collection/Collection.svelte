@@ -69,6 +69,10 @@
     MoreHorizontalRegular,
     FolderAddRegular,
     ArrowSwapRegular,
+    RecordStopRegular,
+    PlayCircle,
+    SettingsRegular,
+    HistoryRegular,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -101,6 +105,7 @@
   let collectionTabWrapper: HTMLElement;
   let isEnableSyncButton = false;
   let isSyncing = false;
+  let showMockMenu: boolean = false;
 
   /**
    * Handle position of the context menu
@@ -108,6 +113,12 @@
   const rightClickContextMenu = () => {
     setTimeout(() => {
       showMenu = !showMenu;
+    }, 100);
+  };
+
+  const rightClickContextMenuMock = () => {
+    setTimeout(() => {
+      showMockMenu = !showMockMenu;
     }, 100);
   };
 
@@ -134,6 +145,7 @@
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
+      showMockMenu = false;
     }
   };
 
@@ -348,6 +360,11 @@
   onDestroy(() => {
     clearInterval(intervalId); // Clean-up to avoid memory leaks
   });
+
+  let isMockRunning = false;
+  const mockRunningStatus = () => {
+    isMockRunning = !isMockRunning;
+  };
 </script>
 
 <svelte:window
@@ -477,6 +494,75 @@
         displayText: "Set Auth",
         disabled: false,
         hidden: false,
+      },
+      {
+        onClick: () => {
+          isCollectionPopup = true;
+        },
+        displayText: "Delete",
+        disabled: false,
+        hidden: false,
+      },
+    ]}
+    {noOfColumns}
+  />
+{/if}
+
+{#if showMockMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+  <Options
+    xAxis={collection.activeSync
+      ? collectionTabWrapper.getBoundingClientRect().right - 115
+      : collectionTabWrapper.getBoundingClientRect().right - 30}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top + 20,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    zIndex={700}
+    menuItems={[
+      {
+        onClick: () =>
+          onItemOpened("collection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          }),
+        displayText: "Open Mock Collection",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          onItemCreated("folder", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add Folder",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          onItemCreated("requestCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: `Add Mock ${HttpRequestDefaultNameBaseEnum.NAME}`,
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          (isRenaming = true), setTimeout(() => inputField.focus(), 100);
+        },
+        displayText: "Rename Mock Collection",
+        disabled: false,
+        hidden: false,
+        // hidden:
+        //   !(collection?.activeSync && isBranchSynced) &&
+        //   !(collection?.activeSync && !isBranchSynced)
+        //     ? false
+        //     : true,
       },
       {
         onClick: () => {
@@ -655,7 +741,11 @@
   </button>
   {#if isMockCollection}
     <div style="display: flex;">
-      <Tag type="green" text={"Mock"} />
+      {#if isMockRunning}
+        <Tag type="green" text={"Mock"} />
+      {:else}
+        <Tag type="grey" text={"Mock"} />
+      {/if}
     </div>
   {/if}
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
@@ -667,49 +757,107 @@
       styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-      {#if !collection?.activeSync}
+      {#if isMockCollection}
+        {#if !collection?.activeSync}
+          <Tooltip
+            title={isMockRunning ? "Stop Mock" : "Run Mock"}
+            placement={"top-center"}
+            distance={13}
+            zIndex={701}
+          >
+            <span class="add-icon-container">
+              {#if isMockRunning}
+                <Button
+                  id={`add-item-collection-${collection.id}`}
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  onClick={() => {
+                    mockRunningStatus();
+                  }}
+                  startIcon={RecordStopRegular}
+                />
+              {:else}
+                <Button
+                  id={`add-item-collection-${collection.id}`}
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  onClick={() => {
+                    mockRunningStatus();
+                  }}
+                  startIcon={PlayCircle}
+                />
+              {/if}
+            </span>
+          </Tooltip>
+        {/if}
+
         <Tooltip
-          title={"Add Options"}
+          title={"More"}
           placement={"bottom-center"}
-          distance={13}
-          show={!showAddItemMenu}
+          distance={17}
           zIndex={701}
+          show={!showMockMenu}
         >
           <span class="add-icon-container">
             <Button
-              id={`add-item-collection-${collection.id}`}
+              id={`show-more-collection-${collection.id}`}
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
+              startIcon={MoreHorizontalRegular}
               onClick={(e) => {
-                rightClickContextMenu2(e);
+                rightClickContextMenuMock();
               }}
-              startIcon={AddRegular}
+            />
+          </span>
+        </Tooltip>
+      {:else}
+        {#if !collection?.activeSync}
+          <Tooltip
+            title={"Add Options"}
+            placement={"bottom-center"}
+            distance={13}
+            show={!showAddItemMenu}
+            zIndex={701}
+          >
+            <span class="add-icon-container">
+              <Button
+                id={`add-item-collection-${collection.id}`}
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                onClick={(e) => {
+                  rightClickContextMenu2(e);
+                }}
+                startIcon={AddRegular}
+              />
+            </span>
+          </Tooltip>
+        {/if}
+
+        <Tooltip
+          title={"More"}
+          placement={"bottom-center"}
+          distance={17}
+          zIndex={701}
+          show={!showMenu}
+        >
+          <span class="add-icon-container">
+            <Button
+              id={`show-more-collection-${collection.id}`}
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+              startIcon={MoreHorizontalRegular}
+              onClick={(e) => {
+                rightClickContextMenu();
+              }}
             />
           </span>
         </Tooltip>
       {/if}
-
-      <Tooltip
-        title={"More"}
-        placement={"bottom-center"}
-        distance={17}
-        zIndex={701}
-        show={!showMenu}
-      >
-        <span class="add-icon-container">
-          <Button
-            id={`show-more-collection-${collection.id}`}
-            size="extra-small"
-            customWidth={"24px"}
-            type="teritiary-regular"
-            startIcon={MoreHorizontalRegular}
-            onClick={(e) => {
-              rightClickContextMenu();
-            }}
-          />
-        </span>
-      </Tooltip>
     {/if}
 
     {#if collection?.activeSync && isSyncChangesAvailable && !isSyncing && !isSharedWorkspace}
@@ -778,6 +926,36 @@
           : 'var(--bg-ds-surface-100)'}"
       ></div>
     {/if}
+    {#if isMockCollection}
+      <div
+        class="box-line"
+        style="background-color: {verticalCollectionLine
+          ? 'var(--bg-ds-neutral-500)'
+          : 'var(--bg-ds-surface-100)'}"
+      ></div>
+      <div
+        style="height:32px; padding-left:68px; color: var(--text-ds-neutral-500)"
+        class="d-flex align-items-center text-ds-font-weight-semi-bold"
+      >
+        <div class="d-flex gap-2 text-ds-font-size-12">
+          <div class="d-flex align-items-center">
+            <SettingsRegular size="16px" />
+          </div>
+          <div>Configuration</div>
+        </div>
+      </div>
+      <div
+        style="height:32px; padding-left:68px; color: var(--text-ds-neutral-500)"
+        class="d-flex align-items-center text-ds-font-weight-semi-bold"
+      >
+        <div class="d-flex gap-2 text-ds-font-size-12">
+          <div class="d-flex align-items-center">
+            <HistoryRegular size="17px" />
+          </div>
+          <div>History</div>
+        </div>
+      </div>
+    {/if}
     <div class="">
       {#if isSyncChangesAvailable && isEnableSyncButton && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
         <div class="ps-5" style="height: 32px; ">
@@ -817,6 +995,7 @@
       {/if}
       {#each collection.items as explorer}
         <Folder
+          {isMockCollection}
           {userRole}
           {isSharedWorkspace}
           {onItemCreated}
