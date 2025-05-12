@@ -69,13 +69,13 @@
     MoreHorizontalRegular,
     FolderAddRegular,
     ArrowSwapRegular,
+    CircleSmallFilled,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import type { CollectionBaseInterface } from "@sparrow/common/types/workspace/collection-base";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
-  import CircleSmallFilled from "../../../../../../@sparrow-library/src/icons/CircleSmallFilled.svelte";
   import {
     activeSyncStore,
     updateActiveSyncStates,
