@@ -70,7 +70,7 @@
     FolderAddRegular,
     ArrowSwapRegular,
     RecordStopRegular,
-    PlayCircle,
+    PlayCircleRegular,
     SettingsRegular,
     HistoryRegular,
   } from "@sparrow/library/icons";
@@ -786,7 +786,7 @@
                   onClick={() => {
                     mockRunningStatus();
                   }}
-                  startIcon={PlayCircle}
+                  startIcon={PlayCircleRegular}
                 />
               {/if}
             </span>
