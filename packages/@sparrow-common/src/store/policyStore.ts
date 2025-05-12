@@ -29,7 +29,7 @@ export async function loadPolicyConfig() {
     policyConfig.set({
       enableLogin: config.enable_login,
       enableAIAssistance: config.enable_ai_assistance,
-      restrictPublicWorkspaceCreation: config.restric_public_workspace_creation,
+      restrictPublicWorkspaceCreation: config.restrict_public_workspace_creation,
       disableActiveSync: config.disable_active_sync,
       hubCreationAllowed: config.hub_creation_allowed
     });

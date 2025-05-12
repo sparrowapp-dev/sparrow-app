@@ -316,7 +316,7 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
         let mut config = PolicyConfig {
             enable_login: true,
             enable_ai_assistance: true,
-            restric_public_workspace_creation: false,
+            restrict_public_workspace_creation: false,
             disable_active_sync: false,
             hub_creation_allowed: true,
         };
@@ -341,7 +341,7 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
 
             // Workspace settings
             if let Ok(workspace_key) = main_key.open_subkey("Workspaces") {
-                config.restric_public_workspace_creation = workspace_key
+                config.restrict_public_workspace_creation = workspace_key
                     .get_value::<u32, _>("RestrictPublicWorkspaceCreation")
                     .unwrap_or(0)
                     == 1;
@@ -373,7 +373,7 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
         Ok(PolicyConfig {
             enable_login: true,
             enable_ai_assistance: true,
-            restric_public_workspace_creation: false,
+            restrict_public_workspace_creation: false,
             disable_active_sync: false,
             hub_creation_allowed: true,
         })
@@ -385,7 +385,7 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
 struct PolicyConfig {
     enable_login: bool,
     enable_ai_assistance: bool,
-    restric_public_workspace_creation: bool,
+    restrict_public_workspace_creation: bool,
     disable_active_sync: bool,
     hub_creation_allowed: bool,
 }
