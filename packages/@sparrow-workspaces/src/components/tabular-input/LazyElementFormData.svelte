@@ -122,7 +122,7 @@
   >
     {#if pairs.length - 1 != index}
       {#if isInputBoxEditable}
-        {#if dynamicExpression && element.type === "text"}
+        {#if dynamicExpression && element.type !== "file"}
           <Tooltip
             title="Insert dynamic"
             placement="bottom-center"
@@ -155,12 +155,10 @@
         >
           <button
             class="button-container d-flex align-items-center justify-content-center border-0
-                {isInputBoxEditable &&
-            element.type == 'text' &&
-            element.value == ''
+          {isInputBoxEditable && element.type !== 'file' && element.value === ''
               ? 'opacity-1'
               : 'opacity-0 pe-none'}"
-            style="width:16px; height:16px; padding:2px; background:transparent;"
+            style="width: 16px; height: 16px; padding: 2px; background: transparent;"
             on:click={() => uploadFormFile(index)}
           >
             <AttachRegular size="16px" color="var(--icon-ds-neutral-100)" />

@@ -70,15 +70,15 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    if (update.docChanged) {
+    if (update.docChanged || update.selectionSet) {
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
-      if (!isAutoChange) {
-        // only hits for input, blur etc type of events.
-        const content = update.state.doc.toString(); // Get the new content
-        cursorPosition = update.state.selection.main.head;
-        dispatch("change", content); // Dispatch the new content to parent.
+      const content = update.state.doc.toString();
+      const cursor = update.state.selection.main.head;
+      cursorPosition = cursor;
+      if (!isAutoChange && update.docChanged) {
+        dispatch("change", content);
       }
     }
   });
