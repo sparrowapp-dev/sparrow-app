@@ -445,7 +445,7 @@
                   >
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center filter-button ${
                         selectedFilter === "All"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -457,7 +457,7 @@
 
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
                         selectedFilter === "Private"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -469,7 +469,7 @@
                     </span>
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
                         selectedFilter === "Public"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -654,6 +654,11 @@
 {/if}
 
 <style>
+  .filter-button:hover {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+  }
+
   .custom-tooltip {
     --bs-tooltip-bg: var(--bs-primary);
   }
