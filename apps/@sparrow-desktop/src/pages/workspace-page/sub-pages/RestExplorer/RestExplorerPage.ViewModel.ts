@@ -737,7 +737,6 @@ class RestExplorerViewModel {
    * @returns A promise that resolves when the update is complete.
    */
   public updateAIModel = async (_modelName: string) => {
-    console.log("model name", _modelName);
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.ai.aiModelName = _modelName;
     this.tab = progressiveTab;
