@@ -285,7 +285,7 @@
           description="This request uses environment variables, but no environment is selected or the required variables are missing. Select or update the environment to ensure all variables are defined."
           varient="warning"
           ctaShow={false}
-          containerWidth={"1155px"}
+          containerWidth={""}
           closeIconRequired={true}
           onClickClose={() => {
             isAnyEnvVariableMissing = false;
