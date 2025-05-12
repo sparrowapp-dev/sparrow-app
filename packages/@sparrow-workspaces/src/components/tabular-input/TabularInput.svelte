@@ -701,9 +701,11 @@
             <!-- isCheckBoxEditable={element.diffType !== "deleted"} -->
           {/each}
 
-          <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+          <div
+            class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns"
+          >
             <Button
-              title={"Keep the Changes!!"}
+              title={"Keep the Changes"}
               size={"small"}
               type={"primary"}
               onClick={applyChanges}
@@ -893,5 +895,10 @@
   :global(.diff-row.diff-deleted) {
     /* background-color: #3d1514 !important; */
     background-color: var(--bg-ds-danger-800) !important;
+  }
+
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 4px;
   }
 </style>

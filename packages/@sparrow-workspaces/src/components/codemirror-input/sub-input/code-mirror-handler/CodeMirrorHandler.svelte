@@ -573,7 +573,9 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
-    dispatcher = codeMirrorView;
+    setTimeout(() => {
+      dispatcher = codeMirrorView;
+    }, 100);
   }
   onMount(() => {
     const initializeAsync = () => {

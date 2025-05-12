@@ -592,7 +592,9 @@
       {/each}
 
       <!-- Diff view action buttons -->
-      <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+      <div
+        class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns"
+      >
         <Button
           title="Keep the Changes"
           size={"small"}
@@ -655,5 +657,10 @@
     transition:
       opacity 0.1s ease-in-out,
       visibility 0.1s;
+  }
+
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 4px;
   }
 </style>

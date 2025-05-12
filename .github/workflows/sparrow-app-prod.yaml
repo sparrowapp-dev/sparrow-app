@@ -1,4 +1,4 @@
-name: Production Release
+name: Production Desktop App Release
 
 on:
   push:

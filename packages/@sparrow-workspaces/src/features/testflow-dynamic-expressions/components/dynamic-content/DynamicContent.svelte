@@ -36,6 +36,13 @@
   };
 
   const handleSelectVariable = (requestVariable: any) => {
+    if (cursorPosition) {
+      expression =
+        expression.slice(0, cursorPosition) +
+        `{{${requestVariable.key}}}` +
+        expression.slice(cursorPosition);
+      return;
+    }
     expression = `${expression}{{${requestVariable.key}}}`;
   };
 

@@ -4,6 +4,7 @@
   import { FunctionOptionData } from "../../utils";
 
   export let expression: string;
+  export let cursorPosition: number | null;
   let data = FunctionOptionData;
   let hoveredFunctionType: string | null = null;
   let searchFunction = "";
@@ -16,7 +17,13 @@
     : data;
 
   const handleFunctionType = (functionItem: any) => {
-    if (expression.endsWith(".")) {
+    if (cursorPosition && cursorPosition < expression.length) {
+      expression =
+        expression.slice(0, cursorPosition) +
+        functionItem.type +
+        expression.slice(cursorPosition);
+      return;
+    } else if (expression.endsWith(".")) {
       expression += functionItem.type;
     } else {
       expression += "." + functionItem.type;
