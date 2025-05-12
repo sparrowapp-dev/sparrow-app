@@ -92,6 +92,7 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { policyConfig } from "../../../../../@sparrow-common/src/store/policyStore";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -651,7 +652,9 @@
                           {onUpdateEnvironment}
                           {environmentVariables}
                           {isWebApp}
-                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
+                          bind:isMergeViewEnabled={
+                            isMergeViewEnableForRequestBody
+                          }
                           bind:isMergeViewLoading
                           bind:newModifiedContent
                           {mergeViewRequestDatasetType}
@@ -748,31 +751,34 @@
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
                               />
-
-                              <div class="d-flex">
-                                <!-- AI debugging trigger button -->
-                                <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
-                                <div
-                                  class="d-flex"
-                                  style="height: 32px;
+                              {#if $policyConfig.enableAIAssistance}
+                                <div class="d-flex">
+                                  <!-- AI debugging trigger button -->
+                                  <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
+                                  <div
+                                    class="d-flex"
+                                    style="height: 32px;
                                   {isAIDebugBtnEnable
-                                    ? 'border: 2px solid #316CF6;'
-                                    : ''} border-radius: 4px; background-color: {isAIDebugBtnEnable
-                                    ? '#272935;'
-                                    : '#14181f'}"
-                                >
-                                  <Button
-                                    title="Help me debug"
-                                    size={"small"}
-                                    type={"secondary"}
-                                    startIcon={SparkleFilled}
-                                    disable={!isAIDebugBtnEnable}
-                                    onClick={handleOnClickAIDebug}
-                                  ></Button>
-                                </div>
+                                      ? 'border: 2px solid #316CF6;'
+                                      : ''} border-radius: 4px; background-color: {isAIDebugBtnEnable
+                                      ? '#272935;'
+                                      : '#14181f'}"
+                                  >
+                                    <Button
+                                      title="Help me debug"
+                                      size={"small"}
+                                      type={"secondary"}
+                                      startIcon={SparkleFilled}
+                                      disable={!isAIDebugBtnEnable}
+                                      onClick={handleOnClickAIDebug}
+                                    ></Button>
+                                  </div>
 
-                                <ResponseStatus response={storeData.response} />
-                              </div>
+                                  <ResponseStatus
+                                    response={storeData.response}
+                                  />
+                                </div>
+                              {/if}
                             </div>
                             <div
                               class="flex-grow-1 d-flex flex-column"
@@ -821,7 +827,7 @@
             {/if}
           </Pane>
           <!-- AI Chatbot Interface -->
-          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive}
+          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive && $policyConfig.enableAIAssistance}
             <Pane
               class="position-relative bg-transparent"
               minSize={minSizePct}
@@ -943,7 +949,7 @@
 </Modal>
 
 <!-- ChatBot Toggler -->
-{#if !isGuestUser}
+{#if !isGuestUser && $policyConfig.enableAIAssistance}
   <div
     style="position: fixed;
         bottom: 28px;

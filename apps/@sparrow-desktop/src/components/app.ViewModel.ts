@@ -229,7 +229,7 @@ export class AppViewModel {
         policySettings = value;
       })();
 
-      if (policySettings?.disableSignIn) {
+      if (!policySettings?.enableLogin) {
         console.error({
           title: "Access Denied",
           content: "Sign-in has been disabled by organization policy"
@@ -260,7 +260,7 @@ export class AppViewModel {
       }
 
       // Check if sign-in is disabled when trying to log in
-      if (currentUserAccessToken && policySettings.disableSignIn) {
+      if (currentUserAccessToken && !policySettings.enableLogin) {
         console.error({
           title: "Access Denied",
           content: "Sign-in has been disabled by organization policy"
@@ -269,7 +269,7 @@ export class AppViewModel {
       }
 
       // Check if workspace switching is disabled when trying to switch workspaces
-      if (workspaceId && policySettings?.disableWorkspace) {
+      if (workspaceId && policySettings?.hubCreationAllowed) {
         console.error({
           title: "Access Denied",
           content: "Workspace access has been disabled by organization policy"

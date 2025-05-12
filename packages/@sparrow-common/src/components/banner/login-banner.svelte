@@ -9,39 +9,39 @@
 </script>
 
 {#if isVisible}
-  <div class="ticker-container">
-    <div class="ticker-container-div">
-      <div style="margin-right: 16px;">
-        <RocketIcon />
-      </div>
+  {#if $policyConfig.enableLogin}
+    <div class="ticker-container">
+      <div class="ticker-container-div">
+        <div style="margin-right: 16px;">
+          <RocketIcon />
+        </div>
 
-      <div>
-        {#if !$policyConfig.disableSignIn}
+        <div>
           <span class="txt-dark text-fs-14">Enjoying Sparrow?</span>
           <span class="txt-light text-fs-14"
             >Unlock the full power by creating an account or signing in.</span
           >
-        {/if}
-      </div>
+        </div>
 
-      <div class="buttons">
-        {#if !$policyConfig.disableSignIn}
-          <button class="click-btn" on:click={onClick}>
-            <span> Create an Account or Sign In</span>
-          </button>
-        {/if}
+        <div class="buttons">
+          {#if $policyConfig.enableLogin}
+            <button class="click-btn" on:click={onClick}>
+              <span> Create an Account or Sign In</span>
+            </button>
+          {/if}
+        </div>
+      </div>
+      <div class="cross-btn-div">
+        <button class="cross-btn" on:click={onClose}>
+          <CrossIcon
+            height={"16px"}
+            width={"12px"}
+            color={"var(--icon-secondary-100)"}
+          />
+        </button>
       </div>
     </div>
-    <div class="cross-btn-div">
-      <button class="cross-btn" on:click={onClose}>
-        <CrossIcon
-          height={"16px"}
-          width={"12px"}
-          color={"var(--icon-secondary-100)"}
-        />
-      </button>
-    </div>
-  </div>
+  {/if}
 {/if}
 
 <style>

@@ -2,11 +2,12 @@
 import { writable } from 'svelte/store';
 import { invoke } from "@tauri-apps/api/core";
 
-
 export const policyConfig = writable({
-  disableSignIn: false,
-  disableWorkspace: false,
+  enableLogin: true,
+  enableAIAssistance: true,
+  restrictPublicWorkspaceCreation: false,
   disableActiveSync: false,
+  hubCreationAllowed: true
   // Other policy settings
 });
 
@@ -15,10 +16,12 @@ export async function loadPolicyConfig() {
   try {
     const config = await invoke('get_policy_config');
     policyConfig.set({
-      disableSignIn: config.disable_sign_in,
-      disableWorkspace: config.disable_workspace,
-      disableActiveSync: config.disable_active_sync
-      // Map other properties
+      enableLogin: config.enable_login,
+      enableAIAssistance: config.enable_ai_assistance,
+      restrictPublicWorkspaceCreation: config.restric_public_workspace_creation,
+      disableActiveSync: config.disable_active_sync,
+      hubCreationAllowed: config.hub_creation_allowed
+      // Map other properties as needed
     });
   } catch (error) {
     console.error('Failed to load policy configuration:', error);

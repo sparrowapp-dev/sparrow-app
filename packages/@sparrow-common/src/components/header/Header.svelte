@@ -298,7 +298,7 @@
     <!-- <div >
       <WorkspaceRegular />
     </div> -->
-    {#if !$policyConfig.disableWorkspace}
+    {#if $policyConfig.hubCreationAllowed}
       <div class="no-drag" style="margin-left: 8px;" id="workspace-container">
         {#if isGuestUser}
           <div style="display: flex;">
@@ -347,7 +347,7 @@
                   </div>
                 </div>
 
-                {#if !$policyConfig.disableSignIn}
+                {#if $policyConfig.enableLogin}
                   <Button
                     type="primary"
                     title="Create an Account or Sign In"
@@ -505,7 +505,7 @@
     class="d-flex align-items-center no-drag"
     style="position: relative; display:flex; gap: 16px;"
   >
-    {#if isGuestUser && isLoginBannerActive === false && !$policyConfig.disableWorkspace}
+    {#if isGuestUser && isLoginBannerActive === false && $policyConfig.hubCreationAllowed}
       <Tooltip
         placement="bottom-center"
         title={"You are using Sparrow Edge"}

@@ -309,43 +309,73 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
         use winreg::RegKey;
 
         // Path to your app's policy in the registry
-        // Typically under HKLM\Software\Policies\YourCompany\YourApp
         let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
         let policy_path = "Software\\Policies\\Sparrow";
 
-        // Try to open the key
-        match hklm.open_subkey(policy_path) {
-            Ok(key) => {
-                // Read specific policy value
-                let disable_sign_in: u32 = key.get_value("DisableSignIn").unwrap_or(0);
-                let disable_workspace: u32 = key.get_value("DisableWorkspace").unwrap_or(0);
-                let disable_active_sync: u32 = key.get_value("DisableActiveSync").unwrap_or(0);
+        // Default configuration
+        let mut config = PolicyConfig {
+            enable_login: true,
+            enable_ai_assistance: true,
+            restric_public_workspace_creation: false,
+            disable_active_sync: false,
+            hub_creation_allowed: true,
+        };
 
-                Ok(PolicyConfig {
-                    disable_sign_in: disable_sign_in == 1,
-                    disable_workspace: disable_workspace == 1,
-                    disable_active_sync: disable_active_sync == 1,
-                    // Add other policy settings as needed
-                })
+        // Try to open the main policy key
+        if let Ok(main_key) = hklm.open_subkey(policy_path) {
+            // Read from subkeys if they exist
+
+            // Login settings
+            if let Ok(login_key) = main_key.open_subkey("Login") {
+                config.enable_login =
+                    login_key.get_value::<u32, _>("EnableLogin").unwrap_or(1) == 1;
             }
-            Err(_) => {
-                // If key doesn't exist, return default values
-                Ok(PolicyConfig {
-                    disable_sign_in: false,
-                    disable_workspace: false,
-                    disable_active_sync: false,
-                })
+
+            // AI Assistance settings
+            if let Ok(ai_key) = main_key.open_subkey("AI") {
+                config.enable_ai_assistance = ai_key
+                    .get_value::<u32, _>("EnableAIAssistance")
+                    .unwrap_or(1)
+                    == 1;
+            }
+
+            // Workspace settings
+            if let Ok(workspace_key) = main_key.open_subkey("Workspaces") {
+                config.restric_public_workspace_creation = workspace_key
+                    .get_value::<u32, _>("RestrictPublicWorkspaceCreation")
+                    .unwrap_or(0)
+                    == 1;
+            }
+
+            // Sync settings
+            if let Ok(sync_key) = main_key.open_subkey("Sync") {
+                config.disable_active_sync = sync_key
+                    .get_value::<u32, _>("DisableActiveSync")
+                    .unwrap_or(0)
+                    == 1;
+            }
+
+            // HubSpace Setting
+            if let Ok(login_key) = main_key.open_subkey("Hubs") {
+                config.hub_creation_allowed = login_key
+                    .get_value::<u32, _>("HubCreationAllowed")
+                    .unwrap_or(1)
+                    == 1;
             }
         }
+
+        Ok(config)
     }
 
     // For non-Windows platforms, return default values
     #[cfg(not(target_os = "windows"))]
     {
         Ok(PolicyConfig {
-            disable_sign_in: false,
-            disable_workspace: false,
-            disable_active_sync: false, // Add other default policy settings
+            enable_login: true,
+            enable_ai_assistance: true,
+            restric_public_workspace_creation: false,
+            disable_active_sync: false,
+            hub_creation_allowed: true,
         })
     }
 }
@@ -353,9 +383,11 @@ fn get_policy_config() -> Result<PolicyConfig, String> {
 // Define your policy configuration struct
 #[derive(serde::Serialize)]
 struct PolicyConfig {
-    disable_sign_in: bool,
-    disable_workspace: bool,
+    enable_login: bool,
+    enable_ai_assistance: bool,
+    restric_public_workspace_creation: bool,
     disable_active_sync: bool,
+    hub_creation_allowed: bool,
 }
 
 #[tauri::command]
