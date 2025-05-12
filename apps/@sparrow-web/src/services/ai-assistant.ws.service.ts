@@ -348,10 +348,6 @@ export class AiAssistantWebSocketService {
       activity
     };
 
-    console.debug("Sending message:", message);
-    // return true;
-
-
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send message");
       return false;
