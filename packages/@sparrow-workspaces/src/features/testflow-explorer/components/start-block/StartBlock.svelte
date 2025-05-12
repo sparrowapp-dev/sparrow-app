@@ -154,6 +154,6 @@
     align-content: center;
   }
   :global(.svelte-flow__handle) {
-    pointer-events: none !important;
+    //pointer-events: none !important;
   }
 </style>

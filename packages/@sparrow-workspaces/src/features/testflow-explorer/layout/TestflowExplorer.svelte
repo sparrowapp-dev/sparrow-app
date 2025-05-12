@@ -5,6 +5,7 @@
     Background,
     type Node,
     type NodeTypes,
+    type EdgeTypes,
   } from "@xyflow/svelte";
 
   import {
@@ -23,6 +24,7 @@
     ResponseHeaders,
     TestFlowName,
     SaveTestflow,
+    Edge,
   } from "../components";
   import {
     RequestDatasetEnum,
@@ -1003,6 +1005,7 @@
         res.push({
           id: dbEdges[i].id,
           source: dbEdges[i].source,
+          type: "edge",
           target: dbEdges[i].target,
           deletable: isEdgeDeletable,
         });
@@ -1034,6 +1037,10 @@
     startBlock: StartBlock,
     requestBlock: RequestBlock,
   } as unknown as NodeTypes;
+
+  const edgeTypes = {
+    edge: Edge,
+  } as unknown as EdgeTypes;
 
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
@@ -1384,6 +1391,11 @@
   // };
 
   let isDynamicExpressionModalOpen = false;
+
+  function handleConnect(params) {
+    debugger;
+    // edges.update((eds) => {});
+  }
 </script>
 
 <div
@@ -1500,7 +1512,13 @@
     on:click={focusDiv}
     style="flex:1; overflow:auto; outline: none; position:realtive;"
   >
-    <SvelteFlow {nodes} {edges} {nodeTypes}>
+    <SvelteFlow
+      {nodes}
+      {edges}
+      {nodeTypes}
+      {edgeTypes}
+      on:connect={(e) => handleConnect(e.detail)}
+    >
       <Background
         bgColor={"var(--bg-ds-surface-900)"}
         patternColor={"var(--bg-ds-surface-500)"}
@@ -1778,6 +1796,13 @@
 <style>
   :global(.svelte-flow__attribution) {
     display: none;
+  }
+
+  :global(.svelte-flow__edge)::before {
+    content: "";
+    height: 20px;
+    width: 20px;
+    background-color: red;
   }
   .loader {
     color: var(--bg-primary-300);
