@@ -100,7 +100,7 @@
 
     {#if workspaceType === WorkspaceType.PRIVATE}
       <div class="flex flex-column" style="gap:8px;">
-        <span class="textarea-header">Make you Workspace public</span>
+        <span class="textarea-header">Make your Workspace public</span>
         <div
           class="w-50 mb-3"
           style="color: var(--text-ds-neutral-400); font-size: 12px;"

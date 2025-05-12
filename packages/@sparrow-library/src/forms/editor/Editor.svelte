@@ -340,9 +340,11 @@
         codeMirrorView.dispatch({
           effects: EditorView.scrollIntoView(cursorPos),
         });
-      }, 0);
+      }, 100);
     }
-    dispatcher = codeMirrorView;
+    setTimeout(() => {
+      dispatcher = codeMirrorView;
+    }, 100);
   }
 
   function destroyCodeMirrorEditor() {
@@ -545,7 +547,7 @@
 />
 
 {#if hasChanges}
-  <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+  <div class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns">
     <Button
       title={"Keep the Changes"}
       size={"small"}
@@ -576,6 +578,11 @@
   }
 
   /* Style for customizing the css for codemirror merge view */
+
+  .merge-view-act-btns {
+    position: sticky; /* fix the position so that it will not go down with scroll down */
+    bottom: 4px;
+  }
 
   /* styling for added row */
   .merge-view :global(.cm-changedLine) {

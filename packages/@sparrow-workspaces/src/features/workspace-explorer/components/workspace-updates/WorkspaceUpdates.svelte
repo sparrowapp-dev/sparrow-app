@@ -97,7 +97,7 @@
             <div class="d-flex">
               <div class="me-2">
                 <Avatar
-                  letter={update.detailsUpdatedBy.split("")[0][0]}
+                  letter={update.detailsUpdatedBy?.split("")[0]?.[0] || ""}
                   size="extra-small"
                   type="letter"
                   bgColor="background-color: var(--bg-ds-surface-600);"
