@@ -139,7 +139,7 @@
         >
           <div class="custom-tooltip-wrapper">
             <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
-              <span>Open AI 4.0</span>
+              <span>GPT-4o</span>
               <Button
                 type="teritiary-regular"
                 startIcon={LockClosedRegular}
@@ -149,7 +149,7 @@
             <span class="custom-tooltip">Upgrade to use additional models.</span
             >
           </div>
-          <div class="custom-tooltip-wrapper">
+          <!-- <div class="custom-tooltip-wrapper">
             <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
               <span>Azure AI</span>
               <Button
@@ -160,7 +160,7 @@
             </div>
             <span class="custom-tooltip">Upgrade to use additional models.</span
             >
-          </div>
+          </div> -->
         </div>
       </Select>
     </div>
