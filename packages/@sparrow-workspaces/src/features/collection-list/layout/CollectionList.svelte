@@ -34,6 +34,7 @@
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import { isExpandCollection } from "../../../stores/recent-left-panel";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -481,7 +482,7 @@
                 classProps={"pe-0"}
               >
                 {#each collectionListDocument as col}
-                  {#if isMock}
+                  {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
                     <Collection
                       isMockCollection={true}
                       bind:userRole
