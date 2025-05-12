@@ -731,6 +731,19 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
+  /**
+   * Updates the AI model name in the request property of the current tab.
+   *
+   * @param _threadId - The new AI model name to set.
+   * @returns A promise that resolves when the update is complete.
+   */
+  public updateAIModel = async (_modelName: string) => {
+    console.log("model name", _modelName);
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.aiModelName = _modelName;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
 
   /**
    * Updates the AI conversations in the request property of the current tab.
