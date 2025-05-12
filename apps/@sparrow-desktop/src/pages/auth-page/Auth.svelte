@@ -80,6 +80,7 @@
   let isTokenValidationLoading = false;
 
   let isPressed = false;
+  console.log("registry read");
   console.log($policyConfig.enableLogin);
 </script>
 

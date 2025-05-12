@@ -9,7 +9,7 @@
     PeopleFilled,
     PeopleRegular,
   } from "@sparrow/library/icons";
-
+  import { policyConfig } from "../../../../../@sparrow-common/src/store/policyStore";
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
@@ -17,7 +17,6 @@
   export let disableNewInviteTag;
   export let modifyTeam;
   export let threeDotIconDisable = false;
-
 </script>
 
 <!--Teams list-->
@@ -31,20 +30,22 @@
     >
       Sparrow Hubs
     </h6>
-    <div>
-      <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
-        <Button
-          type="primary"
-          size="small"
-          customWidth={"28px"}
-          startIcon={AddRegular}
-          disable={isGuestUser}
-          onClick={() => {
-            isCreateTeamModalOpen = true;
-          }}
-        />
-      </Tooltip>
-    </div>
+    {#if $policyConfig.hubCreationAllowed}
+      <div>
+        <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
+          <Button
+            type="primary"
+            size="small"
+            customWidth={"28px"}
+            startIcon={AddRegular}
+            disable={isGuestUser}
+            onClick={() => {
+              isCreateTeamModalOpen = true;
+            }}
+          />
+        </Tooltip>
+      </div>
+    {/if}
   </div>
   <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
     <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-1"}>
