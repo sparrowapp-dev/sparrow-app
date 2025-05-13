@@ -182,7 +182,7 @@
 </Modal>
 
 <Modal
-  title={"Make it public"}
+  title={"Publish Workspace"}
   type={"dark"}
   width={"40%"}
   zIndex={1000}

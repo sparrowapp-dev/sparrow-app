@@ -60,7 +60,7 @@
         </span>
         <Input
           width={"410px"}
-          placeholder={""}
+          placeholder={"Enter your workspace name"}
           type={"text"}
           value={workspaceName}
           size="small"
@@ -149,7 +149,7 @@
   }
   textarea:focus,
   textarea:hover {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-neutral-300) !important;
   }
   .textarea-header {
     font-size: 12px;

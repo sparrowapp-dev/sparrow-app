@@ -207,7 +207,7 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.id,
     );
     testflowServer = testflowServer?.toMutableJSON();
-    // console.log(progressiveTab, testflowServer); will be used for debugging in some time
+    const tabServer = new TestflowTabAdapter().unadapt(progressiveTab);
 
     if (!testflowServer) {
       result = false;
@@ -222,13 +222,13 @@ export class TestflowExplorerPageViewModel {
     else if (
       !this.compareArray.init(
         testflowServer.nodes,
-        progressiveTab.property.testflow.nodes,
+        tabServer.nodes,
       )
     ) {
       result = false;
     }
 
-    // nodes
+    // edges
     else if (
       !this.compareArray.init(
         testflowServer.edges,
@@ -681,8 +681,7 @@ export class TestflowExplorerPageViewModel {
             }
             return testFlowDataMap;
           });
-        } catch (error) {
-          Sentry.captureException(error); 
+        } catch (error) { 
           if (error?.name === "AbortError") {
             break;
           }
@@ -945,7 +944,6 @@ export class TestflowExplorerPageViewModel {
       }
       status = resData.status;
     } catch (error) {
-      Sentry.captureException(error);
       resData = {
         body: "",
         headers: [],

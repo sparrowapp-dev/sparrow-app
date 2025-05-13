@@ -52,6 +52,11 @@ export enum CollectionAuthTypeBaseEnum {
   BASIC_AUTH = "Basic Auth",
 }
 
+export enum CollectionTypeBaseEnum {
+  MOCK = "MOCK",
+  STANDARD = "STANDARD",
+}
+
 export interface CollectionAuthBaseInterface {
   bearerToken: string;
   basicAuth: {
@@ -71,6 +76,8 @@ export interface CollectionBaseInterface {
   name: string;
   totalRequests: number;
   description: string;
+  collectionType?: CollectionTypeBaseEnum;
+  mockCollectionUrl?: string;
   items: CollectionItemBaseInterface[];
   uuid?: string;
   activeSync?: boolean;

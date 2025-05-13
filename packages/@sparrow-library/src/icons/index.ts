@@ -242,3 +242,7 @@ export { default as ArrowEnterRegular } from "./ArrowEnterRegular.svelte";
 export { default as ArrowExitRegular} from "./ArrowExitRegular.svelte";
 export { default as DismissCircleFilled } from "./DismissCircleFilled.svelte";
 export { default as AddCircleRegular } from "./AddCircleRegular.svelte";
+export { default as DatabaseStackRegular } from "./DatabaseStackRegular.svelte";
+export { default as RecordStopRegular } from "./RecordStopRegular.svelte";
+export { default as PlayCircleRegular } from "./PlayCircleRegular.svelte";
+export { default as HistoryRegular } from "./HistoryRegular.svelte";

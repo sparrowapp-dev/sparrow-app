@@ -1156,9 +1156,12 @@
       const nodeToDelete = _nodes.find((n) => n.id === idToDelete);
       let nameToCheck = nodeToDelete?.data?.requestData?.name;
       if (nameToCheck) {
-        nameToCheck = nameToCheck.replace(/\s+/g, "_");
-        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g; // Matches [*$[ ... ]$*]
-        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g; // Matches $$Delete_Pet.response.headers
+        nameToCheck = nameToCheck
+          .replace(/^\//, "_")
+          .replace(/\//g, "_")
+          .replace(/\s+/g, "_");
+        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
+        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
         for (const otherNode of _nodes) {
           if (otherNode.id === idToDelete) continue;
           const stringified = JSON.stringify(

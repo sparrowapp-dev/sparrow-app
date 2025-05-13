@@ -30,7 +30,7 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
-
+  
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -131,7 +131,9 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+
   let selectedFilter = "All";
+
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -365,7 +367,7 @@
                 </p>
               {/if}
               <Button
-                title={`Invite`}
+                title={`Invite collaborators`}
                 type={"secondary"}
                 startIcon={PeopleRegular}
                 onClick={() => {
@@ -445,7 +447,7 @@
                   >
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center filter-button ${
                         selectedFilter === "All"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -457,7 +459,7 @@
 
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
                         selectedFilter === "Private"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -469,7 +471,7 @@
                     </span>
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
                         selectedFilter === "Public"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -484,11 +486,11 @@
                     <Search
                       variant={"primary"}
                       id="search-input"
-                      size="medium"
+                      size="small"
                       placeholder="Search workspaces in {openTeam?.name}"
                       on:input={handleSearchInput}
                       bind:value={searchQuery}
-                      customWidth={"450px"}
+                      customWidth={"320px"}
                     />
                   </div>
                 </div>
@@ -533,6 +535,7 @@
                     bind:isWorkspaceCreationInProgress
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
+                    {selectedFilter}
                   />
                   <!--Enabled in next phase-->
                 {/if}
@@ -654,6 +657,11 @@
 {/if}
 
 <style>
+  .filter-button:hover {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+  }
+
   .custom-tooltip {
     --bs-tooltip-bg: var(--bs-primary);
   }
