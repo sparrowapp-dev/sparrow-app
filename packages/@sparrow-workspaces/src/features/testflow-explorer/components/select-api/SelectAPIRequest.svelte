@@ -277,11 +277,13 @@
         <div style="display: flex; align-items: center; gap: 6px;">
           <span
             class="request-icon text-{getMethodStyle(method)}"
-            style="font-size: 9px; font-weight: 600; text-align: center;"
+            style="font-size: 9px; font-weight: 600; text-align: center; color:var(--text-ds-success-300); margin-left:4px;"
           >
             GET
           </span>
-          <span class="select-txt">Sample API</span>
+          <span class="select-txt" style="color:var(--text-ds-neutral-50);"
+            >Sample API</span
+          >
         </div>
       {:else if (name || method) && !isOpen}
         <div
@@ -328,6 +330,7 @@
     style="overflow:auto; display: {isOpen
       ? 'block'
       : 'none'}; position:absolute"
+    id="dropdown-request-items"
   >
     {#if !selectApiName}
       {#if selectedCollection}

@@ -1,49 +1,90 @@
-<script>
-  import { CrossIcon } from "@sparrow/library/assets";
+<script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { PulseCircle } from "@sparrow/common/components";
+  import { Button } from "@sparrow/library/ui";
 
-  export let pulsePosition = { top: "0px", left: "0px" };
-  export let targetId;
+  export let targetIds: string[] = [];
   export let title = "";
   export let description = "";
-  export let tipPosition = "top-left";
-  export let onNext;
-  export let onClose;
-  export let isPuleCircleRequired = true;
-
+  export let additionLeftValue = 0;
+  export let additionTopValue = 0;
+  export let additionWidthValue = 0;
+  export let additionHeightValue = 0;
+  export let onNext: () => void;
+  export let onClose: () => void;
+  export let rightButtonName = "Close";
+  export let CardNumber = 0;
+  export let totalCards = 7;
   export let isLastStep = false;
+  export let shouldDelay = false;
 
   let top = 0;
   let left = 0;
-  let targetElement;
 
-  // Close function handler
-  function handleClose() {
-    if (onClose) onClose();
+  let containerTopX = 0;
+  let containerLeftX = 0;
+  let containerWidth = 0;
+  let containerHeight = 0;
+
+  function handleClose(): void {
+    onClose?.();
   }
 
-  // Next function handler
-  function handleNext() {
+  function handleNext(event: MouseEvent): void {
     event.stopPropagation();
-    if (onNext) onNext();
+    onNext?.();
   }
 
-  // Find the target element's position and set the popup accordingly
-  function updatePosition() {
-    if (targetId) {
-      targetElement = document.getElementById(targetId);
-      if (targetElement) {
-        const rect = targetElement.getBoundingClientRect();
-        top = rect.top + window.scrollY;
-        left = rect.left + window.scrollX;
-      }
-    }
+  function updatePosition(): void {
+    if (!targetIds.length) return;
+
+    const rects = targetIds
+      .map((id) => document.getElementById(id))
+      .filter(Boolean)
+      .map((el) => el!.getBoundingClientRect());
+
+    if (!rects.length) return;
+
+    const scrollY = window.scrollY;
+    const scrollX = window.scrollX;
+
+    const topValues = rects.map((r) => r.top + scrollY);
+    const leftValues = rects.map((r) => r.left + scrollX);
+    const rightValues = rects.map((r) => r.right + scrollX);
+    const bottomValues = rects.map((r) => r.bottom + scrollY);
+
+    const minTop = Math.min(...topValues);
+    const minLeft = Math.min(...leftValues);
+    const maxRight = Math.max(...rightValues);
+    const maxBottom = Math.max(...bottomValues);
+
+    containerTopX = minTop;
+    containerLeftX = minLeft;
+    containerWidth = maxRight - minLeft;
+    containerHeight = maxBottom - minTop;
+
+    document.documentElement.style.setProperty(
+      "--containerTopX",
+      `${containerTopX + additionTopValue}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--containerLeftX",
+      `${containerLeftX + additionLeftValue}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--containerWidth",
+      `${containerWidth + additionWidthValue}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--containerHeight",
+      `${containerHeight + additionHeightValue}px`,
+    );
+
+    top = containerTopX + additionTopValue;
+    left = containerLeftX + additionLeftValue;
   }
 
-  // Run the position update logic when the component mounts
   onMount(() => {
-    updatePosition();
+    shouldDelay ? setTimeout(updatePosition, 100) : updatePosition();
     window.addEventListener("resize", updatePosition);
   });
 
@@ -52,52 +93,52 @@
   });
 </script>
 
-<!-- Overlay to block user interaction -->
+<!-- Overlay elements -->
 <div class="overlay"></div>
+<div class="overlay-top"></div>
+<div class="overlay-left"></div>
+<div class="overlay-right"></div>
+<div class="overlay-bottom"></div>
 
-<!-- Popup positioned based on the target element -->
-<div class="popup p-4" style="top: {top}px; left: {left}px;">
-  {#if isPuleCircleRequired}
-    <PulseCircle {pulsePosition} />
-  {/if}
-
-  <div class="tip {tipPosition}"></div>
-
-  <!-- Close button (X) -->
-  <div class="close-icon" on:click={handleClose}>
-    <CrossIcon
-      height={"11px"}
-      width={"11px"}
-      color={"var(--icon-tertiary-100)"}
-    />
+<!-- Main tour container -->
+<div class="tour-container">
+  <div class="py-1 px-2">
+    <div class="title-name-text">{title}</div>
+    <div class="description-content-text">{description}</div>
   </div>
 
-  <!-- Title and content -->
-  <h2
-    class="text-fs-16"
-    style="font-weight: 500; color:var(--text-primary-300);"
+  <div
+    class={`d-flex ${
+      rightButtonName === "" || CardNumber > 0
+        ? "justify-content-between"
+        : "justify-content-end"
+    } px-2`}
+    style="margin-top: 8px;"
   >
-    {title}
-  </h2>
-  <p
-    class="text-fs-13"
-    style="line-height: 19.5px; font-weight:400; color:var(--text-secondary-100);"
-  >
-    {@html description}
-  </p>
+    <div class="d-flex justify-content-center align-items-center">
+      {#if rightButtonName === "" || CardNumber > 0}
+        <p class="guide-card-text" style="margin: 0;">
+          {CardNumber}/{totalCards}
+        </p>
+      {/if}
+    </div>
 
-  <!-- Next/Done button -->
-  <div class="d-flex justify-content-end">
-    <button
-      class=" mt-2 rounded-1 text-fs-12"
-      style="font-weight:500; border: none; background-color:#2A2C3C; padding:7px 10px;"
-      on:click={handleNext}
-      >{#if isLastStep}
-        Done
-      {:else}
-        Next
-      {/if}</button
-    >
+    <div class="d-flex justify-content-center align-items-center gap-1">
+      {#if !isLastStep}
+        <Button
+          type="outline-secondary"
+          size="small"
+          title="Dismiss"
+          onClick={handleClose}
+        />
+      {/if}
+      <Button
+        type="primary"
+        size="small"
+        title={isLastStep ? rightButtonName : "Next"}
+        onClick={handleNext}
+      />
+    </div>
   </div>
 </div>
 
@@ -108,111 +149,76 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* Dim background */
-    opacity: 50%;
+    z-index: 100000;
+  }
+
+  .overlay-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: var(--containerTopX);
+    background: rgba(0, 0, 0, 0.65);
     z-index: 10000;
   }
 
-  .popup {
-    position: absolute;
-    background-color: #1c1d2b;
+  .overlay-left {
+    position: fixed;
+    top: var(--containerTopX);
+    left: 0;
+    width: var(--containerLeftX);
+    height: var(--containerHeight);
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+  }
+
+  .overlay-right {
+    position: fixed;
+    top: var(--containerTopX);
+    left: calc(var(--containerLeftX) + var(--containerWidth));
+    width: calc(100vw - var(--containerLeftX) - var(--containerWidth));
+    height: var(--containerHeight);
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+  }
+
+  .overlay-bottom {
+    position: fixed;
+    top: calc(var(--containerTopX) + var(--containerHeight));
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--containerTopX) - var(--containerHeight));
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+  }
+
+  .tour-container {
+    position: fixed;
+    background-color: var(--bg-ds-surface-500);
+    width: 352px;
     border-radius: 8px;
-    padding: 16px;
-    max-width: 300px;
-    width: 300px;
-    font-family: Arial, sans-serif;
+    padding: 12px;
     z-index: 100000;
-    border: 0.3px solid var(--border-tertiary-190);
   }
 
-  .popup h2 {
-    margin: 0;
-    font-size: 18px;
-    color: var(--text-primary-300);
+  .title-name-text {
+    color: var(--text-ds-neutral-50);
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    text-align: left;
   }
 
-  .popup p {
-    margin: 8px 0;
+  .description-content-text {
+    color: var(--text-ds-neutral-300);
+    font-weight: 400;
+    font-size: 12px;
+    text-align: left;
   }
 
-  .popup .close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-  }
-
-  .popup .tip {
-    position: absolute;
-    width: 19px;
-    height: 19px;
-
-    background-color: #1c1d2b;
-  }
-
-  /* Tip positions */
-  .tip.top-left {
-    top: -10px;
-    left: 25px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(45deg);
-  }
-
-  .tip.top-right {
-    top: -10px;
-    right: 30px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(45deg);
-  }
-
-  .tip.bottom-left {
-    bottom: -10px;
-    left: 25px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(225deg);
-  }
-
-  .tip.bottom-right {
-    bottom: -10px;
-    right: 25px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(225deg);
-  }
-
-  /* New Tip Positions */
-  .tip.left-top {
-    top: 25px;
-    left: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(314deg);
-  }
-
-  .tip.left-bottom {
-    bottom: 25px;
-    left: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(314deg);
-  }
-
-  .tip.right-top {
-    top: 25px;
-    right: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(135deg);
-  }
-
-  .tip.right-bottom {
-    bottom: 25px;
-    right: -10px;
-    border-left: 0.3px solid var(--border-tertiary-190);
-    border-top: 0.3px solid var(--border-tertiary-190);
-    transform: rotate(135deg);
+  .guide-card-text {
+    color: var(--text-ds-neutral-300);
+    font-weight: 400;
+    font-size: 12px;
   }
 </style>

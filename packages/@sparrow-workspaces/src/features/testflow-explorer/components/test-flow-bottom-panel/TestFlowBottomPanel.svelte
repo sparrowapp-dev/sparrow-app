@@ -26,6 +26,8 @@
   import { Alert, Loader } from "@sparrow/library/ui";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
   import * as Sentry from "@sentry/svelte";
+  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
+  import { emptyRequest } from "../../utils";
 
   export let selectedBlock;
   export let onClose;
@@ -194,6 +196,11 @@
             .responseContentType as string;
         }
       }
+      if ($currentStep === 7 && $isTestFlowTourGuideOpen) {
+        selectedNodeResponse = emptyRequest;
+        responseState.responseBodyLanguage = selectedNodeResponse?.response
+          .responseContentType as string;
+      }
       const selectedEnvs = extractPlaceholders(
         JSON.stringify(selectedBlock?.data?.requestData),
       );
@@ -225,15 +232,15 @@
       style={`border: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; border-bottom: none;`}
     >
       <div style="display: flex; flex-direction: row;">
-        {#if !selectedNodeResponse || selectedNodeResponse?.response?.status === ""}
-          <ArrowSwapRegular
-            size={"16px"}
-            color={"var(--icon-ds-neutral-200)"}
-          />
-        {:else if selectedNodeResponse?.response?.status?.startsWith("2")}
+        {#if selectedNodeResponse?.response?.status?.startsWith("2") || ($currentStep > 6 && $isTestFlowTourGuideOpen)}
           <CheckmarkCircleRegular
             size="14px"
             color={"var(--icon-ds-success-400)"}
+          />
+        {:else if !selectedNodeResponse || selectedNodeResponse?.response?.status === ""}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
           />
         {:else}
           <ErrorCircleRegular size="14px" color={"var(--icon-ds-danger-300)"} />
