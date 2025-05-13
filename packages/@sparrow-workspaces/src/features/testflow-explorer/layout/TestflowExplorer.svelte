@@ -1442,11 +1442,6 @@
 
   let isDynamicExpressionModalOpen = false;
 
-  function handleConnect(params) {
-    debugger;
-    // edges.update((eds) => {});
-  }
-
   const deleteEdges = (_source: string, _target: string) => {
     edges.update((_edges) => {
       const filteredEdges = _edges.filter((edge) => {
@@ -1576,13 +1571,7 @@
     style="flex:1; overflow:auto; outline: none; position:realtive;"
   >
     <SvelteFlowProvider>
-      <SvelteFlow
-        {nodes}
-        {edges}
-        {nodeTypes}
-        {edgeTypes}
-        on:connect={(e) => handleConnect(e.detail)}
-      >
+      <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes}>
         <Background
           bgColor={"var(--bg-ds-surface-900)"}
           patternColor={"var(--bg-ds-surface-500)"}
@@ -1863,12 +1852,6 @@
     display: none;
   }
 
-  :global(.svelte-flow__edge)::before {
-    content: "";
-    height: 20px;
-    width: 20px;
-    background-color: red;
-  }
   .loader {
     color: var(--bg-primary-300);
     width: 2px;
