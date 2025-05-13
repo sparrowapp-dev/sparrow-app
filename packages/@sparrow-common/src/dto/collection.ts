@@ -1,3 +1,5 @@
+import type { CollectionTypeBaseEnum } from "../types/workspace/collection-base";
+
 export interface CreateDirectoryPostBody {
   name?: string;
   description?: string;
@@ -7,6 +9,7 @@ export interface CreateCollectionPostBody {
   name: string;
   workspaceId: string;
   description: string;
+  collectionType?: CollectionTypeBaseEnum;
 }
 
 export interface UpdateCollectionName {

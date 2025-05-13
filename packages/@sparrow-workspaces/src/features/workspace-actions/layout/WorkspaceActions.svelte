@@ -299,14 +299,10 @@
           iconColor: "var(--icon-secondary-130)",
           iconSize: "13px",
           onclick: () => {
-            if (isGuestUser) {
-              onItemCreated("collection", {
-                workspaceId: currentWorkspaceId,
-                collection: collectionList,
-              });
-            } else {
-              showImportCollectionPopup();
-            }
+            onItemCreated("mockCollection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
             isExpandCollection.set(true);
           },
         },
@@ -411,14 +407,10 @@
           iconColor: "var(--icon-secondary-130)",
           iconSize: "13px",
           onclick: () => {
-            if (isGuestUser) {
-              onItemCreated("collection", {
-                workspaceId: currentWorkspaceId,
-                collection: collectionList,
-              });
-            } else {
-              showImportCollectionPopup();
-            }
+            onItemCreated("mockCollection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
             isExpandCollection.set(true);
           },
         },
