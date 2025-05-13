@@ -1,6 +1,7 @@
 import {
     LLM_AI_Request_Auth_Type_Base_Enum,
     LLMProviderEnum,
+    type AIConfig,
     type AIModelVariant
 
 } from "./llm-ai-request-base";
@@ -12,9 +13,9 @@ import { CollectionRequestAddToBaseEnum } from "./collection-base";
 //                   LLM AI Request Interface
 ///////////////////////////////////////////////////////////////////
 export enum LLM_AI_RequestSectionEnum {
-    SYSTEM_PROMPT = "Sytem Prompt",
+    SYSTEM_PROMPT = "System Prompt",
     AUTHORIZATION = "Authorization",
-    CONFIGURATIONS = "Configurations",
+    AI_MODAL_CONFIGURATIONS = "Configurations",
 }
 
 export enum MessageTypeEnum {
@@ -100,14 +101,12 @@ export interface AIModelVariantWrapper {
     AI_Model_Variant: AIModelVariant;
 }
 
-interface LLMAISectionEnum {
-    auth: "Authorization";
-    systemPrompt: "System Prompt";
-    ai_configurations: "Configurations";
+export interface AISystemPromptWrapper {
+    SystemPrompt: string;
 }
 
-export interface LLMNavigationWrapper {
-    requestNavigation: LLMAISectionEnum;
+export interface AIConfigurationsWrapper {
+    Configurations: AIConfig;
 }
 
 export interface ResponseStatusWrapper {
@@ -200,6 +199,8 @@ export interface LLM_AI_Request
     extends
     AIModelProviderWrapper,
     AIModelVariantWrapper,
+    AISystemPromptWrapper,
+    AIConfigurationsWrapper,
     StateWrapper,
     AuthWrapper,
     AiWrapper { }

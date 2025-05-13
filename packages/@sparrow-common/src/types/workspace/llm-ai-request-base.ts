@@ -68,6 +68,7 @@ export enum GoogleModelEnum {
 // — OpenAI GPT family
 export enum OpenAIModelEnum {
     GPT4 = "gpt-4",
+    GPT4O = "gpt-4o",
     GPT4_Turbo = "gpt-4-turbo",
     GPT4O_Mini = "gpt-4o-mini",
     GPT3_5_Turbo = "gpt-3.5-turbo",
@@ -90,7 +91,7 @@ export type AIModelVariant =
     | DeepSeekModelEnum;
 
 ///////////////////////////////////////////////////////////////
-//              LLM AI Sytem Prompt Base Interface
+//              LLM AI System Prompt Base Interface
 ///////////////////////////////////////////////////////////////
 export type systemPrompt = {
     name: string;

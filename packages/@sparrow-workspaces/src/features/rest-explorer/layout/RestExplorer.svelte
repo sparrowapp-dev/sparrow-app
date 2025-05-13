@@ -489,6 +489,10 @@
       else isAIDebugBtnEnable = false;
     }
   }
+
+  setTimeout(() => {
+    console.log("rest tab data :>> ", $tab);
+  }, 3000);
 </script>
 
 {#if $tab.tabId}

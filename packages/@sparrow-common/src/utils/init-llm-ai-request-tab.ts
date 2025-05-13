@@ -12,7 +12,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { LLM_AI_Request_Auth_Type_Base_Enum } from "../types/workspace/llm-ai-request-base";
+import { LLM_AI_Request_Auth_Type_Base_Enum, LLMProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/llm-ai-request-base";
 import { LLM_AI_RequestSectionEnum } from "../types/workspace/llm-ai-request-tab";
 class InitLLMAIRequestTab {
     private _tab: Tab;
@@ -34,8 +34,10 @@ class InitLLMAIRequestTab {
             activeSync: false,
             property: {
                 llm_ai_request: {
-                    ai_model: "",
-                    systemPrompt: "",
+                    AI_Model_Provider: LLMProviderEnum.OpenAI,
+                    AI_Model_Variant: OpenAIModelEnum.GPT4O,
+                    SystemPrompt: "",
+                    Configurations: {},
                     auth: {
                         bearerToken: "",
                         basicAuth: {
@@ -45,20 +47,13 @@ class InitLLMAIRequestTab {
                         apiKey: {
                             authKey: "",
                             authValue: "",
-                            addTo: CollectionRequestAddToBaseEnum.HEADER,
+                            addTo: CollectionRequestAddToBaseEnum.HEADER, // ToDo (remove while pushing): This "addTo" needs to removed, because api key handling is done from backend so on frontend no need to decided headers or params
                         },
                     },
                     ai: {
                         prompt: "",
                         conversations: [],
                         threadId: "",
-                    },
-                    response: {
-                        headers: [],
-                        status: "",
-                        body: "",
-                        time: 0,
-                        size: 0,
                     },
                     state: {
                         LLM_AI_AuthNavigation: LLM_AI_Request_Auth_Type_Base_Enum.NO_AUTH,
@@ -108,41 +103,43 @@ class InitLLMAIRequestTab {
     }
 
     // change these ???
-    public updateAIModel(_url: string) {
-        if (_url && this._tab.property.request) {
-            this._tab.property.request.url = _url;
+    public updateAIModelProvider(_modalProviderName: LLMProviderEnum) {
+        if (_modalProviderName && this._tab.property.llm_ai_request) {
+            this._tab.property.llm_ai_request.AI_Model_Provider = _modalProviderName;
         }
     }
-    public updateAIModelVariant(_method: RequestMethodEnum) {
-        if (_method && this._tab.property.request) {
-            this._tab.property.request.method = _method;
+    public updateAIModelVariant(_modalVariantName: AIModelVariant) {
+        if (_modalVariantName && this._tab.property.llm_ai_request) {
+            this._tab.property.llm_ai_request.AI_Model_Variant = _modalVariantName;
         }
     }
     public updateAuth(_auth: Auth) {
-        if (_auth && this._tab.property.request) {
-            this._tab.property.request.auth = _auth;
+        if (_auth && this._tab.property.llm_ai_request) {
+            this._tab.property.llm_ai_request.auth = _auth;
         }
     }
-    public updateAIConfigurations(_headers: KeyValueChecked[]) {
-        if (_headers && this._tab.property.request) {
-            this._tab.property.request.headers = _headers;
-        }
-    }
+
+    // ToDo: Method to update AI modal configurations
+    // public updateAIConfigurations(_headers: KeyValueChecked[]) {
+    //     if (_headers && this._tab.property.llm_ai_request) {
+    //         this._tab.property.llm_ai_request.Configurations = _headers;
+    //     }
+    // }
 
     public updateIsSave(_isSave: boolean) {
         this._tab.isSaved = _isSave;
     }
     public updateState(_state: StatePartial) {
-        if (this._tab.property.request) {
-            this._tab.property.request.state = {
-                ...this._tab.property.request.state,
+        if (this._tab.property.llm_ai_request) {
+            this._tab.property.llm_ai_request.state = {
+                ...this._tab.property.llm_ai_request.state,
                 ..._state,
             };
         }
     }
     public updateChatbotState(_isActive: boolean) {
-        if (this._tab.property.request?.state) {
-            this._tab.property.request.state.isChatbotActive = _isActive;
+        if (this._tab.property.llm_ai_request?.state) {
+            this._tab.property.llm_ai_request.state.isChatbotActive = _isActive;
         }
     }
 }

@@ -459,164 +459,6 @@ class RestExplorerViewModel {
   };
 
   /**
-   * Saves saved http request
-   * @param componentData - refers overall saved request tab data.
-   * @returns newly created saved request id.
-   */
-  private saveSavedRequest = async (componentData: Tab): Promise<string> => {
-    const { folderId, collectionId, workspaceId, requestId } =
-      componentData.path;
-    let userSource = {};
-    if (workspaceId && collectionId && requestId) {
-      const requestSavedTabAdapter = new RequestSavedTabAdapter();
-      const unadaptedRequest = requestSavedTabAdapter.unadapt(componentData);
-      /**
-       * handle request at collection level
-       */
-      const _collection = await this.readCollection(collectionId);
-      if (_collection?.activeSync) {
-        userSource = {
-          currentBranch: _collection?.currentBranch,
-          source: "USER",
-        };
-      }
-      let isGuestUser;
-      isGuestUserActive.subscribe((value) => {
-        isGuestUser = value;
-      });
-
-      if (isGuestUser == true) {
-        const savedRequestId = uuidv4();
-        const savedRequestData = {
-          id: savedRequestId,
-          name: componentData.name,
-          description: componentData.description,
-          type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
-          requestResponse: unadaptedRequest,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        if (folderId) {
-          await this.collectionRepository.addSavedRequestInFolder(
-            collectionId,
-            folderId,
-            requestId,
-            savedRequestData,
-          );
-        } else {
-          await this.collectionRepository.addSavedRequestInCollection(
-            collectionId,
-            requestId,
-            savedRequestData,
-          );
-        }
-        notifications.success("Response saved successfully.");
-        return savedRequestId || "";
-      }
-      const baseUrl = await this.constructBaseUrl(workspaceId);
-      const res = await this.collectionService.createSavedRequestInCollection(
-        {
-          collectionId: collectionId,
-          workspaceId: workspaceId,
-          requestId: requestId,
-          folderId: folderId,
-          ...userSource,
-          items: {
-            name: componentData.name,
-            description: componentData.description,
-            type: CollectionItemTypeBaseEnum.SAVED_REQUEST,
-            requestResponse: unadaptedRequest,
-          },
-        },
-        baseUrl,
-      );
-      if (res.isSuccessful) {
-        if (folderId) {
-          this.collectionRepository.addSavedRequestInFolder(
-            collectionId,
-            folderId,
-            requestId,
-            res.data.data,
-          );
-        } else {
-          this.collectionRepository.addSavedRequestInCollection(
-            collectionId,
-            requestId,
-            res.data.data,
-          );
-        }
-
-        notifications.success("Response saved successfully.");
-        return res?.data?.data?.id || "";
-      } else {
-        notifications.error("Failed to save response. Please try again.");
-        return "";
-      }
-    }
-    return "";
-  };
-
-  public saveResponse = async () => {
-    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-
-    const savedRequestTab = new InitTab().savedRequest(
-      UntrackedItems.UNTRACKED + uuidv4(),
-      progressiveTab.path.workspaceId,
-    );
-    savedRequestTab.updateBody(progressiveTab.property.request?.body);
-    savedRequestTab.updateUrl(progressiveTab.property.request?.url);
-    savedRequestTab.updateName(progressiveTab.name + " - Response");
-    savedRequestTab.updateDescription(progressiveTab.description);
-    savedRequestTab.updateMethod(progressiveTab.property.request?.method);
-    savedRequestTab.updateHeaders(progressiveTab.property.request?.headers);
-    savedRequestTab.updateAuth(progressiveTab.property.request?.auth);
-    savedRequestTab.updateIsSave(true);
-    savedRequestTab.updateState({
-      requestBodyNavigation:
-        progressiveTab.property.request?.state.requestBodyNavigation,
-      requestBodyLanguage:
-        progressiveTab.property.request?.state.requestBodyLanguage,
-      requestAuthNavigation:
-        progressiveTab.property.request?.state.requestAuthNavigation,
-    });
-    savedRequestTab.updatePath({
-      ...progressiveTab.path,
-      requestId: progressiveTab.id,
-    });
-    savedRequestTab.updateQueryParams(
-      progressiveTab.property.request?.queryParams,
-    );
-    let responseCode = "";
-    restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
-      if (data) {
-        savedRequestTab.updateResponseBody(data.response.body);
-        savedRequestTab.updateResponseHeaders(data.response.headers);
-        savedRequestTab.updateResponseStatus(data.response.status);
-        savedRequestTab.updateResponseDate(this.formatDate(new Date()));
-        savedRequestTab.updateState({
-          responseBodyLanguage: data.response.bodyLanguage,
-          responseBodyFormatter: data?.response?.bodyFormatter,
-        });
-        responseCode = data.response.status;
-      }
-      return restApiDataMap;
-    });
-    const savedRequestId = await this.saveSavedRequest(
-      savedRequestTab.getValue(),
-    );
-    if (savedRequestId) {
-      savedRequestTab.updateId(savedRequestId);
-      this.tabRepository.createTab(savedRequestTab.getValue());
-      MixpanelEvent(Events.SAVE_RESPONSE, {
-        type: "REST",
-        status_code: responseCode,
-      });
-      moveNavigation("right");
-    }
-  };
-
-  /**
    *
    * @param _url - request url
    * @param _effectQueryParams  - flag that effect request query parameter
@@ -667,14 +509,14 @@ class RestExplorerViewModel {
    *
    * @param _description - request description
    */
-  public updateRequestDescription = async (_description: string) => {
+  public updateAiSystemPrompt = async (_description: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.description = _description;
+    progressiveTab.property.llm_ai_request.SystemPrompt = _description;
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
-      Sentry.captureException(error); 
+      Sentry.captureException(error);
       notifications.error(
         "Failed to update the documentation. Please try again",
       );
@@ -759,83 +601,24 @@ class RestExplorerViewModel {
     this.compareRequestWithServer();
   };
 
-  /**
-   *
-   * @param _headers - request headers
-   */
-  public updateHeaders = async (_headers: KeyValueChecked[]) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.headers = _headers;
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param _params - request query parameters
-   * @param _effectURL - lag that effect request url
-   */
-  public updateParams = async (
-    _params: KeyValueChecked[],
-    _effectURL: boolean = true,
-  ) => {
-    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    if (
-      JSON.stringify(_params) ===
-      JSON.stringify(progressiveTab.property.request.queryParams)
-    ) {
-      return;
-    }
-    progressiveTab.property.request.queryParams = _params;
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_effectURL) {
-      const reducedQueryParams = new ReduceQueryParams(_params);
-      const reducedURL = new ReduceRequestURL(
-        progressiveTab.property.request?.url,
-      );
-      if (
-        reducedQueryParams.getValue() === "" ||
-        reducedQueryParams.getValue() === "="
-      ) {
-        await this.updateRequestUrl(reducedURL.getHost(), false);
-      } else {
-        await this.updateRequestUrl(
-          reducedURL.getHost() + "?" + reducedQueryParams.getValue(),
-          false,
-        );
-      }
-    }
-    this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param headers - request auto generated headers
-   */
-  public updateAutoGeneratedHeaders = async (headers: KeyValueChecked[]) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.autoGeneratedHeaders = headers;
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  };
 
   /**
    *
    * @param _state - request state
    */
   public updateRequestState = async (_state: StatePartial) => {
+    console.log("in updateRequestState", _state);
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.state = {
-      ...progressiveTab.property.request.state,
+    console.log("progressiveTab", progressiveTab);
+    progressiveTab.property.llm_ai_request.state = {
+      ...progressiveTab.property.llm_ai_request.state,
       ..._state,
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state.requestAuthNavigation) {
+    if (_state.LLM_AI_AuthNavigation) {
       if (
-        _state.requestAuthNavigation ===
+        _state.LLM_AI_AuthNavigation ===
         HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
       ) {
         this.authHeader = new ReduceAuthHeader(
@@ -850,52 +633,16 @@ class RestExplorerViewModel {
         ).getValue();
       } else {
         this.authHeader = new ReduceAuthHeader(
-          progressiveTab.property.request.state.requestAuthNavigation,
-          progressiveTab.property.request.auth,
+          progressiveTab.property.llm_ai_request.state.LLM_AI_AuthNavigation,
+          progressiveTab.property.llm_ai_request.auth,
         ).getValue();
         this.authParameter = new ReduceAuthParameter(
-          progressiveTab.property.request.state.requestAuthNavigation,
-          progressiveTab.property.request.auth,
+          progressiveTab.property.llm_ai_request.state.LLM_AI_AuthNavigation,
+          progressiveTab.property.llm_ai_request.auth,
         ).getValue();
       }
     }
     this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param  - response state
-   */
-  public updateResponseState = async (key, val) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    if (key === "responseNavigation") {
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.navigation = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    } else if (key === "responseBodyLanguage") {
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.bodyLanguage = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    } else if (key === "responseBodyFormatter") {
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.response.bodyFormatter = val;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    }
   };
 
   /**
@@ -903,213 +650,23 @@ class RestExplorerViewModel {
    * @param _auth - request auth
    */
   public updateRequestAuth = async (_auth: Auth) => {
+    console.log("this is auth :>> ", _auth)
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.auth = {
-      ...progressiveTab.property.request.auth,
+    progressiveTab.property.llm_ai_request.auth = {
+      ...progressiveTab.property.llm_ai_request.auth,
       ..._auth,
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.authHeader = new ReduceAuthHeader(
-      progressiveTab.property.request.state.requestAuthNavigation,
-      progressiveTab.property.request.auth,
+      progressiveTab.property.llm_ai_request.state.LLM_AI_AuthNavigation,
+      progressiveTab.property.llm_ai_request.auth,
     ).getValue();
     this.authParameter = new ReduceAuthParameter(
-      progressiveTab.property.request.state.requestAuthNavigation,
-      progressiveTab.property.request.auth,
+      progressiveTab.property.llm_ai_request.state.LLM_AI_AuthNavigation,
+      progressiveTab.property.llm_ai_request.auth,
     ).getValue();
     this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param _body - request body
-   */
-  public updateRequestBody = async (_body: Body) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.body = {
-      ...progressiveTab.property.request.body,
-      ..._body,
-    };
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
-  /**
-   *
-   * @param _response response
-   */
-  public updateResponse = async (_response: Response) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.response = _response;
-    this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  };
-
-  /**
-   * @description clear response of a request
-   */
-  public clearResponse = async () => {
-    const response = new InitRequestTab(
-      UntrackedItems.UNTRACKED,
-      "UNTRACKED-",
-    ).getValue().property.request?.response as Response;
-    this.updateResponse(response);
-  };
-
-  /**
-   * @description send request
-   */
-  public sendRequest = async (environmentVariables = []) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const abortController = new AbortController();
-    restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab.tabId);
-      if (data) {
-        data.abortController = abortController;
-      } else {
-        data = {
-          abortController: abortController,
-          response: {
-            body: "",
-            headers: [],
-            status: "",
-            time: 0,
-            size: 0,
-            navigation: ResponseSectionEnum.RESPONSE,
-            bodyLanguage: RequestDataTypeEnum.TEXT,
-            bodyFormatter: ResponseFormatterEnum.PRETTY,
-          },
-          isSendRequestInProgress: false,
-        };
-      }
-      restApiDataMap.set(progressiveTab.tabId, data);
-      return restApiDataMap;
-    });
-    // Create an AbortController for the request
-    const { signal } = abortController; // Extract the signal for the request
-
-    restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
-      if (data) {
-        data.isSendRequestInProgress = true;
-      }
-      restApiDataMap.set(progressiveTab.tabId, data);
-      return restApiDataMap;
-    });
-    const start = Date.now();
-
-    const decodeData = this._decodeRequest.init(
-      this._tab.getValue().property.request,
-      environmentVariables.filtered,
-      this._collectionAuth.getValue(),
-    );
-    const selectedAgent = localStorage.getItem(
-      "selectedAgent",
-    ) as WorkspaceUserAgentBaseEnum;
-    makeHttpRequestV2(...decodeData, selectedAgent, signal)
-      .then((response) => {
-        if (response.isSuccessful === false) {
-          restExplorerDataStore.update((restApiDataMap) => {
-            const data = restApiDataMap.get(progressiveTab?.tabId);
-            if (data) {
-              data.response.body = response?.message ?? "";
-              data.response.headers = [];
-              data.response.status = ResponseStatusCode.ERROR;
-              data.response.time = 0;
-              data.response.size = 0;
-              data.isSendRequestInProgress = false;
-            }
-            restApiDataMap.set(progressiveTab.tabId, data);
-            return restApiDataMap;
-          });
-        } else {
-          const end = Date.now();
-          const byteLength = new TextEncoder().encode(
-            JSON.stringify(response),
-          ).length;
-          const responseSizeKB = byteLength / 1024;
-          const duration = end - start;
-          const responseBody = response.data.body;
-          const formattedHeaders = Object.entries(
-            response?.data?.headers || {},
-          );
-          const responseHeaders = [];
-          formattedHeaders.forEach((elem) => {
-            responseHeaders.push({
-              key: elem[0],
-              value: elem[1],
-            });
-          });
-          let responseStatus = response.data.status;
-          const bodyLanguage =
-            this._decodeRequest.setResponseContentType(responseHeaders);
-
-          restExplorerDataStore.update((restApiDataMap) => {
-            let data = restApiDataMap.get(progressiveTab?.tabId);
-            if (data) {
-              data.response.body = responseBody;
-              data.response.headers = responseHeaders;
-              data.response.status = responseStatus;
-              data.response.time = duration;
-              data.response.size = responseSizeKB;
-              data.response.bodyLanguage = bodyLanguage;
-              data.isSendRequestInProgress = false;
-            }
-            restApiDataMap.set(progressiveTab.tabId, data);
-
-            return restApiDataMap;
-          });
-        }
-      })
-      .catch((error) => {
-        Sentry.captureException(error); 
-        // Handle cancellation or other errors
-        if (error.name === "AbortError") {
-          return;
-        }
-
-        restExplorerDataStore.update((restApiDataMap) => {
-          const data = restApiDataMap.get(progressiveTab?.tabId);
-          if (data) {
-            data.response.body = "";
-            data.response.headers = [];
-            data.response.status = ResponseStatusCode.ERROR;
-            data.response.time = 0;
-            data.response.size = 0;
-            data.isSendRequestInProgress = false;
-          }
-          restApiDataMap.set(progressiveTab.tabId, data);
-          return restApiDataMap;
-        });
-      });
-  };
-
-  /**
-   * aborts the ongoing api request
-   */
-  public cancelRequest = (): Promise<void> => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    let abortController;
-    restExplorerDataStore.update((restApiDataMap) => {
-      const data = restApiDataMap.get(progressiveTab.tabId);
-      if (data) {
-        abortController = data.abortController;
-      }
-      return restApiDataMap;
-    });
-    if (abortController) {
-      abortController.abort(); // Abort the request using the stored controller
-      restExplorerDataStore.update((restApiDataMap) => {
-        const data = restApiDataMap.get(progressiveTab?.tabId);
-        if (data) {
-          data.isSendRequestInProgress = false;
-        }
-        restApiDataMap.set(progressiveTab.tabId, data);
-        return restApiDataMap;
-      });
-    }
   };
 
   /**
@@ -1489,7 +1046,7 @@ class RestExplorerViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) {}
+  set collection(e) { }
 
   /**
    *
@@ -2564,7 +2121,7 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
-      Sentry.captureException(error); 
+      Sentry.captureException(error);
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }
@@ -2613,7 +2170,7 @@ class RestExplorerViewModel {
       // Show error msg in the chat for stop generation
       // this.handleAIResponseError(componentData, "Generation Stopped")
     } catch (error) {
-      Sentry.captureException(error); 
+      Sentry.captureException(error);
       console.error("Error stopping AI response generation:", error);
     }
   };
