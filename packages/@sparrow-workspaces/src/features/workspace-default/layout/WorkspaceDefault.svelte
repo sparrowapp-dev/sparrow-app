@@ -69,13 +69,9 @@
         iconColor="var(--text-primary-300)"
         iconSize={"20px"}
         onClick={() => {
-          if (isGuestUser) {
-            onItemCreated("collection", {
-              workspaceId: currentWorkspaceId,
-            });
-          } else {
-            showImportCollectionPopup();
-          }
+          onItemCreated("mockCollection", {
+            workspaceId: currentWorkspaceId,
+          });
           isExpandCollection = true;
         }}
       />

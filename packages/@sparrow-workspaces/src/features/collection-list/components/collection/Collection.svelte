@@ -402,18 +402,20 @@
       <span class="text-plusButton">{requestCount}</span>
       <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
     </div>
-    <div class="d-flex gap-1 text-ds-font-size-12">
-      <span class="text-plusButton">{graphQLCount}</span>
-      <p>GraphQL</p>
-    </div>
-    <div class="d-flex gap-1 text-ds-font-size-12">
-      <span class="text-plusButton">{webSocketCount}</span>
-      <p>WebSocket</p>
-    </div>
-    <div class="d-flex gap-1 text-ds-font-size-12">
-      <span class="text-plusButton">{socketIoCount}</span>
-      <p>Socket.IO</p>
-    </div>
+    {#if !isMockCollection}
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{graphQLCount}</span>
+        <p>GraphQL</p>
+      </div>
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{webSocketCount}</span>
+        <p>WebSocket</p>
+      </div>
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{socketIoCount}</span>
+        <p>Socket.IO</p>
+      </div>
+    {/if}
   </div>
   <div
     class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
@@ -739,11 +741,6 @@
       </div>
     {/if}
   </button>
-  {#if isMockCollection}
-    <div style="display: flex;">
-      <Tag type={isMockRunning ? "green" : "grey"} text={"Mock"} />
-    </div>
-  {/if}
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else}
@@ -754,6 +751,9 @@
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
+        <div style="display: flex;">
+          <Tag type={isMockRunning ? "green" : "grey"} text={"Mock"} />
+        </div>
         <Tooltip
           title={isMockRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}
@@ -783,7 +783,7 @@
         >
           <span class="add-icon-container">
             <Button
-              id={`add-item-collection-${collection.id}`}
+              id={`show-more-collection-${collection.id}`}
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
@@ -1001,8 +1001,8 @@
           : '0'} text-secondary-300"
       >
         {isMockCollection
-          ? "This mock collection is empty"
-          : "This collection is empty"}
+          ? "This mock collection is empty."
+          : "This collection is empty."}
       </p>
     {/if}
 
