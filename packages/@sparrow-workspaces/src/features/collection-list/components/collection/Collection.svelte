@@ -323,7 +323,6 @@
             }
           })
           .catch((error) => {
-            Sentry.captureException(error);
             console.error("Error during interval compare:", error);
           });
       },

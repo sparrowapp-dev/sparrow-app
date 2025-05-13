@@ -672,7 +672,6 @@ class RestExplorerViewModel {
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
-      Sentry.captureException(error);
       notifications.error(
         "Failed to update the documentation. Please try again",
       );
@@ -2558,7 +2557,6 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }
@@ -2608,7 +2606,6 @@ class RestExplorerViewModel {
       // Show error msg in the chat for stop generation
       // this.handleAIResponseError(componentData, "Generation Stopped")
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Error stopping AI response generation:", error);
     }
   };

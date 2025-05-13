@@ -623,8 +623,7 @@ export class TestflowExplorerPageViewModel {
             }
             return testFlowDataMap;
           });
-        } catch (error) {
-          Sentry.captureException(error); 
+        } catch (error) { 
           if (error?.name === "AbortError") {
             break;
           }
@@ -887,7 +886,6 @@ export class TestflowExplorerPageViewModel {
       }
       status = resData.status;
     } catch (error) {
-      Sentry.captureException(error);
       resData = {
         body: "",
         headers: [],

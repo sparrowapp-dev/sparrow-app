@@ -544,7 +544,6 @@
       );
       refreshLoad = false;
     } catch (error) {
-      Sentry.captureException(error);
       refreshLoad = false;
     }
   };
