@@ -741,11 +741,7 @@
   </button>
   {#if isMockCollection}
     <div style="display: flex;">
-      {#if isMockRunning}
-        <Tag type="green" text={"Mock"} />
-      {:else}
-        <Tag type="grey" text={"Mock"} />
-      {/if}
+      <Tag type={isMockRunning ? "green" : "grey"} text={"Mock"} />
     </div>
   {/if}
   {#if collection && collection.id && collection.id.includes(UntrackedItems.UNTRACKED)}
@@ -766,29 +762,18 @@
             zIndex={701}
           >
             <span class="add-icon-container">
-              {#if isMockRunning}
-                <Button
-                  id={`add-item-collection-${collection.id}`}
-                  size="extra-small"
-                  customWidth={"24px"}
-                  type="teritiary-regular"
-                  onClick={() => {
-                    mockRunningStatus();
-                  }}
-                  startIcon={RecordStopRegular}
-                />
-              {:else}
-                <Button
-                  id={`add-item-collection-${collection.id}`}
-                  size="extra-small"
-                  customWidth={"24px"}
-                  type="teritiary-regular"
-                  onClick={() => {
-                    mockRunningStatus();
-                  }}
-                  startIcon={PlayCircleRegular}
-                />
-              {/if}
+              <Button
+                id={`add-item-collection-${collection.id}`}
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                onClick={() => {
+                  mockRunningStatus();
+                }}
+                startIcon={isMockRunning
+                  ? RecordStopRegular
+                  : PlayCircleRegular}
+              />
             </span>
           </Tooltip>
         {/if}

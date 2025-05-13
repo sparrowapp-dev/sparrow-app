@@ -102,7 +102,6 @@
   let expand: boolean = false;
   let deleteLoader: boolean = false;
   let showMenu: boolean = false;
-  let showMockMenu: boolean = false;
   let isFolderPopup: boolean = false;
   let noOfColumns = 180;
   let isRenaming = false;
@@ -178,19 +177,12 @@
     }, 100);
   }
 
-  function rightClickContextMenuMock() {
-    setTimeout(() => {
-      showMockMenu = !showMockMenu;
-    }, 100);
-  }
-
   function handleSelectClick(event: MouseEvent) {
     const selectElement = document.getElementById(
       `show-more-folder-${explorer.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
-      showMockMenu = false;
     }
   }
 
@@ -412,61 +404,6 @@
               (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
-        },
-        {
-          onClick: () => {
-            isFolderPopup = true;
-          },
-          displayText: "Delete",
-          disabled: false,
-          hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
-              ? false
-              : true,
-        },
-      ]}
-      {noOfColumns}
-    />
-  {/if}
-
-  {#if showMockMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-    <Options
-      xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
-      yAxis={[
-        folderTabWrapper.getBoundingClientRect().top - 0,
-        folderTabWrapper.getBoundingClientRect().bottom + 5,
-      ]}
-      zIndex={500}
-      menuItems={[
-        {
-          onClick: () => {
-            expand = true;
-            if (expand) {
-              onItemOpened("folder", {
-                workspaceId: collection.workspaceId,
-                collection,
-                folder: explorer,
-              });
-            }
-          },
-          displayText: "Open Folder",
-          disabled: false,
-          hidden: false,
-        },
-        {
-          onClick: () => {
-            expand = false;
-            isRenaming = true;
-          },
-          displayText: "Rename Folder",
-          disabled: false,
-          // hidden:
-          //   !collection.activeSync ||
-          //   (explorer?.source === "USER" && collection.activeSync)
-          //     ? false
-          //     : true,
-          hidden: false,
         },
         {
           onClick: () => {
