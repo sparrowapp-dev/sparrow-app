@@ -225,7 +225,7 @@
   };
 
   const handleSelectClick = (event: MouseEvent) => {
-    const selectElement = document.getElementById(`add-item-collection`);
+    const selectElement = document.getElementById(`add-collection-type`);
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showAddItemMenu = false;
     }
@@ -264,14 +264,10 @@
       },
       {
         onClick: () => {
-          if (isGuestUser) {
-            onItemCreated("collection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-          } else {
-            showImportCollectionPopup();
-          }
+          onItemCreated("mockCollection", {
+            workspaceId: currentWorkspaceId,
+            collection: collectionList,
+          });
           isExpandCollection.set(true);
         },
         displayText: "Add Mock Collection",
@@ -365,7 +361,7 @@
         >
           <span style="display:flex;" class="add-icon-container">
             <Button
-              id="add-item-collection"
+              id="add-collection-type"
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
@@ -472,6 +468,23 @@
                 {/if}
               {/each}
             </List>
+            {#if !collectionListDocument.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
+              <EmptyCollection
+                bind:userRole
+                isCollectionEmpty={!collectionListDocument.some(
+                  (col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK,
+                )}
+                {onItemCreated}
+                {collectionList}
+                {userRoleInWorkspace}
+                {currentWorkspace}
+                handleCreateApiRequest={() => onItemCreated("request", {})}
+                onImportCollectionPopup={showImportCollectionPopup}
+                isAddCollectionDisabled={isGuestUser}
+                onImportCurlPopup={showImportCurlPopup}
+                {isGuestUser}
+              />
+            {/if}
             {#if collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
               <hr style="margin: 2px 0 2px 2rem;" />
               <List

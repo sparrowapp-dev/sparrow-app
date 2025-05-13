@@ -1055,7 +1055,10 @@ export default class CollectionsViewModel {
     );
     const newCollection = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextCollection(collectionsDoc, "New Collection") as string,
+      name: this.getNextCollection(
+        collectionsDoc,
+        "New Mock Collection",
+      ) as string,
       items: [],
       createdAt: new Date().toISOString(),
     };
@@ -1099,14 +1102,19 @@ export default class CollectionsViewModel {
             name: newCollection.name,
           },
         );
-        notifications.success("New Collection created successfully.");
+        notifications.success(
+          `'${newCollection.name}' mock collection created successfully.`,
+        );
         MixpanelEvent(Events.CREATE_COLLECTION, {
           source: "USER",
           collectionName: response.data.data.name,
           collectionId: response.data.data._id,
         });
       } else {
-        notifications.error(response.message ?? "Failed to create collection!");
+        notifications.error(
+          response.message ??
+            "Failed to create mock collection. Please try again.",
+        );
       }
     } else {
       const collectionId = uuidv4();
@@ -1132,7 +1140,9 @@ export default class CollectionsViewModel {
         id: dt.id,
         name: dt.name,
       });
-      notifications.success("New Collection created successfully.");
+      notifications.success(
+        `'${newCollection.name}' mock collection created successfully.`,
+      );
     }
     return response;
   };
