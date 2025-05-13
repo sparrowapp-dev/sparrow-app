@@ -754,32 +754,28 @@
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
-        {#if !collection?.activeSync}
-          <Tooltip
-            title={isMockRunning ? "Stop Mock" : "Run Mock"}
-            placement={"top-center"}
-            distance={13}
-            zIndex={701}
-          >
-            <span class="add-icon-container">
-              <Button
-                id={`add-item-collection-${collection.id}`}
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-                onClick={() => {
-                  mockRunningStatus();
-                }}
-                startIcon={isMockRunning
-                  ? RecordStopRegular
-                  : PlayCircleRegular}
-              />
-            </span>
-          </Tooltip>
-        {/if}
+        <Tooltip
+          title={isMockRunning ? "Stop Mock" : "Run Mock"}
+          placement={"top-center"}
+          distance={13}
+          zIndex={701}
+        >
+          <span class="add-icon-container">
+            <Button
+              id={`add-item-collection-${collection.id}`}
+              size="extra-small"
+              customWidth={"24px"}
+              type="teritiary-regular"
+              onClick={() => {
+                mockRunningStatus();
+              }}
+              startIcon={isMockRunning ? RecordStopRegular : PlayCircleRegular}
+            />
+          </span>
+        </Tooltip>
 
         <Tooltip
-          title={"More"}
+          title={"Add Options"}
           placement={"bottom-center"}
           distance={17}
           zIndex={701}
@@ -787,7 +783,7 @@
         >
           <span class="add-icon-container">
             <Button
-              id={`show-more-collection-${collection.id}`}
+              id={`add-item-collection-${collection.id}`}
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"

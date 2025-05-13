@@ -358,7 +358,7 @@
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
         <Tooltip
           title={"Add Options"}
-          placement={"bottom-center"}
+          placement={"top-center"}
           distance={13}
           show={!showAddItemMenu}
           zIndex={701}
