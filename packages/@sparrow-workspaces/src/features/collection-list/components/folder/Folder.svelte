@@ -113,6 +113,7 @@
   let folderTabWrapper: HTMLElement;
 
   let verticalFolderLine = false;
+  export let isMockCollection = false;
 
   $: {
     if (explorer.type === "FOLDER") {
@@ -347,8 +348,9 @@
           displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -363,8 +365,9 @@
           displayText: "Add WebSocket",
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -379,8 +382,9 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -395,8 +399,9 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },

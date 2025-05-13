@@ -11,6 +11,7 @@
     CollectionIcon,
     SocketIoIcon,
     GraphIcon,
+    DatabaseStackRegular,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -57,6 +58,20 @@
           } else {
             showImportCollectionPopup();
           }
+          isExpandCollection = true;
+        }}
+      />
+    {/if}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Card
+        icon={DatabaseStackRegular}
+        label="Mock Collection"
+        iconColor="var(--text-primary-300)"
+        iconSize={"20px"}
+        onClick={() => {
+          onItemCreated("mockCollection", {
+            workspaceId: currentWorkspaceId,
+          });
           isExpandCollection = true;
         }}
       />

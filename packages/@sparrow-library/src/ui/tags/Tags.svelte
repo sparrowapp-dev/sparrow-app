@@ -46,9 +46,9 @@
       border: "var(--border-ds-tertiary-700)",
     },
     grey: {
-      bg: "var(--bg-ds-neutral-900)",
-      text: "var(--text-ds-neutral-300)",
-      border: "var(--border-ds-neutral-700)",
+      bg: "var(--bg-ds-neutral-700)",
+      text: "var(--text-ds-neutral-200)",
+      border: "var(--border-ds-neutral-500)",
     },
     pink: {
       bg: "var(--bg-ds-accent-900)",
@@ -75,7 +75,7 @@
     white-space: nowrap;"
   class="text-ds-font-weight-medium text-ds-line-height-150 text-ds-font-size-12 d-flex align-items-center"
 >
-  <span class="text-content">{convertCasing(text)}</span>
+  <span class={endIcon ? "text-content" : ""}>{convertCasing(text)}</span>
   {#if endIcon}
     <svelte:component
       this={endIcon}

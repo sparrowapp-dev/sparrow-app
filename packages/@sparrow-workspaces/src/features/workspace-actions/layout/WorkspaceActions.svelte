@@ -15,6 +15,7 @@
     AddRegular,
     ArrowClockWiseRegular,
     ChevronDoubleRightRegular,
+    DatabaseStackRegular,
     PlusIcon2,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
@@ -293,6 +294,19 @@
           },
         },
         {
+          name: "Add Mock Collection",
+          icon: DatabaseStackRegular,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
+          onclick: () => {
+            onItemCreated("mockCollection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+            isExpandCollection.set(true);
+          },
+        },
+        {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -384,6 +398,19 @@
             } else {
               showImportCollectionPopup();
             }
+            isExpandCollection.set(true);
+          },
+        },
+        {
+          name: "Add Mock Collection",
+          icon: DatabaseStackRegular,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "13px",
+          onclick: () => {
+            onItemCreated("mockCollection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
             isExpandCollection.set(true);
           },
         },

@@ -66,6 +66,7 @@ import {
   type CollectionArgsBaseInterface as CollectionArgsDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
   CollectionItemTypeBaseEnum,
+  CollectionTypeBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestBaseInterface as RequestDto } from "@sparrow/common/types/workspace/http-request-base";
 import {
@@ -1038,6 +1039,110 @@ export default class CollectionsViewModel {
         name: dt.name,
       });
       notifications.success("New Collection created successfully.");
+    }
+    return response;
+  };
+
+  /**
+   * Handle create empty mock collection
+   * @param workspaceId :string
+   */
+  public handleCreateMockCollection = async (workspaceId: string) => {
+    const collectionsRx =
+      await this.collectionRepository.getCollectionsByWorkspaceId(workspaceId);
+    const collectionsDoc = collectionsRx.map((collection) =>
+      collection.toMutableJSON(),
+    );
+    const newCollection = {
+      id: UntrackedItems.UNTRACKED + uuidv4(),
+      name: this.getNextCollection(
+        collectionsDoc,
+        "New Mock Collection",
+      ) as string,
+      items: [],
+      createdAt: new Date().toISOString(),
+    };
+    let response;
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser !== true) {
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      response = await this.collectionService.addCollection(
+        {
+          name: newCollection.name,
+          collectionType: CollectionTypeBaseEnum.MOCK,
+          workspaceId: workspaceId,
+          description: "",
+        },
+        baseUrl,
+      );
+
+      if (response.isSuccessful && response.data.data) {
+        const res = response.data.data;
+        await this.collectionRepository.addCollection({
+          ...res,
+          id: res._id,
+          workspaceId: workspaceId,
+          description: "",
+          collectionType: CollectionTypeBaseEnum.MOCK,
+        });
+        const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, {
+          ...response.data.data,
+          id: response.data.data._id,
+        });
+        this.tabRepository.createTab(adaptCollection);
+        moveNavigation("right");
+
+        await this.workspaceRepository.updateCollectionInWorkspace(
+          workspaceId,
+          {
+            id: response.data.data._id,
+            name: newCollection.name,
+          },
+        );
+        notifications.success(
+          `'${newCollection.name}' mock collection created successfully.`,
+        );
+        MixpanelEvent(Events.CREATE_COLLECTION, {
+          source: "USER",
+          collectionName: response.data.data.name,
+          collectionId: response.data.data._id,
+        });
+      } else {
+        notifications.error(
+          response.message ??
+            "Failed to create mock collection. Please try again.",
+        );
+      }
+    } else {
+      const collectionId = uuidv4();
+      const dt = {
+        id: collectionId,
+        name: newCollection.name,
+        workspaceId: workspaceId,
+        collectionType: CollectionTypeBaseEnum.MOCK,
+        items: [],
+        description: "",
+        createdAt: newCollection.createdAt,
+        createdBy: "guestUser",
+        totalRequests: 0,
+        updatedAt: newCollection.createdAt,
+        updatedBy: "guestUser",
+      };
+      await this.collectionRepository.addCollection(dt);
+      const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, dt);
+      this.tabRepository.createTab(adaptCollection);
+      moveNavigation("right");
+
+      await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
+        id: dt.id,
+        name: dt.name,
+      });
+      notifications.success(
+        `'${newCollection.name}' mock collection created successfully.`,
+      );
     }
     return response;
   };
@@ -3529,7 +3634,7 @@ export default class CollectionsViewModel {
       this.handleRemoveTab(requestResponse.id);
 
       notifications.success(`"${requestResponse.name}" Response deleted.`);
-      
+
       MixpanelEvent(Events.DELETE_RESPONSE, {
         source: "Collection list",
       });
@@ -4296,6 +4401,9 @@ export default class CollectionsViewModel {
     switch (entityType) {
       case "collection":
         response = await this.handleCreateCollection(args.workspaceId);
+        break;
+      case "mockCollection":
+        response = await this.handleCreateMockCollection(args.workspaceId);
         break;
       case "folder":
         await this.handleCreateFolderInCollection(
