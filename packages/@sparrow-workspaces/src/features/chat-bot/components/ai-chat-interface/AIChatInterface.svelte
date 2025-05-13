@@ -17,6 +17,7 @@
   export let conversations: Conversation[] = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
+  export let onUpdateAiModel;
   export let sendPrompt;
   export let isResponseGenerating;
   export let onToggleLike;
@@ -224,6 +225,7 @@
       <PromptInput
         {prompt}
         {onUpdateAiPrompt}
+        {onUpdateAiModel}
         {isResponseGenerating}
         {onStopGeneratingAIResponse}
         placeholder={"How can I help you?"}

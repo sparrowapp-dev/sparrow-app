@@ -730,6 +730,19 @@ class RestExplorerViewModel {
   };
 
   /**
+   * Updates the AI model name in the request property of the current tab.
+   *
+   * @param _threadId - The new AI model name to set.
+   * @returns A promise that resolves when the update is complete.
+   */
+  public updateAIModel = async (_modelName: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.aiModelName = _modelName;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+  /**
    * Updates the AI conversations in the request property of the current tab.
    *
    * @param _conversations - The new AI conversations to set.
@@ -2407,6 +2420,12 @@ class RestExplorerViewModel {
       auth: componentData.property.request.auth,
     };
 
+    const rawConversations = componentData?.property?.request?.ai?.conversations || [];
+    const formattedConversations = rawConversations.map(({ type, message }) => ({
+      role: type === 'Sender' ? 'user' : 'assistant',
+      content: message
+    }));
+
     try {
       const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
@@ -2419,6 +2438,9 @@ class RestExplorerViewModel {
         userEmail,
         prompt,
         JSON.stringify(apiData),
+        formattedConversations,
+        "deepseek",
+        "chat"
       );
 
       if (!socketResponse) {
@@ -2493,15 +2515,15 @@ class RestExplorerViewModel {
 
             // Handle streaming responses
             if (response.stream_status) {
-              const { stream_status, messages, thread_id } = response;
+              const { stream_status, messages, thread_Id } = response;
 
               // Handle thread ID on stream start if not already set
               if (stream_status === STREAMING_STATES.START) {
                 // console.log("** stream started ** ");
                 const thisTabThreadId =
                   componentData?.property?.request?.ai?.threadId;
-                if (!thisTabThreadId && thread_id) {
-                  await this.updateRequestAIThread(thread_id);
+                if (!thisTabThreadId && thread_Id) {
+                  await this.updateRequestAIThread(thread_Id);
                 }
 
                 // Create empty message container that will be updated with chunks
