@@ -13,12 +13,12 @@
   class="ps-5 pe-1"
 >
   <div class="input-icon">
-    <span class="input-header">GitHub Link</span>
+    <span class="input-header">GitHub Url</span>
     <Input
       id="github-link"
       value={hubGithubUrl}
       type="text"
-      placeholder="Enter GitHub link"
+      placeholder="Enter GitHub Url"
       size="small"
       variant="primary"
       width="90%"
@@ -33,12 +33,12 @@
     />
   </div>
   <div class="input-icon">
-    <span class="input-header">LinkedIn Link</span>
+    <span class="input-header">LinkedIn Url</span>
     <Input
       id="linkedIn-link"
       type="text"
       value={hubLinkedinUrl}
-      placeholder="Enter LinkedIn link"
+      placeholder="Enter LinkedIn Url"
       size="small"
       variant="primary"
       width="90%"
@@ -53,12 +53,12 @@
     />
   </div>
   <div class="input-icon">
-    <span class="input-header">X Link</span>
+    <span class="input-header">X Url</span>
     <Input
       id="X-link"
       type="text"
       value={hubXUrl}
-      placeholder="Enter X link"
+      placeholder="Enter X Url"
       size="small"
       variant="primary"
       width="90%"
