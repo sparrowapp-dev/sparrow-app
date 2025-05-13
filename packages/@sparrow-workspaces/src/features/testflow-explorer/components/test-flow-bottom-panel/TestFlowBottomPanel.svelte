@@ -137,7 +137,6 @@
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
     } catch (err) {
-      Sentry.captureException(err);
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
       responseLoader = false;

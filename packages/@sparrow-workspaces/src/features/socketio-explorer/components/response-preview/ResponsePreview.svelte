@@ -27,7 +27,6 @@
         }
         messageData = `${parse[1]}`;
       } catch (e) {
-        Sentry.captureException(e);
         console.error(e);
       }
 

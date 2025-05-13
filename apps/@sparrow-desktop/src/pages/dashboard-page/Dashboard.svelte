@@ -401,7 +401,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening collection:", error);
