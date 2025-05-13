@@ -1103,7 +1103,7 @@ export default class CollectionsViewModel {
           },
         );
         notifications.success(
-          "'New Mock Collection' mock collection created successfully.",
+          `'${newCollection.name}' mock collection created successfully.`,
         );
         MixpanelEvent(Events.CREATE_COLLECTION, {
           source: "USER",
@@ -1141,7 +1141,7 @@ export default class CollectionsViewModel {
         name: dt.name,
       });
       notifications.success(
-        "'New Mock Collection' mock collection created successfully.",
+        `'${newCollection.name}' mock collection created successfully.`,
       );
     }
     return response;
