@@ -139,74 +139,60 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
-    <div style="display: flex;  justify-content: center; align-items: center;">
-      {#if workspace?.isShared}
-        <div
-          class="shared-workspace-icon position-absolute"
-          style="top: 26px; right: 15px;"
+    {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+      {#if isWorkspaceLinkCopied}
+        <p
+          class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
+          style="color: var(--text-ds-neutral-400); top:25px; right:60px;"
         >
-          <ThreeDotIcon
-            width={24}
-            height={24}
-            color={"var(--icon-primary-300)"}
+          Copied
+        </p>
+        <button
+          bind:this={workspaceTabWrapper}
+          class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
+          style="top:14px; right:36px;"
+        >
+          <StatusSuccess
+            height="14"
+            width="14"
+            color="var(--icon-ds-success-400)"
           />
+        </button>
+      {:else}
+        <div bind:this={workspaceTabWrapper}>
+          <span
+            class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
+            style="color: var(--text-ds-neutral-400); top:26px; right:65px;"
+          >
+            Copy Public Link
+          </span>
         </div>
+        <button
+          bind:this={workspaceTabWrapper}
+          class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
+          style="top:27px; right:35px;"
+          on:click={async () => {
+            await onCopyLink(workspace._id);
+            isWorkspaceLinkCopied = true;
+            setTimeout(() => {
+              isWorkspaceLinkCopied = false;
+            }, 2000);
+          }}
+        >
+          <LinkRegular />
+        </button>
       {/if}
-      {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
-        {#if isWorkspaceLinkCopied}
-          <p
-            class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
-            style="color: var(--text-ds-neutral-400); top:25px; right:60px;"
-          >
-            Copied
-          </p>
-          <button
-            bind:this={workspaceTabWrapper}
-            class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-            style="top:14px; right:36px;"
-          >
-            <StatusSuccess
-              height="14"
-              width="14"
-              color="var(--icon-ds-success-400)"
-            />
-          </button>
-        {:else}
-          <div bind:this={workspaceTabWrapper}>
-            <span
-              class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
-              style="color: var(--text-ds-neutral-400); top:26px; right:65px;"
-            >
-              Copy Public Link
-            </span>
-          </div>
-          <button
-            bind:this={workspaceTabWrapper}
-            class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
-            style="top:27px; right:35px;"
-            on:click={async () => {
-              await onCopyLink(workspace._id);
-              isWorkspaceLinkCopied = true;
-              setTimeout(() => {
-                isWorkspaceLinkCopied = false;
-              }, 2000);
-            }}
-          >
-            <LinkRegular />
-          </button>
-        {/if}
-      {/if}
-      <button
-        bind:this={workspaceTabWrapper}
-        class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
-          ? 'threedot-active'
-          : ''}"
-        style="top:26px; right:15px;"
-        on:click={(e) => rightClickContextMenu(e)}
-      >
-        <MoreVerticalRegular />
-      </button>
-    </div>
+    {/if}
+    <button
+      bind:this={workspaceTabWrapper}
+      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
+        ? 'threedot-active'
+        : ''}"
+      style="top:26px; right:15px;"
+      on:click={(e) => rightClickContextMenu(e)}
+    >
+      <MoreVerticalRegular />
+    </button>
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"

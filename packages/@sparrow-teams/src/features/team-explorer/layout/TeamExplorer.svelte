@@ -132,7 +132,7 @@
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
 
-  export let selectedFilter = "All";
+  let selectedFilter = "All";
 
   const addButtonData = [
     {
