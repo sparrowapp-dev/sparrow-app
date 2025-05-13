@@ -21,16 +21,16 @@
   </div>
   <div class="card-footer">
     <span><PlusIcon color="var(--white-color)" /></span>
-   <span class="text-fs-14"  style="font-weight: 400;">
-    {label}
-   </span>
+    <span class="text-fs-14" style="font-weight: 400;">
+      {label}
+    </span>
   </div>
 </div>
 
 <style>
   .card {
     height: 120px;
-    width: 120px;
+    width: 155px;
     border: 0.5px solid var(--border-tertiary-400);
     border: none;
     background-color: var(--bg-secondary-850);

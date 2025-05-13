@@ -4,7 +4,7 @@
     KeyValuePairWithBase,
   } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
-  import { onMount } from "svelte";
+  import { afterUpdate, onMount } from "svelte";
   import { Tooltip, Button, notifications } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
@@ -73,6 +73,20 @@
 
   let isValidSyntax = true;
   let pairsContainer: HTMLElement;
+
+  // This is a flag to determine if we should scroll to the bottom
+  let shouldScrollToBottom = false;
+
+  // This is for scrolling into view when a new row is added and the component updates
+  afterUpdate(() => {
+    if (shouldScrollToBottom && pairsContainer) {
+      const lastRow = pairsContainer.lastElementChild;
+      if (lastRow) {
+        lastRow.scrollIntoView({ behavior: "auto", block: "end" });
+      }
+      shouldScrollToBottom = false;
+    }
+  });
 
   const theme = new TabularInputTheme().build();
 
@@ -379,20 +393,6 @@
     }
   };
 
-  /**
-   * Scrolls the container to bring the newly added row into view
-   */
-  const scrollToNewRow = async () => {
-    setTimeout(() => {
-      if (pairsContainer) {
-        const lastRow = pairsContainer.lastElementChild;
-        if (lastRow) {
-          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-      }
-    }, 0);
-  };
-
   const updateParam = async (index: number): Promise<void> => {
     pairs = pairs;
     if (
@@ -405,6 +405,7 @@
     ) {
       pairs[pairs.length - 1].checked = true;
       pairs.push({ key: "", value: "", checked: false });
+      shouldScrollToBottom = true;
       pairs = pairs;
       callback(pairs);
 
@@ -414,8 +415,6 @@
         diffBulkText = diffPairsToBulkText(); // ToDo: Calculate only if Bulk Edit mode is active (change in every place)
         checkForChanges();
       }
-
-      await scrollToNewRow();
     } else {
       callback(pairs);
     }

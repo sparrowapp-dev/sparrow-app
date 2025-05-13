@@ -674,7 +674,6 @@ class RestExplorerViewModel {
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
-      Sentry.captureException(error); 
       notifications.error(
         "Failed to update the documentation. Please try again",
       );
@@ -728,6 +727,18 @@ class RestExplorerViewModel {
   public updateRequestAIThread = async (_threadId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.ai.threadId = _threadId;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+  /**
+   * Updates the AI model name in the request property of the current tab.
+   *
+   * @param _threadId - The new AI model name to set.
+   * @returns A promise that resolves when the update is complete.
+   */
+  public updateAIModel = async (_modelName: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.ai.aiModelName = _modelName;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -1064,7 +1075,6 @@ class RestExplorerViewModel {
         }
       })
       .catch((error) => {
-        Sentry.captureException(error); 
         // Handle cancellation or other errors
         if (error.name === "AbortError") {
           return;
@@ -2414,6 +2424,12 @@ class RestExplorerViewModel {
       auth: componentData.property.request.auth,
     };
 
+    const rawConversations = componentData?.property?.request?.ai?.conversations || [];
+    const formattedConversations = rawConversations.map(({ type, message }) => ({
+      role: type === 'Sender' ? 'user' : 'assistant',
+      content: message
+    }));
+
     try {
       const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
@@ -2426,6 +2442,9 @@ class RestExplorerViewModel {
         userEmail,
         prompt,
         JSON.stringify(apiData),
+        formattedConversations,
+        "deepseek",
+        "chat"
       );
 
       if (!socketResponse) {
@@ -2500,15 +2519,15 @@ class RestExplorerViewModel {
 
             // Handle streaming responses
             if (response.stream_status) {
-              const { stream_status, messages, thread_id } = response;
+              const { stream_status, messages, thread_Id } = response;
 
               // Handle thread ID on stream start if not already set
               if (stream_status === STREAMING_STATES.START) {
                 // console.log("** stream started ** ");
                 const thisTabThreadId =
                   componentData?.property?.request?.ai?.threadId;
-                if (!thisTabThreadId && thread_id) {
-                  await this.updateRequestAIThread(thread_id);
+                if (!thisTabThreadId && thread_Id) {
+                  await this.updateRequestAIThread(thread_Id);
                 }
 
                 // Create empty message container that will be updated with chunks
@@ -2564,7 +2583,6 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
-      Sentry.captureException(error); 
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }
@@ -2613,7 +2631,6 @@ class RestExplorerViewModel {
       // Show error msg in the chat for stop generation
       // this.handleAIResponseError(componentData, "Generation Stopped")
     } catch (error) {
-      Sentry.captureException(error); 
       console.error("Error stopping AI response generation:", error);
     }
   };

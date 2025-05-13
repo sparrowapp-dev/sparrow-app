@@ -272,8 +272,7 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    } catch (error) {
-      Sentry.captureException(error); 
+    } catch (error) { 
       notifications.error(
         "Failed to update the documentation. Please try again",
       );

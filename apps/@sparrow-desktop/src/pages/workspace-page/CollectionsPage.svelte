@@ -89,6 +89,7 @@
   import { Checkbox } from "@sparrow/library/forms";
   import { writable } from "svelte/store";
   import * as Sentry from "@sentry/svelte";
+  import {Spinner} from "@sparrow/library/ui";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -525,14 +526,16 @@
       );
       refreshLoad = false;
     } catch (error) {
-      Sentry.captureException(error);
       refreshLoad = false;
     }
   };
 
+  let isInitialDataLoading = true;
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
+        isInitialDataLoading = true;
         activeTab = undefined;
         await handleRefreshApicalls(value?._id);
 
@@ -545,6 +548,8 @@
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
         totalTeamCount = value._data?.users?.length;
+
+        isInitialDataLoading = false;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -760,114 +765,123 @@
           class="d-flex flex-column h-100"
           style="background-color:var(--bg-ds-surface-900)"
         >
-          <TabBar
-            tabList={$tabList}
-            {isGuestUser}
-            onNewTabRequested={_viewModel.createNewTab}
-            onTabClosed={closeTab}
-            onDropEvent={_viewModel.onDropEvent}
-            onDragStart={_viewModel.handleDropOnStart}
-            onDropOver={_viewModel.handleDropOnEnd}
-            onTabSelected={_viewModel.handleActiveTab}
-            onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
-            onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
-            onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
-            onDoubleClick={_viewModel.handleTabTypeChange}
-            onClickCloseOtherTabs={softCloseTabs}
-            onClickForceCloseTabs={tabsForceCloseInitiator}
-            onClickDuplicateTab={handleTabDuplication}
-          />
-          <div style="flex:1; overflow: hidden;">
-            <Route>
-              {#if true}
-                {#if $activeTab?.type === TabTypeEnum.REQUEST}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <CollectionExplorerPage
-                        tab={$activeTab}
-                        onSyncCollection={handleSyncCollection}
-                      />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.FOLDER}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <FolderExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <EnvironmentExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <WorkspaceExplorerPage
-                        {collectionList}
-                        tab={$activeTab}
-                      />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <WebSocketExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <TestFlowExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <SocketIoExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <GraphqlExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <RestExplorerSavedPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if !$tabList?.length}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <WorkspaceDefault
-                        {currentWorkspace}
-                        {handleCreateEnvironment}
-                        onCreateTestflow={() => {
-                          _viewModel3.handleCreateTestflow();
-                          isExpandTestflow.set(true);
-                        }}
-                        showImportCollectionPopup={() =>
-                          (isImportCollectionPopup = true)}
-                        onItemCreated={_viewModel.handleCreateItem}
-                        {isGuestUser}
-                        {userRole}
-                      />
-                    </div>
-                  </Motion>
+          {#if isInitialDataLoading}
+            <div class="h-100 d-flex align-items-center justify-content-center">
+              <Spinner size={"32px"} />
+            </div>
+          {:else}
+            <TabBar
+              tabList={$tabList}
+              {isGuestUser}
+              onNewTabRequested={_viewModel.createNewTab}
+              onTabClosed={closeTab}
+              onDropEvent={_viewModel.onDropEvent}
+              onDragStart={_viewModel.handleDropOnStart}
+              onDropOver={_viewModel.handleDropOnEnd}
+              onTabSelected={_viewModel.handleActiveTab}
+              onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+              onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+              onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+              onDoubleClick={_viewModel.handleTabTypeChange}
+              onClickCloseOtherTabs={softCloseTabs}
+              onClickForceCloseTabs={tabsForceCloseInitiator}
+              onClickDuplicateTab={handleTabDuplication}
+            />
+            <div style="flex:1; overflow: hidden;">
+              <Route>
+                {#if true}
+                  {#if $activeTab?.type === TabTypeEnum.REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <RestExplorerPage
+                          bind:isTourGuideOpen
+                          tab={$activeTab}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <CollectionExplorerPage
+                          tab={$activeTab}
+                          onSyncCollection={handleSyncCollection}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.FOLDER}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <FolderExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <EnvironmentExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <WorkspaceExplorerPage
+                          {collectionList}
+                          tab={$activeTab}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <WebSocketExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <TestFlowExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <SocketIoExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <GraphqlExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <RestExplorerSavedPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if !$tabList?.length}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <WorkspaceDefault
+                          {currentWorkspace}
+                          {handleCreateEnvironment}
+                          onCreateTestflow={() => {
+                            _viewModel3.handleCreateTestflow();
+                            isExpandTestflow.set(true);
+                          }}
+                          showImportCollectionPopup={() =>
+                            (isImportCollectionPopup = true)}
+                          onItemCreated={_viewModel.handleCreateItem}
+                          {isGuestUser}
+                          {userRole}
+                        />
+                      </div>
+                    </Motion>
+                  {/if}
                 {/if}
-              {/if}
-            </Route>
-          </div>
+              </Route>
+            </div>
+          {/if}
         </section>
       </Pane>
     </Splitpanes>

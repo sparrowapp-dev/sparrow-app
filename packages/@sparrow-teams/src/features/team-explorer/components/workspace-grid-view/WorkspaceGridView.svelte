@@ -16,6 +16,7 @@
     ChevronLeftRegular,
     ChevronRightRegular,
   } from "@sparrow/library/icons";
+  import { WorkspaceType } from "@sparrow/common/enums";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -48,6 +49,9 @@
 
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
+  export let selectedFilter;
+  
+
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -126,7 +130,7 @@
             <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
           {/if}
-          {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
+          <!-- {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
               class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
               style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
@@ -142,6 +146,38 @@
                   class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
                   >+ Add New Workspace</span
                 >
+              {/if}
+            </div>
+          {/if} -->
+          {#if workspaces.length === 0}
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              {#if selectedFilter === WorkspaceType.PUBLIC}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+                >
+                  Public workspaces let you share your APIs and tools with the
+                </p>
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  community. Create one to start collaborating openly.
+                </p>
+              {:else}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+                >
+                  Welcome to Sparrow! Let's create your first workspace to
+                  unlock
+                </p>
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  powerful tools and bring your team together in one organized
+                  space.
+                </p>
               {/if}
             </div>
           {/if}

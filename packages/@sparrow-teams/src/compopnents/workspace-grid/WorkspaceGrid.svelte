@@ -150,7 +150,7 @@
         <button
           bind:this={workspaceTabWrapper}
           class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-          style="top:28px; right:36px;"
+          style="top:27px; right:36px;"
         >
           <StatusSuccess
             height="14"
@@ -253,7 +253,7 @@
       >
         {workspace?.description ? workspace.description : "No summary added"}
       </p>
-      <hr style="color: var(--border-ds-surface-100);" />
+      <hr style="color: var(--border-ds-surface-50);" />
 
       <div class="d-flex justify-content-between">
         <p

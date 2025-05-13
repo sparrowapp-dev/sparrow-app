@@ -57,6 +57,14 @@
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+       if (requestUrl === "") {
+          const codeMirrorElement = document.querySelector(
+            ".input-url .cm-editor",
+          );
+          if (codeMirrorElement) {
+            codeMirrorElement.classList.add("url-red-border");
+          }
+        }
       onSendButtonClicked(environmentVariables?.filtered || []);
     }
   };

@@ -122,7 +122,6 @@
       handleSearch();
       decidingKey();
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Error fetching workspace details:", error);
     }
   });
