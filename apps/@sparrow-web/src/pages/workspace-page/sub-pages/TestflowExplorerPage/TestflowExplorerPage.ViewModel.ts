@@ -207,7 +207,7 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.id,
     );
     testflowServer = testflowServer?.toMutableJSON();
-    // console.log(progressiveTab, testflowServer); will be used for debugging in some time
+    const tabServer = new TestflowTabAdapter().unadapt(progressiveTab);
 
     if (!testflowServer) {
       result = false;
@@ -222,13 +222,13 @@ export class TestflowExplorerPageViewModel {
     else if (
       !this.compareArray.init(
         testflowServer.nodes,
-        progressiveTab.property.testflow.nodes,
+        tabServer.nodes,
       )
     ) {
       result = false;
     }
 
-    // nodes
+    // edges
     else if (
       !this.compareArray.init(
         testflowServer.edges,

@@ -238,6 +238,8 @@ export { default as LinkRegular } from "./LinkRegular.svelte";
 export { default as StatusSuccess } from "./StatusSuccess.svelte";
 export { default as LinkedinOrgIcon } from "./LinkdinIcon.svelte";
 export { default as XIcon } from "./XIcon.svelte";
+export { default as ArrowEnterRegular } from "./ArrowEnterRegular.svelte";
+export { default as ArrowExitRegular} from "./ArrowExitRegular.svelte";
 export { default as DatabaseStackRegular } from "./DatabaseStackRegular.svelte";
 export { default as RecordStopRegular } from "./RecordStopRegular.svelte";
 export { default as PlayCircleRegular } from "./PlayCircleRegular.svelte";

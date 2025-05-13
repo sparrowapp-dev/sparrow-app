@@ -13,6 +13,8 @@
     RenameRegular,
     ArrowExportRegular,
     ArrowImportRegular,
+    ArrowExitRegular,
+    ArrowEnterRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
@@ -191,19 +193,10 @@
 
   let moreOptions = [
     {
-      name: "Rename Block",
-      iconSize: "16px",
-      iconColor: "var(--icon-ds-neutral-50)",
-      Icon: RenameRegular,
-      onClick: () => {
-        isEditing = true;
-      },
-    },
-    {
       name: "Run From Here",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
-      Icon: ArrowExportRegular,
+      Icon: ArrowExitRegular,
       onClick: () => {
         data.onContextMenu(id, "run-from-here");
       },
@@ -212,7 +205,7 @@
       name: "Run Till Here",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
-      Icon: ArrowImportRegular,
+      Icon: ArrowEnterRegular,
       onClick: () => {
         data.onContextMenu(id, "run-till-here");
       },
@@ -233,6 +226,15 @@
       Icon: ArrowImportRegular,
       onClick: () => {
         data.onContextMenu(id, "add-block-before");
+      },
+    },
+    {
+      name: "Rename Block",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: RenameRegular,
+      onClick: () => {
+        isEditing = true;
       },
     },
     {
