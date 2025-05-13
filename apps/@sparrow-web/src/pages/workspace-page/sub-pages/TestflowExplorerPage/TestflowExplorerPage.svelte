@@ -200,5 +200,6 @@
     {userRole}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
+    redirectDocsTestflow={_viewModel.redirectDocsTestflow}
   />
 {/if}

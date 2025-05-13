@@ -70,15 +70,15 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    if (update.docChanged) {
+    if (update.docChanged || update.selectionSet) {
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
-      if (!isAutoChange) {
-        // only hits for input, blur etc type of events.
-        const content = update.state.doc.toString(); // Get the new content
-        cursorPosition = update.state.selection.main.head;
-        dispatch("change", content); // Dispatch the new content to parent.
+      const content = update.state.doc.toString();
+      const cursor = update.state.selection.main.head;
+      cursorPosition = cursor;
+      if (!isAutoChange && update.docChanged) {
+        dispatch("change", content);
       }
     }
   });
@@ -308,7 +308,9 @@
       parent: codeMirrorEditorDiv,
       state: state,
     });
-    dispatcher = codeMirrorView;
+    setTimeout(() => {
+      dispatcher = codeMirrorView;
+    }, 100);
   }
 
   function destroyCodeMirrorEditor() {
@@ -501,7 +503,7 @@
 />
 
 {#if hasChanges}
-  <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+  <div class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns">
     <Button
       title={"Keep the Changes"}
       size={"small"}
@@ -532,6 +534,11 @@
   }
 
   /* Style for customizing the css for codemirror merge view */
+
+  .merge-view-act-btns {
+    position: sticky; /* fix the position so that it will not go down with scroll down */
+    bottom: 4px;
+  }
 
   /* styling for added row */
   .merge-view :global(.cm-changedLine) {
