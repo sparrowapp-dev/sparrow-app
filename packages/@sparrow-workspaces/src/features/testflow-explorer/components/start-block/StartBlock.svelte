@@ -27,6 +27,8 @@
   // State to control the visibility of the "Add Block" button
   let isAddBlockVisible = false;
 
+  let isNodeExistToRight = false;
+
   // Unsubscribers for the blocks and connector stores
   let dataBlocksSubscriber: Unsubscriber;
   let dataConnectorSubscriber: Unsubscriber;
@@ -37,6 +39,7 @@
     dataBlocksSubscriber = data.blocks.subscribe(() => {
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
@@ -44,6 +47,7 @@
     dataConnectorSubscriber = data.connector.subscribe(() => {
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
@@ -88,7 +92,12 @@
       /><span class="ms-2 text-fs-12">Run</span>
     </span>
 
-    <Handle type="source" position={Position.Right} />
+    <Handle
+      type="source"
+      position={Position.Right}
+      isConnectable={isNodeExistToRight ? false : true}
+      style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    />
     {#if isAddBlockVisible}
       <div
         class="add-block-btn"
@@ -152,8 +161,5 @@
     padding: 8px 4px;
     display: inline-block;
     align-content: center;
-  }
-  :global(.svelte-flow__handle) {
-    pointer-events: none !important;
   }
 </style>
