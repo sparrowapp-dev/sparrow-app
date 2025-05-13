@@ -214,7 +214,6 @@
     isHovered = false;
   };
 
-  const isMock = true; // check mock collection
   let showAddItemMenu = false;
   let collectionTabWrapper: HTMLElement;
   let noOfColumns = 180;
@@ -359,7 +358,7 @@
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
         <Tooltip
           title={"Add Options"}
-          placement={"bottom-center"}
+          placement={"top-center"}
           distance={13}
           show={!showAddItemMenu}
           zIndex={701}
@@ -384,7 +383,7 @@
 
     {#if $isExpandCollection}
       <div
-        class="overflow-auto position-relative d-flex flex-column me-0 pt-1"
+        class="overflow-auto position-relative d-flex flex-column me-0 py-1"
         style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
@@ -450,7 +449,7 @@
               classProps={"pe-0"}
             >
               {#each collectionListDocument as col}
-                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace)}
+                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
                   <Collection
                     bind:userRole
                     {isSharedWorkspace}
@@ -473,8 +472,8 @@
                 {/if}
               {/each}
             </List>
-            {#if isMock}
-              <hr style="margin: 0px; margin-left: 2rem !important;" />
+            {#if collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+              <hr style="margin: 2px 0 2px 2rem;" />
               <List
                 bind:scrollList
                 height={"auto"}
@@ -534,8 +533,8 @@
           {/if}
         {/if}
       </div>
-      {#if !isMock}
-        <hr style="margin: 0.5rem; margn-left: 2rem !important;" />
+      {#if !collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+        <hr style="margin: 0.5rem; margin-left: 2rem !important;" />
         <EmptyCollection
           bind:userRole
           isMockCollection={true}

@@ -46,9 +46,9 @@
       border: "var(--border-ds-tertiary-700)",
     },
     grey: {
-      bg: "var(--bg-ds-neutral-900)",
-      text: "var(--text-ds-neutral-300)",
-      border: "var(--border-ds-neutral-700)",
+      bg: "var(--bg-ds-neutral-700)",
+      text: "var(--text-ds-neutral-200)",
+      border: "var(--border-ds-neutral-500)",
     },
     pink: {
       bg: "var(--bg-ds-accent-900)",

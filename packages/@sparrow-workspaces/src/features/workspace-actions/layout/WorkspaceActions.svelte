@@ -15,7 +15,7 @@
     AddRegular,
     ArrowClockWiseRegular,
     ChevronDoubleRightRegular,
-    MockCollection,
+    DatabaseStackRegular,
     PlusIcon2,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
@@ -295,7 +295,7 @@
         },
         {
           name: "Add Mock Collection",
-          icon: MockCollection,
+          icon: DatabaseStackRegular,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "13px",
           onclick: () => {
@@ -403,7 +403,7 @@
         },
         {
           name: "Add Mock Collection",
-          icon: MockCollection,
+          icon: DatabaseStackRegular,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "13px",
           onclick: () => {

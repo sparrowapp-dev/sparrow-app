@@ -11,7 +11,7 @@
     CollectionIcon,
     SocketIoIcon,
     GraphIcon,
-    MockCollection,
+    DatabaseStackRegular,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -64,7 +64,7 @@
     {/if}
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <Card
-        icon={MockCollection}
+        icon={DatabaseStackRegular}
         label="Mock Collection"
         iconColor="var(--text-primary-300)"
         iconSize={"20px"}
