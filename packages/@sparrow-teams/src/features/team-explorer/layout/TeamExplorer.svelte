@@ -30,7 +30,7 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
-
+  
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -131,7 +131,9 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+
   let selectedFilter = "All";
+
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -365,7 +367,7 @@
                 </p>
               {/if}
               <Button
-                title={`Invite`}
+                title={`Invite collaborators`}
                 type={"secondary"}
                 startIcon={PeopleRegular}
                 onClick={() => {
@@ -484,11 +486,11 @@
                     <Search
                       variant={"primary"}
                       id="search-input"
-                      size="medium"
+                      size="small"
                       placeholder="Search workspaces in {openTeam?.name}"
                       on:input={handleSearchInput}
                       bind:value={searchQuery}
-                      customWidth={"450px"}
+                      customWidth={"320px"}
                     />
                   </div>
                 </div>
@@ -533,6 +535,7 @@
                     bind:isWorkspaceCreationInProgress
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
+                    {selectedFilter}
                   />
                   <!--Enabled in next phase-->
                 {/if}

@@ -60,7 +60,7 @@
         </span>
         <Input
           width={"410px"}
-          placeholder={""}
+          placeholder={"Enter your workspace name"}
           type={"text"}
           value={workspaceName}
           size="small"
