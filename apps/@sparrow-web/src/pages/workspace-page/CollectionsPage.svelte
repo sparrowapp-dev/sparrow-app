@@ -840,6 +840,7 @@
               onClickCloseOtherTabs={softCloseTabs}
               onClickForceCloseTabs={tabsForceCloseInitiator}
               onClickDuplicateTab={handleTabDuplication}
+              {userRole}
             />
             <div style="flex:1; overflow: hidden;">
               <Route>

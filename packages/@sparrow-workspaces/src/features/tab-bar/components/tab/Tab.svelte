@@ -35,6 +35,7 @@
   import { type Tab } from "@sparrow/common/types/workspace/tab";
   import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
   // ----
 
   // ------ Props ------
@@ -81,6 +82,9 @@
   export let onClickCloseOtherTabs: (tabId: string) => void;
   export let onClickForceCloseTabs: (tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
+  export let userRole;
+
+
   let noOfColumns = 200;
   let showTabControlMenu = false;
 
@@ -320,7 +324,7 @@
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
         >
-          {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
+          {#if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Badge type="dot" variant="danger" size="medium" />
           {/if}
         </div>
@@ -330,8 +334,12 @@
         class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
         !tab.isActive ? 'inactive-close-btn' : ''} btn"
         on:click={(e) => {
-          e.stopPropagation();
-          onTabClosed(tab.id, tab);
+          if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+            onTabClosed(tab.id, tab);
+          } else {
+            e.stopPropagation();
+            onTabClosed(tab.id, tab);
+          }
         }}
         style="overflow:hidden; height: 18px; width:18px;"
       >
