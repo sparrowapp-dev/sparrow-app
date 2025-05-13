@@ -150,7 +150,7 @@
         <button
           bind:this={workspaceTabWrapper}
           class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-          style="top:14px; right:36px;"
+          style="top:27px; right:36px;"
         >
           <StatusSuccess
             height="14"
