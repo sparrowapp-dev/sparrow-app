@@ -172,7 +172,7 @@
   let updateNodeMethod: string;
   let updateNodeUrl: string;
   let updateNodeFolderId: any;
-  let dynamicExpressionDeleteWarning: boolean = false;
+  // let dynamicExpressionDeleteWarning: boolean = false;
   // Flag to control whether nodes are draggable
   let isNodesDraggable = false;
   let blockName = `Block ${nodesValue}`;
@@ -1099,45 +1099,45 @@
       let shouldPreserve = false;
       const nodeToDelete = _nodes.find((n) => n.id === idToDelete);
       let nameToCheck = nodeToDelete?.data?.requestData?.name;
-      if (nameToCheck) {
-        nameToCheck = nameToCheck
-          .replace(/^\//, "_")
-          .replace(/\//g, "_")
-          .replace(/\s+/g, "_");
-        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
-        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
-        for (const otherNode of _nodes) {
-          if (otherNode.id === idToDelete) continue;
-          const stringified = JSON.stringify(
-            otherNode?.data?.requestData || {},
-          );
-          const expressionMatches = [...stringified.matchAll(expressionRegex)];
-          for (const exprMatch of expressionMatches) {
-            const contentInside = exprMatch[1];
-            const varMatches = [...contentInside.matchAll(variableRegex)];
-            for (const vMatch of varMatches) {
-              const fullVar = vMatch[1];
-              const baseVar = fullVar.split(".")[0];
-              if (baseVar === nameToCheck) {
-                shouldPreserve = true;
-                dynamicExpressionDeleteWarning = true;
-                break;
-              }
-            }
-            if (shouldPreserve) break;
-          }
-          if (shouldPreserve) break;
-        }
-      }
+      // if (nameToCheck) {
+      //   nameToCheck = nameToCheck
+      //     .replace(/^\//, "_")
+      //     .replace(/\//g, "_")
+      //     .replace(/\s+/g, "_");
+      //   const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
+      //   const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
+      //   for (const otherNode of _nodes) {
+      //     if (otherNode.id === idToDelete) continue;
+      //     const stringified = JSON.stringify(
+      //       otherNode?.data?.requestData || {},
+      //     );
+      //     const expressionMatches = [...stringified.matchAll(expressionRegex)];
+      //     for (const exprMatch of expressionMatches) {
+      //       const contentInside = exprMatch[1];
+      //       const varMatches = [...contentInside.matchAll(variableRegex)];
+      //       for (const vMatch of varMatches) {
+      //         const fullVar = vMatch[1];
+      //         const baseVar = fullVar.split(".")[0];
+      //         if (baseVar === nameToCheck) {
+      //           shouldPreserve = true;
+      //           // dynamicExpressionDeleteWarning = true;
+      //           break;
+      //         }
+      //       }
+      //       if (shouldPreserve) break;
+      //     }
+      //     if (shouldPreserve) break;
+      //   }
+      // }
       return shouldPreserve
         ? _nodes
         : _nodes.filter((node) => node.id !== idToDelete);
     });
 
-    if (dynamicExpressionDeleteWarning) {
-      isDeleteNodeModalOpen = false;
-      return;
-    }
+    // if (dynamicExpressionDeleteWarning) {
+    //   isDeleteNodeModalOpen = false;
+    //   return;
+    // }
 
     edges.update((_edges) => {
       const incomingEdge = _edges.find((edge) => edge.target === idToDelete);
@@ -1707,7 +1707,7 @@
   />
 </Modal>
 
-<Modal
+<!-- <Modal
   title="Warning Dynamic Expression"
   type="dark"
   width={"540px"}
@@ -1725,7 +1725,7 @@
     The block is currently in use and must be removed from all dependent dynamic
     expressions before it can be deleted.
   </p>
-</Modal>
+</Modal> -->
 
 <Modal
   title={"New Request"}
