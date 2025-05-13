@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { DismissCircleRegular } from "@sparrow/library/icons";
+  import {
+    AddCircleRegular,
+    DismissCircleFilled,
+    DismissCircleRegular,
+  } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
   import { getBezierPath } from "@xyflow/svelte";
 
   export let id;
@@ -7,6 +12,8 @@
   export let sourceY;
   export let targetX;
   export let targetY;
+  export let source;
+  export let target;
   export let sourcePosition;
   export let targetPosition;
   export let selected: boolean;
@@ -28,23 +35,23 @@
     });
   }
 
-  const handleDelete = (event) => {
+  const handleDeleteEdge = (event) => {
     event.stopPropagation();
-    data?.onDelete?.(id);
+    data?.onDeleteEdge?.(source, target);
   };
-  const handleAdd = (event: MouseEvent) => {
+  const handleAddNode = (event: MouseEvent) => {
     event.stopPropagation();
-    data?.onAdd?.(id);
+    data?.onCreateNode?.(source);
   };
 </script>
 
 <!-- SVG Path -->
 <g class="svelte-flow__edge">
-  <path d={edgePath} fill="none" stroke="#333" stroke-width="1.5" />
+  <path d={edgePath} fill="none" stroke="transparent" stroke-width="40" />
   <path
     d={edgePath}
     fill="none"
-    stroke={selected ? "#007aff" : "#333"}
+    stroke={selected ? "#333" : "#333"}
     stroke-width="1"
     class="svelte-flow__edge-interaction"
   />
@@ -56,8 +63,32 @@
     height="36"
   >
     <div class="d-flex justify-content-center align-items-center h-100 gap-2">
-      <DismissCircleRegular />
-      <DismissCircleRegular />
+      <span class="position-relative icon-parent" on:click={handleDeleteEdge}>
+        <DismissCircleFilled color={"var(--icon-ds-danger-300)"} />
+        <div
+          class="icon-tooltip position-absolute text-fs-12 rounded d-flex justify-content-center align-items-center z-2"
+          style="height: 26px; width: 157px; background-color:var(--bg-ds-surface-100); top:-45px; left:0%; transform: translateX(-50%);"
+        >
+          Remove this connection
+        </div>
+        <span
+          class="position-absolute tooltip-square"
+          style="top:-15px; left:50%; transform: translateX(-50%) translateY(-100%) rotate(45deg); "
+        ></span>
+      </span>
+      <span class="position-relative icon-parent" on:click={handleAddNode}>
+        <AddCircleRegular />
+        <div
+          class="icon-tooltip position-absolute text-fs-12 rounded d-flex justify-content-center align-items-center z-2"
+          style="height: 26px; width: 157px; background-color:var(--bg-ds-surface-100); top:-45px; left:0%; transform: translateX(-50%);"
+        >
+          Insert a new block here
+        </div>
+        <span
+          class="position-absolute tooltip-square"
+          style="top:-15px; left:50%; transform: translateX(-50%) translateY(-100%) rotate(45deg); "
+        ></span>
+      </span>
     </div>
   </foreignObject>
 </g>
@@ -65,9 +96,36 @@
 <!-- HTML Button Overlay -->
 <!-- Overlay buttons -->
 
-<style>
+<style lang="scss">
   .btn-container {
+    overflow: visible;
     transform: translateX(-10%) translateY(-12%);
     background-color: var(--bg-ds-surface-300);
+    display: none;
+  }
+  :global(.svelte-flow__edge:hover) {
+    height: 500px;
+    .btn-container {
+      display: block;
+    }
+  }
+  .icon-tooltip {
+    display: none !important;
+  }
+
+  .tooltip-square {
+    display: none !important;
+    height: 10px;
+    width: 10px;
+    background-color: var(--bg-ds-surface-100);
+  }
+
+  :global(.icon-parent:hover) {
+    .icon-tooltip {
+      display: flex !important;
+    }
+    .tooltip-square {
+      display: block !important;
+    }
   }
 </style>

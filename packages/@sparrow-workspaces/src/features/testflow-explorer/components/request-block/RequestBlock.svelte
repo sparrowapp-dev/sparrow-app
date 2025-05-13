@@ -70,6 +70,8 @@
   let isEditing = false;
   let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
+  let isNodeExistToRight = false;
+  let isNodeExistToLeft = false;
   let isRunTextVisible = false; // State to track visibility of run text
   let isDropHereVisible = false; // state to track if there is drag in test flow screen
   let dataBlocksSubscriber: Unsubscriber;
@@ -154,6 +156,8 @@
       });
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
+        isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
       isDropHereVisible = _nodes[0].data.parentDrag;
@@ -161,6 +165,8 @@
     dataConnectorSubscriber = data.connector.subscribe(() => {
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
+        isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
@@ -266,7 +272,7 @@
   <Handle
     type="target"
     position={Position.Left}
-    class="connecting-dot-left"
+    isConnectable={isNodeExistToLeft ? false : true}
     style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
   <div
@@ -499,6 +505,7 @@
   <Handle
     type="source"
     position={Position.Right}
+    isConnectable={isNodeExistToRight ? false : true}
     style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
@@ -587,18 +594,7 @@
     border-radius: 8px;
     outline: none;
   }
-  .connecting-dot-left {
-    background-color: var(--bg-ds-surface-600);
-    border: 1px solid var(--border-ds-neutral-500);
-  }
 
-  .connecting-dot-left:hover {
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
-
-  .connecting-dot-left:active {
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
   .base-line {
     border: 1px solid var(--bg-ds-surface-400);
   }

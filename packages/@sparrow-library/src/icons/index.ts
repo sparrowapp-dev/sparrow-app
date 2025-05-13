@@ -240,3 +240,5 @@ export { default as LinkedinOrgIcon } from "./LinkdinIcon.svelte";
 export { default as XIcon } from "./XIcon.svelte";
 export { default as ArrowEnterRegular } from "./ArrowEnterRegular.svelte";
 export { default as ArrowExitRegular} from "./ArrowExitRegular.svelte";
+export { default as DismissCircleFilled } from "./DismissCircleFilled.svelte";
+export { default as AddCircleRegular } from "./AddCircleRegular.svelte";

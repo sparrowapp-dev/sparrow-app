@@ -387,6 +387,23 @@ export class TestflowExplorerPageViewModel {
     return collectionAuth;
   };
 
+  private findConnectedNodes  = (adj: any[], start: number,nodes, result, visited = new Set(), ) => {
+    if (visited.has(start)) return;
+
+    
+      for (let i = 0; i < nodes.length; i++) {
+        if (Number(nodes[i].id) === start) {
+          result.push(nodes[i]);
+        }
+      }
+      
+    visited.add(start);
+
+    for (const neighbor of adj[start]) {
+      this.findConnectedNodes(adj, neighbor, nodes, result, visited,);
+    }
+  };
+
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -399,25 +416,66 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+    const edges = progressiveTab?.property?.testflow?.edges;
     const abortController = new AbortController();
     const { signal } = abortController;
 
     let runningNodes: any[] = [];
 
     if (_event === "run-from-here") {
-      nodes.forEach((node: any) => {
-        if (node.id >= _id) {
-          runningNodes.push(node);
-        }
-      });
+      let maxNodeId = 1;
+      for (let i = 0; i < nodes.length; i++) {
+           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+         }
+         
+       // Initialize adjacency list
+       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+       // Populate adjacency list
+  
+     
+      for (let i = 0; i < edges.length; i++) {
+        graph[Number(edges[i].source)].push(Number(edges[i].target));
+      }
+      
+      let result = [];
+      this.findConnectedNodes(graph, Number(_id), nodes,result );
+      runningNodes = [...result];
     } else if (_event === "run-till-here") {
-      nodes.forEach((node: any) => {
-        if (node.id <= _id) {
-          runningNodes.push(node);
-        }
-      });
+      let maxNodeId = 1;
+      for (let i = 0; i < nodes.length; i++) {
+           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+         }
+         
+       // Initialize adjacency list
+       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+       // Populate adjacency list
+  
+     
+      for (let i = 0; i < edges.length; i++) {
+        graph[Number(edges[i].target)].push(Number(edges[i].source));
+      }
+      
+      let result = [];
+      this.findConnectedNodes(graph, Number(_id), nodes,result );
+      runningNodes = [...(result.reverse())];
     } else {
-      runningNodes = [...nodes];
+      let maxNodeId = 1;
+      for (let i = 0; i < nodes.length; i++) {
+           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+         }
+         
+       // Initialize adjacency list
+       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+       // Populate adjacency list
+  
+     
+      for (let i = 0; i < edges.length; i++) {
+        graph[Number(edges[i].source)].push(Number(edges[i].target));
+      }
+      
+      let result = [];
+      this.findConnectedNodes(graph, Number("1"), nodes,result );
+      runningNodes = [...result];
     }
 
     testFlowDataStore.update((testFlowDataMap) => {

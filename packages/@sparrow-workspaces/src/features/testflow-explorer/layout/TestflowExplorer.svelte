@@ -6,6 +6,8 @@
     type Node,
     type NodeTypes,
     type EdgeTypes,
+    useSvelteFlow,
+    SvelteFlowProvider,
   } from "@xyflow/svelte";
 
   import {
@@ -178,7 +180,7 @@
   // Flag to control whether nodes are draggable
   let isNodesDraggable = true;
   let isNodeDeletable = false;
-  let isEdgeDeletable = true;
+  let isEdgeDeletable = false;
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let collectionListDocument: CollectionDocument[];
@@ -187,21 +189,28 @@
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
+  setTimeout(() => {}, 1000);
 
   /**
    * Checks if edges exist for the given node ID.
    * @param _id - Node ID to check for connected edges.
    * @returns True if edges exist, otherwise false.
    */
-  const checkIfEdgesExist = (_id: string) => {
+  const checkIfEdgesExist = (_id: string, _direction = "right") => {
     let edge: TFEdgeHandlerType[] = [];
     edges.subscribe((value) => {
       edge = value;
     })();
     let response = false;
     edge.forEach((it) => {
-      if (it.id.replace("xy-edge__", "").split("-")[0] === _id) {
-        response = true;
+      if (_direction === "right") {
+        if (it.id.replace("xy-edge__", "").split("-")[0] === _id) {
+          response = true;
+        }
+      } else {
+        if (it.id.replace("xy-edge__", "").split("-")[1] === _id) {
+          response = true;
+        }
       }
     });
     return response;
@@ -757,8 +766,8 @@
             onClick: function (_id: string, _options = undefined) {
               createNewNode(_id, _options);
             },
-            onCheckEdges: function (_id: string) {
-              return checkIfEdgesExist(_id);
+            onCheckEdges: function (_id: string, _direction: string) {
+              return checkIfEdgesExist(_id, _direction);
             },
             onContextMenu: function (id: string, _event: string) {
               if (_event === "delete") {
@@ -825,6 +834,9 @@
 
     ////////////////////////////////////////////////////////////
     if (_direction === "add-block-after") {
+      /**
+       * Future work: Have to handle case if multiple blocks connected to the same node to the right.
+       */
       let destinationId: string;
       edges.update((edges) => {
         for (let i = 0; i < edges.length; i++) {
@@ -879,6 +891,9 @@
       dfs(graph, Number(newNodeId));
       // debugger;
     } else if (_direction === "add-block-before") {
+      /**
+       * Future work: Have to handle case if multiple blocks connected to the same node to the left.
+       */
       let destinationId: any;
       edges.update((edges) => {
         for (let i = 0; i < edges.length; i++) {
@@ -888,15 +903,27 @@
             edges[i].id = "xy-edge__" + newNodeId + "-" + _id;
           }
         }
-        return [
-          ...edges,
-          {
-            id: "xy-edge__" + destinationId + "-" + newNodeId,
-            source: destinationId,
-            target: newNodeId,
-            deletable: isEdgeDeletable,
-          },
-        ];
+        if (destinationId) {
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + destinationId + "-" + newNodeId,
+              source: destinationId,
+              target: newNodeId,
+              deletable: isEdgeDeletable,
+            },
+          ];
+        } else {
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + newNodeId + "-" + _id,
+              source: newNodeId,
+              target: _id,
+              deletable: isEdgeDeletable,
+            },
+          ];
+        }
       });
 
       let maxNodeId = 1;
@@ -940,8 +967,8 @@
             onClick: function (_id: string, _options = undefined) {
               createNewNode(_id, _options);
             },
-            onCheckEdges: function (_id: string) {
-              return checkIfEdgesExist(_id);
+            onCheckEdges: function (_id: string, _direction: string) {
+              return checkIfEdgesExist(_id, _direction);
             },
             onContextMenu: function (id: string, _event: string) {
               if (_event === "delete") {
@@ -1008,6 +1035,10 @@
           type: "edge",
           target: dbEdges[i].target,
           deletable: isEdgeDeletable,
+          data: {
+            onDeleteEdge: deleteEdges,
+            onCreateNode: createNewNode,
+          },
         });
       }
       return res;
@@ -1060,9 +1091,25 @@
     }
   });
 
+  let prevEdgeLength = 0;
   // Subscribe to changes in the edges
   const edgesSubscriber = edges.subscribe((val) => {
-    if (val) onUpdateEdges(val);
+    if (val) {
+      onUpdateEdges(val);
+      if (prevEdgeLength !== val.length) {
+        edges.update((edges) => {
+          val.forEach((edge) => {
+            edge.type = "edge";
+            edge.data = {
+              onDeleteEdge: deleteEdges,
+              onCreateNode: createNewNode,
+            };
+          });
+          return val;
+        });
+      }
+      prevEdgeLength = val.length || 0;
+    }
   });
 
   /**
@@ -1396,6 +1443,19 @@
     debugger;
     // edges.update((eds) => {});
   }
+
+  const deleteEdges = (_source: string, _target: string) => {
+    edges.update((_edges) => {
+      const filteredEdges = _edges.filter((edge) => {
+        if (edge.source === _source && edge.target === _target) {
+          return false;
+        }
+        return true;
+      });
+
+      return [...filteredEdges];
+    });
+  };
 </script>
 
 <div
@@ -1512,20 +1572,22 @@
     on:click={focusDiv}
     style="flex:1; overflow:auto; outline: none; position:realtive;"
   >
-    <SvelteFlow
-      {nodes}
-      {edges}
-      {nodeTypes}
-      {edgeTypes}
-      on:connect={(e) => handleConnect(e.detail)}
-    >
-      <Background
-        bgColor={"var(--bg-ds-surface-900)"}
-        patternColor={"var(--bg-ds-surface-500)"}
-        size={4}
-        gap={20}
-      />
-    </SvelteFlow>
+    <SvelteFlowProvider>
+      <SvelteFlow
+        {nodes}
+        {edges}
+        {nodeTypes}
+        {edgeTypes}
+        on:connect={(e) => handleConnect(e.detail)}
+      >
+        <Background
+          bgColor={"var(--bg-ds-surface-900)"}
+          patternColor={"var(--bg-ds-surface-500)"}
+          size={4}
+          gap={20}
+        />
+      </SvelteFlow>
+    </SvelteFlowProvider>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
       <div style="position:absolute; top:260px; left:265px; z-index:1000;">
