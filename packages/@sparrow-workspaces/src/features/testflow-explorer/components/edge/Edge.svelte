@@ -103,7 +103,7 @@
     background-color: var(--bg-ds-surface-300);
     display: none;
   }
-  :global(.svelte-flow__edge:hover) {
+  .svelte-flow__edge:hover {
     height: 500px;
     .btn-container {
       display: block;
@@ -120,7 +120,7 @@
     background-color: var(--bg-ds-surface-100);
   }
 
-  :global(.icon-parent:hover) {
+  .icon-parent:hover {
     .icon-tooltip {
       display: flex !important;
     }
