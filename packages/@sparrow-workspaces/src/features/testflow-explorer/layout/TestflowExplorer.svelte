@@ -1203,9 +1203,11 @@
         _nodes.map((node) => [node.id, { ...node }]),
       );
       const edgesCopy = [...$edges];
-
       // Sort edges by numeric source for reliable ordering
       edgesCopy.sort((a, b) => parseInt(a.source) - parseInt(b.source));
+      if (edgesCopy.length === 0 || edgesCopy[0].source !== "1") {
+        return _nodes;
+      }
       const validChains: string[][] = [];
       let currentChain: string[] = [];
       for (let i = 0; i < edgesCopy.length; i++) {
@@ -1214,19 +1216,21 @@
           currentChain.push(source, target);
         } else {
           const prevTarget = currentChain[currentChain.length - 1];
-          if (source === prevTarget) {
-            currentChain.push(target);
-          } else {
-            if (currentChain.length > 2) validChains.push([...currentChain]);
-            currentChain = [source, target];
+          // If sequential chain breaks, cancel all layout changes
+          if (source !== prevTarget) {
+            return _nodes;
           }
+          currentChain.push(target);
         }
       }
-      // Push last collected chain if valid
-      if (currentChain.length > 2) validChains.push(currentChain);
+
+      if (currentChain.length > 1) {
+        validChains.push(currentChain);
+      }
       for (const chain of validChains) {
         let x = 100;
         let y = 200;
+
         for (const nodeId of chain) {
           const node = nodeMap.get(nodeId);
           if (!node) continue;
