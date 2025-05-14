@@ -62,7 +62,7 @@
         }}
       />
     {/if}
-    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isGuestUser}
       <Card
         icon={DatabaseStackRegular}
         label="Mock Collection"

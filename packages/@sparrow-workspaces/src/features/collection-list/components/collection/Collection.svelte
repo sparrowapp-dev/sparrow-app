@@ -374,7 +374,7 @@
 />
 
 <Modal
-  title={"Delete Collection?"}
+  title={isMockCollection ? "Delete Mock Collection" : "Delete Collection?"}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -385,7 +385,10 @@
     <p
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
-      Are you sure you want to delete this Collection? Everything in <span
+      Are you sure you want to delete this {isMockCollection
+        ? "mock collection"
+        : "Collection"}? Everything in
+      <span
         class="text-ds-font-weight-semi-bold"
         style="color: var(--text-ds-neutral-50);">"{collection.name}"</span
       >
@@ -668,7 +671,9 @@
     tabindex="-1"
     class="d-flex {collection?.activeSync
       ? 'main-collection-sync'
-      : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
+      : isMockCollection
+        ? 'main-collection-mock'
+        : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
@@ -1344,6 +1349,9 @@
   }
   .main-collection {
     width: calc(100% - 55px);
+  }
+  .main-collection-mock {
+    width: calc(100% - 100px);
   }
   .main-collection-sync {
     width: calc(100% - 119px);

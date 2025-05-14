@@ -41,7 +41,7 @@
     isExpandTestflow,
   } from "@sparrow/workspaces/stores";
   import { WithModal } from "@sparrow/workspaces/hoc";
-  import { notifications } from "@sparrow/library/ui";
+  import { notifications, Tooltip } from "@sparrow/library/ui";
 
   // ---- Interface, enum & constants
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
@@ -90,6 +90,7 @@
   import { writable } from "svelte/store";
   import * as Sentry from "@sentry/svelte";
   import { Spinner } from "@sparrow/library/ui";
+  import { OpenRegular } from "@sparrow/library/icons";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -694,6 +695,13 @@
       });
     }
   };
+
+  let mockCollectionUrl: string;
+  let isMockURLModelOpen: boolean;
+  const handleMockCollectionModel = (url: string) => {
+    mockCollectionUrl = url;
+    isMockURLModelOpen = true;
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -805,6 +813,7 @@
                         <CollectionExplorerPage
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
+                          onMockCollectionModelOpen={handleMockCollectionModel}
                         />
                       </div>
                     </Motion>
@@ -1482,6 +1491,80 @@
         isReplaceCollectionModalOpen = false;
       }}
     ></Button>
+  </div>
+</Modal>
+
+<Modal
+  title={"How to use Mock URL?"}
+  zIndex={1000}
+  isOpen={isMockURLModelOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isMockURLModelOpen = false;
+  }}
+>
+  <div class="d-flex flex-column gap-3 mt-3 mb-2">
+    <div class="d-flex gap-1" style="width: 100%;">
+      <p class="text-ds-font-size-14" style="margin-bottom: 0px;">1.</p>
+      <div>
+        <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
+          Copy the Mock URL
+        </p>
+        <p
+          class="text-ds-font-size-12 mt-1"
+          style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
+        >
+          Click "Copy" to copy your unique mock base URL.
+        </p>
+      </div>
+    </div>
+    <div class="d-flex gap-1">
+      <p class="text-ds-font-size-14" style="margin-bottom: 0px;">2.</p>
+      <div>
+        <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
+          Use it in Request
+        </p>
+        <p
+          class="text-ds-font-size-12 mt-1"
+          style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
+        >
+          Open request in this collection, paste the base URL in the request
+          field, followed by the endpoints (if any). For example,
+        </p>
+        <div
+          class="d-flex justify-content-start align-items-start px-2 py-1 text-ds-font-size-12 mt-1"
+          style="
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    gap: 16px;
+    width: fit-content;
+  "
+        >
+          <span class="d-inline-block text-truncate" style="max-width: 380px;">
+            GET {mockCollectionUrl}/users
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex gap-1" style="width: 100%;">
+      <p class="text-ds-font-size-14" style="margin-bottom: 0px;">3.</p>
+      <div>
+        <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
+          Need more details?
+        </p>
+        <Tooltip title={"Coming Soon"} placement={"top-center"}>
+          <Button
+            size="small"
+            customWidth={"220px"}
+            type={"link-primary"}
+            title="Learn how mock collection works"
+            disable={true}
+            onClick={() => {}}
+            endIcon={OpenRegular}
+          />
+        </Tooltip>
+      </div>
+    </div>
   </div>
 </Modal>
 
