@@ -27,6 +27,7 @@
   export let tab: TabDocument;
 
   export let onSyncCollection: (collectionId: string) => void;
+  export let onMockCollectionModelOpen;
 
   // ViewModel initialization
   const _viewModel = new CollectionExplorerPage(tab);
@@ -187,6 +188,7 @@
 </script>
 
 <CollectionExplorer
+  {onMockCollectionModelOpen}
   {isCollectionEditable}
   onUpdateEnvironment={_viewModel.updateEnvironment}
   isWebApp={false}

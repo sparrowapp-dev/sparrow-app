@@ -293,19 +293,23 @@
             isExpandCollection.set(true);
           },
         },
-        {
-          name: "Add Mock Collection",
-          icon: DatabaseStackRegular,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            onItemCreated("mockCollection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-            isExpandCollection.set(true);
-          },
-        },
+        ...(!isGuestUser
+          ? [
+              {
+                name: "Add Mock Collection",
+                icon: DatabaseStackRegular,
+                iconColor: "var(--icon-secondary-130)",
+                iconSize: "13px",
+                onclick: () => {
+                  onItemCreated("mockCollection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                  isExpandCollection.set(true);
+                },
+              },
+            ]
+          : []),
         {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
@@ -401,19 +405,23 @@
             isExpandCollection.set(true);
           },
         },
-        {
-          name: "Add Mock Collection",
-          icon: DatabaseStackRegular,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            onItemCreated("mockCollection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-            isExpandCollection.set(true);
-          },
-        },
+        ...(!isGuestUser
+          ? [
+              {
+                name: "Add Mock Collection",
+                icon: DatabaseStackRegular,
+                iconColor: "var(--icon-secondary-130)",
+                iconSize: "13px",
+                onclick: () => {
+                  onItemCreated("mockCollection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                  isExpandCollection.set(true);
+                },
+              },
+            ]
+          : []),
         {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,

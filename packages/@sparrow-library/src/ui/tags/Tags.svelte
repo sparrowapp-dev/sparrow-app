@@ -10,6 +10,13 @@
   export let text: string = "Tag";
   export let iconSize = 16;
   export let endIcon;
+  export let size: "small" | "medium" = "small";
+  let height = 18;
+  if (size === "medium") {
+    height = 20;
+  } else {
+    height = 18;
+  }
 
   const convertCasing = (sentence: string) => {
     let sen =
@@ -65,7 +72,7 @@
     border: 1px solid {colorPalette[type]?.border};
     border-radius: 2px;
     padding: 0px 4px;
-    height: 20px;
+    height: {height}px;
     text-align: center;
     font-family: Inter, sans-serif;
     width: fit-content;
