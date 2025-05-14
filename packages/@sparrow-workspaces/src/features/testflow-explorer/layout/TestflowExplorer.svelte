@@ -613,7 +613,42 @@
       (node) => node.id === id,
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
-    // countNextDeletedNode(id);
+
+    // nodes.update((_nodes) => {
+    //   let shouldPreserve = false;
+    //   const nodeToDelete = _nodes.find((n) => n.id === deletedNodeId);
+    //   let nameToCheck = nodeToDelete?.data?.requestData?.name;
+    //   if (nameToCheck) {
+    //     nameToCheck = nameToCheck
+    //       .replace(/^\//, "_")
+    //       .replace(/\//g, "_")
+    //       .replace(/\s+/g, "_");
+    //     const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
+    //     const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
+    //     for (const otherNode of _nodes) {
+    //       if (otherNode.id === deleteNodeId) continue;
+    //       const stringified = JSON.stringify(
+    //         otherNode?.data?.requestData || {},
+    //       );
+    //       const expressionMatches = [...stringified.matchAll(expressionRegex)];
+    //       for (const exprMatch of expressionMatches) {
+    //         const contentInside = exprMatch[1];
+    //         const varMatches = [...contentInside.matchAll(variableRegex)];
+    //         for (const vMatch of varMatches) {
+    //           const fullVar = vMatch[1];
+    //           const baseVar = fullVar.split(".")[0];
+    //           if (baseVar === nameToCheck) {
+    //             shouldPreserve = true;
+    //             break;
+    //           }
+    //         }
+    //         if (shouldPreserve) break;
+    //       }
+    //       if (shouldPreserve) break;
+    //     }
+    //   }
+    //   return _nodes;
+    // });
   };
 
   /**
@@ -820,17 +855,6 @@
         },
       ];
     });
-    // edges.update((edges) => {
-    //   return [
-    //     ...edges,
-    //     {
-    //       id: "xy-edge__" + _id + "-" + newNodeId,
-    //       source: _id,
-    //       target: newNodeId,
-    //       deletable: isEdgeDeletable,
-    //     },
-    //   ];
-    // });
 
     ////////////////////////////////////////////////////////////
     if (_direction === "add-block-after") {
@@ -889,7 +913,6 @@
         return edges;
       });
       dfs(graph, Number(newNodeId));
-      // debugger;
     } else if (_direction === "add-block-before") {
       /**
        * Future work: Have to handle case if multiple blocks connected to the same node to the left.
@@ -1104,6 +1127,7 @@
               onDeleteEdge: deleteEdges,
               onCreateNode: createNewNode,
             };
+            edge.deletable = isEdgeDeletable;
           });
           return val;
         });
@@ -1149,62 +1173,9 @@
    * @param id - The ID of the node to delete.
    */
   const handleDeleteNode = (idToDelete: string) => {
-    const deletedIndex = Number(idToDelete);
-    let nodesCount = 0;
-    let nodeFinalIndex = "";
-
     nodes.update((_nodes) => {
-      let shouldPreserve = false;
-      nodesCount = _nodes?.length;
-      const nodeToDelete = _nodes.find((n) => n.id === idToDelete);
-      let nameToCheck = nodeToDelete?.data?.requestData?.name;
-      // if (nameToCheck) {
-      //   nameToCheck = nameToCheck
-      //     .replace(/^\//, "_")
-      //     .replace(/\//g, "_")
-      //     .replace(/\s+/g, "_");
-      //   const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
-      //   const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
-      //   for (const otherNode of _nodes) {
-      //     if (otherNode.id === idToDelete) continue;
-      //     const stringified = JSON.stringify(
-      //       otherNode?.data?.requestData || {},
-      //     );
-      //     const expressionMatches = [...stringified.matchAll(expressionRegex)];
-      //     for (const exprMatch of expressionMatches) {
-      //       const contentInside = exprMatch[1];
-      //       const varMatches = [...contentInside.matchAll(variableRegex)];
-      //       for (const vMatch of varMatches) {
-      //         const fullVar = vMatch[1];
-      //         const baseVar = fullVar.split(".")[0];
-      //         if (baseVar === nameToCheck) {
-      //           shouldPreserve = true;
-      //           dynamicExpressionDeleteWarning = true;
-      //           break;
-      //         }
-      //       }
-      //       if (shouldPreserve) break;
-      //     }
-      //     if (shouldPreserve) break;
-      //   }
-      // }
-      return shouldPreserve
-        ? _nodes
-        : _nodes.filter((node) => node.id !== idToDelete);
+      return _nodes.filter((node) => node.id !== idToDelete);
     });
-
-    nodes.update((_nodes) => {
-      nodesCount = _nodes.length;
-      if (nodesCount === 2) {
-        nodeFinalIndex = _nodes[1].id;
-      }
-      return _nodes;
-    });
-
-    // if (dynamicExpressionDeleteWarning) {
-    //   isDeleteNodeModalOpen = false;
-    //   return;
-    // }
 
     edges.update((_edges) => {
       const incomingEdge = _edges.find((edge) => edge.target === idToDelete);
@@ -1216,160 +1187,20 @@
           id: `xy-edge__${incomingEdge.source}-${outgoingEdge.target}`,
           source: incomingEdge.source,
           target: outgoingEdge.target,
-          deletable: false,
-          selected: false,
+          deletable: isEdgeDeletable,
         });
       }
       const filteredEdges = _edges.filter((edge) => {
         if (edge.source === idToDelete || edge.target === idToDelete) {
-          if (!outgoingEdge && edge.target === idToDelete) return false;
-          // If it's an incoming or outgoing edge, remove it
-          if (edge.source === idToDelete || edge.target === idToDelete)
-            return false;
+          return false;
         }
         return true;
       });
-
       return [...filteredEdges, ...newEdge];
     });
-
-    nodes.update((_nodes) => {
-      const nodeMap = new Map<string, Node>(
-        _nodes.map((node) => [node.id, { ...node }]),
-      );
-
-      const edgesCopy = [...$edges];
-      const addedNodes: Node[] = [];
-
-      // Sort edges by source
-      const sortedEdges = edgesCopy.sort((a, b) =>
-        a.source.localeCompare(b.source),
-      );
-
-      // Detect missing links and insert intermediate nodes
-      for (let i = 0; i < sortedEdges.length - 1; i++) {
-        const current = sortedEdges[i];
-        const next = sortedEdges[i + 1];
-
-        if (current.target !== next.source) {
-          const intermediateId = `missing-${current.target}-${next.source}`;
-          const intermediateNode: Node = {
-            id: intermediateId,
-            type: "default",
-            data: { label: "Missing Link" },
-            position: { x: 0, y: 0 },
-          };
-
-          addedNodes.push(intermediateNode);
-          nodeMap.set(intermediateId, intermediateNode);
-
-          // Insert a fake edge from current.target → missing → next.source
-          edgesCopy.push({
-            id: `xy-edge__${current.target}-${intermediateId}`,
-            source: current.target,
-            target: intermediateId,
-          });
-          edgesCopy.push({
-            id: `xy-edge__${intermediateId}-${next.source}`,
-            source: intermediateId,
-            target: next.source,
-          });
-        }
-      }
-
-      // Build adjacency list and in-degree map
-      const adj: Record<string, string[]> = {};
-      const inDegree: Record<string, number> = {};
-
-      edgesCopy.forEach(({ source, target }) => {
-        if (!adj[source]) adj[source] = [];
-        adj[source].push(target);
-        inDegree[target] = (inDegree[target] || 0) + 1;
-        if (!(source in inDegree)) inDegree[source] = 0;
-      });
-
-      // Topological sort & layout
-      const queue: string[] = [];
-      for (const id in inDegree) {
-        if (inDegree[id] === 0) {
-          queue.push(id);
-          const root = nodeMap.get(id);
-          if (root) {
-            root.position.x = 100;
-            root.position.y = 200;
-          }
-        }
-      }
-
-      const visited = new Set<string>();
-
-      while (queue.length) {
-        const nodeId = queue.shift()!;
-        const sourceNode = nodeMap.get(nodeId);
-        if (!sourceNode) continue;
-        visited.add(nodeId);
-
-        const children = adj[nodeId] || [];
-        let offset = 0;
-
-        for (const childId of children) {
-          const childNode = nodeMap.get(childId);
-          if (!childNode || visited.has(childId)) continue;
-
-          childNode.position.x = sourceNode.position.x + 350;
-          childNode.position.y = sourceNode.position.y + offset;
-          offset += 80;
-
-          inDegree[childId]--;
-          if (inDegree[childId] === 0) {
-            queue.push(childId);
-          }
-        }
-      }
-
-      return Array.from(nodeMap.values());
-    });
-
-    // Cleanup
     deleteNodeResponse($tab.tabId, selectedNodeId);
     unselectNodes();
     isDeleteNodeModalOpen = false;
-  };
-
-  /**
-   *  Count nodes with an id greater than the one being deleted
-   * @param id - node id from which count starts
-   */
-  const countNextDeletedNode = (id: string) => {
-    nodes.subscribe((_nodes) => {
-      deleteCount = _nodes.filter(
-        (node) => Number(node.id) > Number(id),
-      ).length;
-    });
-  };
-
-  /**
-   * Handles key press events, preventing default behavior for "Backspace" and "Delete" keys.
-   * If "Delete" is pressed, it triggers the deletion modal for the selected node.
-   *
-   * @param event - The key press event object.
-   */
-  const handleKeyPress = async (event: KeyboardEvent) => {
-    // if (event.key === "Backspace") {
-    //   try {
-    //     if (userOS === "macos") {
-    //       event.preventDefault();
-    //       handleDeleteModal(selectedNodeId);
-    //     }
-    //   } catch (error) {
-    //     console.error("Failed to determine platform:", error);
-    //   }
-    // }
-    // if (event.key === "Delete") {
-    //   debugger;
-    //   event.preventDefault();
-    //   handleDeleteModal(selectedNodeId);
-    // }
   };
 
   /**
@@ -1620,7 +1451,6 @@
   <div
     bind:this={divElement}
     tabindex="0"
-    on:keydown={handleKeyPress}
     on:click={focusDiv}
     style="flex:1; overflow:auto; outline: none; position:realtive;"
   >
@@ -1832,26 +1662,6 @@
     }}
   />
 </Modal>
-
-<!-- <Modal
-  title="Warning Dynamic Expression"
-  type="dark"
-  width={"540px"}
-  zIndex={1000}
-  isOpen={dynamicExpressionDeleteWarning}
-  handleModalState={(flag = false) => {
-    isDeleteNodeModalOpen = false;
-    dynamicExpressionDeleteWarning = flag;
-  }}
->
-  <p
-    class="text-fs-14 text-ds-font-weight-medium"
-    style="color: var(--text-secondary-1000); margin-top:20px;"
-  >
-    The block is currently in use and must be removed from all dependent dynamic
-    expressions before it can be deleted.
-  </p>
-</Modal> -->
 
 <Modal
   title={"New Request"}

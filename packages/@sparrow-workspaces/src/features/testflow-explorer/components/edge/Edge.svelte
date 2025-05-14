@@ -124,10 +124,10 @@
 
   .icon-parent:hover {
     .icon-tooltip {
-      display: flex !important;
+      // display: flex !important;
     }
     .tooltip-square {
-      display: block !important;
+      // display: block !important;
     }
   }
 </style>
