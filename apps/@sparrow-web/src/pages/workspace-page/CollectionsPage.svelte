@@ -1020,7 +1020,7 @@
   handleModalState={() => handleClosePopupBackdrop(false)}
 >
   <div class="mt-2 mb-4">
-    <p class="lightGray" style="color: lightGray;">
+    <p class="lightGray text-fs-14" style="color: lightGray;">
       Do you want to save changes in this tab “<span
         class="text-whiteColor fw-bold"
       >

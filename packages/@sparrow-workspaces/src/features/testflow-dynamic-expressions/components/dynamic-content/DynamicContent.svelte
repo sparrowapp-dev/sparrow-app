@@ -186,7 +186,7 @@
               on:click={() =>
                 handleSelectRequestType(
                   type.requestType,
-                  selectedAPI?.requestData?.name,
+                  selectedAPI?.blockName,
                 )}
             >
               <div class="d-flex justify-content-start align-items-center">

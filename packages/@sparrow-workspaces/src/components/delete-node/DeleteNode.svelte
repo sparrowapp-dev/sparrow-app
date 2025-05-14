@@ -24,16 +24,8 @@
       class="text-fs-14 text-ds-font-weight-medium"
       style="color: var(--text-secondary-1000);"
     >
-      Are you sure you want to delete this block? All dynamic expressions it
-      contains will be permanently removed.
-
-      {#if deleteCount > 0}
-        Deleting
-        <span style="font-weight: 700;">
-          {deleteNodeName ? `"${deleteNodeName}"` : "this"}
-        </span>
-        will also remove its {deleteCount} connected blocks.
-      {/if}
+      Deleting this block will break connected downstream blocks that rely on
+      its dynamic expressions. Are you sure you want to proceed?
     </p>
   </div>
 

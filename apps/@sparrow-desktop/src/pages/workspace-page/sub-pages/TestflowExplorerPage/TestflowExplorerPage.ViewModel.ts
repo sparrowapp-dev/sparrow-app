@@ -664,16 +664,23 @@ export class TestflowExplorerPageViewModel {
                     headers: response?.data?.headers
                   },
                   request: {
-                    url: decodeData[0],
                     headers: headersObject || {},
                     body:reqBody,
                     parameters:reqParam || {}
                   }
                 }
-           
-           
-
-
+                requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+          
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -709,7 +716,18 @@ export class TestflowExplorerPageViewModel {
                   headers:{}
                 },
                 request: {
-                  url: decodeData[0],
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
+
+              requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                response: {
+                  body: {},
+                  headers:{}
+                },
+                request: {
                     headers:{},
                     body:{},
                     parameters:{}
@@ -740,7 +758,6 @@ export class TestflowExplorerPageViewModel {
     if (failedRequests === 0) {
       history.status = "pass";
     }
-
     testFlowDataStore.update((testFlowDataMap) => {
       const wsData = testFlowDataMap.get(progressiveTab.tabId);
       if (wsData) {
