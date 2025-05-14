@@ -1150,50 +1150,61 @@
    */
   const handleDeleteNode = (idToDelete: string) => {
     const deletedIndex = Number(idToDelete);
+    let nodesCount = 0;
+    let nodeFinalIndex = "";
 
     nodes.update((_nodes) => {
       let shouldPreserve = false;
+      nodesCount = _nodes?.length;
       const nodeToDelete = _nodes.find((n) => n.id === idToDelete);
       let nameToCheck = nodeToDelete?.data?.requestData?.name;
-      if (nameToCheck) {
-        nameToCheck = nameToCheck
-          .replace(/^\//, "_")
-          .replace(/\//g, "_")
-          .replace(/\s+/g, "_");
-        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
-        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
-        for (const otherNode of _nodes) {
-          if (otherNode.id === idToDelete) continue;
-          const stringified = JSON.stringify(
-            otherNode?.data?.requestData || {},
-          );
-          const expressionMatches = [...stringified.matchAll(expressionRegex)];
-          for (const exprMatch of expressionMatches) {
-            const contentInside = exprMatch[1];
-            const varMatches = [...contentInside.matchAll(variableRegex)];
-            for (const vMatch of varMatches) {
-              const fullVar = vMatch[1];
-              const baseVar = fullVar.split(".")[0];
-              if (baseVar === nameToCheck) {
-                shouldPreserve = true;
-                dynamicExpressionDeleteWarning = true;
-                break;
-              }
-            }
-            if (shouldPreserve) break;
-          }
-          if (shouldPreserve) break;
-        }
-      }
+      // if (nameToCheck) {
+      //   nameToCheck = nameToCheck
+      //     .replace(/^\//, "_")
+      //     .replace(/\//g, "_")
+      //     .replace(/\s+/g, "_");
+      //   const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
+      //   const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
+      //   for (const otherNode of _nodes) {
+      //     if (otherNode.id === idToDelete) continue;
+      //     const stringified = JSON.stringify(
+      //       otherNode?.data?.requestData || {},
+      //     );
+      //     const expressionMatches = [...stringified.matchAll(expressionRegex)];
+      //     for (const exprMatch of expressionMatches) {
+      //       const contentInside = exprMatch[1];
+      //       const varMatches = [...contentInside.matchAll(variableRegex)];
+      //       for (const vMatch of varMatches) {
+      //         const fullVar = vMatch[1];
+      //         const baseVar = fullVar.split(".")[0];
+      //         if (baseVar === nameToCheck) {
+      //           shouldPreserve = true;
+      //           dynamicExpressionDeleteWarning = true;
+      //           break;
+      //         }
+      //       }
+      //       if (shouldPreserve) break;
+      //     }
+      //     if (shouldPreserve) break;
+      //   }
+      // }
       return shouldPreserve
         ? _nodes
         : _nodes.filter((node) => node.id !== idToDelete);
     });
 
-    if (dynamicExpressionDeleteWarning) {
-      isDeleteNodeModalOpen = false;
-      return;
-    }
+    nodes.update((_nodes) => {
+      nodesCount = _nodes.length;
+      if (nodesCount === 2) {
+        nodeFinalIndex = _nodes[1].id;
+      }
+      return _nodes;
+    });
+
+    // if (dynamicExpressionDeleteWarning) {
+    //   isDeleteNodeModalOpen = false;
+    //   return;
+    // }
 
     edges.update((_edges) => {
       const incomingEdge = _edges.find((edge) => edge.target === idToDelete);
@@ -1227,45 +1238,88 @@
         _nodes.map((node) => [node.id, { ...node }]),
       );
 
-      // Step 1: Build adjacency list and in-degree map
+      const edgesCopy = [...$edges];
+      const addedNodes: Node[] = [];
+
+      // Sort edges by source
+      const sortedEdges = edgesCopy.sort((a, b) =>
+        a.source.localeCompare(b.source),
+      );
+
+      // Detect missing links and insert intermediate nodes
+      for (let i = 0; i < sortedEdges.length - 1; i++) {
+        const current = sortedEdges[i];
+        const next = sortedEdges[i + 1];
+
+        if (current.target !== next.source) {
+          const intermediateId = `missing-${current.target}-${next.source}`;
+          const intermediateNode: Node = {
+            id: intermediateId,
+            type: "default",
+            data: { label: "Missing Link" },
+            position: { x: 0, y: 0 },
+          };
+
+          addedNodes.push(intermediateNode);
+          nodeMap.set(intermediateId, intermediateNode);
+
+          // Insert a fake edge from current.target → missing → next.source
+          edgesCopy.push({
+            id: `xy-edge__${current.target}-${intermediateId}`,
+            source: current.target,
+            target: intermediateId,
+          });
+          edgesCopy.push({
+            id: `xy-edge__${intermediateId}-${next.source}`,
+            source: intermediateId,
+            target: next.source,
+          });
+        }
+      }
+
+      // Build adjacency list and in-degree map
       const adj: Record<string, string[]> = {};
       const inDegree: Record<string, number> = {};
 
-      $edges.forEach(
-        ({ source, target }: { source: string; target: string }) => {
-          if (!adj[source]) adj[source] = [];
-          adj[source].push(target);
-          inDegree[target] = (inDegree[target] || 0) + 1;
-          if (!(source in inDegree)) inDegree[source] = 0;
-        },
-      );
+      edgesCopy.forEach(({ source, target }) => {
+        if (!adj[source]) adj[source] = [];
+        adj[source].push(target);
+        inDegree[target] = (inDegree[target] || 0) + 1;
+        if (!(source in inDegree)) inDegree[source] = 0;
+      });
 
-      // Step 2: Topological Sort
+      // Topological sort & layout
       const queue: string[] = [];
       for (const id in inDegree) {
         if (inDegree[id] === 0) {
           queue.push(id);
           const root = nodeMap.get(id);
           if (root) {
-            root.position.x = 100; // Initial X for root node
-            root.position.y = 200; // Optional fixed Y
+            root.position.x = 100;
+            root.position.y = 200;
           }
         }
       }
+
+      const visited = new Set<string>();
 
       while (queue.length) {
         const nodeId = queue.shift()!;
         const sourceNode = nodeMap.get(nodeId);
         if (!sourceNode) continue;
+        visited.add(nodeId);
 
         const children = adj[nodeId] || [];
+        let offset = 0;
+
         for (const childId of children) {
           const childNode = nodeMap.get(childId);
-          if (!childNode) continue;
-          childNode.position.x = sourceNode.position.x + 350;
-          childNode.position.y = sourceNode.position.y;
+          if (!childNode || visited.has(childId)) continue;
 
-          // Decrease in-degree and enqueue if ready
+          childNode.position.x = sourceNode.position.x + 350;
+          childNode.position.y = sourceNode.position.y + offset;
+          offset += 80;
+
           inDegree[childId]--;
           if (inDegree[childId] === 0) {
             queue.push(childId);
@@ -1779,7 +1833,7 @@
   />
 </Modal>
 
-<Modal
+<!-- <Modal
   title="Warning Dynamic Expression"
   type="dark"
   width={"540px"}
@@ -1797,7 +1851,7 @@
     The block is currently in use and must be removed from all dependent dynamic
     expressions before it can be deleted.
   </p>
-</Modal>
+</Modal> -->
 
 <Modal
   title={"New Request"}
