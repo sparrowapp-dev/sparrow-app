@@ -1632,7 +1632,7 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will redirect to the sparrow docs of testflow.
    */
   public redirectDocsTestflow = async () => {
-    await open(constants.DOCS_URL);
+    await open(constants.TESTFLOW_DOCS_URL);
     return;
   };
 }
