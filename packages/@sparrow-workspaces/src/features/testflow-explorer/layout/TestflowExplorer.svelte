@@ -1386,29 +1386,31 @@
               onClick={onClickStop}
             />
           {:else}
-            <Button
-              type="primary"
-              size="medium"
-              startIcon={PlayFilled}
-              title="Run"
-              onClick={async () => {
-                unselectNodes();
-                await onClickRun();
-                selectNode("2");
-                MixpanelEvent(Events.Run_TestFlows);
-              }}
-            />
+            <div id="testflow-run-button">
+              <Button
+                type="primary"
+                size="medium"
+                startIcon={PlayFilled}
+                title="Run"
+                onClick={async () => {
+                  unselectNodes();
+                  await onClickRun();
+                  selectNode("2");
+                  MixpanelEvent(Events.Run_TestFlows);
+                }}
+              />
+            </div>
           {/if}
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
-          <div style="position:absolute;  top:60px; right:320px">
+          <div style="position:absolute; top:50px; right:350px">
             <TestFlowTourGuide
-              targetId="run-btn"
-              title="Ready, Set, Run 🏃🏻‍♂️"
-              pulsePosition={{ top: "-62px", left: "260px" }}
-              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! <br/> Alternatively, you can use the "Start" play button to initiate the flow as well.`}
-              tipPosition="top-right"
+              targetIds={["testflow-run-button"]}
+              title="Run Your Test Flow"
+              description={`Almost there! With your blocks and API in place, go ahead and click ‘Run’ to execute your test flow.`}
+              CardNumber={6}
+              totalCards={7}
               onNext={async () => {
                 currentStep.set(7);
               }}
@@ -1453,6 +1455,7 @@
     tabindex="0"
     on:click={focusDiv}
     style="flex:1; overflow:auto; outline: none; position:realtive;"
+    id="testflow-container-main"
   >
     <SvelteFlowProvider>
       <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes}>
@@ -1466,16 +1469,18 @@
     </SvelteFlowProvider>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
+      <div style="position:absolute; top:196px; left:370px; z-index:1000;">
         <TestFlowTourGuide
-          title="One Block At A Time 🧱"
-          pulsePosition={{ top: "-64px", left: "30px" }}
-          description={`Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there.`}
-          tipPosition="top-left"
+          targetIds={["add-block"]}
+          title="Add Your First Block"
+          CardNumber={3}
+          totalCards={7}
+          description={`Welcome to the canvas! Click ‘Add Block’ to start building your flow. You're just a few steps away.`}
           onNext={() => {
             currentStep.set(4);
             createNewNode("1");
           }}
+          shouldDelay={true}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
           }}
@@ -1484,12 +1489,13 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:232px; left:638px; z-index:1000;">
+      <div style="position:absolute; top:198px; left:685px; z-index:1000;">
         <TestFlowTourGuide
-          title="Block Added! 👏 "
-          description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
-          tipPosition="left-top"
-          pulsePosition={{ top: "8px", left: "-150px" }}
+          targetIds={["request-block"]}
+          title="Select an API"
+          description={`Block added—nice! Now, click the dropdown to select an API. Don’t have one? No worries, a sample API is available for you to use.`}
+          CardNumber={4}
+          totalCards={7}
           onNext={() => {
             currentStep.set(5);
           }}
@@ -1501,14 +1507,41 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <div style="position:absolute; top:265px; left:632px; z-index:1000;">
+      <div style="position:absolute; top:265px; left:680px; z-index:1000;">
         <TestFlowTourGuide
-          title="Sample API waiting...⏱️"
-          description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
-          tipPosition="left-top"
-          pulsePosition={{ top: "10px", left: "-145px" }}
+          targetIds={["request-block", "dropdown-request-items"]}
+          title="Sample API Ready"
+          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
+          CardNumber={5}
+          totalCards={7}
           onNext={() => {
             currentStep.set(6);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
+    {#if $isTestFlowTourGuideOpen && $currentStep == 7}
+      <div
+        style="position:absolute; top:200px; left:{isWebApp
+          ? '700px'
+          : '700px'};"
+      >
+        <TestFlowTourGuide
+          targetIds={["request-block", "testflow-bottom-panel"]}
+          isLastStep={true}
+          title="You Did It!"
+          description={`Congratulations! Your test flow is running successfully. You can re-run the API at any time to update values as needed.`}
+          rightButtonName="Finish"
+          CardNumber={7}
+          additionTopValue={isWebApp ? -140 : -280}
+          additionHeightValue={isWebApp ? 260 : 280}
+          totalCards={7}
+          onNext={() => {
+            currentStep.set(-1);
+            isTestFlowTourGuideOpen.set(false);
           }}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
@@ -1536,7 +1569,10 @@
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
-    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+    <div
+      style=" background-color: transparent; margin: 0px 13px 12px 13px;"
+      id="testflow-bottom-panel"
+    >
       <!-- Request Response Nav -->
       <TestFlowBottomPanel
         selectedBlock={{

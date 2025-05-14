@@ -34,6 +34,7 @@
   } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
+  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
 
   /**
    * The data object containing various handlers and data stores.
@@ -263,11 +264,13 @@
   class="request-block position-relative"
   style={selected && !currentBlock?.response.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
-    : selected && currentBlock && checkIfRequestSucceed(currentBlock)
+    : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
+        ($currentStep > 6 && $isTestFlowTourGuideOpen)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
         ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
         : ""}
+  id="request-block"
 >
   <Handle
     type="target"
@@ -284,15 +287,15 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock?.response?.status}
-          <ArrowSwapRegular
-            size={"16px"}
-            color={"var(--icon-ds-neutral-200)"}
-          />
-        {:else if checkIfRequestSucceed(currentBlock)}
+        {#if checkIfRequestSucceed(currentBlock) || ($currentStep > 6 && $isTestFlowTourGuideOpen)}
           <CheckmarkCircleRegular
             size={"16px"}
             color={"var(--icon-ds-success-400)"}
+          />
+        {:else if !currentBlock?.response?.status}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
           />
         {:else}
           <ErrorCircleRegular
@@ -407,8 +410,8 @@
         {handleOpenAddCustomRequestModal}
       />
     </div>
-    {#if !currentBlock?.response?.status}
-      {#if req.name?.length > 0}
+    {#if !currentBlock?.response?.status || ($currentStep > 5 && isTestFlowTourGuideOpen)}
+      {#if req.name?.length > 0 || ($currentStep > 5 && isTestFlowTourGuideOpen)}
         <div class="d-flex run-txt-container">
           <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
           <p style="basic-text-message">Run the block to get response</p>
