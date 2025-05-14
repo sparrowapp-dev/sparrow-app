@@ -132,6 +132,7 @@
   export let onUpdateCollectionGuide: (query, isActive) => void;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
+  export let onUpdateAiModel;
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
 
@@ -832,6 +833,7 @@
                 {tab}
                 {onUpdateAiPrompt}
                 {onUpdateAiConversation}
+                {onUpdateAiModel}
                 {onUpdateRequestState}
                 {onGenerateAiResponse}
                 {onStopGeneratingAIResponse}

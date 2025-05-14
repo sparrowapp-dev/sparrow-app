@@ -622,6 +622,23 @@ const connectWebSocket = async (
 };
 
 /**
+ * 
+ * @param signal - AbortSignal to listen for abort events
+ * @returns 
+ */
+const waitForAbort = (signal: AbortSignal): Promise<never> => {
+  return new Promise((_, reject) => {
+    if (signal.aborted) {
+      return reject(new Error("Aborted before starting"));
+    }
+
+    signal.addEventListener("abort", () => {
+      reject(new Error("Aborted during request"));
+    }, { once: true });
+  });
+}
+
+/**
  *
  * @param url
  * @param method
@@ -646,11 +663,11 @@ const makeHttpRequestV2 = async (
     let response;
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
-      response = await axios({
+      response = await Promise.race([axios({
         data: { url, method, headers, body, contentType },
         url: proxyUrl,
         method: "POST",
-      });
+      }), waitForAbort(signal)]); 
     } else {
       try {
         let jsonHeader;
@@ -711,7 +728,7 @@ const makeHttpRequestV2 = async (
           headersObject["Content-Type"] = contentType;
         }
 
-        const axiosResponse = await axios({
+        const axiosResponse = await Promise.race([axios({
           method,
           url,
           data: requestData || {},
@@ -719,7 +736,8 @@ const makeHttpRequestV2 = async (
           validateStatus: function (status) {
             return true;
           },
-        });
+        }), waitForAbort(signal)]);
+        
         response = {
           data: {
             status: `${axiosResponse.status} ${axiosResponse.statusText}`,
@@ -728,6 +746,10 @@ const makeHttpRequestV2 = async (
           },
         };
       } catch (axiosError: any) {
+        if (signal?.aborted) {
+          throw new Error();
+        }
+
         // response = {
         //   data: {
         //     status: `${error.response.status} ${error.response.statusText}`,

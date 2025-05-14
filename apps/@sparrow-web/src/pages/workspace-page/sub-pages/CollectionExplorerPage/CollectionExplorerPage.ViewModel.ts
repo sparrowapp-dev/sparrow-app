@@ -629,7 +629,6 @@ class CollectionExplorerPage {
         return;
       }
     } catch (e) {
-      Sentry.captureException(e);
       notifications.error(errMessage);
       return;
     }
@@ -706,7 +705,6 @@ class CollectionExplorerPage {
         return false;
       }
     } catch (e) {
-      Sentry.captureException(e);
       notifications.error(errMessage);
       return false;
     }

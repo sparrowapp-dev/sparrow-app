@@ -134,11 +134,9 @@
           return;
         }
       } catch (e) {
-        Sentry.captureException(e);
         throw "Not able to parse JSON";
       }
     } catch (e) {
-      Sentry.captureException(e);
       onUpdateContentType(RequestDataTypeEnum.TEXT);
       return;
     }

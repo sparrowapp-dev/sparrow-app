@@ -5,6 +5,7 @@
 
   import type { Observable } from "rxjs";
   import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   import type {
     CreateCollectionType,
@@ -92,6 +93,9 @@
   const handleKeydown = async (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
       event.preventDefault();
+      if ($tab.isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+        return;
+      }
       if (!$tab.isSaved) {
         const x = await onSaveSocket();
         if (

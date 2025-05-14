@@ -79,7 +79,6 @@
         breadcrum = calculateBreadcrumPath(queryBuilder, 5);
       }
     } catch (e) {
-      Sentry.captureException(e); 
       querySchema = [];
       queryBuilder = [];
       breadcrum = [];

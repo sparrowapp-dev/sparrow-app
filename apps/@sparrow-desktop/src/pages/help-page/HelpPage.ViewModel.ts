@@ -315,7 +315,6 @@ class HelpPageViewModel {
         }
         return response;
       } catch (e) {
-        Sentry.captureException(e); 
         notifications.error(errorMessage);
       }
     } else {
@@ -379,7 +378,6 @@ class HelpPageViewModel {
         }
         return response;
       } catch (e) {
-        Sentry.captureException(e); 
         notifications.error(errorMessage);
       }
     } else {

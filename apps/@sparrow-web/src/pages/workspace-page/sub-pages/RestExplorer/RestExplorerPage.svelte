@@ -204,6 +204,7 @@
   onRenameFolder={_viewModel.handleRenameFolder}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onUpdateAiModel={_viewModel.updateAIModel}
   onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
   azureBlobCDN={constants.AZURE_CDN_URL}

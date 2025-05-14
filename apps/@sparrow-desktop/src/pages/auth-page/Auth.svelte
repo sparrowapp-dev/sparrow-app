@@ -238,7 +238,6 @@
               isTokenErrorMessage = false;
               handleLoginV2(token);
             } catch (e) {
-              Sentry.captureException(e);
               isTokenErrorMessage = true;
             } finally {
               isTokenValidationLoading = false;

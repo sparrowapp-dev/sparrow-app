@@ -1,7 +1,11 @@
 <script lang="ts">
   import { Events } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { SendRegular, StopFilled } from "@sparrow/library/icons";
+  import {
+    SendRegular,
+    StopFilled,
+    LockClosedRegular,
+  } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
   import { Button, Tooltip } from "@sparrow/library/ui";
 
@@ -10,8 +14,12 @@
   export let sendPrompt;
   export let prompt: string = "";
   export let onUpdateAiPrompt;
+  export let onUpdateAiModel;
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
+
+  // let defaultModel = "GPT-4o";
+  let defaultModel = "deepseek";
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -100,32 +108,61 @@
         id={"ai-model-selector"}
         data={[
           {
-            name: "GPT-4o",
-            id: "azure-ai",
+            name: "DeepSeek",
+            id: "deepseek",
+            disabled: false,
             hide: false,
           },
           {
-            name: "Open AI 4.0",
-            id: "open-AI-40",
-            disabled: true,
-            hide: true,
-          },
-          {
-            name: "DeepSeek",
-            id: "deepseek",
+            name: "GPT-4o",
+            id: "GPT-4o",
             disabled: true,
             hide: true,
           },
         ]}
-        titleId={"azure-ai"}
-        onclick={() => {}}
+        titleId={defaultModel}
+        onclick={(modelId) => {
+          console.log("clicked", modelId);
+          onUpdateAiModel(modelId);
+        }}
         variant={"secondary"}
         zIndex={499}
         disabled={false}
         maxHeaderWidth={"110px"}
         minBodyWidth={"182px"}
         menuItem={"v2"}
-      />
+      >
+        <div
+          slot="post-select"
+          class="post-dropdown"
+          style="justify-content: center; align-items:center;"
+        >
+          <div class="custom-tooltip-wrapper">
+            <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
+              <span>GPT-4o</span>
+              <Button
+                type="teritiary-regular"
+                startIcon={LockClosedRegular}
+                size="small"
+              />
+            </div>
+            <span class="custom-tooltip">Upgrade to use additional models.</span
+            >
+          </div>
+          <!-- <div class="custom-tooltip-wrapper">
+            <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
+              <span>Azure AI</span>
+              <Button
+                type="teritiary-regular"
+                startIcon={LockClosedRegular}
+                size="small"
+              />
+            </div>
+            <span class="custom-tooltip">Upgrade to use additional models.</span
+            >
+          </div> -->
+        </div>
+      </Select>
     </div>
 
     <Tooltip
@@ -202,5 +239,59 @@
     border-radius: 4px;
     border: 2px solid var(--border-ds-surface-50);
     padding: 4px;
+  }
+
+  .locked-models {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-ds-neutral-100);
+    background-color: var(--bg-ds-surface-600);
+    cursor: pointer;
+    /* min-height: 28px; */
+    padding: 4px 4px 4px 8px;
+    border-radius: 4px;
+    opacity: 0.3;
+  }
+
+  .locked-models:hover {
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .custom-tooltip-wrapper {
+    position: relative;
+    /* display: inline-block; */
+  }
+
+  .custom-tooltip {
+    visibility: hidden;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* background-color: var(--bg-ds-surface-800); */
+    background-color: #31353f;
+    color: var(--text-ds-neutral-000);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    margin-bottom: 4px;
+    z-index: 1000;
+  }
+
+  .custom-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #31353f transparent transparent transparent;
+  }
+
+  .custom-tooltip-wrapper:hover .custom-tooltip {
+    visibility: visible;
   }
 </style>

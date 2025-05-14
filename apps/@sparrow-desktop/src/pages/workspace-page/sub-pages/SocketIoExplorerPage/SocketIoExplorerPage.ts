@@ -327,7 +327,6 @@ class SocketIoExplorerPageViewModel {
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
-      Sentry.captureException(error);
       notifications.error(
         "Failed to update the documentation. Please try again",
       );

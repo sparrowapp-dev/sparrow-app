@@ -25,6 +25,7 @@
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
+  export let onUpdateAiModel;
   export let onUpdateRequestState;
   export let onGenerateAiResponse;
   export let onStopGeneratingAIResponse;
@@ -79,6 +80,7 @@
       conversations={$tab?.property?.request?.ai?.conversations}
       prompt={$tab?.property?.request?.ai?.prompt}
       {onUpdateAiPrompt}
+      {onUpdateAiModel}
       {sendPrompt}
       isResponseGenerating={$tab?.property?.request?.state
         ?.isChatbotGeneratingResponse}

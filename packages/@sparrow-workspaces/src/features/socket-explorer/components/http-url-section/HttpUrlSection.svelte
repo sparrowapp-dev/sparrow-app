@@ -47,23 +47,29 @@
       notifications.success("WebSocket request saved successfully.");
     }
   };
+
+  // const handleKeyPress = (event: KeyboardEvent) => {
+  //   if (event.ctrlKey && event.key === "s") {
+  //     event.preventDefault(); // Prevent the default browser save behavior
+  //     handleSaveRequest(); // Call the save function
+  //   }
+  // };
 </script>
 
 <div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
-
-   <div class="w-100 d-flex align-items-center position-relative ">
+  <div class="w-100 d-flex align-items-center position-relative">
     <div class="position-absolute top-0" style="width: calc(100% );">
       <CodeMirrorInput
-    bind:value={requestUrl}
-    onUpdateInput={onUpdateRequestUrl}
-    placeholder={"Enter URL here"}
-    {theme}
-    {onUpdateEnvironment}
-    {environmentVariables}
-    codeId={"url"}
-    class={"input-url"}
-    {userRole}
-  />
+        bind:value={requestUrl}
+        onUpdateInput={onUpdateRequestUrl}
+        placeholder={"Enter URL here"}
+        {theme}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        codeId={"url"}
+        class={"input-url"}
+        {userRole}
+      />
     </div>
   </div>
 

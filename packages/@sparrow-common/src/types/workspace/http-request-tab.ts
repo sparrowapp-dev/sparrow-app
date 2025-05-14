@@ -327,11 +327,15 @@ export interface ConversationsWrapper {
 export interface ThreadIdWrapper {
   threadId: string;
 }
+export interface AIModelNameWrapper {
+  aiModelName: string;
+}
 
 export interface Ai
   extends PromptWrapper,
     ConversationsWrapper,
-    ThreadIdWrapper {}
+    ThreadIdWrapper,
+    AIModelNameWrapper {}
 export interface AiWrapper {
   ai: Ai;
 }

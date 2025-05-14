@@ -236,7 +236,7 @@ RequestDatasetEnum.RAW
   : input.data.requestData?.state.requestBodyNavigation;
   return {
     id: input.data.requestId || "",
-    name: input.data.name || "",
+    name: input.data?.requestData?.name || "",
     type: "REQUEST",
     description: "[]",
     source: "USER",

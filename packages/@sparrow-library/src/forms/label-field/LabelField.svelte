@@ -16,7 +16,8 @@
   export let maxTextLength: number = 300;
   export let type: "input" | "textarea" = "input";
 
-  let fontSize = size === "small" ? "text-ds-font-size-12" : "text-ds-font-size-14";
+  let fontSize =
+    size === "small" ? "text-ds-font-size-12" : "text-ds-font-size-14";
 </script>
 
 <div class="input-container d-flex flex-column">
@@ -33,11 +34,6 @@
         <span class="required-mark-{variant}">*</span>
       {/if}
     </div>
-    {#if supportLabelText}
-      <p class="support-label-text-{variant} text-ds-font-size-12">
-        {supportLabelText}
-      </p>
-    {/if}
   </div>
 
   <!-- Input Field -->
@@ -72,8 +68,13 @@
           <p class="help-label-text-{variant}" style="font-size: 12px;">
             {helpLabelText}
           </p>
+        {:else if supportLabelText}
+          <p class="support-label-text-{variant} text-ds-font-size-12">
+            {supportLabelText}
+          </p>
         {/if}
       </div>
+
       {#if type === "textarea"}
         <div>
           <p

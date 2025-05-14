@@ -11,7 +11,6 @@ export function getPathFromUrl(url: string) {
     const urlObject = new URL(sanitizedUrl);
     return urlObject.pathname;
   } catch (error) {
-    Sentry.captureException(error); 
     console.error("Invalid URL:", url);
   }
   return "";

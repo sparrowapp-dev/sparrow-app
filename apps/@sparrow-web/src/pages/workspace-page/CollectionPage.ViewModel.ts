@@ -3967,7 +3967,6 @@ export default class CollectionsViewModel {
         return;
       }
     } catch (e) {
-      Sentry.captureException(e);
       notifications.error(errMessage);
       return;
     }
@@ -6617,7 +6616,6 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
-      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to sync collection. Please try again.");
     }
@@ -6661,7 +6659,6 @@ export default class CollectionsViewModel {
         }
       }
     } catch (error) {
-      Sentry.captureException(error);
       console.error(error);
       notifications.error("Failed to replace collection. Please try again.");
     }
