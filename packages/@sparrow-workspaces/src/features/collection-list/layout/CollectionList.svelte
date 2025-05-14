@@ -510,7 +510,7 @@
                   {isGuestUser}
                 />
               {/if}
-              {#if collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+              {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
                 <hr style="margin: 2px 0 2px 2rem;" />
                 {#each collectionListDocument as col}
                   {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}

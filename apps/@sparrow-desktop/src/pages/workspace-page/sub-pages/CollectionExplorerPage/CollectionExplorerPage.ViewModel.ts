@@ -551,7 +551,7 @@ class CollectionExplorerPage {
       baseUrl,
     );
     const isMockCollection =
-      response.data.data.collectionType === CollectionTypeBaseEnum.MOCK;
+      response.data.data?.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
         progressiveTab.id as string,

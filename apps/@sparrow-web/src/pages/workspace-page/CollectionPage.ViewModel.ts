@@ -3369,7 +3369,7 @@ export default class CollectionsViewModel {
     );
 
     const isMockCollection =
-      collection.collectionType === CollectionTypeBaseEnum.MOCK;
+      collection?.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.deleteCollection(collection.id);
       this.deleteCollectioninWorkspace(workspaceId, collection.id);
@@ -6284,7 +6284,7 @@ export default class CollectionsViewModel {
       baseUrl,
     );
     const isMockCollection =
-      response.data.data.collectionType === CollectionTypeBaseEnum.MOCK;
+      response.data.data?.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
         progressiveTab.id as string,
