@@ -2,7 +2,6 @@
   import {
     AddCircleRegular,
     DismissCircleFilled,
-    DismissCircleRegular,
   } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import { getBezierPath } from "@xyflow/svelte";
@@ -59,12 +58,15 @@
     x={labelX}
     y={labelY}
     class="btn-container rounded p-2"
-    width="65"
-    height="36"
+    width="36"
+    height="22"
   >
-    <div class="d-flex justify-content-center align-items-center h-100 gap-2">
+    <div class="d-flex justify-content-center align-items-center h-100 gap-1">
       <span class="position-relative icon-parent" on:click={handleDeleteEdge}>
-        <DismissCircleFilled color={"var(--icon-ds-danger-300)"} />
+        <DismissCircleFilled
+          size={"14px"}
+          color={"var(--icon-ds-danger-300)"}
+        />
         <div
           class="icon-tooltip position-absolute text-fs-12 rounded d-flex justify-content-center align-items-center z-2"
           style="height: 26px; width: 157px; background-color:var(--bg-ds-surface-100); top:-45px; left:0%; transform: translateX(-50%);"
@@ -77,7 +79,7 @@
         ></span>
       </span>
       <span class="position-relative icon-parent" on:click={handleAddNode}>
-        <AddCircleRegular />
+        <AddCircleRegular size={"14px"} />
         <div
           class="icon-tooltip position-absolute text-fs-12 rounded d-flex justify-content-center align-items-center z-2"
           style="height: 26px; width: 157px; background-color:var(--bg-ds-surface-100); top:-45px; left:0%; transform: translateX(-50%);"
@@ -99,7 +101,7 @@
 <style lang="scss">
   .btn-container {
     overflow: visible;
-    transform: translateX(-10%) translateY(-12%);
+    transform: translateX(-6%) translateY(-8%);
     background-color: var(--bg-ds-surface-300);
     display: none;
   }
