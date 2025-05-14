@@ -1748,6 +1748,7 @@
   <TestflowDynamicExpression
     {dynamicExpressionEditorContent}
     requestApis={$nodes}
+    edges={$edges}
     {onInsertExpression}
     {handleAddingNested}
     {selectedBlock}
