@@ -25,7 +25,7 @@ const constants = {
     .VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_WEB_BASE_URL,
   MARKETING_URL: import.meta.env.VITE_WEB_MARKETING_URL,
-  DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/intro",
+  INTRO_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/intro",
   TESTFLOW_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/usermanual/testflows",
   PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
   SOCKET_IO_API_URL: import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
