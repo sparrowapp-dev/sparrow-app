@@ -468,10 +468,10 @@
                 {/if}
               {/each}
             </List>
-            {#if !collectionListDocument.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
+            {#if !collectionListDocument?.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
               <EmptyCollection
                 bind:userRole
-                isCollectionEmpty={!collectionListDocument.some(
+                isCollectionEmpty={!collectionListDocument?.some(
                   (col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK,
                 )}
                 {onItemCreated}
@@ -485,7 +485,7 @@
                 {isGuestUser}
               />
             {/if}
-            {#if collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+            {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
               <hr style="margin: 2px 0 2px 2rem;" />
               <List
                 bind:scrollList
@@ -546,7 +546,7 @@
           {/if}
         {/if}
       </div>
-      {#if !collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+      {#if !collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
         <hr style="margin: 0.5rem; margin-left: 2rem !important;" />
         <EmptyCollection
           bind:userRole
