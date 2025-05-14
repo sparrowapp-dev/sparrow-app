@@ -1092,6 +1092,7 @@ export default class CollectionsViewModel {
 
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
+        console.log("res from be---", res);
         await this.collectionRepository.addCollection({
           ...res,
           id: res._id,
@@ -3368,6 +3369,8 @@ export default class CollectionsViewModel {
       baseUrl,
     );
 
+    const isMockCollection =
+      collection.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.deleteCollection(collection.id);
       this.deleteCollectioninWorkspace(workspaceId, collection.id);
@@ -3379,14 +3382,20 @@ export default class CollectionsViewModel {
         "collection",
       );
 
-      notifications.success(`"${collection.name}" Collection deleted.`);
+      const successMessage = isMockCollection
+        ? `'${collection.name}' mock collection deleted successfully.`
+        : `"${collection.name}" Collection deleted.`;
+
+      notifications.success(successMessage);
       MixpanelEvent(Events.DELETE_COLLECTION, {
         source: "Collection list",
       });
     } else {
-      notifications.error(
-        response.message ?? "Failed to delete collection. Please try again.",
-      );
+      const errorMessage = isMockCollection
+        ? `Failed to delete '${collection.name}'. Please try again.`
+        : (response.message ??
+          "Failed to delete collection. Please try again.");
+      notifications.error(errorMessage);
     }
   };
 
@@ -6275,18 +6284,24 @@ export default class CollectionsViewModel {
       },
       baseUrl,
     );
-
+    const isMockCollection =
+      response.data.data.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
         progressiveTab.id as string,
         response.data.data,
       );
-      notifications.success(
-        `The ‘${progressiveTab.name}’ collection saved successfully.`,
-      );
+      const successMessage = isMockCollection
+        ? `'${progressiveTab.name}' mock collection saved successfully.`
+        : `The '${progressiveTab.name}' collection saved successfully.`;
+
+      notifications.success(successMessage);
       return true;
     } else {
-      notifications.error("Failed to update description. Please try again.");
+      const errorMessage = isMockCollection
+        ? `Failed to save mock collection. Please try again.`
+        : `Failed to update description. Please try again.`;
+      notifications.error(errorMessage);
     }
     return false;
   };

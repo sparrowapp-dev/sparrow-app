@@ -37,6 +37,7 @@ import { isGuestUserActive } from "@app/store/auth.store";
 
 import {
   CollectionItemTypeBaseEnum,
+  CollectionTypeBaseEnum,
   type CollectionArgsBaseInterface,
   type CollectionBaseInterface as CollectionDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
@@ -549,19 +550,26 @@ class CollectionExplorerPage {
       },
       baseUrl,
     );
+    const isMockCollection =
+      response.data.data.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
         progressiveTab.id as string,
         response.data.data,
       );
-      notifications.success(
-        `The ‘${progressiveTab.name}’ collection saved successfully.`,
-      );
+      const successMessage = isMockCollection
+        ? `'${progressiveTab.name}' mock collection saved successfully.`
+        : `The '${progressiveTab.name}' collection saved successfully.`;
+
+      notifications.success(successMessage);
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } else {
-      notifications.error("Failed to save collection. Please try again.");
+      const errorMessage = isMockCollection
+        ? `Failed to save mock collection. Please try again.`
+        : `Failed to update description. Please try again.`;
+      notifications.error(errorMessage);
     }
   };
 

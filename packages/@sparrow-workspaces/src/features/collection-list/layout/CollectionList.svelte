@@ -272,7 +272,7 @@
         },
         displayText: "Add Mock Collection",
         disabled: false,
-        hidden: false,
+        hidden: isGuestUser ? true : false,
       },
     ]}
     {noOfColumns}
@@ -352,13 +352,7 @@
       </div>
 
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
-        <Tooltip
-          title={"Add Options"}
-          placement={"top-center"}
-          distance={13}
-          show={!showAddItemMenu}
-          zIndex={701}
-        >
+        {#if isGuestUser}
           <span style="display:flex;" class="add-icon-container">
             <Button
               id="add-collection-type"
@@ -369,11 +363,42 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
-                rightClickContextMenu(e);
+                if (isGuestUser) {
+                  onItemCreated("collection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                } else {
+                  showImportCollectionPopup();
+                }
+                isExpandCollection.set(true);
               }}
             />
           </span>
-        </Tooltip>
+        {:else}
+          <Tooltip
+            title={"Add Options"}
+            placement={"top-center"}
+            distance={13}
+            show={!showAddItemMenu}
+            zIndex={701}
+          >
+            <span style="display:flex;" class="add-icon-container">
+              <Button
+                id="add-collection-type"
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                startIcon={AddRegular}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  rightClickContextMenu(e);
+                }}
+              />
+            </span>
+          </Tooltip>
+        {/if}
       {/if}
     </div>
 
@@ -467,32 +492,26 @@
                   />
                 {/if}
               {/each}
-            </List>
-            {#if !collectionListDocument?.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
-              <EmptyCollection
-                bind:userRole
-                isCollectionEmpty={!collectionListDocument?.some(
-                  (col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK,
-                )}
-                {onItemCreated}
-                {collectionList}
-                {userRoleInWorkspace}
-                {currentWorkspace}
-                handleCreateApiRequest={() => onItemCreated("request", {})}
-                onImportCollectionPopup={showImportCollectionPopup}
-                isAddCollectionDisabled={isGuestUser}
-                onImportCurlPopup={showImportCurlPopup}
-                {isGuestUser}
-              />
-            {/if}
-            {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
-              <hr style="margin: 2px 0 2px 2rem;" />
-              <List
-                bind:scrollList
-                height={"auto"}
-                overflowY={"auto"}
-                classProps={"pe-0"}
-              >
+              {#if !collectionListDocument?.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
+                <EmptyCollection
+                  bind:userRole
+                  isCollectionEmpty={!collectionListDocument?.some(
+                    (col) =>
+                      col?.collectionType !== CollectionTypeBaseEnum.MOCK,
+                  )}
+                  {onItemCreated}
+                  {collectionList}
+                  {userRoleInWorkspace}
+                  {currentWorkspace}
+                  handleCreateApiRequest={() => onItemCreated("request", {})}
+                  onImportCollectionPopup={showImportCollectionPopup}
+                  isAddCollectionDisabled={isGuestUser}
+                  onImportCurlPopup={showImportCurlPopup}
+                  {isGuestUser}
+                />
+              {/if}
+              {#if collectionListDocument.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+                <hr style="margin: 2px 0 2px 2rem;" />
                 {#each collectionListDocument as col}
                   {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
                     <Collection
@@ -517,8 +536,8 @@
                     />
                   {/if}
                 {/each}
-              </List>
-            {/if}
+              {/if}
+            </List>
           {/if}
         {:else}
           {#if searchData.length === 0}
@@ -546,7 +565,7 @@
           {/if}
         {/if}
       </div>
-      {#if !collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+      {#if !collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK) && !isGuestUser}
         <hr style="margin: 0.5rem; margin-left: 2rem !important;" />
         <EmptyCollection
           bind:userRole
