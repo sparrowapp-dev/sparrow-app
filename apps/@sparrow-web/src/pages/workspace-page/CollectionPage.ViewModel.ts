@@ -1092,7 +1092,6 @@ export default class CollectionsViewModel {
 
       if (response.isSuccessful && response.data.data) {
         const res = response.data.data;
-        console.log("res from be---", res);
         await this.collectionRepository.addCollection({
           ...res,
           id: res._id,
