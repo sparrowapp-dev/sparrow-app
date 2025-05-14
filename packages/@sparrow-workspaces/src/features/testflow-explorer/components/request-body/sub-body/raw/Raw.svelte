@@ -16,7 +16,7 @@
   export let dispatcher;
 </script>
 
-<div class="request-body position-relative">
+<div class="request-body position-relative h-100">
   <Editor
     bind:lang
     bind:value
