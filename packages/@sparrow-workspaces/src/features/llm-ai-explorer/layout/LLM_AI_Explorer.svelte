@@ -19,6 +19,7 @@
     RestExtensionPanel,
     RequestParameters,
     ResponseStatus,
+    ChatBot,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -89,8 +90,7 @@
   import { SparrowSecondaryIcon, SparkleFilled } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
-  import { AIChatInterface } from "../../chat-bot/components";
-  import { ChatBot } from "../../chat-bot";
+
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/llm-ai-request-tab";
 
@@ -207,15 +207,15 @@
     });
 
     // Delay to ensure DOM is ready before measuring container width
-    // setTimeout(() => {
-    //   updateSplitpaneContSizes();
-    //   // Watch for container size changes and update pane size percentages
-    //   const resizeObserver = new ResizeObserver(() => {
-    //     updateSplitpaneContSizes();
-    //   });
-    //   resizeObserver.observe(splitpaneContainer);
-    //   return () => resizeObserver.disconnect(); // Cleanup on component unmount
-    // }, 0);
+    setTimeout(() => {
+      updateSplitpaneContSizes();
+      // Watch for container size changes and update pane size percentages
+      const resizeObserver = new ResizeObserver(() => {
+        updateSplitpaneContSizes();
+      });
+      resizeObserver.observe(splitpaneContainer);
+      return () => resizeObserver.disconnect(); // Cleanup on component unmount
+    }, 0);
   });
 
   export let onRenameCollection;
@@ -253,6 +253,8 @@
   setTimeout(() => {
     console.log("tab data :>> ", $tab);
   }, 3000);
+
+  console.log("isChatBot active ;>> ", $tab?.property?.llm_ai_request?.state);
 </script>
 
 {#if $tab.tabId}
@@ -271,10 +273,8 @@
         isSave={$tab.isSaved}
         bind:userRole
         requestUrl={` ${$tab.property.llm_ai_request?.AI_Model_Provider} | ${$tab.property.llm_ai_request?.AI_Model_Variant}`}
-        httpMethod={$tab.property.request?.ai}
+        httpMethod={$tab.property.llm_ai_request?.ai}
         isSendRequestInProgress={storeData?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateRequestUrl}
@@ -284,118 +284,71 @@
         {isGuestUser}
       />
 
-      <div style="flex:1; overflow:auto; margin-top: 12px;">
-        <!-- Request Pane -->
-        <div class="h-100 d-flex flex-column position-relative">
-          <RequestNavigator
-            requestStateSection={$tab.property.llm_ai_request?.state
-              ?.LLM_AI_Navigation}
-            {onUpdateRequestState}
-            authParameterLength={1}
-            authHeaderLength={1}
-          />
-          <div style="flex:1; overflow:auto;" class="p-0">
-            {#if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.SYSTEM_PROMPT}
-              <RequestDoc
-                {onUpdateAiSystemPrompt}
-                requestDoc={$tab.property.llm_ai_request.SystemPrompt}
-              />
-            {:else if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.AUTHORIZATION}
-              <RequestAuth
-                requestStateAuth={$tab.property.llm_ai_request.state
-                  .LLM_AI_AuthNavigation}
-                auth={$tab.property.llm_ai_request.auth}
-                collectionAuth={$collectionAuth}
-                {onUpdateRequestState}
-                {onUpdateRequestAuth}
-                {onUpdateEnvironment}
-                {environmentVariables}
-                {collection}
-                {onOpenCollection}
-              />
-            {:else if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-              <div
-                class="w-100 h-100 d-flex align-items-center justify-content-center opacity-50"
-              >
-                <h4>Coming soon ...</h4>
+      <div
+        bind:this={splitpaneContainer}
+        style="flex:1; overflow:auto; margin-top: 12px;"
+      >
+        <Splitpanes class="explorer-chatbot-splitter">
+          <Pane class="position-relative bg-transparent">
+            <div style="flex:1; overflow:auto; margin-top: 12px;">
+              <!-- Request Pane -->
+              <div class="h-100 d-flex flex-column position-relative">
+                <RequestNavigator
+                  requestStateSection={$tab.property.llm_ai_request?.state
+                    ?.LLM_AI_Navigation}
+                  {onUpdateRequestState}
+                  authParameterLength={1}
+                  authHeaderLength={1}
+                />
+                <div style="flex:1; overflow:auto;" class="p-0">
+                  {#if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.SYSTEM_PROMPT}
+                    <RequestDoc
+                      {onUpdateAiSystemPrompt}
+                      requestDoc={$tab.property.llm_ai_request.SystemPrompt}
+                    />
+                  {:else if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.AUTHORIZATION}
+                    <RequestAuth
+                      requestStateAuth={$tab.property.llm_ai_request.state
+                        .LLM_AI_AuthNavigation}
+                      auth={$tab.property.llm_ai_request.auth}
+                      collectionAuth={$collectionAuth}
+                      {onUpdateRequestState}
+                      {onUpdateRequestAuth}
+                      {onUpdateEnvironment}
+                      {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
+                    />
+                  {:else if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.AI_MODAL_CONFIGURATIONS}
+                    <div
+                      class="w-100 h-100 d-flex align-items-center justify-content-center opacity-50"
+                    >
+                      <h4>Coming soon ...</h4>
+                    </div>
+                  {/if}
+                </div>
               </div>
-            {/if}
-          </div>
-          <!-- <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
-                        <RequestParameters
-                          isBulkEditActive={$tab?.property?.request.state
-                            ?.isParameterBulkEditActive}
-                          {onUpdateRequestState}
-                          params={$tab.property.request.queryParams}
-                          {onUpdateRequestParams}
-                          authParameter={$requestAuthParameter}
-                          {onUpdateEnvironment}
-                          {environmentVariables}
-                          bind:isMergeViewEnabled={isMergeViewEnableForParams}
-                          bind:isMergeViewLoading
-                          bind:newModifiedContent
-                        />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
-                        <RequestBody
-                          body={$tab.property.request.body}
-                          method={$tab.property.request.method}
-                          requestState={$tab.property.request.state}
-                          {onUpdateRequestBody}
-                          {onUpdateRequestState}
-                          {onUpdateEnvironment}
-                          {environmentVariables}
-                          {isWebApp}
-                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
-                          bind:isMergeViewLoading
-                          bind:newModifiedContent
-                          {mergeViewRequestDatasetType}
-                        />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
-                        <RequestHeaders
-                          isBulkEditActive={$tab?.property?.request.state
-                            ?.isHeaderBulkEditActive}
-                          {onUpdateRequestState}
-                          {environmentVariables}
-                          {onUpdateEnvironment}
-                          headers={$tab.property.request.headers}
-                          autoGeneratedHeaders={$tab.property.request
-                            .autoGeneratedHeaders}
-                          authHeader={$requestAuthHeader}
-                          onHeadersChange={onUpdateHeaders}
-                          onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
-                          {isWebApp}
-                          bind:isMergeViewEnabled={isMergeViewEnableForHeaders}
-                          bind:isMergeViewLoading
-                          bind:newModifiedContent
-                        />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
-                        <RequestAuth
-                          requestStateAuth={$tab.property.request.state
-                            .requestAuthNavigation}
-                          {onUpdateRequestState}
-                          auth={$tab.property.request.auth}
-                          collectionAuth={$collectionAuth}
-                          {onUpdateRequestAuth}
-                          {onUpdateEnvironment}
-                          {environmentVariables}
-                          {collection}
-                          {onOpenCollection}
-                        />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
-                        <RequestDoc
-                          isDocGenerating={$tab.property.request?.state
-                            ?.isDocGenerating}
-                          isDocAlreadyGenerated={$tab.property.request?.state
-                            ?.isDocAlreadyGenerated}
-                          {onGenerateDocumentation}
-                          {onUpdateRequestDescription}
-                          requestDoc={$tab.description}
-                          {isGuestUser}
-                        />
-                      {/if}
-                    </div> -->
-        </div>
+            </div>
+          </Pane>
+
+          <Pane
+            class="position-relative bg-transparent"
+            minSize={minSizePct}
+            size={defaultSizePct}
+            maxSize={maxSizePct}
+          >
+            <ChatBot
+              {tab}
+              {onUpdateAiPrompt}
+              {onUpdateAiConversation}
+              {onUpdateRequestState}
+              {onGenerateAiResponse}
+              {onStopGeneratingAIResponse}
+              {onToggleLike}
+              handleApplyChangeOnAISuggestion={() => {}}
+            />
+          </Pane>
+        </Splitpanes>
       </div>
     </div>
     <!--

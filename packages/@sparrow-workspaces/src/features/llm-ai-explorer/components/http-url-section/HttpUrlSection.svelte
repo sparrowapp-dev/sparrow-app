@@ -6,6 +6,8 @@
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { SaveRegular } from "@sparrow/library/icons";
+  import { ModelSelector } from "..";
+  import { createEventDispatcher } from "svelte";
 
   let componentClass = "";
   export { componentClass as class };
@@ -25,7 +27,26 @@
   export let userRole;
   export let isSaveLoad = false;
 
+  const dispatch = createEventDispatcher();
   const theme = new UrlInputTheme().build();
+
+  // Model selector state
+  let isModelSelectorOpen = true;
+  let selectedModelProvider = "Anthropic";
+  let selectedModel = "";
+
+  // Toggle model selector
+  const toggleModelSelector = () => {
+    isModelSelectorOpen = !isModelSelectorOpen;
+  };
+
+  // Handle model selection
+  const handleModelSelection = (provider: string, model: string) => {
+    selectedModelProvider = provider;
+    selectedModel = model;
+    onUpdateRequestUrl(model);
+  };
+
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
@@ -75,98 +96,42 @@
   function handleMouseLeave() {
     isHovered = false;
   }
+
+  function handleInputClick() {
+    toggleModelSelector();
+  }
 </script>
 
 <div class={`d-flex ${componentClass}`} style="display: flex; gap: 6px;">
-  <!-- Http Method Dropdown -->
-  <!-- <Select
-    variant={"secondary"}
-    id={"api-request"}
-    size={"medium"}
-    data={[
-      {
-        name: "GET",
-        id: RequestMethod.GET,
-        color: "success",
-      },
-      {
-        name: "POST",
-        id: RequestMethod.POST,
-        color: "warning",
-      },
-      {
-        name: "PUT",
-        id: RequestMethod.PUT,
-        color: "secondary",
-      },
-      {
-        name: "DELETE",
-        id: RequestMethod.DELETE,
-        color: "danger",
-      },
-      {
-        name: "PATCH",
-        id: RequestMethod.PATCH,
-        color: "patch",
-      },
-    ]}
-    titleId={httpMethod}
-    onclick={handleDropdown}
-    borderHighlight={"active"}
-    headerHighlight={"hover"}
-    minHeaderWidth={"100px"}
-    borderActiveType={"none"}
-    zIndex={500}
-    borderType={"none"}
-    menuItem={"v2"}
-    highlightTickedItem={false}
-  /> -->
   <div class="w-100 d-flex align-items-center position-relative">
     <div class="position-absolute top-0" style="width: calc(100% );">
-      <CodeMirrorInput
-        value={requestUrl}
-        onUpdateInput={onUpdateRequestUrl}
-        placeholder={"Select a Model"}
-        {theme}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        codeId={"url"}
-        class={"input-url"}
-        {userRole}
-        isFocusedOnMount={false}
+      <!-- Wrap with a div to handle the click event -->
+      <div on:click={handleInputClick} style="cursor: pointer;">
+        <CodeMirrorInput
+          value={selectedModel || "Select a Model"}
+          onUpdateInput={onUpdateRequestUrl}
+          placeholder={"Select a Model"}
+          {theme}
+          {onUpdateEnvironment}
+          {environmentVariables}
+          codeId={"url"}
+          class={"input-url"}
+          {userRole}
+          isFocusedOnMount={false}
+          readonly={true}
+        />
+      </div>
+
+      <!-- Model selector dropdown -->
+      <ModelSelector
+        isOpen={isModelSelectorOpen}
+        {selectedModelProvider}
+        {selectedModel}
+        onSelect={handleModelSelection}
+        on:close={() => (isModelSelectorOpen = false)}
       />
     </div>
   </div>
-
-  <!-- Send button -->
-  <!-- {#if !isSendRequestInProgress}
-    <Button
-      title="Send"
-      type="primary"
-      customWidth={"96px"}
-      onClick={() => {
-        if (requestUrl === "") {
-          const codeMirrorElement = document.querySelector(
-            ".input-url .cm-editor",
-          );
-          if (codeMirrorElement) {
-            codeMirrorElement.classList.add("url-red-border");
-          }
-        } else {
-          onSendButtonClicked(environmentVariables);
-        }
-      }}
-    />
-  {:else}
-    <Button
-      type="secondary"
-      customWidth={"96px"}
-      title="Cancel"
-      onClick={() => {
-        onCancelButtonClicked();
-      }}
-    />
-  {/if} -->
 
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <Button

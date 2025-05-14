@@ -239,3 +239,5 @@ export { default as StatusSuccess } from "./StatusSuccess.svelte";
 export { default as LinkedinOrgIcon } from "./LinkdinIcon.svelte";
 export { default as XIcon } from "./XIcon.svelte";
 export { default as AISparkleRegularIcon } from "./AISparkleRegular.svelte";
+export { default as CoinMultipleRegular } from "./CoinMultipleRegular.svelte";
+export { default as OpenAIVectorIcon } from "./OpenAiVectorIcon.svelte";

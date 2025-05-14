@@ -112,15 +112,19 @@ export interface AIConfigurationsWrapper {
 export interface ResponseStatusWrapper {
     status: string;
 }
-export interface ResponseBodyWrapper {
-    body: string;
-}
 export interface ResponseTimeWrapper {
     time: number;
 }
 export interface ResponseSizeWrapper {
     size: number;
 }
+export interface ResponseTokenCountWrapper {
+    tokenCount: number;
+}
+
+export interface AIResponseInfo extends
+    ResponseStatusWrapper, ResponseTimeWrapper, ResponseSizeWrapper, ResponseTokenCountWrapper, AIModelVariantWrapper { }
+
 
 export interface StateWrapper {
     state: State;

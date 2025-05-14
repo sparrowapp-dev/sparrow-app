@@ -96,6 +96,7 @@ import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { LLM_AI_Request_Auth_Type_Base_Enum } from "@sparrow/common/types/workspace/llm-ai-request-base";
 
 class RestExplorerViewModel {
   /**
@@ -181,8 +182,8 @@ class RestExplorerViewModel {
         await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
         if (
-          m.property.request?.state.requestAuthNavigation ===
-          HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+          m.property.llm_ai_request?.state.LLM_AI_AuthNavigation ===
+          LLM_AI_Request_Auth_Type_Base_Enum.API_KEY
         ) {
           this.authHeader = new ReduceAuthHeader(
             this._collectionAuth.getValue()
@@ -196,12 +197,12 @@ class RestExplorerViewModel {
           ).getValue();
         } else {
           this.authHeader = new ReduceAuthHeader(
-            this._tab.getValue().property.request?.state.requestAuthNavigation,
-            this._tab.getValue().property.request?.auth,
+            this._tab.getValue().property.llm_ai_request?.state.LLM_AI_AuthNavigation,
+            this._tab.getValue().property.llm_ai_request?.auth,
           ).getValue();
           this.authParameter = new ReduceAuthParameter(
-            this._tab.getValue().property.request?.state.requestAuthNavigation,
-            this._tab.getValue().property.request?.auth,
+            this._tab.getValue().property.llm_ai_request?.state.LLM_AI_AuthNavigation,
+            this._tab.getValue().property.llm_ai_request?.auth,
           ).getValue();
         }
       }, 0);
@@ -556,7 +557,7 @@ class RestExplorerViewModel {
    */
   public updateRequestAIPrompt = async (_prompt: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.ai.prompt = _prompt;
+    progressiveTab.property.llm_ai_request.ai.prompt = _prompt;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -569,7 +570,7 @@ class RestExplorerViewModel {
    */
   public updateRequestAIThread = async (_threadId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.ai.threadId = _threadId;
+    progressiveTab.property.llm_ai_request.ai.threadId = _threadId;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -584,7 +585,7 @@ class RestExplorerViewModel {
     _conversations: Conversation[],
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.ai.conversations = _conversations;
+    progressiveTab.property.llm_ai_request.ai.conversations = _conversations;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -1866,18 +1867,18 @@ class RestExplorerViewModel {
       const componentData = this._tab.getValue();
 
       // Check if generation should be stopped
-      if (!componentData?.property?.request?.state?.isChatbotGeneratingResponse)
+      if (!componentData?.property?.llm_ai_request?.state?.isChatbotGeneratingResponse)
         return;
 
       if (index < data.length) {
         const chunk = data.slice(index, index + chunkSize);
         const length =
-          componentData?.property?.request?.ai?.conversations.length;
-        componentData.property.request.ai.conversations[length - 1].message =
-          componentData.property.request.ai.conversations[length - 1].message +
+          componentData?.property?.llm_ai_request?.ai?.conversations.length;
+        componentData.property.llm_ai_request.ai.conversations[length - 1].message =
+          componentData.property.llm_ai_request.ai.conversations[length - 1].message +
           chunk;
         await this.updateRequestAIConversation([
-          ...componentData.property.request.ai.conversations,
+          ...componentData.property.llm_ai_request.ai.conversations,
         ]);
         index += chunkSize;
         await sleep(delay);
@@ -1908,7 +1909,7 @@ class RestExplorerViewModel {
     errorMessage: string,
   ) {
     await this.updateRequestAIConversation([
-      ...(componentData?.property?.request?.ai?.conversations || []),
+      ...(componentData?.property?.llm_ai_request?.ai?.conversations || []),
       {
         message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
@@ -1929,7 +1930,7 @@ class RestExplorerViewModel {
   private async updateAIResponseByChunk(messageId: string, chunk: string) {
     const componentData = this._tab.getValue();
     const conversations =
-      componentData?.property?.request?.ai?.conversations || [];
+      componentData?.property?.llm_ai_request.ai?.conversations || [];
 
     let foundIndex = -1;
     // Find the index of the message we need to update
@@ -1963,12 +1964,12 @@ class RestExplorerViewModel {
 
     // extraction of request API data for setting AI Context
     const apiData = {
-      body: componentData.property.request.body,
-      headers: componentData.property.request.headers,
-      method: componentData.property.request.method,
-      queryParams: componentData.property.request.queryParams,
-      url: componentData.property.request.url,
-      auth: componentData.property.request.auth,
+      body: componentData.property.llm_ai_request.body,
+      headers: componentData.property.llm_ai_request.headers,
+      method: componentData.property.llm_ai_request.method,
+      queryParams: componentData.property.llm_ai_request.queryParams,
+      url: componentData.property.llm_ai_request.url,
+      auth: componentData.property.llm_ai_request.auth,
     };
 
     try {
@@ -1979,7 +1980,7 @@ class RestExplorerViewModel {
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
-        componentData?.property?.request?.ai?.threadId || null,
+        componentData?.property?.llm_ai_request?.ai?.threadId || null,
         userEmail,
         prompt,
         JSON.stringify(apiData),
@@ -2039,7 +2040,7 @@ class RestExplorerViewModel {
                 : "Some issue occurred while processing your request, please try again.";
 
               await this.updateRequestAIConversation([
-                ...(componentData?.property?.request?.ai?.conversations || []),
+                ...(componentData?.property?.llm_ai_request?.ai?.conversations || []),
                 {
                   message: errorMessage,
                   messageId: uuidv4(),
@@ -2063,7 +2064,7 @@ class RestExplorerViewModel {
               if (stream_status === STREAMING_STATES.START) {
                 // console.log("** stream started ** ");
                 const thisTabThreadId =
-                  componentData?.property?.request?.ai?.threadId;
+                  componentData?.property?.llm_ai_request?.ai?.threadId;
                 if (!thisTabThreadId && thread_id) {
                   await this.updateRequestAIThread(thread_id);
                 }
@@ -2071,7 +2072,7 @@ class RestExplorerViewModel {
                 // Create empty message container that will be updated with chunks
                 if (!messageCreated) {
                   await this.updateRequestAIConversation([
-                    ...(componentData?.property?.request?.ai?.conversations ||
+                    ...(componentData?.property?.llm_ai_request?.ai?.conversations ||
                       []),
                     {
                       message: "",
@@ -2136,7 +2137,7 @@ class RestExplorerViewModel {
 
     // Handling the case where user clicked stop generating just after the "start" stream status
     const conversation =
-      componentData?.property?.request?.ai?.conversations || [];
+      componentData?.property?.llm_ai_request?.ai?.conversations || [];
     if (conversation.length > 0) {
       // Remove last message
       const lastResponse = conversation[conversation.length - 1];
@@ -2150,7 +2151,7 @@ class RestExplorerViewModel {
       // Send stop signal to the server
       await this.aiAssistentWebSocketService.stopGeneration(
         componentData.tabId,
-        componentData?.property?.request?.ai?.threadId || null,
+        componentData?.property?.llm_ai_request?.ai?.threadId || null,
         getClientUser().email,
       );
 
@@ -2384,7 +2385,7 @@ class RestExplorerViewModel {
    */
   public toggleChatMessageLike = (_messageId: string, _flag: boolean) => {
     const componentData = this._tab.getValue();
-    const data = componentData?.property?.request?.ai;
+    const data = componentData?.property?.llm_ai_request?.ai;
     this.aiAssistentService.updateAiStats(data.threadId, _messageId, _flag);
 
     // Map through the conversations and update the like or dislike status of the specified message
@@ -2411,47 +2412,47 @@ class RestExplorerViewModel {
   public refreshTabData = (tab: RequestTab) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
-    if (progressiveTab?.property?.request?.ai?.conversations) {
+    if (progressiveTab?.property?.llm_ai_request?.ai?.conversations) {
       // Handles AiConversationClient state
       const AiConversationClient =
-        progressiveTab?.property?.request?.ai.conversations;
-      const AiConversationServer = tab.property.request.ai.conversations;
+        progressiveTab?.property?.llm_ai_request?.ai.conversations;
+      const AiConversationServer = tab.property.llm_ai_request.ai.conversations;
       if (AiConversationServer.length > AiConversationClient.length) {
-        progressiveTab.property.request.ai.conversations =
-          tab.property.request.ai.conversations;
+        progressiveTab.property.llm_ai_request.ai.conversations =
+          tab.property.llm_ai_request.ai.conversations;
         this.tab = progressiveTab;
       }
     }
-    if (progressiveTab?.property?.request?.state) {
+    if (progressiveTab?.property?.llm_ai_request?.state) {
       // Handles isChatbotGeneratingResponseClient state
       const isChatbotGeneratingResponseClient =
-        progressiveTab?.property?.request?.state?.isChatbotGeneratingResponse;
+        progressiveTab?.property?.llm_ai_request?.state?.isChatbotGeneratingResponse;
       const isChatbotGeneratingResponseServer =
-        tab.property.request.state.isChatbotGeneratingResponse;
+        tab.property.llm_ai_request.state.isChatbotGeneratingResponse;
       if (
         isChatbotGeneratingResponseServer !== isChatbotGeneratingResponseClient
       ) {
-        progressiveTab.property.request.state.isChatbotGeneratingResponse =
-          tab.property.request.state.isChatbotGeneratingResponse;
+        progressiveTab.property.llm_ai_request.state.isChatbotGeneratingResponse =
+          tab.property.llm_ai_request.state.isChatbotGeneratingResponse;
         this.tab = progressiveTab;
       }
       // Handles isDocGenerating state
       const isDocGeneratingClient =
-        progressiveTab?.property?.request?.state?.isDocGenerating;
-      const isDocGeneratingServer = tab.property.request.state.isDocGenerating;
+        progressiveTab?.property?.llm_ai_request?.state?.isDocGenerating;
+      const isDocGeneratingServer = tab.property.llm_ai_request.state.isDocGenerating;
       if (isDocGeneratingServer !== isDocGeneratingClient) {
-        progressiveTab.property.request.state.isDocGenerating =
-          tab.property.request.state.isDocGenerating;
+        progressiveTab.property.llm_ai_request.state.isDocGenerating =
+          tab.property.llm_ai_request.state.isDocGenerating;
         this.tab = progressiveTab;
       }
       // Handles isDocAlreadyGeneratedClient state
       const isDocAlreadyGeneratedClient =
-        progressiveTab?.property?.request?.state?.isDocAlreadyGenerated;
+        progressiveTab?.property?.llm_ai_request?.state?.isDocAlreadyGenerated;
       const isDocAlreadyGeneratedServer =
-        tab.property.request.state.isDocAlreadyGenerated;
+        tab.property.llm_ai_request.state.isDocAlreadyGenerated;
       if (isDocAlreadyGeneratedServer !== isDocAlreadyGeneratedClient) {
-        progressiveTab.property.request.state.isDocAlreadyGenerated =
-          tab.property.request.state.isDocAlreadyGenerated;
+        progressiveTab.property.llm_ai_request.state.isDocAlreadyGenerated =
+          tab.property.llm_ai_request.state.isDocAlreadyGenerated;
         this.tab = progressiveTab;
       }
     }
