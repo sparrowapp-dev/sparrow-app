@@ -246,3 +246,4 @@ export { default as DatabaseStackRegular } from "./DatabaseStackRegular.svelte";
 export { default as RecordStopRegular } from "./RecordStopRegular.svelte";
 export { default as PlayCircleRegular } from "./PlayCircleRegular.svelte";
 export { default as HistoryRegular } from "./HistoryRegular.svelte";
+export { default as CheckmarkStarburstFilled } from "./CheckmarkStarburstFilled.svelte";
