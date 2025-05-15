@@ -162,7 +162,7 @@
         <div bind:this={workspaceTabWrapper}>
           <span
             class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
-            style="color: var(--text-ds-neutral-400); top:27px; right:65px;"
+            style="color: var(--text-ds-neutral-400); top:28px; right:65px;"
           >
             Copy Public Link
           </span>
