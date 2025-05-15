@@ -227,7 +227,7 @@
 />
 <div>
   <Modal
-    title={"Delete Folder?"}
+    title={isMockCollection ? "Delete Folder" : "Delete Folder?"}
     type={"danger"}
     width={"35%"}
     zIndex={1000}
@@ -235,9 +235,11 @@
     handleModalState={(flag = false) => (isFolderPopup = flag)}
   >
     <div
-      class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+      class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium {isMockCollection
+        ? 'mt-2'
+        : ''}"
     >
-      <p>
+      <p class="mb-0">
         Are you sure you want to delete this Folder? Everything in <span
           class="text-ds-font-weight-semi-bold"
           style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
@@ -246,9 +248,13 @@
       </p>
     </div>
     <div class="d-flex gap-3 text-ds-font-size-12">
-      <div class="d-flex gap-1">
-        <span class="text-plusButton">{requestCount}</span>
-        <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
+      <div class="d-flex gap-1 {isMockCollection ? 'align-items-center' : ''}">
+        <span class="text-plusButton {isMockCollection ? 'fs-5' : ''}"
+          >{requestCount}</span
+        >
+        <p style="font-size: 12px;" class="mb-0">
+          {HttpRequestDefaultNameBaseEnum.NAME}
+        </p>
       </div>
       {#if !isMockCollection}
         <div class="d-flex gap-1">
@@ -266,7 +272,9 @@
       {/if}
     </div>
     <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded {isMockCollection
+        ? 'mt-3'
+        : ''}"
     >
       <Button
         disable={deleteLoader}

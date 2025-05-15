@@ -3459,7 +3459,7 @@ export default class CollectionsViewModel {
       // Deleting the main and child tabs
       await this.removeTabWithChildren(explorer.id, workspaceId, "folder");
 
-      notifications.success(`"${explorer.name}" Folder deleted.`);
+      notifications.success(`‘${explorer.name}’ folder deleted successfully.`);
       MixpanelEvent(Events.DELETE_FOLDER, {
         source: "Collection list",
       });
@@ -6235,7 +6235,7 @@ export default class CollectionsViewModel {
         response.data.data,
       );
       notifications.success(
-        `The ‘${progressiveTab.name}’ folder saved successfully.`,
+        `‘${progressiveTab.name}’ folder saved successfully.`,
       );
       return true;
     } else {
