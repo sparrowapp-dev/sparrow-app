@@ -207,7 +207,7 @@
       open(`${constants.MARKETING_URL}/privacy-policy`);
     }}
     onRedirectDocs={() => {
-      open(`${constants.DOCS_URL}`);
+      open(`${constants.INTRO_DOCS_URL}`);
     }}
   />
 </Modal>
