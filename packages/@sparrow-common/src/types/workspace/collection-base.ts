@@ -81,6 +81,7 @@ export interface CollectionBaseInterface {
   description: string;
   collectionType?: CollectionTypeBaseEnum;
   mockCollectionUrl?: string;
+  isMockCollectionRunning?: boolean;
   items: CollectionItemBaseInterface[];
   uuid?: string;
   activeSync?: boolean;

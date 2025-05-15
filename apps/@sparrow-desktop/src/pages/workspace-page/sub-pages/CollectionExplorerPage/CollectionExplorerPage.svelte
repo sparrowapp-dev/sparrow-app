@@ -207,4 +207,5 @@
   getLastUpdatedAndCount={_viewModel.getLastUpdatedAndCount}
   onUpdateCollectionState={_viewModel.updateCollectionState}
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
+  onUpdateRunningState={_viewModel.handleMockCollectionState}
 />

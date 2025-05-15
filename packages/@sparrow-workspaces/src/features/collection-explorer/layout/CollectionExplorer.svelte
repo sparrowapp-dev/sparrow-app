@@ -114,6 +114,7 @@
   export let environmentVariables;
   export let onSaveCollection;
   export let onItemCreated;
+  export let onUpdateRunningState;
 
   /**
    * Local variables
@@ -321,6 +322,9 @@
   export let onMockCollectionModelOpen;
   let isMockRunning = false;
   const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection.isMockCollectionRunning,
+    });
     isMockRunning = !isMockRunning;
   };
 </script>
@@ -647,18 +651,24 @@
               <div class="d-flex justify-content-center">
                 <Tag
                   size="medium"
-                  type={isMockRunning ? "green" : "grey"}
-                  text={isMockRunning ? "Running" : "Inactive"}
+                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                  text={collection?.isMockCollectionRunning
+                    ? "Running"
+                    : "Inactive"}
                 />
               </div>
               <Button
                 size="small"
-                type={isMockRunning ? "danger" : "primary"}
-                title={isMockRunning ? "Stop Mock" : "Run Mock"}
+                type={collection?.isMockCollectionRunning
+                  ? "danger"
+                  : "primary"}
+                title={collection?.isMockCollectionRunning
+                  ? "Stop Mock"
+                  : "Run Mock"}
                 onClick={() => {
                   mockRunningStatus();
                 }}
-                startIcon={isMockRunning
+                startIcon={collection?.isMockCollectionRunning
                   ? RecordStopRegular
                   : PlayCircleRegular}
               />

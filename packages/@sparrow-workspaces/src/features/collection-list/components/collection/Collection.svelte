@@ -30,6 +30,7 @@
   export let isSharedWorkspace = false;
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
+  export let onUpdateRunningState;
 
   import {
     openedComponent,
@@ -362,6 +363,9 @@
 
   let isMockRunning = false;
   const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection?.isMockCollectionRunning,
+    });
     isMockRunning = !isMockRunning;
   };
 </script>
@@ -756,10 +760,13 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
         <div style="display: flex;">
-          <Tag type={isMockRunning ? "green" : "grey"} text={"Mock"} />
+          <Tag
+            type={collection?.isMockCollectionRunning ? "green" : "grey"}
+            text={"Mock"}
+          />
         </div>
         <Tooltip
-          title={isMockRunning ? "Stop Mock" : "Run Mock"}
+          title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}
           distance={13}
           zIndex={701}
@@ -773,7 +780,9 @@
               onClick={() => {
                 mockRunningStatus();
               }}
-              startIcon={isMockRunning ? RecordStopRegular : PlayCircleRegular}
+              startIcon={collection?.isMockCollectionRunning
+                ? RecordStopRegular
+                : PlayCircleRegular}
             />
           </span>
         </Tooltip>
