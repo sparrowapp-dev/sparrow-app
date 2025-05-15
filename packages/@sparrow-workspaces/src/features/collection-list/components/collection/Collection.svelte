@@ -546,7 +546,7 @@
       },
       {
         onClick: () => {
-          onItemCreated("requestCollection", {
+          onItemCreated("mockRequestCollection", {
             workspaceId: collection.workspaceId,
             collection,
           });
@@ -1052,7 +1052,12 @@
             style="height: 24px; width: 24px;"
             role="button"
             on:click={() => {
-              if (!collection?.activeSync) {
+              if (isMockCollection) {
+                onItemCreated("mockRequestCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              } else if (!collection?.activeSync) {
                 onItemCreated("requestCollection", {
                   workspaceId: collection.workspaceId,
                   collection,

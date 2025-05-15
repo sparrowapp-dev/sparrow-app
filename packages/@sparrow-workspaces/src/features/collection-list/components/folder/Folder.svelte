@@ -48,6 +48,7 @@
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
+  import MockRequest from "../mock-request/MockRequest.svelte";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -541,7 +542,7 @@
         {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
           {#if !collection?.activeSync}
             <Tooltip
-              title={"Add REST API"}
+              title={isMockCollection ? "Add Mock REST API" : "Add REST API"}
               placement={"bottom-center"}
               zIndex={701}
               distance={13}
@@ -555,11 +556,19 @@
                   onClick={(e) => {
                     e.stopPropagation();
                     expand = true;
-                    onItemCreated("requestFolder", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                      folder: explorer,
-                    });
+                    if (isMockCollection) {
+                      onItemCreated("requestMockFolder", {
+                        workspaceId: collection.workspaceId,
+                        collection,
+                        folder: explorer,
+                      });
+                    } else {
+                      onItemCreated("requestFolder", {
+                        workspaceId: collection.workspaceId,
+                        collection,
+                        folder: explorer,
+                      });
+                    }
                   }}
                 />
               </span>
@@ -713,6 +722,24 @@
           {folder}
           {collection}
           {activeTabId}
+        />
+      </div>
+    {:else if explorer.type === CollectionItemTypeBaseEnum.MOCK_REQUEST}
+      <div style={`cursor: pointer; `}>
+        <MockRequest
+          {userRole}
+          {isSharedWorkspace}
+          api={explorer}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {activeTabPath}
+          {searchData}
+          {activeTabType}
+          {folder}
+          {collection}
+          {activeTabId}
+          {isWebApp}
         />
       </div>
     {/if}

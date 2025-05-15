@@ -47,6 +47,10 @@ import type {
   HttpRequestSavedDeletePayloadDtoInterface,
   HttpRequestSavedUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-request-saved-dto";
+import type {
+  HttpRequestMockCreateUpdatePayloadDtoInterface,
+  HttpRequestMockDeletePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/http-request-mock-dto";
 
 export class CollectionService {
   constructor() {}
@@ -201,6 +205,54 @@ export class CollectionService {
     const response = await makeRequest(
       "DELETE",
       `${baseUrl}/api/collection/request/${requestId}`,
+      {
+        body: deleteRequestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public addMockRequestInCollection = async (
+    apiRequest: HttpRequestMockCreateUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/mock-request`,
+      {
+        body: apiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateMockRequestInCollection = async (
+    requestId: string,
+    requestBody: HttpRequestMockCreateUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${baseUrl}/api/collection/mock-request/${requestId}`,
+      {
+        body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public deleteMockRequestInCollection = async (
+    requestId: string,
+    deleteRequestBody: HttpRequestMockDeletePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/collection/mock-request/${requestId}`,
       {
         body: deleteRequestBody,
         headers: getAuthHeaders(),
