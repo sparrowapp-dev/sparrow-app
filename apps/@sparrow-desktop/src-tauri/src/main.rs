@@ -35,9 +35,11 @@
 //! - `url_fetch_handler::import_swagger_url`: Function for importing Swagger URLs.
 //! - `urlencoded_handler::make_www_form_urlencoded_request`: Function for making URL-encoded requests.
 //! - `utils::response_decoder::decode_response_body`: Function for decoding response body as per encoded type.
+//! - `group_policy_config::get_policy_config: Function to read the registry keys for group policy support`
 // Submodules
 mod config;
 mod formdata_handler;
+mod group_policy_config;
 mod json_handler;
 mod raw_handler;
 mod request_handler;
@@ -48,6 +50,7 @@ mod utils;
 // External Imports
 use base64;
 use formdata_handler::make_formdata_request;
+use group_policy_config::get_policy_config;
 use json_handler::make_json_request;
 use nfd::Response;
 use raw_handler::make_text_request;
@@ -298,96 +301,6 @@ async fn close_oauth_window(handle: tauri::AppHandle) {
         "window.location.replace('https://accounts.google.com/logout')"
     ));
     let _ = oauth_window.hide();
-}
-
-#[tauri::command]
-fn get_policy_config() -> Result<PolicyConfig, String> {
-    // For Windows
-    #[cfg(target_os = "windows")]
-    {
-        use winreg::enums::*;
-        use winreg::RegKey;
-
-        // Path to your app's policy in the registry
-        let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
-        let policy_path = "Software\\Policies\\Sparrow";
-
-        // Default configuration
-        let mut config = PolicyConfig {
-            enable_login: true,
-            enable_ai_assistance: true,
-            restric_public_workspace_creation: false,
-            disable_active_sync: false,
-            hub_creation_allowed: true,
-        };
-
-        // Try to open the main policy key
-        if let Ok(main_key) = hklm.open_subkey(policy_path) {
-            // Read from subkeys if they exist
-
-            // Login settings
-            if let Ok(login_key) = main_key.open_subkey("Login") {
-                config.enable_login =
-                    login_key.get_value::<u32, _>("EnableLogin").unwrap_or(1) == 1;
-            }
-
-            // AI Assistance settings
-            if let Ok(ai_key) = main_key.open_subkey("AI") {
-                config.enable_ai_assistance = ai_key
-                    .get_value::<u32, _>("EnableAIAssistance")
-                    .unwrap_or(1)
-                    == 1;
-            }
-
-            // Workspace settings
-            if let Ok(workspace_key) = main_key.open_subkey("Workspaces") {
-                config.restric_public_workspace_creation = workspace_key
-                    .get_value::<u32, _>("RestrictPublicWorkspaceCreation")
-                    .unwrap_or(0)
-                    == 1;
-            }
-
-            // Sync settings
-            if let Ok(sync_key) = main_key.open_subkey("Sync") {
-                config.disable_active_sync = sync_key
-                    .get_value::<u32, _>("DisableActiveSync")
-                    .unwrap_or(0)
-                    == 1;
-            }
-
-            // HubSpace Setting
-            if let Ok(login_key) = main_key.open_subkey("Hubs") {
-                config.hub_creation_allowed = login_key
-                    .get_value::<u32, _>("HubCreationAllowed")
-                    .unwrap_or(1)
-                    == 1;
-            }
-        }
-
-        Ok(config)
-    }
-
-    // For non-Windows platforms, return default values
-    #[cfg(not(target_os = "windows"))]
-    {
-        Ok(PolicyConfig {
-            enable_login: true,
-            enable_ai_assistance: true,
-            restric_public_workspace_creation: false,
-            disable_active_sync: false,
-            hub_creation_allowed: true,
-        })
-    }
-}
-
-// Define your policy configuration struct
-#[derive(serde::Serialize)]
-struct PolicyConfig {
-    enable_login: bool,
-    enable_ai_assistance: bool,
-    restric_public_workspace_creation: bool,
-    disable_active_sync: bool,
-    hub_creation_allowed: bool,
 }
 
 #[tauri::command]

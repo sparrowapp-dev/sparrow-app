@@ -54,8 +54,11 @@
     "targets": "all",
     "windows": {
       "wix": {
-        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs"],
-        "componentRefs": ["DeepLinkRegistryEntries", "GroupPolicyRegistryEntries"]
+        "fragmentPaths": ["./assets/DeepLinkRegistryEntries.wxs", "./assets/LoginRegistry.wxs", "./assets/AIRegistry.wxs","./assests/WorkspaceRegistry.wxs"],
+        "componentRefs": [
+          "DeepLinkRegistryEntries",
+          "AIRegistryEntries",
+          "WorkspacesRegistryEntries"]
       }
     },
     "macOS": {
