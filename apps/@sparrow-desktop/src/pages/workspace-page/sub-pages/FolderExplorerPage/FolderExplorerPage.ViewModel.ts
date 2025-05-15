@@ -16,6 +16,7 @@ import type {
 import {
   createDeepCopy,
   Debounce,
+  InitMockRequestTab,
   InitWebSocketTab,
   moveNavigation,
 } from "@sparrow/common/utils";
@@ -455,6 +456,134 @@ class FolderExplorerPage {
   };
 
   /**
+   * Handles creating a new mock request in a folder
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param explorer : - the folder in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateMockRequestInFolder = async (
+    workspaceId: string,
+    collection: CollectionBaseInterface,
+    explorer: CollectionItemBaseInterface,
+  ) => {
+    const sampleRequest = new InitMockRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection.activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      folderId: explorer.id,
+      items: {
+        name: explorer.name,
+        type: ItemType.FOLDER,
+        id: explorer.id,
+        items: {
+          name: sampleRequest.getValue().name,
+          type: sampleRequest.getValue().type,
+          description: "",
+          mockRequest: {
+            method: sampleRequest.getValue().property.mockRequest?.method,
+            url: collection?.mockCollectionUrl,
+          },
+        },
+      },
+    };
+
+    await this.collectionRepository.addRequestInFolder(
+      requestObj.collectionId,
+      requestObj.folderId,
+      {
+        ...requestObj.items.items,
+        id: sampleRequest.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res = (await this.collectionRepository.readRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+      )) as CollectionItemBaseInterface;
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+        res,
+      );
+
+      sampleRequest.updateId(res.id);
+      sampleRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      sampleRequest.updateIsSave(true);
+      this.tabRepository.createTab(sampleRequest.getValue());
+
+      moveNavigation("right");
+      MixpanelEvent(Events.CREATE_REQUEST, {
+        source: "Collection list",
+      });
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addMockRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      this.collectionRepository.updateRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+        request,
+      );
+
+      sampleRequest.updateId(request.id);
+      sampleRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      sampleRequest.updateIsSave(true);
+      sampleRequest.updateUrl(collection?.mockCollectionUrl);
+      this.tabRepository.createTab(sampleRequest.getValue());
+
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        requestObj.collectionId,
+        requestObj.folderId,
+        sampleRequest.getValue().id,
+      );
+    }
+  };
+
+  /**
    * Handles creating a new web socket in a folder
    * @param workspaceId - the workspace id in which new web socket is going to be created
    * @param collection - the collection in which new web socket is going to be created
@@ -800,6 +929,13 @@ class FolderExplorerPage {
     switch (entityType) {
       case "requestFolder":
         await this.handleCreateRequestInFolder(
+          args.workspaceId,
+          args.collection as CollectionBaseInterface,
+          args.folder as CollectionItemBaseInterface,
+        );
+        break;
+      case "mockRequestFolder":
+        await this.handleCreateMockRequestInFolder(
           args.workspaceId,
           args.collection as CollectionBaseInterface,
           args.folder as CollectionItemBaseInterface,

@@ -28,6 +28,7 @@
   export let onShareWorkspace;
   export let isWorkspaceSharing = false;
   export let onUpdateWorkspaceName;
+  export let isShareModalOpen;
   let isWorkspaceUpdating = false;
 
   const handleInputDescription = (event: Event) => {
@@ -112,16 +113,11 @@
     {/if}
     {#if workspaceType === WorkspaceType.PUBLIC}
       <Button
-        title={isWorkspaceSharing ? "Link Copied" : "Share workspace"}
+        title={"Share workspace"}
         type={"secondary"}
-        onClick={async () => {
-          await onShareWorkspace();
-          isWorkspaceSharing = true;
-          setTimeout(() => {
-            isWorkspaceSharing = false;
-          }, 3000);
+        onClick={() => {
+          isShareModalOpen = true;
         }}
-        startIcon={isWorkspaceSharing ? CopyRegular : ""}
       ></Button>
     {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN}
       <Button

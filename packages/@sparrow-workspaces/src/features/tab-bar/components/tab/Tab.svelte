@@ -228,6 +228,14 @@
             >{tab?.property?.request?.method || ""}</span
           >
         </span>
+      {:else if tab.type === TabTypeEnum.MOCK_REQUEST}
+        <span class="text-{getMethodStyle(tab?.property?.mockRequest?.method)}">
+          <span
+            class={!tab.isActive ? "request-icon" : ""}
+            style="font-size: 11px; height: 31px; font-weight: 500;"
+            >{tab?.property?.mockRequest?.method || ""}</span
+          >
+        </span>
       {:else if tab.type === TabTypeEnum.FOLDER}
         <span>
           <img

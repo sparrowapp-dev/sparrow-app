@@ -190,7 +190,7 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
-    color: var(--text-ds-neutral-50);
+    /* color: var(--text-ds-neutral-50); */
   }
   .option-subtitle {
     font-family: "Inter", sans-serif;

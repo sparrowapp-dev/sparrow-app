@@ -777,6 +777,7 @@
           bind:isFirstCollectionExpand
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
+          onUpdateRunningState={_viewModel.handleMockCollectionState}
         />
       </Pane>
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>

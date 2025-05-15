@@ -213,7 +213,7 @@
             title={"Add Mock REST API"}
             type={"primary"}
             onClick={() => {
-              onItemCreated("requestFolder", {
+              onItemCreated("mockRequestFolder", {
                 workspaceId: collection.workspaceId,
                 collection: collection,
                 folder: folder,

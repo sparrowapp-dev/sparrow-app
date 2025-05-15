@@ -826,6 +826,7 @@
           isWebApp={true}
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
+          onUpdateRunningState={_viewModel.handleMockCollectionState}
         />
       </Pane>
       <Pane

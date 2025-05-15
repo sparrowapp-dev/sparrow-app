@@ -50,7 +50,9 @@
   <path
     d={edgePath}
     fill="none"
-    stroke={selected ? "#333" : "#333"}
+    stroke={selected
+      ? "var(--text-ds-neutral-600)"
+      : "var(--text-ds-neutral-600)"}
     stroke-width="1"
     class="svelte-flow__edge-interaction"
   />
