@@ -316,7 +316,7 @@
           on:input={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            data.updateBlockName("blockName", e?.target?.value);
+            data.updateBlockName(id, e?.target?.value);
           }}
           on:change={(e) => {
             e.preventDefault();
@@ -327,9 +327,11 @@
             e.stopPropagation();
           }}
           value={blockName}
-          on:blur={() => {
+          on:blur={(e) => {
             if (blockName.trim().length == 0) {
-              data.updateBlockName("blockName", "Untitled");
+              data.updateBlockName(id, "Untitled");
+            } else if (blockName.trim().length) {
+              data.updateBlockName(id, blockName.trim());
             }
             isEditing = false;
           }}
