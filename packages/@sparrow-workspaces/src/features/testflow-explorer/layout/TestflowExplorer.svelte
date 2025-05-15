@@ -598,6 +598,7 @@
     }
   });
 
+  let dynamicExpressionDependencyCount = 0;
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
    * Also triggers the count of the next node to be deleted.
@@ -605,6 +606,7 @@
    * @param id - The ID of the node to be deleted.
    */
   const handleDeleteModal = (id: string) => {
+    dynamicExpressionDependencyCount = 0;
     if (!id) return;
     if (id === "1") return;
     isDeleteNodeModalOpen = true;
@@ -614,41 +616,31 @@
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
 
-    // nodes.update((_nodes) => {
-    //   let shouldPreserve = false;
-    //   const nodeToDelete = _nodes.find((n) => n.id === deletedNodeId);
-    //   let nameToCheck = nodeToDelete?.data?.requestData?.name;
-    //   if (nameToCheck) {
-    //     nameToCheck = nameToCheck
-    //       .replace(/^\//, "_")
-    //       .replace(/\//g, "_")
-    //       .replace(/\s+/g, "_");
-    //     const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
-    //     const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
-    //     for (const otherNode of _nodes) {
-    //       if (otherNode.id === deleteNodeId) continue;
-    //       const stringified = JSON.stringify(
-    //         otherNode?.data?.requestData || {},
-    //       );
-    //       const expressionMatches = [...stringified.matchAll(expressionRegex)];
-    //       for (const exprMatch of expressionMatches) {
-    //         const contentInside = exprMatch[1];
-    //         const varMatches = [...contentInside.matchAll(variableRegex)];
-    //         for (const vMatch of varMatches) {
-    //           const fullVar = vMatch[1];
-    //           const baseVar = fullVar.split(".")[0];
-    //           if (baseVar === nameToCheck) {
-    //             shouldPreserve = true;
-    //             break;
-    //           }
-    //         }
-    //         if (shouldPreserve) break;
-    //       }
-    //       if (shouldPreserve) break;
-    //     }
-    //   }
-    //   return _nodes;
-    // });
+    nodes.update((_nodes) => {
+      for (let i = 0; i < _nodes.length; i++) {
+        if (_nodes[i].id === id) {
+          continue;
+        }
+        const requestData = JSON.stringify(_nodes[i]?.data?.requestData);
+        if (
+          requestData.includes(
+            "$$" +
+              filteredNodes[0]?.data?.requestData?.name?.replace(
+                /[^a-zA-Z0-9_]/g,
+                "_",
+              ),
+          ) ||
+          requestData.includes(
+            "$$" +
+              filteredNodes[0]?.data?.blockName?.replace(/[^a-zA-Z0-9_]/g, "_"),
+          )
+        ) {
+          dynamicExpressionDependencyCount =
+            dynamicExpressionDependencyCount + 1;
+        }
+      }
+      return _nodes;
+    });
   };
 
   /**
@@ -1655,7 +1647,7 @@
 </Modal>
 
 <Modal
-  title={"Delete block?"}
+  title={"Delete Block?"}
   type={"dark"}
   width={"540px"}
   zIndex={1000}
@@ -1668,7 +1660,7 @@
     {deletedNodeId}
     {deleteNodeName}
     {handleDeleteNode}
-    {deleteCount}
+    deleteCount={dynamicExpressionDependencyCount}
     handleModalState={(flag = false) => {
       isDeleteNodeModalOpen = flag;
     }}
