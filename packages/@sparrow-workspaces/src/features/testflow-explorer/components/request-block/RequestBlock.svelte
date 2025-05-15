@@ -324,9 +324,11 @@
             e.stopPropagation();
           }}
           value={blockName}
-          on:blur={() => {
+          on:blur={(e) => {
             if (blockName.trim().length == 0) {
               data.updateBlockName(id, "Untitled");
+            } else if (blockName.trim().length) {
+              data.updateBlockName(id, blockName.trim());
             }
             isEditing = false;
           }}
