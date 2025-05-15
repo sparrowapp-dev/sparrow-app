@@ -24,8 +24,15 @@
       class="text-fs-14 text-ds-font-weight-medium"
       style="color: var(--text-secondary-1000);"
     >
-      Deleting this block will break connected downstream blocks that rely on
-      its dynamic expressions. Are you sure you want to proceed?
+      {#if deleteCount >= 1}
+        Deleting this block will break <span
+          class=""
+          style="color: var(--text-ds-neutral-50)"
+          >{deleteCount} downstream blocks</span
+        > that rely on its dynamic expressions. Are you sure you want to proceed?
+      {:else}
+        Are you sure you want to delete this Block?
+      {/if}
     </p>
   </div>
 
