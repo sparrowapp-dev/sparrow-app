@@ -187,7 +187,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     collectionId: {
       type: "string",
@@ -201,6 +201,9 @@ export const collectionSchemaLiteral = {
     },
     mockCollectionUrl: {
       type: "string",
+    },
+    isMockCollectionRunning: {
+      type: "boolean",
     },
     id: {
       type: "string",
