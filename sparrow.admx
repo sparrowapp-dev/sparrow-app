@@ -1,3 +1,5 @@
+<!-- this template will be used by admin to the features and option selection -->
+
 <?xml version='1.0' encoding='utf-8'?>
 <policyDefinitions revision="1.0" schemaVersion="1.0">
   <policyNamespaces>
