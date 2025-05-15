@@ -30,6 +30,7 @@
   export let isSharedWorkspace = false;
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
+  export let onUpdateRunningState;
 
   import {
     openedComponent,
@@ -362,6 +363,9 @@
 
   let isMockRunning = false;
   const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection?.isMockCollectionRunning,
+    });
     isMockRunning = !isMockRunning;
   };
 </script>

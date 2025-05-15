@@ -730,4 +730,21 @@ export class CollectionService {
     );
     return response;
   };
+
+  public updateMockCollectionRunningStatus = async (
+    collectionId: string,
+    workspaceId: string,
+    requestBody: any,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/mock-status`,
+      {
+        body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

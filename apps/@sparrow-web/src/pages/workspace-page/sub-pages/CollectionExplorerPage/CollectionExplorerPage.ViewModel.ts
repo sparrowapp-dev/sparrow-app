@@ -1576,6 +1576,32 @@ class CollectionExplorerPage {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+
+  public handleMockCollectionState = async (
+    collectionId: string,
+    workspaceId: string,
+    request: any,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response =
+      await this.collectionService.updateMockCollectionRunningStatus(
+        collectionId,
+        workspaceId,
+
+        request,
+        baseUrl,
+      );
+    if (response.isSuccessful) {
+      await this.collectionRepository.updateCollection(
+        collectionId,
+        response.data.data,
+      );
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update running state. Please try again.");
+    }
+  };
 }
 
 export default CollectionExplorerPage;
