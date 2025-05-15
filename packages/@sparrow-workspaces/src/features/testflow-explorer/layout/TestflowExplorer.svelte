@@ -1100,6 +1100,7 @@
     edge: Edge,
   } as unknown as EdgeTypes;
 
+  let isRunButtonEnabled = false;
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
     if (val && val.length) {
@@ -1121,6 +1122,7 @@
   let prevEdgeLength = 0;
   // Subscribe to changes in the edges
   const edgesSubscriber = edges.subscribe((val) => {
+    isRunButtonEnabled = false;
     if (val) {
       onUpdateEdges(val);
       if (prevEdgeLength !== val.length) {
@@ -1137,6 +1139,11 @@
         });
       }
       prevEdgeLength = val.length || 0;
+      val.find((edge) => {
+        if (edge.source === "1") {
+          isRunButtonEnabled = true;
+        }
+      });
     }
   });
 
@@ -1380,7 +1387,7 @@
         </div>
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
-        {#if nodesValue > 1}
+        {#if isRunButtonEnabled}
           {#if testflowStore?.isTestFlowRunning}
             <Button
               type="secondary"
