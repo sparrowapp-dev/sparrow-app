@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getMethodStyle } from "@sparrow/common/utils";
   import type { CollectionDocument } from "@app/database/database";
+  import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import {
     ChevronUpRegular,
     FolderRegular,
@@ -259,6 +260,21 @@
   $: if (isOpen && searchInputRef) {
     searchInputRef.focus();
   }
+
+  const dummyData = [
+    {
+      requestType: HttpRequestMethodBaseEnum.POST,
+      requestName: "Request",
+    },
+    {
+      requestType: HttpRequestMethodBaseEnum.PATCH,
+      requestName: "Request",
+    },
+    {
+      requestType: HttpRequestMethodBaseEnum.GET,
+      requestName: "Request",
+    },
+  ];
 </script>
 
 <div class="dropdown" bind:this={dropdownRef}>
@@ -332,7 +348,55 @@
       : 'none'}; position:absolute"
     id="dropdown-request-items"
   >
-    {#if !selectApiName}
+    {#if $currentStep === 5 && $isTestFlowTourGuideOpen}
+      <div class="d-flex ellipsis back-header justfy-content-center">
+        <Button
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={ChevronLeftRegular}
+          onClick={handleClickBackInList}
+        />
+        <div
+          class="d-flex justify-content-center gap-1"
+          style="margin-left: 2px; align-items:center; margin-right:2px;"
+        >
+          <FolderRegular size={"16px"} />
+          <p
+            class="ellipsis label-text"
+            style="margin-left: 4px; margin-bottom:0px"
+          >
+            Sample API
+          </p>
+        </div>
+      </div>
+      <hr class="my-1" />
+      <div
+        class="d-flex flex-column"
+        style="padding: 4px; margin-left:5px; gap:6px;"
+      >
+        {#each dummyData as data}
+          <div
+            class="d-flex justify-content-start align-items-center dropdown-single-option"
+            style="gap: 20px;"
+          >
+            <span
+              class="text-{getMethodStyle(data.requestType)}"
+              style="width: 30px;"
+            >
+              <span
+                class="request-icon"
+                style="font-size: 9px; font-weight: 600;"
+              >
+                {data.requestType === "DELETE" ? "DEL" : data.requestType || ""}
+              </span>
+            </span>
+            <span class="request-name" style="margin: 0;">
+              {data.requestName}
+            </span>
+          </div>
+        {/each}
+      </div>
+    {:else if !selectApiName}
       {#if selectedCollection}
         <div class="d-flex ellipsis back-header">
           <Tooltip title={"Back"} placement={"top-center"} size="medium">

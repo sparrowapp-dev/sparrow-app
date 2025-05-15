@@ -412,8 +412,8 @@
         {handleOpenAddCustomRequestModal}
       />
     </div>
-    {#if !currentBlock?.response?.status || ($currentStep > 5 && isTestFlowTourGuideOpen)}
-      {#if req.name?.length > 0 || ($currentStep > 5 && isTestFlowTourGuideOpen)}
+    {#if !currentBlock?.response?.status}
+      {#if req.name?.length > 0}
         <div class="d-flex run-txt-container">
           <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
           <p style="basic-text-message">Run the block to get response</p>
@@ -459,6 +459,33 @@
         <span class="response-text">
           {parseTime.convertMilliseconds(currentBlock?.response?.time) || ""}
         </span>
+      </div>
+    </div>
+  {/if}
+  {#if $currentStep > 5 && isTestFlowTourGuideOpen}
+    <div class="px-2 d-flex response-status-container">
+      <!-- Response status -->
+      <div
+        class="d-flex align-items-center px-1 me-2 text-getColor}"
+        style="gap: 6px;"
+      >
+        <div class="d-flex justify-content-center alin-items-center">
+          <DotIcon
+            color={"var(--text-ds-success-400)"}
+            height={"6px"}
+            width={"6px"}
+          />
+        </div>
+        <span class="response-text-success">
+          {200}
+        </span>
+      </div>
+      <!-- Response time -->
+      <div class="d-flex align-items-center me-2" style="gap: 6px;">
+        <div class="d-flex justify-content-center alin-items-center clock-icon">
+          <ClockRegular size={"16px"} color={"var(--icon-ds-neutral-200)"} />
+        </div>
+        <span class="response-text"> 1629 ms </span>
       </div>
     </div>
   {/if}

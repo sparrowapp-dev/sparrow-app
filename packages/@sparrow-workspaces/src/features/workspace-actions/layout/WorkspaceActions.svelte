@@ -703,7 +703,7 @@
         <div
           style="position:fixed; top:{isWebApp
             ? '330px'
-            : '340px'}; left:{isWebApp ? '550px' : '530px'}; z-index:9999;"
+            : '340px'}; left:{isWebApp ? '620px' : '550px'}; z-index:9999;"
         >
           <TestFlowTourGuide
             targetIds={["dropdown-items"]}
