@@ -4,6 +4,7 @@
   export let handleModalState;
   export let deletedNodeId;
   export let handleDeleteNode;
+  export let dynamicExpressionDeleteWarning = false;
   export let deleteNodeName;
   export let deleteCount;
 
@@ -24,8 +25,9 @@
       class="text-fs-14 text-ds-font-weight-medium"
       style="color: var(--text-secondary-1000);"
     >
-      Deleting this block will break connected downstream blocks that rely on
-      its dynamic expressions. Are you sure you want to proceed?
+      {dynamicExpressionDeleteWarning
+        ? "Deleting this block will break connected downstream blocks that rely on its dynamic expressions. Are you sure you want to proceed?"
+        : "Are you sure you want to delete this block?"}
     </p>
   </div>
 

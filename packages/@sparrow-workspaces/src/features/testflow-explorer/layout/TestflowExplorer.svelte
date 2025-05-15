@@ -607,48 +607,48 @@
   const handleDeleteModal = (id: string) => {
     if (!id) return;
     if (id === "1") return;
+    dynamicExpressionDeleteWarning = false;
+    nodes.update((_nodes) => {
+      const nodeToDelete = _nodes.find((n) => n.id === id);
+      let nameToCheck = nodeToDelete?.data?.blockName;
+      if (nameToCheck) {
+        nameToCheck = nameToCheck
+          .replace(/^\//, "_")
+          .replace(/\//g, "_")
+          .replace(/\s+/g, "_");
+        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
+        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
+        for (const otherNode of _nodes) {
+          if (otherNode.id === id) continue;
+          const stringified = JSON.stringify(
+            otherNode?.data?.requestData || {},
+          );
+          const expressionMatches = [...stringified.matchAll(expressionRegex)];
+          for (const exprMatch of expressionMatches) {
+            const contentInside = exprMatch[1];
+            const varMatches = [...contentInside.matchAll(variableRegex)];
+            for (const vMatch of varMatches) {
+              const fullVar = vMatch[1];
+              const baseVar = fullVar.split(".")[0];
+              if (baseVar === nameToCheck) {
+                dynamicExpressionDeleteWarning = true;
+                break;
+              }
+            }
+            if (dynamicExpressionDeleteWarning) break;
+          }
+          if (dynamicExpressionDeleteWarning) break;
+        }
+      }
+      return _nodes;
+    });
+
     isDeleteNodeModalOpen = true;
     deletedNodeId = id;
     let filteredNodes = $nodes.filter(
       (node) => node.id === id,
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
-
-    // nodes.update((_nodes) => {
-    //   let shouldPreserve = false;
-    //   const nodeToDelete = _nodes.find((n) => n.id === deletedNodeId);
-    //   let nameToCheck = nodeToDelete?.data?.requestData?.name;
-    //   if (nameToCheck) {
-    //     nameToCheck = nameToCheck
-    //       .replace(/^\//, "_")
-    //       .replace(/\//g, "_")
-    //       .replace(/\s+/g, "_");
-    //     const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
-    //     const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
-    //     for (const otherNode of _nodes) {
-    //       if (otherNode.id === deleteNodeId) continue;
-    //       const stringified = JSON.stringify(
-    //         otherNode?.data?.requestData || {},
-    //       );
-    //       const expressionMatches = [...stringified.matchAll(expressionRegex)];
-    //       for (const exprMatch of expressionMatches) {
-    //         const contentInside = exprMatch[1];
-    //         const varMatches = [...contentInside.matchAll(variableRegex)];
-    //         for (const vMatch of varMatches) {
-    //           const fullVar = vMatch[1];
-    //           const baseVar = fullVar.split(".")[0];
-    //           if (baseVar === nameToCheck) {
-    //             shouldPreserve = true;
-    //             break;
-    //           }
-    //         }
-    //         if (shouldPreserve) break;
-    //       }
-    //       if (shouldPreserve) break;
-    //     }
-    //   }
-    //   return _nodes;
-    // });
   };
 
   /**
@@ -1201,6 +1201,7 @@
     deleteNodeResponse($tab.tabId, selectedNodeId);
     unselectNodes();
     isDeleteNodeModalOpen = false;
+    dynamicExpressionDeleteWarning = false;
   };
 
   /**
@@ -1691,6 +1692,7 @@
   <DeleteNode
     {deletedNodeId}
     {deleteNodeName}
+    {dynamicExpressionDeleteWarning}
     {handleDeleteNode}
     {deleteCount}
     handleModalState={(flag = false) => {
