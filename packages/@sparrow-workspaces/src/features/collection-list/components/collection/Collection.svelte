@@ -381,7 +381,7 @@
   isOpen={isCollectionPopup}
   handleModalState={() => (isCollectionPopup = false)}
 >
-  <div class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 {isMockCollection ? 'mt-3' : ''}">
     <p
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
@@ -546,7 +546,7 @@
       },
       {
         onClick: () => {
-          onItemCreated("requestCollection", {
+          onItemCreated("mockRequestCollection", {
             workspaceId: collection.workspaceId,
             collection,
           });
@@ -1052,7 +1052,12 @@
             style="height: 24px; width: 24px;"
             role="button"
             on:click={() => {
-              if (!collection?.activeSync) {
+              if (isMockCollection) {
+                onItemCreated("mockRequestCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              } else if (!collection?.activeSync) {
                 onItemCreated("requestCollection", {
                   workspaceId: collection.workspaceId,
                   collection,

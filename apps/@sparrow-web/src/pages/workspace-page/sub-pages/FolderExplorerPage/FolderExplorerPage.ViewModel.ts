@@ -273,7 +273,7 @@ class FolderExplorerPage {
         response.data.data,
       );
       notifications.success(
-        `The ‘${progressiveTab.name}’ folder saved successfully.`,
+        `‘${progressiveTab.name}’ folder saved successfully.`,
       );
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;

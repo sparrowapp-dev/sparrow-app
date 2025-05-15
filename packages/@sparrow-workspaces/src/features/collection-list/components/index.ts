@@ -7,3 +7,4 @@ export { default as WebSocket } from "./web-socket/WebSocket.svelte";
 export { default as SocketIo } from "./socket-io/SocketIo.svelte";
 export { default as Graphql } from "./graphql/Graphql.svelte";
 export { default as SavedRequest } from "./saved-request/SavedRequest.svelte";
+export { default as MockRequest } from "./mock-request/MockRequest.svelte";

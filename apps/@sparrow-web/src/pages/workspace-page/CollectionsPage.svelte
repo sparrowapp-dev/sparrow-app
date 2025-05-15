@@ -92,6 +92,7 @@
   import * as Sentry from "@sentry/svelte";
   import { Spinner } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
+  import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -241,6 +242,7 @@
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.MOCK_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.WORKSPACE ||
@@ -401,6 +403,7 @@
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
+      removeTab.type === TabTypeEnum.MOCK_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL ||
       removeTab.type === TabTypeEnum.FOLDER
     ) {
@@ -410,6 +413,14 @@
 
         if (removeTab.type === TabTypeEnum.REQUEST) {
           const res = await _viewModel.saveAPIRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.MOCK_REQUEST) {
+          const res = await _viewModel.saveMockAPIRequest(removeTab);
           if (res) {
             loader = false;
             _viewModel.handleRemoveTab(id);
@@ -922,6 +933,15 @@
                         <GraphqlExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <RestExplorerMockPage
+                          bind:isTourGuideOpen
+                          tab={$activeTab}
+                        />
+                      </div>
+                    </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
@@ -1334,7 +1354,7 @@
       window.open(constants.SPARROW_GITHUB, "_blank");
     }}
     onDocsRedirect={() => {
-      window.open(constants.DOCS_URL, "_blank");
+      window.open(constants.INTRO_DOCS_URL, "_blank");
     }}
   />
 </Modal>
