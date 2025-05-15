@@ -113,6 +113,7 @@
   let folderTabWrapper: HTMLElement;
 
   let verticalFolderLine = false;
+  export let isMockCollection = false;
 
   $: {
     if (explorer.type === "FOLDER") {
@@ -249,18 +250,20 @@
         <span class="text-plusButton">{requestCount}</span>
         <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
-      <div class="d-flex gap-1">
-        <span class="text-plusButton">{graghQlCount}</span>
-        <p>GraphQL</p>
-      </div>
-      <div class="d-flex gap-1">
-        <span class="text-plusButton">{webSocketCount}</span>
-        <p>WebSocket</p>
-      </div>
-      <div class="d-flex gap-1">
-        <span class="text-plusButton">{socketIoCount}</span>
-        <p>Socket.IO</p>
-      </div>
+      {#if !isMockCollection}
+        <div class="d-flex gap-1">
+          <span class="text-plusButton">{graghQlCount}</span>
+          <p>GraphQL</p>
+        </div>
+        <div class="d-flex gap-1">
+          <span class="text-plusButton">{webSocketCount}</span>
+          <p>WebSocket</p>
+        </div>
+        <div class="d-flex gap-1">
+          <span class="text-plusButton">{socketIoCount}</span>
+          <p>Socket.IO</p>
+        </div>
+      {/if}
     </div>
     <div
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
@@ -347,8 +350,9 @@
           displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -363,8 +367,9 @@
           displayText: "Add WebSocket",
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -379,8 +384,9 @@
           displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },
@@ -395,8 +401,9 @@
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
           disabled: false,
           hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
               ? false
               : true,
         },

@@ -13,6 +13,8 @@
     RenameRegular,
     ArrowExportRegular,
     ArrowImportRegular,
+    ArrowExitRegular,
+    ArrowEnterRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
@@ -32,6 +34,7 @@
   } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
+  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
 
   /**
    * The data object containing various handlers and data stores.
@@ -68,6 +71,8 @@
   let isEditing = false;
   let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
+  let isNodeExistToRight = false;
+  let isNodeExistToLeft = false;
   let isRunTextVisible = false; // State to track visibility of run text
   let isDropHereVisible = false; // state to track if there is drag in test flow screen
   let dataBlocksSubscriber: Unsubscriber;
@@ -152,6 +157,8 @@
       });
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
+        isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
       isDropHereVisible = _nodes[0].data.parentDrag;
@@ -159,6 +166,8 @@
     dataConnectorSubscriber = data.connector.subscribe(() => {
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
+        isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
@@ -191,19 +200,10 @@
 
   let moreOptions = [
     {
-      name: "Rename Block",
-      iconSize: "16px",
-      iconColor: "var(--icon-ds-neutral-50)",
-      Icon: RenameRegular,
-      onClick: () => {
-        isEditing = true;
-      },
-    },
-    {
       name: "Run From Here",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
-      Icon: ArrowExportRegular,
+      Icon: ArrowExitRegular,
       onClick: () => {
         data.onContextMenu(id, "run-from-here");
       },
@@ -212,7 +212,7 @@
       name: "Run Till Here",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
-      Icon: ArrowImportRegular,
+      Icon: ArrowEnterRegular,
       onClick: () => {
         data.onContextMenu(id, "run-till-here");
       },
@@ -236,6 +236,15 @@
       },
     },
     {
+      name: "Rename Block",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: RenameRegular,
+      onClick: () => {
+        isEditing = true;
+      },
+    },
+    {
       name: "Delete",
       iconSize: "16px",
       iconColor: "var(--icon-ds-danger-300)",
@@ -255,16 +264,18 @@
   class="request-block position-relative"
   style={selected && !currentBlock?.response.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
-    : selected && currentBlock && checkIfRequestSucceed(currentBlock)
+    : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
+        ($currentStep > 6 && $isTestFlowTourGuideOpen)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
         ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
         : ""}
+  id="request-block"
 >
   <Handle
     type="target"
     position={Position.Left}
-    class="connecting-dot-left"
+    isConnectable={isNodeExistToLeft ? false : true}
     style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
   <div
@@ -276,15 +287,15 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock?.response?.status}
-          <ArrowSwapRegular
-            size={"16px"}
-            color={"var(--icon-ds-neutral-200)"}
-          />
-        {:else if checkIfRequestSucceed(currentBlock)}
+        {#if checkIfRequestSucceed(currentBlock) || ($currentStep > 6 && $isTestFlowTourGuideOpen)}
           <CheckmarkCircleRegular
             size={"16px"}
             color={"var(--icon-ds-success-400)"}
+          />
+        {:else if !currentBlock?.response?.status}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
           />
         {:else}
           <ErrorCircleRegular
@@ -399,8 +410,8 @@
         {handleOpenAddCustomRequestModal}
       />
     </div>
-    {#if !currentBlock?.response?.status}
-      {#if req.name?.length > 0}
+    {#if !currentBlock?.response?.status || ($currentStep > 5 && isTestFlowTourGuideOpen)}
+      {#if req.name?.length > 0 || ($currentStep > 5 && isTestFlowTourGuideOpen)}
         <div class="d-flex run-txt-container">
           <InfoRegular size={"16px"} color={"var(--icon-ds-neutral-400)"} />
           <p style="basic-text-message">Run the block to get response</p>
@@ -497,6 +508,7 @@
   <Handle
     type="source"
     position={Position.Right}
+    isConnectable={isNodeExistToRight ? false : true}
     style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
@@ -585,18 +597,7 @@
     border-radius: 8px;
     outline: none;
   }
-  .connecting-dot-left {
-    background-color: var(--bg-ds-surface-600);
-    border: 1px solid var(--border-ds-neutral-500);
-  }
 
-  .connecting-dot-left:hover {
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
-
-  .connecting-dot-left:active {
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
   .base-line {
     border: 1px solid var(--bg-ds-surface-400);
   }

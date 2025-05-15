@@ -906,7 +906,6 @@ export class CollectionRepository {
         },
       });
     } catch (error) {
-      Sentry.captureException(error); 
       console.error("Error updating block data:", error);
     }
   };

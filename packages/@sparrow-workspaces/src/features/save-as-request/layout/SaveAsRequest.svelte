@@ -31,6 +31,7 @@
   import { TextEditor } from "@sparrow/library/forms";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -572,7 +573,7 @@
             <div class=" ps-2">
               <FileType name={col.name} type={ItemType.GRAPHQL} />
             </div>
-          {:else}
+          {:else if col?.collectionType !== CollectionTypeBaseEnum.MOCK}
             <div
               class="item ps-2"
               on:click={() => {

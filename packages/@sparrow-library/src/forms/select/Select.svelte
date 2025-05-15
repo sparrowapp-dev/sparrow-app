@@ -209,22 +209,56 @@
   let bodyRightDistance: number;
   let bodyTopDistance: number;
 
+  // Old solution
+  // const toggleSelect = () => {
+  //   const bodyHeight =
+  //     15 +
+  //     data.filter((element) => {
+  //       return !element.hide;
+  //     }).length *
+  //       34;
+  //   bodyLeftDistance = selectHeaderWrapper.getBoundingClientRect().left;
+  //   bodyTopDistance =
+  //     bodyHeight + selectHeaderWrapper.getBoundingClientRect().bottom >
+  //     window.innerHeight
+  //       ? selectHeaderWrapper.getBoundingClientRect().top - 5 - bodyHeight
+  //       : 5 + selectHeaderWrapper.getBoundingClientRect().bottom;
+  //   bodyRightDistance =
+  //     window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
+  //   isOpen = !isOpen;
+  // };
+
+  // Update based on the actual height of the dropdown content - permanent solution
   const toggleSelect = () => {
-    const bodyHeight =
-      15 +
-      data.filter((element) => {
-        return !element.hide;
-      }).length *
-        34;
-    bodyLeftDistance = selectHeaderWrapper.getBoundingClientRect().left;
-    bodyTopDistance =
-      bodyHeight + selectHeaderWrapper.getBoundingClientRect().bottom >
-      window.innerHeight
-        ? selectHeaderWrapper.getBoundingClientRect().top - 5 - bodyHeight
-        : 5 + selectHeaderWrapper.getBoundingClientRect().bottom;
-    bodyRightDistance =
-      window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
+    // First toggle to make sure the element is in the DOM
     isOpen = !isOpen;
+
+    // Then recalculate positions after the DOM has updated with the dropdown content
+    if (isOpen) {
+      // Get the actual height of the dropdown content including slots
+      const actualBodyHeight = selectBodyWrapper
+        ? selectBodyWrapper.offsetHeight
+        : 0;
+
+      // Calculate positions based on actual content height
+      bodyLeftDistance = selectHeaderWrapper.getBoundingClientRect().left;
+
+      // Check if dropdown would extend beyond viewport bottom
+      const wouldOverflowBottom =
+        selectHeaderWrapper.getBoundingClientRect().bottom + actualBodyHeight >
+        window.innerHeight;
+
+      // Position either above or below based on available space
+      bodyTopDistance = wouldOverflowBottom
+        ? selectHeaderWrapper.getBoundingClientRect().top - actualBodyHeight - 5
+        : selectHeaderWrapper.getBoundingClientRect().bottom + 0;
+
+      bodyRightDistance =
+        window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
+
+      // Force a style update to apply the new position
+      selectBodyWrapper.style.top = `${bodyTopDistance}px`;
+    }
   };
 
   $: {

@@ -167,6 +167,47 @@ const requestItems = {
   },
 };
 
+const mockRequestItems = {
+  method: {
+    type: "string",
+  },
+  operationId: {
+    type: "string",
+  },
+  url: {
+    type: "string",
+  },
+  body: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedRequestBodyType: {
+    type: "string",
+  },
+  queryParams: {
+    type: "array",
+    properties: params,
+  },
+  headers: {
+    type: "array",
+    properties: params,
+  },
+  responseBody: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedResponseBodyType: {
+    type: "string",
+  },
+  responseHeaders: {
+    type: "array",
+    properties: params,
+  },
+  responseStatus: {
+    type: "string",
+  },
+};
+
 const websocketItems = {
   url: {
     type: "string",
@@ -261,6 +302,10 @@ const itemsProperties = {
     type: "object",
     properties: requestItems,
   },
+  mockRequest: {
+    type: "object",
+    properties: mockRequestItems,
+  },
   websocket: {
     type: "object",
     properties: websocketItems,
@@ -303,13 +348,19 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 11,
+  version: 12,
   properties: {
     collectionId: {
       type: "string",
       maxLength: 100,
     },
     description: {
+      type: "string",
+    },
+    collectionType: {
+      type: "string",
+    },
+    mockCollectionUrl: {
       type: "string",
     },
     id: {

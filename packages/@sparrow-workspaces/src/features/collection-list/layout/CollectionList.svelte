@@ -6,7 +6,7 @@
   } from "@sparrow/library/assets";
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { WorkspaceRole } from "@sparrow/common/enums";
-  import { Button, List } from "@sparrow/library/ui";
+  import { Button, List, Options } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type {
     CollectionDocument,
@@ -34,6 +34,7 @@
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import { isExpandCollection } from "../../../stores/recent-left-panel";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -212,7 +213,71 @@
   const handleMouseOut = () => {
     isHovered = false;
   };
+
+  let showAddItemMenu = false;
+  let collectionTabWrapper: HTMLElement;
+  let noOfColumns = 180;
+
+  const rightClickContextMenu = () => {
+    setTimeout(() => {
+      showAddItemMenu = !showAddItemMenu;
+    }, 100);
+  };
+
+  const handleSelectClick = (event: MouseEvent) => {
+    const selectElement = document.getElementById(`add-collection-type`);
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showAddItemMenu = false;
+    }
+  };
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
+
+{#if showAddItemMenu}
+  <Options
+    xAxis={collectionTabWrapper.getBoundingClientRect().right + 5}
+    yAxis={[
+      collectionTabWrapper.getBoundingClientRect().top - 0,
+      collectionTabWrapper.getBoundingClientRect().bottom + 2,
+    ]}
+    zIndex={701}
+    menuItems={[
+      {
+        onClick: () => {
+          if (isGuestUser) {
+            onItemCreated("collection", {
+              workspaceId: currentWorkspaceId,
+              collection: collectionList,
+            });
+          } else {
+            showImportCollectionPopup();
+          }
+          isExpandCollection.set(true);
+        },
+        displayText: "Add Collection",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          onItemCreated("mockCollection", {
+            workspaceId: currentWorkspaceId,
+            collection: collectionList,
+          });
+          isExpandCollection.set(true);
+        },
+        displayText: "Add Mock Collection",
+        disabled: false,
+        hidden: isGuestUser ? true : false,
+      },
+    ]}
+    {noOfColumns}
+  />
+{/if}
 
 <div
   style="height:100%; overflow:hidden"
@@ -256,6 +321,7 @@
       <div
         class=" d-flex align-items-center"
         style="width: calc(100% - 30px);  padding: 4px 2px; height:32px; "
+        bind:this={collectionTabWrapper}
       >
         <span style=" display: flex; margin-right:4px;">
           <Button
@@ -286,15 +352,10 @@
       </div>
 
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !activeWorkspace?.isShared}
-        <Tooltip
-          title={"Add Collection"}
-          placement={"bottom-center"}
-          distance={13}
-          show={isHovered}
-          zIndex={701}
-        >
+        {#if isGuestUser}
           <span style="display:flex;" class="add-icon-container">
             <Button
+              id="add-collection-type"
               size="extra-small"
               customWidth={"24px"}
               type="teritiary-regular"
@@ -302,23 +363,48 @@
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
                 e.stopPropagation();
+                if (isGuestUser) {
+                  onItemCreated("collection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                } else {
+                  showImportCollectionPopup();
+                }
                 isExpandCollection.set(true);
-                isGuestUser
-                  ? onItemCreated("collection", {
-                      workspaceId: currentWorkspaceId,
-                      collection: collectionList,
-                    })
-                  : showImportCollectionPopup();
               }}
             />
           </span>
-        </Tooltip>
+        {:else}
+          <Tooltip
+            title={"Add Options"}
+            placement={"top-center"}
+            distance={13}
+            show={!showAddItemMenu}
+            zIndex={701}
+          >
+            <span style="display:flex;" class="add-icon-container">
+              <Button
+                id="add-collection-type"
+                size="extra-small"
+                customWidth={"24px"}
+                type="teritiary-regular"
+                startIcon={AddRegular}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  rightClickContextMenu(e);
+                }}
+              />
+            </span>
+          </Tooltip>
+        {/if}
       {/if}
     </div>
 
     {#if $isExpandCollection}
       <div
-        class="overflow-auto position-relative d-flex flex-column me-0 pt-1"
+        class="overflow-auto position-relative d-flex flex-column me-0 py-1"
         style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >
         {#if collectionListDocument?.length > 0 && searchData.length === 0}
@@ -384,7 +470,7 @@
               classProps={"pe-0"}
             >
               {#each collectionListDocument as col}
-                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace)}
+                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
                   <Collection
                     bind:userRole
                     {isSharedWorkspace}
@@ -406,6 +492,51 @@
                   />
                 {/if}
               {/each}
+              {#if !collectionListDocument?.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
+                <EmptyCollection
+                  bind:userRole
+                  isCollectionEmpty={!collectionListDocument?.some(
+                    (col) =>
+                      col?.collectionType !== CollectionTypeBaseEnum.MOCK,
+                  )}
+                  {onItemCreated}
+                  {collectionList}
+                  {userRoleInWorkspace}
+                  {currentWorkspace}
+                  handleCreateApiRequest={() => onItemCreated("request", {})}
+                  onImportCollectionPopup={showImportCollectionPopup}
+                  isAddCollectionDisabled={isGuestUser}
+                  onImportCurlPopup={showImportCurlPopup}
+                  {isGuestUser}
+                />
+              {/if}
+              {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+                <hr style="margin: 2px 0 2px 2rem;" />
+                {#each collectionListDocument as col}
+                  {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
+                    <Collection
+                      isMockCollection={true}
+                      bind:userRole
+                      {isSharedWorkspace}
+                      {onItemCreated}
+                      {onItemDeleted}
+                      {onItemRenamed}
+                      {onItemOpened}
+                      {onBranchSwitched}
+                      {onRefetchCollection}
+                      {userRoleInWorkspace}
+                      {activeTabPath}
+                      {activeTabType}
+                      collection={col?.toMutableJSON()}
+                      {activeTabId}
+                      bind:isFirstCollectionExpand
+                      {isWebApp}
+                      {onCompareCollection}
+                      {onSyncCollection}
+                    />
+                  {/if}
+                {/each}
+              {/if}
             </List>
           {/if}
         {:else}
@@ -434,6 +565,22 @@
           {/if}
         {/if}
       </div>
+      {#if !collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK) && !isGuestUser}
+        <hr style="margin: 0.5rem; margin-left: 2rem !important;" />
+        <EmptyCollection
+          bind:userRole
+          isMockCollection={true}
+          {onItemCreated}
+          {collectionList}
+          {userRoleInWorkspace}
+          {currentWorkspace}
+          handleCreateApiRequest={() => onItemCreated("request", {})}
+          onImportCollectionPopup={showImportCollectionPopup}
+          isAddCollectionDisabled={isGuestUser}
+          onImportCurlPopup={showImportCurlPopup}
+          {isGuestUser}
+        />
+      {/if}
     {/if}
   </div>
 </div>
