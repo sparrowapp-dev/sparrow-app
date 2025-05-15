@@ -7,7 +7,13 @@
   import { Modal } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import { onDestroy, onMount } from "svelte";
-  import { DeleteWorkspace, PublicWorkspace } from "@sparrow/common/features";
+  import {
+    DeleteWorkspace,
+    PublicWorkspace,
+    PublishedWorkspace,
+    SharedWorkspace,
+    FailedPublishedWorkspace,
+  } from "@sparrow/common/features";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import type { UpdatesDocType } from "../../../../models/updates.model";
   import { user } from "@app/store/auth.store";
@@ -31,6 +37,10 @@
   let workspaceID = tab._data.path.workspaceId;
   let workspaceType = "";
   let isWorkspacePublicModalOpen = false;
+  let isPublishedModalOpen = false;
+  let isShareModalOpen = false;
+  let isFailedPublishedModalOpen = false;
+
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -100,6 +110,7 @@
   const handleWorkspaceUpdatesScroll = () => {
     _viewModel.refetchPreviousUpdates(workspaceID);
   };
+  const workspaceLink = `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${currentWorkspace.id}`;
 
   // $:{
   //   if(userId )
@@ -115,6 +126,7 @@
 
 <WorkspaceExplorer
   bind:userRole
+  bind:isShareModalOpen
   tab={_viewModel.tab}
   {workspaceUpdatesList}
   {workspaceType}
@@ -196,6 +208,9 @@
       const response = await _viewModel.handleWorkspaceVisibility();
       if (response?.isSuccessful) {
         isWorkspacePublicModalOpen = false;
+        isPublishedModalOpen = true;
+      } else {
+        isFailedPublishedModalOpen = true;
       }
     }}
     onRedirectTermsService={() => {
@@ -207,5 +222,54 @@
     onRedirectDocs={() => {
       open(`${constants.DOCS_URL}`);
     }}
+  />
+</Modal>
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isPublishedModalOpen}
+  handleModalState={(flag) => {
+    isPublishedModalOpen = flag;
+  }}
+>
+  <PublishedWorkspace
+    workspaceName={currentWorkspace.name}
+    onCopyLink={_viewModel.handleShareWorkspace}
+    {workspaceLink}
+  />
+</Modal>
+
+<Modal
+  title={`Share ${currentWorkspace.name}`}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isShareModalOpen}
+  handleModalState={(flag) => {
+    isShareModalOpen = flag;
+  }}
+>
+  <SharedWorkspace
+    {workspaceLink}
+    onCopyLink={_viewModel.handleShareWorkspace}
+  />
+</Modal>
+
+<Modal
+  title={""}
+  type={"dark"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={isFailedPublishedModalOpen}
+  handleModalState={(flag) => {
+    isFailedPublishedModalOpen = flag;
+  }}
+>
+  <FailedPublishedWorkspace
+    bind:isFailedPublishedModalOpen
+    workspaceName={currentWorkspace.name}
   />
 </Modal>
