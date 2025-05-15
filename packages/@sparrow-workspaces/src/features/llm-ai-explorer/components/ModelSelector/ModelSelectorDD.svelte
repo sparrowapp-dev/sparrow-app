@@ -135,6 +135,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     z-index: 1000;
     overflow: hidden;
+    margin-top: 3px;
   }
 
   .provider-tabs {
@@ -156,7 +157,7 @@
   }
 
   .model-item:hover {
-    background-color: var(--bg-secondary-400);
+    background-color: var(--bg-ds-surface-500);
   }
 
   .model-item.selected {

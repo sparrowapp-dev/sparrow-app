@@ -1,18 +1,15 @@
 import { writable } from "svelte/store";
 
 export type LLM_AI_ExplorerData = {
-    abortController: AbortController;
     response: {
-        body: string;
-        headers: any[];
-        status: string;
+        messageId: string,
+        statusCode: string,
+        inputTokens: number,
+        outputTokens: number,
+        totalTokens: number,
         time: number;
-        size: number;
-        navigation: string;
-        bodyLanguage: string;
-        bodyFormatter: string;
+        // size: number;
     };
-    isSendRequestInProgress: boolean;
 };
 
 export const LLM_AI_ExplorerDataStore = writable<Map<string, LLM_AI_ExplorerData>>(

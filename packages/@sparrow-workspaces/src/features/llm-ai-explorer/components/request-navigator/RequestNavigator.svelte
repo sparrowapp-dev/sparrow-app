@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
-  // Need to fix the imports
   import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/llm-ai-request-tab";
 
   import { Navigator } from "@sparrow/library/ui";
@@ -16,17 +15,13 @@
     count: number;
   }[] = [];
 
-  /**
-   * @description - refresh tabs label count
-   * @param _authParameterLength - auth parameter length
-   * @param _authHeaderLength - auth headers length
-   * @param _configurationLength - ai configuration length
-   */
-  const refreshTabs = (
-    _authParameterLength: number,
-    _authHeaderLength: number,
-    _configurationLength: number,
-  ) => {
+  // /**
+  //  * @description - refresh tabs label count
+  //  * @param _authParameterLength - auth parameter length
+  //  * @param _authHeaderLength - auth headers length
+  //  * @param _configurationLength - ai configuration length
+  //  */
+  const refreshTabs = () => {
     return [
       {
         name: "System Prompt",
@@ -50,12 +45,8 @@
    * @description - re-calculates value when dependency changes
    */
   $: {
-    if (authParameterLength || authHeaderLength) {
-      tabs = refreshTabs(
-        authParameterLength,
-        authHeaderLength,
-        configurationLength,
-      );
+    if (authParameterLength || authHeaderLength || configurationLength) {
+      tabs = refreshTabs();
     }
   }
 

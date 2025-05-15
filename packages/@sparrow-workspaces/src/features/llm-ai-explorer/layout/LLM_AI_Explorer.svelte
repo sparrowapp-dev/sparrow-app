@@ -79,7 +79,10 @@
   import { ResponseStatusCode } from "@sparrow/common/enums";
 
   import type { CancelRequestType } from "@workspaces/common/type/actions";
-  import type { restExplorerData } from "../store/llm-ai-explorer";
+  import type {
+    LLM_AI_ExplorerData,
+    restExplorerData,
+  } from "../store/llm-ai-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import {
     CheckmarkCircleFilled,
@@ -140,7 +143,7 @@
    * Role of user in active workspace
    */
   export let userRole;
-  export let storeData: restExplorerData | undefined;
+  export let storeData: LLM_AI_ExplorerData | undefined;
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
@@ -250,11 +253,11 @@
     // isChatbotOpenInCurrTab.set(false);
   });
 
-  setTimeout(() => {
-    console.log("tab data :>> ", $tab);
-  }, 3000);
+  // setTimeout(() => {
+  //   console.log("tab data :>> ", $tab);
+  // }, 3000);
 
-  console.log("isChatBot active ;>> ", $tab?.property?.llm_ai_request?.state);
+  // console.log("isChatBot active ;>> ", $tab?.property?.llm_ai_request?.state);
 </script>
 
 {#if $tab.tabId}
@@ -294,11 +297,11 @@
               <!-- Request Pane -->
               <div class="h-100 d-flex flex-column position-relative">
                 <RequestNavigator
-                  requestStateSection={$tab.property.llm_ai_request?.state
-                    ?.LLM_AI_Navigation}
+                  requestStateSection={LLM_AI_RequestSectionEnum.SYSTEM_PROMPT}
                   {onUpdateRequestState}
-                  authParameterLength={1}
-                  authHeaderLength={1}
+                  authParameterLength={5}
+                  authHeaderLength={3}
+                  configurationLength={5}
                 />
                 <div style="flex:1; overflow:auto;" class="p-0">
                   {#if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.SYSTEM_PROMPT}
@@ -339,6 +342,7 @@
           >
             <ChatBot
               {tab}
+              responseData={storeData}
               {onUpdateAiPrompt}
               {onUpdateAiConversation}
               {onUpdateRequestState}

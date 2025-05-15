@@ -241,3 +241,6 @@ export { default as XIcon } from "./XIcon.svelte";
 export { default as AISparkleRegularIcon } from "./AISparkleRegular.svelte";
 export { default as CoinMultipleRegular } from "./CoinMultipleRegular.svelte";
 export { default as OpenAIVectorIcon } from "./OpenAiVectorIcon.svelte";
+export { default as ChatHistoryIcon } from "./ChatHistory.svelte";
+export { default as FormNewRegular } from "./FormNewRegular.svelte";
+export { default as BotSparkleFilled } from "./BotSparkleFilled.svelte";

@@ -1,7 +1,11 @@
 <script lang="ts">
   import { Events } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { SendRegular, StopFilled } from "@sparrow/library/icons";
+  import {
+    BotSparkleFilled,
+    SendRegular,
+    StopFilled,
+  } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
   import { Button, Tooltip } from "@sparrow/library/ui";
 
@@ -95,37 +99,15 @@
   <div
     class="actions-container d-flex justify-content-between align-items-center"
   >
-    <div id="ai-model-select-container">
-      <Select
-        id={"ai-model-selector"}
-        data={[
-          {
-            name: "GPT-4o",
-            id: "azure-ai",
-            hide: false,
-          },
-          {
-            name: "Open AI 4.0",
-            id: "open-AI-40",
-            disabled: true,
-            hide: true,
-          },
-          {
-            name: "DeepSeek",
-            id: "deepseek",
-            disabled: true,
-            hide: true,
-          },
-        ]}
-        titleId={"azure-ai"}
-        onclick={() => {}}
-        variant={"secondary"}
-        zIndex={499}
-        disabled={false}
-        maxHeaderWidth={"110px"}
-        minBodyWidth={"182px"}
-        menuItem={"v2"}
-      />
+    <div id="generate-prompt-chip">
+      <Tooltip title={"Available soon"} placement={"top-center"}>
+        <button
+          class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1 opacity-50"
+        >
+          <BotSparkleFilled size={"15px"} color="#4387f4" />
+          <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>
+        </button>
+      </Tooltip>
     </div>
 
     <Tooltip
@@ -203,4 +185,16 @@
     border: 2px solid var(--border-ds-surface-50);
     padding: 4px;
   }
+
+  .generate-prompt-btn {
+    background-color: var(--bg-ds-surface-700);
+    color: #ffffff;
+    border: 1px solid var(--bg-ds-surface-100);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* .generate-prompt-btn:hover {
+    background-color: rgba(30, 30, 35, 0.95);
+  } */
 </style>

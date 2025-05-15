@@ -78,7 +78,7 @@ import { AiAssistantService } from "../../../../services/ai-assistant.service";
 import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
-import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import { LLM_AI_ExplorerDataStore, type LLM_AI_ExplorerData } from "@sparrow/workspaces/features/llm-ai-explorer/store";
 import { CollectionTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
@@ -1962,29 +1962,73 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
-    // extraction of request API data for setting AI Context
-    const apiData = {
-      body: componentData.property.llm_ai_request.body,
-      headers: componentData.property.llm_ai_request.headers,
-      method: componentData.property.llm_ai_request.method,
-      queryParams: componentData.property.llm_ai_request.queryParams,
-      url: componentData.property.llm_ai_request.url,
-      auth: componentData.property.llm_ai_request.auth,
+
+    let finalSP = null;
+    if (componentData.property.llm_ai_request.SystemPrompt.length) {
+      const SPDatas = JSON.parse(componentData.property.llm_ai_request.SystemPrompt);
+      if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
+    }
+
+    const llmReqData = {
+      feature: "llm-evaluation",
+      // model: componentData.property.llm_ai_request.AI_Model_Provider || "openai",
+      // modelVersion: componentData.property.llm_ai_request.AI_Model_Variant || "gpt-3.5-turbo",
+      // authKey: "",
+      model: "openai",
+      authKey: componentData.property.llm_ai_request.auth.apiKey.authValue,
+      modelVersion: "gpt-3.5-turbo",
+      systemPrompt: finalSP || "Answer my queries.",
+      userInput: prompt,
+      configs: {
+        streamResponse: true,
+        jsonResponseFormat: false,
+        temperature: 0.5,
+        presencePenalty: 0.5,
+        frequencePenalty: 0.5,
+        maxTokens: -1
+      }
+    }
+    console.log("component data ;>> ", llmReqData);
+
+    const newData: LLM_AI_ExplorerData = {
+      response: {
+        messageId: "abc123",
+        statusCode: "200",
+        inputTokens: 100,
+        outputTokens: 250,
+        totalTokens: 350,
+        time: 1234
+      },
     };
 
+    // const tabId = componentData.tabId; // or any string key
+
+    // LLM_AI_ExplorerDataStore.update((map) => {
+    //   map.set(tabId, newData);
+    //   return new Map(map); // Return a new Map to trigger reactivity
+    // });
+
+    // Log the value after 3 seconds
+    LLM_AI_ExplorerDataStore.subscribe((map) => {
+      const value = map.get(componentData.tabId);
+      console.log('*** JUST *** :>> In genResWs :>> ', value);
+    })();
+    setTimeout(() => {
+      LLM_AI_ExplorerDataStore.subscribe((map) => {
+        const value = map.get(componentData.tabId);
+        console.log('*** AFTER *** :>> Data after 3 seconds:', value);
+      })();
+    }, 10000);
+
+    // return;
+
     try {
-      const userEmail = getClientUser().email;
+      // const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
 
-      const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
-        componentData.tabId,
-        componentData?.property?.llm_ai_request?.ai?.threadId || null,
-        userEmail,
-        prompt,
-        JSON.stringify(apiData),
-      );
+      const socketResponse = await this.aiAssistentWebSocketService.sendLLMRequest(llmReqData);
 
       if (!socketResponse) {
         throw new Error("Something went wrong. Please try again");
@@ -2025,19 +2069,23 @@ class RestExplorerViewModel {
           case `assistant-response`:
           case `assistant-response_${componentData.tabId}`:
             // Handle special error messages
-            if (
-              response.messages &&
-              (response.messages.includes("Limit Reached") ||
-                response.messages.includes("Some Issue Occurred"))
-            ) {
+            if (response.event === "error" && response.message) {
+
+              console.log("Error Response :>> ", response)
               // After getting error response remove all listeners
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
               );
 
-              const errorMessage = response.messages.includes("Limit Reached")
-                ? "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section."
-                : "Some issue occurred while processing your request, please try again.";
+              let errorMessage: string;
+
+              if (response.message.includes("Limit Reached")) {
+                errorMessage = "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+              } else if (response.message.includes("Some Issue Occurred")) {
+                errorMessage = "Some issue occurred while processing your request, please try again.";
+              } else {
+                errorMessage = response.message; // Use the actual error message from the response
+              }
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.llm_ai_request?.ai?.conversations || []),
@@ -2048,6 +2096,9 @@ class RestExplorerViewModel {
                   isLiked: false,
                   isDisliked: false,
                   status: false,
+                  statusCode: response.statusCode || 400,
+                  time: 10,
+                  tokenCount: 0
                 },
               ]);
               await this.updateRequestState({
@@ -2100,6 +2151,24 @@ class RestExplorerViewModel {
 
               // Handle end of stream
               else if (stream_status === STREAMING_STATES.END) {
+
+                const tabId = componentData.tabId; // or any string key
+                const newData: LLM_AI_ExplorerData = {
+                  response: {
+                    messageId: "abc123",
+                    statusCode: response.statusCode,
+                    inputTokens: response.inputTokens,
+                    outputTokens: response.outputTokens,
+                    totalTokens: response.totalTokens,
+                    time: response.timeTaken.replace("ms", "")
+                  },
+                };
+
+                LLM_AI_ExplorerDataStore.update((map) => {
+                  map.set(tabId, newData);
+                  return new Map(map); // Return a new Map to trigger reactivity
+                });
+
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>
                   this.aiAssistentWebSocketService.removeListener(event),

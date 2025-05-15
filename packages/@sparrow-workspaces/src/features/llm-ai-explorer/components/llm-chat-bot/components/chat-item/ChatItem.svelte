@@ -31,10 +31,13 @@
     ThumbDislikeRegular,
   } from "@sparrow/library/icons";
   import * as Sentry from "@sentry/svelte";
-  import { size } from "@tauri-apps/plugin-fs";
 
   import ResponseStatus from "../../../response-status/ResponseStatus.svelte";
   import { OpenAIModelEnum } from "@sparrow/common/types/workspace/llm-ai-request-base";
+  import {
+    LLM_AI_ExplorerDataStore,
+    type LLM_AI_ExplorerData,
+  } from "@sparrow/workspaces/features/llm-ai-explorer/store";
 
   export let message: string;
   export let messageId: string;
@@ -46,6 +49,17 @@
   export let isLastRecieverMessage;
   export let status;
   export let isResponseGenerating;
+  export let chatResponse: LLM_AI_ExplorerData | undefined;
+
+  // $: setTimeout(() => {
+  //   console.log("chat :>> ", chatResponse);
+  // }, 2000);
+
+  $: {
+    if (chatResponse) {
+      console.log("In ChatItem :>> ", chatResponse);
+    }
+  }
 
   export let onClickCodeBlockPreview;
 
@@ -435,7 +449,6 @@
    * @returns A promise that resolves when the listeners are embedded.
    */
   const embedListenerToCopyCode = async () => {
-    console.log("message ;>> ", message);
     extractedMessage = decodeMessage(await marked(message));
 
     setTimeout(() => {
@@ -510,11 +523,10 @@
     <div class="send-item my-4">
       <ResponseStatus
         response={{
-          size: 133,
-          time: 122,
-          status: "200 OK",
+          time: chatResponse?.response.time || 0,
+          status: chatResponse?.response.statusCode || "",
+          tokenCount: chatResponse?.response.outputTokens || 0,
           AI_Model_Variant: OpenAIModelEnum.GPT4O,
-          tokenCount: 432,
         }}
         responseType={"Sender"}
       />
@@ -556,13 +568,16 @@
         </div>
       </div>
 
+      <!-- response={{
+          ...chatResponse,
+          AI_Model_Variant: OpenAIModelEnum.GPT4O,
+        }} -->
       <ResponseStatus
         response={{
-          size: 133,
-          time: 122,
-          status: "200 OK",
+          time: chatResponse?.response.time || 0,
+          status: chatResponse?.response.statusCode || "",
+          tokenCount: chatResponse?.response.inputTokens || 0,
           AI_Model_Variant: OpenAIModelEnum.GPT4O,
-          tokenCount: 432,
         }}
         responseType={"Receiver"}
       />
@@ -571,7 +586,7 @@
           {@html extractedMessage}
         </div>
       {:else}
-        <div class="markdown error-message p-2 border-radius-4 mb-2 mt-3">
+        <div class="markdown error-message p-2 border-radius-4">
           <p class="mb-0">{message}</p>
         </div>
       {/if}

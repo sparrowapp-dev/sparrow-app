@@ -32,12 +32,17 @@
 
   // Model selector state
   let isModelSelectorOpen = true;
-  let selectedModelProvider = "Anthropic";
+  let selectedModelProvider = "";
   let selectedModel = "";
 
   // Toggle model selector
   const toggleModelSelector = () => {
-    isModelSelectorOpen = !isModelSelectorOpen;
+    if (!isModelSelectorOpen) {
+      setTimeout(() => {
+        // isModelSelectorOpen = !isModelSelectorOpen;
+        isModelSelectorOpen = true;
+      }, 2);
+    }
   };
 
   // Handle model selection
@@ -124,11 +129,10 @@
 
       <!-- Model selector dropdown -->
       <ModelSelector
-        isOpen={isModelSelectorOpen}
+        bind:isOpen={isModelSelectorOpen}
         {selectedModelProvider}
         {selectedModel}
         onSelect={handleModelSelection}
-        on:close={() => (isModelSelectorOpen = false)}
       />
     </div>
   </div>

@@ -1,7 +1,14 @@
 <script lang="ts">
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
-  import { AISparkle, CrossIcon } from "@sparrow/library/icons";
+  import {
+    AISparkle,
+    CrossIcon,
+    ChatHistoryIcon,
+    EditRegular,
+    BroomRegular,
+    FormNewRegular,
+  } from "@sparrow/library/icons";
   import { SparkleFilled } from "@sparrow/common/icons";
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
@@ -10,8 +17,13 @@
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
   import { SparrowPrimaryIcon } from "@sparrow/common/icons";
-  import { Modal } from "@sparrow/library/ui";
+  import { Modal, Toggle } from "@sparrow/library/ui";
   import { tick } from "svelte";
+  import { StatusCode } from "@sparrow/common/utils";
+  import {
+    LLM_AI_ExplorerDataStore,
+    type LLM_AI_ExplorerData,
+  } from "@sparrow/workspaces/features/llm-ai-explorer/store";
   // import { isChatbotOpenInCurrTab } from "../../../../stores";
 
   export let conversations: Conversation[] = [];
@@ -25,6 +37,7 @@
   export let onStopGeneratingAIResponse;
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
+  export let responseData: LLM_AI_ExplorerData | undefined;
 
   let chatContainer: HTMLElement;
   /**
@@ -105,17 +118,48 @@
       <div class="d-flex h-100 flex-column">
         <div class="chatbox-heading">
           <div
-            class="d-flex"
-            style="justify-content: space-between; align-items:center"
+            class="d-flex justify-content-between align-items-center w-100"
             in:fade={{ duration: 200 }}
           >
-            <div class="">
-              <SparrowPrimaryIcon
-                height={"32px"}
-                width={"32px"}
-                color="var(--primary-btn-color)"
-              />
-              <span class="gradient-text">Sparrow AI</span>
+            <div class="d-flex align-items-center gap-2">
+              <button
+                class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2"
+                style="background-color: var(--bg-ds-surface-300); pointer-events: none;"
+              >
+                <ChatHistoryIcon size={"20px"} />
+              </button>
+              <span class="text-ds-font-size-12 fw-medium text-white"
+                >Conversation</span
+              >
+              <button
+                class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent"
+              >
+                <EditRegular size={"12px"} color={"white"} />
+              </button>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <!-- <div class="d-flex align-items-center gap-2">
+        <span class="small text-white-50">Auto Clear</span>
+        <Toggle isActive={false} disabled={false} onChange={() => {}} />
+      </div> -->
+              <div
+                class="d-flex flex-row gap-2 text-ds-font-size-12 fw-medium"
+                style="color: var(--text-ds-neutral-100);"
+              >
+                <span
+                  >{responseData?.response.inputTokens || 0} input tokens</span
+                >
+                <span
+                  >{responseData?.response.outputTokens || 0} output tokens</span
+                >
+              </div>
+              <!-- <button class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent">
+        <BroomRegular size={"20px"} />
+      </button>
+      <button class="btn btn-sm d-flex align-items-center gap-1 rounded-2 border border-white-25 btn-transparent">
+        <FormNewRegular name="document-add" size="18" />
+        <span>New</span>
+      </button> -->
             </div>
           </div>
         </div>
@@ -151,6 +195,7 @@
                   <div in:fade={{ duration: 200, delay: index * 50 }}>
                     <ChatItem
                       message={chat.message}
+                      chatResponse={responseData}
                       messageId={chat.messageId}
                       type={chat.type}
                       status={chat.status}
@@ -187,7 +232,7 @@
         {onUpdateAiPrompt}
         {isResponseGenerating}
         {onStopGeneratingAIResponse}
-        placeholder={"How can I help you?"}
+        placeholder={"Write a prompt or generate one from generate prompt."}
         {sendPrompt}
       />
     </div>
@@ -250,5 +295,15 @@
   }
   ::-webkit-scrollbar-thumb {
     background-color: var(--bg-ds-surface-100);
+  }
+
+  .btn-transparent {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .btn-transparent:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
   }
 </style>

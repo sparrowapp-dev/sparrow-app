@@ -40,7 +40,7 @@
         count: _paramsLength + _authParameterLength - 1,
       },
       {
-        name: "Body",
+        name: "Request Body",
         id: RequestSectionEnum.REQUEST_BODY,
         count: 0,
       },

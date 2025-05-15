@@ -9,6 +9,10 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import type { ScrollList } from "../types";
+  import {
+    LLM_AI_ExplorerDataStore,
+    type LLM_AI_ExplorerData,
+  } from "@sparrow/workspaces/features/llm-ai-explorer/store";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -18,11 +22,38 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
+  export let responseData: LLM_AI_ExplorerData | undefined;
 
   let scrollList: ScrollList;
 
   const sendPrompt = async (text: string) => {
+    console.log("in sendPrompt :>> 1");
     if (text) {
+      console.log("in sendPrompt :>> 2");
+      // const tabId: string = $tab?.tabId;
+      // const newData: LLM_AI_ExplorerData = {
+      //   response: {
+      //     messageId: "",
+      //     statusCode: "",
+      //     inputTokens: 0,
+      //     outputTokens: 0,
+      //     totalTokens: 0,
+      //     time: 0,
+      //   },
+      // };
+
+      // LLM_AI_ExplorerDataStore.update((map) => {
+      //   map.set(tabId, newData);
+      //   return new Map(map); // Return a new Map to trigger reactivity
+      // });
+
+      // setTimeout(() => {
+      // LLM_AI_ExplorerDataStore.subscribe((map) => {
+      //   const value = map.get(tabId);
+      //   console.log("In SendPrompt :>> Data after 3 seconds:", value);
+      // })();
+      // }, 2000);
+
       onUpdateAiConversation([
         // ...$tab?.property?.llm_ai_request?.ai?.conversations,
         {
@@ -65,6 +96,7 @@
   <div class="h-100">
     <AIChatInterface
       conversations={$tab?.property?.llm_ai_request?.ai?.conversations}
+      {responseData}
       prompt={$tab?.property?.llm_ai_request?.ai?.prompt}
       {onUpdateAiPrompt}
       {sendPrompt}

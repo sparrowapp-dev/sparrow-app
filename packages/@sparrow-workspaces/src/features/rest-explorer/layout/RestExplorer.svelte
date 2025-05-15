@@ -619,8 +619,7 @@
                       : 'pe-2'}"
                   >
                     <RequestNavigator
-                      requestStateSection={$tab.property.request?.state
-                        ?.requestNavigation}
+                      requestStateSection={RequestSectionEnum.PARAMETERS}
                       {onUpdateRequestState}
                       authParameterLength={$requestAuthParameter.value ? 1 : 0}
                       authHeaderLength={$requestAuthHeader.value ? 1 : 0}
