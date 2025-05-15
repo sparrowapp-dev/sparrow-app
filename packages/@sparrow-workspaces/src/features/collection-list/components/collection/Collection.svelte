@@ -381,7 +381,7 @@
   isOpen={isCollectionPopup}
   handleModalState={() => (isCollectionPopup = false)}
 >
-  <div class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 {isMockCollection ? 'mt-3' : ''}">
     <p
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
