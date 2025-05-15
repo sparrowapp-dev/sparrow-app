@@ -839,8 +839,8 @@
                 folderId,
               );
             },
-            updateBlockName: function (field: string, value: string) {
-              handleUpdateRequestData(field, value);
+            updateBlockName: function (_id: string, value: string) {
+              handleUpdateBlockName(_id, value);
             },
             collectionId: _requestData?.collectionId,
             folderId: _requestData?.folderId,
@@ -971,6 +971,18 @@
     }
   };
 
+  const handleUpdateBlockName = async (id: string, value: string) => {
+    if (!id) return;
+    nodes.update((_nodes) => {
+      for (let i = 0; i < _nodes.length; i++) {
+        if (_nodes[i].id === id) {
+          _nodes[i].data.blockName = value;
+        }
+      }
+      return _nodes;
+    });
+  };
+
   /**
    * Initializes nodes and edges on component mount.
    */
@@ -1028,8 +1040,8 @@
                 folderId,
               );
             },
-            updateBlockName: function (field: string, value: string) {
-              handleUpdateRequestData(field, value);
+            updateBlockName: function (_id: string, value: string) {
+              handleUpdateBlockName(_id, value);
             },
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,

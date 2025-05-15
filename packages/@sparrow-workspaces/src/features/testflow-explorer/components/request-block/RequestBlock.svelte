@@ -313,7 +313,7 @@
           on:input={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            data.updateBlockName("blockName", e?.target?.value);
+            data.updateBlockName(id, e?.target?.value);
           }}
           on:change={(e) => {
             e.preventDefault();
@@ -326,7 +326,7 @@
           value={blockName}
           on:blur={() => {
             if (blockName.trim().length == 0) {
-              data.updateBlockName("blockName", "Untitled");
+              data.updateBlockName(id, "Untitled");
             }
             isEditing = false;
           }}
