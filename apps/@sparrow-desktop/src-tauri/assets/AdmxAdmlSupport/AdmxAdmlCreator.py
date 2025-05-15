@@ -1,3 +1,6 @@
+#this file is used to automate the creation of ADMX & EN-US ADML template files used to create template for group policy
+#Admins use these files to control features via UI
+
 import xml.etree.ElementTree as ET
 import uuid
 import os
