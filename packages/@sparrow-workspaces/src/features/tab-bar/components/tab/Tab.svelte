@@ -27,6 +27,7 @@
     DismissCircleRegular,
     CopyRegular,
     BoardRegular,
+    DatabaseStackRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -248,6 +249,14 @@
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
         </span>
+      {:else if tab.type === TabTypeEnum.MOCK_COLLECTION}
+        <span>
+          <DatabaseStackRegular
+            height={"14px"}
+            width={"14px"}
+            color={"var(--icon-secondary-130)"}
+          />
+        </span>
       {:else if tab.type === TabTypeEnum.WORKSPACE}
         <span>
           <BookIcon />
@@ -326,7 +335,7 @@
       <Tag type={"green"} text={"Mock"} />
     {/if}
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.MOCK_COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"

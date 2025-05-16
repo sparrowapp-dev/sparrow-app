@@ -22,6 +22,7 @@ export enum TabTypeEnum {
   GRAPHQL = "GRAPHQL",
   SAVED_REQUEST = "SAVED_REQUEST",
   MOCK_REQUEST = "MOCK_REQUEST",
+  MOCK_COLLECTION = "MOCK_COLLECTION",
 }
 
 export enum TabPersistenceTypeEnum {
