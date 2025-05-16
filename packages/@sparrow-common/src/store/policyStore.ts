@@ -1,6 +1,6 @@
-// stores/policyStore.js
 import { writable, derived } from 'svelte/store';
 import { invoke } from "@tauri-apps/api/core";
+import { OSDetector } from '../utils';
 
 // Track loading state
 export const policyLoading = writable(true);
@@ -42,9 +42,19 @@ export async function loadPolicyConfig() {
   }
 }
 
-// Load policies when the store is imported
-// This should happen as early as possible in your app bootstrap
-loadPolicyConfig();
+(async () => {
+  try {
+    const os = new OSDetector()
+        if (os.getOS() === 'windows') {
+      await loadPolicyConfig();
+    } else {
+      policyLoading.set(false); // Still resolve loading
+    }
+  } catch (err) {
+    console.error('Platform detection failed:', err);
+    policyLoading.set(false);
+  }
+})();
 
 // Helper to check if a policy is enabled or disabled
 export function isPolicyEnabled(policyName) {
