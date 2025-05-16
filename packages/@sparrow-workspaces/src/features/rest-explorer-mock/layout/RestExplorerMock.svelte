@@ -125,6 +125,7 @@
   export let isGuestUser = false;
   export let onOpenCollection;
   export let onUpdateResponseBody;
+  export let onUpdateResponseStatus;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -756,8 +757,10 @@
                               data={HttpStatusCodes}
                               onclick={(selectedItem) => {
                                 selectedStatusCode = selectedItem;
+                                onUpdateResponseStatus(selectedItem);
                               }}
-                              titleId={selectedStatusCode}
+                              titleId={$tab.property.mockRequest
+                                ?.responseStatus}
                               placeholderText={"Status Code"}
                               id={"httpStatusCode"}
                               zIndex={701}
