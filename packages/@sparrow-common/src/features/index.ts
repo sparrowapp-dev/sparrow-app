@@ -5,3 +5,6 @@ export * from "./create-team";
 export * from "./sidebar";
 export * from "./global-search";
 export * from "./public-workspace";
+export * from "./published-workspace";
+export * from "./shared-workspace";
+export * from "./failed-published-workspace";

@@ -92,9 +92,7 @@
             if (res?.isSuccessful) {
               isValidServerURL = true;
             }
-          } catch (e) {
-            Sentry.captureException(e);
-          }
+          } catch (e) {}
         }
       } else {
         isValidClientDeployedURL = true;
@@ -105,9 +103,7 @@
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
-          } catch (e) {
-            Sentry.captureException(e);
-          }
+          } catch (e) {}
         }
       }
     } else if (validateClientJSON(importData)) {
@@ -444,9 +440,7 @@
           currentBranch = activeResponse;
         }
       }
-    } catch (e) {
-      Sentry.captureException(e);
-    }
+    } catch (e) {}
   };
 
   let repositoryBranch = "not exist";

@@ -29,6 +29,7 @@
   export let onShareWorkspace;
   export let isWorkspaceSharing = false;
   export let onUpdateWorkspaceName;
+  export let isShareModalOpen;
   let isWorkspaceUpdating = false;
 
   const handleInputDescription = (event: Event) => {
@@ -61,7 +62,7 @@
         </span>
         <Input
           width={"410px"}
-          placeholder={""}
+          placeholder={"Enter your workspace name"}
           type={"text"}
           value={workspaceName}
           size="small"
@@ -113,16 +114,11 @@
     {/if}
     {#if workspaceType === WorkspaceType.PUBLIC}
       <Button
-        title={isWorkspaceSharing ? "Link Copied" : "Share workspace"}
+        title={"Share workspace"}
         type={"secondary"}
-        onClick={async () => {
-          await onShareWorkspace();
-          isWorkspaceSharing = true;
-          setTimeout(() => {
-            isWorkspaceSharing = false;
-          }, 3000);
+        onClick={() => {
+          isShareModalOpen = true;
         }}
-        startIcon={isWorkspaceSharing ? CopyRegular : ""}
       ></Button>
     {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN && !$policyConfig.restrictPublicWorkspaceCreation}
       <Button
@@ -150,7 +146,7 @@
   }
   textarea:focus,
   textarea:hover {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-neutral-300) !important;
   }
   .textarea-header {
     font-size: 12px;

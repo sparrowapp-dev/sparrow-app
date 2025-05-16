@@ -150,7 +150,7 @@
         <button
           bind:this={workspaceTabWrapper}
           class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-          style="top:28px; right:36px;"
+          style="top:27px; right:36px;"
         >
           <StatusSuccess
             height="14"
@@ -162,7 +162,7 @@
         <div bind:this={workspaceTabWrapper}>
           <span
             class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
-            style="color: var(--text-ds-neutral-400); top:26px; right:65px;"
+            style="color: var(--text-ds-neutral-400); top:28px; right:65px;"
           >
             Copy Public Link
           </span>
@@ -253,7 +253,7 @@
       >
         {workspace?.description ? workspace.description : "No summary added"}
       </p>
-      <hr style="color: var(--border-ds-surface-100);" />
+      <hr style="color: var(--border-ds-surface-50);" />
 
       <div class="d-flex justify-content-between">
         <p

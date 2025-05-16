@@ -143,8 +143,8 @@
 </script>
 
 <div
-  class={`d-flex flex-column  pt-0 px-1`}
-  style="font-weight: 500;margin-bottom:2px; "
+  class={`d-flex flex-column h-100 pt-0 px-1`}
+  style="font-weight: 500;"
   id="testflow-container"
 >
   <!-- 

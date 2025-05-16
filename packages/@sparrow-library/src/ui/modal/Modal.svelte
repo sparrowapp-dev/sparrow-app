@@ -83,7 +83,8 @@
               <div class="d-flex flex-row align-items-center" style="gap: 8px;">
                 <h3
                   class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold ellipsis"
-                >
+                  style="color: var(--text-ds-neutral-50);"
+              >
                   {title}
                 </h3>
                 {#if helpingIcon}
@@ -164,6 +165,7 @@
     border-radius: 8px;
     padding: 30px 30px 20px 30px;
     position: relative;
+    overflow: hidden;
   }
   .sparrow-modal-heading {
     width: 400px;

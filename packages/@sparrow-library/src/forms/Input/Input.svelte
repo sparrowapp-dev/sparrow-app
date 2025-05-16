@@ -140,6 +140,7 @@
     color: var(--text-ds-neutral-400);
     pointer-events: none; /* Prevent interaction with the icon */
     z-index: 2;
+    padding-bottom: 2px;
   }
   /* Add padding to inputs with icons */
   .has-icon {
