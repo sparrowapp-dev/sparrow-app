@@ -557,6 +557,7 @@
         {toggleSaveRequest}
         {onSaveRequest}
         {isGuestUser}
+        mockCollectionUrl={collection?.mockCollectionUrl}
       />
 
       <div

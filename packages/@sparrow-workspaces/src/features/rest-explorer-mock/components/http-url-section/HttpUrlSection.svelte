@@ -3,9 +3,9 @@
   import { Select } from "@sparrow/library/forms";
   import { notifications, Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
-  import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { ArrowUpRightRegular, SaveRegular } from "@sparrow/library/icons";
+  import { MockUrlInputTheme } from "../../../../utils";
 
   let componentClass = "";
   export { componentClass as class };
@@ -24,8 +24,9 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
+  export let mockCollectionUrl;
 
-  const theme = new UrlInputTheme().build();
+  const theme = new MockUrlInputTheme().build();
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
@@ -129,20 +130,28 @@
     menuItem={"v2"}
     highlightTickedItem={false}
   />
-  <div class="w-100 d-flex align-items-center position-relative">
-    <div class="position-absolute top-0" style="width: calc(100% );">
-      <CodeMirrorInput
-        value={requestUrl}
-        onUpdateInput={onUpdateRequestUrl}
-        placeholder={"Enter a URL"}
-        {theme}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        codeId={"url"}
-        class={"input-url"}
-        {userRole}
-        isFocusedOnMount={false}
-      />
+  <div class="d-flex" style="width: 100%;">
+    <div class="static-url-section">
+      <span style="font-size: 14px; margin-right: 12px;"
+        >{mockCollectionUrl}</span
+      >
+      <span style="font-size: 14px;">/</span>
+    </div>
+    <div class="w-100 d-flex align-items-center position-relative">
+      <div class="position-absolute top-0" style="width: calc(100% );">
+        <CodeMirrorInput
+          value={requestUrl}
+          onUpdateInput={onUpdateRequestUrl}
+          placeholder={"Enter a URL"}
+          {theme}
+          {onUpdateEnvironment}
+          {environmentVariables}
+          codeId={"url"}
+          class={"input-url"}
+          {userRole}
+          isFocusedOnMount={false}
+        />
+      </div>
     </div>
   </div>
 
@@ -215,6 +224,14 @@
   .save-disk {
     padding: 7px;
     background-color: var(--bg-secondary-400);
+  }
+  .static-url-section {
+    height: 36px;
+    background-color: var(--bg-ds-surface-600);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-radius: 4px 0 0 4px;
   }
 
   .save-disk:disabled {
