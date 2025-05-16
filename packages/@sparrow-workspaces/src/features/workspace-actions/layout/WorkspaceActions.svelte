@@ -58,6 +58,13 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { LaunchDesktop } from "@sparrow/common/components";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import {
+    ArrowRightIcon,
+    ArrowRightRegular,
+    WorkspaceRegular,
+  } from "@sparrow/library/icons";
+  export let onOpenWorkspace: (workspaceId: string) => Promise<void>;
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -147,11 +154,26 @@
   let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId = "";
+  let currentWorkspaceName: string = "";
+  let isWorkspaceTabOpen: boolean = false;
   currentWorkspace.subscribe((value) => {
     if (value?._data) {
+      currentWorkspaceName = value._data.name;
       currentWorkspaceId = value._data._id;
     }
   });
+
+  $: {
+    isWorkspaceTabOpen =
+      activeTabType === TabTypeEnum.WORKSPACE &&
+      activeTabId === currentWorkspaceId;
+  }
+
+  $: {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      isExpandCollection.set(true);
+    }
+  }
 
   // export let isExpandCollection = false;
   // export let isExpandEnvironment = false;
@@ -725,11 +747,46 @@
         </div>
       {/if}
     </div>
+    <div
+      class="d-flex flex-row justify-content-between align-items-center border-radius-2 collection-container {isWorkspaceTabOpen
+        ? 'selected'
+        : ''}"
+      style="cursor:pointer; margin-top:5px; padding-right: 12px; height:32px;"
+      tabindex="0"
+      on:click={() => {
+        // Open workspace tab when clicked
+        if ($currentWorkspace) {
+          onOpenWorkspace($currentWorkspace._id);
+        }
+      }}
+    >
+      <div class="d-flex flex-row align-items-center flex-grow-1">
+        <span style="display: flex; margin-left:15px;">
+          <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
+        </span>
+        <span
+          class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
+          style="max-width: 110px;"
+        >
+          {currentWorkspaceName}
+        </span>
+      </div>
+      <span class="button-container">
+        <Button
+          id="add-collection-type"
+          size="extra-small"
+          type="teritiary-regular"
+          startIcon={ArrowRightRegular}
+        />
+      </span>
+    </div>
+
+    <hr class="my-1 ms-1 me-1" />
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
       class="d-flex flex-column collections-list"
-      style="overflow:hidden; margin-top:5px;  flex:1; "
+      style="overflow:hidden;   flex:1; "
     >
       <!-----Collection Section------>
       <div
@@ -898,6 +955,31 @@
 {/if}
 
 <style>
+  .collection-container .button-container {
+    visibility: hidden;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 8px;
+  }
+
+  .collection-container:hover .button-container {
+    visibility: visible;
+  }
+
+  .collection-container:hover {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+
+  .collection-container.selected {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+
+  .collection-container.selected:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+
   .not-opened-any {
     height: 40px;
   }

@@ -235,6 +235,10 @@
    * Handle close tab functionality in tab bar list
    */
   const closeTab = async (id: string, tab: Tab) => {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      _viewModel.handleRemoveTab(id);
+      return;
+    }
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -827,6 +831,7 @@
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
           onUpdateRunningState={_viewModel.handleMockCollectionState}
+          onOpenWorkspace={_viewModel.handleOpenWorkspace} 
         />
       </Pane>
       <Pane
