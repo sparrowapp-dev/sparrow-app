@@ -298,7 +298,7 @@
 
 <div
   tabindex="0"
-  draggable={activeTabType === "TESTFLOW" ? true : false}
+  draggable={false}
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}

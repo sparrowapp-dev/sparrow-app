@@ -1,24 +1,24 @@
 export const HttpStatusCodes = [
-  {
-    name: "100 Continue",
-    id: "100",
-  },
-  {
-    name: "101 Switching Protocols",
-    id: "101",
-  },
-  {
-    name: "102 Processing",
-    id: "102",
-  },
-  {
-    name: "103 Early Hints",
-    id: "103",
-  },
-  {
-    name: "122 Request - URL too long",
-    id: "122",
-  },
+  // {
+  //   name: "100 Continue",
+  //   id: "100",
+  // },
+  // {
+  //   name: "101 Switching Protocols",
+  //   id: "101",
+  // },
+  // {
+  //   name: "102 Processing",
+  //   id: "102",
+  // },
+  // {
+  //   name: "103 Early Hints",
+  //   id: "103",
+  // },
+  // {
+  //   name: "122 Request - URL too long",
+  //   id: "122",
+  // },
   {
     name: "200 Ok",
     id: "200",
@@ -250,6 +250,34 @@ export const HttpStatusCodes = [
   {
     name: "496 SSL Certificate Required (nginx)",
     id: "496",
+  },
+  {
+    id: "496",
+    name: "496 SSL Certificate Required (nginx)",
+  },
+  {
+    id: "497",
+    name: "497 HTTP Request Sent to HTTPS Port (nginx)",
+  },
+  {
+    id: "499",
+    name: "499 Client Closed Request (nginx)",
+  },
+  {
+    id: "500",
+    name: "500 Internal Server Error",
+  },
+  {
+    id: "501",
+    name: "501 Not Implemented",
+  },
+  {
+    id: "502",
+    name: "502 Bad Gateway",
+  },
+  {
+    id: "503",
+    name: "503 Service Unavailable",
   },
   {
     name: "504 Gateway Timeout",
