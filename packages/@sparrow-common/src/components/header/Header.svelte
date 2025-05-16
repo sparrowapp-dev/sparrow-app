@@ -23,7 +23,7 @@
   } from "./sub-component/UserProfileModal.svelte";
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
-  import { policyConfig, loadPolicyConfig } from "../../store/policyStore";
+  import { policyConfig } from "@sparrow/common/store";
 
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**

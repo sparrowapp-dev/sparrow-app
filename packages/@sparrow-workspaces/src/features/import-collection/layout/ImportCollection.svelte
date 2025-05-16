@@ -15,10 +15,8 @@
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
   import * as Sentry from "@sentry/svelte";
-  import {
-    policyConfig,
-    loadPolicyConfig,
-  } from "../../../../../@sparrow-common/src/store/policyStore";
+  import {policyConfig} from "@sparrow/common/store"
+
 
   export let currentWorkspaceId;
   export let onCloseModal;
