@@ -6,8 +6,8 @@
   import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
-  import RestExplorerViewModel from "./LLM_AI_ExplorerPage.ViewModel";
-  import { LLM_AI_Explorer, ChatBot } from "@sparrow/workspaces/features";
+  import AiRequestExplorerViewModel from "./LLM_AI_ExplorerPage.ViewModel";
+  import { LLM_AI_Explorer } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount, onDestroy } from "svelte";
@@ -15,14 +15,13 @@
     LLM_AI_ExplorerDataStore,
     type LLM_AI_ExplorerData,
   } from "@sparrow/workspaces/features/llm-ai-explorer/store";
-  import constants from "../../../../constants/constants";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
 
   export let tab;
   // export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
-  const _viewModel = new RestExplorerViewModel(tab);
+  const _viewModel = new AiRequestExplorerViewModel(tab);
   const collectionObs = _viewModel.collectionSubscriber(tab.path.collectionId);
 
   let collection: CollectionDocType;
@@ -52,10 +51,7 @@
     _viewModel.updateNameWithCollectionList as any,
     1000,
   );
-  const debouncedAPIUpdater = new Debounce().debounce(
-    _viewModel?.refreshTabData as any,
-    1000,
-  );
+
   let prevTabName = "";
   /**
    * Find the role of user in active workspace
@@ -77,7 +73,6 @@
       }
       prevTabName = tab.name;
       findUserRole();
-      debouncedAPIUpdater(tab);
     }
   }
 
@@ -154,7 +149,6 @@
     }
   });
 
-  // Anish -> Need to fix the imports
   let LLM_AI_ExplorerData: LLM_AI_ExplorerData | undefined;
   LLM_AI_ExplorerDataStore.subscribe((LLM_AI_ExplorerMap) => {
     LLM_AI_ExplorerData = LLM_AI_ExplorerMap.get(tab.tabId);
@@ -167,11 +161,9 @@
 </script>
 
 <LLM_AI_Explorer
-  bind:collections={_viewModel.collection}
   bind:tab={_viewModel.tab}
+  bind:collections={_viewModel.collection}
   bind:collectionAuth={_viewModel.collectionAuth}
-  bind:requestAuthHeader={_viewModel.authHeader}
-  bind:requestAuthParameter={_viewModel.authParameter}
   bind:userRole
   {collection}
   {environmentVariables}
@@ -186,22 +178,11 @@
   onUpdateRequestState={_viewModel.updateRequestState}
   onSaveRequest={_viewModel.saveRequest}
   onUpdateAiSystemPrompt={_viewModel.updateAiSystemPrompt}
-  readRequestOrFolderInCollection={_viewModel.readRequestOrFolderInCollection}
-  readCollection={_viewModel.readCollection}
-  readWorkspace={_viewModel.readWorkspace}
-  onSaveAsRequest={_viewModel.saveAsRequest}
-  onCreateFolder={_viewModel.createFolder}
-  onCreateCollection={_viewModel.createCollection}
   onUpdateEnvironment={_viewModel.updateEnvironment}
-  onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
   onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
-  onRenameCollection={_viewModel.handleRenameCollection}
-  onRenameFolder={_viewModel.handleRenameFolder}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
-  onGenerateDocumentation={_viewModel.generateDocumentation}
   isWebApp={true}
-  azureBlobCDN={constants.AZURE_CDN_URL}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
