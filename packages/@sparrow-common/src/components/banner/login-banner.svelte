@@ -2,7 +2,8 @@
   import { CrossIcon } from "@sparrow/library/icons";
   import { RocketIcon } from "@sparrow/library/icons";
   import { Link } from "svelte-navigator";
-  import { policyConfig } from "../../store/policyStore";
+  import {policyConfig} from "@sparrow/common/store"
+
   export let isVisible = true;
   export let onClose;
   export let onClick;
