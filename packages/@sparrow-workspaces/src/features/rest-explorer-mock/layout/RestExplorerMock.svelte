@@ -723,7 +723,7 @@
                       : 'ps-2'}"
                   >
                     <div class="h-100 d-flex flex-column">
-                      <div style="flex:1;">
+                      <div style="flex:1; overflow:auto;">
                         <!-- {#if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
