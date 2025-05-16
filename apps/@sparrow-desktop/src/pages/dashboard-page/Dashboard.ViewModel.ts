@@ -122,7 +122,7 @@ export class DashboardViewModel {
 
   // redirects to Sparrow Docs.
   public redirectDocs = async () => {
-    await open(constants.DOCS_URL);
+    await open(constants.INTRO_DOCS_URL);
     return;
   };
 

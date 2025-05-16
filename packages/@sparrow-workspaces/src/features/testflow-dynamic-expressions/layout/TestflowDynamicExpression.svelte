@@ -15,7 +15,7 @@
   let expression = dynamicExpressionEditorContent;
   export let handleAddingNested: (value: string) => void;
   export let selectedBlock;
-
+  export let edges;
   export let onPreviewExpression;
   export let dynamicExpressionPath: string = "";
 
@@ -107,6 +107,7 @@
               {environmentVariables}
               bind:selectedApiRequestType
               bind:cursorPosition
+              {edges}
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
             <FunctionsOptions bind:expression bind:cursorPosition />

@@ -628,11 +628,11 @@ const connectWebSocket = async (
  */
 const waitForAbort = (signal: AbortSignal): Promise<never> => {
   return new Promise((_, reject) => {
-    if (signal.aborted) {
+    if (signal?.aborted) {
       return reject(new Error("Aborted before starting"));
     }
 
-    signal.addEventListener("abort", () => {
+    signal?.addEventListener("abort", () => {
       reject(new Error("Aborted during request"));
     }, { once: true });
   });

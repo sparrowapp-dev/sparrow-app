@@ -30,6 +30,7 @@
   export let isSharedWorkspace = false;
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
+  export let onUpdateRunningState;
 
   import {
     openedComponent,
@@ -362,6 +363,9 @@
 
   let isMockRunning = false;
   const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection?.isMockCollectionRunning,
+    });
     isMockRunning = !isMockRunning;
   };
 </script>
@@ -374,18 +378,21 @@
 />
 
 <Modal
-  title={"Delete Collection?"}
+  title={isMockCollection ? "Delete Mock Collection" : "Delete Collection?"}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
   isOpen={isCollectionPopup}
   handleModalState={() => (isCollectionPopup = false)}
 >
-  <div class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 {isMockCollection ? 'mt-3' : ''}">
     <p
       class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
     >
-      Are you sure you want to delete this Collection? Everything in <span
+      Are you sure you want to delete this {isMockCollection
+        ? "mock collection"
+        : "Collection"}? Everything in
+      <span
         class="text-ds-font-weight-semi-bold"
         style="color: var(--text-ds-neutral-50);">"{collection.name}"</span
       >
@@ -543,7 +550,7 @@
       },
       {
         onClick: () => {
-          onItemCreated("requestCollection", {
+          onItemCreated("mockRequestCollection", {
             workspaceId: collection.workspaceId,
             collection,
           });
@@ -668,7 +675,9 @@
     tabindex="-1"
     class="d-flex {collection?.activeSync
       ? 'main-collection-sync'
-      : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
+      : isMockCollection
+        ? 'main-collection-mock'
+        : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
     on:contextmenu|preventDefault={rightClickContextMenu}
     on:click|preventDefault={() => {
@@ -751,10 +760,13 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
         <div style="display: flex;">
-          <Tag type={isMockRunning ? "green" : "grey"} text={"Mock"} />
+          <Tag
+            type={collection?.isMockCollectionRunning ? "green" : "grey"}
+            text={"Mock"}
+          />
         </div>
         <Tooltip
-          title={isMockRunning ? "Stop Mock" : "Run Mock"}
+          title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}
           distance={13}
           zIndex={701}
@@ -768,7 +780,9 @@
               onClick={() => {
                 mockRunningStatus();
               }}
-              startIcon={isMockRunning ? RecordStopRegular : PlayCircleRegular}
+              startIcon={collection?.isMockCollectionRunning
+                ? RecordStopRegular
+                : PlayCircleRegular}
             />
           </span>
         </Tooltip>
@@ -1035,10 +1049,16 @@
         </Tooltip>
 
         <Tooltip
-          title={collection?.activeSync
-            ? "Adding requests is disabled for active sync collections."
-            : "Add REST API"}
-          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          title={isMockCollection
+            ? "Add Mock REST API"
+            : collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : "Add REST API"}
+          placement={isMockCollection
+            ? "top-center"
+            : collection?.activeSync
+              ? "top-left"
+              : "bottom-center"}
           distance={12}
           zIndex={1000}
         >
@@ -1047,7 +1067,12 @@
             style="height: 24px; width: 24px;"
             role="button"
             on:click={() => {
-              if (!collection?.activeSync) {
+              if (isMockCollection) {
+                onItemCreated("mockRequestCollection", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                });
+              } else if (!collection?.activeSync) {
                 onItemCreated("requestCollection", {
                   workspaceId: collection.workspaceId,
                   collection,
@@ -1344,6 +1369,9 @@
   }
   .main-collection {
     width: calc(100% - 55px);
+  }
+  .main-collection-mock {
+    width: calc(100% - 100px);
   }
   .main-collection-sync {
     width: calc(100% - 119px);

@@ -572,12 +572,7 @@ export default class WorkspaceExplorerViewModel {
         progressiveTab.id,
         updatedata,
       );
-      notifications.success(
-        `Workspace published. ‘${progressiveTab.name}’ is now public.`,
-      );
-    } else {
-      notifications.error("Failed to publish the workspace. Please try again.");
-    }
+    } 
     return response;
   };
 
@@ -586,6 +581,6 @@ export default class WorkspaceExplorerViewModel {
     await copyToClipBoard(
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
     );
-    notifications.success("Link Copied.");
+    notifications.success("Link copied to clipboard.");
   };
 }

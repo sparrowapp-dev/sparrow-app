@@ -165,6 +165,7 @@
     border-radius: 8px;
     padding: 30px 30px 20px 30px;
     position: relative;
+    overflow: hidden;
   }
   .sparrow-modal-heading {
     width: 400px;

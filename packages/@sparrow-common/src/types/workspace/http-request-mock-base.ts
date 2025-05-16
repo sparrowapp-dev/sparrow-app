@@ -1,0 +1,103 @@
+import type { CollectionRequestAddToBaseEnum } from "./collection-base";
+
+interface HttpRequestMockKeyValueCheckedWithBaseBaseInterface {
+  key: string;
+  value: string;
+  checked: boolean;
+  base: string;
+}
+interface HttpRequestMockKeyValueCheckedBaseInterface {
+  key: string;
+  value: string;
+  checked: boolean;
+}
+
+interface HttpRequestMockBodyBaseInterface {
+  raw?: string;
+  urlencoded?: HttpRequestMockKeyValueCheckedBaseInterface[];
+  formdata?: {
+    text: HttpRequestMockKeyValueCheckedBaseInterface[];
+    file: HttpRequestMockKeyValueCheckedWithBaseBaseInterface[];
+  };
+}
+
+interface HttpRequestMockBasicAuthBaseInterface {
+  username?: string;
+  password?: string;
+}
+
+interface HttpRequestMockApiKeyBaseInterface {
+  authKey: string;
+  authValue: string;
+  addTo: CollectionRequestAddToBaseEnum;
+}
+
+interface HttpRequestMockAuthBaseInterface {
+  bearerToken?: string;
+  basicAuth?: HttpRequestMockBasicAuthBaseInterface;
+  apiKey?: HttpRequestMockApiKeyBaseInterface;
+}
+
+export enum HttpRequestMockMethodBaseEnum {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE",
+  PATCH = "PATCH",
+  HEAD = "HEAD",
+  OPTIONS = "OPTIONS",
+}
+
+export enum HttpRequestMockDefaultNameBaseEnum {
+  NAME = "REST API",
+}
+
+export enum HttpRequestMockBodyModeBaseEnum {
+  NONE = "none",
+  JSON = "application/json",
+  XML = "application/xml",
+  URLENCODED = "application/x-www-form-urlencoded",
+  FORMDATA = "multipart/form-data",
+  JAVASCRIPT = "application/javascript",
+  TEXT = "text/plain",
+  HTML = "text/html",
+}
+
+export enum HttpRequestMockAuthModeBaseEnum {
+  NO_AUTH = "No Auth",
+  API_KEY = "API Key",
+  BEARER_TOKEN = "Bearer Token",
+  BASIC_AUTH = "Basic Auth",
+  INHERIT_AUTH = "Inherit Auth",
+}
+
+export enum HttpResponseMockBodyModeBaseEnum {
+  NONE = "none",
+  JSON = "application/json",
+  XML = "application/xml",
+  JAVASCRIPT = "application/javascript",
+  TEXT = "text/plain",
+  HTML = "text/html",
+}
+
+export enum HttpRequestMockAddToBaseEnum {
+  HEADER = "HEADER",
+  QUERY = "QUERY",
+}
+
+export interface HttpRequestMockBaseInterface {
+  method: HttpRequestMockMethodBaseEnum;
+  operationId: string;
+  url: string;
+  body: HttpRequestMockBodyBaseInterface;
+  selectedRequestBodyType: HttpRequestMockBodyModeBaseEnum;
+  selectedRequestAuthType: HttpRequestMockAuthModeBaseEnum;
+  selectedResponseBodyType: HttpResponseMockBodyModeBaseEnum;
+  queryParams: HttpRequestMockKeyValueCheckedBaseInterface[];
+  auth: HttpRequestMockAuthBaseInterface;
+  headers: HttpRequestMockKeyValueCheckedBaseInterface[];
+  responseBody?: string;
+  responseStatus: string;
+  responseDate: string;
+  responseHeaders?: HttpRequestMockKeyValueCheckedBaseInterface[];
+}

@@ -34,6 +34,7 @@
   } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
+  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
 
   /**
    * The data object containing various handlers and data stores.
@@ -263,17 +264,19 @@
   class="request-block position-relative"
   style={selected && !currentBlock?.response.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
-    : selected && currentBlock && checkIfRequestSucceed(currentBlock)
+    : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
+        ($currentStep > 6 && $isTestFlowTourGuideOpen)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
         ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
         : ""}
+  id="request-block"
 >
   <Handle
     type="target"
     position={Position.Left}
     isConnectable={isNodeExistToLeft ? false : true}
-    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    style=" border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <div
     class="d-flex px-2 align-items-center"
@@ -284,15 +287,15 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock?.response?.status}
-          <ArrowSwapRegular
-            size={"16px"}
-            color={"var(--icon-ds-neutral-200)"}
-          />
-        {:else if checkIfRequestSucceed(currentBlock)}
+        {#if checkIfRequestSucceed(currentBlock) || ($currentStep > 6 && $isTestFlowTourGuideOpen)}
           <CheckmarkCircleRegular
             size={"16px"}
             color={"var(--icon-ds-success-400)"}
+          />
+        {:else if !currentBlock?.response?.status}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
           />
         {:else}
           <ErrorCircleRegular
@@ -313,7 +316,7 @@
           on:input={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            data.updateBlockName("blockName", e?.target?.value);
+            data.updateBlockName(id, e?.target?.value);
           }}
           on:change={(e) => {
             e.preventDefault();
@@ -324,9 +327,11 @@
             e.stopPropagation();
           }}
           value={blockName}
-          on:blur={() => {
+          on:blur={(e) => {
             if (blockName.trim().length == 0) {
-              data.updateBlockName("blockName", "Untitled");
+              data.updateBlockName(id, "Untitled");
+            } else if (blockName.trim().length) {
+              data.updateBlockName(id, blockName.trim());
             }
             isEditing = false;
           }}
@@ -457,6 +462,33 @@
       </div>
     </div>
   {/if}
+  {#if $currentStep > 5 && isTestFlowTourGuideOpen}
+    <div class="px-2 d-flex response-status-container">
+      <!-- Response status -->
+      <div
+        class="d-flex align-items-center px-1 me-2 text-getColor}"
+        style="gap: 6px;"
+      >
+        <div class="d-flex justify-content-center alin-items-center">
+          <DotIcon
+            color={"var(--text-ds-success-400)"}
+            height={"6px"}
+            width={"6px"}
+          />
+        </div>
+        <span class="response-text-success">
+          {200}
+        </span>
+      </div>
+      <!-- Response time -->
+      <div class="d-flex align-items-center me-2" style="gap: 6px;">
+        <div class="d-flex justify-content-center alin-items-center clock-icon">
+          <ClockRegular size={"16px"} color={"var(--icon-ds-neutral-200)"} />
+        </div>
+        <span class="response-text"> 1629 ms </span>
+      </div>
+    </div>
+  {/if}
   <!-- ------------- -->
   <div class="">
     {#if isDropHereVisible && isAddBlockVisible}
@@ -506,7 +538,7 @@
     type="source"
     position={Position.Right}
     isConnectable={isNodeExistToRight ? false : true}
-    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
   {#if !isDropHereVisible && isAddBlockVisible}

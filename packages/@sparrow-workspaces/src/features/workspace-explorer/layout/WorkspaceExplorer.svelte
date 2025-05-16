@@ -63,6 +63,8 @@
    */
   export let userRole: any;
 
+  export let isShareModalOpen;
+
   let workspaceID = $tab?.id;
 
   let workspaceNavigatorId: string = "about";
@@ -95,6 +97,7 @@
     <section style="flex:1; overflow:auto;">
       {#if workspaceNavigatorId === "about"}
         <WorkspaceAbout
+          bind:isShareModalOpen
           {userRole}
           workspaceName={$tab?.name}
           {onUpdateWorkspaceDescription}

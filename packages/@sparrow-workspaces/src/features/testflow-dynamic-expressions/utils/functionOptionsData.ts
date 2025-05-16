@@ -90,4 +90,14 @@ export const FunctionOptionData = [
       "Returns the index of the first occurrence of a specified value.",
     indexOf: (str: string, value: string) => str.indexOf(value),
   },
+  {
+    type: "JSON.stringify()",
+    description: "Converts a JS object into a JSON string.",
+    example: (obj: any) => JSON.stringify(obj),
+  },
+  {
+    type: "JSON.parse()",
+    description: "Parses a JSON string and converts it into a Js object.",
+    example: (jsonString: string) => JSON.parse(jsonString),
+  },
 ];

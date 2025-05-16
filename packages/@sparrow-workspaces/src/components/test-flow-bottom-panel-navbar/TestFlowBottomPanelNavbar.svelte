@@ -122,26 +122,6 @@
       </Tooltip>
     </div>
   {/if}
-
-  {#if $isTestFlowTourGuideOpen && $currentStep == 7}
-    <div style="position:absolute; bottom:260px; right:300px;">
-      <TestFlowTourGuide
-        isLastStep={true}
-        isPuleCircleRequired={false}
-        title="Congratulations! 🎊"
-        pulsePosition={{ top: "210px", left: "250px" }}
-        description={`Great work! You’ve got one successful running flow.`}
-        tipPosition="bottom-right"
-        onNext={() => {
-          currentStep.set(-1);
-          isTestFlowTourGuideOpen.set(false);
-        }}
-        onClose={() => {
-          isTestFlowTourGuideOpen.set(false);
-        }}
-      />
-    </div>
-  {/if}
 </div>
 
 <style>

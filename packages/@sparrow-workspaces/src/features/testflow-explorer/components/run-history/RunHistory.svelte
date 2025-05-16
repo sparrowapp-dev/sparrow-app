@@ -145,9 +145,9 @@
                     <div style="width: 260px;">
                       <Accordion position="right">
                         <div
-                          class="d-flex justify-content-between align-items-center"
+                          class="d-flex w-100 justify-content-between align-items-center"
                           slot="accordion-field"
-                          style="gap: 26px;"
+                          style="gap: 4px;"
                         >
                           <div>
                             <p
@@ -241,7 +241,7 @@
 
                                 <span
                                   class="text-fs-12 request-time"
-                                  style="width: 48px; text-align: right;"
+                                  style="width: 60px; text-align: right;"
                                 >
                                   {request.time}
                                 </span>

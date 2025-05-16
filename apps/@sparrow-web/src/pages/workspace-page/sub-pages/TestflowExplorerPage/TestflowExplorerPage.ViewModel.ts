@@ -669,7 +669,17 @@ export class TestflowExplorerPageViewModel {
                     headers: response?.data?.headers
                   },
                   request: {
-                    url: decodeData[0],
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+                requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
                     headers: headersObject || {},
                     body:reqBody,
                     parameters:reqParam || {}
@@ -710,7 +720,18 @@ export class TestflowExplorerPageViewModel {
                   headers:{}
                 },
                 request: {
-                  url: decodeData[0],
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
+
+              requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                response: {
+                  body: {},
+                  headers:{}
+                },
+                request: {
                     headers:{},
                     body:{},
                     parameters:{}
@@ -1054,14 +1075,15 @@ export class TestflowExplorerPageViewModel {
    * @returns Resolves when the redirection process is completed.
    */
   public redirectRequest = async (
-    _workspaceId: string,
     _collectionId: string,
     _folderId: string,
     _requestId: string,
   ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const workspaceId = progressiveTab.path.workspaceId; 
     const errorMessage = "id can't be empty while redirecting request!";
     // base conditions
-    if (!_workspaceId) {
+    if (!workspaceId) {
       console.error("Workspace " + errorMessage);
       return;
     }
@@ -1096,7 +1118,7 @@ export class TestflowExplorerPageViewModel {
     // creating a tab for the request
     const requestTabAdapter = new RequestTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
-      _workspaceId || "",
+      workspaceId || "",
       _collectionId || "",
       _folderId || "",
       request,
@@ -1623,7 +1645,7 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will redirect to the sparrow docs of testflow.
    */
   public redirectDocsTestflow = async () => {
-    window.open(constants.DOCS_URL, "_blank");
+    window.open(constants.TESTFLOW_DOCS_URL, "_blank");
     return;
   };
 }

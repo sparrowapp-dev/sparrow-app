@@ -393,7 +393,7 @@ export class DashboardViewModel {
 
   // redirects to Sparrow Docs.
   public redirectDocs = async () => {
-    window.open(constants.DOCS_URL, "_blank");
+    window.open(constants.INTRO_DOCS_URL, "_blank");
     return;
   };
 

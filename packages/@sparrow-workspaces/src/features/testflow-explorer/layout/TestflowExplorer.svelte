@@ -598,6 +598,7 @@
     }
   });
 
+  let dynamicExpressionDependencyCount = 0;
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
    * Also triggers the count of the next node to be deleted.
@@ -605,6 +606,7 @@
    * @param id - The ID of the node to be deleted.
    */
   const handleDeleteModal = (id: string) => {
+    dynamicExpressionDependencyCount = 0;
     if (!id) return;
     if (id === "1") return;
     isDeleteNodeModalOpen = true;
@@ -613,7 +615,32 @@
       (node) => node.id === id,
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
-    // countNextDeletedNode(id);
+
+    nodes.update((_nodes) => {
+      for (let i = 0; i < _nodes.length; i++) {
+        if (_nodes[i].id === id) {
+          continue;
+        }
+        const requestData = JSON.stringify(_nodes[i]?.data?.requestData);
+        if (
+          requestData.includes(
+            "$$" +
+              filteredNodes[0]?.data?.requestData?.name?.replace(
+                /[^a-zA-Z0-9_]/g,
+                "_",
+              ),
+          ) ||
+          requestData.includes(
+            "$$" +
+              filteredNodes[0]?.data?.blockName?.replace(/[^a-zA-Z0-9_]/g, "_"),
+          )
+        ) {
+          dynamicExpressionDependencyCount =
+            dynamicExpressionDependencyCount + 1;
+        }
+      }
+      return _nodes;
+    });
   };
 
   /**
@@ -804,8 +831,8 @@
                 folderId,
               );
             },
-            updateBlockName: function (field: string, value: string) {
-              handleUpdateRequestData(field, value);
+            updateBlockName: function (_id: string, value: string) {
+              handleUpdateBlockName(_id, value);
             },
             collectionId: _requestData?.collectionId,
             folderId: _requestData?.folderId,
@@ -820,17 +847,6 @@
         },
       ];
     });
-    // edges.update((edges) => {
-    //   return [
-    //     ...edges,
-    //     {
-    //       id: "xy-edge__" + _id + "-" + newNodeId,
-    //       source: _id,
-    //       target: newNodeId,
-    //       deletable: isEdgeDeletable,
-    //     },
-    //   ];
-    // });
 
     ////////////////////////////////////////////////////////////
     if (_direction === "add-block-after") {
@@ -889,7 +905,6 @@
         return edges;
       });
       dfs(graph, Number(newNodeId));
-      // debugger;
     } else if (_direction === "add-block-before") {
       /**
        * Future work: Have to handle case if multiple blocks connected to the same node to the left.
@@ -946,6 +961,18 @@
       dfs(graph, Number(_id));
       // debugger;
     }
+  };
+
+  const handleUpdateBlockName = async (id: string, value: string) => {
+    if (!id) return;
+    nodes.update((_nodes) => {
+      for (let i = 0; i < _nodes.length; i++) {
+        if (_nodes[i].id === id) {
+          _nodes[i].data.blockName = value;
+        }
+      }
+      return _nodes;
+    });
   };
 
   /**
@@ -1005,8 +1032,8 @@
                 folderId,
               );
             },
-            updateBlockName: function (field: string, value: string) {
-              handleUpdateRequestData(field, value);
+            updateBlockName: function (_id: string, value: string) {
+              handleUpdateBlockName(_id, value);
             },
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
@@ -1073,6 +1100,7 @@
     edge: Edge,
   } as unknown as EdgeTypes;
 
+  let isRunButtonEnabled = false;
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
     if (val && val.length) {
@@ -1094,6 +1122,7 @@
   let prevEdgeLength = 0;
   // Subscribe to changes in the edges
   const edgesSubscriber = edges.subscribe((val) => {
+    isRunButtonEnabled = false;
     if (val) {
       onUpdateEdges(val);
       if (prevEdgeLength !== val.length) {
@@ -1104,11 +1133,17 @@
               onDeleteEdge: deleteEdges,
               onCreateNode: createNewNode,
             };
+            edge.deletable = isEdgeDeletable;
           });
           return val;
         });
       }
       prevEdgeLength = val.length || 0;
+      val.find((edge) => {
+        if (edge.source === "1") {
+          isRunButtonEnabled = true;
+        }
+      });
     }
   });
 
@@ -1149,51 +1184,9 @@
    * @param id - The ID of the node to delete.
    */
   const handleDeleteNode = (idToDelete: string) => {
-    const deletedIndex = Number(idToDelete);
-
     nodes.update((_nodes) => {
-      let shouldPreserve = false;
-      const nodeToDelete = _nodes.find((n) => n.id === idToDelete);
-      let nameToCheck = nodeToDelete?.data?.requestData?.name;
-      if (nameToCheck) {
-        nameToCheck = nameToCheck
-          .replace(/^\//, "_")
-          .replace(/\//g, "_")
-          .replace(/\s+/g, "_");
-        const expressionRegex = /\[\*\$\[(.*?)\]\$\*\]/g;
-        const variableRegex = /\$\$([a-zA-Z0-9_.]+)\b/g;
-        for (const otherNode of _nodes) {
-          if (otherNode.id === idToDelete) continue;
-          const stringified = JSON.stringify(
-            otherNode?.data?.requestData || {},
-          );
-          const expressionMatches = [...stringified.matchAll(expressionRegex)];
-          for (const exprMatch of expressionMatches) {
-            const contentInside = exprMatch[1];
-            const varMatches = [...contentInside.matchAll(variableRegex)];
-            for (const vMatch of varMatches) {
-              const fullVar = vMatch[1];
-              const baseVar = fullVar.split(".")[0];
-              if (baseVar === nameToCheck) {
-                shouldPreserve = true;
-                dynamicExpressionDeleteWarning = true;
-                break;
-              }
-            }
-            if (shouldPreserve) break;
-          }
-          if (shouldPreserve) break;
-        }
-      }
-      return shouldPreserve
-        ? _nodes
-        : _nodes.filter((node) => node.id !== idToDelete);
+      return _nodes.filter((node) => node.id !== idToDelete);
     });
-
-    if (dynamicExpressionDeleteWarning) {
-      isDeleteNodeModalOpen = false;
-      return;
-    }
 
     edges.update((_edges) => {
       const incomingEdge = _edges.find((edge) => edge.target === idToDelete);
@@ -1205,117 +1198,20 @@
           id: `xy-edge__${incomingEdge.source}-${outgoingEdge.target}`,
           source: incomingEdge.source,
           target: outgoingEdge.target,
-          deletable: false,
-          selected: false,
+          deletable: isEdgeDeletable,
         });
       }
       const filteredEdges = _edges.filter((edge) => {
         if (edge.source === idToDelete || edge.target === idToDelete) {
-          if (!outgoingEdge && edge.target === idToDelete) return false;
-          // If it's an incoming or outgoing edge, remove it
-          if (edge.source === idToDelete || edge.target === idToDelete)
-            return false;
+          return false;
         }
         return true;
       });
-
       return [...filteredEdges, ...newEdge];
     });
-
-    nodes.update((_nodes) => {
-      const nodeMap = new Map<string, Node>(
-        _nodes.map((node) => [node.id, { ...node }]),
-      );
-
-      // Step 1: Build adjacency list and in-degree map
-      const adj: Record<string, string[]> = {};
-      const inDegree: Record<string, number> = {};
-
-      $edges.forEach(
-        ({ source, target }: { source: string; target: string }) => {
-          if (!adj[source]) adj[source] = [];
-          adj[source].push(target);
-          inDegree[target] = (inDegree[target] || 0) + 1;
-          if (!(source in inDegree)) inDegree[source] = 0;
-        },
-      );
-
-      // Step 2: Topological Sort
-      const queue: string[] = [];
-      for (const id in inDegree) {
-        if (inDegree[id] === 0) {
-          queue.push(id);
-          const root = nodeMap.get(id);
-          if (root) {
-            root.position.x = 100; // Initial X for root node
-            root.position.y = 200; // Optional fixed Y
-          }
-        }
-      }
-
-      while (queue.length) {
-        const nodeId = queue.shift()!;
-        const sourceNode = nodeMap.get(nodeId);
-        if (!sourceNode) continue;
-
-        const children = adj[nodeId] || [];
-        for (const childId of children) {
-          const childNode = nodeMap.get(childId);
-          if (!childNode) continue;
-          childNode.position.x = sourceNode.position.x + 350;
-          childNode.position.y = sourceNode.position.y;
-
-          // Decrease in-degree and enqueue if ready
-          inDegree[childId]--;
-          if (inDegree[childId] === 0) {
-            queue.push(childId);
-          }
-        }
-      }
-
-      return Array.from(nodeMap.values());
-    });
-
-    // Cleanup
     deleteNodeResponse($tab.tabId, selectedNodeId);
     unselectNodes();
     isDeleteNodeModalOpen = false;
-  };
-
-  /**
-   *  Count nodes with an id greater than the one being deleted
-   * @param id - node id from which count starts
-   */
-  const countNextDeletedNode = (id: string) => {
-    nodes.subscribe((_nodes) => {
-      deleteCount = _nodes.filter(
-        (node) => Number(node.id) > Number(id),
-      ).length;
-    });
-  };
-
-  /**
-   * Handles key press events, preventing default behavior for "Backspace" and "Delete" keys.
-   * If "Delete" is pressed, it triggers the deletion modal for the selected node.
-   *
-   * @param event - The key press event object.
-   */
-  const handleKeyPress = async (event: KeyboardEvent) => {
-    // if (event.key === "Backspace") {
-    //   try {
-    //     if (userOS === "macos") {
-    //       event.preventDefault();
-    //       handleDeleteModal(selectedNodeId);
-    //     }
-    //   } catch (error) {
-    //     console.error("Failed to determine platform:", error);
-    //   }
-    // }
-    // if (event.key === "Delete") {
-    //   debugger;
-    //   event.preventDefault();
-    //   handleDeleteModal(selectedNodeId);
-    // }
   };
 
   /**
@@ -1491,7 +1387,7 @@
         </div>
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
-        {#if nodesValue > 1}
+        {#if isRunButtonEnabled}
           {#if testflowStore?.isTestFlowRunning}
             <Button
               type="secondary"
@@ -1501,29 +1397,31 @@
               onClick={onClickStop}
             />
           {:else}
-            <Button
-              type="primary"
-              size="medium"
-              startIcon={PlayFilled}
-              title="Run"
-              onClick={async () => {
-                unselectNodes();
-                await onClickRun();
-                selectNode("2");
-                MixpanelEvent(Events.Run_TestFlows);
-              }}
-            />
+            <div id="testflow-run-button">
+              <Button
+                type="primary"
+                size="medium"
+                startIcon={PlayFilled}
+                title="Run"
+                onClick={async () => {
+                  unselectNodes();
+                  await onClickRun();
+                  selectNode("2");
+                  MixpanelEvent(Events.Run_TestFlows);
+                }}
+              />
+            </div>
           {/if}
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
-          <div style="position:absolute;  top:60px; right:320px">
+          <div style="position:absolute; top:50px; right:350px">
             <TestFlowTourGuide
-              targetId="run-btn"
-              title="Ready, Set, Run 🏃🏻‍♂️"
-              pulsePosition={{ top: "-62px", left: "260px" }}
-              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! <br/> Alternatively, you can use the "Start" play button to initiate the flow as well.`}
-              tipPosition="top-right"
+              targetIds={["testflow-run-button"]}
+              title="Run Your Test Flow"
+              description={`Almost there! With your blocks and API in place, go ahead and click ‘Run’ to execute your test flow.`}
+              CardNumber={6}
+              totalCards={7}
               onNext={async () => {
                 currentStep.set(7);
               }}
@@ -1566,9 +1464,9 @@
   <div
     bind:this={divElement}
     tabindex="0"
-    on:keydown={handleKeyPress}
     on:click={focusDiv}
     style="flex:1; overflow:auto; outline: none; position:realtive;"
+    id="testflow-container-main"
   >
     <SvelteFlowProvider>
       <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes}>
@@ -1582,16 +1480,18 @@
     </SvelteFlowProvider>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
+      <div style="position:absolute; top:196px; left:370px; z-index:1000;">
         <TestFlowTourGuide
-          title="One Block At A Time 🧱"
-          pulsePosition={{ top: "-64px", left: "30px" }}
-          description={`Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there.`}
-          tipPosition="top-left"
+          targetIds={["add-block"]}
+          title="Add Your First Block"
+          CardNumber={3}
+          totalCards={7}
+          description={`Welcome to the canvas! Click ‘Add Block’ to start building your flow. You're just a few steps away.`}
           onNext={() => {
             currentStep.set(4);
             createNewNode("1");
           }}
+          shouldDelay={true}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
           }}
@@ -1600,12 +1500,13 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:232px; left:638px; z-index:1000;">
+      <div style="position:absolute; top:198px; left:685px; z-index:1000;">
         <TestFlowTourGuide
-          title="Block Added! 👏 "
-          description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
-          tipPosition="left-top"
-          pulsePosition={{ top: "8px", left: "-150px" }}
+          targetIds={["request-block"]}
+          title="Select an API"
+          description={`Block added—nice! Now, click the dropdown to select an API. Don’t have one? No worries, a sample API is available for you to use.`}
+          CardNumber={4}
+          totalCards={7}
           onNext={() => {
             currentStep.set(5);
           }}
@@ -1617,14 +1518,41 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <div style="position:absolute; top:265px; left:632px; z-index:1000;">
+      <div style="position:absolute; top:265px; left:680px; z-index:1000;">
         <TestFlowTourGuide
-          title="Sample API waiting...⏱️"
-          description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
-          tipPosition="left-top"
-          pulsePosition={{ top: "10px", left: "-145px" }}
+          targetIds={["request-block", "dropdown-request-items"]}
+          title="Sample API Ready"
+          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
+          CardNumber={5}
+          totalCards={7}
           onNext={() => {
             currentStep.set(6);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
+    {#if $isTestFlowTourGuideOpen && $currentStep == 7}
+      <div
+        style="position:absolute; top:200px; left:{isWebApp
+          ? '700px'
+          : '700px'};"
+      >
+        <TestFlowTourGuide
+          targetIds={["request-block", "testflow-bottom-panel"]}
+          isLastStep={true}
+          title="You Did It!"
+          description={`Congratulations! Your test flow is running successfully. You can re-run the API at any time to update values as needed.`}
+          rightButtonName="Finish"
+          CardNumber={7}
+          additionTopValue={isWebApp ? -140 : -280}
+          additionHeightValue={isWebApp ? 260 : 280}
+          totalCards={7}
+          onNext={() => {
+            currentStep.set(-1);
+            isTestFlowTourGuideOpen.set(false);
           }}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
@@ -1652,7 +1580,10 @@
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
-    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+    <div
+      style=" background-color: transparent; margin: 0px 13px 12px 13px;"
+      id="testflow-bottom-panel"
+    >
       <!-- Request Response Nav -->
       <TestFlowBottomPanel
         selectedBlock={{
@@ -1748,6 +1679,7 @@
   <TestflowDynamicExpression
     {dynamicExpressionEditorContent}
     requestApis={$nodes}
+    edges={$edges}
     {onInsertExpression}
     {handleAddingNested}
     {selectedBlock}
@@ -1758,7 +1690,7 @@
 </Modal>
 
 <Modal
-  title={"Delete block?"}
+  title={"Delete Block?"}
   type={"dark"}
   width={"540px"}
   zIndex={1000}
@@ -1771,31 +1703,11 @@
     {deletedNodeId}
     {deleteNodeName}
     {handleDeleteNode}
-    {deleteCount}
+    deleteCount={dynamicExpressionDependencyCount}
     handleModalState={(flag = false) => {
       isDeleteNodeModalOpen = flag;
     }}
   />
-</Modal>
-
-<Modal
-  title="Warning Dynamic Expression"
-  type="dark"
-  width={"540px"}
-  zIndex={1000}
-  isOpen={dynamicExpressionDeleteWarning}
-  handleModalState={(flag = false) => {
-    isDeleteNodeModalOpen = false;
-    dynamicExpressionDeleteWarning = flag;
-  }}
->
-  <p
-    class="text-fs-14 text-ds-font-weight-medium"
-    style="color: var(--text-secondary-1000); margin-top:20px;"
-  >
-    The block is currently in use and must be removed from all dependent dynamic
-    expressions before it can be deleted.
-  </p>
 </Modal>
 
 <Modal

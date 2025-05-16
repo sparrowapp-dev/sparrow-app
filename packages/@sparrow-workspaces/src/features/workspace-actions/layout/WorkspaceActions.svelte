@@ -138,6 +138,7 @@
   export let userCount = 0;
   export let onCompareCollection;
   export let onSyncCollection;
+  export let onUpdateRunningState;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -293,19 +294,23 @@
             isExpandCollection.set(true);
           },
         },
-        {
-          name: "Add Mock Collection",
-          icon: DatabaseStackRegular,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            onItemCreated("mockCollection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-            isExpandCollection.set(true);
-          },
-        },
+        ...(!isGuestUser
+          ? [
+              {
+                name: "Add Mock Collection",
+                icon: DatabaseStackRegular,
+                iconColor: "var(--icon-secondary-130)",
+                iconSize: "13px",
+                onclick: () => {
+                  onItemCreated("mockCollection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                  isExpandCollection.set(true);
+                },
+              },
+            ]
+          : []),
         {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
@@ -401,19 +406,23 @@
             isExpandCollection.set(true);
           },
         },
-        {
-          name: "Add Mock Collection",
-          icon: DatabaseStackRegular,
-          iconColor: "var(--icon-secondary-130)",
-          iconSize: "13px",
-          onclick: () => {
-            onItemCreated("mockCollection", {
-              workspaceId: currentWorkspaceId,
-              collection: collectionList,
-            });
-            isExpandCollection.set(true);
-          },
-        },
+        ...(!isGuestUser
+          ? [
+              {
+                name: "Add Mock Collection",
+                icon: DatabaseStackRegular,
+                iconColor: "var(--icon-secondary-130)",
+                iconSize: "13px",
+                onclick: () => {
+                  onItemCreated("mockCollection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                  isExpandCollection.set(true);
+                },
+              },
+            ]
+          : []),
         {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
@@ -668,13 +677,17 @@
       </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+        <div
+          style="position:fixed; top:96px; left:{isWebApp
+            ? '335px'
+            : '310px'}; z-index:9999;"
+        >
           <TestFlowTourGuide
-            targetId="addButton"
-            title="Getting Started  🎉"
-            pulsePosition={{ top: "-58px", left: "14px" }}
-            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
-            tipPosition="top-left"
+            targetIds={["addButton"]}
+            title="Welcome to Test Flow!"
+            description={`Let’s begin by creating your first flow. Click the ‘+ Add’ button to get started.`}
+            CardNumber={1}
+            totalCards={7}
             onNext={() => {
               currentStep.set(2);
               addButtonMenu = true;
@@ -690,15 +703,15 @@
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
         <div
           style="position:fixed; top:{isWebApp
-            ? '234px'
-            : '266px'}; left:220px; z-index:9999;"
+            ? '330px'
+            : '340px'}; left:{isWebApp ? '620px' : '550px'}; z-index:9999;"
         >
           <TestFlowTourGuide
-            targetId="addButton"
-            title="Add Your Flow 🌊"
-            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
-            tipPosition="left-top"
-            pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
+            targetIds={["dropdown-items"]}
+            title="Add Your Flow"
+            description={`Click ‘Add Test Flow’ to instantly create a new flow. It’s that simple—your workspace is ready!`}
+            CardNumber={2}
+            totalCards={7}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
@@ -751,6 +764,7 @@
           {handleTabUpdate}
           {onCompareCollection}
           {onSyncCollection}
+          {onUpdateRunningState}
         />
       </div>
 

@@ -48,6 +48,11 @@ export class CollectionRepository {
       if (data.branches) value.branches = data.branches;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
       if (data.currentBranch) value.currentBranch = data.currentBranch;
+      if (
+        data?.isMockCollectionRunning === true ||
+        data?.isMockCollectionRunning === false
+      )
+        value.isMockCollectionRunning = data.isMockCollectionRunning;
       if (data.localRepositoryPath)
         value.localRepositoryPath = data.localRepositoryPath;
       return value;

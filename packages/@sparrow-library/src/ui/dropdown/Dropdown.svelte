@@ -98,6 +98,7 @@
     <div
       in:scale={{ start: 0.8, duration: 400 }}
       out:scale={{ start: 0.8, duration: 400 }}
+      id="dropdown-items"
       class="dropdown-container p-1 rounded-1 position-fixed
       "
       style="min-width: {minWidth}px; top: {menuPosition.top}px; left: {menuPosition.left}px; z-index: 9999;"
@@ -189,7 +190,7 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
-    color: var(--text-ds-neutral-50);
+    /* color: var(--text-ds-neutral-50); */
   }
   .option-subtitle {
     font-family: "Inter", sans-serif;

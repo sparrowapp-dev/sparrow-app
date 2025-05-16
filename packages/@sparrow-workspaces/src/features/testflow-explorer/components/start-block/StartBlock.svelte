@@ -96,7 +96,7 @@
       type="source"
       position={Position.Right}
       isConnectable={isNodeExistToRight ? false : true}
-      style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+      style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
     />
     {#if isAddBlockVisible}
       <div
@@ -120,17 +120,19 @@
         <div class="arrow">
           <ArrowIcon />
         </div>
-        <span
-          on:click={(event) => {
-            event?.preventDefault();
-            event.stopPropagation();
-            data.onClick(id);
-          }}
-        >
-          <span class="btnc py-1 px-3 d-flex align-items-center">
-            <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
+        <div id="add-block">
+          <span
+            on:click={(event) => {
+              event?.preventDefault();
+              event.stopPropagation();
+              data.onClick(id);
+            }}
+          >
+            <span class="btnc py-1 px-3 d-flex align-items-center">
+              <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
+            </span>
           </span>
-        </span>
+        </div>
       </div>
     {/if}
   </span>

@@ -19,4 +19,6 @@ export * from "./welcome-popup";
 export * from "./socketio-explorer";
 export * from "./graphql-explorer";
 export * from "./rest-explorer-saved";
+export * from "./rest-explorer-mock";
 export * from "./workspace-tour-guide";
+

@@ -33,7 +33,7 @@
     TabTypeEnum,
   } from "@sparrow/common/types/workspace/tab";
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-  import { Badge, Spinner, Options, Dropdown } from "@sparrow/library/ui";
+  import { Badge, Spinner, Options, Dropdown, Tag } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   // ----
 
@@ -211,7 +211,7 @@
     <button
       tabindex="-1"
       class="position-relative p-0 border-0 ellipsis"
-      style="width: 100%;
+      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ? '60%' : '100%'};
         text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if loader}
@@ -222,6 +222,14 @@
             class={!tab.isActive ? "request-icon" : ""}
             style="font-size: 11px; height: 31px; font-weight: 500;"
             >{tab?.property?.request?.method || ""}</span
+          >
+        </span>
+      {:else if tab.type === TabTypeEnum.MOCK_REQUEST}
+        <span class="text-{getMethodStyle(tab?.property?.mockRequest?.method)}">
+          <span
+            class={!tab.isActive ? "request-icon" : ""}
+            style="font-size: 11px; height: 31px; font-weight: 500;"
+            >{tab?.property?.mockRequest?.method || ""}</span
           >
         </span>
       {:else if tab.type === TabTypeEnum.FOLDER}
@@ -314,8 +322,11 @@
         {tab.name}
       </span>
     </button>
+    {#if tab?.type === TabTypeEnum.MOCK_REQUEST}
+      <Tag type={"green"} text={"Mock"} />
+    {/if}
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
