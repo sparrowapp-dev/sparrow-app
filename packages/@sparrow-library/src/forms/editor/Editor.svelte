@@ -4,6 +4,7 @@
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import handleCodeMirrorSyntaxFormat from "./editor";
   import { EditorView } from "codemirror";
+  import { EditorSelection } from "@codemirror/state";
   import { createEventDispatcher } from "svelte";
   import {
     placeholder as CreatePlaceHolder,
@@ -38,6 +39,7 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
+  export let autofocus = false;
   export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
@@ -70,15 +72,15 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    if (update.docChanged) {
+    if (update.docChanged || update.selectionSet) {
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
-      if (!isAutoChange) {
-        // only hits for input, blur etc type of events.
-        const content = update.state.doc.toString(); // Get the new content
-        cursorPosition = update.state.selection.main.head;
-        dispatch("change", content); // Dispatch the new content to parent.
+      const content = update.state.doc.toString();
+      const cursor = update.state.selection.main.head;
+      cursorPosition = cursor;
+      if (!isAutoChange && update.docChanged) {
+        dispatch("change", content);
       }
     }
   });
@@ -283,6 +285,26 @@
     createDiagnostics(view.state.doc.toString()),
   );
 
+  const findCursorPosition = (text: string): number => {
+    if (!text || text.length === 0) return 0;
+
+    const lines = text.split("\n");
+    let lineIndex = lines.length - 1;
+    while (lineIndex >= 0 && lines[lineIndex].trim() === "") {
+      lineIndex--;
+    }
+
+    if (lineIndex < 0) return 0;
+
+    let position = 0;
+    for (let i = 0; i < lineIndex; i++) {
+      position += lines[i].length + 1;
+    }
+
+    position += lines[lineIndex].length;
+    return position;
+  };
+
   function initalizeCodeMirrorEditor(value: string) {
     let extensions: Extension[];
     extensions = [
@@ -300,14 +322,26 @@
       CreatePlaceHolder(placeholder),
     ];
 
+    const cursorPos = findCursorPosition(value);
     let state = EditorState.create({
       doc: value,
       extensions: extensions,
+      selection: EditorSelection.cursor(cursorPos),
     });
+
     codeMirrorView = new EditorView({
       parent: codeMirrorEditorDiv,
       state: state,
     });
+
+    if (autofocus && isEditable) {
+      setTimeout(() => {
+        codeMirrorView.focus();
+        codeMirrorView.dispatch({
+          effects: EditorView.scrollIntoView(cursorPos),
+        });
+      }, 100);
+    }
     setTimeout(() => {
       dispatcher = codeMirrorView;
     }, 100);
@@ -456,14 +490,24 @@
   afterUpdate(() => {
     // Handling the mergeview state while component state changes
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
+      const cursorPos = findCursorPosition(value);
+
       codeMirrorView.dispatch({
         changes: {
           from: 0,
           to: codeMirrorView.state.doc.length,
           insert: value,
         },
+        selection: EditorSelection.cursor(cursorPos),
         annotations: [{ autoChange: true }],
       });
+
+      if (autofocus && isEditable) {
+        codeMirrorView.focus();
+        codeMirrorView.dispatch({
+          effects: EditorView.scrollIntoView(cursorPos),
+        });
+      }
     }
 
     handleCodeMirrorSyntaxFormat(

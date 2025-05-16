@@ -41,6 +41,7 @@
     totalGraphQl: number;
     totalSocketIo: number;
     totalWebSocket: number;
+    totalMockRequests: number;
   }>;
   /**
    * Role of user in active workspace
@@ -73,6 +74,7 @@
   } from "@sparrow/library/icons";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 
   /**
    * Local variables
@@ -81,6 +83,7 @@
   let totalGraphQl: number = 0;
   let totalSocketIo: number = 0;
   let totalWebSocket: number = 0;
+  let totalMockRequests: number = 0;
   let showAddItemMenu = false;
 
   const addButtonData = [
@@ -148,6 +151,7 @@
       totalGraphQl = res.totalGraphQl;
       totalSocketIo = res.totalSocketIo;
       totalWebSocket = res.totalWebSocket;
+      totalMockRequests = res.totalMockRequests;
     }
   };
 
@@ -204,59 +208,86 @@
             onCreateAPIRequest(collection, folder);
           }}>New Request</button
         > -->
-        <Dropdown
-          zIndex={600}
-          buttonId={`add-item-collection`}
-          bind:isMenuOpen={showAddItemMenu}
-          options={addButtonData}
-          horizontalPosition="left"
-        >
+        {#if collection?.collectionType === CollectionTypeBaseEnum.MOCK}
           <Button
             id={`add-item-collection`}
             disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
               collection?.activeSync}
-            title={"New"}
+            title={"Add Mock REST API"}
             type={"primary"}
             onClick={() => {
-              showAddItemMenu = !showAddItemMenu;
+              onItemCreated("mockRequestFolder", {
+                workspaceId: collection.workspaceId,
+                collection: collection,
+                folder: folder,
+              });
             }}
             size="medium"
-            startIcon={AddRegular}
-            endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+            startIcon={ArrowSwapRegular}
           />
-        </Dropdown>
+        {:else}
+          <Dropdown
+            zIndex={600}
+            buttonId={`add-item-collection`}
+            bind:isMenuOpen={showAddItemMenu}
+            options={addButtonData}
+            horizontalPosition="left"
+          >
+            <Button
+              id={`add-item-collection`}
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                collection?.activeSync}
+              title={"New"}
+              type={"primary"}
+              onClick={() => {
+                showAddItemMenu = !showAddItemMenu;
+              }}
+              size="medium"
+              startIcon={AddRegular}
+              endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+            />
+          </Dropdown>
+        {/if}
       </div>
-      <Button
-        disable={$tab?.isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER
-          ? true
-          : false}
-        startIcon={SaveRegular}
-        type={"secondary"}
-        onClick={() => {
-          onSaveFolder();
-        }}
-      />
+      <Tooltip title={"Save"} placement={"top-center"}>
+        <Button
+          disable={$tab?.isSaved || userRole === WorkspaceRole.WORKSPACE_VIEWER
+            ? true
+            : false}
+          startIcon={SaveRegular}
+          type={"secondary"}
+          onClick={() => {
+            onSaveFolder();
+          }}
+        />
+      </Tooltip>
     </div>
 
     <div class="d-flex gap-4 ps-2">
       <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-primary-300">{totalRequests}</span>
+        <span class="fs-4 text-primary-300"
+          >{collection?.collectionType === CollectionTypeBaseEnum.MOCK
+            ? totalMockRequests
+            : totalRequests}</span
+        >
         <p style="font-size: 12px;" class="mb-0">
           {HttpRequestDefaultNameBaseEnum.NAME}
         </p>
       </div>
-      <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-primary-300">{totalGraphQl}</span>
-        <p style="font-size: 12px;" class="mb-0">GraphQL</p>
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-primary-300">{totalWebSocket}</span>
-        <p style="font-size: 12px;" class="mb-0">WebSocket</p>
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-primary-300">{totalSocketIo}</span>
-        <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
-      </div>
+      {#if collection?.collectionType !== CollectionTypeBaseEnum.MOCK}
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-primary-300">{totalGraphQl}</span>
+          <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-primary-300">{totalWebSocket}</span>
+          <p style="font-size: 12px;" class="mb-0">WebSocket</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-primary-300">{totalSocketIo}</span>
+          <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
+        </div>
+      {/if}
     </div>
     <hr />
     <div class="d-flex align-items-start ps-0 h-100">

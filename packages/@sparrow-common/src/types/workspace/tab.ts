@@ -7,6 +7,7 @@ import type { TFTabItemWrapperType } from "./testflow-tab";
 import type { SocketIoWrapper } from "./socket-io-request-tab";
 import type { GraphqlRequestWrapperTabInterface } from "./graphql-request-tab";
 import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-tab";
+import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab";
 import type { LLM_AI_RequestWrapper } from "./llm-ai-request-tab";
 
 export enum TabTypeEnum {
@@ -22,6 +23,7 @@ export enum TabTypeEnum {
   GRAPHQL = "GRAPHQL",
   SAVED_REQUEST = "SAVED_REQUEST",
   LLM_REQUEST = "LLM_REQUEST",
+  MOCK_REQUEST = "MOCK_REQUEST",
 }
 
 export enum TabPersistenceTypeEnum {
@@ -46,7 +48,8 @@ export interface LLMRequestIdWrapper {
 export interface Path
   extends WorkspaceIdWrapper,
   CollectionIdWrapper,
-  FolderIdWrapper, RequestIdWrapper { }
+  FolderIdWrapper,
+    RequestIdWrapper { }
 export interface DescriptionWrapper {
   description: string;
 }
@@ -100,6 +103,7 @@ export interface Property
   Partial<TFTabItemWrapperType>,
   Partial<SocketIoWrapper>,
   Partial<GraphqlRequestWrapperTabInterface>,
+    Partial<HttpRequestMockWrapperTabInterface>,
   Partial<HttpRequestSavedWrapperTabInterface>,
   Partial<LLM_AI_RequestWrapper> { }
 

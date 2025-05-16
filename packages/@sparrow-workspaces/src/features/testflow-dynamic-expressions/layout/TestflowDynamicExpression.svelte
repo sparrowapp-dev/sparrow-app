@@ -15,8 +15,9 @@
   let expression = dynamicExpressionEditorContent;
   export let handleAddingNested: (value: string) => void;
   export let selectedBlock;
-
+  export let edges;
   export let onPreviewExpression;
+  export let dynamicExpressionPath: string = "";
 
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
@@ -62,10 +63,19 @@
   $: currentOpenItem = $isDynamicExpressionContent.find(
     (item) => item.isCurrentOpen,
   );
+  $: {
+    if (
+      dynamicExpressionPath === "raw" ||
+      dynamicExpressionPath === "urlencoded" ||
+      dynamicExpressionPath === "formdata"
+    ) {
+      dynamicExpressionPath = "body" + " > " + dynamicExpressionPath;
+    }
+  }
   let cursorPosition: number | null = 0;
 </script>
 
-<div class="d-flex justify-content-between" style="gap: 12px;">
+<div class="d-flex justify-content-between" style="gap: 12px; margin-top:16px;">
   <div class="w-50">
     <ExpressionEditor
       bind:expression
@@ -97,9 +107,10 @@
               {environmentVariables}
               bind:selectedApiRequestType
               bind:cursorPosition
+              {edges}
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
-            <FunctionsOptions bind:expression />
+            <FunctionsOptions bind:expression bind:cursorPosition />
           {/if}
         {/key}
       </div>
@@ -111,10 +122,9 @@
   style="margin-top: 24px;"
 >
   <div>
-    <!-- <p style="margin: 0px;">
-      {currentOpenItem?.blockName} > {currentOpenItem?.method} > {currentOpenItem?.requestType}
-      > {currentOpenItem?.key}
-    </p> -->
+    <p style="margin: 0px;" class="dynamic-path-title">
+      Location: {selectedBlock?.data?.blockName} > {dynamicExpressionPath}
+    </p>
   </div>
   <div>
     <Button
@@ -135,5 +145,13 @@
     padding: 12px;
     border-radius: 4px;
     /* height: "440px"; */
+  }
+  .dynamic-path-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0px;
+    color: #82858a;
   }
 </style>

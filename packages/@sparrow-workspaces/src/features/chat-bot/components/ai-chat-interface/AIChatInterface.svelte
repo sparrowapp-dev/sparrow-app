@@ -13,10 +13,12 @@
   import { Modal } from "@sparrow/library/ui";
   import { tick } from "svelte";
   import { isChatbotOpenInCurrTab } from "../../../../stores";
+  import {policyConfig} from "@sparrow/common/store"
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
   export let onUpdateAiPrompt;
+  export let onUpdateAiModel;
   export let sendPrompt;
   export let isResponseGenerating;
   export let onToggleLike;
@@ -95,6 +97,7 @@
   ></div>
 </Modal>
 
+{#if $policyConfig.enableAIAssistance}
 <div class="ai-chat-panel h-100">
   <div
     class="d-flex flex-column h-100 chat-box"
@@ -224,6 +227,7 @@
       <PromptInput
         {prompt}
         {onUpdateAiPrompt}
+        {onUpdateAiModel}
         {isResponseGenerating}
         {onStopGeneratingAIResponse}
         placeholder={"How can I help you?"}
@@ -232,6 +236,7 @@
     </div>
   </div>
 </div>
+{/if}
 
 <style>
   .ai-chat-panel {

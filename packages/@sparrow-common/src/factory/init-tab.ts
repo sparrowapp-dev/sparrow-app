@@ -3,6 +3,7 @@ import {
   InitEnvironmentTab,
   InitFolderTab,
   InitGraphqlTab,
+  InitMockRequestTab,
   InitRequestTab,
   InitSavedRequestTab,
   InitTestflowTab,
@@ -76,6 +77,13 @@ class InitTab {
     return new InitSavedRequestTab(_id, _workspaceId);
   };
   /**
+   * @param _id - request mongo document id
+   * @param _workspaceId - Workspace mongo id to which request belongs to
+   */
+  public mockRequest = (_id: string, _workspaceId: string) => {
+    return new InitMockRequestTab(_id, _workspaceId);
+  };
+  /**
    * @param _id - collection mongo document id
    * @param _workspaceId - Workspace mongo id to which collection belongs to
    */
@@ -92,8 +100,8 @@ class InitTab {
   /**
    * @param _id - workspace mongo document id
    */
-  public workspace = (_id: string, _workspaceId : string) => {
-      return new InitWorkspaceTab(_id, _workspaceId);
+  public workspace = (_id: string, _workspaceId: string) => {
+    return new InitWorkspaceTab(_id, _workspaceId);
   };
 }
 

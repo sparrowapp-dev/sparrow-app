@@ -15,6 +15,8 @@
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
   import * as Sentry from "@sentry/svelte";
+  import {policyConfig} from "@sparrow/common/store"
+
 
   export let currentWorkspaceId;
   export let onCloseModal;
@@ -90,9 +92,7 @@
             if (res?.isSuccessful) {
               isValidServerURL = true;
             }
-          } catch (e) {
-            Sentry.captureException(e);
-          }
+          } catch (e) {}
         }
       } else {
         isValidClientDeployedURL = true;
@@ -103,9 +103,7 @@
             if (res.isSuccessful) {
               isValidServerDeployedURL = true;
             }
-          } catch (e) {
-            Sentry.captureException(e);
-          }
+          } catch (e) {}
         }
       }
     } else if (validateClientJSON(importData)) {
@@ -442,9 +440,7 @@
           currentBranch = activeResponse;
         }
       }
-    } catch (e) {
-      Sentry.captureException(e);
-    }
+    } catch (e) {}
   };
 
   let repositoryBranch = "not exist";
@@ -787,31 +783,33 @@
     class="d-flex"
     style="justify-content: space-between; align-items:flex-start; margin-top:10px;"
   >
-    <div>
-      <div class="d-flex">
+    {#if !$policyConfig.disableActiveSync}
+      <div>
+        <div class="d-flex">
+          <p
+            class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+            style="color: var(--text-ds-neutral-200); margin-bottom:0px; margin-right:8px;"
+          >
+            Enable active sync
+          </p>
+          <Tag type="cyan" text={"Beta"} />
+        </div>
         <p
-          class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
-          style="color: var(--text-ds-neutral-200); margin-bottom:0px; margin-right:8px;"
+          class="text-ds-font-size-12 text-ds-font-weight-medium"
+          style="color: var(--text-ds-neutral-400);"
         >
-          Enable active sync
+          Keeps your Sparrow collection in sync with your Swagger in real-time.
+          While edits are allowed, adding or deleting APIs is disabled to
+          maintain consistency.
         </p>
-        <Tag type="cyan" text={"Beta"} />
       </div>
-      <p
-        class="text-ds-font-size-12 text-ds-font-weight-medium"
-        style="color: var(--text-ds-neutral-400);"
-      >
-        Keeps your Sparrow collection in sync with your Swagger in real-time.
-        While edits are allowed, adding or deleting APIs is disabled to maintain
-        consistency.
-      </p>
-    </div>
-    <Toggle
-      isActive={isActiveSyncEnabled}
-      onChange={() => {
-        isActiveSyncEnabled = !isActiveSyncEnabled;
-      }}
-    />
+      <Toggle
+        isActive={isActiveSyncEnabled}
+        onChange={() => {
+          isActiveSyncEnabled = !isActiveSyncEnabled;
+        }}
+      />
+    {/if}
   </div>
 {/if}
 <div

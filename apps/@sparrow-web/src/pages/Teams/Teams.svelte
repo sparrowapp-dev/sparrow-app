@@ -305,7 +305,7 @@
       window.open(constants.SPARROW_GITHUB, "_blank");
     }}
     onDocsRedirect={() => {
-      window.open(constants.DOCS_URL, "_blank");
+      window.open(constants.INTRO_DOCS_URL, "_blank");
     }}
   />
 </Modal>

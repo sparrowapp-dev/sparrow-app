@@ -150,7 +150,6 @@ export class AiAssistantWebSocketService {
 
       return this.webSocket;
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Failed to create WebSocket connection:", error);
       this.scheduleReconnect();
       return null;
@@ -216,7 +215,6 @@ export class AiAssistantWebSocketService {
         this.triggerEvent(`assistant-response`, data);
       }
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Error in parsing response:", error);
     }
   };
@@ -309,7 +307,6 @@ export class AiAssistantWebSocketService {
         try {
           callback(data);
         } catch (error) {
-          Sentry.captureException(error);
           console.error(`Error in event listener for '${eventName}':`, error);
         }
       });
@@ -333,6 +330,9 @@ export class AiAssistantWebSocketService {
     userEmail: string,
     prompt: string,
     apiContext: string,
+    conversation,
+    model,
+    activity
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -340,6 +340,9 @@ export class AiAssistantWebSocketService {
       emailId: userEmail,
       userInput: prompt,
       apiData: apiContext,
+      conversation,
+      model,
+      activity
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
@@ -351,7 +354,6 @@ export class AiAssistantWebSocketService {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Error sending message:", error);
       return false;
     }
@@ -388,7 +390,6 @@ export class AiAssistantWebSocketService {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
-      Sentry.captureException(error);
       console.error("Error sending message:", error);
       return false;
     }
