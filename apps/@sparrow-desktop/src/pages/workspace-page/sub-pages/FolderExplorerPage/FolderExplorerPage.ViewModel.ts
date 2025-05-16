@@ -298,6 +298,7 @@ class FolderExplorerPage {
     let totalWebSocket = 0;
     let totalGraphQl = 0;
     let totalSocketIo = 0;
+    let totalMockRequests = 0;
     const folder = await this.getFolder(collection, this._tab.getValue().id);
     if (folder?.items) {
       folder.items.forEach((item: any) => {
@@ -309,6 +310,8 @@ class FolderExplorerPage {
           totalGraphQl++;
         } else if (item.type === ItemType.WEB_SOCKET) {
           totalWebSocket++;
+        } else if (item.type === ItemType.MOCK_REQUEST) {
+          totalMockRequests++;
         }
       });
     }
@@ -317,6 +320,7 @@ class FolderExplorerPage {
       totalGraphQl,
       totalSocketIo,
       totalWebSocket,
+      totalMockRequests,
     };
   };
 
