@@ -19,6 +19,7 @@
     "./icons": "./src/icons/index.ts",
     "./images": "./src/images/index.ts",
     "./utils": "./src/utils/index.ts",
+    "./store": "./src/store/index.ts",
     "./utils/auth.helper": "./src/utils/auth.helper.ts",
     "./utils/common.helper": "./src/utils/common.helper.ts",
     "./utils/conversion.helper": "./src/utils/conversion.helper.ts",
