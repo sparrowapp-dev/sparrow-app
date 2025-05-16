@@ -342,7 +342,8 @@ export class AiAssistantWebSocketService {
       apiData: apiContext,
       conversation,
       model,
-      activity
+      activity,
+      "feature": "sparrow-ai"
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
