@@ -41,6 +41,7 @@
     totalGraphQl: number;
     totalSocketIo: number;
     totalWebSocket: number;
+    totalMockRequests: number;
   }>;
   /**
    * Role of user in active workspace
@@ -82,6 +83,7 @@
   let totalGraphQl: number = 0;
   let totalSocketIo: number = 0;
   let totalWebSocket: number = 0;
+  let totalMockRequests: number = 0;
   let showAddItemMenu = false;
 
   const addButtonData = [
@@ -149,6 +151,7 @@
       totalGraphQl = res.totalGraphQl;
       totalSocketIo = res.totalSocketIo;
       totalWebSocket = res.totalWebSocket;
+      totalMockRequests = res.totalMockRequests;
     }
   };
 
@@ -262,7 +265,11 @@
 
     <div class="d-flex gap-4 ps-2">
       <div class="d-flex align-items-center gap-2">
-        <span class="fs-4 text-primary-300">{totalRequests}</span>
+        <span class="fs-4 text-primary-300"
+          >{collection?.collectionType === CollectionTypeBaseEnum.MOCK
+            ? totalMockRequests
+            : totalRequests}</span
+        >
         <p style="font-size: 12px;" class="mb-0">
           {HttpRequestDefaultNameBaseEnum.NAME}
         </p>
