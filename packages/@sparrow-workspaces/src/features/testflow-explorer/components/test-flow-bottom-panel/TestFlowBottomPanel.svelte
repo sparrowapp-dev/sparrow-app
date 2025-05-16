@@ -88,7 +88,6 @@
 
   const handleRedirect = () => {
     onRedirect(
-      selectedBlock?.data?.workspaceId,
       selectedBlock?.data?.collectionId,
       selectedBlock?.data?.folderId,
       selectedBlock?.data?.requestId,
