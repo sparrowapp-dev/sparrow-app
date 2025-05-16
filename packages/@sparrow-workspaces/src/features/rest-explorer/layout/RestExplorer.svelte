@@ -92,8 +92,7 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
-  import { policyConfig } from "../../../../../@sparrow-common/src/store/policyStore";
-
+  import {policyConfig} from "@sparrow/common/store"
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;

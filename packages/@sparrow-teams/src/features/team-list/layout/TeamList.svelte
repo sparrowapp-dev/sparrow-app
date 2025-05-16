@@ -9,7 +9,7 @@
     PeopleFilled,
     PeopleRegular,
   } from "@sparrow/library/icons";
-  import { policyConfig } from "../../../../../@sparrow-common/src/store/policyStore";
+  import {policyConfig} from "@sparrow/common/store"
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;

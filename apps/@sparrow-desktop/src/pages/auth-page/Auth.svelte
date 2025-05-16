@@ -34,7 +34,8 @@
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
   import * as Sentry from "@sentry/svelte";
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
-  import { policyConfig } from "../../../../../packages/@sparrow-common/src/store/policyStore";
+  import {policyConfig} from "@sparrow/common/store"
+
   let isEntry = false;
   let isHover = false;
   let externalSparrowLink =

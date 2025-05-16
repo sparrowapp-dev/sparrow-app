@@ -21,7 +21,7 @@ import { TeamRepository } from "@app/repositories/team.repository";
 import { GuideRepository } from "@app/repositories/guide.repository";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import * as Sentry from "@sentry/svelte";
-import { policyConfig } from "../../../../packages/@sparrow-common/src/store/policyStore";
+import {policyConfig} from "@sparrow/common/store"
 
 interface DeepLinkHandlerWindowsPayload {
   payload: {

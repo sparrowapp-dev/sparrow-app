@@ -13,7 +13,7 @@
   import { Modal } from "@sparrow/library/ui";
   import { tick } from "svelte";
   import { isChatbotOpenInCurrTab } from "../../../../stores";
-  import { policyConfig } from "../../../../../../@sparrow-common/src/store/policyStore";
+  import {policyConfig} from "@sparrow/common/store"
 
   export let conversations: Conversation[] = [];
   export let prompt = "";

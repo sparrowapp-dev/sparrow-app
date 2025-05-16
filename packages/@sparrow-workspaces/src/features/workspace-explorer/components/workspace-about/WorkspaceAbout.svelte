@@ -3,7 +3,7 @@
   import { Input } from "@sparrow/library/forms";
   import { CopyRegular } from "@sparrow/library/icons";
   import { Button, notifications } from "@sparrow/library/ui";
-  import { policyConfig } from "../../../../../../@sparrow-common/src/store/policyStore";
+  import {policyConfig} from "@sparrow/common/store"
 
   /**
    * The description of the workspace.
