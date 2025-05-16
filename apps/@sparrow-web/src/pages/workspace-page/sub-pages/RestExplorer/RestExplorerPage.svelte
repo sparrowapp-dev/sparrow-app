@@ -154,7 +154,6 @@
   let restExplorerData: restExplorerData | undefined;
   restExplorerDataStore.subscribe((webSocketMap) => {
     restExplorerData = webSocketMap.get(tab.tabId);
-    console.log("restExpp LLLL>: ", restExplorerData);
   });
 
   onDestroy(() => {
