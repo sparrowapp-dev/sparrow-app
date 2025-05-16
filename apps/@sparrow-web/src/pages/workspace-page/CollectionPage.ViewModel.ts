@@ -408,11 +408,11 @@ export default class CollectionsViewModel {
   /**
    * Create graphql new tab with untracked id
    */
-  private createLLMRequestNewTab = async () => {
+  private createAiRequestNewTab = async () => {
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     if (ws) {
       this.tabRepository.createTab(
-        this.initTab.llm_ai("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+        this.initTab.aiRequest("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
     } else {
@@ -5082,8 +5082,8 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
-      case "LLM-Request-Tab":
-        await this.createLLMRequestNewTab();
+      case "Ai-Request-Tab":
+        await this.createAiRequestNewTab();
         break;
     }
     return response;

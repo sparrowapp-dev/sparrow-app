@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
 import { LLM_AI_Request_Auth_Type_Base_Enum, LLMProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/llm-ai-request-base";
 import { LLM_AI_RequestSectionEnum } from "../types/workspace/llm-ai-request-tab";
-class InitLLMAIRequestTab {
+class InitAiRequestTab {
     private _tab: Tab;
     /**
      *
@@ -145,4 +145,4 @@ class InitLLMAIRequestTab {
     }
 }
 
-export { InitLLMAIRequestTab };
+export { InitAiRequestTab };

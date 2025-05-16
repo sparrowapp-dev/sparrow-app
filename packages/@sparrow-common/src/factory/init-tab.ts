@@ -8,7 +8,7 @@ import {
   InitSavedRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
-  InitLLMAIRequestTab
+  InitAiRequestTab
 } from "@sparrow/common/utils";
 import { InitSocketIoTab } from "../utils/init-socket-io-tab";
 import { InitWorkspaceTab } from "../utils/init-workspace-tab";
@@ -65,8 +65,8 @@ class InitTab {
    * @param _id - request mongo document id
    * @param _workspaceId - Workspace mongo id to which request belongs to
    */
-  public llm_ai = (_id: string, _workspaceId: string) => {
-    return new InitLLMAIRequestTab(_id, _workspaceId);
+  public aiRequest = (_id: string, _workspaceId: string) => {
+    return new InitAiRequestTab(_id, _workspaceId);
   };
 
   /**

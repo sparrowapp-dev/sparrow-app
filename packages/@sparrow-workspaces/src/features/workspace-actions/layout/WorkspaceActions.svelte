@@ -336,7 +336,10 @@
           icon: AISparkleRegularIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "20px",
-          onclick: () => onItemCreated("LLM-Request-Tab", {}),
+          onclick: () => { 
+            onItemCreated("Ai-Request-Tab", {});
+            MixpanelEvent(Events.Add_WebSocket);
+          }
         },
         {
           name: "Add WebSocket",
