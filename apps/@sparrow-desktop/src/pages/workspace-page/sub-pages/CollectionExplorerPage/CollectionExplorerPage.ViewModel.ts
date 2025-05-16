@@ -19,6 +19,7 @@ import {
   createDeepCopy,
   Debounce,
   InitFolderTab,
+  InitMockRequestTab,
   InitWebSocketTab,
   moveNavigation,
 } from "@sparrow/common/utils";
@@ -1121,6 +1122,115 @@ class CollectionExplorerPage {
   };
 
   /**
+   * Handle creating a new mock request in a collection
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateMockRequestInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const request = new InitMockRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: request.getValue().name,
+        type: request.getValue().type,
+        description: "",
+        mockRequest: {
+          method: request?.getValue().property?.mockRequest?.method,
+          url: collection?.mockCollectionUrl,
+        } as HttpRequestBaseInterface,
+      },
+    };
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...requestObj.items,
+        id: request.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          requestObj.collectionId,
+          request.getValue().id,
+        );
+      if (res) {
+        res.id = uuidv4();
+      }
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+
+      request.updateId(res?.id as string);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      request.updateIsSave(true);
+      await this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addMockRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+      request.updateId(res.id);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      request.updateIsSave(true);
+      request.updateUrl(collection?.mockCollectionUrl);
+      this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
    * Handles creating a new folder in a collection
    * @param workspaceId :string
    * @param collection :CollectionDocument - the collection in which new folder is going to be created
@@ -1544,6 +1654,12 @@ class CollectionExplorerPage {
         break;
       case "requestCollection":
         await this.handleCreateRequestInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "requestMockCollection":
+        await this.handleCreateMockRequestInCollection(
           args.collection.workspaceId,
           args.collection as CollectionDto,
         );
