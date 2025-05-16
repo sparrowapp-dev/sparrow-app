@@ -31,3 +31,10 @@ export const handleEventOnClickDynamicExpressionButton = (
     field_type: field_type,
   });
 };
+
+export const handleEventOnOpenDE = (component: string, requestType: string) => {
+  captureEvent("chip_clicked_to_edit", {
+    component: component,
+    requestType: requestType,
+  });
+};

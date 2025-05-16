@@ -3,6 +3,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Editor } from "@sparrow/library/forms";
   import { selectedRequestTypes } from "../../../testflow-explorer/store";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let expression = "";
   export let handleAddingNested: (value: string) => void;
@@ -60,6 +61,13 @@
         }
       }
     }
+  };
+
+  const handleEventOnSelectFunction = () => {
+    captureEvent("expression_preview_clicked", {
+      component: "ExpressionEditor",
+      buttonText: "Run Preview",
+    });
   };
 </script>
 
@@ -123,6 +131,7 @@
         size="small"
         disable={!expression}
         onClick={async () => {
+          handleEventOnSelectFunction();
           expressionPreviewResult = "";
           expressionErrorResult = "";
           expressionResultContentType = "Text";

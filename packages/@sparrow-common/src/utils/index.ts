@@ -25,6 +25,7 @@ export {
   handleEventonClickApplyChangesAI,
   handleEventOnClickApplyUndoAI,
   handleEventOnClickDynamicExpressionButton,
+  handleEventOnOpenDE,
 } from "./events";
 export * from "./auth.helper";
 export * from "./common.helper";

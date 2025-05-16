@@ -2,6 +2,7 @@
   import { Search } from "@sparrow/library/forms";
   import { AddRegular } from "@sparrow/library/icons";
   import { FunctionOptionData } from "../../utils";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let expression: string;
   export let cursorPosition: number | null;
@@ -29,6 +30,17 @@
       expression += "." + functionItem.type;
     }
   };
+
+  const handleEventOnSelectFunction = (
+    funtionType: string,
+    category_name: string | undefined,
+  ) => {
+    captureEvent("function_inserted", {
+      component: "FunctionOptions",
+      function_name: funtionType,
+      category_name: category_name,
+    });
+  };
 </script>
 
 <div class="functions-container d-flex flex-column">
@@ -40,6 +52,7 @@
         on:mouseenter={() => (hoveredFunctionType = item.type)}
         on:mouseleave={() => (hoveredFunctionType = null)}
         on:click={() => {
+          handleEventOnSelectFunction(item?.type, item?.category);
           handleFunctionType(item);
         }}
       >

@@ -6,6 +6,7 @@
   } from "@sparrow/library/icons";
   import { Accordion, Button } from "@sparrow/library/ui";
   import { getMethodStyle } from "@sparrow/common/utils";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let requestApis: any = [];
   export let expression = "";
@@ -56,6 +57,13 @@
     const close = (expr.match(/\)/g) || []).length;
     return open >= 2 && close >= 2;
   }
+
+  const handleEventOnSelectVariable = (variable: string) => {
+    captureEvent("variables_selected", {
+      component: "DynamicContent",
+      Variable_name: variable,
+    });
+  };
 
   const handleSelectRequestType = (
     requestType: string,
@@ -288,6 +296,7 @@
             on:mouseenter={() => (hoveredVariableKey = variable.key)}
             on:mouseleave={() => (hoveredVariableKey = null)}
             on:click={() => {
+              handleEventOnSelectVariable(variable);
               handleSelectVariable(variable);
             }}
           >

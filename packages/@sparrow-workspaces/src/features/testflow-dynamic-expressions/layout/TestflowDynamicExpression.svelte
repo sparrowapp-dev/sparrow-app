@@ -7,6 +7,7 @@
   import DynamicContent from "../components/dynamic-content/DynamicContent.svelte";
   import FunctionsOptions from "../components/function-options/FunctionsOptions.svelte";
   import { isDynamicExpressionContent } from "../../testflow-explorer/store";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let requestApis: any;
   export let environmentVariables: any;
@@ -73,6 +74,32 @@
     }
   }
   let cursorPosition: number | null = 0;
+
+  const getFirstMatchingType = (expression: string) => {
+    const types = [
+      "response.body",
+      "response.header",
+      "request.body",
+      "request.header",
+      "request.parameter",
+      "variable",
+    ];
+    for (const type of types) {
+      if (expression.includes(type)) {
+        return type;
+      }
+    }
+    return null;
+  };
+
+  const handleEventOnClickInsertDE = () => {
+    captureEvent("expression_inserted", {
+      component: "TestFlowDynamicExpression",
+      buttonText: "Insert Dynamic Expression",
+      sourceLocation: `${dynamicExpressionPath}`,
+      insertType: getFirstMatchingType(expression),
+    });
+  };
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px; margin-top:16px;">
@@ -133,6 +160,7 @@
       disable={!expression}
       size="medium"
       onClick={() => {
+        handleEventOnClickInsertDE();
         onInsertExpression(expression);
       }}
     />
