@@ -96,7 +96,7 @@
       type="source"
       position={Position.Right}
       isConnectable={isNodeExistToRight ? false : true}
-      style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+      style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
     />
     {#if isAddBlockVisible}
       <div

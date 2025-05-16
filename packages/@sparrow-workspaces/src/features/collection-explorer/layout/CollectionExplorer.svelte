@@ -264,7 +264,7 @@
     },
     {
       onclick: () => {
-        onItemCreated("requestCollection", {
+        onItemCreated("requestMockCollection", {
           collection: collection,
         });
       },
