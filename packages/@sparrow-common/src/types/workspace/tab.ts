@@ -8,7 +8,7 @@ import type { SocketIoWrapper } from "./socket-io-request-tab";
 import type { GraphqlRequestWrapperTabInterface } from "./graphql-request-tab";
 import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-tab";
 import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab";
-import type { LLM_AI_RequestWrapper } from "./llm-ai-request-tab";
+import type { AiRequestWrapper } from "./ai-request-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -105,7 +105,7 @@ export interface Property
   Partial<GraphqlRequestWrapperTabInterface>,
     Partial<HttpRequestMockWrapperTabInterface>,
   Partial<HttpRequestSavedWrapperTabInterface>,
-  Partial<LLM_AI_RequestWrapper> { }
+  Partial<AiRequestWrapper> { }
 
 export interface PropertyWrapper {
   property: Property;

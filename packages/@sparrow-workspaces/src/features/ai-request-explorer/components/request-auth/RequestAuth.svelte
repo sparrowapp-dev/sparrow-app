@@ -17,15 +17,15 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
-  const handlecollection_llm_ai_tab_auth_changed = ({
-    LLM_AI_AuthNavigation,
+  const handlecollection_ai_tab_auth_changed = ({
+    AiAuthNavigation,
   }: {
-    LLM_AI_AuthNavigation: string;
+    AiAuthNavigation: string;
   }) => {
-    captureEvent("llm_ai_auth_changed", {
+    captureEvent("ai_auth_changed", {
       component: "RequestAuth",
-      button_text: LLM_AI_AuthNavigation,
-      destination: LLM_AI_AuthNavigation,
+      button_text: AiAuthNavigation,
+      destination: AiAuthNavigation,
     });
   };
 </script>
@@ -62,9 +62,9 @@
             zIndex={499}
             titleId={requestStateAuth}
             onclick={(id = "") => {
-              onUpdateRequestState({ LLM_AI_AuthNavigation: id });
-              handlecollection_llm_ai_tab_auth_changed({
-                LLM_AI_AuthNavigation: id,
+              onUpdateRequestState({ AiAuthNavigation: id });
+              handlecollection_ai_tab_auth_changed({
+                AiAuthNavigation: id,
               });
             }}
             disabled={false}

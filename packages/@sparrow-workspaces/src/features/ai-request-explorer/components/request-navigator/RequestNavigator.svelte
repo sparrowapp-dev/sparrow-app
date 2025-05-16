@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
-  import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
+  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
 
   import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string | undefined;
@@ -11,7 +11,7 @@
 
   let tabs: {
     name: string;
-    id: LLM_AI_RequestSectionEnum;
+    id: AiRequestSectionEnum;
     count: number;
   }[] = [];
 
@@ -25,17 +25,17 @@
     return [
       {
         name: "System Prompt",
-        id: LLM_AI_RequestSectionEnum.SYSTEM_PROMPT,
+        id: AiRequestSectionEnum.SYSTEM_PROMPT,
         count: 0,
       },
       {
         name: "Auth",
-        id: LLM_AI_RequestSectionEnum.AUTHORIZATION,
+        id: AiRequestSectionEnum.AUTHORIZATION,
         count: 0,
       },
       // {
       //   name: "Configurations",
-      //   id: LLM_AI_RequestSectionEnum.AI_MODAL_CONFIGURATIONS,
+      //   id: AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS,
       //   count: 0,
       // },
     ];
@@ -50,8 +50,8 @@
     }
   }
 
-  const onTabClick = (tabId: LLM_AI_RequestSectionEnum) => {
-    onUpdateRequestState({ LLM_AI_Navigation: tabId });
+  const onTabClick = (tabId: AiRequestSectionEnum) => {
+    onUpdateRequestState({ AiNavigation: tabId });
   };
 </script>
 

@@ -12,8 +12,8 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { LLM_AI_Request_Auth_Type_Base_Enum, LLMProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/ai-request-base";
-import { LLM_AI_RequestSectionEnum } from "../types/workspace/ai-request-tab";
+import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/ai-request-base";
+import { AiRequestSectionEnum } from "../types/workspace/ai-request-tab";
 class InitAiRequestTab {
     private _tab: Tab;
     /**
@@ -33,10 +33,10 @@ class InitAiRequestTab {
             isDeleted: false,
             activeSync: false,
             property: {
-                llm_ai_request: {
+                aiRequest: {
                     // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    AI_Model_Provider: 'openai',
-                    AI_Model_Variant: OpenAIModelEnum.GPT_4o,
+                    AIModelProvider: 'openai',
+                    AIModelVariant: OpenAIModelEnum.GPT_4o,
                     SystemPrompt: "",
                     Configurations: {},
                     auth: {
@@ -57,11 +57,11 @@ class InitAiRequestTab {
                         threadId: "",
                     },
                     state: {
-                        LLM_AI_AuthNavigation: LLM_AI_Request_Auth_Type_Base_Enum.NO_AUTH,
-                        LLM_AI_Navigation: LLM_AI_RequestSectionEnum.SYSTEM_PROMPT,
-                        LLM_AI_LeftSplitterWidthPercentage: 50,
-                        LLM_AI_RightSplitterWidthPercentage: 50,
-                        is_LLM_ai_SendRequestInProgress: false,
+                        AiAuthNavigation: AiRequestAuthTypeBaseEnum.NO_AUTH,
+                        AiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
+                        AiLeftSplitterWidthPercentage: 50,
+                        AiRightSplitterWidthPercentage: 50,
+                        isAiSendRequestInProgress: false,
                         isSaveDescriptionInProgress: false,
                         isSaveRequestInProgress: false,
                         isChatbotActive: true,
@@ -104,26 +104,26 @@ class InitAiRequestTab {
     }
 
     // change these ???
-    public updateAIModelProvider(_modalProviderName: LLMProviderEnum) {
-        if (_modalProviderName && this._tab.property.llm_ai_request) {
-            this._tab.property.llm_ai_request.AI_Model_Provider = _modalProviderName;
+    public updateAIModelProvider(_modalProviderName: AiModelProviderEnum) {
+        if (_modalProviderName && this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.AIModelProvider = _modalProviderName;
         }
     }
     public updateAIModelVariant(_modalVariantName: AIModelVariant) {
-        if (_modalVariantName && this._tab.property.llm_ai_request) {
-            this._tab.property.llm_ai_request.AI_Model_Variant = _modalVariantName;
+        if (_modalVariantName && this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.AIModelVariant = _modalVariantName;
         }
     }
     public updateAuth(_auth: Auth) {
-        if (_auth && this._tab.property.llm_ai_request) {
-            this._tab.property.llm_ai_request.auth = _auth;
+        if (_auth && this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.auth = _auth;
         }
     }
 
     // ToDo: Method to update AI modal configurations
     // public updateAIConfigurations(_headers: KeyValueChecked[]) {
-    //     if (_headers && this._tab.property.llm_ai_request) {
-    //         this._tab.property.llm_ai_request.Configurations = _headers;
+    //     if (_headers && this._tab.property.aiRequest) {
+    //         this._tab.property.aiRequest.Configurations = _headers;
     //     }
     // }
 
@@ -131,16 +131,16 @@ class InitAiRequestTab {
         this._tab.isSaved = _isSave;
     }
     public updateState(_state: StatePartial) {
-        if (this._tab.property.llm_ai_request) {
-            this._tab.property.llm_ai_request.state = {
-                ...this._tab.property.llm_ai_request.state,
+        if (this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.state = {
+                ...this._tab.property.aiRequest.state,
                 ..._state,
             };
         }
     }
     public updateChatbotState(_isActive: boolean) {
-        if (this._tab.property.llm_ai_request?.state) {
-            this._tab.property.llm_ai_request.state.isChatbotActive = _isActive;
+        if (this._tab.property.aiRequest?.state) {
+            this._tab.property.aiRequest.state.isChatbotActive = _isActive;
         }
     }
 }

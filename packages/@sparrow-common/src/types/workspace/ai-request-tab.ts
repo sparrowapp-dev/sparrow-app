@@ -1,6 +1,6 @@
 import {
-    LLM_AI_Request_Auth_Type_Base_Enum,
-    LLMProviderEnum,
+    AiRequestAuthTypeBaseEnum,
+    AiModelProviderEnum,
     type AIConfig,
     type AIModelVariant
 
@@ -10,9 +10,9 @@ import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
 
 ///////////////////////////////////////////////////////////////////
-//                   LLM AI Request Interface
+//                   AI Request Interface
 ///////////////////////////////////////////////////////////////////
-export enum LLM_AI_RequestSectionEnum {
+export enum AiRequestSectionEnum {
     SYSTEM_PROMPT = "System Prompt",
     AUTHORIZATION = "Authorization",
     AI_MODAL_CONFIGURATIONS = "Configurations",
@@ -32,26 +32,26 @@ export enum UntrackedItemsEnum {
 
 
 ////////////////////////////////////////////////////////////////
-//            Managing LLM AI Request Tab State
+//            Managing AI Request Tab State
 ////////////////////////////////////////////////////////////////
-export interface LLM_AI_AuthNavigationWrapper {
-    LLM_AI_AuthNavigation: LLM_AI_Request_Auth_Type_Base_Enum;
+export interface AiAuthNavigationWrapper {
+    AiAuthNavigation: AiRequestAuthTypeBaseEnum;
 }
 
-export interface LLM_AI_NavigationWrapper {
-    LLM_AI_Navigation: LLM_AI_RequestSectionEnum;
+export interface AiNavigationWrapper {
+    AiNavigation: AiRequestSectionEnum;
 }
 
-export interface LLM_AI_LeftSplitterWidthPercentageWrapper {
-    LLM_AI_LeftSplitterWidthPercentage: number;
+export interface AiLeftSplitterWidthPercentageWrapper {
+    AiLeftSplitterWidthPercentage: number;
 }
 
-export interface LLM_AI_RightSplitterWidthPercentageWrapper {
-    LLM_AI_RightSplitterWidthPercentage: number;
+export interface AiRightSplitterWidthPercentageWrapper {
+    AiRightSplitterWidthPercentage: number;
 }
 
-export interface Is_LLM_AI_SendRequestInProgressWrapper {
-    is_LLM_ai_SendRequestInProgress: boolean;
+export interface IsAiSendRequestInProgressWrapper {
+    isAiSendRequestInProgress: boolean;
 }
 
 export interface IsSaveDescriptionInProgressWrapper {
@@ -93,19 +93,19 @@ export interface BearerTokenWrapper {
     bearerToken: string;
 }
 
-export interface AIModelProviderWrapper {
-    AI_Model_Provider: LLMProviderEnum;
+export interface AiModelProviderWrapper {
+    AIModelProvider: AiModelProviderEnum;
 }
 
-export interface AIModelVariantWrapper {
-    AI_Model_Variant: AIModelVariant;
+export interface AiModelVariantWrapper {
+    AIModelVariant: AIModelVariant;
 }
 
-export interface AISystemPromptWrapper {
+export interface AiSystemPromptWrapper {
     SystemPrompt: string;
 }
 
-export interface AIConfigurationsWrapper {
+export interface AiConfigurationsWrapper {
     Configurations: AIConfig;
 }
 
@@ -122,8 +122,8 @@ export interface ResponseTokenCountWrapper {
     tokenCount: number;
 }
 
-export interface AIResponseInfo extends
-    ResponseStatusWrapper, ResponseTimeWrapper, ResponseSizeWrapper, ResponseTokenCountWrapper, AIModelVariantWrapper { }
+export interface AiResponseInfo extends
+    ResponseStatusWrapper, ResponseTimeWrapper, ResponseSizeWrapper, ResponseTokenCountWrapper, AiModelVariantWrapper { }
 
 
 export interface StateWrapper {
@@ -195,16 +195,16 @@ export interface AuthWrapper {
     auth: Auth;
 }
 
-export interface LLM_AI_RequestWrapper {
-    llm_ai_request: LLM_AI_Request;
+export interface AiRequestWrapper {
+    aiRequest: AiRequestType;
 }
 
-export interface LLM_AI_Request
+export interface AiRequestType
     extends
-    AIModelProviderWrapper,
-    AIModelVariantWrapper,
-    AISystemPromptWrapper,
-    AIConfigurationsWrapper,
+    AiModelProviderWrapper,
+    AiModelVariantWrapper,
+    AiSystemPromptWrapper,
+    AiConfigurationsWrapper,
     StateWrapper,
     AuthWrapper,
     AiWrapper { }
@@ -212,11 +212,11 @@ export interface LLM_AI_Request
 
 export interface State
     extends
-    LLM_AI_AuthNavigationWrapper,
-    LLM_AI_NavigationWrapper,
-    LLM_AI_LeftSplitterWidthPercentageWrapper,
-    LLM_AI_RightSplitterWidthPercentageWrapper,
-    Is_LLM_AI_SendRequestInProgressWrapper,
+    AiAuthNavigationWrapper,
+    AiNavigationWrapper,
+    AiLeftSplitterWidthPercentageWrapper,
+    AiRightSplitterWidthPercentageWrapper,
+    IsAiSendRequestInProgressWrapper,
     IsSaveDescriptionInProgressWrapper,
     IsSaveRequestInProgressWrapper,
     IsChatbotActive,
@@ -225,11 +225,11 @@ export interface State
 
 export interface StatePartial
     extends
-    Partial<LLM_AI_AuthNavigationWrapper>,
-    Partial<LLM_AI_NavigationWrapper>,
-    Partial<LLM_AI_LeftSplitterWidthPercentageWrapper>,
-    Partial<LLM_AI_RightSplitterWidthPercentageWrapper>,
-    Partial<Is_LLM_AI_SendRequestInProgressWrapper>,
+    Partial<AiAuthNavigationWrapper>,
+    Partial<AiNavigationWrapper>,
+    Partial<AiLeftSplitterWidthPercentageWrapper>,
+    Partial<AiRightSplitterWidthPercentageWrapper>,
+    Partial<IsAiSendRequestInProgressWrapper>,
     Partial<IsSaveDescriptionInProgressWrapper>,
     Partial<IsSaveRequestInProgressWrapper>,
     Partial<IsChatbotActive>,

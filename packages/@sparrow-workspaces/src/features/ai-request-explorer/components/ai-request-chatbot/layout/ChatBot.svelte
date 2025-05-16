@@ -29,7 +29,7 @@
   const sendPrompt = async (text: string) => {
     if (text) {
       onUpdateAiConversation([
-        // ...$tab?.property?.llm_ai_request?.ai?.conversations,
+        // ...$tab?.property?.aiRequest?.ai?.conversations,
         {
           message: text,
           messageId: "",
@@ -57,7 +57,7 @@
 
   const regenerateAiResponse = async () => {
     const regenerateConversation =
-      $tab?.property?.llm_ai_request?.ai?.conversations.slice(0, -1);
+      $tab?.property?.aiRequest?.ai?.conversations.slice(0, -1);
     onUpdateAiConversation(regenerateConversation);
     const response = await onGenerateAiResponse(
       regenerateConversation[regenerateConversation.length - 1].message,
@@ -66,22 +66,22 @@
   };
 </script>
 
-{#if $tab?.property?.llm_ai_request?.state?.isChatbotActive}
+{#if $tab?.property?.aiRequest?.state?.isChatbotActive}
   <div class="h-100">
     <AIChatInterface
-      conversations={$tab?.property?.llm_ai_request?.ai?.conversations}
+      conversations={$tab?.property?.aiRequest?.ai?.conversations}
       {responseData}
-      prompt={$tab?.property?.llm_ai_request?.ai?.prompt}
+      prompt={$tab?.property?.aiRequest?.ai?.prompt}
       {onUpdateAiPrompt}
       {sendPrompt}
-      isResponseGenerating={$tab?.property?.llm_ai_request?.state
+      isResponseGenerating={$tab?.property?.aiRequest?.state
         ?.isChatbotGeneratingResponse}
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      modelVariant={$tab?.property?.llm_ai_request?.AI_Model_Variant}
+      modelVariant={$tab?.property?.aiRequest?.AIModelVariant}
       bind:scrollList
     />
   </div>

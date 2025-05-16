@@ -113,7 +113,6 @@
           class={"input-url"}
           {userRole}
           isFocusedOnMount={false}
-          readonly={true}
           disabled={true}
         />
       </div>

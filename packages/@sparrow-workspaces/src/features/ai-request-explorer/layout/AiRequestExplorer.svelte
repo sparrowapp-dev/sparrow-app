@@ -22,7 +22,7 @@
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { writable } from "svelte/store";
-  import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
+  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -98,9 +98,9 @@
   onDestroy(() => {});
 
   setTimeout(() => {
-    console.log("tab data :>> ", $tab.property.llm_ai_request);
+    console.log("tab data :>> ", $tab.property.aiRequest);
   }, 3000);
-  // console.log("isChatBot active ;>> ", $tab?.property?.llm_ai_request?.state);
+  // console.log("isChatBot active ;>> ", $tab?.property?.aiRequest?.state);
 </script>
 
 {#if $tab.tabId}
@@ -125,9 +125,9 @@
         {onSaveRequest}
         {isGuestUser}
         selectedModelProvider={"openai"}
-        selectedModel={$tab.property.llm_ai_request?.AI_Model_Variant}
+        selectedModel={$tab.property.aiRequest?.AIModelVariant}
       />
-      <!-- selectedModelProvider={$tab.property.llm_ai_request?.AI_Model_Provider} -->
+      <!-- selectedModelProvider={$tab.property.aiRequest?.AI_Model_Provider} -->
 
       <div
         bind:this={splitpaneContainer}
@@ -139,22 +139,22 @@
               <!-- Request Pane -->
               <div class="h-100 d-flex flex-column position-relative">
                 <RequestNavigator
-                  requestStateSection={$tab.property.llm_ai_request?.state
-                    ?.LLM_AI_Navigation}
+                  requestStateSection={$tab.property.aiRequest?.state
+                    ?.AiNavigation}
                   {onUpdateRequestState}
                   configurationLength={5}
                 />
                 <div style="flex:1; overflow:auto;" class="p-0">
-                  {#if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.SYSTEM_PROMPT}
+                  {#if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
                     <RequestDoc
                       {onUpdateAiSystemPrompt}
-                      requestDoc={$tab.property.llm_ai_request.SystemPrompt}
+                      requestDoc={$tab.property.aiRequest.SystemPrompt}
                     />
-                  {:else if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.AUTHORIZATION}
+                  {:else if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.AUTHORIZATION}
                     <RequestAuth
-                      requestStateAuth={$tab.property.llm_ai_request.state
-                        .LLM_AI_AuthNavigation}
-                      auth={$tab.property.llm_ai_request.auth}
+                      requestStateAuth={$tab.property.aiRequest.state
+                        .AiAuthNavigation}
+                      auth={$tab.property.aiRequest.auth}
                       collectionAuth={$collectionAuth}
                       {onUpdateRequestState}
                       {onUpdateRequestAuth}
@@ -163,7 +163,7 @@
                       {collection}
                       {onOpenCollection}
                     />
-                  {:else if $tab.property.llm_ai_request?.state?.LLM_AI_Navigation === LLM_AI_RequestSectionEnum.AI_MODAL_CONFIGURATIONS}
+                  {:else if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
                     <div
                       class="w-100 h-100 d-flex align-items-center justify-content-center opacity-50"
                     >

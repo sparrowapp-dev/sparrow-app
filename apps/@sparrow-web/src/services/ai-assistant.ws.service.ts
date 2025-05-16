@@ -360,7 +360,7 @@ export class AiAssistantWebSocketService {
     }
   };
 
-  public sendLLMRequest = async (data: {
+  public sendAiRequest = async (data: {
     model: string;
     modelVersion: string;
     authKey: string;

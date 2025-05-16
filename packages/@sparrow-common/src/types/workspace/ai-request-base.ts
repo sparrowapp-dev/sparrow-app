@@ -4,9 +4,9 @@ import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
 
 ///////////////////////////////////////////////////////////////
-//              LLM AI Request Auth Base Interface
+//              AI Request Auth Base Interface
 ///////////////////////////////////////////////////////////////
-export enum LLM_AI_Request_Auth_Type_Base_Enum {
+export enum AiRequestAuthTypeBaseEnum {
     NO_AUTH = "No Auth",
     API_KEY = "API Key",
     BEARER_TOKEN = "Bearer Token",
@@ -14,20 +14,20 @@ export enum LLM_AI_Request_Auth_Type_Base_Enum {
     INHERIT_AUTH = "Inherit Auth"
 }
 
-interface LLM_AI_Request_Basic_Auth_Base_Interface {
+interface AiRequestBasicAuthBaseInterface {
     username?: string;
     password?: string;
 }
 
-interface LLM_AI_Request_Api_Key_Base_Interface {
+interface AiRequestApiKeyBaseInterface {
     authKey: string;
     authValue: string;
     addTo: CollectionRequestAddToBaseEnum;
 }
 
-interface LLM_AI_Request_Auth_Base_Interface {
-    apiKey?: LLM_AI_Request_Api_Key_Base_Interface;
-    basicAuth?: LLM_AI_Request_Basic_Auth_Base_Interface;
+interface AiRequestAuthBaseInterface {
+    apiKey?: AiRequestApiKeyBaseInterface;
+    basicAuth?: AiRequestBasicAuthBaseInterface;
     bearerToken?: string;
 }
 
@@ -36,7 +36,7 @@ interface LLM_AI_Request_Auth_Base_Interface {
 ///////////////////////////////////////////////////////////////
 //              LLM Providers
 ///////////////////////////////////////////////////////////////
-export enum LLMProviderEnum {
+export enum AiModelProviderEnum {
     Anthropic = "Anthropic",
     Google = "Google",
     OpenAI = "openai",
@@ -86,7 +86,7 @@ export enum DeepSeekModelEnum {
 }
 
 ///////////////////////////////////////////////////////////////
-//              LLM AI Models Interface
+//              AI Models Interface
 ///////////////////////////////////////////////////////////////
 export type AIModelVariant =
     AnthropicModelEnum
@@ -116,7 +116,7 @@ export type systemPrompt = {
 
 
 ///////////////////////////////////////////////////////////////
-//              LLM AI Request Base Interface
+//              AI Request Base Interface
 ///////////////////////////////////////////////////////////////
 
 // - 1) Anthropic (Claude 3 family) Configurations
@@ -190,7 +190,7 @@ export interface GeminiGenerationConfig {
 export type DeepSeekConfig = OpenAIChatConfig;
 
 ///////////////////////////////////////////////////////////////
-//              LLM AI Request Base Interface
+//              AI Request Base Interface
 ///////////////////////////////////////////////////////////////
 // 2) Make a union of all configs
 export type AIConfig =
@@ -201,15 +201,15 @@ export type AIConfig =
 
 
 ///////////////////////////////////////////////////////////////
-//              LLM AI Request Base Interface
+//              AI Request Base Interface
 ///////////////////////////////////////////////////////////////
 export interface HttpRequestBaseInterface {
-    AI_Model_Provider: LLMProviderEnum;
-    AI_Model_Variant: AIModelVariant;
-    selectedAuthType: LLM_AI_Request_Auth_Base_Interface;
-    auth: LLM_AI_Request_Auth_Base_Interface;
+    AIModelProvider: AiModelProviderEnum;
+    AIModelVariant: AIModelVariant;
+    selectedAuthType: AiRequestAuthBaseInterface;
+    auth: AiRequestAuthBaseInterface;
     systemPrompt: systemPrompt;
-    ai_configurations: AIConfig;
+    aiConfigurations: AIConfig;
 }
 
 
