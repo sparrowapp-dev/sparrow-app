@@ -338,7 +338,7 @@
           iconSize: "20px",
           onclick: () => { 
             onItemCreated("Ai-Request-Tab", {});
-            MixpanelEvent(Events.Add_WebSocket);
+            // MixpanelEvent(Events.Add_WebSocket);
           }
         },
         {

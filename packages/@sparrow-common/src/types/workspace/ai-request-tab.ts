@@ -4,7 +4,7 @@ import {
     type AIConfig,
     type AIModelVariant
 
-} from "./llm-ai-request-base";
+} from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
 

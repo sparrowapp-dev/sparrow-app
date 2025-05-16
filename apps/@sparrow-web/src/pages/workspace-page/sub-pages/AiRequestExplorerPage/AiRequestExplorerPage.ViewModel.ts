@@ -96,7 +96,7 @@ import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import { LLM_AI_Request_Auth_Type_Base_Enum } from "@sparrow/common/types/workspace/llm-ai-request-base";
+import { LLM_AI_Request_Auth_Type_Base_Enum } from "@sparrow/common/types/workspace/ai-request-base";
 
 class RestExplorerViewModel {
   /**

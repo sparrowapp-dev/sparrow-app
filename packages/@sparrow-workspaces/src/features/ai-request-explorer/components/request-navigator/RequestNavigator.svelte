@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type UpdateRequestStateType } from "@sparrow/workspaces/type";
-  import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/llm-ai-request-tab";
+  import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
 
   import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string | undefined;

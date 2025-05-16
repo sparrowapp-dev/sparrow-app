@@ -9,7 +9,7 @@
     CoinMultipleRegular,
     OpenAIVectorIcon,
   } from "@sparrow/library/icons";
-  import type { AIResponseInfo } from "@sparrow/common/types/workspace/llm-ai-request-tab";
+  import type { AIResponseInfo } from "@sparrow/common/types/workspace/ai-request-tab";
   import { Tooltip } from "@sparrow/library/ui";
   export let response: AIResponseInfo;
   export let responseType: "Sender" | "Receiver" = "Receiver";

@@ -22,7 +22,7 @@
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { writable } from "svelte/store";
-  import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/llm-ai-request-tab";
+  import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;

@@ -33,7 +33,7 @@
   import * as Sentry from "@sentry/svelte";
 
   import ResponseStatus from "../../../response-status/ResponseStatus.svelte";
-  import { OpenAIModelEnum } from "@sparrow/common/types/workspace/llm-ai-request-base";
+  import { OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
   import {
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
