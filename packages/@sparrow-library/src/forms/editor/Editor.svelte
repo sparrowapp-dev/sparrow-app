@@ -22,6 +22,10 @@
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { unifiedMergeView } from "@codemirror/merge";
   import { DismissIcon } from "@sparrow/library/assets";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "@sparrow/common/utils";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -395,6 +399,7 @@
 
     await sleep(1000);
     isMergeViewLoading = false;
+    handleEventonClickApplyChangesAI("Editor", "Body");
   };
 
   /**
@@ -423,6 +428,7 @@
 
     await sleep(1000);
     isMergeViewLoading = false;
+    handleEventOnClickApplyUndoAI("Editor", "Body");
   };
 
   // Function to check if there are actual changes between original and current content

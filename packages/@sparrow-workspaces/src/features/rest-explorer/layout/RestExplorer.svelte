@@ -92,6 +92,7 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -301,6 +302,13 @@
     // isMergeViewLoading = true;
   };
 
+  const handleEventOnInsertSuggestion = (suggestion_type: string) => {
+    captureEvent("copilot_suggestion_applied", {
+      component: "RestExplorer",
+      suggestion_type: suggestion_type,
+    });
+  };
+
   /**
    * Embeds the changes suggested by AI in request data
    * @param target Where to insert the changes (Request Body or Headers or Parameters)
@@ -325,7 +333,7 @@
       notifications.error("Please accept the current suggested changes first.");
       return;
     }
-
+    handleEventOnInsertSuggestion(target);
     try {
       switch (target) {
         case RequestSectionEnum.REQUEST_BODY: {
@@ -420,7 +428,23 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
+  const handleEventOnClickAI = (
+    responseStatus: string | undefined,
+    requestMethod: string | undefined,
+  ) => {
+    captureEvent("help_me_debug_cta_clicked", {
+      component: "Rest Explorer",
+      button_text: "Help me Bug",
+      error_code: responseStatus,
+      http_method: requestMethod,
+    });
+  };
+
   const handleOnClickAIDebug = async () => {
+    handleEventOnClickAI(
+      storeData?.response?.status,
+      tab.property?.request?.method,
+    );
     isAIDebugBtnEnable = false;
 
     // adjusting the panel layout

@@ -6,6 +6,7 @@
   import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import { Events } from "@sparrow/common/enums";
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
@@ -13,6 +14,7 @@
   import { Modal } from "@sparrow/library/ui";
   import { tick } from "svelte";
   import { isChatbotOpenInCurrTab } from "../../../../stores";
+  import { MessageTypeEnum } from "@sparrow/common/types/workspace";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -28,6 +30,7 @@
   export let scrollList;
 
   let chatContainer: HTMLElement;
+  let suggestionCount = 0;
   /**
    * @description - scrolls the list container to top or bottom
    * @param position - decides the direction to scroll
@@ -79,6 +82,23 @@
       },
     };
   };
+
+  const handleEventOnCloseAIPanel = () => {
+    captureEvent("copilot_dismissed", {
+      component: "AIChatInterface",
+      Suggestions_shown: suggestionCount,
+    });
+  };
+
+  $: {
+    if (conversations) {
+      for (let i = 0; i < conversations.length; i++) {
+        if ((conversations[i].type = MessageTypeEnum.RECEIVER)) {
+          suggestionCount += 1;
+        }
+      }
+    }
+  }
 </script>
 
 <!-- Code Block Preview Modal -->
@@ -120,6 +140,7 @@
             </div>
             <div
               on:click={() => {
+                handleEventOnCloseAIPanel();
                 onUpdateRequestState({ isChatbotActive: false });
                 isChatbotOpenInCurrTab.set(false);
               }}

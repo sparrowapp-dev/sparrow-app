@@ -4,6 +4,10 @@
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "@sparrow/common/utils";
 
   import {
     ViewPlugin,
@@ -155,6 +159,7 @@
     newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
     updateMergeView(); // Update the editor view
+    handleEventonClickApplyChangesAI("BulkEditor", "headers && parameters");
   };
 
   /**
@@ -179,6 +184,7 @@
     newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
     updateMergeView(); // Update the editor view
+    handleEventOnClickApplyUndoAI("BulkEditor", "headers && parameters");
   };
 
   // Handle changes to isMergeViewEnabled prop
@@ -273,7 +279,12 @@
       type={"primary"}
       onClick={applyChanges}
     />
-    <Button title={"Undo"} size={"small"} type={"secondary"} onClick={undoChanges} />
+    <Button
+      title={"Undo"}
+      size={"small"}
+      type={"secondary"}
+      onClick={undoChanges}
+    />
   </div>
 {/if}
 

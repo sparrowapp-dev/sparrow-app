@@ -123,6 +123,7 @@
   export let runSingleNode;
   export let onPreviewExpression;
   export let redirectDocsTestflow: () => void;
+  export let handleEventOnClickQuestionMark;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -1669,6 +1670,7 @@
   zIndex={1000}
   helpingIcon={true}
   onClickHelpIcon={() => {
+    handleEventOnClickQuestionMark();
     redirectDocsTestflow();
   }}
   isOpen={isDynamicExpressionModalOpen}

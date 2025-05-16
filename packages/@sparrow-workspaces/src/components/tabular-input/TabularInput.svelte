@@ -11,6 +11,10 @@
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
   import { Toggle } from "@sparrow/library/ui";
+  import {
+    handleEventOnClickApplyUndoAI,
+    handleEventonClickApplyChangesAI,
+  } from "@sparrow/common/utils";
 
   export let environmentVariables;
   export let handleDynamicExpression:
@@ -330,6 +334,7 @@
 
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventonClickApplyChangesAI("TabularInput", "headers && parameters");
   };
 
   // Function to undo all changes and revert to original state
@@ -344,6 +349,7 @@
     isMergeViewLoading = true;
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventOnClickApplyUndoAI("TabularInput", "headers && parameters");
   };
 
   // Utility function to create a delay

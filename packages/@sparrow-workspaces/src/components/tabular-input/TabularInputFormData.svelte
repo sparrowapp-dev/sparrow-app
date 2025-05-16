@@ -8,6 +8,10 @@
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
   import LazyElementFormData from "./LazyElementFormData.svelte";
+  import {
+    handleEventOnClickApplyUndoAI,
+    handleEventonClickApplyChangesAI,
+  } from "@sparrow/common/utils";
   export let keyValue: {
     key: string;
     value: string;
@@ -44,7 +48,7 @@
   let pairs = keyValue;
   let controller: boolean = false;
   let pairsContainer: HTMLElement;
-  
+
   // This is a flag to determine if we should scroll to the bottom
   let shouldScrollToBottom = false;
 
@@ -302,6 +306,7 @@
 
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventonClickApplyChangesAI("TabularInputFormData", "Body-FormData");
   };
 
   // Function to undo all changes and revert to original state
@@ -316,6 +321,7 @@
     isMergeViewLoading = true;
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventOnClickApplyUndoAI("TabularInputFormData", "Body-FormData");
   };
 
   // Utility function to create a delay
