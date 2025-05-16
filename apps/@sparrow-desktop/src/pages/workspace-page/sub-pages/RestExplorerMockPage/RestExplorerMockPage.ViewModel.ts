@@ -339,6 +339,11 @@ class RestExplorerMockViewModel {
       )
     ) {
       result = false;
+    } else if (
+      requestServer.mockRequest.responseStatus !==
+      progressiveTab.property.mockRequest.responseStatus
+    ) {
+      result = false;
     }
     // name
     else if (requestServer.name !== progressiveTab.name) {
@@ -693,6 +698,18 @@ class RestExplorerMockViewModel {
   public updateResponseBody = async (_body: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.responseBody = _body;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
+   * @param _body - response status
+   */
+  public updateResponseStatus = async (_status: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.mockRequest.responseStatus = _status;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
