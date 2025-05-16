@@ -425,7 +425,7 @@
             loader = false;
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
-            notifications.success("API request saved successfully.");
+            notifications.success("Mock Request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);

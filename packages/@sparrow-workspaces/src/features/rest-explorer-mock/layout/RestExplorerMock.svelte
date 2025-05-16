@@ -525,7 +525,7 @@
               ) {
                 isExposeSaveAsRequest = true;
               } else if (x.status === "success") {
-                notifications.success("API request saved successfully.");
+                notifications.success("Mock Request saved successfully.");
               }
             }}
           /> <span class="position-relative" style="width:35px;"> </span>

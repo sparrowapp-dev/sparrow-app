@@ -41,7 +41,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved successfully.");
+      notifications.success("Mock Request saved successfully.");
     }
   };
 
