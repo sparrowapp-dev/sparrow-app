@@ -1075,14 +1075,15 @@ export class TestflowExplorerPageViewModel {
    * @returns Resolves when the redirection process is completed.
    */
   public redirectRequest = async (
-    _workspaceId: string,
     _collectionId: string,
     _folderId: string,
     _requestId: string,
   ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const workspaceId = progressiveTab.path.workspaceId; 
     const errorMessage = "id can't be empty while redirecting request!";
     // base conditions
-    if (!_workspaceId) {
+    if (!workspaceId) {
       console.error("Workspace " + errorMessage);
       return;
     }
@@ -1117,7 +1118,7 @@ export class TestflowExplorerPageViewModel {
     // creating a tab for the request
     const requestTabAdapter = new RequestTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
-      _workspaceId || "",
+      workspaceId || "",
       _collectionId || "",
       _folderId || "",
       request,

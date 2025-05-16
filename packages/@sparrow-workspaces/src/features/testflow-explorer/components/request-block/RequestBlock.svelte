@@ -276,7 +276,7 @@
     type="target"
     position={Position.Left}
     isConnectable={isNodeExistToLeft ? false : true}
-    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    style=" border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <div
     class="d-flex px-2 align-items-center"
@@ -538,7 +538,7 @@
     type="source"
     position={Position.Right}
     isConnectable={isNodeExistToRight ? false : true}
-    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
   {#if !isDropHereVisible && isAddBlockVisible}
