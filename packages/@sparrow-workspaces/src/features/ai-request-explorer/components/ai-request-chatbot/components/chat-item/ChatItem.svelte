@@ -35,9 +35,9 @@
   import ResponseStatus from "../../../response-status/ResponseStatus.svelte";
   import { OpenAIModelEnum } from "@sparrow/common/types/workspace/llm-ai-request-base";
   import {
-    LLM_AI_ExplorerDataStore,
-    type LLM_AI_ExplorerData,
-  } from "@sparrow/workspaces/features/llm-ai-explorer/store";
+    AiRequestExplorerDataStore,
+    type AiRequestExplorerData,
+  } from "@sparrow/workspaces/features/ai-request-explorer/store";
 
   export let message: string;
   export let messageId: string;
@@ -49,7 +49,7 @@
   export let isLastRecieverMessage;
   export let status;
   export let isResponseGenerating;
-  export let chatResponse: LLM_AI_ExplorerData | undefined;
+  export let chatResponse: AiRequestExplorerData | undefined;
   export let modelVariant: string;
 
   $: setTimeout(() => {

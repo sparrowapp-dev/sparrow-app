@@ -22,7 +22,7 @@
     CollectionExplorerPage,
     FolderExplorerPage,
     WorkspaceExplorerPage,
-    LLM_AI_ExplorerPage,
+    AiRequestExplorerPage,
   } from "..";
   import {
     TabBar,
@@ -873,16 +873,13 @@
                         />
                       </div>
                     </Motion>
-                  {:else if $activeTab?.type === ItemType.LLM_AI_REQUEST}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <LLM_AI_ExplorerPage
-                        bind:isTourGuideOpen
-                        tab={$activeTab}
-                      />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.COLLECTION}
+                  {:else if $activeTab?.type === ItemType.AI_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <AiRequestExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.COLLECTION}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
                         <CollectionExplorerPage

@@ -19,7 +19,7 @@
   } from "@sparrow/workspaces/type";
   import { onDestroy, onMount } from "svelte";
   import RequestDoc from "../components/request-doc/RequestDoc.svelte";
-  import type { LLM_AI_ExplorerData } from "../store/llm-ai-explorer";
+  import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { writable } from "svelte/store";
   import { LLM_AI_RequestSectionEnum } from "@sparrow/common/types/workspace/llm-ai-request-tab";
@@ -45,7 +45,7 @@
 
   // Role of user in active workspace
   export let userRole;
-  export let storeData: LLM_AI_ExplorerData | undefined;
+  export let storeData: AiRequestExplorerData | undefined;
   export let isWebApp = false;
   export let onSaveResponse;
   export let collectionAuth;

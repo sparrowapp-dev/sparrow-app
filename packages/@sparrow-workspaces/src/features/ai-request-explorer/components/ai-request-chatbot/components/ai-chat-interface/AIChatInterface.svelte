@@ -20,11 +20,7 @@
   import { Modal, Toggle } from "@sparrow/library/ui";
   import { tick } from "svelte";
   import { StatusCode } from "@sparrow/common/utils";
-  import {
-    LLM_AI_ExplorerDataStore,
-    type LLM_AI_ExplorerData,
-  } from "@sparrow/workspaces/features/llm-ai-explorer/store";
-  // import { isChatbotOpenInCurrTab } from "../../../../stores";
+  import { type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -37,7 +33,7 @@
   export let onStopGeneratingAIResponse;
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
-  export let responseData: LLM_AI_ExplorerData | undefined;
+  export let responseData: AiRequestExplorerData | undefined;
   export let modelVariant = "gpt-4os";
 
   let chatContainer: HTMLElement;

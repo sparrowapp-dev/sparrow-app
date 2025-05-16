@@ -10,7 +10,7 @@ import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
-} from "../../../../../../../packages/@sparrow-common/src/store";
+} from "@sparrow/common/store";
 import {
   CompareArray,
   Debounce,
@@ -78,7 +78,7 @@ import { AiAssistantService } from "../../../../services/ai-assistant.service";
 import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
-import { LLM_AI_ExplorerDataStore, type LLM_AI_ExplorerData } from "@sparrow/workspaces/features/llm-ai-explorer/store";
+import { AiRequestExplorerDataStore, type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
 import { CollectionTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
@@ -2076,7 +2076,7 @@ class RestExplorerViewModel {
                 isChatbotGeneratingResponse: false,
               });
 
-              const newData: LLM_AI_ExplorerData = {
+              const newData: AiRequestExplorerData = {
                 response: {
                   messageId: "",
                   statusCode: response.statusCode || 400,
@@ -2087,7 +2087,7 @@ class RestExplorerViewModel {
                 },
               };
 
-              LLM_AI_ExplorerDataStore.update((map) => {
+              AiRequestExplorerDataStore.update((map) => {
                 map.set(tabId, newData);
                 return new Map(map); // Return a new Map to trigger reactivity
               });
@@ -2141,7 +2141,7 @@ class RestExplorerViewModel {
               // Handle end of stream
               else if (stream_status === STREAMING_STATES.END) {
 
-                const newData: LLM_AI_ExplorerData = {
+                const newData: AiRequestExplorerData = {
                   response: {
                     messageId: "abc123",
                     statusCode: response.statusCode,
@@ -2152,7 +2152,7 @@ class RestExplorerViewModel {
                   },
                 };
 
-                LLM_AI_ExplorerDataStore.update((map) => {
+                AiRequestExplorerDataStore.update((map) => {
                   map.set(tabId, newData);
                   return new Map(map); // Return a new Map to trigger reactivity
                 });

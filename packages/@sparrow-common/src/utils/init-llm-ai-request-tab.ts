@@ -26,7 +26,7 @@ class InitLLMAIRequestTab {
             id: _id,
             tabId: uuidv4(),
             name: "New AI Request",
-            type: TabTypeEnum.LLM_REQUEST,
+            type: TabTypeEnum.AI_REQUEST,
             persistence: TabPersistenceTypeEnum.PERMANENT,
             description: "[]",
             source: "USER",

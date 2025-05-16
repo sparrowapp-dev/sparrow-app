@@ -6,15 +6,15 @@
   import { environmentType } from "@sparrow/common/enums";
 
   // ---- View Model
-  import AiRequestExplorerViewModel from "./LLM_AI_ExplorerPage.ViewModel";
-  import { LLM_AI_Explorer } from "@sparrow/workspaces/features";
+  import AiRequestExplorerViewModel from "./AiRequestExplorerPage.ViewModel";
+  import { AiRequestExplorer } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onMount, onDestroy } from "svelte";
   import {
-    LLM_AI_ExplorerDataStore,
-    type LLM_AI_ExplorerData,
-  } from "@sparrow/workspaces/features/llm-ai-explorer/store";
+    AiRequestExplorerDataStore,
+    type AiRequestExplorerData,
+  } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
 
@@ -149,9 +149,9 @@
     }
   });
 
-  let LLM_AI_ExplorerData: LLM_AI_ExplorerData | undefined;
-  LLM_AI_ExplorerDataStore.subscribe((LLM_AI_ExplorerMap) => {
-    LLM_AI_ExplorerData = LLM_AI_ExplorerMap.get(tab.tabId);
+  let AiRequestExplorerData: AiRequestExplorerData | undefined;
+  AiRequestExplorerDataStore.subscribe((AiRequestExplorerMap) => {
+    AiRequestExplorerData = AiRequestExplorerMap.get(tab.tabId);
   });
 
   onDestroy(() => {
@@ -160,7 +160,7 @@
   });
 </script>
 
-<LLM_AI_Explorer
+<AiRequestExplorer
   bind:tab={_viewModel.tab}
   bind:collections={_viewModel.collection}
   bind:collectionAuth={_viewModel.collectionAuth}
@@ -169,7 +169,7 @@
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
-  storeData={LLM_AI_ExplorerData}
+  storeData={AiRequestExplorerData}
   onOpenCollection={_viewModel.openCollection}
   onUpdateAIModel={_viewModel.onUpdateAIModel}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}

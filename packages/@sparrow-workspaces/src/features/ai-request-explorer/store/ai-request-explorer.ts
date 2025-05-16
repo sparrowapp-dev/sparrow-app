@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 
-export type LLM_AI_ExplorerData = {
+export type AiRequestExplorerData = {
     response: {
         messageId: string,
         statusCode: string,
@@ -12,6 +12,6 @@ export type LLM_AI_ExplorerData = {
     };
 };
 
-export const LLM_AI_ExplorerDataStore = writable<Map<string, LLM_AI_ExplorerData>>(
+export const AiRequestExplorerDataStore = writable<Map<string, AiRequestExplorerData>>(
     new Map(),
 );

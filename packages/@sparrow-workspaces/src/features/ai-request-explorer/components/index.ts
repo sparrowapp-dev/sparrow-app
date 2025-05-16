@@ -6,4 +6,4 @@ export { default as RequestNavigator } from "./request-navigator/RequestNavigato
 export { default as RequestName } from "./request-name/RequestName.svelte";
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
 export { default as ModelSelector } from "./ModelSelector/ModelSelectorDD.svelte";
-export { ChatBot } from "./llm-chat-bot";
+export { ChatBot } from "./ai-request-chatbot";
