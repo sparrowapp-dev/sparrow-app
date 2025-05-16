@@ -92,6 +92,8 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { Select } from "@sparrow/library/forms";
+  import { HttpStatusCodes } from "../utils";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -491,6 +493,8 @@
       else isAIDebugBtnEnable = false;
     }
   }
+
+  let selectedStatusCode = "";
 </script>
 
 {#if $tab.tabId}
@@ -718,7 +722,7 @@
                       : 'ps-2'}"
                   >
                     <div class="h-100 d-flex flex-column">
-                      <div style="flex:1; overflow:auto;">
+                      <div style="flex:1;">
                         <!-- {#if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
@@ -740,13 +744,41 @@
                             class="d-flex justify-content-between"
                             style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                           > -->
-                          <ResponseNavigator
-                            requestStateSection={$tab.property.mockRequest
-                              ?.state?.responseNavigation}
-                            {onUpdateRequestState}
-                            responseHeadersLength={$tab.property.mockRequest
-                              ?.responseHeaders?.length || 0}
-                          />
+                          <div class="d-flex justify-content-between">
+                            <ResponseNavigator
+                              requestStateSection={$tab.property.mockRequest
+                                ?.state?.responseNavigation}
+                              {onUpdateRequestState}
+                              responseHeadersLength={$tab.property.mockRequest
+                                ?.responseHeaders?.length || 0}
+                            />
+                            <Select
+                              data={HttpStatusCodes}
+                              onclick={(selectedItem) => {
+                                selectedStatusCode = selectedItem;
+                              }}
+                              titleId={selectedStatusCode}
+                              placeholderText={"Status Code"}
+                              id={"httpStatusCode"}
+                              zIndex={701}
+                              disabled={false}
+                              minBodyWidth={"180px"}
+                              minHeaderWidth={"180px"}
+                              maxHeaderWidth={"180px"}
+                              bodyTheme={"violet"}
+                              menuItem={"v2"}
+                              headerFontSize={"12px"}
+                              isDropIconFilled={true}
+                              maxBodyHeight={"196px"}
+                              variant={"secondary"}
+                              borderType={"none"}
+                              borderActiveType={"none"}
+                              borderHighlight={"hover-active"}
+                              headerHighlight={"hover-active"}
+                              headerHeight={"26px"}
+                              borderRounded={"4px"}
+                            />
+                          </div>
                           <!-- </div> -->
                           <div
                             class="flex-grow-1 d-flex flex-column"

@@ -4081,6 +4081,8 @@ export default class CollectionsViewModel {
       baseUrl,
     );
 
+    const isMockCollection =
+      response.data.data?.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       if (
         requestObject.folderId &&
@@ -4102,13 +4104,21 @@ export default class CollectionsViewModel {
       // Deleting the main and child tabs
       await this.removeTabWithChildren(request.id, workspaceId, "request");
 
-      notifications.success(`"${request.name}" Request deleted.`);
+      const successMessage = isMockCollection
+        ? `'${request.name}' mock request deleted successfully.`
+        : `"${request.name}" Request deleted.`;
+
+      notifications.success(successMessage);
       MixpanelEvent(Events.DELETE_REQUEST, {
         source: "Collection list",
       });
       return true;
     } else {
-      notifications.error("Failed to delete API request. Please try again.");
+      const errorMessage = isMockCollection
+        ? `Failed to delete '${request.name}'. Please try again.`
+        : "Failed to delete API request. Please try again.";
+
+      notifications.error(errorMessage);
       return false;
     }
   };

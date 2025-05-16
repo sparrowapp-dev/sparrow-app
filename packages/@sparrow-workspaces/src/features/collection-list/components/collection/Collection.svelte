@@ -1049,10 +1049,16 @@
         </Tooltip>
 
         <Tooltip
-          title={collection?.activeSync
-            ? "Adding requests is disabled for active sync collections."
-            : "Add REST API"}
-          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          title={isMockCollection
+            ? "Add Mock REST API"
+            : collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : "Add REST API"}
+          placement={isMockCollection
+            ? "top-center"
+            : collection?.activeSync
+              ? "top-left"
+              : "bottom-center"}
           distance={12}
           zIndex={1000}
         >
