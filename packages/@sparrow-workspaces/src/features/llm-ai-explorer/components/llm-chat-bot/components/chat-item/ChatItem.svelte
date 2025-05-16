@@ -50,6 +50,7 @@
   export let status;
   export let isResponseGenerating;
   export let chatResponse: LLM_AI_ExplorerData | undefined;
+  export let modelVariant: string;
 
   $: setTimeout(() => {
     console.log("chat :>> ", chatResponse);
@@ -526,7 +527,7 @@
           time: chatResponse?.response.time || 0,
           status: chatResponse?.response.statusCode || "",
           tokenCount: chatResponse?.response.inputTokens || 0,
-          AI_Model_Variant: OpenAIModelEnum.GPT4O,
+          AI_Model_Variant: modelVariant,
         }}
         responseType={"Sender"}
       />

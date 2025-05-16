@@ -1976,11 +1976,11 @@ class RestExplorerViewModel {
     const llmReqData = {
       feature: "llm-evaluation",
       // model: componentData.property.llm_ai_request.AI_Model_Provider || "openai",
-      // modelVersion: componentData.property.llm_ai_request.AI_Model_Variant || "gpt-3.5-turbo",
-      // authKey: "",
       model: "openai",
+      modelVersion: componentData.property.llm_ai_request.AI_Model_Variant || "gpt-3.5-turbo",
+      // modelVersion: "gpt-3.5-turbo",
+      // model: "openai",
       authKey: componentData.property.llm_ai_request.auth.apiKey.authValue,
-      modelVersion: "gpt-3.5-turbo",
       systemPrompt: finalSP || "Answer my queries.",
       userInput: prompt,
       configs: {
@@ -2079,11 +2079,11 @@ class RestExplorerViewModel {
               const newData: LLM_AI_ExplorerData = {
                 response: {
                   messageId: "",
-                  statusCode: response.statusCode,
+                  statusCode: response.statusCode || 400,
                   inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  time: "5"
+                  time: response.timeTaken.replace("ms", "")
                 },
               };
 

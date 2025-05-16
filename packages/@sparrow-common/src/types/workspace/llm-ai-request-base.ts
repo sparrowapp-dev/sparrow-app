@@ -39,7 +39,7 @@ interface LLM_AI_Request_Auth_Base_Interface {
 export enum LLMProviderEnum {
     Anthropic = "Anthropic",
     Google = "Google",
-    OpenAI = "OpenAI",
+    OpenAI = "openai",
     DeepSeek = "DeepSeek",
 }
 
@@ -67,12 +67,16 @@ export enum GoogleModelEnum {
 
 // — OpenAI GPT family
 export enum OpenAIModelEnum {
-    GPT4 = "gpt-4",
-    GPT4O = "gpt-4o",
-    GPT4_Turbo = "gpt-4-turbo",
-    GPT4O_Mini = "gpt-4o-mini",
-    GPT3_5_Turbo = "gpt-3.5-turbo",
-    Text_Davinci_003 = "text-davinci-003",
+    GPT_4o = "gpt-4o",
+    GPT_4o_Mini = "gpt-4o-mini",
+    GPT_4_5_Preview = "gpt-4.5-preview",
+    GPT_4_Turbo = "gpt-4-turbo",
+    GPT_4 = "gpt-4",
+    GPT_4_1 = "gpt-4.1",
+    GPT_o1 = "o1",
+    GPT_o1_Mini = "o1-mini",
+    GPT_o3_Mini = "o3-mini",
+    GPT_3_5_Turbo = "gpt-3.5-turbo"
 }
 
 // — DeepSeek (open‑source) family

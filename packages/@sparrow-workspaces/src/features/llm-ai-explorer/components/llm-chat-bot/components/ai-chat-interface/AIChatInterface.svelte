@@ -38,6 +38,7 @@
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
   export let responseData: LLM_AI_ExplorerData | undefined;
+  export let modelVariant = "gpt-4os";
 
   let chatContainer: HTMLElement;
   /**
@@ -209,6 +210,7 @@
                         : false}
                       {isResponseGenerating}
                       {handleApplyChangeOnAISuggestion}
+                      {modelVariant}
                     />
                   </div>
                 {/each}

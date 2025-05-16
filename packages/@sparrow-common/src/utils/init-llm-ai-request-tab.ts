@@ -25,7 +25,7 @@ class InitLLMAIRequestTab {
         this._tab = {
             id: _id,
             tabId: uuidv4(),
-            name: "New LLM Request",
+            name: "New AI Request",
             type: TabTypeEnum.LLM_REQUEST,
             persistence: TabPersistenceTypeEnum.PERMANENT,
             description: "[]",
@@ -34,8 +34,9 @@ class InitLLMAIRequestTab {
             activeSync: false,
             property: {
                 llm_ai_request: {
-                    AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    AI_Model_Variant: OpenAIModelEnum.GPT4O,
+                    // AI_Model_Provider: LLMProviderEnum.OpenAI,
+                    AI_Model_Provider: 'openai',
+                    AI_Model_Variant: OpenAIModelEnum.GPT_4o,
                     SystemPrompt: "",
                     Configurations: {},
                     auth: {

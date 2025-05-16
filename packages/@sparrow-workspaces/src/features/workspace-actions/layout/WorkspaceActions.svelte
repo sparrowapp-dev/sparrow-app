@@ -313,7 +313,7 @@
           },
         },
         {
-          name: `Add LLM Request`,
+          name: `Add AI Request`,
           icon: AISparkleRegularIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "20px",

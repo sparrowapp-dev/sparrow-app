@@ -29,15 +29,15 @@
         count: 0,
       },
       {
-        name: "Authorization",
+        name: "Auth",
         id: LLM_AI_RequestSectionEnum.AUTHORIZATION,
         count: 0,
       },
-      {
-        name: "Configurations",
-        id: LLM_AI_RequestSectionEnum.AI_MODAL_CONFIGURATIONS,
-        count: 0,
-      },
+      // {
+      //   name: "Configurations",
+      //   id: LLM_AI_RequestSectionEnum.AI_MODAL_CONFIGURATIONS,
+      //   count: 0,
+      // },
     ];
   };
 

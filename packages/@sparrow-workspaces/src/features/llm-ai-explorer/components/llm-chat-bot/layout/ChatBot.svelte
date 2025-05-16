@@ -107,6 +107,7 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
+      modelVariant={$tab?.property?.llm_ai_request?.AI_Model_Variant}
       bind:scrollList
     />
   </div>

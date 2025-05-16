@@ -5,16 +5,16 @@
   // ---- Components
   import {
     HttpUrlSection,
-    RequestHeaders,
     RequestNavigator,
-    ResponseNavigator,
     RequestAuth,
+    RequestName,
+    RequestHeaders,
+    ResponseNavigator,
     ResponseDefaultScreen,
     ResponseErrorScreen,
     ResponseHeaders,
     ResponseBodyNavigator,
     RequestBody,
-    RequestName,
     ResponseBody,
     RestExtensionPanel,
     RequestParameters,
@@ -281,9 +281,10 @@
         {toggleSaveRequest}
         {onSaveRequest}
         {isGuestUser}
-        selectedModelProvider={$tab.property.llm_ai_request?.AI_Model_Provider}
+        selectedModelProvider={"openai"}
         selectedModel={$tab.property.llm_ai_request?.AI_Model_Variant}
       />
+      <!-- selectedModelProvider={$tab.property.llm_ai_request?.AI_Model_Provider} -->
 
       <div
         bind:this={splitpaneContainer}
@@ -298,8 +299,6 @@
                   requestStateSection={$tab.property.llm_ai_request?.state
                     ?.LLM_AI_Navigation}
                   {onUpdateRequestState}
-                  authParameterLength={5}
-                  authHeaderLength={3}
                   configurationLength={5}
                 />
                 <div style="flex:1; overflow:auto;" class="p-0">

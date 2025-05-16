@@ -21,7 +21,7 @@
   export let userRole;
   export let isSaveLoad = false;
   let isModelSelectorOpen = false;
-  export let selectedModelProvider = "OpenAI";
+  export let selectedModelProvider = "openai";
   export let selectedModel = "GPT-3.5 Turbo";
 
   const dispatch = createEventDispatcher();
@@ -135,10 +135,11 @@
       loader={isSaveLoad}
       startIcon={isSaveLoad ? "" : SaveRegular}
       onClick={handleSaveRequest}
-      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? true
-        : false}
+      disable={true}
     />
+    <!-- disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+        ? true
+        : false} -->
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
