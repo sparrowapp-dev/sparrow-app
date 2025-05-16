@@ -4,7 +4,7 @@
   import { GitBranchIcon } from "@sparrow/library/assets";
   import MenuItemsv2 from "./menu-items/MenuItemsv2.svelte";
   import MenuItemsV3 from "./menu-items/MenuItemsV3.svelte";
-  import { CaretDownFilled } from "@sparrow/library/icons";
+  import { CaretDownFilled, CaretUpFilled } from "@sparrow/library/icons";
 
   /**
    * Determines id of the menu item.
@@ -64,6 +64,7 @@
   export let search = false;
   export let searchText = "Search";
   export let searchErrorMessage = "No value found.";
+  export let headerSearchable = false;
 
   /**
    * Determines the background state for the Select header.
@@ -129,12 +130,15 @@
   }
   let selectHeaderWrapper: HTMLElement;
   let selectBodyWrapper: HTMLElement;
+  let headerSearchInput: HTMLInputElement;
 
   const Icon = icon;
   let searchData = "";
   let isOpen = false;
   let isHover = false;
   let isClicked = false;
+  let headerSearchValue = "";
+  let isHeaderInSearchMode = false;
   let selectedRequest: {
     name: string;
     id: string;
@@ -228,10 +232,23 @@
   //   isOpen = !isOpen;
   // };
 
-  // Update based on the actual height of the dropdown content - permanent solution
+  // Enhanced toggle function to handle searchable header
   const toggleSelect = () => {
     // First toggle to make sure the element is in the DOM
     isOpen = !isOpen;
+
+    if (isOpen && headerSearchable) {
+      isHeaderInSearchMode = true;
+      headerSearchValue = selectedRequest?.name || "";
+
+      setTimeout(() => {
+        if (headerSearchInput) {
+          headerSearchInput.focus();
+        }
+      }, 50);
+    } else {
+      isHeaderInSearchMode = false;
+    }
 
     // Then recalculate positions after the DOM has updated with the dropdown content
     if (isOpen) {
@@ -261,6 +278,11 @@
     }
   };
 
+  const handleHeaderSearchInput = (e: Event) => {
+    e.stopPropagation();
+    searchData = headerSearchValue;
+  };
+
   $: {
     if (titleId) {
       data.forEach((element) => {
@@ -275,6 +297,7 @@
     const selectElement = document.getElementById(`color-select-${id}`);
     if (selectElement && !selectElement.contains(event.target as Node)) {
       isOpen = false;
+      isHeaderInSearchMode = false;
     }
   }
 
@@ -385,7 +408,7 @@
 <div
   class="parent-select display-inline-block cursor-pointer"
   bind:this={selectHeaderWrapper}
-  style=" position: relative;{disabled ? 'pointer-events: none;' : ''}"
+  style="position: relative;{disabled ? 'pointer-events: none;' : ''}"
   id={`color-select-${id}`}
 >
   <div
@@ -422,64 +445,85 @@
         d-flex align-items-center justify-content-between"
       style="min-width:{minHeaderWidth}; max-width:{maxHeaderWidth}; border-radius: {borderRounded}; height: {headerHeight};"
     >
-      <p
-        class=" mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color}"
-      >
-        {#if iconRequired}
-          <span class="me-2" style="margin-top: -2px;">
-            <svelte:component
-              this={icon}
-              height={14}
-              width={14}
-              color={iconColor}
+      {#if isHeaderInSearchMode && headerSearchable}
+        <div class="d-flex align-items-center justify-content-between w-100">
+          <div class="search-input-container">
+            <input
+              bind:this={headerSearchInput}
+              type="text"
+              class="header-search-input bg-transparent border-0"
+              style="font-size: {headerFontSize}; height: 100%; color: var(--text-ds-neutral-100); outline: none;"
+              bind:value={headerSearchValue}
+              on:input={handleHeaderSearchInput}
+              on:click={(e) => e.stopPropagation()}
             />
-          </span>
-        {/if}
-
-        {#if placeholderText && !selectedRequest}
-          <span
-            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-            style=" color:var(--text-ds-neutral-400)"
-          >
-            {placeholderText}
-          </span>
-        {:else if isHeaderCombined}
-          <div class="d-flex ellipsis">
-            <span
-              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
-                selectedRequest?.color,
-              )}"
-            >
-              {selectedRequest?.description ?? ""}
-            </span>
-            <span
-              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
-                selectedRequest?.color,
-              )}"
-            >
-              / {selectedRequest?.name ?? ""}
-            </span>
           </div>
-        {:else}
-          <span
-            class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
-              selectedRequest?.color,
-            )}"
-            style=" {disabled || selectedRequest?.hide
-              ? 'opacity: 0.5 !important'
-              : ''}"
-          >
-            {selectedRequest?.name}
+          <span class="d-flex ps-2 select-caret-wrapper">
+            <CaretUpFilled size={"16px"} color={"var(--icon-ds-neutral-100)"} />
           </span>
-        {/if}
-      </p>
-      <span
-        class="d-flex ps-2"
-        class:select-logo-active={isOpen}
-        style={disabled ? "opacity: 0.5 !important" : ""}
-      >
-        <CaretDownFilled size={"16px"} color={"var(--icon-ds-neutral-100)"} />
-      </span>
+        </div>
+      {:else}
+        <p
+          class="mb-0 d-flex align-items-center ellipsis text-{selectedRequest?.color} select-text-wrapper"
+        >
+          {#if iconRequired}
+            <span class="me-2 select-icon-wrapper" style="margin-top: -2px;">
+              <svelte:component
+                this={icon}
+                height={14}
+                width={14}
+                color={iconColor}
+              />
+            </span>
+          {/if}
+
+          {#if placeholderText && !selectedRequest}
+            <span
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium select-placeholder-wrapper"
+              style="color: {headerSearchable
+                ? 'var(--text-ds-neutral-100)'
+                : 'var(--text-ds-neutral-400)'}"
+            >
+              {placeholderText}
+            </span>
+          {:else if isHeaderCombined}
+            <div class="d-flex ellipsis select-combined-wrapper">
+              <span
+                class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                  selectedRequest?.color,
+                )}"
+              >
+                {selectedRequest?.description ?? ""}
+              </span>
+              <span
+                class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                  selectedRequest?.color,
+                )}"
+              >
+                / {selectedRequest?.name ?? ""}
+              </span>
+            </div>
+          {:else}
+            <span
+              class="ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium {getTextColor(
+                selectedRequest?.color,
+              )} select-name-wrapper"
+              style={disabled || selectedRequest?.hide
+                ? "opacity: 0.5 !important"
+                : ""}
+            >
+              {selectedRequest?.name}
+            </span>
+          {/if}
+        </p>
+        <span
+          class="d-flex ps-2 select-caret-wrapper"
+          class:select-logo-active={isOpen}
+          style={disabled ? "opacity: 0.5 !important" : ""}
+        >
+          <CaretDownFilled size={"16px"} color={"var(--icon-ds-neutral-100)"} />
+        </span>
+      {/if}
     </div>
   </div>
 
@@ -487,37 +531,38 @@
     bind:this={selectBodyWrapper}
     class="select-data {position === 'fixed'
       ? 'position-fixed'
-      : 'position-absolute'} {selectBodyBackgroundClass}  border-radius-2 {selectBodyBackgroundShadow}
+      : 'position-absolute'} {selectBodyBackgroundClass} border-radius-2 {selectBodyBackgroundShadow}
     {isOpen ? 'visible' : 'invisible'}"
     style="
-  {isOpen
+    {isOpen
       ? 'opacity: 1; transform: scale(1);'
       : 'opacity: 0; transform: scale(0.8);'}
-  min-width:{minBodyWidth}; 
-  left: {position === 'fixed'
+    min-width:{minBodyWidth}; 
+    left: {position === 'fixed'
       ? bodyAlignment === 'right'
         ? `${bodyLeftDistance}px;`
         : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`
       : bodyAlignment === 'right'
         ? '0px;'
         : 'auto;'} 
-  top: {position === 'fixed'
+    top: {position === 'fixed'
       ? `${bodyTopDistance}px;`
       : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
-  right: {position === 'fixed'
+    right: {position === 'fixed'
       ? bodyAlignment === 'right'
         ? `${bodyRightDistance}px;`
         : 'auto;'
       : bodyAlignment === 'right'
         ? '0px;'
         : '0px;'} 
-  z-index:{zIndex}; 
-  padding: 8px 6px;
-  "
+    z-index:{zIndex}; 
+    padding: 8px 6px;
+    "
   >
     <div
       on:click={() => {
         isOpen = false;
+        isHeaderInSearchMode = false;
       }}
       role="button"
       tabindex="0"
@@ -526,7 +571,7 @@
     >
       <slot name="pre-select" />
     </div>
-    {#if search}
+    {#if search && !headerSearchable}
       <div class="position-relative">
         <input
           type="text"
@@ -543,7 +588,8 @@
     {/if}
     <div style="max-height:{maxBodyHeight}; overflow:auto;">
       {#each data.filter((element) => {
-        return (element?.name?.toLowerCase?.() || "").includes(searchData?.toLowerCase?.() || "");
+        const searchValue = headerSearchable ? headerSearchValue : searchData;
+        return (element?.name?.toLowerCase?.() || "").includes(searchValue?.toLowerCase?.() || "");
       }) as list}
         <div
           class="{list.hide ? 'd-none' : ''} {list?.disabled
@@ -551,6 +597,7 @@
             : ''}"
           on:click={() => {
             isOpen = false;
+            isHeaderInSearchMode = false;
             onclick(list.id);
           }}
           role="button"
@@ -578,10 +625,9 @@
       {/each}
     </div>
     {#if data.filter((element) => {
-      return element?.name
-        ?.toLowerCase()
-        .includes(searchData?.toLowerCase?.() || "");
-    }).length === 0 && search}
+      const searchValue = headerSearchable ? headerSearchValue : searchData;
+      return (element?.name?.toLowerCase?.() || "").includes(searchValue?.toLowerCase?.() || "");
+    }).length === 0 && (search || headerSearchable)}
       <div class="p-2">
         <p class="sparrow-fs-12 mb-0 text-textColor text-center">
           {searchErrorMessage}
@@ -591,6 +637,7 @@
     <div
       on:click={() => {
         isOpen = false;
+        isHeaderInSearchMode = false;
       }}
       role="button"
       tabindex="0"
@@ -607,6 +654,38 @@
     border: none;
     width: auto;
     padding: 0 10px;
+  }
+
+  .select-text-wrapper,
+  .select-icon-wrapper,
+  .select-placeholder-wrapper,
+  .select-combined-wrapper,
+  .select-name-wrapper,
+  .select-caret-wrapper {
+    pointer-events: none;
+  }
+
+  .search-input-container {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .header-search-input {
+    width: 100%;
+    border: none;
+    outline: none !important;
+    box-shadow: none !important;
+    pointer-events: auto;
+  }
+
+  .header-search-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .header-search-input::placeholder {
+    color: var(--text-ds-neutral-500);
   }
 
   // default states
@@ -803,7 +882,8 @@
   }
 
   input:focus {
-    border: 1px solid var(--send-button) !important;
+    border: none !important;
+    outline: none !important;
     caret-color: var(--send-button) !important;
   }
   .disabled-option {
