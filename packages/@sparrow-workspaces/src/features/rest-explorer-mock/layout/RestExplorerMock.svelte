@@ -777,6 +777,7 @@
                               headerHighlight={"hover-active"}
                               headerHeight={"26px"}
                               borderRounded={"4px"}
+                              headerSearchable={true}
                             />
                           </div>
                           <!-- </div> -->
