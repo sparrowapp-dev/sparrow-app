@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Button } from "@sparrow/library/ui";
   import { TeamPropertyEnum } from "../../types";
   import type { UpdateTeamIcon as IUpdateTeamIcon } from "../../types";
 
@@ -57,48 +58,35 @@
    * @param property - The property of the team to be updated.
    * @returns A promise that resolves when the update is complete.
    */
-  const handleUpdateTeam = async (property: TeamPropertyEnum) => {
-    const blankFile = new File([""], "blank.jpg", {
-      type: "",
-      lastModified: 1706698162061,
-    });
+  const handleUpdateTeam = async () => {
     let data;
-    if (property === TeamPropertyEnum.IMAGE) {
-      data = {
-        image:
-          uploadTeamIcon.file.value.length === 0
-            ? blankFile
-            : uploadTeamIcon.file.value,
-      };
-    } else if (property === TeamPropertyEnum.NAME) {
-      if (!teamName) {
-        teamName = openTeam?.name;
-        isTeamNameInvalid = false;
-      } else if (isOnlySpecialCharacters(teamName)) {
-        isTeamNameInvalid = true;
-        return;
-      }
-      isTeamNameInvalid = false;
-      data = {
-        name: teamName,
-      };
-    } else if (property === TeamPropertyEnum.DESCRIPTION) {
-      data = {
-        description: teamDescription,
-      };
-    }
 
+    if (!teamName) {
+      teamName = openTeam?.name;
+      isTeamNameInvalid = false;
+      return;
+    } else if (isOnlySpecialCharacters(teamName)) {
+      isTeamNameInvalid = true;
+      return;
+    }
+    isTeamNameInvalid = false;
+    data = {
+      name: teamName,
+      description: teamDescription || "",
+    };
     await onUpdateTeam(openTeam.teamId, data);
   };
 </script>
 
 <div class="settings-content h-100">
   <!-- <UpdateTeamIcon bind:uploadTeamIcon onUpdateTeam={handleUpdateTeam} /> -->
-  <UpdateTeamName
-    bind:teamName
-    onUpdateTeam={handleUpdateTeam}
-    {isTeamNameInvalid}
-  />
-  <UpdateTeamDescription bind:teamDescription onUpdateTeam={handleUpdateTeam} />
+  <UpdateTeamName bind:teamName onUpdateTeam={() => {}} {isTeamNameInvalid} />
+  <UpdateTeamDescription bind:teamDescription onUpdateTeam={() => {}} />
   <TeamOwner {ownerDetails} />
+  <Button
+    title="Save"
+    type={"primary"}
+    customWidth={"72px"}
+    onClick={handleUpdateTeam}
+  />
 </div>
