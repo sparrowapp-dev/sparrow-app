@@ -1270,6 +1270,11 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             // Get the main window (fallback to "windows" if "main" isn't available)
+            #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+                {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                app.deep_link().register_all();
+                }
             let window = if app.get_webview_window("main").is_some() {
                 app.get_webview_window("main").unwrap()
             } else {
