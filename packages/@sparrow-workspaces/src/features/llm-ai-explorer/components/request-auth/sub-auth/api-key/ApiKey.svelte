@@ -20,7 +20,7 @@
   };
 </script>
 
-<p class="text-fs-12 fw-bold mb-2">Add API Key</p>
+<!-- <p class="text-fs-12 fw-bold mb-2">Add API Key</p> -->
 <!-- <div class="d-flex ps-1 gap-3 mb-2">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
@@ -48,7 +48,7 @@
   </div>
 </div> -->
 <div class="d-flex flex-column w-100">
-  <div class="mb-3" style="font-size: 12px; font-weight:500">
+  <!-- <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Key</p>
 
     <div class="position-relative" style="min-height: 40px;">
@@ -66,11 +66,11 @@
         />
       </div>
     </div>
-  </div>
+  </div> -->
   <div class="mb-3" style="font-size: 12px; font-weight:500">
-    <p class="mb-2 text-secondary-100">Value</p>
+    <p class="mb-2 text-secondary-100">Key</p>
 
-    <div class="position-relative" style="min-height: 40px;">
+    <div class="position-relative" style="min-height: 100px;">
       <div class="position-absolute top-0 auth-input-container">
         <CodeMirrorInput
           bind:value={apiData.authValue}

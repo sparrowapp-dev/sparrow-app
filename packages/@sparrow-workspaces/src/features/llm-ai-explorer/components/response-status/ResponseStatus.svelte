@@ -43,7 +43,7 @@
     >
       <!-- insert controller here -->
       <div class="d-flex align-items-center gap-3">
-        {#if responseType === "Receiver" && response.status && response.tokenCount && response.time}
+        {#if responseType === "Receiver" && response.status && response.time}
           {#if response.status}
             <Tooltip
               title="HTTP Status - {response.status}"

@@ -51,9 +51,9 @@
   export let isResponseGenerating;
   export let chatResponse: LLM_AI_ExplorerData | undefined;
 
-  // $: setTimeout(() => {
-  //   console.log("chat :>> ", chatResponse);
-  // }, 2000);
+  $: setTimeout(() => {
+    console.log("chat :>> ", chatResponse);
+  }, 2000);
 
   $: {
     if (chatResponse) {
@@ -525,7 +525,7 @@
         response={{
           time: chatResponse?.response.time || 0,
           status: chatResponse?.response.statusCode || "",
-          tokenCount: chatResponse?.response.outputTokens || 0,
+          tokenCount: chatResponse?.response.inputTokens || 0,
           AI_Model_Variant: OpenAIModelEnum.GPT4O,
         }}
         responseType={"Sender"}
@@ -576,7 +576,7 @@
         response={{
           time: chatResponse?.response.time || 0,
           status: chatResponse?.response.statusCode || "",
-          tokenCount: chatResponse?.response.inputTokens || 0,
+          tokenCount: chatResponse?.response.outputTokens || 0,
           AI_Model_Variant: OpenAIModelEnum.GPT4O,
         }}
         responseType={"Receiver"}

@@ -2,6 +2,7 @@
   import { onMount, createEventDispatcher } from "svelte";
   import { fly, fade } from "svelte/transition";
   import { Navigator } from "@sparrow/library/ui";
+  import { OpenAIVectorIcon } from "@sparrow/library/icons";
 
   // Types
   export let selectedModelProvider: string = "Anthropic";
@@ -9,7 +10,10 @@
   export let isOpen: boolean = false;
 
   // Props
-  export let onSelect: (provider: string, model: string) => void;
+  export let onSelect: (
+    provider: string,
+    model: { name: string; id: string },
+  ) => void;
 
   const dispatch = createEventDispatcher();
 
@@ -56,6 +60,9 @@
   // Current active provider
   let activeProvider =
     providers.find((p) => p.name === selectedModelProvider) || providers[0];
+  let activeModel =
+    activeProvider.models.find((model) => model.id === selectedModel) ??
+    activeProvider.models[0];
 
   // Navigation tabs setup
   let tabs = providers.map((provider) => ({
@@ -72,7 +79,7 @@
   // Handle model selection
   const handleModelSelection = (model: { name: string; id: string }) => {
     selectedModel = model.name;
-    onSelect(activeProvider.name, model.name);
+    onSelect(activeProvider.name, model);
     isOpen = false;
     dispatch("close");
   };
@@ -88,6 +95,9 @@
   };
 
   onMount(() => {
+    setTimeout(() => {
+      handleModelSelection(activeModel);
+    }, 2000);
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);

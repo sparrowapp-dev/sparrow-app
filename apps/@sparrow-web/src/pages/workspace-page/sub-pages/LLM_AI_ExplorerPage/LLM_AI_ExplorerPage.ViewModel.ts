@@ -464,22 +464,26 @@ class RestExplorerViewModel {
    * @param _url - request url
    * @param _effectQueryParams  - flag that effect request query parameter
    */
-  public updateRequestUrl = async (
-    _url: string,
+  public onUpdateAIModel = async (
+    _modelProvider: string,
+    _modelId: string,
     _effectQueryParams: boolean = true,
   ) => {
+    console.log("onUpdateAIModel :>> ", _modelProvider, _modelId)
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    if (_url === progressiveTab.property.request.url) {
+    if (_modelId === progressiveTab.property.llm_ai_request.AI_Model_Variant) {
       return;
     }
-    progressiveTab.property.request.url = _url;
+    progressiveTab.property.llm_ai_request.AI_Model_Provider = _modelProvider;
+    progressiveTab.property.llm_ai_request.AI_Model_Variant = _modelId;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_effectQueryParams) {
-      const reducedURL = new ReduceRequestURL(_url);
-      await this.updateParams(reducedURL.getQueryParameters(), false);
-    }
+    // if (_effectQueryParams) {
+    //   const reducedURL = new ReduceRequestURL(_url);
+    //   await this.updateParams(reducedURL.getQueryParameters(), false);
+    // }
     this.compareRequestWithServer();
+
   };
 
   /**
@@ -610,7 +614,7 @@ class RestExplorerViewModel {
   public updateRequestState = async (_state: StatePartial) => {
     console.log("in updateRequestState", _state);
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    console.log("progressiveTab", progressiveTab);
+    console.log("progressiveTab", progressiveTab.property.llm_ai_request);
     progressiveTab.property.llm_ai_request.state = {
       ...progressiveTab.property.llm_ai_request.state,
       ..._state,
@@ -1961,7 +1965,7 @@ class RestExplorerViewModel {
   public generateAIResponseWS = async (prompt = "") => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-
+    const tabId = componentData.tabId; // or any string key
 
     let finalSP = null;
     if (componentData.property.llm_ai_request.SystemPrompt.length) {
@@ -1988,39 +1992,6 @@ class RestExplorerViewModel {
         maxTokens: -1
       }
     }
-    console.log("component data ;>> ", llmReqData);
-
-    const newData: LLM_AI_ExplorerData = {
-      response: {
-        messageId: "abc123",
-        statusCode: "200",
-        inputTokens: 100,
-        outputTokens: 250,
-        totalTokens: 350,
-        time: 1234
-      },
-    };
-
-    // const tabId = componentData.tabId; // or any string key
-
-    // LLM_AI_ExplorerDataStore.update((map) => {
-    //   map.set(tabId, newData);
-    //   return new Map(map); // Return a new Map to trigger reactivity
-    // });
-
-    // Log the value after 3 seconds
-    LLM_AI_ExplorerDataStore.subscribe((map) => {
-      const value = map.get(componentData.tabId);
-      console.log('*** JUST *** :>> In genResWs :>> ', value);
-    })();
-    setTimeout(() => {
-      LLM_AI_ExplorerDataStore.subscribe((map) => {
-        const value = map.get(componentData.tabId);
-        console.log('*** AFTER *** :>> Data after 3 seconds:', value);
-      })();
-    }, 10000);
-
-    // return;
 
     try {
       // const userEmail = getClientUser().email;
@@ -2104,6 +2075,24 @@ class RestExplorerViewModel {
               await this.updateRequestState({
                 isChatbotGeneratingResponse: false,
               });
+
+              const newData: LLM_AI_ExplorerData = {
+                response: {
+                  messageId: "",
+                  statusCode: response.statusCode,
+                  inputTokens: 0,
+                  outputTokens: 0,
+                  totalTokens: 0,
+                  time: "5"
+                },
+              };
+
+              LLM_AI_ExplorerDataStore.update((map) => {
+                map.set(tabId, newData);
+                return new Map(map); // Return a new Map to trigger reactivity
+              });
+
+
               return;
             }
 
@@ -2152,7 +2141,6 @@ class RestExplorerViewModel {
               // Handle end of stream
               else if (stream_status === STREAMING_STATES.END) {
 
-                const tabId = componentData.tabId; // or any string key
                 const newData: LLM_AI_ExplorerData = {
                   response: {
                     messageId: "abc123",

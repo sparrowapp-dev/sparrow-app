@@ -179,7 +179,7 @@
   {isLoginBannerActive}
   storeData={LLM_AI_ExplorerData}
   onOpenCollection={_viewModel.openCollection}
-  onUpdateRequestUrl={_viewModel.updateRequestUrl}
+  onUpdateAIModel={_viewModel.onUpdateAIModel}
   onUpdateRequestMethod={_viewModel.updateRequestMethod}
   onUpdateRequestName={_viewModel.updateRequestName}
   onUpdateRequestAuth={_viewModel.updateRequestAuth}

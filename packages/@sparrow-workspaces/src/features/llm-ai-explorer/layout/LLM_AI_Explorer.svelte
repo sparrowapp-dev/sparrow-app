@@ -101,7 +101,7 @@
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
   export let requestAuthParameter: Observable<KeyValue>;
-  export let onUpdateRequestUrl: UpdateRequestUrlType;
+  export let onUpdateAIModel;
   export let onSendRequest: SendRequestType;
   export let onCancelRequest: CancelRequestType;
   export let onUpdateRequestMethod: UpdateRequestMethodType;
@@ -253,9 +253,9 @@
     // isChatbotOpenInCurrTab.set(false);
   });
 
-  // setTimeout(() => {
-  //   console.log("tab data :>> ", $tab);
-  // }, 3000);
+  setTimeout(() => {
+    console.log("tab data :>> ", $tab.property.llm_ai_request);
+  }, 3000);
 
   // console.log("isChatBot active ;>> ", $tab?.property?.llm_ai_request?.state);
 </script>
@@ -275,16 +275,14 @@
         isSaveLoad={$loading}
         isSave={$tab.isSaved}
         bind:userRole
-        requestUrl={` ${$tab.property.llm_ai_request?.AI_Model_Provider} | ${$tab.property.llm_ai_request?.AI_Model_Variant}`}
-        httpMethod={$tab.property.llm_ai_request?.ai}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
         {onUpdateEnvironment}
         {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
+        {onUpdateAIModel}
         {toggleSaveRequest}
         {onSaveRequest}
         {isGuestUser}
+        selectedModelProvider={$tab.property.llm_ai_request?.AI_Model_Provider}
+        selectedModel={$tab.property.llm_ai_request?.AI_Model_Variant}
       />
 
       <div
@@ -297,7 +295,8 @@
               <!-- Request Pane -->
               <div class="h-100 d-flex flex-column position-relative">
                 <RequestNavigator
-                  requestStateSection={LLM_AI_RequestSectionEnum.SYSTEM_PROMPT}
+                  requestStateSection={$tab.property.llm_ai_request?.state
+                    ?.LLM_AI_Navigation}
                   {onUpdateRequestState}
                   authParameterLength={5}
                   authHeaderLength={3}

@@ -12,13 +12,7 @@
   let componentClass = "";
   export { componentClass as class };
 
-  export let requestUrl;
-  export let httpMethod;
-  export let isSendRequestInProgress;
-  export let onSendButtonClicked;
-  export let onCancelButtonClicked;
-  export let onUpdateRequestUrl;
-  export let onUpdateRequestMethod;
+  export let onUpdateAIModel;
   export let toggleSaveRequest;
   export let onSaveRequest;
   export let environmentVariables;
@@ -26,14 +20,12 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
+  let isModelSelectorOpen = false;
+  export let selectedModelProvider = "OpenAI";
+  export let selectedModel = "GPT-3.5 Turbo";
 
   const dispatch = createEventDispatcher();
   const theme = new UrlInputTheme().build();
-
-  // Model selector state
-  let isModelSelectorOpen = true;
-  let selectedModelProvider = "";
-  let selectedModel = "";
 
   // Toggle model selector
   const toggleModelSelector = () => {
@@ -46,14 +38,13 @@
   };
 
   // Handle model selection
-  const handleModelSelection = (provider: string, model: string) => {
+  const handleModelSelection = (
+    provider: string,
+    model: { name: string; id: string },
+  ) => {
     selectedModelProvider = provider;
-    selectedModel = model;
-    onUpdateRequestUrl(model);
-  };
-
-  const handleDropdown = (tab: string) => {
-    onUpdateRequestMethod(tab);
+    selectedModel = model.name;
+    onUpdateAIModel(provider, model.id);
   };
 
   /**
@@ -87,8 +78,6 @@
       handleSaveRequest();
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
-    } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      onSendButtonClicked(environmentVariables);
     }
   };
 
@@ -113,8 +102,9 @@
       <!-- Wrap with a div to handle the click event -->
       <div on:click={handleInputClick} style="cursor: pointer;">
         <CodeMirrorInput
-          value={selectedModel || "Select a Model"}
-          onUpdateInput={onUpdateRequestUrl}
+          value={`${selectedModelProvider} | ${selectedModel}` ||
+            "Select a Model"}
+          onUpdateInput={onUpdateAIModel}
           placeholder={"Select a Model"}
           {theme}
           {onUpdateEnvironment}
@@ -124,14 +114,15 @@
           {userRole}
           isFocusedOnMount={false}
           readonly={true}
+          disabled={true}
         />
       </div>
 
       <!-- Model selector dropdown -->
       <ModelSelector
         bind:isOpen={isModelSelectorOpen}
-        {selectedModelProvider}
-        {selectedModel}
+        bind:selectedModelProvider
+        bind:selectedModel
         onSelect={handleModelSelection}
       />
     </div>
