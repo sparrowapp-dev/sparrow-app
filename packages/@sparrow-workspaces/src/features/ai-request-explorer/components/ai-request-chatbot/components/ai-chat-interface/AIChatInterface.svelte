@@ -144,10 +144,16 @@
                 style="color: var(--text-ds-neutral-100);"
               >
                 <span
-                  >{responseData?.response.inputTokens || 0} input tokens</span
+                  >{isResponseGenerating
+                    ? 0
+                    : conversations[conversations.length - 1]?.inputTokens || 0}
+                  input tokens</span
                 >
                 <span
-                  >{responseData?.response.outputTokens || 0} output tokens</span
+                  >{isResponseGenerating
+                    ? 0
+                    : conversations[conversations.length - 1]?.outputTokens ||
+                      0} output tokens</span
                 >
               </div>
               <!-- <button class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent">
@@ -193,6 +199,16 @@
                     <ChatItem
                       message={chat.message}
                       chatResponse={responseData}
+                      aiResponseMetrices={{
+                        response: {
+                          messageId: chat.messageId,
+                          inputTokens: chat.inputTokens,
+                          outputTokens: chat.outputTokens,
+                          totalTokens: chat.totalTokens,
+                          statusCode: chat.statusCode,
+                          time: chat.time,
+                        },
+                      }}
                       messageId={chat.messageId}
                       type={chat.type}
                       status={chat.status}

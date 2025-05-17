@@ -51,9 +51,10 @@
   export let isResponseGenerating;
   export let chatResponse: AiRequestExplorerData | undefined;
   export let modelVariant: string;
+  export let aiResponseMetrices;
 
-  $: setTimeout(() => {
-    console.log("chat :>> ", chatResponse);
+  setTimeout(() => {
+    console.log("chat  dddd:>> ", aiResponseMetrices, messageId);
   }, 2000);
 
   $: {
@@ -521,16 +522,17 @@
     -- 
     -->
   {#if type === MessageTypeEnum.SENDER}
-    <div class="send-item my-4">
+    <div class="send-item">
       <ResponseStatus
         response={{
-          time: chatResponse?.response.time || 0,
-          status: chatResponse?.response.statusCode || "",
-          tokenCount: chatResponse?.response.inputTokens || 0,
+          tokenCount: isResponseGenerating
+            ? 0
+            : aiResponseMetrices?.response.inputTokens || 0,
           AI_Model_Variant: modelVariant,
         }}
         responseType={"Sender"}
       />
+
       <p
         class=" px-3 text-fs-12"
         style="background-color: var(--bg-ds-surface-500); 
@@ -540,6 +542,7 @@
         padding: 8px; 
         margin-left: auto; 
         margin-right: 5px; 
+        margin-bottom: 0px;
         max-width: 248px; 
         text-align: left;
         font-size:14px;
@@ -573,15 +576,18 @@
           ...chatResponse,
           AI_Model_Variant: OpenAIModelEnum.GPT4O,
         }} -->
-      <ResponseStatus
-        response={{
-          time: chatResponse?.response.time || 0,
-          status: chatResponse?.response.statusCode || "",
-          tokenCount: chatResponse?.response.outputTokens || 0,
-          AI_Model_Variant: OpenAIModelEnum.GPT4O,
-        }}
-        responseType={"Receiver"}
-      />
+
+      {#if !isResponseGenerating}
+        <ResponseStatus
+          response={{
+            time: aiResponseMetrices?.response.time || 0,
+            status: aiResponseMetrices?.response.statusCode || "",
+            tokenCount: aiResponseMetrices?.response.outputTokens || 0,
+            AI_Model_Variant: OpenAIModelEnum.GPT_4o,
+          }}
+          responseType={"Receiver"}
+        />
+      {/if}
       {#if status}
         <div class="markdown">
           {@html extractedMessage}

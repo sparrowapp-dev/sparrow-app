@@ -2067,9 +2067,11 @@ class RestExplorerViewModel {
                   isLiked: false,
                   isDisliked: false,
                   status: false,
-                  statusCode: response.statusCode || 400,
-                  time: 10,
-                  tokenCount: 0
+                  inputTokens: 0, 
+                  outputTokens: 0,
+                  totalTokens: 0,
+                  statusCode: response.statusCode, 
+                  time: response.timeTaken.replace("ms", "")
                 },
               ]);
               await this.updateRequestState({
@@ -2133,22 +2135,26 @@ class RestExplorerViewModel {
                 messages
               ) {
                 accumulatedMessage += messages;
-
-                // Append only the new chunk to the existing message
-                await this.updateAIResponseByChunk(responseMessageId, messages);
+                await this.updateAIResponseByChunk(responseMessageId, messages); // Append only the new chunk to the existing message
               }
 
               // Handle end of stream
               else if (stream_status === STREAMING_STATES.END) {
 
+                // Extract response metrics
+                const responseMetrics = {
+                  statusCode: response.statusCode,
+                  inputTokens: response.inputTokens,
+                  outputTokens: response.outputTokens,
+                  totalTokens: response.totalTokens,
+                  time: parseInt(response.timeTaken.replace("ms", ""))
+                };
+
+                // Store in AiRequestExplorerDataStore
                 const newData: AiRequestExplorerData = {
                   response: {
-                    messageId: "abc123",
-                    statusCode: response.statusCode,
-                    inputTokens: response.inputTokens,
-                    outputTokens: response.outputTokens,
-                    totalTokens: response.totalTokens,
-                    time: response.timeTaken.replace("ms", "")
+                    messageId: responseMessageId, // Use the same message ID for consistency
+                    ...responseMetrics
                   },
                 };
 
@@ -2156,6 +2162,54 @@ class RestExplorerViewModel {
                   map.set(tabId, newData);
                   return new Map(map); // Return a new Map to trigger reactivity
                 });
+
+
+                // Storing respose metrices in chat converstaion data
+                // Update the conversation messages with metrics
+                const componentData = this._tab.getValue();
+                const conversations = componentData?.property?.aiRequest.ai?.conversations || [];
+                
+                // Find indices for both the AI response and the preceding user message
+                let aiResponseIndex = -1;
+                
+                for (let i = 0; i < conversations.length; i++) {
+                  if (conversations[i].messageId === responseMessageId) {
+                    aiResponseIndex = i;
+                    break;
+                  }
+                }
+
+                if (aiResponseIndex !== -1) {
+                  // Create a shallow clone of the conversations array
+                  const updatedConversations = [...conversations];
+                  
+                  // Update the AI response message with response metrics
+                  updatedConversations[aiResponseIndex] = {
+                    ...updatedConversations[aiResponseIndex],
+                    statusCode: responseMetrics.statusCode,
+                    inputTokens: responseMetrics.inputTokens,
+                    outputTokens: responseMetrics.outputTokens,
+                    totalTokens: responseMetrics.totalTokens,
+                    time: responseMetrics.time
+                  };
+                  
+                  // Also update the preceding user message (Sender) if it exists
+                  // User message will be the one directly before this AI response
+                  if (aiResponseIndex > 0 && updatedConversations[aiResponseIndex - 1].type === MessageTypeEnum.SENDER) {
+                    updatedConversations[aiResponseIndex - 1] = {
+                      ...updatedConversations[aiResponseIndex - 1],
+                      statusCode: responseMetrics.statusCode, 
+                      inputTokens: responseMetrics.inputTokens, 
+                      outputTokens: responseMetrics.outputTokens,
+                      totalTokens: responseMetrics.inputTokens,
+                      time: responseMetrics.time
+                    };
+                  }
+                  
+                  // Update the conversation data
+                  await this.updateRequestAIConversation(updatedConversations);
+                }
+                
 
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>
