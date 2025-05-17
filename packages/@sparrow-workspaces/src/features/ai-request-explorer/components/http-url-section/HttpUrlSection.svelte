@@ -126,7 +126,12 @@
     </div>
   </div>
 
-  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
+  <Tooltip
+    title={"Save (coming soon)"}
+    placement={"left-center"}
+    distance={12}
+    zIndex={10}
+  >
     <Button
       type="secondary"
       size="medium"

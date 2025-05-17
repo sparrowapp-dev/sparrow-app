@@ -128,11 +128,11 @@
               <span class="text-ds-font-size-12 fw-medium text-white"
                 >Conversation</span
               >
-              <button
+              <!-- <button
                 class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent"
               >
                 <EditRegular size={"12px"} color={"white"} />
-              </button>
+              </button> -->
             </div>
             <div class="d-flex align-items-center gap-2">
               <!-- <div class="d-flex align-items-center gap-2">
