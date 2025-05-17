@@ -170,16 +170,12 @@
   {isGuestUser}
   {isLoginBannerActive}
   storeData={AiRequestExplorerData}
-  onOpenCollection={_viewModel.openCollection}
   onUpdateAIModel={_viewModel.onUpdateAIModel}
-  onUpdateRequestMethod={_viewModel.updateRequestMethod}
   onUpdateRequestName={_viewModel.updateRequestName}
   onUpdateRequestAuth={_viewModel.updateRequestAuth}
   onUpdateRequestState={_viewModel.updateRequestState}
-  onSaveRequest={_viewModel.saveRequest}
   onUpdateAiSystemPrompt={_viewModel.updateAiSystemPrompt}
   onUpdateEnvironment={_viewModel.updateEnvironment}
-  onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   isWebApp={true}
