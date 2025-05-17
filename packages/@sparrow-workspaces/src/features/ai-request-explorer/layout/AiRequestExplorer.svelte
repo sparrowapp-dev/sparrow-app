@@ -19,30 +19,29 @@
     UpdateRequestNameType,
     UpdateRequestStateType,
   } from "@sparrow/workspaces/type";
-  import { onDestroy, onMount } from "svelte";
+  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
+  import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
-  export let onUpdateRequestName: UpdateRequestNameType;
-  export let onUpdateRequestAuth: UpdateRequestAuthType;
-  export let onUpdateRequestState: UpdateRequestStateType;
-  export let onUpdateAiSystemPrompt: UpdateRequestDescriptionType;
-  export let onSaveRequest: SaveRequestType;
-  export let onUpdateResponseState;
+  export let onUpdateRequestName;
+  export let onUpdateRequestAuth;
+  export let onUpdateRequestState;
+  export let onUpdateAiSystemPrompt;
+  export let onSaveRequest;
+  export let onOpenCollection;
   export let onUpdateEnvironment;
   export let environmentVariables;
   export let isGuestUser = false;
-  export let onOpenCollection;
   export let onGenerateAiResponse;
-  export let onToggleLike;
   export let onUpdateAIModel;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
   export let onStopGeneratingAIResponse;
+  export let onToggleLike;
 
   // Role of user in active workspace
   export let userRole;
@@ -101,7 +100,6 @@
   setTimeout(() => {
     console.log("tab data :>> ", $tab.property.aiRequest);
   }, 3000);
-  // console.log("isChatBot active ;>> ", $tab?.property?.aiRequest?.state);
 </script>
 
 {#if $tab.tabId}
@@ -128,7 +126,6 @@
         selectedModelProvider={"openai"}
         selectedModel={$tab.property.aiRequest?.AIModelVariant}
       />
-      <!-- selectedModelProvider={$tab.property.aiRequest?.AI_Model_Provider} -->
 
       <div
         bind:this={splitpaneContainer}
