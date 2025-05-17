@@ -143,7 +143,6 @@
                   requestStateSection={$tab.property.aiRequest?.state
                     ?.AiNavigation}
                   {onUpdateRequestState}
-                  configurationLength={5}
                 />
                 <div style="flex:1; overflow:auto;" class="p-0">
                   {#if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}

@@ -209,9 +209,30 @@ export interface HttpRequestBaseInterface {
     selectedAuthType: AiRequestAuthBaseInterface;
     auth: AiRequestAuthBaseInterface;
     systemPrompt: systemPrompt;
-    aiConfigurations: AIConfig;
+    aionfigurations: AIConfig;
 }
 
 
+///////////////////////////////////////////////////////////////
+//              Models id to name mapping
+///////////////////////////////////////////////////////////////
+export enum ModelIdNameMapping {
+    openai = "OpenAI",
+    anthropic = "Google",
+    google = "Bearer Token",
+    deepseek = "DeepSeek",
+}
 
+export enum ModelVariantIdNameMapping {
+  "gpt-4o" = "GPT_4o",
+  "gpt-4o-mini" = "GPT_4o_Mini",
+  "gpt-4.5-preview" = "GPT_4_5_Preview",
+  "gpt-4-turbo" = "GPT_4_Turbo",
+  "gpt-4" = "GPT_4",
+  "gpt-4.1" = "GPT_4_1",
+  "o1" = "GPT_o1",
+  "o1-mini" = "GPT_o1_Mini",
+  "o3-mini" = "GPT_o3_Mini",
+  "gpt-3.5-turbo" = "GPT_3_5_Turbo"
+} 
 

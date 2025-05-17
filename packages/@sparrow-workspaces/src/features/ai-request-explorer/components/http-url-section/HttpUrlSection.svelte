@@ -7,6 +7,10 @@
   import { SaveRegular } from "@sparrow/library/icons";
   import { ModelSelector } from "..";
   import { createEventDispatcher } from "svelte";
+  import {
+    ModelVariantIdNameMapping,
+    ModelIdNameMapping,
+  } from "@sparrow/common/types/workspace/ai-request-base";
 
   let componentClass = "";
   export { componentClass as class };
@@ -21,7 +25,7 @@
   export let isSaveLoad = false;
   let isModelSelectorOpen = false;
   export let selectedModelProvider = "openai";
-  export let selectedModel = "GPT-3.5 Turbo";
+  export let selectedModel = "gpt-4o";
 
   const dispatch = createEventDispatcher();
   const theme = new UrlInputTheme().build();
@@ -101,7 +105,7 @@
       <!-- Wrap with a div to handle the click event -->
       <div on:click={handleInputClick} style="cursor: pointer;">
         <CodeMirrorInput
-          value={`${selectedModelProvider} | ${selectedModel}` ||
+          value={`${ModelIdNameMapping[selectedModelProvider]} | ${ModelVariantIdNameMapping[selectedModel]}` ||
             "Select a Model"}
           onUpdateInput={onUpdateAIModel}
           placeholder={"Select a Model"}

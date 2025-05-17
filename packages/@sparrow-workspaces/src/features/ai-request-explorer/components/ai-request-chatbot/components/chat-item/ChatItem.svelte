@@ -49,24 +49,12 @@
   export let isLastRecieverMessage;
   export let status;
   export let isResponseGenerating;
-  export let chatResponse: AiRequestExplorerData | undefined;
+  export let chatResponse: AiRequestExplorerData;
   export let modelVariant: string;
   export let aiResponseMetrices;
 
-  setTimeout(() => {
-    console.log("chat  dddd:>> ", aiResponseMetrices, messageId);
-  }, 2000);
-
-  $: {
-    if (chatResponse) {
-      console.log("In ChatItem :>> ", chatResponse);
-    }
-  }
-
   export let onClickCodeBlockPreview;
-
   export let handleApplyChangeOnAISuggestion;
-
   let showTickIcon: boolean = false;
 
   /**
@@ -560,23 +548,6 @@
     -- 
     -->
     <div class="recieve-item p-2">
-      <div class="d-flex justify-content-between">
-        <div class="d-flex gap-1 pb-2">
-          {#if status}
-            <!--
-            -- 
-            -- LIKE / DISLIKE
-            -- 
-            -->
-          {/if}
-        </div>
-      </div>
-
-      <!-- response={{
-          ...chatResponse,
-          AI_Model_Variant: OpenAIModelEnum.GPT4O,
-        }} -->
-
       {#if !isResponseGenerating}
         <ResponseStatus
           response={{

@@ -119,9 +119,6 @@
   };
 
   onMount(() => {
-    setTimeout(() => {
-      handleModelSelection(activeModel);
-    }, 2000);
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);

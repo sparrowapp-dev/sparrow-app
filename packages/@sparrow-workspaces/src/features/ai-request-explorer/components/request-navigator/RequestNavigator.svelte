@@ -3,6 +3,7 @@
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
 
   import { Navigator } from "@sparrow/library/ui";
+  import { afterUpdate } from "svelte";
   export let requestStateSection: string | undefined;
   export let authParameterLength = 0;
   export let authHeaderLength = 0;
@@ -44,11 +45,15 @@
   /**
    * @description - re-calculates value when dependency changes
    */
-  $: {
-    if (authParameterLength || authHeaderLength || configurationLength) {
-      tabs = refreshTabs();
-    }
-  }
+  // $: {
+  //   if (authParameterLength || authHeaderLength || configurationLength) {
+  //     tabs = refreshTabs();
+  //   }
+  // }
+
+  afterUpdate(() => {
+    tabs = refreshTabs();
+  });
 
   const onTabClick = (tabId: AiRequestSectionEnum) => {
     onUpdateRequestState({ AiNavigation: tabId });

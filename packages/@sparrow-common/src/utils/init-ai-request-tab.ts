@@ -36,7 +36,7 @@ class InitAiRequestTab {
                 aiRequest: {
                     // AI_Model_Provider: LLMProviderEnum.OpenAI,
                     AIModelProvider: 'openai',
-                    AIModelVariant: OpenAIModelEnum.GPT_4o,
+                    AIModelVariant: "gpt-4o",
                     SystemPrompt: "",
                     Configurations: {},
                     auth: {
