@@ -33,11 +33,11 @@
         id: AiRequestSectionEnum.AUTHORIZATION,
         count: 0,
       },
-      // {
-      //   name: "Configurations",
-      //   id: AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS,
-      //   count: 0,
-      // },
+      {
+        name: "Configurations",
+        id: AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS,
+        count: 0,
+      },
     ];
   };
 

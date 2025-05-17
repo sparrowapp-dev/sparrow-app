@@ -1,6 +1,6 @@
 <script>
-  export let height = "24px";
-  export let width = "24px";
+  export let height = "16px";
+  export let width = "16px";
   export let color = "white";
 </script>
 

@@ -5,4 +5,5 @@ export { default as RequestName } from "./request-name/RequestName.svelte";
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
 export { default as ModelSelector } from "./ModelSelector/ModelSelectorDD.svelte";
 export { default as RequestDoc } from "./request-doc/RequestDoc.svelte";
+export { default as AiConfigs } from "./ai-config-selection/AiConfigurations.svelte";
 export { ChatBot } from "./ai-request-chatbot";

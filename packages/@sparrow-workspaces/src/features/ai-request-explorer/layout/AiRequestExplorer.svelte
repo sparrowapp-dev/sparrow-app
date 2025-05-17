@@ -7,6 +7,7 @@
     RequestName,
     ChatBot,
     RequestDoc,
+    AiConfigs,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type { CollectionDocument } from "@app/database/database";
@@ -135,7 +136,7 @@
       >
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
-            <div style="flex:1; overflow:auto; margin-top: 12px;">
+            <div style="flex:1; overflow:auto;">
               <!-- Request Pane -->
               <div class="h-100 d-flex flex-column position-relative">
                 <RequestNavigator
@@ -164,11 +165,10 @@
                       {onOpenCollection}
                     />
                   {:else if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                    <div
-                      class="w-100 h-100 d-flex align-items-center justify-content-center opacity-50"
-                    >
-                      <h4>Coming soon ...</h4>
-                    </div>
+                    <AiConfigs
+                      config={$tab?.property?.aiRequest?.Configurations}
+                      {onUpdateRequestState}
+                    />
                   {/if}
                 </div>
               </div>

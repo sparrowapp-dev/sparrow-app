@@ -136,27 +136,27 @@
     transition:fly={{ y: -5, duration: 200 }}
   >
     <div
-      class="d-flex align-items-center ms-2 border-bottom border-secondary"
+      class="d-flex align-items-center ms-2 border-secondary"
       style="height: 45px;"
     >
       <Navigator {tabs} {onTabClick} currentTabId={activeProvider.id} />
     </div>
-
+    <hr class="m-0" style="color: #62656A;" />
     <div
       class="p-3 overflow-auto models-container"
       transition:fade={{ duration: 100 }}
     >
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gx-0 gy-3">
+      <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2">
         {#each activeProvider.models as model}
           <div class="col">
             <div
-              class="card h-10 model-card p-2 {selectedModel === model.name
+              class=" h-10 model-card p-2 {selectedModel === model.name
                 ? 'selected-card'
                 : ''}"
               on:click={() => handleModelSelection(model)}
             >
               <div
-                class="card-body p-0 d-flex align-items-center justify-content-between"
+                class="p-0 d-flex align-items-center justify-content-between"
               >
                 <div class="d-flex align-items-center">
                   <div
@@ -208,12 +208,15 @@
 
   .model-card {
     width: 208px;
+    border: 1px solid #272935;
+    border-radius: 4px;
     background-color: var(--bg-ds-surface-500);
     transition: background-color 0.2s ease;
   }
 
   .model-card:hover {
     background-color: var(--bg-secondary-600);
+    background-color: #222630;
   }
 
   .selected-card {
