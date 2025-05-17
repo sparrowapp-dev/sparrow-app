@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { RequestMethod, WorkspaceRole } from "@sparrow/common/enums";
-  import { Select } from "@sparrow/library/forms";
+  import { WorkspaceRole } from "@sparrow/common/enums";
   import { notifications, Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";

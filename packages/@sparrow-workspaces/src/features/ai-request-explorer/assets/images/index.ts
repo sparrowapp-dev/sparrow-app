@@ -1,1 +1,1 @@
-export { default as SparrowLogo } from "./sparrow-logo.svelte";
+// export { default as SparrowLogo } from "./sparrow-logo.svelte";

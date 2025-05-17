@@ -1,1 +1,1 @@
-export { default as SplitterButton } from "./SplitterButton.svg";
+// export { default as SplitterButton } from "./SplitterButton.svg";

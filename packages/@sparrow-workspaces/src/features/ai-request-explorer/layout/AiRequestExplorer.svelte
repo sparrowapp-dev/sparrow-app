@@ -6,6 +6,7 @@
     RequestAuth,
     RequestName,
     ChatBot,
+    RequestDoc,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type { CollectionDocument } from "@app/database/database";
@@ -18,7 +19,6 @@
     UpdateRequestStateType,
   } from "@sparrow/workspaces/type";
   import { onDestroy, onMount } from "svelte";
-  import RequestDoc from "../components/request-doc/RequestDoc.svelte";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { writable } from "svelte/store";
