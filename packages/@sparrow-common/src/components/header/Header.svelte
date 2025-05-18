@@ -23,6 +23,8 @@
   } from "./sub-component/UserProfileModal.svelte";
   import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
+  import { policyConfig } from "@sparrow/common/store";
+
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -341,14 +343,15 @@
                   </div>
                 </div>
               </div>
-
-              <Button
-                type="primary"
-                title="Create an Account or Sign In"
-                size="small"
-                onClick={onLoginUser}
-                customWidth={"100%"}
-              />
+              {#if $policyConfig.enableLogin}
+                <Button
+                  type="primary"
+                  title="Create an Account or Sign In"
+                  size="small"
+                  onClick={onLoginUser}
+                  customWidth={"100%"}
+                />
+              {/if}
             </div>
           </Select>
         </div>
@@ -382,7 +385,11 @@
           headerHeight={"28px"}
         >
           <div slot="pre-select" class="mb-1">
-            <div class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">{currentTeamName}</div>
+            <div
+              class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
+            >
+              {currentTeamName}
+            </div>
           </div>
           <div
             slot="post-select"
@@ -390,7 +397,10 @@
             style="justify-content: center; align-items:center;"
           >
             <div class="lower-underline"></div>
-            <div class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={handleViewWorkspaces}>
+            <div
+              class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+              on:click={handleViewWorkspaces}
+            >
               <span>View all Workspaces</span>
               <Button
                 type="teritiary-regular"
@@ -399,7 +409,10 @@
               />
             </div>
             <div class="lower-underline"></div>
-            <div class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={onCreateWorkspace}>
+            <div
+              class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+              on:click={onCreateWorkspace}
+            >
               <span>Create New Workspace</span>
               <div style="align-content: flex-end;">
                 <Button
@@ -417,9 +430,11 @@
 
   <div
     class="d-flex align-items-center no-drag"
-    style="position: relative; display:flex; gap: 16px;"
+    style="position: relative; display:flex; gap: 16px; margin-right: {isWebApp
+      ? '16px'
+      : '0px'}"
   >
-    {#if isGuestUser && isLoginBannerActive === false}
+    {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
       <Tooltip
         placement="bottom-center"
         title={"You are using Sparrow Edge"}
@@ -600,7 +615,7 @@
     {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-1"}>
+      <div>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}

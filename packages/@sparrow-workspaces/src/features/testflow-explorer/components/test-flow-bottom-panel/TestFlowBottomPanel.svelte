@@ -23,9 +23,11 @@
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import { Loader } from "@sparrow/library/ui";
+  import { Alert, Loader } from "@sparrow/library/ui";
   import type { TFResponseStateType } from "@sparrow/common/types/workspace/testflow";
   import * as Sentry from "@sentry/svelte";
+  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
+  import { emptyRequest } from "../../utils";
 
   export let selectedBlock;
   export let onClose;
@@ -50,6 +52,7 @@
   let responseNavigation = "Response";
   let requestNavigation = "Parameters";
   let apiState;
+  let isAnyEnvVariableMissing = false;
 
   const handleResponseState = (_state) => {
     responseState = {
@@ -85,7 +88,6 @@
 
   const handleRedirect = () => {
     onRedirect(
-      selectedBlock?.data?.workspaceId,
       selectedBlock?.data?.collectionId,
       selectedBlock?.data?.folderId,
       selectedBlock?.data?.requestId,
@@ -136,7 +138,6 @@
       responseLoader = true;
       await runSingleNode(selectedBlock?.id);
     } catch (err) {
-      Sentry.captureException(err); 
       console.error(`Error in run ${selectedBlock?.data?.name} API`, err);
     } finally {
       responseLoader = false;
@@ -148,8 +149,30 @@
     responseBodyFormatter: "Pretty",
   };
 
+  const extractPlaceholders = (url: string): string[] => {
+    return [...url.matchAll(/{{\s*([\w.-]+)\s*}}/g)].map((match) => match[1]);
+  };
+
+  const checkEnvironmentVariableExistValue = (items: string[]): boolean => {
+    const filteredVariables = environmentVariables?.filtered;
+    if (!filteredVariables && items.length > 0) return true;
+    if (items.length === 0) return false;
+    for (let i = 0; i < items.length; i++) {
+      const matchingItem = filteredVariables.find(
+        (variable: any) => variable.key === items[i],
+      );
+      // If any item is not found, return true
+      if (!matchingItem) {
+        return true;
+      }
+    }
+    // All items matched and have valid values
+    return false;
+  };
+
   $: {
     if (selectedBlock) {
+      isAnyEnvVariableMissing = false;
       apiState = selectedBlock?.data?.requestData?.state;
       requestNavigation =
         selectedBlock?.data?.requestData?.state?.requestNavigation;
@@ -171,6 +194,17 @@
             .responseContentType as string;
         }
       }
+      if ($currentStep === 7 && $isTestFlowTourGuideOpen) {
+        selectedNodeResponse = emptyRequest;
+        responseState.responseBodyLanguage = selectedNodeResponse?.response
+          .responseContentType as string;
+      }
+      const selectedEnvs = extractPlaceholders(
+        JSON.stringify(selectedBlock?.data?.requestData),
+      );
+
+      isAnyEnvVariableMissing =
+        checkEnvironmentVariableExistValue(selectedEnvs);
     }
   }
 </script>
@@ -196,15 +230,15 @@
       style={`border: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; border-bottom: none;`}
     >
       <div style="display: flex; flex-direction: row;">
-        {#if !selectedNodeResponse || selectedNodeResponse?.response?.status === ""}
-          <ArrowSwapRegular
-            size={"16px"}
-            color={"var(--icon-ds-neutral-200)"}
-          />
-        {:else if selectedNodeResponse?.response?.status?.startsWith("2")}
+        {#if selectedNodeResponse?.response?.status?.startsWith("2") || ($currentStep > 6 && $isTestFlowTourGuideOpen)}
           <CheckmarkCircleRegular
             size="14px"
             color={"var(--icon-ds-success-400)"}
+          />
+        {:else if !selectedNodeResponse || selectedNodeResponse?.response?.status === ""}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
           />
         {:else}
           <ErrorCircleRegular size="14px" color={"var(--icon-ds-danger-300)"} />
@@ -249,6 +283,21 @@
       {handleOpenCurrentDynamicExpression}
       isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
     />
+    {#if isAnyEnvVariableMissing}
+      <div class="" style="margin-top: 8px;">
+        <Alert
+          heading="Unresolved Environment Variables"
+          description="This request uses environment variables, but no environment is selected or the required variables are missing. Select or update the environment to ensure all variables are defined."
+          varient="warning"
+          ctaShow={false}
+          containerWidth={""}
+          closeIconRequired={true}
+          onClickClose={() => {
+            isAnyEnvVariableMissing = false;
+          }}
+        />
+      </div>
+    {/if}
   </div>
 
   <Splitpanes

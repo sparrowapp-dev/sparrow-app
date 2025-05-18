@@ -44,8 +44,8 @@
       placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}
       height={"77px"}
       defaultBorderColor="transparent"
-      hoveredBorderColor="transparent"
-      focusedBorderColor={"transparent"}
+      hoveredBorderColor="var(--border-ds-neutral-300)"
+      focusedBorderColor={"var(--border-ds-primary-300)"}
       class="text-ds-font-size-14 bg-tertiary-300 text-ds-font-weight-medium px-2 py-2 border-radius-4"
       style="outline:none;"
       disabled={false}

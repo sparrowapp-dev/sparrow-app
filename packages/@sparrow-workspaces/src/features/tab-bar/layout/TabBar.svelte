@@ -190,8 +190,7 @@
       style="height: 24px; gap:8px;  padding:4px 8px; "
     >
       {#if tabList.length <= 0}
-        <span>
-        </span>
+        <span> </span>
       {/if}
       <Tooltip
         title={"New Request"}
@@ -199,13 +198,12 @@
         distance={10}
         zIndex={20}
       >
-      <Button
-      type="teritiary-regular"
-      startIcon={PlusIcon}
-      onClick={onNewTabRequested}
-      size="small"
-
-      />
+        <Button
+          type="teritiary-regular"
+          startIcon={PlusIcon}
+          onClick={onNewTabRequested}
+          size="small"
+        />
       </Tooltip>
     </div>
     <div class="d-flex ms-auto my-auto {!tabList.length ? 'd-none' : ''}">

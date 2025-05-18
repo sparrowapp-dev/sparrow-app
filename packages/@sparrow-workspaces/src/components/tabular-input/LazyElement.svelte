@@ -47,7 +47,11 @@
   use:inview={options}
   on:inview_change={handleChange}
   class="pair-data-row d-flex align-items-center w-100 {customClass}"
-  style="padding-right:1rem; padding-left: 4px;"
+  style="padding-right: {dynamicExpression &&
+  isCheckBoxEditable &&
+  pairs.length - 1 === index
+    ? '2.7rem'
+    : '1rem'}; padding-left: 4px;"
 >
   {#if isInView}
     <!-- <div class="button-container">

@@ -43,7 +43,6 @@ const handleDownloadResponse = async (
 
     return "success";
   } catch (error) {
-    Sentry.captureException(error); 
     notifications.error("Failed to export file.");
 
     return "failed";

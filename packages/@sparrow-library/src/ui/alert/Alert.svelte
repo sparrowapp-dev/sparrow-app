@@ -13,6 +13,9 @@
   export let ctaShow = false;
   export let onClick = () => {};
   export let varient: "error" | "success" | "warning" | "info" = "error";
+  export let containerWidth = "543px";
+  export let closeIconRequired = false;
+  export let onClickClose = () => {};
 
   let componentClass;
   switch (varient) {
@@ -43,15 +46,15 @@
 
 <div>
   <div
-    class={componentClass}
-    style="width: 543px; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
+    class={`${componentClass} ${containerWidth ? "" : "w-100"}`}
+    style="max-width: {containerWidth}; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
   >
     <div
       class="d-flex align-items-start flex-row"
-      style=" gap:16px; padding:16px;  "
+      style="gap:16px; padding:16px;"
     >
       <div
-        style="height: 100%; width: 32px; display:flex; align-items:center; justify-content:center; "
+        style="height: 100%; width: 32px; display:flex; align-items:center; justify-content:center;"
       >
         <div
           class="absolute inset-0 opacity-40 rounded-full"
@@ -72,7 +75,7 @@
           {/if}
         </div>
       </div>
-      <div style="display: flex; flex-direction: column; min-width: 322px; ">
+      <div style="display: flex; flex-direction: column; min-width: 322px;">
         {#if heading}
           <p
             class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
@@ -102,6 +105,18 @@
                 event_name: ctaTitle + "Clicked!",
               });
               onClick();
+            }}
+          />
+        </div>
+      {/if}
+      {#if closeIconRequired}
+        <div style="margin-left: auto;">
+          <Button
+            size="small"
+            type="teritiary-regular"
+            startIcon={DismissRegular}
+            onClick={() => {
+              onClickClose();
             }}
           />
         </div>

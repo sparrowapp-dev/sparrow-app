@@ -74,7 +74,7 @@
     background-color: transparent !important;
   }
   .settings-team-description:hover {
-    outline: 1px solid var(--border-primary-300);
+    outline: 1px solid var(--border-ds-neutral-300);
   }
   .settings-team-description:focus {
     outline: 1px solid var(--border-primary-300);
@@ -86,7 +86,7 @@
     width: 98px;
   }
   .container-width {
-    background-color: var(--bg-ds-surface-600);
+    /* background-color: var(--bg-ds-surface-600); */
     width: 398px;
     border-radius: 4px;
     margin-left: 1px;
@@ -95,5 +95,8 @@
     font-size: 12px;
     color: var(--text-ds-neutral-400);
     font-weight: 400;
+  }
+  .settings-team-description {
+    background-color: var(--bg-ds-surface-600) !important;
   }
 </style>

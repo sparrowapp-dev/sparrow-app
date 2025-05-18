@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <Component Id="WorkspacesRegistryEntries" Guid="*" Directory="TARGETDIR">
+      <RegistryKey
+        Root="HKLM"
+        Key="SOFTWARE\Policies\Sparrow\Workspaces"
+        ForceCreateOnInstall="yes"
+        ForceDeleteOnUninstall="yes">
+        <RegistryValue
+          Type="integer"
+          Name="RestrictPublicWorkspaceCreation"
+          Value="0"
+          KeyPath="yes"/>
+      </RegistryKey>
+    </Component>
+  </Fragment>
+</Wix>

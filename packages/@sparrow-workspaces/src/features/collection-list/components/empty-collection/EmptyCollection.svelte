@@ -21,6 +21,8 @@
   export let isGuestUser;
   export let currentWorkspace;
   export let onItemCreated;
+  export let isMockCollection = false;
+  export let isCollectionEmpty = false;
 
   let currentWorkspaceId;
   currentWorkspace.subscribe((value) => {
@@ -33,25 +35,34 @@
   <List classProps={"pb-2 p-1 w-100"}>
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <p
-        class="text-fs-12 text-center w-100"
+        class="text-fs-12 text-center w-100 {isCollectionEmpty ? 'ps-3' : ''}"
         style="color: var(--text-ds-neutral-400)"
       >
-        Build your API workflow and organize it with collections. Add a
-        collection or import a cURL command to get started.
+        {isMockCollection
+          ? "Create mock collections to test and organize your API without a live server."
+          : "Build your API workflow and organize it with collections. Add a collection or import a cURL command to get started."}
       </p>
     {/if}
-    <div class="w-100 mt-2" style="display: flex; flex-direction:column; ">
+    <div
+      class="w-100 mt-2 {isCollectionEmpty ? 'ps-3' : ''}"
+      style="display: flex; flex-direction:column; "
+    >
       {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <span class="mb-2">
           <Button
-            title="Add Collection"
+            title={isMockCollection ? "Add Mock Collection" : "Add Collection"}
             type="secondary"
             size="small"
             customWidth="100%"
             startIcon={AddRegular}
             disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
             onClick={() => {
-              if (isGuestUser === true) {
+              if (isMockCollection) {
+                onItemCreated("mockCollection", {
+                  workspaceId: currentWorkspaceId,
+                  collection: collectionList,
+                });
+              } else if (isGuestUser === true) {
                 onItemCreated("collection", {
                   workspaceId: currentWorkspaceId,
                   collection: collectionList,
@@ -64,15 +75,17 @@
         </span>
       {/if}
 
-      <Button
-        title="Import cURL"
-        onClick={() => {
-          onImportCurlPopup();
-        }}
-        type="primary"
-        size="small"
-        customWidth="100%"
-      />
+      {#if !isMockCollection}
+        <Button
+          title="Import cURL"
+          onClick={() => {
+            onImportCurlPopup();
+          }}
+          type="primary"
+          size="small"
+          customWidth="100%"
+        />
+      {/if}
     </div>
   </List>
 </div>

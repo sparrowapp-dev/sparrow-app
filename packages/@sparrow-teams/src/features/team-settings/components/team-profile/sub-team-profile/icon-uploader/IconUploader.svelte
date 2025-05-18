@@ -163,7 +163,7 @@
       <!-- Icon Uploader description only shows when no file is uploaded -->
       <span
         class="sparrow-input-label-desc text-ds-font-size-18 ms-4"
-        style="font-size:{labelDescriptionSize}; width: calc(100% - {width})"
+        style="font-size:{labelDescriptionSize}; width: calc(100% - ({width} + 270px))"
         >{labelDescription}</span
       >
     {/if}

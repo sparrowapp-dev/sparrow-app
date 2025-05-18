@@ -19,6 +19,7 @@ export { handleDownloadResponse } from "./handle-downlod-rest";
 export { Sleep } from "./sleep";
 export { Base64Converter } from "./base64Converter";
 export { InitSavedRequestTab } from "./init-saved-request";
+export { InitMockRequestTab } from "./init-mock-request";
 export { StatusCode } from "./status-code";
 export * from "./auth.helper";
 export * from "./common.helper";
