@@ -207,7 +207,8 @@
   }
 
   .model-card {
-    width: 208px;
+    width: 100%;
+    max-width: 210px;
     border-radius: 4px;
     background-color: var(--bg-ds-surface-600);
     border: 1px solid var(--bg-ds-surface-300);
