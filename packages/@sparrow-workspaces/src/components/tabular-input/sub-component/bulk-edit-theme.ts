@@ -115,7 +115,7 @@ export const basicTheme = EditorView.theme({
   ".cm-chunkButtons": {
     display: "none",
     // display: "flex",
-    backgroundColor: "#316CF6",
+    backgroundColor: "var(--bg-ds-primary-400) !important",
     alignItems: "center",
     justifyContent: "flex-end",
     gap: "2px",

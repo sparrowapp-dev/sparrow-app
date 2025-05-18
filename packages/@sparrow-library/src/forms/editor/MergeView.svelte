@@ -157,7 +157,6 @@
       size={"small"}
       type={"primary"}
       onClick={() => {
-        "click applyChanges";
         applyChanges();
       }}
     ></Button>
@@ -167,7 +166,6 @@
       size={"small"}
       type={"secondary"}
       onClick={() => {
-        "click undoChanges";
         undoChanges();
       }}
     ></Button>
@@ -189,7 +187,7 @@
 
   /* Add any additional styles needed for merge view navigation */
   :global(.cm-merge-highlighted-change) {
-    outline: 2px solid #3b82f6;
+    /* outline: 2px solid #3b82f6; */
     position: relative;
     z-index: 1;
   }

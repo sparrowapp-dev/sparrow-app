@@ -58,6 +58,7 @@
     "./types/editorjs": "./src/types/editorjs/index.ts",
     "./interfaces": "./src/interfaces/index.ts",
     "./interfaces/collection.interface": "./src/interfaces/collection.interface.ts",
+    "./interfaces/editorMergeView.interface": "./src/interfaces/editorMergeView.interface.ts",
     "./interfaces/request.interface": "./src/interfaces/request.interface.ts",
     "./interfaces/team.interface": "./src/interfaces/team.interface.ts",
     "./interfaces/workspace.interface": "./src/interfaces/workspace.interface.ts",

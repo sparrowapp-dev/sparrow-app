@@ -16,16 +16,7 @@
     groupChanges,
   } from "./mergeViewUtils";
 
-  /**
-   * Represents a change in the merge view
-   */
-  interface MergeChange {
-    from: number; // Start position in the document
-    to: number; // End position in the document
-    type: "added" | "removed"; // Type of change
-    element: Element; // DOM element representing the change
-    elements?: Element[]; // All DOM elements in this group
-  }
+  import { type MergeChange } from "@sparrow/common/interfaces/editorMergeView.interface";
 
   export let editorView: EditorView | null = null;
   export let isMergeViewEnabled = false;
@@ -130,7 +121,7 @@
           title="Previous change (Alt+Up)"
         >
           <!-- <ChevronUp size={14} /> -->
-          <ArrowUpFilled size={"16px"} color={"#D8D8D9"} />
+          <ArrowUpFilled size={"16px"} color={"var(--bg-ds-neutral-100)"} />
         </button>
 
         <button
@@ -140,7 +131,7 @@
           title="Next change (Alt+Down)"
         >
           <!-- <ChevronDown size={14} /> -->
-          <ArrowDownRegular size={"16px"} color={"#D8D8D9"} />
+          <ArrowDownRegular size={"16px"} color={"var(--bg-ds-neutral-100)"} />
         </button>
       </div>
     </div>
@@ -163,9 +154,9 @@
     display: flex;
     align-items: center;
     height: 28px;
-    border: 1px solid #222630;
+    border: 1px solid var(--bg-ds-surface-400);
     border-radius: 4px;
-    background-color: #222630;
+    background-color: var(--bg-ds-surface-400);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
@@ -179,23 +170,23 @@
     padding: 0;
     width: 24px;
     height: 100%;
-    color: #222630;
+    color: var(--bg-ds-surface-400);
     border-radius: 4px;
     transition: background-color 0.2s;
   }
 
   .merge-nav-button:hover:not(:disabled) {
-    background-color: #383d4b;
+    background-color: var(--bg-ds-surface-200);
   }
 
   .merge-nav-button:active:not(:disabled) {
-    background-color: #383d4b;
+    background-color: var(--bg-ds-surface-200);
   }
 
-  .merge-nav-button:disabled {
+  /* .merge-nav-button:disabled {
     color: #9ca3af;
     cursor: not-allowed;
-  }
+  } */
 
   .merge-nav-counter {
     /* padding: 0 10px; */

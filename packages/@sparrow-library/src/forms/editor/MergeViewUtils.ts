@@ -2,17 +2,8 @@
  * Utilities for working with CodeMirror merge view and navigating changes
  */
 import { EditorView } from '@codemirror/view';
+import { type MergeChange } from "@sparrow/common/interfaces/editorMergeView.interface";
 
-/**
- * Represents a change in the merge view
- */
-export interface MergeChange {
-  from: number;      // Start position in the document
-  to: number;        // End position in the document
-  type: 'added' | 'removed';  // Type of change
-  element: Element;  // DOM element representing the change
-  elements?: Element[];  // All DOM elements in this group
-}
 
 /**
  * Find all changes in a merge view editor
