@@ -113,7 +113,7 @@
           {onUpdateEnvironment}
           {environmentVariables}
           codeId={"url"}
-          class={"input-url"}
+          class={"input-url no-caret-input"}
           {userRole}
           isFocusedOnMount={false}
           disabled={true}
@@ -162,5 +162,15 @@
   }
   :global(.url-red-border) {
     border: 1px solid var(--border-danger-200) !important;
+  }
+
+  /* Hide caret for this specific instance */
+  :global(.no-caret-input .cm-editor) {
+    caret-color: transparent;
+  }
+
+  /* This will ensure cursor doesn't show even when focused */
+  :global(.no-caret-input .cm-content) {
+    caret-color: transparent;
   }
 </style>
