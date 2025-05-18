@@ -336,10 +336,10 @@
           icon: AISparkleRegularIcon,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "20px",
-          onclick: () => { 
+          onclick: () => {
             onItemCreated("Ai-Request-Tab", {});
             // MixpanelEvent(Events.Add_WebSocket);
-          }
+          },
         },
         {
           name: "Add WebSocket",
@@ -451,6 +451,16 @@
               source: "curl import popup",
             });
             showImportCurlPopup();
+          },
+        },
+        {
+          name: `Add AI Request`,
+          icon: AISparkleRegularIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "20px",
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
           },
         },
         {

@@ -385,8 +385,6 @@ export class AiAssistantWebSocketService {
     const { configs, ...rest } = data;
     const message = { ...rest, ...configs }; // spread configs at root level
 
-    console.log("messgae ;>> ", message);
-
     try {
       this.webSocket.send(JSON.stringify(message));
       return true;
