@@ -1,7 +1,7 @@
 <!-- This component is functional yet -->
 <script>
   import { Input } from "@sparrow/library/forms";
-  import { Toggle } from "@sparrow/library/ui";
+  import { Toggle, Tooltip } from "@sparrow/library/ui";
 
   // Dummy config data
   //   export let config = {
@@ -21,14 +21,15 @@
 </script>
 
 <div class="ai-config-container">
+  <!-- <Tooltip title={"Coming Soon"} placement={"top-center"}></Tooltip> -->
   <div
     class="d-flex justify-content-between align-items-start mb-3"
-    style="border-bottom: 0.8px solid #272935; height: 34px;"
+    style="border-bottom: 0.8px solid var(--bg-ds-surface-300); height: 34px;"
   >
     <p class="config-header mb-0">Configuration</p>
     <button
       class="btn btn-sm btn-link text-ds-font-size-12 disabled"
-      style="color: #62656A; text-decoration: none; font-size: 12px;"
+      style="color: var(--bg-ds-neutral-500); text-decoration: none; font-size: 12px;"
       on:click={() => handleConfigChange("reset", true)}
     >
       Reset to default
@@ -139,8 +140,9 @@
           class="form-control form-control-sm config-input"
           value={config.maxTokens}
           disabled={true}
-          on:input={(e) =>
-            handleConfigChange("maxTokens", parseInt(e.target.value))}
+          on:input={(e) => {
+            handleConfigChange("maxTokens", parseInt(e.target.value));
+          }}
         />
         <!-- <Input
           type={"text"}
@@ -169,27 +171,26 @@
     font-size: 12px;
     font-style: inter, "sans-serif";
   }
-  .config-input {
-    font-size: 12px;
-    font-style: inter, "sans-serif";
-  }
+
   .config-desc {
-    color: #b6b7b9;
+    color: var(--text-ds-neutral-200);
   }
   .ai-config-container {
     padding: 0;
     height: 100%;
     overflow-y: auto;
     background-color: transparent;
-    color: #fff;
+    color: var(--white-color);
   }
 
   .config-input {
+    font-size: 12px;
+    font-style: inter, "sans-serif";
     width: 60px;
     text-align: right;
-    background-color: #222630;
-    color: #fff;
-    border-color: #343a40;
+    background-color: var(--bg-ds-surface-400);
+    color: var(--white-color);
+    border: none;
   }
 
   .config-value {
@@ -202,9 +203,9 @@
   }
 
   :global(.form-control:focus) {
-    background-color: #212529;
-    color: #fff;
-    border-color: #0d6efd;
+    /* background-color: #212529;
+    border-color: #0d6efd; */
+    color: var(--white-color);
     box-shadow: none;
   }
 </style>
