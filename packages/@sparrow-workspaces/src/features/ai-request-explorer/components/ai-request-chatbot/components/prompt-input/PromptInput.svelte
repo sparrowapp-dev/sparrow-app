@@ -188,7 +188,7 @@
 
   .generate-prompt-btn {
     background-color: var(--bg-ds-surface-700);
-    color: #ffffff;
+    color: var(--sparrow-white);
     border: 1px solid var(--bg-ds-surface-100);
     font-size: 12px;
     font-weight: 500;

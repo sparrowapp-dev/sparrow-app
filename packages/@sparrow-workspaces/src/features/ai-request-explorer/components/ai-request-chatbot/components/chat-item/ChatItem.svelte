@@ -657,7 +657,7 @@
 
   .markdown {
     width: 85%;
-    background-color: #101318;
+    background-color: var(--text-ds-surface-800);
     padding: 8px;
     border-radius: 4px;
     margin-bottom: 4px;
@@ -696,7 +696,7 @@
     min-width: 276px;
     max-height: 400px;
     min-height: 70px;
-    background: #000 !important;
+    background: var(--sparrow-black) !important;
     border: 2px solid var(--border-ds-surface-400);
     border-radius: 8px;
     overflow-y: auto;
