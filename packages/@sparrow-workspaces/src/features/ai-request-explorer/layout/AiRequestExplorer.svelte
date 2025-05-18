@@ -123,7 +123,7 @@
         toggleSaveRequest={() => {}}
         {onSaveRequest}
         {isGuestUser}
-        selectedModelProvider={"openai"}
+        selectedModelProvider={$tab.property.aiRequest?.AIModelProvider}
         selectedModel={$tab.property.aiRequest?.AIModelVariant}
       />
 

@@ -12,8 +12,8 @@
   } from "@sparrow/library/icons";
 
   // Types
-  export let selectedModelProvider: string;
-  export let selectedModel: string | undefined = undefined;
+  export let selectedModelProvider: string = "openai";
+  export let selectedModel: string = "gpt-4o";
   export let isOpen: boolean = false;
 
   // Props
@@ -27,7 +27,7 @@
   // Available providers and their models
   const providers = [
     {
-      name: "openai",
+      name: "OpenAI",
       id: "openai",
       disabled: false,
       icon: OpenAIVectorIcon,
@@ -81,7 +81,7 @@
 
   // Current active provider
   let activeProvider =
-    providers.find((p) => p.name === selectedModelProvider) || providers[0];
+    providers.find((p) => p.id === selectedModelProvider) || providers[0];
   let activeModel =
     activeProvider.models.find((model) => model.id === selectedModel) ??
     activeProvider.models[0];
@@ -102,8 +102,8 @@
 
   // Handle model selection
   const handleModelSelection = (model: { name: string; id: string }) => {
-    selectedModel = model.name;
-    onSelect(activeProvider.name, model);
+    selectedModel = model.id;
+    onSelect(activeProvider.id, model);
     isOpen = false;
     dispatch("close");
   };
@@ -144,10 +144,10 @@
       transition:fade={{ duration: 100 }}
     >
       <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-2">
-        {#each activeProvider.models as model}
+        {#each activeProvider.models as model, index}
           <div class="col">
             <div
-              class=" h-10 model-card p-2 {selectedModel === model.name
+              class=" h-10 model-card p-2 {selectedModel === model.id
                 ? 'selected-card'
                 : ''}"
               on:click={() => handleModelSelection(model)}
@@ -162,7 +162,7 @@
                     <span>
                       <ChannelRegular
                         size={"20px"}
-                        color={selectedModel === model.name
+                        color={selectedModel === model.id
                           ? "var(--icon-ds-primary-300)"
                           : undefined}
                       />
@@ -171,12 +171,12 @@
                   <span
                     class="fw-medium text-ds-font-size-12"
                     style="font-family: inter, sans-serif; {selectedModel ===
-                    model.name
+                    model.id
                       ? 'color: var(--text-ds-primary-300)'
                       : ''}">{model.name}</span
                   >
                 </div>
-                {#if selectedModel === model.name}
+                {#if selectedModel === model.id}
                   <div class="checkmark-container">
                     <CheckMarkIcon
                       size={"16px"}

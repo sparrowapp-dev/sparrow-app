@@ -286,18 +286,6 @@
     font-weight: 400;
   }
 
-  .close-btn {
-    cursor: pointer;
-    height: 30px;
-    width: 30px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-  }
-  .close-btn:hover {
-    cursor: pointer;
-    background-color: #37394e;
-  }
-
   .input-parent {
     position: relative;
   }
