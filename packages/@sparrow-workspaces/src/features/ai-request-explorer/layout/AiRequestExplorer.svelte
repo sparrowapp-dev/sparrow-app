@@ -1,7 +1,7 @@
 <script lang="ts">
   // ---- Components
   import {
-    HttpUrlSection,
+    ModelSector,
     RequestNavigator,
     RequestAuth,
     RequestName,
@@ -109,7 +109,7 @@
       </div>
 
       <!-- HTTP URL Section -->
-      <HttpUrlSection
+      <ModelSector
         class=""
         isSaveLoad={$loading}
         isSave={$tab.isSaved}

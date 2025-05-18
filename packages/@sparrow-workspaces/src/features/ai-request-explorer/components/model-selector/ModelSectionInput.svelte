@@ -5,7 +5,7 @@
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { SaveRegular } from "@sparrow/library/icons";
-  import { ModelSelector } from "..";
+  import { ModelOptions } from "..";
   import { createEventDispatcher } from "svelte";
   import {
     ModelVariantIdNameMapping,
@@ -121,7 +121,7 @@
       </div>
 
       <!-- Model selector dropdown -->
-      <ModelSelector
+      <ModelOptions
         bind:isOpen={isModelSelectorOpen}
         bind:selectedModelProvider
         bind:selectedModel
