@@ -27,6 +27,7 @@
     DismissCircleRegular,
     CopyRegular,
     BoardRegular,
+    BotRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -291,6 +292,10 @@
             width={"14px"}
             color={"var(--icon-danger-1100)"}
           />
+        </span>
+      {:else if tab.type === TabTypeEnum.AI_REQUEST}
+        <span>
+          <BotRegular height={"17px"} width={"15px"} />
         </span>
       {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
         <span>
