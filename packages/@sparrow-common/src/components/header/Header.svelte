@@ -430,7 +430,9 @@
 
   <div
     class="d-flex align-items-center no-drag"
-    style="position: relative; display:flex; gap: 16px;"
+    style="position: relative; display:flex; gap: 16px; margin-right: {isWebApp
+      ? '16px'
+      : '0px'}"
   >
     {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
       <Tooltip
@@ -613,7 +615,7 @@
     {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-1"}>
+      <div>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}

@@ -19,11 +19,11 @@
   const refreshTabs = (_responseHeadersLength: number) => {
     return [
       { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
-      {
-        name: "Headers",
-        id: ResponseSectionEnum.HEADERS,
-        count: _responseHeadersLength,
-      },
+      // {
+      //   name: "Headers",
+      //   id: ResponseSectionEnum.HEADERS,
+      //   count: _responseHeadersLength,
+      // },
     ];
   };
 
