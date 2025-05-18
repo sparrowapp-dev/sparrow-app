@@ -138,7 +138,7 @@
     >
       <Navigator {tabs} {onTabClick} currentTabId={activeProvider.id} />
     </div>
-    <hr class="m-0" style="color: #62656A;" />
+    <hr class="m-0" style="color: var(--bg-ds-neutral-500);" />
     <div
       class="p-3 overflow-auto models-container"
       transition:fade={{ duration: 100 }}
@@ -163,7 +163,7 @@
                       <ChannelRegular
                         size={"20px"}
                         color={selectedModel === model.name
-                          ? "#6894F9"
+                          ? "var(--icon-ds-primary-300)"
                           : undefined}
                       />
                     </span>
@@ -172,13 +172,16 @@
                     class="fw-medium text-ds-font-size-12"
                     style="font-family: inter, sans-serif; {selectedModel ===
                     model.name
-                      ? 'color: #6894F9;'
+                      ? 'color: var(--text-ds-primary-300)'
                       : ''}">{model.name}</span
                   >
                 </div>
                 {#if selectedModel === model.name}
                   <div class="checkmark-container">
-                    <CheckMarkIcon size={"16px"} color="#6894F9" />
+                    <CheckMarkIcon
+                      size={"16px"}
+                      color="var(--icon-ds-primary-300)"
+                    />
                   </div>
                 {/if}
               </div>
@@ -205,20 +208,14 @@
 
   .model-card {
     width: 208px;
-    border: 1px solid #272935;
     border-radius: 4px;
-    background-color: var(--bg-ds-surface-500);
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid var(--bg-ds-surface-300);
     transition: background-color 0.2s ease;
   }
 
   .model-card:hover {
-    background-color: var(--bg-secondary-600);
-    background-color: #222630;
-  }
-
-  .selected-card {
-    /* background-color: var(--bg-secondary-450) !important;
-    border: 1px solid var(--border-primary-300) !important; */
+    cursor: pointer;
   }
 
   .checkmark-container {
