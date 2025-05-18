@@ -92,7 +92,7 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
-  import {policyConfig} from "@sparrow/common/store"
+  import { policyConfig } from "@sparrow/common/store";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -620,8 +620,8 @@
                       : 'pe-2'}"
                   >
                     <RequestNavigator
-                      requestStateSection={RequestSectionEnum.PARAMETERS}
-                      {onUpdateRequestState}
+                      requestStateSection={$tab.property.request?.state
+                        ?.requestNavigation}
                       authParameterLength={$requestAuthParameter.value ? 1 : 0}
                       authHeaderLength={$requestAuthHeader.value ? 1 : 0}
                       paramsLength={$tab.property?.request?.queryParams
@@ -656,9 +656,7 @@
                           {onUpdateEnvironment}
                           {environmentVariables}
                           {isWebApp}
-                          bind:isMergeViewEnabled={
-                            isMergeViewEnableForRequestBody
-                          }
+                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
                           bind:isMergeViewLoading
                           bind:newModifiedContent
                           {mergeViewRequestDatasetType}
