@@ -8,16 +8,7 @@
     groupChanges,
   } from "./mergeViewUtils";
 
-  /**
-   * Represents a change in the merge view
-   */
-  interface MergeChange {
-    from: number; // Start position in the document
-    to: number; // End position in the document
-    type: "added" | "removed"; // Type of change
-    element: Element; // DOM element representing the change
-    elements?: Element[]; // All DOM elements in this group
-  }
+  import { type MergeChange } from "@sparrow/common/interfaces/editorMergeView.interface";
 
   export let editorView: EditorView | null = null;
   export let isMergeViewEnabled = false;
@@ -158,7 +149,6 @@
     border: 1px solid var(--bg-ds-surface-400);
     border-radius: 4px;
     background-color: var(--bg-ds-surface-400);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
   .merge-nav-button {

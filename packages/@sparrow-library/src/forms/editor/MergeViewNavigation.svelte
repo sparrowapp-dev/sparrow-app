@@ -157,7 +157,6 @@
     border: 1px solid var(--bg-ds-surface-400);
     border-radius: 4px;
     background-color: var(--bg-ds-surface-400);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
   .merge-nav-button {
