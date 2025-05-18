@@ -97,9 +97,6 @@
   });
   onDestroy(() => {});
 
-  setTimeout(() => {
-    console.log("tab data :>> ", $tab.property.aiRequest);
-  }, 3000);
 </script>
 
 {#if $tab.tabId}

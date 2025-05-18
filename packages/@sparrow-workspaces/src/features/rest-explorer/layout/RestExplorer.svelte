@@ -479,7 +479,6 @@
    * @returns {boolean} - Returns true if the status code is between 400 and 499, otherwise false.
    */
   const isClientError = () => {
-    console.log("store data ;>> ", storeData?.response);
     const status = storeData?.response?.status;
     const code = parseInt(status?.split(" ")[0]);
     return code >= 400 && code < 500;
@@ -492,9 +491,6 @@
     }
   }
 
-  setTimeout(() => {
-    console.log("rest tab data :>> ", $tab);
-  }, 3000);
 </script>
 
 {#if $tab.tabId}

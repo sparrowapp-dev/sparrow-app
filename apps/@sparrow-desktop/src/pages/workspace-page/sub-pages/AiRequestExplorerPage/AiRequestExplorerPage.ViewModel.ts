@@ -475,7 +475,6 @@ class AiRequestExplorerViewModel {
    */
   public updateRequestState = async (_state: StatePartial) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    console.log("progressiveTab", progressiveTab.property.aiRequest);
     progressiveTab.property.aiRequest.state = {
       ...progressiveTab.property.aiRequest.state,
       ..._state,
@@ -490,7 +489,6 @@ class AiRequestExplorerViewModel {
    * @param _auth - request auth
    */
   public updateRequestAuth = async (_auth: Auth) => {
-    console.log("this is auth :>> ", _auth)
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.auth = {
       ...progressiveTab.property.aiRequest.auth,
@@ -640,7 +638,6 @@ class AiRequestExplorerViewModel {
             // Handle special error messages
             if (response.event === "error" && response.message) {
 
-              console.log("Error Response :>> ", response)
               // After getting error response remove all listeners
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
