@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <Component Id="LoginRegistryEntries" Guid="*" Directory="TARGETDIR">
+      <RegistryKey
+        Root="HKLM"
+        Key="SOFTWARE\Policies\Sparrow\Login"
+        ForceCreateOnInstall="yes"
+        ForceDeleteOnUninstall="yes">
+        <RegistryValue
+          Type="integer"
+          Name="EnableLogin"
+          Value="1"
+          KeyPath="yes"/>
+      </RegistryKey>
+    </Component>
+  </Fragment>
+</Wix>

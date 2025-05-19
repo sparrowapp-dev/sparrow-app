@@ -794,6 +794,7 @@ class CollectionExplorerPage {
     let totalWebSocket = 0;
     let totalSocketIo = 0;
     let totalGraphQl = 0;
+    let totalMockRequests = 0;
 
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
@@ -805,6 +806,8 @@ class CollectionExplorerPage {
           totalSocketIo++;
         } else if (collectionItem.type === ItemType.GRAPHQL) {
           totalGraphQl++;
+        } else if (collectionItem.type === ItemType.MOCK_REQUEST) {
+          totalMockRequests++;
         } else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
           if (collectionItem?.items)
@@ -817,6 +820,8 @@ class CollectionExplorerPage {
                 totalSocketIo++;
               } else if (item.type === ItemType.GRAPHQL) {
                 totalGraphQl++;
+              } else if (item.type === ItemType.MOCK_REQUEST) {
+                totalMockRequests++;
               }
             });
         }
@@ -854,6 +859,7 @@ class CollectionExplorerPage {
       totalGraphQl,
       totalFolders,
       lastUpdated,
+      totalMockRequests,
     };
   };
 

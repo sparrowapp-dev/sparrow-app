@@ -130,6 +130,7 @@
   let totalWebSocket: number = 0;
   let totalSocketIo: number = 0;
   let totalGraphQl: number = 0;
+  let totalMockRequests: number = 0;
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
@@ -149,6 +150,7 @@
       totalWebSocket = res.totalWebSocket;
       totalSocketIo = res.totalSocketIo;
       totalGraphQl = res.totalGraphQl;
+      totalMockRequests = res.totalMockRequests;
     }
   };
 
@@ -730,7 +732,7 @@
                 <p style="font-size: 12px;" class="mb-0">Folders</p>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <span class="fs-4 highlighted-number">{totalRequests}</span>
+                <span class="fs-4 highlighted-number">{totalMockRequests}</span>
                 <p style="font-size: 12px;" class="mb-0">
                   {HttpRequestDefaultNameBaseEnum.NAME}
                 </p>

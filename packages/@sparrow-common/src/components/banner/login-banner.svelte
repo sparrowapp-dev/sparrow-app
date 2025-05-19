@@ -2,41 +2,47 @@
   import { CrossIcon } from "@sparrow/library/icons";
   import { RocketIcon } from "@sparrow/library/icons";
   import { Link } from "svelte-navigator";
+  import {policyConfig} from "@sparrow/common/store"
+
   export let isVisible = true;
   export let onClose;
   export let onClick;
 </script>
 
 {#if isVisible}
-  <div class="ticker-container">
-    <div class="ticker-container-div">
-      <div style="margin-right: 16px;">
-        <RocketIcon />
-      </div>
+  {#if $policyConfig.enableLogin}
+    <div class="ticker-container">
+      <div class="ticker-container-div">
+        <div style="margin-right: 16px;">
+          <RocketIcon />
+        </div>
 
-      <div>
-        <span class="txt-dark text-fs-14">Enjoying Sparrow?</span>
-        <span class="txt-light text-fs-14"
-          >Unlock the full power by creating an account or signing in.</span
-        >
-      </div>
+        <div>
+          <span class="txt-dark text-fs-14">Enjoying Sparrow?</span>
+          <span class="txt-light text-fs-14"
+            >Unlock the full power by creating an account or signing in.</span
+          >
+        </div>
 
-      <div class="buttons">
-        <button class="click-btn" on:click={onClick}>
-          <span> Create an Account or Sign In</span>
+        <div class="buttons">
+          {#if $policyConfig.enableLogin}
+            <button class="click-btn" on:click={onClick}>
+              <span> Create an Account or Sign In</span>
+            </button>
+          {/if}
+        </div>
+      </div>
+      <div class="cross-btn-div">
+        <button class="cross-btn" on:click={onClose}>
+          <CrossIcon
+            height={"16px"}
+            width={"12px"}
+            color={"var(--icon-secondary-100)"}
+          />
         </button>
       </div>
     </div>
-    <div class="cross-btn-div">
-      <button class="cross-btn" on:click={onClose}>
-        <CrossIcon
-          height={"16px"}
-          width={"12px"}
-          color={"var(--icon-secondary-100)"}
-        />
-      </button>
-    </div>
-  </div>
+  {/if}
 {/if}
 
 <style>

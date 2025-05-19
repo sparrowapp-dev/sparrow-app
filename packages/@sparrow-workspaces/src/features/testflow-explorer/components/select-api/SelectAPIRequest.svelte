@@ -475,7 +475,7 @@
           {/each}
         {:else if arrayData?.some((data) => data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER")}
           {#each arrayData as data}
-            {#if data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER"}
+            {#if (data?.type === "REQUEST" || !data?.type || data?.type === "FOLDER") && data?.collectionType !== "MOCK"}
               <div
                 class="d-flex align-items-center dropdown-single-option x-2 py-1 gap-1"
                 on:click|stopPropagation={() => {
