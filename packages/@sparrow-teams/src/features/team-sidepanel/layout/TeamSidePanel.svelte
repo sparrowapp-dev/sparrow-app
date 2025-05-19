@@ -84,7 +84,7 @@
         <div
           class="sidebar-teams-header d-flex justify-content-between p-3 pb-0"
         >
-          <h6 class="teams-heading ms-2 px-1">Sparrow Hubs</h6>
+          <h6 class="teams-heading ms-2 px-1">Hubs</h6>
           <div>
             <Tooltip title="New Hub" placement={"bottom-center"} distance={10}>
               <button
