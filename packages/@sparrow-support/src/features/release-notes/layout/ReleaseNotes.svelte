@@ -181,6 +181,7 @@
     isLoading = false;
   });
 
+  // Render URL in web
   const renderer = new marked.Renderer();
   renderer.link = function (href, title, text) {
     let url = href;
