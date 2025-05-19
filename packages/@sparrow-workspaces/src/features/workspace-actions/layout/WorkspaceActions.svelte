@@ -14,6 +14,7 @@
   import {
     AddRegular,
     ArrowClockWiseRegular,
+    BetaVectorIcon,
     ChevronDoubleRightRegular,
     DatabaseStackRegular,
     PlusIcon2,
@@ -337,6 +338,7 @@
           icon: BotRegular,
           iconColor: "var(--icon-secondary-130)",
           iconSize: "16px",
+          endIcon: BetaVectorIcon,
           onclick: () => {
             onItemCreated("Ai-Request-Tab", {});
             // MixpanelEvent(Events.Add_WebSocket);

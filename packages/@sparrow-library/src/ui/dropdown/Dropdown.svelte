@@ -148,7 +148,7 @@
           </div>
           {#if item.endIcon}
             <svelte:component
-              this={item.startIcon}
+              this={item.endIcon}
               size={item.iconSize}
               color={item.iconColor}
             />
