@@ -107,6 +107,7 @@
   let noOfColumns = 180;
   let isRenaming = false;
   let requestCount: number;
+  let mockRequestCount: number = 0;
   let graghQlCount: number;
   let webSocketCount: number;
   let socketIoCount: number;
@@ -138,6 +139,7 @@
     if (explorer) {
       requestIds = [];
       requestCount = 0;
+      mockRequestCount = 0;
       graghQlCount = 0;
       socketIoCount = 0;
       webSocketCount = 0;
@@ -155,6 +157,9 @@
             requestIds.push(item.id);
           } else if (item.type === CollectionItemTypeBaseEnum.SOCKETIO) {
             socketIoCount++;
+            requestIds.push(item.id);
+          } else if (item.type === CollectionItemTypeBaseEnum.MOCK_REQUEST) {
+            mockRequestCount++;
             requestIds.push(item.id);
           }
         });
@@ -251,7 +256,7 @@
     <div class="d-flex gap-3 text-ds-font-size-12">
       <div class="d-flex gap-1 {isMockCollection ? 'align-items-center' : ''}">
         <span class="text-plusButton {isMockCollection ? 'fs-5' : ''}"
-          >{requestCount}</span
+          >{isMockCollection ? mockRequestCount : requestCount}</span
         >
         <p style="font-size: 12px;" class="mb-0">
           {HttpRequestDefaultNameBaseEnum.NAME}

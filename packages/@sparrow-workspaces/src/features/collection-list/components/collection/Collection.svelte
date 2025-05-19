@@ -92,6 +92,7 @@
   let graphQLCount = 0;
   let webSocketCount = 0;
   let socketIoCount = 0;
+  let mockRequestCount = 0;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -188,6 +189,7 @@
     if (collection) {
       deletedIds = [];
       requestCount = 0;
+      mockRequestCount = 0;
       folderCount = 0;
       graphQLCount = 0;
       webSocketCount = 0;
@@ -210,6 +212,9 @@
             } else if (item.items[i].type === ItemType.SOCKET_IO) {
               socketIoCount++;
               deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.MOCK_REQUEST) {
+              mockRequestCount++;
+              deletedIds.push(item.items[i].id);
             }
           }
         } else if (item.type === ItemType.REQUEST) {
@@ -223,6 +228,9 @@
           deletedIds.push(item.id);
         } else if (item.type === ItemType.WEB_SOCKET) {
           webSocketCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.MOCK_REQUEST) {
+          mockRequestCount++;
           deletedIds.push(item.id);
         }
       });
@@ -404,11 +412,11 @@
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
     </div>
-    <div class="d-flex gap-1 text-ds-font-size-12">
-      <span class="text-plusButton">{requestCount}</span>
-      <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
-    </div>
     {#if !isMockCollection}
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{requestCount}</span>
+        <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
+      </div>
       <div class="d-flex gap-1 text-ds-font-size-12">
         <span class="text-plusButton">{graphQLCount}</span>
         <p>GraphQL</p>
@@ -420,6 +428,11 @@
       <div class="d-flex gap-1 text-ds-font-size-12">
         <span class="text-plusButton">{socketIoCount}</span>
         <p>Socket.IO</p>
+      </div>
+    {:else}
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{mockRequestCount}</span>
+        <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
     {/if}
   </div>
