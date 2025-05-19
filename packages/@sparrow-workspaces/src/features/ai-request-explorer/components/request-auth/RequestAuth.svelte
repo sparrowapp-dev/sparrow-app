@@ -18,14 +18,14 @@
   export let collection;
   export let onOpenCollection;
   const handlecollection_ai_tab_auth_changed = ({
-    AiAuthNavigation,
+    aiAuthNavigation,
   }: {
-    AiAuthNavigation: string;
+    aiAuthNavigation: string;
   }) => {
     captureEvent("ai_auth_changed", {
       component: "RequestAuth",
-      button_text: AiAuthNavigation,
-      destination: AiAuthNavigation,
+      button_text: aiAuthNavigation,
+      destination: aiAuthNavigation,
     });
   };
 </script>
@@ -62,9 +62,9 @@
             zIndex={499}
             titleId={requestStateAuth}
             onclick={(id = "") => {
-              onUpdateRequestState({ AiAuthNavigation: id });
+              onUpdateRequestState({ aiAuthNavigation: id });
               handlecollection_ai_tab_auth_changed({
-                AiAuthNavigation: id,
+                aiAuthNavigation: id,
               });
             }}
             disabled={false}

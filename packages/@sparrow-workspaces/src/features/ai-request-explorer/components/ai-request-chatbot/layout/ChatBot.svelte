@@ -81,7 +81,7 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      modelVariant={$tab?.property?.aiRequest?.AIModelVariant}
+      modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
       bind:scrollList
     />
   </div>

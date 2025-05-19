@@ -398,11 +398,11 @@ class AiRequestExplorerViewModel {
     _effectQueryParams: boolean = true,
   ) => {
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    if (_modelId === progressiveTab.property.aiRequest.AIModelVariant) {
+    if (_modelId === progressiveTab.property.aiRequest.aiModelVariant) {
       return;
     }
-    progressiveTab.property.aiRequest.AIModelProvider = _modelProvider;
-    progressiveTab.property.aiRequest.AIModelVariant = _modelId;
+    progressiveTab.property.aiRequest.aiModelProvider = _modelProvider;
+    progressiveTab.property.aiRequest.aiModelVariant = _modelId;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     // this.compareRequestWithServer();
@@ -415,7 +415,7 @@ class AiRequestExplorerViewModel {
    */
   public updateAiSystemPrompt = async (_description: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.aiRequest.SystemPrompt = _description;
+    progressiveTab.property.aiRequest.systemPrompt = _description;
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -481,6 +481,7 @@ class AiRequestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
     // this.compareRequestWithServer();
   };
 
@@ -564,8 +565,8 @@ class AiRequestExplorerViewModel {
     const tabId = componentData.tabId; // or any string key
 
     let finalSP = null;
-    if (componentData.property.aiRequest.SystemPrompt.length) {
-      const SPDatas = JSON.parse(componentData.property.aiRequest.SystemPrompt);
+    if (componentData.property.aiRequest.systemPrompt.length) {
+      const SPDatas = JSON.parse(componentData.property.aiRequest.systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
@@ -573,7 +574,7 @@ class AiRequestExplorerViewModel {
       feature: "llm-evaluation",
       // model: componentData.property.aiRequest.AI_Model_Provider || "openai",
       model: "openai",
-      modelVersion: componentData.property.aiRequest.AIModelVariant || "gpt-3.5-turbo",
+      modelVersion: componentData.property.aiRequest.aiModelVariant || "gpt-3.5-turbo",
       // modelVersion: "gpt-3.5-turbo",
       // model: "openai",
       authKey: componentData.property.aiRequest.auth.apiKey.authValue,

@@ -1285,31 +1285,28 @@ export const tabSchemaLiteral = {
         aiRequest: {
           type: "object",
           properties: {
-            AIModelProvider: {
+            aiModelProvider: {
               type: "string",
             },
-            AIModelVariant: {
+            aiModelVariant: {
               type: "string",
             },
-            SystemPrompt: {
+            systemPrompt: {
               type: "string",
-            },
-            Configurations: {
-              type: "object"
             },
             state: {
               type: "object",
               properties: {
-                AiAuthNavigation: {
+                aiAuthNavigation: {
                   type: "string",
                 },
-                AiNavigation: {
+                aiNavigation: {
                   type: "string",
                 },
-                AiLeftSplitterWidthPercentage: {
+                aiLeftSplitterWidthPercentage: {
                   type: "number",
                 },
-                AiRightSplitterWidthPercentage: {
+                aiRightSplitterWidthPercentage: {
                   type: "number",
                 },
                 isAiSendRequestInProgress: {

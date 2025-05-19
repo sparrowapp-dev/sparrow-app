@@ -56,7 +56,7 @@
   });
 
   const onTabClick = (tabId: AiRequestSectionEnum) => {
-    onUpdateRequestState({ AiNavigation: tabId });
+    onUpdateRequestState({ aiNavigation: tabId });
   };
 </script>
 

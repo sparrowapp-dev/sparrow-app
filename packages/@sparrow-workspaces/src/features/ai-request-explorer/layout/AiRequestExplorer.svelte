@@ -97,6 +97,11 @@
   });
   onDestroy(() => {});
 
+  $: {
+    if (tab) {
+      console.log("tab data :>> ", $tab.property);
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -120,8 +125,8 @@
         toggleSaveRequest={() => {}}
         {onSaveRequest}
         {isGuestUser}
-        selectedModelProvider={$tab.property.aiRequest?.AIModelProvider}
-        selectedModel={$tab.property.aiRequest?.AIModelVariant}
+        selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
+        selectedModel={$tab.property.aiRequest?.aiModelVariant}
       />
 
       <div
@@ -135,19 +140,19 @@
               <div class="h-100 d-flex flex-column position-relative">
                 <RequestNavigator
                   requestStateSection={$tab.property.aiRequest?.state
-                    ?.AiNavigation}
+                    ?.aiNavigation}
                   {onUpdateRequestState}
                 />
                 <div style="flex:1; overflow:auto;" class="p-0">
-                  {#if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
+                  {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
                     <RequestDoc
                       {onUpdateAiSystemPrompt}
-                      requestDoc={$tab.property.aiRequest.SystemPrompt}
+                      requestDoc={$tab.property.aiRequest.systemPrompt}
                     />
-                  {:else if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.AUTHORIZATION}
+                  {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
                     <RequestAuth
                       requestStateAuth={$tab.property.aiRequest.state
-                        .AiAuthNavigation}
+                        .aiAuthNavigation}
                       auth={$tab.property.aiRequest.auth}
                       collectionAuth={$collectionAuth}
                       {onUpdateRequestState}
@@ -157,11 +162,8 @@
                       {collection}
                       {onOpenCollection}
                     />
-                  {:else if $tab.property.aiRequest?.state?.AiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                    <AiConfigs
-                      config={$tab?.property?.aiRequest?.Configurations}
-                      {onUpdateRequestState}
-                    />
+                  {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
+                    <AiConfigs {onUpdateRequestState} />
                   {/if}
                 </div>
               </div>

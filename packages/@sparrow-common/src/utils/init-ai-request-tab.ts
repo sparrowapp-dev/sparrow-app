@@ -35,10 +35,9 @@ class InitAiRequestTab {
             property: {
                 aiRequest: {
                     // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    AIModelProvider: 'openai',
-                    AIModelVariant: "gpt-4o",
-                    SystemPrompt: "",
-                    Configurations: {},
+                    aiModelProvider: 'openai',
+                    aiModelVariant: 'gpt-4o',
+                    systemPrompt: "",
                     auth: {
                         bearerToken: "",
                         basicAuth: {
@@ -57,10 +56,10 @@ class InitAiRequestTab {
                         threadId: "",
                     },
                     state: {
-                        AiAuthNavigation: AiRequestAuthTypeBaseEnum.NO_AUTH,
-                        AiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
-                        AiLeftSplitterWidthPercentage: 50,
-                        AiRightSplitterWidthPercentage: 50,
+                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.NO_AUTH,
+                        aiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
+                        aiLeftSplitterWidthPercentage: 50,
+                        aiRightSplitterWidthPercentage: 50,
                         isAiSendRequestInProgress: false,
                         isSaveDescriptionInProgress: false,
                         isSaveRequestInProgress: false,
@@ -106,12 +105,12 @@ class InitAiRequestTab {
     // change these ???
     public updateAIModelProvider(_modalProviderName: AiModelProviderEnum) {
         if (_modalProviderName && this._tab.property.aiRequest) {
-            this._tab.property.aiRequest.AIModelProvider = _modalProviderName;
+            this._tab.property.aiRequest.aiModelProvider = _modalProviderName;
         }
     }
     public updateAIModelVariant(_modalVariantName: AIModelVariant) {
         if (_modalVariantName && this._tab.property.aiRequest) {
-            this._tab.property.aiRequest.AIModelVariant = _modalVariantName;
+            this._tab.property.aiRequest.aiModelVariant = _modalVariantName;
         }
     }
     public updateAuth(_auth: Auth) {

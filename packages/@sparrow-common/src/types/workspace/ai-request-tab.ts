@@ -35,19 +35,19 @@ export enum UntrackedItemsEnum {
 //            Managing AI Request Tab State
 ////////////////////////////////////////////////////////////////
 export interface AiAuthNavigationWrapper {
-    AiAuthNavigation: AiRequestAuthTypeBaseEnum;
+    aiAuthNavigation: AiRequestAuthTypeBaseEnum;
 }
 
 export interface AiNavigationWrapper {
-    AiNavigation: AiRequestSectionEnum;
+    aiNavigation: AiRequestSectionEnum;
 }
 
 export interface AiLeftSplitterWidthPercentageWrapper {
-    AiLeftSplitterWidthPercentage: number;
+    aiLeftSplitterWidthPercentage: number;
 }
 
 export interface AiRightSplitterWidthPercentageWrapper {
-    AiRightSplitterWidthPercentage: number;
+    aiRightSplitterWidthPercentage: number;
 }
 
 export interface IsAiSendRequestInProgressWrapper {
@@ -94,15 +94,15 @@ export interface BearerTokenWrapper {
 }
 
 export interface AiModelProviderWrapper {
-    AIModelProvider: AiModelProviderEnum;
+    aiModelProvider: AiModelProviderEnum;
 }
 
 export interface AiModelVariantWrapper {
-    AIModelVariant: AIModelVariant;
+    aiModelVariant: AIModelVariant;
 }
 
 export interface AiSystemPromptWrapper {
-    SystemPrompt: string;
+    systemPrompt: string;
 }
 
 export interface AiConfigurationsWrapper {
