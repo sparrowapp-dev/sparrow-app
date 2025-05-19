@@ -69,7 +69,7 @@
   export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
   export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
-
+  export let userRole;
   let isTabSaved: boolean;
 
   let activeTabType: string;
@@ -159,6 +159,7 @@
             {onClickCloseOtherTabs}
             {onClickForceCloseTabs}
             {onClickDuplicateTab}
+            {userRole}
           />
         {/each}
       {/if}
