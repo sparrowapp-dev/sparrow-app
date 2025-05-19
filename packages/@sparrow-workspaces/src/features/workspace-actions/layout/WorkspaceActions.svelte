@@ -752,7 +752,7 @@
         class="d-flex flex-row justify-content-between align-items-center border-radius-2 collection-container {isWorkspaceTabOpen
           ? 'selected'
           : ''}"
-        style="cursor:pointer; margin-top:5px; padding-right: 12px; height:32px;"
+        style="cursor:pointer; margin-top:5px;margin: 5px 5px 0 7px; height:32px;"
         tabindex="0"
         on:click={() => {
           // Open workspace tab when clicked
@@ -762,7 +762,7 @@
         }}
       >
         <div class="d-flex flex-row align-items-center flex-grow-1">
-          <span style="display: flex; margin-left:15px;">
+          <span style="display: flex; margin-left:5px;">
             <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
           </span>
           <span
@@ -773,12 +773,7 @@
           </span>
         </div>
         <span class="button-container">
-          <Button
-            id="add-collection-type"
-            size="extra-small"
-            type="teritiary-regular"
-            startIcon={ArrowRightRegular}
-          />
+          <ArrowRightRegular size="16px" color="var(--text-ds-neutral-50)" />
         </span>
       </div>
 
@@ -961,7 +956,7 @@
     visibility: hidden;
     flex-shrink: 0;
     margin-left: auto;
-    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .collection-container:hover .button-container {
@@ -980,6 +975,10 @@
 
   .collection-container.selected:hover {
     background-color: var(--bg-ds-surface-500);
+  }
+
+  .button-container:hover {
+    background-color: transparent;
   }
 
   .not-opened-any {
