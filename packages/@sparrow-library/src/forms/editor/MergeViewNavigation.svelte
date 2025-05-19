@@ -14,7 +14,7 @@
     findMergeViewChanges,
     scrollToChange,
     groupChanges,
-  } from "./mergeViewUtils";
+  } from "./mergeViewUtil";
 
   import { type MergeChange } from "@sparrow/common/interfaces/editorMergeView.interface";
 
