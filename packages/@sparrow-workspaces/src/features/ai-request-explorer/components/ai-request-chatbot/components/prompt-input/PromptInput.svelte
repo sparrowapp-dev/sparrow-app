@@ -100,7 +100,7 @@
     class="actions-container d-flex justify-content-between align-items-center"
   >
     <div id="generate-prompt-chip">
-      <Tooltip title={"Available soon"} placement={"top-center"}>
+      <Tooltip title={"Coming Soon"} placement={"top-center"}>
         <button
           class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1 opacity-50"
         >
