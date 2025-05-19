@@ -97,11 +97,6 @@
   });
   onDestroy(() => {});
 
-  $: {
-    if (tab) {
-      console.log("tab data :>> ", $tab.property);
-    }
-  }
 </script>
 
 {#if $tab.tabId}
