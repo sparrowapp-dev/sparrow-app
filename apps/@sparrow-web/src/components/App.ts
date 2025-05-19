@@ -413,6 +413,8 @@ export async function handleLogin(url: string) {
   const tokens = getAuthJwt();
   const urlParams = new URLSearchParams(url.split("?")[1]);
   const workspaceId = urlParams.get("workspaceId");
+  const adminRedirectWorkspaceId = urlParams.get("adminRedirectWorkspaceId");
+  const adminRedirectHubId = urlParams.get("adminRedirectHubId");
   const clientUser = getClientUser();
 
   if ((!tokens[0] || !tokens[1]) && !url) {
@@ -447,6 +449,18 @@ export async function handleLogin(url: string) {
           await workspaceRepository.setActiveWorkspace(workspaceId);
         }, 1000);
       }
+    }
+    // this will open the workspace in the app
+    if (adminRedirectWorkspaceId) {
+      setTimeout(async () => {
+        await workspaceRepository.setActiveWorkspace(adminRedirectWorkspaceId);
+      }, 1000);
+    }
+    // this will open the hub in the app
+    if (adminRedirectHubId) {
+      setTimeout(async () => {
+        await teamRepository.setOpenTeam(adminRedirectHubId);
+      }, 1000);
     }
     return;
   }
