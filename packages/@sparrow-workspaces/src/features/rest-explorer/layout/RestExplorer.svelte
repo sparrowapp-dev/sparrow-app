@@ -750,8 +750,9 @@
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
                               />
-                              {#if $policyConfig.enableAIAssistance}
-                                <div class="d-flex">
+                              
+                              <div class="d-flex">
+                                {#if $policyConfig.enableAIAssistance}  
                                   <!-- AI debugging trigger button -->
                                   <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
                                   <div
@@ -772,12 +773,13 @@
                                       onClick={handleOnClickAIDebug}
                                     ></Button>
                                   </div>
+                                  {/if}
 
                                   <ResponseStatus
                                     response={storeData.response}
                                   />
                                 </div>
-                              {/if}
+                              
                             </div>
                             <div
                               class="flex-grow-1 d-flex flex-column"
