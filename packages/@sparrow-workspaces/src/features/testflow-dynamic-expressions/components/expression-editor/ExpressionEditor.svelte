@@ -8,7 +8,7 @@
   export let handleAddingNested: (value: string) => void;
   export let selectedApiRequestType: string;
   export let onPreviewExpression;
-  export let cursorPosition: number | null = 0;
+  export let dispatcher;
 
   let expressionPreviewResult = "";
   let expressionErrorResult = "";
@@ -78,7 +78,7 @@
           on:change={handleCodeMirrorChange}
           isEditable={true}
           isEnterKeyNotAllowed={true}
-          bind:cursorPosition
+          bind:dispatcher
         />
       </div>
       <div>

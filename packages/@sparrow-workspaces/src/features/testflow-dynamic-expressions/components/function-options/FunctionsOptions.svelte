@@ -4,7 +4,8 @@
   import { FunctionOptionData } from "../../utils";
 
   export let expression: string;
-  export let cursorPosition: number | null;
+  export let dispatcher;
+
   let data = FunctionOptionData;
   let hoveredFunctionType: string | null = null;
   let searchFunction = "";
@@ -17,6 +18,7 @@
     : data;
 
   const handleFunctionType = (functionItem: any) => {
+    const cursorPosition = dispatcher?.state?.selection?.main?.head || 0;
     if (cursorPosition && cursorPosition < expression.length) {
       expression =
         expression.slice(0, cursorPosition) +

@@ -19,6 +19,8 @@
   export let onPreviewExpression;
   export let dynamicExpressionPath: string = "";
 
+  let dispatcher;
+
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
 
@@ -72,7 +74,6 @@
       dynamicExpressionPath = "body" + " > " + dynamicExpressionPath;
     }
   }
-  let cursorPosition: number | null = 0;
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px; margin-top:16px;">
@@ -82,7 +83,7 @@
       {onPreviewExpression}
       {handleAddingNested}
       bind:selectedApiRequestType
-      bind:cursorPosition
+      bind:dispatcher
     />
   </div>
   <div class="w-50">
@@ -106,11 +107,11 @@
               {requestApis}
               {environmentVariables}
               bind:selectedApiRequestType
-              bind:cursorPosition
+              bind:dispatcher
               {edges}
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
-            <FunctionsOptions bind:expression bind:cursorPosition />
+            <FunctionsOptions bind:expression bind:dispatcher />
           {/if}
         {/key}
       </div>
