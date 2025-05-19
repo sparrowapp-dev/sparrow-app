@@ -345,12 +345,8 @@
         class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
         !tab.isActive ? 'inactive-close-btn' : ''} btn"
         on:click={(e) => {
-          if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
-            onTabClosed(tab.id, tab);
-          } else {
             e.stopPropagation();
             onTabClosed(tab.id, tab);
-          }
         }}
         style="overflow:hidden; height: 18px; width:18px;"
       >

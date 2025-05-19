@@ -287,8 +287,11 @@
     }
 
     const wsId = currentWOrkspaceValue._id;
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
     _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
-
     for (let tab of unSavedTabs) {
       // Wait for user confirmation before moving to the next tab
       await closeTab(tab.id, tab);
@@ -296,6 +299,12 @@
   };
   // Methods for Tab Controls - start
   const tabsForceCloseInitiator = (currentTabId: string) => {
+    // For viewer role, directly force close without popup
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
+
     tabsToForceClose = $tabList;
     tabIdWhoRecivedForceClose = currentTabId;
 
@@ -831,7 +840,7 @@
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
           onUpdateRunningState={_viewModel.handleMockCollectionState}
-          onOpenWorkspace={_viewModel.handleOpenWorkspace} 
+          onOpenWorkspace={_viewModel.handleOpenWorkspace}
         />
       </Pane>
       <Pane
