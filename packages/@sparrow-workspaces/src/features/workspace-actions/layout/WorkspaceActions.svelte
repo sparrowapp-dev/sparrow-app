@@ -788,7 +788,7 @@
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
       class="d-flex flex-column collections-list"
-      style="overflow:hidden;   flex:1; "
+      style="overflow:hidden; margin-top:{isGuestUser ? '5px' : '0'};  flex:1; "
     >
       <!-----Collection Section------>
       <div
