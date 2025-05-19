@@ -78,7 +78,7 @@
       class="text-ds-font-size-12 text-ds-font-weight-regular"
       style="color:var(--text-ds-neutral-400)"
     >
-      Add the api key you've got from your provdier
+      Add the api key you've got from your provider.
     </p>
   </div>
   <section class="w-100" style="flex:1; overflow:auto;">
