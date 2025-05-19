@@ -4,7 +4,7 @@
   import {
     AISparkle,
     CrossIcon,
-    ChatHistoryIcon,
+    ChatHistoryRegular,
     EditRegular,
     BroomRegular,
     FormNewRegular,
@@ -123,7 +123,7 @@
                 class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2"
                 style="background-color: var(--bg-ds-surface-300); pointer-events: none;"
               >
-                <ChatHistoryIcon size={"20px"} />
+                <ChatHistoryRegular size={"20px"} />
               </button>
               <span class="text-ds-font-size-12 fw-medium text-white"
                 >Conversation</span

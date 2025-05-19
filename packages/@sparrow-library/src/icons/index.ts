@@ -253,7 +253,7 @@ export { default as OpenAIVectorIcon } from "./OpenAiVectorIcon.svelte";
 export { default as AnthropicVectorIcon } from "./AnthropicVectorIcon.svelte";
 export { default as DeepseekVectorIcon } from "./DeepseekVectorIcon.svelte";
 export { default as GoogleVectorIcon } from "./GoogleVectorIcon.svelte";
-export { default as ChatHistoryIcon } from "./ChatHistory.svelte";
+export { default as ChatHistoryRegular } from "./ChatHistoryRegular.svelte";
 export { default as FormNewRegular } from "./FormNewRegular.svelte";
 export { default as BotSparkleFilled } from "./BotSparkleFilled.svelte";
 export { default as ChannelRegular } from "./ChannelRegular.svelte";
