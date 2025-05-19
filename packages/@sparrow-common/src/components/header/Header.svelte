@@ -430,202 +430,200 @@
 
   <div
     class="d-flex align-items-center no-drag"
-    style="position: relative; display:flex;"
+    style="position: relative; display:flex; gap: 16px; margin-right: {isWebApp
+      ? '16px'
+      : '0px'}"
   >
-    <div
-      class="d-flex align-items-center"
-      style="position: relative; display:flex; gap: 16px; margin-right: 16px;"
-    >
-      {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
-        <Tooltip
-          placement="bottom-center"
-          title={"You are using Sparrow Edge"}
-          zIndex={600}
+    {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
+      <Tooltip
+        placement="bottom-center"
+        title={"You are using Sparrow Edge"}
+        zIndex={600}
+      >
+        <div
+          style="background-color:var(--bg-ds-surface-300); justify-content:center; align-items:center; margin-left:10px; border-radius:4px; min-width:72px"
+          class="join-container"
+          on:click={onLoginUser}
         >
-          <div
-            style="background-color:var(--bg-ds-surface-300); justify-content:center; align-items:center; margin-left:10px; border-radius:4px; min-width:72px"
-            class="join-container"
-            on:click={onLoginUser}
-          >
-            <span class="join-txt"> Sign in For Better Experience</span>
-          </div>
-        </Tooltip>
-      {/if}
-      <div>
-        <SearchBar
-          placeholder="Search Sparrow"
-          bind:searchQuery
-          onClick={handleSearchClick}
-        />
-      </div>
+          <span class="join-txt"> Sign in For Better Experience</span>
+        </div>
+      </Tooltip>
+    {/if}
 
-      <!-- Multiple Agent Dropdown -->
-      {#if isWebApp}
-        <Select
-          id={"multiple-agent"}
-          data={multipleAgentData}
-          titleId={`${multipleAgentvar}`}
-          onclick={handleAgentDropdown}
-          minHeaderWidth={"171px"}
-          iconRequired={true}
-          icon={CheckCircle}
-          iconColor={"#69D696"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={"hover-active"}
-          headerTheme={"primary"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"12px"}
-          zIndex={200}
-          bodyTheme={"surface"}
-          borderRounded={"2px"}
-          position={"absolute"}
-          isHeaderCombined={false}
-          maxBodyHeight={"296px"}
-          minBodyWidth={"296px"}
-          headerHeight={"28px"}
+    <div>
+      <SearchBar
+        placeholder="Search Sparrow"
+        bind:searchQuery
+        onClick={handleSearchClick}
+      />
+    </div>
+
+    <!-- Multiple Agent Dropdown -->
+    {#if isWebApp}
+      <Select
+        id={"multiple-agent"}
+        data={multipleAgentData}
+        titleId={`${multipleAgentvar}`}
+        onclick={handleAgentDropdown}
+        minHeaderWidth={"171px"}
+        iconRequired={true}
+        icon={CheckCircle}
+        iconColor={"#69D696"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        headerTheme={"primary"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"12px"}
+        zIndex={200}
+        bodyTheme={"surface"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        isHeaderCombined={false}
+        maxBodyHeight={"296px"}
+        minBodyWidth={"296px"}
+        headerHeight={"28px"}
+      >
+        <div
+          slot="post-select"
+          class="post-dropdown d-flex justify-content-center align-items-center flex-column"
         >
-          <div
-            slot="post-select"
-            class="post-dropdown d-flex justify-content-center align-items-center flex-column"
-          >
-            <div class="lower-underline"></div>
-            <div class="download-area w-100">
-              <div
-                class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
-                style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
-              >
-                <SparrowFilledLogo />
+          <div class="lower-underline"></div>
+          <div class="download-area w-100">
+            <div
+              class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
+              style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
+            >
+              <SparrowFilledLogo />
 
-                <div class="d-flex flex-column gap-1" style="line-height: 1;">
-                  <p
-                    class="download-text"
-                    style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);"
-                  >
-                    Sparrow Desktop
-                  </p>
-                  <span
-                    class="description text-fs-10"
-                    style="font-size: 12px; color: gray;"
-                  >
-                    No agent needed.
-                  </span>
-                </div>
-
-                <!-- Download Button -->
-
-                <Button
-                  type="primary"
-                  title="Download Now"
-                  size="small"
-                  onClick={onMarketingRedirect}
-                  customWidth={"103px"}
-                />
+              <div class="d-flex flex-column gap-1" style="line-height: 1;">
+                <p
+                  class="download-text"
+                  style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);"
+                >
+                  Sparrow Desktop
+                </p>
+                <span
+                  class="description text-fs-10"
+                  style="font-size: 12px; color: gray;"
+                >
+                  No agent needed.
+                </span>
               </div>
+
+              <!-- Download Button -->
+
+              <Button
+                type="primary"
+                title="Download Now"
+                size="small"
+                onClick={onMarketingRedirect}
+                customWidth={"103px"}
+              />
             </div>
           </div>
-        </Select>
-      {/if}
-      <!-- {#if !isWebApp} -->
+        </div>
+      </Select>
+    {/if}
+    <!-- {#if !isWebApp} -->
 
-      <div id="environment-select-container">
-        <Select
-          id={"environment-selector"}
-          data={[
+    <div id="environment-select-container">
+      <Select
+        id={"environment-selector"}
+        data={[
+          {
+            name: "Select Environment",
+            id: "none",
+            type: environmentType.LOCAL,
+            hide: true,
+          },
+          {
+            name: "None",
+            id: "none",
+            display: "none",
+            type: environmentType.LOCAL,
+          },
+          ...environments,
+        ].filter((elem) => {
+          return elem.type === environmentType.LOCAL;
+        })}
+        titleId={currentEnvironment?.id}
+        onclick={handleDropdown}
+        minHeaderWidth={"205px"}
+        iconRequired={true}
+        icon={StackIcon}
+        iconColor={"var(--icon-primary-300)"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={"hover-active"}
+        headerTheme={"transparent"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"185px"}
+        zIndex={200}
+        bodyTheme={"surface"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        headerHeight={"28px"}
+      />
+    </div>
+    <!-- {/if} -->
+    <div class="" id="question-container">
+      <Tooltip placement="bottom-right" title={"Quick Help"} zIndex={600}>
+        <Button
+          startIcon={QuestionCirlceReqular}
+          type="teritiary-regular"
+          size="medium"
+          iconSize={20}
+          onClick={() => (helpOptionsOpen = !helpOptionsOpen)}
+        />
+      </Tooltip>
+    </div>
+    {#if helpOptionsOpen}
+      <div class="question-option">
+        <Dropdown
+          buttonId="question-container"
+          horizontalPosition="left"
+          isMenuOpen={true}
+          options={[
             {
-              name: "Select Environment",
-              id: "none",
-              type: environmentType.LOCAL,
-              hide: true,
+              name: "Documentation",
+              color: "var(--text-ds-neutral-50)",
+              startIcon: DocumentRegular,
+              iconSize: "16px",
+              iconColor: "var(--icon-ds-neutral-50)",
+              onclick: () => {
+                redirectDocumentation();
+              },
             },
             {
-              name: "None",
-              id: "none",
-              display: "none",
-              type: environmentType.LOCAL,
+              name: "What’s New?",
+              color: "var(--text-ds-neutral-50)",
+              startIcon: GiftReqular,
+              iconSize: "16px",
+              iconColor: "var(--icon-ds-neutral-50)",
+              onclick: () => {
+                redirectNewFeatures();
+              },
             },
-            ...environments,
-          ].filter((elem) => {
-            return elem.type === environmentType.LOCAL;
-          })}
-          titleId={currentEnvironment?.id}
-          onclick={handleDropdown}
-          minHeaderWidth={"205px"}
-          iconRequired={true}
-          icon={StackIcon}
-          iconColor={"var(--icon-primary-300)"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={"hover-active"}
-          headerTheme={"transparent"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"185px"}
-          zIndex={200}
-          bodyTheme={"surface"}
-          borderRounded={"2px"}
-          position={"absolute"}
-          headerHeight={"28px"}
+          ]}
         />
       </div>
-      <!-- {/if} -->
-      <div class="" id="question-container">
-        <Tooltip placement="bottom-right" title={"Quick Help"} zIndex={600}>
-          <Button
-            startIcon={QuestionCirlceReqular}
-            type="teritiary-regular"
-            size="medium"
-            iconSize={20}
-            onClick={() => (helpOptionsOpen = !helpOptionsOpen)}
-          />
-        </Tooltip>
-      </div>
-      {#if helpOptionsOpen}
-        <div class="question-option">
-          <Dropdown
-            buttonId="question-container"
-            horizontalPosition="left"
-            isMenuOpen={true}
-            options={[
-              {
-                name: "Documentation",
-                color: "var(--text-ds-neutral-50)",
-                startIcon: DocumentRegular,
-                iconSize: "16px",
-                iconColor: "var(--icon-ds-neutral-50)",
-                onclick: () => {
-                  redirectDocumentation();
-                },
-              },
-              {
-                name: "What’s New?",
-                color: "var(--text-ds-neutral-50)",
-                startIcon: GiftReqular,
-                iconSize: "16px",
-                iconColor: "var(--icon-ds-neutral-50)",
-                onclick: () => {
-                  redirectNewFeatures();
-                },
-              },
-            ]}
-          />
-        </div>
-      {/if}
+    {/if}
 
-      {#if !isGuestUser}
-        <div>
-          <UserProfileModal
-            {isGuestUser}
-            item={sidebarModalItem}
-            {onLogout}
-            bind:showProfileModal
-          />
-        </div>
-      {/if}
-    </div>
+    {#if !isGuestUser}
+      <div>
+        <UserProfileModal
+          {isGuestUser}
+          item={sidebarModalItem}
+          {onLogout}
+          bind:showProfileModal
+        />
+      </div>
+    {/if}
 
     {#if isWebApp === false}
       {#if isWindows}
