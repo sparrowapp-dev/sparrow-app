@@ -10,6 +10,12 @@
     ArrowDownRegular,
   } from "@sparrow/library/icons";
 
+  import {
+    findMergeViewChanges,
+    scrollToChange,
+    groupChanges,
+  } from "./MergeViewUtils";
+
   import { type MergeChange } from "@sparrow/common/interfaces/editorMergeView.interface";
 
   export let editorView: EditorView | null = null;
