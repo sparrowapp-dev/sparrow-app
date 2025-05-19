@@ -70,16 +70,25 @@
     </div>
   </div>
 </div>
-{#if showConfetti}
-  <img
-    src={fallingConfetti}
-    alt="Confetti Animation"
-    style="position: absolute; top: -40px; left: -121px; padding-top: 0px; padding-left: 0px; transform: rotate(36deg); width:150px; height:267px; overflow: hidden;"
-  />
 
-  <img
-    src={fallingConfetti}
-    alt="Confetti Animation"
-    style="position: absolute; bottom: -40px; right: -121px; padding-top: 0px; padding-left: 0px; transform: rotate(36deg); width: 150px; height: 267px; overflow: hidden;"
-  />
+{#if showConfetti}
+  <div
+    style="position: absolute; top: 0px; left: 0px; padding-top: 0px; padding-left: 0px; width:150px; height:150px; overflow: hidden;"
+  >
+    <img
+      src={fallingConfetti}
+      alt="Confetti Animation"
+      style="position: absolute; top: -40px; left: -121px; padding-top: 0px; padding-left: 0px; transform: rotate(36deg); width:150px; height:267px; overflow: hidden;"
+    />
+  </div>
+
+  <div
+    style="position: absolute; bottom: 0px; right: 0px; padding-top: 0px; padding-left: 0px; width: 150px; height: 150px; overflow: hidden;"
+  >
+    <img
+      src={fallingConfetti}
+      alt="Confetti Animation"
+      style="position: absolute; bottom: -40px; right: -121px; padding-top: 0px; padding-left: 0px; transform: rotate(36deg); width: 150px; height: 267px; overflow: hidden;"
+    />
+  </div>
 {/if}

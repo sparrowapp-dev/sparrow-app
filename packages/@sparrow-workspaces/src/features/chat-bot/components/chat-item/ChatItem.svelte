@@ -633,6 +633,13 @@
   ) {
     font-size: 12px;
   }
+  :global(
+    .message-wrapper .markdown pre,
+    .message-wrapper .markdown code,
+    .message-wrapper .markdown code span
+  ) {
+    font-family: "JetBrains Mono", monospace !important;
+  }
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;
   }
