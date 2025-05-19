@@ -9,7 +9,7 @@
     PeopleFilled,
     PeopleRegular,
   } from "@sparrow/library/icons";
-  import {policyConfig} from "@sparrow/common/store"
+  import { policyConfig } from "@sparrow/common/store";
   export let isCreateTeamModalOpen;
   export let isGuestUser;
   export let setOpenTeam;
@@ -28,7 +28,7 @@
       class="teams-heading px-1 text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-regular"
       style=" color:var(--bg-ds-neutral-300); display:flex;align-items:center; margin-bottom:0;"
     >
-      Sparrow Hubs
+      Hubs
     </h6>
     {#if $policyConfig.hubCreationAllowed}
       <div>
