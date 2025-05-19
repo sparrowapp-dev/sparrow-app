@@ -7261,8 +7261,6 @@ export default class CollectionsViewModel {
       const res = await this.workspaceRepository.readWorkspace(id);
       const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
       await this.tabRepository.createTab(initWorkspaceTab, id);
-      await this.workspaceRepository.setActiveWorkspace(id);
-      navigate("collections");
     } catch (error) {
       console.error("Error opening workspace:", error);
       notifications.error("Failed to open workspace. Please try again.");
