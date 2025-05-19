@@ -147,11 +147,13 @@
             {/if}
           </div>
           {#if item.endIcon}
-            <svelte:component
-              this={item.endIcon}
-              size={item.iconSize}
-              color={item.iconColor}
-            />
+            <span class="ms-auto">
+              <svelte:component
+                this={item.endIcon}
+                size={item.iconSize}
+                color={item.iconColor}
+              />
+            </span>
           {/if}
         </button>
       {/each}

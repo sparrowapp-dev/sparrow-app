@@ -1,13 +1,13 @@
 <script>
-  export let height = "18px";
-  export let width = "60px";
-  export let color = "grey";
+  export let width = "34px";
+  export let height = "17px";
+  export let color = "white";
 </script>
 
 <svg
   {width}
   {height}
-  viewBox="0 0 16 16"
+  viewBox="0 0 34 17"
   fill="none"
   xmlns="http://www.w3.org/2000/svg"
 >
