@@ -180,6 +180,25 @@
     filteredEvents = events;
     isLoading = false;
   });
+
+  const renderer = new marked.Renderer();
+  renderer.link = function (href, title, text) {
+    let url = href;
+    if (typeof href === "object" && href !== null) {
+      url = href.href || href.raw || href.text || "#";
+    }
+
+    url = String(url);
+    let linkText = text;
+    if (typeof text === "object" && text !== null) {
+      linkText = text.text || text.raw || "Link";
+    }
+
+    linkText = linkText !== undefined ? String(linkText) : "Link";
+    return `<a href="${url}"${title ? ` title="${title}"` : ""} target="_blank" rel="noopener noreferrer">${url}</a>`;
+  };
+
+  marked.setOptions({ renderer });
 </script>
 
 <div style="height:100%; width:100%;">
