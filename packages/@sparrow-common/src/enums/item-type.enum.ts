@@ -10,6 +10,7 @@ export enum ItemType {
   SOCKET_IO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
   MOCK_REQUEST = "MOCK_REQUEST",
+  AI_REQUEST = "AI_REQUEST",
 }
 
 export enum UntrackedItems {

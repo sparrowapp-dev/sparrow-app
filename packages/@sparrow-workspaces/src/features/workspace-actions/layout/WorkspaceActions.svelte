@@ -37,6 +37,7 @@
     SocketIoIcon,
     GraphIcon,
     ChevronDoubleLeftRegular,
+    AISparkleRegularIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -331,6 +332,16 @@
           },
         },
         {
+          name: `Add AI Request`,
+          icon: AISparkleRegularIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "20px",
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
           name: "Add WebSocket",
           icon: SocketIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -440,6 +451,16 @@
               source: "curl import popup",
             });
             showImportCurlPopup();
+          },
+        },
+        {
+          name: `Add AI Request`,
+          icon: AISparkleRegularIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "20px",
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
           },
         },
         {

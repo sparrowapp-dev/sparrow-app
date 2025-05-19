@@ -92,7 +92,7 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
-  import {policyConfig} from "@sparrow/common/store"
+  import { policyConfig } from "@sparrow/common/store";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -490,6 +490,7 @@
       else isAIDebugBtnEnable = false;
     }
   }
+
 </script>
 
 {#if $tab.tabId}
@@ -652,9 +653,7 @@
                           {onUpdateEnvironment}
                           {environmentVariables}
                           {isWebApp}
-                          bind:isMergeViewEnabled={
-                            isMergeViewEnableForRequestBody
-                          }
+                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
                           bind:isMergeViewLoading
                           bind:newModifiedContent
                           {mergeViewRequestDatasetType}

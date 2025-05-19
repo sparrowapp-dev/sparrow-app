@@ -2,3 +2,4 @@ export { default as RestExplorerPage } from "./workspace-page/sub-pages/RestExpl
 export { default as CollectionExplorerPage } from "./workspace-page/sub-pages/CollectionExplorerPage/CollectionExplorerPage.svelte";
 export { default as FolderExplorerPage } from "./workspace-page/sub-pages/FolderExplorerPage/FolderExplorerPage.svelte";
 export { default as WorkspaceExplorerPage } from "./workspace-page/sub-pages/WorkspaceExplorerPage/WorkspaceExplorerPage.svelte";
+export { default as AiRequestExplorerPage } from "./workspace-page/sub-pages/AiRequestExplorerPage/AiRequestExplorerPage.svelte";

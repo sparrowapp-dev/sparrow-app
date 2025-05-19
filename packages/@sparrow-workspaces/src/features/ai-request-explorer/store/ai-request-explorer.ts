@@ -1,0 +1,17 @@
+import { writable } from "svelte/store";
+
+export type AiRequestExplorerData = {
+    response: {
+        messageId: string,
+        statusCode: string,
+        inputTokens: number,
+        outputTokens: number,
+        totalTokens: number,
+        time: number;
+        // size: number;
+    };
+};
+
+export const AiRequestExplorerDataStore = writable<Map<string, AiRequestExplorerData>>(
+    new Map(),
+);

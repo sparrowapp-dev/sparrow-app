@@ -332,7 +332,7 @@ export class AiAssistantWebSocketService {
     apiContext: string,
     conversation,
     model,
-    activity
+    activity,
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -342,13 +342,48 @@ export class AiAssistantWebSocketService {
       apiData: apiContext,
       conversation,
       model,
-      activity
+      activity,
+      "feature": "sparrow-ai"
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send message");
       return false;
     }
+
+    try {
+      this.webSocket.send(JSON.stringify(message));
+      return true;
+    } catch (error) {
+      console.error("Error sending message:", error);
+      return false;
+    }
+  };
+
+  public sendAiRequest = async (data: {
+    model: string;
+    modelVersion: string;
+    authKey: string;
+    systemPrompt: string;
+    userInput: string;
+    configs: {
+      streamResponse: boolean;
+      jsonResponseFormat: boolean;
+      temperature: number;
+      presencePenalty: number;
+      frequencePenalty: number;
+      maxTokens: number;
+    }
+
+  }): Promise<boolean> => {
+
+    if (!this.webSocket || !this.isWsConnected()) {
+      console.error("WebSocket not connected, cannot send message");
+      return false;
+    }
+
+    const { configs, ...rest } = data;
+    const message = { ...rest, ...configs }; // spread configs at root level
 
     try {
       this.webSocket.send(JSON.stringify(message));
@@ -425,6 +460,7 @@ export class AiAssistantWebSocketService {
 
       return true;
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error sending stop generation signal:", error);
       return false;
     }
