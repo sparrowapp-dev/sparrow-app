@@ -46,7 +46,7 @@
     model: { name: string; id: string },
   ) => {
     selectedModelProvider = provider;
-    selectedModel = model.name;
+    selectedModel = model.id;
     onUpdateAIModel(provider, model.id);
   };
 
