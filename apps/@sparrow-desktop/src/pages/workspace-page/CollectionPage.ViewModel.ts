@@ -406,6 +406,21 @@ export default class CollectionsViewModel {
     }
   };
 
+   /**
+   * Create ai request new tab with untracked id
+   */
+  private createAiRequestNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    if (ws) {
+      this.tabRepository.createTab(
+        this.initTab.aiRequest("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+    } else {
+      console.error("No active workspace found!");
+    }
+  };
+
   // ****** Handling Tab Duplication - St ******
   private createRESTDuplciateTab = async (tabId: string) => {
     const originalTab = await this.tabRepository.getTabById(tabId); // Tab to be copied
@@ -5054,6 +5069,9 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
+        break;
+      case "Ai-Request-Tab":
+        await this.createAiRequestNewTab();
         break;
     }
     return response;

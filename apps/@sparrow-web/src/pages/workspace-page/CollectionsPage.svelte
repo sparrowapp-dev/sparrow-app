@@ -22,6 +22,7 @@
     CollectionExplorerPage,
     FolderExplorerPage,
     WorkspaceExplorerPage,
+    AiRequestExplorerPage,
   } from "..";
   import {
     TabBar,
@@ -870,6 +871,12 @@
                           bind:isTourGuideOpen
                           tab={$activeTab}
                         />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.AI_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <AiRequestExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.COLLECTION}
