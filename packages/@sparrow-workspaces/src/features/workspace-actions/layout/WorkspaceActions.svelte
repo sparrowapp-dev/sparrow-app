@@ -747,41 +747,43 @@
         </div>
       {/if}
     </div>
-    <div
-      class="d-flex flex-row justify-content-between align-items-center border-radius-2 collection-container {isWorkspaceTabOpen
-        ? 'selected'
-        : ''}"
-      style="cursor:pointer; margin-top:5px; padding-right: 12px; height:32px;"
-      tabindex="0"
-      on:click={() => {
-        // Open workspace tab when clicked
-        if ($currentWorkspace) {
-          onOpenWorkspace($currentWorkspace._id);
-        }
-      }}
-    >
-      <div class="d-flex flex-row align-items-center flex-grow-1">
-        <span style="display: flex; margin-left:15px;">
-          <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
-        </span>
-        <span
-          class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
-          style="max-width: 110px;"
-        >
-          {currentWorkspaceName}
+    {#if !isGuestUser}
+      <div
+        class="d-flex flex-row justify-content-between align-items-center border-radius-2 collection-container {isWorkspaceTabOpen
+          ? 'selected'
+          : ''}"
+        style="cursor:pointer; margin-top:5px; padding-right: 12px; height:32px;"
+        tabindex="0"
+        on:click={() => {
+          // Open workspace tab when clicked
+          if ($currentWorkspace) {
+            onOpenWorkspace($currentWorkspace._id);
+          }
+        }}
+      >
+        <div class="d-flex flex-row align-items-center flex-grow-1">
+          <span style="display: flex; margin-left:15px;">
+            <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
+          </span>
+          <span
+            class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
+            style="max-width: 110px;"
+          >
+            {currentWorkspaceName}
+          </span>
+        </div>
+        <span class="button-container">
+          <Button
+            id="add-collection-type"
+            size="extra-small"
+            type="teritiary-regular"
+            startIcon={ArrowRightRegular}
+          />
         </span>
       </div>
-      <span class="button-container">
-        <Button
-          id="add-collection-type"
-          size="extra-small"
-          type="teritiary-regular"
-          startIcon={ArrowRightRegular}
-        />
-      </span>
-    </div>
 
-    <hr class="my-1 ms-1 me-1" />
+      <hr class="my-1 ms-1 me-1" />
+    {/if}
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
