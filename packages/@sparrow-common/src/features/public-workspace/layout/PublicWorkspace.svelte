@@ -39,7 +39,7 @@
     >
       Anyone with the link can view this workspace, but only collaborators
       you've added can make changes. Active sync collections will remain private
-      and will not be made public. By publishing, you agree to our
+      and will not be made public.<br/>By publishing, you agree to our
     </p>
     <div class="d-flex" style="align-items:center;">
       <Button
@@ -171,6 +171,7 @@
 
 <style lang="scss">
   .checkbox-container {
+    margin-left: -5px;
     display: flex;
     align-items: center;
     padding-left: 0;
