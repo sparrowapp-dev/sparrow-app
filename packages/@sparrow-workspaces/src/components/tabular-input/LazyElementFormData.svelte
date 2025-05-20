@@ -8,6 +8,7 @@
     MathFormulaRegular,
   } from "@sparrow/library/icons";
   import { crossIcon as close } from "@sparrow/library/assets";
+  import { handleEventOnClickDynamicExpressionButton } from "@sparrow/common/utils";
 
   export let element;
   export let index;
@@ -102,6 +103,11 @@
             {onUpdateEnvironment}
             bind:dispatcher
             handleOpenDE={(obj) => {
+              handleEventOnClickDynamicExpressionButton(
+                "LazyElementFormData",
+                "fx_icon",
+                "Body-FormData",
+              );
               handleOpenCurrentDynamicExpression({
                 ...obj,
                 destination: {

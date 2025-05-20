@@ -43,6 +43,13 @@
       MixpanelEvent(Events.AI_Initiate_Response);
     }
   };
+
+  const handleEventOnClickAIOptions = (modelId: string) => {
+    captureEvent("ai_engine_dropdown_switched", {
+      component: "PromptInput",
+      new_model: modelId,
+    });
+  };
 </script>
 
 <div
@@ -123,6 +130,7 @@
         titleId={defaultModel}
         onclick={(modelId) => {
           console.log("clicked", modelId);
+          handleEventOnClickAIOptions(modelId);
           onUpdateAiModel(modelId);
         }}
         variant={"secondary"}

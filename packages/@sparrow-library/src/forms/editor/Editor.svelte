@@ -20,6 +20,10 @@
   import { RangeSetBuilder } from "@codemirror/state";
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { DismissIcon } from "@sparrow/library/assets";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "@sparrow/common/utils";
   import MergeView from "./MergeView.svelte";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =

@@ -32,7 +32,6 @@
       tipPosition="bottom-center"
       rightButtonName="Close"
       onNext={() => {
-        handle_finish_tour();
         isDefaultTourGuideClose.set(false);
         isDefaultTourGuideOpen.set(false);
       }}
@@ -50,6 +49,9 @@
       tipPosition={currentStepData.tipPosition}
       rightButtonName={$defaultCurrentStep === totalSteps ? "Finish" : ""}
       onNext={() => {
+        if ($defaultCurrentStep === totalSteps) {
+          handle_finish_tour();
+        }
         defaultCurrentStep.set($defaultCurrentStep + 1);
       }}
       onClose={() => {

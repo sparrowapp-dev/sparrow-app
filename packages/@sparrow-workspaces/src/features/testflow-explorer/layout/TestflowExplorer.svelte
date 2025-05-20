@@ -65,8 +65,10 @@
   } from "@sparrow/common/types/workspace/testflow";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     Debounce,
+    handleEventOnOpenDE,
     InitFolderTab,
     InitRequestTab,
     OSDetector,
@@ -123,6 +125,7 @@
   export let runSingleNode;
   export let onPreviewExpression;
   export let redirectDocsTestflow: () => void;
+  export let handleEventOnClickQuestionMark;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -397,6 +400,7 @@
     dynamicExpressionModal = obj;
     dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
     dynamicExpressionPath = obj?.type;
+    handleEventOnOpenDE("TestFlowExplorer", obj?.type);
     isDynamicExpressionModalOpen = true;
   };
 
@@ -1350,6 +1354,28 @@
       return [...filteredEdges];
     });
   };
+
+  const handleEventOnRunBlocks = () => {
+    let matchedNames = new Set();
+    nodes.update((_nodes) => {
+      const regex = /\$\$([a-zA-Z0-9_]+)/g;
+      for (let i = 0; i < _nodes.length; i++) {
+        const requestData = JSON.stringify(_nodes[i]?.data?.requestData || {});
+        let match;
+        while ((match = regex.exec(requestData)) !== null) {
+          matchedNames.add(match[1]);
+        }
+      }
+      return _nodes;
+    });
+    const matchedNamesArray = Array.from(matchedNames);
+    if (matchedNamesArray.length > 0) {
+      captureEvent("send_request_with_expression", {
+        component: "TestExplorer",
+        blockNames: matchedNamesArray.toString(),
+      });
+    }
+  };
 </script>
 
 <div
@@ -1408,6 +1434,7 @@
                   await onClickRun();
                   selectNode("2");
                   MixpanelEvent(Events.Run_TestFlows);
+                  handleEventOnRunBlocks();
                 }}
               />
             </div>
@@ -1669,6 +1696,7 @@
   zIndex={1000}
   helpingIcon={true}
   onClickHelpIcon={() => {
+    handleEventOnClickQuestionMark();
     redirectDocsTestflow();
   }}
   isOpen={isDynamicExpressionModalOpen}

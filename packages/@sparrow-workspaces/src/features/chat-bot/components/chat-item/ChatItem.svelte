@@ -16,6 +16,7 @@
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import { Events } from "@sparrow/common/enums";
   import {
     MessageTypeEnum,
@@ -387,6 +388,20 @@
     }
   };
 
+  const handleEventClickOnPreview = () => {
+    captureEvent("copilot_suggestion_previewed", {
+      component: "ChatItem",
+      buttonText: "Preview",
+    });
+  };
+
+  const handleEventClickOnCopyCode = () => {
+    captureEvent("copilot_suggestion_copied", {
+      component: "ChatItem",
+      buttonText: "Copy",
+    });
+  };
+
   /**
    * Handles the click event to preview code from a specified wrapper to the modal popup.
    *
@@ -400,6 +415,7 @@
     if (!originalCodeBlock || !originalPreElement) return;
     const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
     onClickCodeBlockPreview(preClone);
+    handleEventClickOnPreview();
   };
 
   /**
@@ -430,6 +446,7 @@
    */
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
+    handleEventClickOnCopyCode();
 
     setTimeout(() => {
       const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);

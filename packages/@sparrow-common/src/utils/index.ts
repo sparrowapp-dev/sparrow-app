@@ -21,6 +21,12 @@ export { Base64Converter } from "./base64Converter";
 export { InitSavedRequestTab } from "./init-saved-request";
 export { InitMockRequestTab } from "./init-mock-request";
 export { StatusCode } from "./status-code";
+export {
+  handleEventonClickApplyChangesAI,
+  handleEventOnClickApplyUndoAI,
+  handleEventOnClickDynamicExpressionButton,
+  handleEventOnOpenDE,
+} from "./events";
 export { InitAiRequestTab } from "./init-ai-request-tab";
 export * from "./auth.helper";
 export * from "./common.helper";
