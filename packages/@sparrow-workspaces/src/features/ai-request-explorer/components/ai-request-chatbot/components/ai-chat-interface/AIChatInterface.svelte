@@ -11,7 +11,7 @@
   } from "@sparrow/library/icons";
   import { SparkleFilled } from "@sparrow/common/icons";
   import { cubicOut } from "svelte/easing";
-  import { generatingImage } from "@sparrow/common/images";
+  import { generatingImage, SparrowLogo } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
   import type { Conversation } from "@sparrow/common/types/workspace";
@@ -182,7 +182,8 @@
               >
                 <div class="d-flex flex-column align-items-center">
                   <span class="pb-3">
-                    <SparkleFilled height={"28px"} width={"28px"} />
+                    <!-- <SparkleFilled height={"28px"} width={"28px"} /> -->
+                    <SparrowLogo width={"116"} height={"120px"} />
                   </span>
                   <p
                     class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-semi-bold text-secondary-250 mb-0"
