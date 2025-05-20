@@ -339,6 +339,11 @@ class RestExplorerMockViewModel {
       )
     ) {
       result = false;
+    } else if (
+      requestServer.mockRequest.responseStatus !==
+      progressiveTab.property.mockRequest.responseStatus
+    ) {
+      result = false;
     }
     // name
     else if (requestServer.name !== progressiveTab.name) {
@@ -700,6 +705,18 @@ class RestExplorerMockViewModel {
 
   /**
    *
+   * @param _body - response status
+   */
+  public updateResponseStatus = async (_status: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.mockRequest.responseStatus = _status;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
    * @param _path - request path
    */
   private updateRequestPath = async (_path: Path) => {
@@ -1022,124 +1039,33 @@ class RestExplorerMockViewModel {
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const abortController = new AbortController();
-    restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab.tabId);
-      if (data) {
-        data.abortController = abortController;
-      } else {
-        data = {
-          abortController: abortController,
-          response: {
-            body: "",
-            headers: [],
-            status: "",
-            time: 0,
-            size: 0,
-            navigation: ResponseSectionEnum.RESPONSE,
-            bodyLanguage: RequestDataTypeEnum.TEXT,
-            bodyFormatter: ResponseFormatterEnum.PRETTY,
-          },
-          isSendRequestInProgress: false,
-        };
-      }
-      restApiDataMap.set(progressiveTab.tabId, data);
-      return restApiDataMap;
-    });
-    // Create an AbortController for the request
-    const { signal } = abortController; // Extract the signal for the request
-
-    restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
-      if (data) {
-        data.isSendRequestInProgress = true;
-      }
-      restApiDataMap.set(progressiveTab.tabId, data);
-      return restApiDataMap;
-    });
-    const start = Date.now();
-
-    const decodeData = this._decodeRequest.init(
-      this._tab.getValue().property.request,
-      environmentVariables.filtered || [],
-      this._collectionAuth.getValue(),
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const initRequestTab = new InitTab().request(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      progressiveTab.path.workspaceId,
     );
-    makeHttpRequestV2(...decodeData, signal)
-      .then((response) => {
-        if (response.isSuccessful === false) {
-          restExplorerDataStore.update((restApiDataMap) => {
-            const data = restApiDataMap.get(progressiveTab?.tabId);
-            if (data) {
-              data.response.body = response?.message || "";
-              data.response.headers = [];
-              data.response.status = ResponseStatusCode.ERROR;
-              data.response.time = 0;
-              data.response.size = 0;
-              data.isSendRequestInProgress = false;
-            }
-            restApiDataMap.set(progressiveTab.tabId, data);
-            return restApiDataMap;
-          });
-        } else {
-          const end = Date.now();
-          const byteLength = new TextEncoder().encode(
-            JSON.stringify(response),
-          ).length;
-          const responseSizeKB = byteLength / 1024;
-          const duration = end - start;
-          const responseBody = response.data.body;
-          const formattedHeaders = Object.entries(
-            response?.data?.headers || {},
-          );
-          const responseHeaders = [];
-          formattedHeaders.forEach((elem) => {
-            responseHeaders.push({
-              key: elem[0],
-              value: elem[1],
-            });
-          });
-          let responseStatus = response.data.status;
-          const bodyLanguage =
-            this._decodeRequest.setResponseContentType(responseHeaders);
-
-          restExplorerDataStore.update((restApiDataMap) => {
-            let data = restApiDataMap.get(progressiveTab?.tabId);
-            if (data) {
-              data.response.body = responseBody;
-              data.response.headers = responseHeaders;
-              data.response.status = responseStatus;
-              data.response.time = duration;
-              data.response.size = responseSizeKB;
-              data.response.bodyLanguage = bodyLanguage;
-              data.isSendRequestInProgress = false;
-            }
-            restApiDataMap.set(progressiveTab.tabId, data);
-            return restApiDataMap;
-          });
-        }
-      })
-      .catch((error) => {
-        // Handle cancellation or other errors
-        if (error.name === "AbortError") {
-          return;
-        }
-
-        restExplorerDataStore.update((restApiDataMap) => {
-          const data = restApiDataMap.get(progressiveTab?.tabId);
-
-          if (data) {
-            data.response.body = "";
-            data.response.headers = [];
-            data.response.status = ResponseStatusCode.ERROR;
-            data.response.time = 0;
-            data.response.size = 0;
-            data.isSendRequestInProgress = false;
-          }
-          restApiDataMap.set(progressiveTab.tabId, data);
-          return restApiDataMap;
-        });
-      });
+    initRequestTab.updateBody(progressiveTab.property.mockRequest?.body);
+    initRequestTab.updateUrl(progressiveTab.property.mockRequest?.url);
+    initRequestTab.updateName(progressiveTab.name);
+    initRequestTab.updateDescription(progressiveTab.description);
+    initRequestTab.updateMethod(progressiveTab.property.mockRequest?.method);
+    initRequestTab.updateHeaders(progressiveTab.property.mockRequest?.headers);
+    initRequestTab.updateAuth(progressiveTab.property.mockRequest.auth);
+    initRequestTab.updateQueryParams(
+      progressiveTab.property.mockRequest?.queryParams,
+    );
+    initRequestTab.updateState({
+      requestBodyLanguage:
+        progressiveTab.property.mockRequest?.state?.requestBodyLanguage,
+      requestBodyNavigation:
+        progressiveTab.property.mockRequest?.state?.requestBodyNavigation,
+      // requestAuthNavigation:
+      //   progressiveTab.property.savedRequest?.state?.requestAuthNavigation,
+    });
+    initRequestTab.updateIsSave(false);
+    // MixpanelEvent(Events.TRY_RESPONSE);
+    this.tabRepository.createTab(initRequestTab.getValue());
+    moveNavigation("right");
   };
 
   /**

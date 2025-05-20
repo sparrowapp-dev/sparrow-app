@@ -5,18 +5,11 @@
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
   import {
-    handleEventonClickApplyChangesAI,
-    handleEventOnClickApplyUndoAI,
-  } from "@sparrow/common/utils";
-
-  import {
     ViewPlugin,
     Decoration,
     placeholder as CreatePlaceHolder,
   } from "@codemirror/view";
-
-  import { unifiedMergeView } from "@codemirror/merge";
-  import { Button } from "@sparrow/library/ui";
+  import BulkEditorMergeView from "./BulkEditorMergeView.svelte";
 
   export let placeholder: string;
 
@@ -29,7 +22,6 @@
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
   export let newModifiedContent: string = ""; // New content to show in merge view
-  let previousMergeViewState = isMergeViewEnabled;
   let originalContent = value; // Store the original content for comparison
 
   const dispatch = createEventDispatcher();
@@ -39,16 +31,6 @@
   const mergeConf = new Compartment(); // Add merge compartment
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
-
-  // Create merge extension
-  function createMergeExtension(original: string) {
-    return unifiedMergeView({
-      original: original,
-      highlightChanges: true,
-      gutter: false,
-      mergeControls: false,
-    });
-  }
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
@@ -132,117 +114,6 @@
     }
   }
 
-  // Update the merge view with current original content
-  function updateMergeView() {
-    if (codeMirrorView) {
-      codeMirrorView.dispatch({
-        effects: mergeConf.reconfigure(
-          isMergeViewEnabled ? [createMergeExtension(originalContent)] : [],
-        ),
-      });
-    }
-  }
-
-  /**
-   * Apply changes from the modified content
-   * This function accepts the changes and updates the original value
-   */
-  const applyChanges = () => {
-    if (!isMergeViewEnabled || !codeMirrorView) return;
-
-    const modifiedContent = codeMirrorView.state.doc.toString(); // Get the current modified content
-    value = modifiedContent; // Update the original value with the modified content
-    originalContent = modifiedContent; // Update internal state
-    // dispatch("applyChanges", modifiedContent); // Notify parent component of change
-
-    isMergeViewEnabled = false; // Exit merge view mode
-    newModifiedContent = ""; // reset the content
-    previousMergeViewState = false;
-    updateMergeView(); // Update the editor view
-    handleEventonClickApplyChangesAI("BulkEditor", "headers && parameters");
-  };
-
-  /**
-   * Undo changes and revert to the original content
-   * This function declines the changes and keeps the original value
-   */
-  const undoChanges = () => {
-    if (!isMergeViewEnabled || !codeMirrorView) return;
-
-    // Restore original content
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: originalContent,
-      },
-      annotations: [{ autoChange: true }],
-    });
-
-    // dispatch("undoChanges", originalContent); // Notify parent that changes were declined
-    isMergeViewEnabled = false; // Exit merge view mode
-    newModifiedContent = ""; // reset the content
-    previousMergeViewState = false;
-    updateMergeView(); // Update the editor view
-    handleEventOnClickApplyUndoAI("BulkEditor", "headers && parameters");
-  };
-
-  // Handle changes to isMergeViewEnabled prop
-  $: if (codeMirrorView && isMergeViewEnabled !== previousMergeViewState) {
-    previousMergeViewState = isMergeViewEnabled;
-
-    if (isMergeViewEnabled) {
-      isMergeViewLoading = true;
-      originalContent = codeMirrorView.state.doc.toString(); // Store current content as original
-
-      // Apply new content if provided
-      if (newModifiedContent) {
-        codeMirrorView.dispatch({
-          changes: {
-            from: 0,
-            to: codeMirrorView.state.doc.length,
-            insert: newModifiedContent,
-          },
-          annotations: [{ autoChange: true }],
-        });
-        updateMergeView();
-
-        setTimeout(() => {
-          isMergeViewLoading = false;
-        }, 1000);
-      }
-    } else {
-      // If turning off merge view, restore original content
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: originalContent,
-        },
-        annotations: [{ autoChange: true }],
-      });
-    }
-
-    updateMergeView(); // Can be removed
-  }
-
-  // Handle changes to newModifiedContent when in merge view
-  $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
-    isMergeViewLoading = true;
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: newModifiedContent,
-      },
-      annotations: [{ autoChange: true }],
-    });
-    updateMergeView();
-    setTimeout(() => {
-      isMergeViewLoading = false;
-    }, 1000);
-  }
-
   afterUpdate(() => {
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
       codeMirrorView.dispatch({
@@ -258,7 +129,7 @@
 
   onMount(() => {
     initalizeCodeMirrorEditor(value);
-    originalContent = value;
+    // originalContent = value;
   });
 
   onDestroy(() => {
@@ -271,22 +142,19 @@
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if !isMergeViewLoading && isMergeViewEnabled}
-  <div class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns">
-    <Button
-      title={"Keep the Changes"}
-      size={"small"}
-      type={"primary"}
-      onClick={applyChanges}
-    />
-    <Button
-      title={"Undo"}
-      size={"small"}
-      type={"secondary"}
-      onClick={undoChanges}
-    />
-  </div>
-{/if}
+<BulkEditorMergeView
+  {mergeConf}
+  {codeMirrorView}
+  bind:isMergeViewEnabled
+  bind:isMergeViewLoading
+  bind:newModifiedContent
+  bind:value
+  bind:originalContent
+  on:change={(e) => {
+    value = e.detail;
+    dispatch("change", e.detail); // Dispatch the new content to parent.
+  }}
+/>
 
 <style>
   .basic-codemirror-editor {
@@ -301,33 +169,5 @@
 
   :global(.value-highlight) {
     color: var(--white-color);
-  }
-
-  /* Merge view styles */
-  .merge-view :global(.cm-changedLine) {
-    /* background-color: #113b21; */
-    background: var(--bg-ds-success-800) !important;
-  }
-
-  .merge-view :global(.cm-deletedChunk) {
-    /* background-color: #3d1514; */
-    background-color: var(--bg-ds-danger-800) !important;
-  }
-
-  /* Specific styling for deleted text */
-  .merge-view :global(.cm-deletedText) {
-    /* background-color: #621b18; */
-    background-color: var(--bg-ds-danger-700) !important;
-  }
-
-  /* Specific styling for added text */
-  .merge-view :global(.cm-changedText) {
-    /* background: #14522e !important; */
-    background: var(--bg-ds-success-700) !important;
-  }
-
-  .merge-view-act-btns {
-    position: sticky;
-    bottom: 4px;
   }
 </style>

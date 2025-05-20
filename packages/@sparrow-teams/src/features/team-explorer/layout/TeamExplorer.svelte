@@ -30,7 +30,7 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
-  
+
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
@@ -137,7 +137,7 @@
   const addButtonData = [
     {
       name: "Leave Hub",
-      color: "var(--dangerColor)",
+      color: "var(--text-ds-danger-300)",
       onclick: () => handleLeaveTeam(),
     },
   ];
@@ -177,7 +177,8 @@
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
         count: openTeam?.users?.length || 1,
-        visible: true,
+        visible: (openTeam?.owner === userId &&
+        openTeam.teamId !== "sharedWorkspaceTeam"),
         disabled: isGuestUser === true ? true : false,
       },
       {

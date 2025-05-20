@@ -34,6 +34,8 @@
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
   import * as Sentry from "@sentry/svelte";
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
+  import {policyConfig} from "@sparrow/common/store"
+
   let isEntry = false;
   let isHover = false;
   let externalSparrowLink =
@@ -125,30 +127,32 @@
       class=""
       style="display: flex ; flex-direction:column; align-items:center;"
     >
-      <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
-        <button
-          on:mousedown={() => (isPressed = true)}
-          on:mouseup={() => (isPressed = false)}
-          on:mouseleave={() => (isPressed = false)}
-          class="btn btn-primary w-100 border-0 {isPressed
-            ? 'shadow-pressed'
-            : 'shadow-none'}"
-          on:click={() => {
-            handleRedirect(true);
-            openDefaultBrowser();
-            isTokenFormEnabled = true;
-          }}
-          id="create_account_or_sign_in"
-        >
-          Login or Create</button
-        >
-      </div>
+      {#if $policyConfig.enableLogin}
+        <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
+          <button
+            on:mousedown={() => (isPressed = true)}
+            on:mouseup={() => (isPressed = false)}
+            on:mouseleave={() => (isPressed = false)}
+            class="btn btn-primary w-100 border-0 {isPressed
+              ? 'shadow-pressed'
+              : 'shadow-none'}"
+            on:click={() => {
+              handleRedirect(true);
+              openDefaultBrowser();
+              isTokenFormEnabled = true;
+            }}
+            id="create_account_or_sign_in"
+          >
+            Login or Create</button
+          >
+        </div>
 
-      <div class="divider w-100">
-        <span class="line"></span>
-        <span class="text" style="color:var(--text-secondary-200)">Or</span>
-        <span class="line"></span>
-      </div>
+        <div class="divider w-100">
+          <span class="line"></span>
+          <span class="text" style="color:var(--text-secondary-200)">Or</span>
+          <span class="line"></span>
+        </div>
+      {/if}
 
       <div class="d-flex" style="height:44px; width:100%;">
         <button

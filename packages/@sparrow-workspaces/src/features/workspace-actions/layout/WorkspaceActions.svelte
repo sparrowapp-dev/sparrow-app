@@ -37,6 +37,7 @@
     SocketIoIcon,
     GraphIcon,
     ChevronDoubleLeftRegular,
+    AISparkleRegularIcon,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -58,6 +59,13 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { LaunchDesktop } from "@sparrow/common/components";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import {
+    ArrowRightIcon,
+    ArrowRightRegular,
+    WorkspaceRegular,
+  } from "@sparrow/library/icons";
+  export let onOpenWorkspace: (workspaceId: string) => Promise<void>;
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -138,6 +146,7 @@
   export let userCount = 0;
   export let onCompareCollection;
   export let onSyncCollection;
+  export let onUpdateRunningState;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -146,11 +155,26 @@
   let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId = "";
+  let currentWorkspaceName: string = "";
+  let isWorkspaceTabOpen: boolean = false;
   currentWorkspace.subscribe((value) => {
     if (value?._data) {
+      currentWorkspaceName = value._data.name;
       currentWorkspaceId = value._data._id;
     }
   });
+
+  $: {
+    isWorkspaceTabOpen =
+      activeTabType === TabTypeEnum.WORKSPACE &&
+      activeTabId === currentWorkspaceId;
+  }
+
+  $: {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      isExpandCollection.set(true);
+    }
+  }
 
   // export let isExpandCollection = false;
   // export let isExpandEnvironment = false;
@@ -330,6 +354,16 @@
           },
         },
         {
+          name: `Add AI Request`,
+          icon: AISparkleRegularIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "20px",
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
+          },
+        },
+        {
           name: "Add WebSocket",
           icon: SocketIcon,
           iconColor: "var(--icon-secondary-130)",
@@ -439,6 +473,16 @@
               source: "curl import popup",
             });
             showImportCurlPopup();
+          },
+        },
+        {
+          name: `Add AI Request`,
+          icon: AISparkleRegularIcon,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "20px",
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
           },
         },
         {
@@ -724,11 +768,43 @@
         </div>
       {/if}
     </div>
+    {#if !isGuestUser}
+      <div
+        class="d-flex flex-row justify-content-between align-items-center border-radius-2 collection-container {isWorkspaceTabOpen
+          ? 'selected'
+          : ''}"
+        style="cursor:pointer; margin-top:5px;margin: 5px 5px 0 7px; height:32px;"
+        tabindex="0"
+        on:click={() => {
+          // Open workspace tab when clicked
+          if ($currentWorkspace) {
+            onOpenWorkspace($currentWorkspace._id);
+          }
+        }}
+      >
+        <div class="d-flex flex-row align-items-center flex-grow-1">
+          <span style="display: flex; margin-left:5px;">
+            <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
+          </span>
+          <span
+            class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
+            style="max-width: 110px;"
+          >
+            {currentWorkspaceName}
+          </span>
+        </div>
+        <span class="button-container">
+          <ArrowRightRegular size="16px" color="var(--text-ds-neutral-50)" />
+        </span>
+      </div>
+
+      <hr class="my-1 ms-1 me-1" />
+    {/if}
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
       class="d-flex flex-column collections-list"
-      style="overflow:hidden; margin-top:5px;  flex:1; "
+      style="overflow:hidden; margin-top:{isGuestUser ? '5px' : '0'};  flex:1; "
     >
       <!-----Collection Section------>
       <div
@@ -763,6 +839,7 @@
           {handleTabUpdate}
           {onCompareCollection}
           {onSyncCollection}
+          {onUpdateRunningState}
         />
       </div>
 
@@ -896,6 +973,35 @@
 {/if}
 
 <style>
+  .collection-container .button-container {
+    visibility: hidden;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-right: 8px;
+  }
+
+  .collection-container:hover .button-container {
+    visibility: visible;
+  }
+
+  .collection-container:hover {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+
+  .collection-container.selected {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+
+  .collection-container.selected:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+
+  .button-container:hover {
+    background-color: transparent;
+  }
+
   .not-opened-any {
     height: 40px;
   }

@@ -35,9 +35,11 @@
 //! - `url_fetch_handler::import_swagger_url`: Function for importing Swagger URLs.
 //! - `urlencoded_handler::make_www_form_urlencoded_request`: Function for making URL-encoded requests.
 //! - `utils::response_decoder::decode_response_body`: Function for decoding response body as per encoded type.
+//! - `group_policy_config::get_policy_config: Function to read the registry keys for group policy support`
 // Submodules
 mod config;
 mod formdata_handler;
+mod group_policy_config;
 mod json_handler;
 mod raw_handler;
 mod request_handler;
@@ -48,6 +50,7 @@ mod utils;
 // External Imports
 use base64;
 use formdata_handler::make_formdata_request;
+use group_policy_config::get_policy_config;
 use json_handler::make_json_request;
 use nfd::Response;
 use raw_handler::make_text_request;
@@ -1317,6 +1320,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             fetch_swagger_url_command,
+            get_policy_config,
             get_git_branches,
             get_git_active_branch,
             fetch_file_command,

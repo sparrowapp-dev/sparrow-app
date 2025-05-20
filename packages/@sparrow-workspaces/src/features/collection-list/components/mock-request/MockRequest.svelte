@@ -188,7 +188,7 @@
 />
 
 <Modal
-  title={"Delete Request?"}
+  title={"Delete Mock Request"}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -196,10 +196,10 @@
   handleModalState={() => (isDeletePopup = false)}
 >
   <div
-    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium mt-1"
   >
     <p>
-      Are you sure you want to delete this Request? <span
+      Are you sure you want to delete this mock Request? <span
         class="text-ds-font-weight-semi-bold"
         style="color: var(--text-ds-neutral-50);">"{api.name}"</span
       >
@@ -208,7 +208,7 @@
   </div>
 
   <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+    class="d-flex align-items-center justify-content-end gap-3 mt-4 mb-0 rounded w-100 text-ds-font-size-16"
   >
     <Button
       disable={deleteLoader}
@@ -261,7 +261,7 @@
             request: api,
           });
         },
-        displayText: `Open ${HttpRequestDefaultNameBaseEnum.NAME}`,
+        displayText: `Open Mock ${HttpRequestDefaultNameBaseEnum.NAME}`,
         disabled: false,
         hidden: false,
       },
@@ -270,7 +270,7 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: `Rename ${HttpRequestDefaultNameBaseEnum.NAME}`,
+        displayText: `Rename Mock ${HttpRequestDefaultNameBaseEnum.NAME}`,
         disabled: false,
         hidden:
           !collection.activeSync ||
@@ -298,7 +298,7 @@
 
 <div
   tabindex="0"
-  draggable={activeTabType === "TESTFLOW" ? true : false}
+  draggable={false}
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}

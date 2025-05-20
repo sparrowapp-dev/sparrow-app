@@ -8,6 +8,7 @@ import {
   InitSavedRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
+  InitAiRequestTab
 } from "@sparrow/common/utils";
 import { InitSocketIoTab } from "../utils/init-socket-io-tab";
 import { InitWorkspaceTab } from "../utils/init-workspace-tab";
@@ -58,6 +59,14 @@ class InitTab {
    */
   public request = (_id: string, _workspaceId: string) => {
     return new InitRequestTab(_id, _workspaceId);
+  };
+
+  /**
+   * @param _id - request mongo document id
+   * @param _workspaceId - Workspace mongo id to which request belongs to
+   */
+  public aiRequest = (_id: string, _workspaceId: string) => {
+    return new InitAiRequestTab(_id, _workspaceId);
   };
 
   /**

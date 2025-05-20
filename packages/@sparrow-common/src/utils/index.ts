@@ -27,6 +27,7 @@ export {
   handleEventOnClickDynamicExpressionButton,
   handleEventOnOpenDE,
 } from "./events";
+export { InitAiRequestTab } from "./init-ai-request-tab";
 export * from "./auth.helper";
 export * from "./common.helper";
 export * from "./conversion.helper";

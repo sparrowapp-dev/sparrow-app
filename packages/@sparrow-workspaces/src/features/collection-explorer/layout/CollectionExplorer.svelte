@@ -114,6 +114,7 @@
   export let environmentVariables;
   export let onSaveCollection;
   export let onItemCreated;
+  export let onUpdateRunningState;
 
   /**
    * Local variables
@@ -129,6 +130,7 @@
   let totalWebSocket: number = 0;
   let totalSocketIo: number = 0;
   let totalGraphQl: number = 0;
+  let totalMockRequests: number = 0;
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
@@ -148,6 +150,7 @@
       totalWebSocket = res.totalWebSocket;
       totalSocketIo = res.totalSocketIo;
       totalGraphQl = res.totalGraphQl;
+      totalMockRequests = res.totalMockRequests;
     }
   };
 
@@ -263,7 +266,7 @@
     },
     {
       onclick: () => {
-        onItemCreated("requestCollection", {
+        onItemCreated("requestMockCollection", {
           collection: collection,
         });
       },
@@ -321,6 +324,9 @@
   export let onMockCollectionModelOpen;
   let isMockRunning = false;
   const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection.isMockCollectionRunning,
+    });
     isMockRunning = !isMockRunning;
   };
 </script>
@@ -647,18 +653,24 @@
               <div class="d-flex justify-content-center">
                 <Tag
                   size="medium"
-                  type={isMockRunning ? "green" : "grey"}
-                  text={isMockRunning ? "Running" : "Inactive"}
+                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                  text={collection?.isMockCollectionRunning
+                    ? "Running"
+                    : "Inactive"}
                 />
               </div>
               <Button
                 size="small"
-                type={isMockRunning ? "danger" : "primary"}
-                title={isMockRunning ? "Stop Mock" : "Run Mock"}
+                type={collection?.isMockCollectionRunning
+                  ? "danger"
+                  : "primary"}
+                title={collection?.isMockCollectionRunning
+                  ? "Stop Mock"
+                  : "Run Mock"}
                 onClick={() => {
                   mockRunningStatus();
                 }}
-                startIcon={isMockRunning
+                startIcon={collection?.isMockCollectionRunning
                   ? RecordStopRegular
                   : PlayCircleRegular}
               />
@@ -720,7 +732,7 @@
                 <p style="font-size: 12px;" class="mb-0">Folders</p>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <span class="fs-4 highlighted-number">{totalRequests}</span>
+                <span class="fs-4 highlighted-number">{totalMockRequests}</span>
                 <p style="font-size: 12px;" class="mb-0">
                   {HttpRequestDefaultNameBaseEnum.NAME}
                 </p>

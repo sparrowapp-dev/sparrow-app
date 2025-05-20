@@ -136,6 +136,8 @@ import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspac
 import { WorkspaceService } from "@app/services/workspace.service";
 import constants from "@app/constants/constants";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
 
 export default class CollectionsViewModel {
@@ -399,6 +401,21 @@ export default class CollectionsViewModel {
     if (ws) {
       this.tabRepository.createTab(
         this.initTab.graphQl("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      );
+      moveNavigation("right");
+    } else {
+      console.error("No active workspace found!");
+    }
+  };
+
+   /**
+   * Create ai request new tab with untracked id
+   */
+  private createAiRequestNewTab = async () => {
+    const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
+    if (ws) {
+      this.tabRepository.createTab(
+        this.initTab.aiRequest("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
       moveNavigation("right");
     } else {
@@ -4066,6 +4083,8 @@ export default class CollectionsViewModel {
       baseUrl,
     );
 
+    const isMockCollection =
+      response.data.data?.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       if (
         requestObject.folderId &&
@@ -4087,13 +4106,21 @@ export default class CollectionsViewModel {
       // Deleting the main and child tabs
       await this.removeTabWithChildren(request.id, workspaceId, "request");
 
-      notifications.success(`"${request.name}" Request deleted.`);
+      const successMessage = isMockCollection
+        ? `'${request.name}' mock request deleted successfully.`
+        : `"${request.name}" Request deleted.`;
+
+      notifications.success(successMessage);
       MixpanelEvent(Events.DELETE_REQUEST, {
         source: "Collection list",
       });
       return true;
     } else {
-      notifications.error("Failed to delete API request. Please try again.");
+      const errorMessage = isMockCollection
+        ? `Failed to delete '${request.name}'. Please try again.`
+        : "Failed to delete API request. Please try again.";
+
+      notifications.error(errorMessage);
       return false;
     }
   };
@@ -5044,6 +5071,9 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
+        break;
+      case "Ai-Request-Tab":
+        await this.createAiRequestNewTab();
         break;
     }
     return response;
@@ -7215,6 +7245,43 @@ export default class CollectionsViewModel {
     } catch (error) {
       console.error(error);
       notifications.error("Failed to replace collection. Please try again.");
+    }
+  };
+
+  public handleMockCollectionState = async (
+    collectionId: string,
+    workspaceId: string,
+    request: any,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response =
+      await this.collectionService.updateMockCollectionRunningStatus(
+        collectionId,
+        workspaceId,
+
+        request,
+        baseUrl,
+      );
+    if (response.isSuccessful) {
+      await this.collectionRepository.updateCollection(
+        collectionId,
+        response.data.data,
+      );
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update running state. Please try again.");
+    }
+  };
+  public handleOpenWorkspace = async (id: string) => {
+    if (!id) return;
+    try {
+      const res = await this.workspaceRepository.readWorkspace(id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, id);
+    } catch (error) {
+      console.error("Error opening workspace:", error);
+      notifications.error("Failed to open workspace. Please try again.");
     }
   };
 }

@@ -4,6 +4,7 @@
   import { generatingImage } from "@sparrow/common/images";
   import { TextEditor } from "@sparrow/library/forms";
   import { AISuggestionBox } from "../../../../features/chat-bot/components";
+  import { policyConfig } from "@sparrow/common/store";
 
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
@@ -35,7 +36,7 @@
         />
       </div>
     </div>
-    {#if !isGuestUser}
+    {#if !isGuestUser && $policyConfig.enableAIAssistance}
       <div
         class=""
         style=" width: 100%;"

@@ -95,6 +95,7 @@
   export let handleTabUpdate;
   export let onCompareCollection;
   export let onSyncCollection;
+  export let onUpdateRunningState;
 
   let isExpandCollectionLine = false;
   let isSharedWorkspace = false;
@@ -443,6 +444,7 @@
                     {isWebApp}
                     {onCompareCollection}
                     {onSyncCollection}
+                    {onUpdateRunningState}
                   />
                 {/each}
               </List>
@@ -489,6 +491,7 @@
                     {isWebApp}
                     {onCompareCollection}
                     {onSyncCollection}
+                    {onUpdateRunningState}
                   />
                 {/if}
               {/each}
@@ -533,6 +536,7 @@
                       {isWebApp}
                       {onCompareCollection}
                       {onSyncCollection}
+                      {onUpdateRunningState}
                     />
                   {/if}
                 {/each}

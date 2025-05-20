@@ -30,6 +30,7 @@
   export let isSharedWorkspace = false;
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
+  export let onUpdateRunningState;
 
   import {
     openedComponent,
@@ -91,6 +92,7 @@
   let graphQLCount = 0;
   let webSocketCount = 0;
   let socketIoCount = 0;
+  let mockRequestCount = 0;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -187,6 +189,7 @@
     if (collection) {
       deletedIds = [];
       requestCount = 0;
+      mockRequestCount = 0;
       folderCount = 0;
       graphQLCount = 0;
       webSocketCount = 0;
@@ -209,6 +212,9 @@
             } else if (item.items[i].type === ItemType.SOCKET_IO) {
               socketIoCount++;
               deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.MOCK_REQUEST) {
+              mockRequestCount++;
+              deletedIds.push(item.items[i].id);
             }
           }
         } else if (item.type === ItemType.REQUEST) {
@@ -222,6 +228,9 @@
           deletedIds.push(item.id);
         } else if (item.type === ItemType.WEB_SOCKET) {
           webSocketCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.MOCK_REQUEST) {
+          mockRequestCount++;
           deletedIds.push(item.id);
         }
       });
@@ -362,6 +371,9 @@
 
   let isMockRunning = false;
   const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection?.isMockCollectionRunning,
+    });
     isMockRunning = !isMockRunning;
   };
 </script>
@@ -400,11 +412,11 @@
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>
     </div>
-    <div class="d-flex gap-1 text-ds-font-size-12">
-      <span class="text-plusButton">{requestCount}</span>
-      <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
-    </div>
     {#if !isMockCollection}
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{requestCount}</span>
+        <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
+      </div>
       <div class="d-flex gap-1 text-ds-font-size-12">
         <span class="text-plusButton">{graphQLCount}</span>
         <p>GraphQL</p>
@@ -416,6 +428,11 @@
       <div class="d-flex gap-1 text-ds-font-size-12">
         <span class="text-plusButton">{socketIoCount}</span>
         <p>Socket.IO</p>
+      </div>
+    {:else}
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{mockRequestCount}</span>
+        <p>{HttpRequestDefaultNameBaseEnum.NAME}</p>
       </div>
     {/if}
   </div>
@@ -756,10 +773,13 @@
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
         <div style="display: flex;">
-          <Tag type={isMockRunning ? "green" : "grey"} text={"Mock"} />
+          <Tag
+            type={collection?.isMockCollectionRunning ? "green" : "grey"}
+            text={"Mock"}
+          />
         </div>
         <Tooltip
-          title={isMockRunning ? "Stop Mock" : "Run Mock"}
+          title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}
           distance={13}
           zIndex={701}
@@ -773,7 +793,9 @@
               onClick={() => {
                 mockRunningStatus();
               }}
-              startIcon={isMockRunning ? RecordStopRegular : PlayCircleRegular}
+              startIcon={collection?.isMockCollectionRunning
+                ? RecordStopRegular
+                : PlayCircleRegular}
             />
           </span>
         </Tooltip>
@@ -1040,10 +1062,16 @@
         </Tooltip>
 
         <Tooltip
-          title={collection?.activeSync
-            ? "Adding requests is disabled for active sync collections."
-            : "Add REST API"}
-          placement={collection?.activeSync ? "top-left" : "bottom-center"}
+          title={isMockCollection
+            ? "Add Mock REST API"
+            : collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : "Add REST API"}
+          placement={isMockCollection
+            ? "top-center"
+            : collection?.activeSync
+              ? "top-left"
+              : "bottom-center"}
           distance={12}
           zIndex={1000}
         >

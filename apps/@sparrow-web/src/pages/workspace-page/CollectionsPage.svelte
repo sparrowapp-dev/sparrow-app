@@ -22,6 +22,7 @@
     CollectionExplorerPage,
     FolderExplorerPage,
     WorkspaceExplorerPage,
+    AiRequestExplorerPage,
   } from "..";
   import {
     TabBar,
@@ -235,6 +236,10 @@
    * Handle close tab functionality in tab bar list
    */
   const closeTab = async (id: string, tab: Tab) => {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      _viewModel.handleRemoveTab(id);
+      return;
+    }
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -283,8 +288,11 @@
     }
 
     const wsId = currentWOrkspaceValue._id;
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
     _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
-
     for (let tab of unSavedTabs) {
       // Wait for user confirmation before moving to the next tab
       await closeTab(tab.id, tab);
@@ -292,6 +300,12 @@
   };
   // Methods for Tab Controls - start
   const tabsForceCloseInitiator = (currentTabId: string) => {
+    // For viewer role, directly force close without popup
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
+
     tabsToForceClose = $tabList;
     tabIdWhoRecivedForceClose = currentTabId;
 
@@ -425,7 +439,7 @@
             loader = false;
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
-            notifications.success("API request saved successfully.");
+            notifications.success("Mock Request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);
@@ -826,6 +840,8 @@
           isWebApp={true}
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
+          onUpdateRunningState={_viewModel.handleMockCollectionState}
+          onOpenWorkspace={_viewModel.handleOpenWorkspace}
         />
       </Pane>
       <Pane
@@ -858,6 +874,7 @@
               onClickCloseOtherTabs={softCloseTabs}
               onClickForceCloseTabs={tabsForceCloseInitiator}
               onClickDuplicateTab={handleTabDuplication}
+              {userRole}
             />
             <div style="flex:1; overflow: hidden;">
               <Route>
@@ -869,6 +886,12 @@
                           bind:isTourGuideOpen
                           tab={$activeTab}
                         />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.AI_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <AiRequestExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.COLLECTION}

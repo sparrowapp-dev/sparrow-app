@@ -13,7 +13,7 @@
   export let environmentVariables: any;
   export let selectedApiRequestType: string;
   export let selectedBlock: any;
-  export let cursorPosition: number | null = 0;
+  export let dispatcher;
   export let edges = [];
 
   let selectedAPI: any = null;
@@ -38,6 +38,7 @@
   };
 
   const handleSelectVariable = (requestVariable: any) => {
+    const cursorPosition = dispatcher?.state?.selection?.main?.head || 0;
     if (cursorPosition) {
       expression =
         expression.slice(0, cursorPosition) +
@@ -74,6 +75,7 @@
     }
     const sanitizedRequestName = requestName.replace(/[^a-zA-Z0-9_]/g, "_");
     const current = `$$${sanitizedRequestName}.${requestType}`;
+    const cursorPosition = dispatcher?.state?.selection?.main?.head || 0;
     if (cursorPosition !== null && expression) {
       expression =
         expression.slice(0, cursorPosition) +

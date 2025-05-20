@@ -5,7 +5,7 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { SaveRegular } from "@sparrow/library/icons";
+  import { ArrowUpRightRegular, SaveRegular } from "@sparrow/library/icons";
 
   let componentClass = "";
   export { componentClass as class };
@@ -41,7 +41,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved successfully.");
+      notifications.success("Mock Request saved successfully.");
     }
   };
 
@@ -62,14 +62,14 @@
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-             if (requestUrl === "") {
-          const codeMirrorElement = document.querySelector(
-            ".input-url .cm-editor",
-          );
-          if (codeMirrorElement) {
-            codeMirrorElement.classList.add("url-red-border");
-          }
+      if (requestUrl === "") {
+        const codeMirrorElement = document.querySelector(
+          ".input-url .cm-editor",
+        );
+        if (codeMirrorElement) {
+          codeMirrorElement.classList.add("url-red-border");
         }
+      }
       onSendButtonClicked(environmentVariables);
     }
   };
@@ -129,7 +129,7 @@
     menuItem={"v2"}
     highlightTickedItem={false}
   />
-  <div class="w-100 d-flex align-items-center position-relative ">
+  <div class="w-100 d-flex align-items-center position-relative">
     <div class="position-absolute top-0" style="width: calc(100% );">
       <CodeMirrorInput
         value={requestUrl}
@@ -142,31 +142,31 @@
         class={"input-url"}
         {userRole}
         isFocusedOnMount={false}
-
       />
     </div>
   </div>
 
   <!-- Send button -->
-  {#if !isSendRequestInProgress}
-    <Button
-      title="Send"
-      type="primary"
-      customWidth={"96px"}
-      onClick={() => {
-        if (requestUrl === "") {
-          const codeMirrorElement = document.querySelector(
-            ".input-url .cm-editor",
-          );
-          if (codeMirrorElement) {
-            codeMirrorElement.classList.add("url-red-border");
-          }
-        } else {
-          onSendButtonClicked(environmentVariables);
+  <!-- {#if !isSendRequestInProgress} -->
+  <Button
+    title="Try"
+    endIcon={ArrowUpRightRegular}
+    type="primary"
+    customWidth={"96px"}
+    onClick={() => {
+      if (requestUrl === "") {
+        const codeMirrorElement = document.querySelector(
+          ".input-url .cm-editor",
+        );
+        if (codeMirrorElement) {
+          codeMirrorElement.classList.add("url-red-border");
         }
-      }}
-    />
-  {:else}
+      } else {
+        onSendButtonClicked(environmentVariables);
+      }
+    }}
+  />
+  <!-- {:else}
     <Button
       type="secondary"
       customWidth={"96px"}
@@ -175,7 +175,7 @@
         onCancelButtonClicked();
       }}
     />
-  {/if}
+  {/if} -->
 
   <!-- Switch pane layout button -->
   <!-- <ToggleButton

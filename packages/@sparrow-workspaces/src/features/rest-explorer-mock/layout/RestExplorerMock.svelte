@@ -92,6 +92,8 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { Select } from "@sparrow/library/forms";
+  import { HttpStatusCodes } from "../utils";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -123,6 +125,7 @@
   export let isGuestUser = false;
   export let onOpenCollection;
   export let onUpdateResponseBody;
+  export let onUpdateResponseStatus;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -491,6 +494,8 @@
       else isAIDebugBtnEnable = false;
     }
   }
+
+  let selectedStatusCode = "";
 </script>
 
 {#if $tab.tabId}
@@ -521,7 +526,7 @@
               ) {
                 isExposeSaveAsRequest = true;
               } else if (x.status === "success") {
-                notifications.success("API request saved successfully.");
+                notifications.success("Mock Request saved successfully.");
               }
             }}
           /> <span class="position-relative" style="width:35px;"> </span>
@@ -740,13 +745,44 @@
                             class="d-flex justify-content-between"
                             style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                           > -->
-                          <ResponseNavigator
-                            requestStateSection={$tab.property.mockRequest
-                              ?.state?.responseNavigation}
-                            {onUpdateRequestState}
-                            responseHeadersLength={$tab.property.mockRequest
-                              ?.responseHeaders?.length || 0}
-                          />
+                          <div class="d-flex justify-content-between">
+                            <ResponseNavigator
+                              requestStateSection={$tab.property.mockRequest
+                                ?.state?.responseNavigation}
+                              {onUpdateRequestState}
+                              responseHeadersLength={$tab.property.mockRequest
+                                ?.responseHeaders?.length || 0}
+                            />
+                            <Select
+                              data={HttpStatusCodes}
+                              onclick={(selectedItem) => {
+                                selectedStatusCode = selectedItem;
+                                onUpdateResponseStatus(selectedItem);
+                              }}
+                              titleId={$tab.property.mockRequest
+                                ?.responseStatus}
+                              placeholderText={"Status Code"}
+                              id={"httpStatusCode"}
+                              zIndex={701}
+                              disabled={false}
+                              minBodyWidth={"180px"}
+                              minHeaderWidth={"180px"}
+                              maxHeaderWidth={"180px"}
+                              bodyTheme={"violet"}
+                              menuItem={"v2"}
+                              headerFontSize={"12px"}
+                              isDropIconFilled={true}
+                              maxBodyHeight={"196px"}
+                              variant={"secondary"}
+                              borderType={"none"}
+                              borderActiveType={"none"}
+                              borderHighlight={"hover-active"}
+                              headerHighlight={"hover-active"}
+                              headerHeight={"26px"}
+                              borderRounded={"4px"}
+                              headerSearchable={true}
+                            />
+                          </div>
                           <!-- </div> -->
                           <div
                             class="flex-grow-1 d-flex flex-column"
