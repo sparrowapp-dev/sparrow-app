@@ -648,7 +648,7 @@
     .message-wrapper .markdown span,
     .message-wrapper .markdown code
   ) {
-    font-size: 12px;
+    font-size: 12px !important;
   }
   :global(
     .message-wrapper .markdown pre,

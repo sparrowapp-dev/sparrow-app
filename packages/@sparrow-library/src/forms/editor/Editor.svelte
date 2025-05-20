@@ -42,6 +42,7 @@
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
   export let autofocus = false;
+  export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
 
