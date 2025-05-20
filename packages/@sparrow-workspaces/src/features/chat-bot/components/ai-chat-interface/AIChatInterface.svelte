@@ -94,7 +94,7 @@
   $: {
     if (conversations) {
       for (let i = 0; i < conversations.length; i++) {
-        if ((conversations[i].type = MessageTypeEnum.RECEIVER)) {
+        if (conversations[i].type === MessageTypeEnum.RECEIVER) {
           suggestionCount += 1;
         }
       }
