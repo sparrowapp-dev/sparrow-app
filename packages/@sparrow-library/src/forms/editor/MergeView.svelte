@@ -7,6 +7,10 @@
   import { Button, notifications } from "@sparrow/library/ui";
   import { createEventDispatcher } from "svelte";
   import MergeViewNavigation from "./MergeViewNavigation.svelte";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "../../../../@sparrow-common/src/utils/events";
 
   // ****************************** Props ******************************
   // For merge view
@@ -84,7 +88,7 @@
   const applyChanges = async () => {
     if (!isMergeViewEnabled || !codeMirrorView) return;
     isMergeViewLoading = true;
-
+    handleEventonClickApplyChangesAI("Editor", "Body");
     const modifiedContent = codeMirrorView.state.doc.toString();
     dispatch("change", modifiedContent);
     value = modifiedContent; // Update the original value with the modified content
@@ -104,6 +108,7 @@
    * This function declines the changes and keeps the original value
    */
   const undoChanges = async () => {
+    handleEventOnClickApplyUndoAI("Editor", "Body");
     if (!isMergeViewEnabled || !codeMirrorView) return;
     isMergeViewLoading = true;
 
