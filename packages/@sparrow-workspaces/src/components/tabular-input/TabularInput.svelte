@@ -628,7 +628,7 @@
         diffPairs[i + 1].diffType === "modified"
       ) {
         changedPairIndices.push(i);
-        i += 2; // Skip the next one as it's part of the same group
+        i += 1; // Skip the next one as it's part of the same group
       } else if (
         diffPairs[i].diffType === "added" ||
         diffPairs[i].diffType === "deleted"

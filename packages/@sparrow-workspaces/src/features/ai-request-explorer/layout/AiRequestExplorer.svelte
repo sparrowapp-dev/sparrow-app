@@ -130,37 +130,35 @@
       >
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
-            <div style="flex:1; overflow:auto;">
-              <!-- Request Pane -->
-              <div class="h-100 d-flex flex-column position-relative">
-                <RequestNavigator
-                  requestStateSection={$tab.property.aiRequest?.state
-                    ?.aiNavigation}
-                  {onUpdateRequestState}
-                />
-                <div style="flex:1; overflow:auto;" class="p-0">
-                  {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
-                    <RequestDoc
-                      {onUpdateAiSystemPrompt}
-                      requestDoc={$tab.property.aiRequest.systemPrompt}
-                    />
-                  {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
-                    <RequestAuth
-                      requestStateAuth={$tab.property.aiRequest.state
-                        .aiAuthNavigation}
-                      auth={$tab.property.aiRequest.auth}
-                      collectionAuth={$collectionAuth}
-                      {onUpdateRequestState}
-                      {onUpdateRequestAuth}
-                      {onUpdateEnvironment}
-                      {environmentVariables}
-                      {collection}
-                      {onOpenCollection}
-                    />
-                  {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                    <AiConfigs {onUpdateRequestState} />
-                  {/if}
-                </div>
+            <!-- Request Pane -->
+            <div class="h-100 d-flex flex-column position-relative">
+              <RequestNavigator
+                requestStateSection={$tab.property.aiRequest?.state
+                  ?.aiNavigation}
+                {onUpdateRequestState}
+              />
+              <div style="flex:1; overflow:auto;" class="p-0">
+                {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
+                  <RequestDoc
+                    {onUpdateAiSystemPrompt}
+                    requestDoc={$tab.property.aiRequest.systemPrompt}
+                  />
+                {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
+                  <RequestAuth
+                    requestStateAuth={$tab.property.aiRequest.state
+                      .aiAuthNavigation}
+                    auth={$tab.property.aiRequest.auth}
+                    collectionAuth={$collectionAuth}
+                    {onUpdateRequestState}
+                    {onUpdateRequestAuth}
+                    {onUpdateEnvironment}
+                    {environmentVariables}
+                    {collection}
+                    {onOpenCollection}
+                  />
+                {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
+                  <AiConfigs {onUpdateRequestState} />
+                {/if}
               </div>
             </div>
           </Pane>

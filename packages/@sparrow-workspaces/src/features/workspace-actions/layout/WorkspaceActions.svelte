@@ -14,6 +14,7 @@
   import {
     AddRegular,
     ArrowClockWiseRegular,
+    BetaVectorIcon,
     ChevronDoubleRightRegular,
     DatabaseStackRegular,
     PlusIcon2,
@@ -38,6 +39,7 @@
     GraphIcon,
     ChevronDoubleLeftRegular,
     AISparkleRegularIcon,
+    BotRegular,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -355,9 +357,10 @@
         },
         {
           name: `Add AI Request`,
-          icon: AISparkleRegularIcon,
+          icon: BotRegular,
           iconColor: "var(--icon-secondary-130)",
-          iconSize: "20px",
+          iconSize: "16px",
+          endIcon: BetaVectorIcon,
           onclick: () => {
             onItemCreated("Ai-Request-Tab", {});
             // MixpanelEvent(Events.Add_WebSocket);

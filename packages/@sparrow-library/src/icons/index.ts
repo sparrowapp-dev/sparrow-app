@@ -259,3 +259,5 @@ export { default as BotSparkleFilled } from "./BotSparkleFilled.svelte";
 export { default as ChannelRegular } from "./ChannelRegular.svelte";
 export { default as BotRegular } from "./BotRegular.svelte";
 export { default as ArrowUndoRegular } from "./ArrowUndoRegular.svelte";
+
+export { default as BetaVectorIcon } from "./BetaVectorIcon.svelte";

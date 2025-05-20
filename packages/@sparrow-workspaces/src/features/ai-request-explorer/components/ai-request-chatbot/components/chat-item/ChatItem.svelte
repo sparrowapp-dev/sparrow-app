@@ -696,7 +696,11 @@
     min-width: 276px;
     max-height: 400px;
     min-height: 70px;
-    background: var(--sparrow-black) !important;
+
+    /* *sparrow black is not rendering, so using hardcode hexcode* */
+    /* background: var(--sparrow-black) !important; */
+    background: #000 !important;
+
     border: 2px solid var(--border-ds-surface-400);
     border-radius: 8px;
     overflow-y: auto;

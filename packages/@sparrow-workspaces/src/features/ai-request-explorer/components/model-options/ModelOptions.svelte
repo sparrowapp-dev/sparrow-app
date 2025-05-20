@@ -38,8 +38,8 @@
         { name: "GPT 4 Turbo", id: "gpt-4-turbo" },
         { name: "GPT-4", id: "gpt-4" },
         { name: "GPT 4.1", id: "gpt-4.1" },
-        { name: "o1", id: "o1" },
-        { name: "o1 Mini", id: "o1-mini" },
+        // { name: "o1", id: "o1" },
+        // { name: "o1 Mini", id: "o1-mini" },
         { name: "o3 Mini", id: "o3-mini" },
         { name: "GPT-3.5 Turbo", id: "gpt-3.5-turbo" },
       ],
@@ -203,7 +203,7 @@
 
   .models-container {
     max-height: 230px;
-    min-height: 100px;
+    min-height: 170px;
   }
 
   .model-card {

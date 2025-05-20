@@ -268,7 +268,7 @@
       // Position either above or below based on available space
       bodyTopDistance = wouldOverflowBottom
         ? selectHeaderWrapper.getBoundingClientRect().top - actualBodyHeight - 5
-        : selectHeaderWrapper.getBoundingClientRect().bottom + 0;
+        : selectHeaderWrapper.getBoundingClientRect().bottom + 5;
 
       bodyRightDistance =
         window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;

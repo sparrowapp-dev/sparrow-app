@@ -46,7 +46,7 @@
     model: { name: string; id: string },
   ) => {
     selectedModelProvider = provider;
-    selectedModel = model.name;
+    selectedModel = model.id;
     onUpdateAIModel(provider, model.id);
   };
 
@@ -131,7 +131,7 @@
   </div>
 
   <Tooltip
-    title={"Save (coming soon)"}
+    title={"Coming Soon"}
     placement={"left-center"}
     distance={12}
     zIndex={10}
