@@ -267,7 +267,7 @@
                 </div>
               </div>
             </section>
-            <!-- Launch sparrow desktop -->
+            <!-- Launch sparrow desktop logo-->
             <LaunchDesktop {launchSparrowWebApp} />
           </div>
         {/if}
