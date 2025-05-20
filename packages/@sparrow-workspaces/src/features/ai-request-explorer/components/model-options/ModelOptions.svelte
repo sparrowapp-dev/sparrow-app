@@ -203,7 +203,7 @@
 
   .models-container {
     max-height: 230px;
-    min-height: 100px;
+    min-height: 170px;
   }
 
   .model-card {
