@@ -37,6 +37,7 @@
     padding: 8px;
     display: flex;
     flex-direction: column;
+    font-size: 14px;
     gap: 4px;
     overflow: auto; /* Add scrollbar when content overflows */
   }
