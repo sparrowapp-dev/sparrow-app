@@ -136,6 +136,8 @@ import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspac
 import { WorkspaceService } from "src/services/workspace.service";
 import constants from "src/constants/constants";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -7307,6 +7309,16 @@ export default class CollectionsViewModel {
       notifications.error(response.message);
     } else {
       notifications.error("Failed to update running state. Please try again.");
+    }
+  };
+  public handleOpenWorkspace = async (id: string) => {
+    try {
+      const res = await this.workspaceRepository.readWorkspace(id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, id);
+    } catch (error) {
+      console.error("Error opening workspace:", error);
+      notifications.error("Failed to open workspace. Please try again.");
     }
   };
 }

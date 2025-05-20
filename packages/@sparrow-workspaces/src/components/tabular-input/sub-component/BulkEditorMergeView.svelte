@@ -11,6 +11,10 @@
   import { unifiedMergeView } from "@codemirror/merge";
   import { Button } from "@sparrow/library/ui";
   import BulkEditorMergeViewNavigation from "./BulkEditorMergeViewNavigation.svelte";
+  import {
+    handleEventOnClickApplyUndoAI,
+    handleEventonClickApplyChangesAI,
+  } from "@sparrow/common/utils";
 
   // ****************************** Props ******************************
   // For merge view
@@ -124,6 +128,7 @@
     newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
     updateMergeView(); // Update the editor view
+    handleEventonClickApplyChangesAI("BulkEditor", "headers && parameters");
   };
 
   /**
@@ -148,6 +153,7 @@
     newModifiedContent = ""; // reset the content
     previousMergeViewState = false;
     updateMergeView(); // Update the editor view
+    handleEventOnClickApplyUndoAI("BulkEditor", "headers && parameters");
   };
 </script>
 

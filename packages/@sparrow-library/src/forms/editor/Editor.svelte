@@ -19,6 +19,10 @@
   import { RangeSetBuilder } from "@codemirror/state";
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { DismissIcon } from "@sparrow/library/assets";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "@sparrow/common/utils";
   import MergeView from "./MergeView.svelte";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
@@ -58,13 +62,15 @@
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    if (update.docChanged || update.selectionSet) {
+    if (update.docChanged) {
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
-      const content = update.state.doc.toString();
-      if (!isAutoChange && update.docChanged) {
-        dispatch("change", content);
+      if (!isAutoChange) {
+        // only hits for input, blur etc type of events.
+        const content = update.state.doc.toString(); // Get the new content
+        cursorPosition = update.state.selection.main.head;
+        dispatch("change", content); // Dispatch the new content to parent.
       }
     }
   });
