@@ -177,8 +177,7 @@
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
         count: openTeam?.users?.length || 1,
-        visible: (openTeam?.owner === userId &&
-        openTeam.teamId !== "sharedWorkspaceTeam"),
+        visible: openTeam.teamId !== "sharedWorkspaceTeam",
         disabled: isGuestUser === true ? true : false,
       },
       {
