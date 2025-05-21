@@ -129,27 +129,7 @@
           {:else if searchQuery !== "" && filteredWorkspaces.length === 0}
             <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
-          {/if}
-          <!-- {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
-            <div
-              class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
-              style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
-              on:click={handleClick}
-              tabindex="0"
-            >
-              {#if isWorkspaceCreationInProgress}
-                <span>
-                  <Spinner size={`16px`} />
-                </span>
-              {:else}
-                <span
-                  class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-                  >+ Add New Workspace</span
-                >
-              {/if}
-            </div>
-          {/if} -->
-          {#if workspaces.length === 0}
+            {:else if workspaces.length === 0}
             <div class="container">
               <div class="sparrow-logo">
                 <SparrowLogo />
@@ -181,6 +161,26 @@
               {/if}
             </div>
           {/if}
+          <!-- {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
+            <div
+              class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
+              style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+              on:click={handleClick}
+              tabindex="0"
+            >
+              {#if isWorkspaceCreationInProgress}
+                <span>
+                  <Spinner size={`16px`} />
+                </span>
+              {:else}
+                <span
+                  class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                  >+ Add New Workspace</span
+                >
+              {/if}
+            </div>
+          {/if} -->
+     
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
               {onAddMember}
