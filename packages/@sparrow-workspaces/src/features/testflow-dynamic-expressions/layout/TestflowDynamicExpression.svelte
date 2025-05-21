@@ -19,6 +19,7 @@
   export let edges;
   export let onPreviewExpression;
   export let dynamicExpressionPath: string = "";
+  export let runDynamicExpression: boolean = false;
 
   let dispatcher;
 
@@ -110,6 +111,7 @@
       {onPreviewExpression}
       {handleAddingNested}
       bind:selectedApiRequestType
+      {runDynamicExpression}
       bind:dispatcher
     />
   </div>

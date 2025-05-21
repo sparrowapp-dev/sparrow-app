@@ -1714,6 +1714,7 @@
     {environmentVariables}
     {onPreviewExpression}
     {dynamicExpressionPath}
+    runDynamicExpression={testflowStore?.history.length > 0 ? true : false}
   />
 </Modal>
 
