@@ -329,6 +329,7 @@
     </div>
     <div
       style="display: flex; align-items: center; padding-right: 7px; padding-bottom:1px"
+      on:click|stopPropagation={() => (isOpen = !isOpen)}
     >
       {#if isOpen}
         <ChevronUpRegular size={"16px"} color={"var(--icon-ds-neutral-100)"} />
