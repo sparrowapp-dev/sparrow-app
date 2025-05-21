@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The `@sparrow/desktop` package is responsible for delivering the desktop version of the Sparrow app. It builds upon the core Sparrow packages, importing functionality from `@sparrow/workspace`, `@sparrow/teams`, `@sparrow/common`,`@sparrow/library`,`@sparrow/support`, and others to create a fully-fledged desktop application experience.
+The `@sparrow/desktop` package is responsible for delivering the desktop version of the Sparrow app. It builds upon the core Sparrow packages, importing functionality from `@sparrow/workspace`, `@sparrow/teams`, `@sparrow/common`,`@sparrow/library`,`@sparrow/support`, `@sparrow/marketplace`, and others to create a fully-fledged desktop application experience.
 
 ## Core Features
 
@@ -16,6 +16,7 @@ The `@sparrow/desktop` package is responsible for delivering the desktop version
 - **Offline Capability**: Prioritizes offline functionality to allow users to work without internet access and sync their data when connectivity is restored.
 
 ## Usage
+
 After installation, you can import and start using the package within your Tauri or desktop app setup:
 
 ```
@@ -25,6 +26,7 @@ initializeDesktopApp({
   // Your app initialization configuration
 });
 ```
+
 ## Dependencies Relationships
 
 - **[@sparrow/library](packages/library/README.md)**: Contains global utilities without app-specific data.
@@ -32,4 +34,3 @@ initializeDesktopApp({
 - **[@sparrow/workspace](packages/workspace/README.md)**: Manages collections, environments, and test flows for the REST API tool.
 - **[@sparrow/teams](packages/teams/README.md)**: Facilitates team collaboration and user management.
 - **[@sparrow/support](packages/support/README.md)**: Handles user feedback and support requests.
-

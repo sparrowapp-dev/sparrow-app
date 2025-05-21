@@ -1,8 +1,8 @@
 {
-  "name": "@sparrow/web",
+  "name": "@sparrow/marketplace",
   "version": "2.23.1",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 1422",
+    "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
@@ -12,6 +12,14 @@
   },
   "private": true,
   "main": "src/main.ts",
+  "exports": {
+    "./features": "./src/features/index.ts",
+    "./components": "./src/components/index.ts",
+    "./constants": "./src/constants/index.ts",
+    "./types": "./src/types/index.ts",
+    "./hoc": "./src/hoc/index.ts",
+    "./utils": "./src/utils/index.ts"
+  },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
     "@neoconfetti/svelte": "^1.0.0",
@@ -32,8 +40,7 @@
     "tslib": "^2.4.1",
     "typescript": "^5.0.0",
     "vite": "^5.0.3",
-    "vitest": "^1.2.0",
-    "socket.io-client": "^4.x"
+    "vitest": "^1.2.0"
   },
   "type": "module",
   "dependencies": {
@@ -46,11 +53,8 @@
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
     "yup": "^1.2.0",
-    "posthog-js": "1.236.7",
     "@sparrow/library": "*",
-    "@sparrow/common": "*",
-    "@sparrow/teams": "*",
-    "@sparrow/marketplace": "*"
+    "@sparrow/common": "*"
   },
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
