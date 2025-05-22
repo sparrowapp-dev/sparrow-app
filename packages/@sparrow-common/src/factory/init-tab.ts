@@ -8,10 +8,11 @@ import {
   InitSavedRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
-  InitAiRequestTab
+  InitAiRequestTab,
 } from "@sparrow/common/utils";
 import { InitSocketIoTab } from "../utils/init-socket-io-tab";
 import { InitWorkspaceTab } from "../utils/init-workspace-tab";
+import { InitMockHistoryTab } from "../utils/init-mock-history-tab";
 
 class InitTab {
   constructor() {}
@@ -102,6 +103,13 @@ class InitTab {
    */
   public workspace = (_id: string, _workspaceId: string) => {
     return new InitWorkspaceTab(_id, _workspaceId);
+  };
+  /**
+   * @param _id - folder mongo document id
+   * @param _workspaceId - Workspace mongo id to which folder belongs to
+   */
+  public mockHistory = (_id: string, _workspaceId: string) => {
+    return new InitMockHistoryTab(_id, _workspaceId);
   };
 }
 

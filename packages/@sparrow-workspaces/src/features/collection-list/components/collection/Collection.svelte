@@ -952,8 +952,14 @@
         </div>
       </div>
       <div
-        style="height:32px; padding-left:68px; color: var(--text-ds-neutral-500)"
+        style="height:32px; padding-left:68px; color: var(--text-ds-neutral-500); cursor: pointer;"
         class="d-flex align-items-center text-ds-font-weight-semi-bold"
+        on:click={() => {
+          onItemOpened("mockHistory", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        }}
       >
         <div class="d-flex gap-2 text-ds-font-size-12">
           <div class="d-flex align-items-center">
