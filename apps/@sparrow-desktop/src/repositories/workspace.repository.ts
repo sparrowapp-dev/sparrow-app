@@ -33,6 +33,17 @@ export class WorkspaceRepository {
   };
 
   /**
+   * Get only public workspaces (workspaceType === 'PUBLIC')
+   */
+  public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        workspaceType: "PUBLIC",
+      },
+    }).$;
+  };
+
+  /**
    * get filtered workspaces
    */
   public getFilteredWorkspaces = (
