@@ -48,6 +48,22 @@ export interface CollectionUpdaterDetailsDtoInterface {
   id?: string;
 }
 
+export interface MockRequestHistoryDtoInterface {
+  id?: string;
+  timestamp: Date;
+  name: string;
+  url: string;
+  method: string;
+  responseStatus?: string;
+  duration: number;
+  requestHeaders?: { key: string; value: string; checked: boolean }[];
+  requestBody?: any[];
+  selectedRequestBodyType?: string;
+  selectedResponseBodyType?: string;
+  responseHeaders?: { key: string; value: string; checked: boolean }[];
+  responseBody?: string;
+}
+
 export interface CollectionDtoInterface {
   name: string;
   description?: string;
@@ -63,4 +79,5 @@ export interface CollectionDtoInterface {
   updatedAt?: Date;
   createdBy?: string;
   updatedBy?: CollectionUpdaterDetailsDtoInterface;
+  mockRequestHistory?: MockRequestHistoryDtoInterface[];
 }

@@ -139,6 +139,7 @@ import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspa
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
+import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -408,7 +409,7 @@ export default class CollectionsViewModel {
     }
   };
 
-   /**
+  /**
    * Create ai request new tab with untracked id
    */
   private createAiRequestNewTab = async () => {
@@ -2975,6 +2976,19 @@ export default class CollectionsViewModel {
     this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
   };
+
+  public handleOpenMockHistory = (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const mockHistroyTab = new MockHistoryTabAdapter().adapt(
+      workspaceId,
+      collection.id,
+    );
+    this.handleCreateTab(mockHistroyTab);
+    moveNavigation("right");
+  };
+
   /**
    * Handles renaming a request
    * @param workspaceId :string
@@ -5315,6 +5329,12 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.graphql as CollectionItemsDto,
+        );
+        break;
+      case "mockHistory":
+        this.handleOpenMockHistory(
+          args.workspaceId,
+          args.collection as CollectionDto,
         );
         break;
     }
