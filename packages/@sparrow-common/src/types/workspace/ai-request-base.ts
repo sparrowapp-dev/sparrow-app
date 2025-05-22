@@ -142,26 +142,12 @@ export interface AnthropicGenerationConfig {
 
 // - 2) OpenAI (GPT‑3.5, GPT‑4 family) Configurations
 export interface OpenAIChatConfig {
-    model: OpenAIModelEnum;
-    messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
-    n?: number;
-    max_tokens?: number;
+    streamResponse?: boolean;
+    responseFormat?: boolean;
+    maxTokens?: number;
     temperature?: number;
-    top_p?: number;
-    frequency_penalty?: number;
-    presence_penalty?: number;
-    logit_bias?: Record<string, number>;
-    logprobs?: number;
-    stop?: string | string[];
-    stream?: boolean;
-    user?: string;
-    functions?: Array<{
-        name: string;
-        description?: string;
-        parameters: Record<string, any>;
-    }>;
-    function_call?: 'auto' | 'none' | { name: string };
-    parallel_tool_calls?: boolean;
+    frequencePenalty?: number;
+    presencePenalty?: number;
 }
 
 // - 3) Google (Gemini family) Configurations

@@ -106,7 +106,7 @@ export interface AiSystemPromptWrapper {
 }
 
 export interface AiConfigurationsWrapper {
-    Configurations: AIConfig;
+    configurations: AIConfig;
 }
 
 export interface ResponseStatusWrapper {

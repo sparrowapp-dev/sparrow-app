@@ -50,6 +50,7 @@ class InitAiRequestTab {
                             addTo: CollectionRequestAddToBaseEnum.HEADER, // ToDo (remove while pushing): This "addTo" needs to removed, because api key handling is done from backend so on frontend no need to decided headers or params
                         },
                     },
+                    configurations: {},
                     ai: {
                         prompt: "",
                         conversations: [],
