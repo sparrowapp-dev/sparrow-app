@@ -10,6 +10,7 @@
   export let selectedApiRequestType: string;
   export let onPreviewExpression;
   export let dispatcher;
+  export let runDynamicExpression: boolean = false;
 
   let expressionPreviewResult = "";
   let expressionErrorResult = "";
@@ -156,7 +157,9 @@
         class="text-fs-12 mb-0 ellipsis-5"
         style="color: var(--text-ds-danger-300)"
       >
-        No preview available. Please check your expression and try again.
+        {runDynamicExpression
+          ? "No preview available. Please check your expression and try again."
+          : "Please run the Blocks to check the dynamic expression preview."}
       </p>
     {/if}
   </div>
