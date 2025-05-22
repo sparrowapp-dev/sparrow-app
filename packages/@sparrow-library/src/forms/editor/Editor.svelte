@@ -13,14 +13,17 @@
     type DecorationSet,
   } from "@codemirror/view";
   import { linter } from "@codemirror/lint";
-  import { Button, notifications } from "../../ui";
   import type { Diagnostic } from "@codemirror/lint";
   import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
   import { Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view";
   import { RangeSetBuilder } from "@codemirror/state";
   import { MathFormulaFunction } from "@sparrow/library/assets";
-  import { unifiedMergeView } from "@codemirror/merge";
   import { DismissIcon } from "@sparrow/library/assets";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "@sparrow/common/utils";
+  import MergeView from "./MergeView.svelte";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "Text";
@@ -38,6 +41,7 @@
   export let errorMessage = ""; // Error message to display if `isErrorVisible` is true
   export let errorStartIndex = 0;
   export let errorEndIndex = 0;
+  export let autofocus = false;
   export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
@@ -46,7 +50,6 @@
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
   export let newModifiedContent: string; // New content to show in merge view
-  let hasChanges = false;
   let originalContent = value; // Store the original content for comparison
 
   const dispatch = createEventDispatcher();
@@ -57,16 +60,6 @@
   const mergeConf = new Compartment(); // Compartment for diff/merge view
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
-
-  // Create merge extension
-  function createMergeExtension(original: string) {
-    return unifiedMergeView({
-      original: original,
-      highlightChanges: true,
-      gutter: false,
-      mergeControls: false,
-    });
-  }
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
@@ -101,7 +94,6 @@
       readonly name: string,
       readonly from: number,
       readonly to: number,
-      // readonly id: string,
     ) {
       super();
     }
@@ -303,11 +295,24 @@
     let state = EditorState.create({
       doc: value,
       extensions: extensions,
+      selection: autofocus
+        ? { anchor: value.length, head: value.length }
+        : { anchor: 0, head: 0 },
     });
+
     codeMirrorView = new EditorView({
       parent: codeMirrorEditorDiv,
       state: state,
     });
+
+    if (autofocus && isEditable) {
+      setTimeout(() => {
+        codeMirrorView.focus();
+        codeMirrorView.dispatch({
+          effects: EditorView.scrollIntoView(value.length),
+        });
+      }, 100);
+    }
     setTimeout(() => {
       dispatcher = codeMirrorView;
     }, 100);
@@ -330,87 +335,6 @@
     }
   }
 
-  // Update the merge view with current original content
-  function updateMergeView() {
-    if (codeMirrorView) {
-      codeMirrorView.dispatch({
-        effects: mergeConf.reconfigure(
-          isMergeViewEnabled ? [createMergeExtension(originalContent)] : [],
-        ),
-      });
-    }
-  }
-
-  /**
-   * Apply changes from the modified content
-   * This function accepts the changes and updates the original value
-   */
-  const applyChanges = async () => {
-    if (!isMergeViewEnabled || !codeMirrorView) return;
-    isMergeViewLoading = true;
-
-    const modifiedContent = codeMirrorView.state.doc.toString();
-    dispatch("change", modifiedContent);
-    value = modifiedContent; // Update the original value with the modified content
-    originalContent = modifiedContent; // Update internal state
-
-    isMergeViewEnabled = false;
-    newModifiedContent = ""; // reset the content
-    hasChanges = false;
-    updateMergeView(); // Update the editor view
-
-    await sleep(1000);
-    isMergeViewLoading = false;
-  };
-
-  /**
-   * Undo changes and revert to the original content
-   * This function declines the changes and keeps the original value
-   */
-  const undoChanges = async () => {
-    if (!isMergeViewEnabled || !codeMirrorView) return;
-    isMergeViewLoading = true;
-
-    // Restore original content
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: originalContent,
-      },
-      annotations: [{ autoChange: true }],
-    });
-    // dispatch("undoChanges", originalContent); // Notify parent that changes were declined
-
-    isMergeViewEnabled = false;
-    newModifiedContent = "";
-    hasChanges = false;
-    updateMergeView(); // Update the editor view
-
-    await sleep(1000);
-    isMergeViewLoading = false;
-  };
-
-  // Function to check if there are actual changes between original and current content
-  function checkForChanges() {
-    if (!codeMirrorView || !isMergeViewEnabled) {
-      hasChanges = false;
-      return;
-    }
-    const currentContent = codeMirrorView.state.doc.toString();
-    hasChanges = newModifiedContent !== currentContent;
-
-    if (!hasChanges) {
-      undoChanges(); // resetting the mergeview states and props
-      notifications.success("You already have updated changes.");
-    }
-
-    return hasChanges;
-  }
-
-  // Call this function whenever content might change
-  $: if (codeMirrorView && isMergeViewEnabled) checkForChanges();
-
   onMount(() => {
     initalizeCodeMirrorEditor(value);
     // Attach keydown listener to prevent global search when inside CodeMirror
@@ -422,36 +346,6 @@
     originalContent = value; // Store initial content as original
   });
 
-  // Handle changes to newModifiedContent when in merge view
-  $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
-    isMergeViewLoading = true;
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: newModifiedContent,
-      },
-      annotations: [{ autoChange: true }],
-    });
-    updateMergeView();
-
-    // Use setTimeout to allow the merge view to be rendered
-    // This is a workaround since the operation isn't really async
-    setTimeout(() => (isMergeViewLoading = false), 2000);
-  }
-
-  // Utility function to create a delay
-  const sleep = (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
-
-  // Show dummy loading
-  const showSyncLoading = async (delay: number) => {
-    isMergeViewLoading = true;
-    await sleep(delay);
-    isMergeViewLoading = false;
-  };
-
   // Run whenever component state changes
   afterUpdate(() => {
     // Handling the mergeview state while component state changes
@@ -462,8 +356,18 @@
           to: codeMirrorView.state.doc.length,
           insert: value,
         },
+        selection: autofocus
+          ? { anchor: value.length, head: value.length }
+          : { anchor: 0, head: 0 },
         annotations: [{ autoChange: true }],
       });
+
+      if (autofocus && isEditable) {
+        codeMirrorView.focus();
+        codeMirrorView.dispatch({
+          effects: EditorView.scrollIntoView(value.length),
+        });
+      }
     }
 
     handleCodeMirrorSyntaxFormat(
@@ -502,29 +406,19 @@
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if hasChanges}
-  <div class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns">
-    <Button
-      title={"Keep the Changes"}
-      size={"small"}
-      type={"primary"}
-      onClick={() => {
-        "click applyChanges";
-        applyChanges();
-      }}
-    ></Button>
-
-    <Button
-      title={"Undo"}
-      size={"small"}
-      type={"secondary"}
-      onClick={() => {
-        "click undoChanges";
-        undoChanges();
-      }}
-    ></Button>
-  </div>
-{/if}
+<MergeView
+  {mergeConf}
+  {codeMirrorView}
+  bind:isMergeViewEnabled
+  bind:isMergeViewLoading
+  bind:newModifiedContent
+  bind:value
+  bind:originalContent
+  on:change={(e) => {
+    value = e.detail;
+    dispatch("change", e.detail); // Dispatch the new content to parent.
+  }}
+/>
 
 <style>
   .basic-codemirror-editor {
@@ -533,32 +427,6 @@
     margin-right: 1%;
   }
 
-  /* Style for customizing the css for codemirror merge view */
-
-  .merge-view-act-btns {
-    position: sticky; /* fix the position so that it will not go down with scroll down */
-    bottom: 4px;
-  }
-
-  /* styling for added row */
-  .merge-view :global(.cm-changedLine) {
-    background: var(--bg-ds-success-800);
-  }
-
-  /* styling for deleted row */
-  .merge-view :global(.cm-deletedChunk) {
-    background-color: var(--bg-ds-danger-800);
-  }
-
-  /* styling for deleted text */
-  .merge-view :global(.cm-deletedText) {
-    background-color: var(--bg-ds-danger-700);
-  }
-
-  /* styling for added text */
-  .merge-view :global(.cm-changedText) {
-    background: var(--bg-ds-success-700);
-  }
   :global(.cm-expression-block) {
     height: 20px;
   }

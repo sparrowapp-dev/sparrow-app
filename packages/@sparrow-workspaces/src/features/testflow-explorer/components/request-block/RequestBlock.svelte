@@ -13,6 +13,8 @@
     RenameRegular,
     ArrowExportRegular,
     ArrowImportRegular,
+    ArrowExitRegular,
+    ArrowEnterRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
@@ -32,6 +34,7 @@
   } from "@sparrow/common/types/workspace/testflow";
   import type { Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
+  import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
 
   /**
    * The data object containing various handlers and data stores.
@@ -68,6 +71,8 @@
   let isEditing = false;
   let blockName = "";
   let isAddBlockVisible = false; // State to track visibility of add block button
+  let isNodeExistToRight = false;
+  let isNodeExistToLeft = false;
   let isRunTextVisible = false; // State to track visibility of run text
   let isDropHereVisible = false; // state to track if there is drag in test flow screen
   let dataBlocksSubscriber: Unsubscriber;
@@ -152,6 +157,8 @@
       });
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
+        isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
       isDropHereVisible = _nodes[0].data.parentDrag;
@@ -159,6 +166,8 @@
     dataConnectorSubscriber = data.connector.subscribe(() => {
       // Update visibility of the "Add Block" button based on edge check
       setTimeout(() => {
+        isNodeExistToRight = data?.onCheckEdges(id);
+        isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
     });
@@ -191,19 +200,10 @@
 
   let moreOptions = [
     {
-      name: "Rename Block",
-      iconSize: "16px",
-      iconColor: "var(--icon-ds-neutral-50)",
-      Icon: RenameRegular,
-      onClick: () => {
-        isEditing = true;
-      },
-    },
-    {
       name: "Run From Here",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
-      Icon: ArrowExportRegular,
+      Icon: ArrowExitRegular,
       onClick: () => {
         data.onContextMenu(id, "run-from-here");
       },
@@ -212,9 +212,36 @@
       name: "Run Till Here",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",
-      Icon: ArrowImportRegular,
+      Icon: ArrowEnterRegular,
       onClick: () => {
         data.onContextMenu(id, "run-till-here");
+      },
+    },
+    {
+      name: "Add block after",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowExportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "add-block-after");
+      },
+    },
+    {
+      name: "Add block before",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowImportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "add-block-before");
+      },
+    },
+    {
+      name: "Rename Block",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: RenameRegular,
+      onClick: () => {
+        isEditing = true;
       },
     },
     {
@@ -237,17 +264,19 @@
   class="request-block position-relative"
   style={selected && !currentBlock?.response.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
-    : selected && currentBlock && checkIfRequestSucceed(currentBlock)
+    : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
+        ($currentStep > 6 && $isTestFlowTourGuideOpen)
       ? "outline: 1px solid var(--border-ds-success-300); border:none;"
       : selected && currentBlock && !checkIfRequestSucceed(currentBlock)
         ? "outline: 1px solid var(--border-ds-danger-300); border:none;"
         : ""}
+  id="request-block"
 >
   <Handle
     type="target"
     position={Position.Left}
-    class="connecting-dot-left"
-    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    isConnectable={isNodeExistToLeft ? false : true}
+    style=" border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <div
     class="d-flex px-2 align-items-center"
@@ -258,15 +287,15 @@
       style="gap: 4px;"
     >
       <div class="status-icon">
-        {#if !currentBlock?.response?.status}
-          <ArrowSwapRegular
-            size={"16px"}
-            color={"var(--icon-ds-neutral-200)"}
-          />
-        {:else if checkIfRequestSucceed(currentBlock)}
+        {#if checkIfRequestSucceed(currentBlock) || ($currentStep > 6 && $isTestFlowTourGuideOpen)}
           <CheckmarkCircleRegular
             size={"16px"}
             color={"var(--icon-ds-success-400)"}
+          />
+        {:else if !currentBlock?.response?.status}
+          <ArrowSwapRegular
+            size={"16px"}
+            color={"var(--icon-ds-neutral-200)"}
           />
         {:else}
           <ErrorCircleRegular
@@ -287,7 +316,7 @@
           on:input={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            data.updateBlockName("blockName", e?.target?.value);
+            data.updateBlockName(id, e?.target?.value);
           }}
           on:change={(e) => {
             e.preventDefault();
@@ -298,9 +327,11 @@
             e.stopPropagation();
           }}
           value={blockName}
-          on:blur={() => {
+          on:blur={(e) => {
             if (blockName.trim().length == 0) {
-              data.updateBlockName("blockName", "Untitled");
+              data.updateBlockName(id, "Untitled");
+            } else if (blockName.trim().length) {
+              data.updateBlockName(id, blockName.trim());
             }
             isEditing = false;
           }}
@@ -431,6 +462,33 @@
       </div>
     </div>
   {/if}
+  {#if $currentStep > 5 && isTestFlowTourGuideOpen}
+    <div class="px-2 d-flex response-status-container">
+      <!-- Response status -->
+      <div
+        class="d-flex align-items-center px-1 me-2 text-getColor}"
+        style="gap: 6px;"
+      >
+        <div class="d-flex justify-content-center alin-items-center">
+          <DotIcon
+            color={"var(--text-ds-success-400)"}
+            height={"6px"}
+            width={"6px"}
+          />
+        </div>
+        <span class="response-text-success">
+          {200}
+        </span>
+      </div>
+      <!-- Response time -->
+      <div class="d-flex align-items-center me-2" style="gap: 6px;">
+        <div class="d-flex justify-content-center alin-items-center clock-icon">
+          <ClockRegular size={"16px"} color={"var(--icon-ds-neutral-200)"} />
+        </div>
+        <span class="response-text"> 1629 ms </span>
+      </div>
+    </div>
+  {/if}
   <!-- ------------- -->
   <div class="">
     {#if isDropHereVisible && isAddBlockVisible}
@@ -479,7 +537,8 @@
   <Handle
     type="source"
     position={Position.Right}
-    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:6px; width:6px;"
+    isConnectable={isNodeExistToRight ? false : true}
+    style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
   {#if !isDropHereVisible && isAddBlockVisible}
@@ -567,18 +626,7 @@
     border-radius: 8px;
     outline: none;
   }
-  .connecting-dot-left {
-    background-color: var(--bg-ds-surface-600);
-    border: 1px solid var(--border-ds-neutral-500);
-  }
 
-  .connecting-dot-left:hover {
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
-
-  .connecting-dot-left:active {
-    border: 1px solid var(--border-ds-primary-300) !important;
-  }
   .base-line {
     border: 1px solid var(--bg-ds-surface-400);
   }

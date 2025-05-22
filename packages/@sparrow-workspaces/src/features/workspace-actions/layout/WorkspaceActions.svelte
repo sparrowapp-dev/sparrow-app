@@ -14,7 +14,9 @@
   import {
     AddRegular,
     ArrowClockWiseRegular,
+    BetaVectorIcon,
     ChevronDoubleRightRegular,
+    DatabaseStackRegular,
     PlusIcon2,
   } from "@sparrow/library/icons";
   import type { Observable } from "rxjs";
@@ -36,6 +38,8 @@
     SocketIoIcon,
     GraphIcon,
     ChevronDoubleLeftRegular,
+    AISparkleRegularIcon,
+    BotRegular,
   } from "@sparrow/library/icons";
   import { WithButton } from "@sparrow/workspaces/hoc";
   import { createDeepCopy } from "@sparrow/common/utils";
@@ -57,6 +61,13 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { LaunchDesktop } from "@sparrow/common/components";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import {
+    ArrowRightIcon,
+    ArrowRightRegular,
+    WorkspaceRegular,
+  } from "@sparrow/library/icons";
+  export let onOpenWorkspace: (workspaceId: string) => Promise<void>;
   export let appVersion;
 
   export let collectionList: Observable<CollectionDocument[]>;
@@ -137,6 +148,7 @@
   export let userCount = 0;
   export let onCompareCollection;
   export let onSyncCollection;
+  export let onUpdateRunningState;
 
   let runAnimation: boolean = true;
   let showfilterDropdown: boolean = false;
@@ -145,11 +157,26 @@
   let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId = "";
+  let currentWorkspaceName: string = "";
+  let isWorkspaceTabOpen: boolean = false;
   currentWorkspace.subscribe((value) => {
     if (value?._data) {
+      currentWorkspaceName = value._data.name;
       currentWorkspaceId = value._data._id;
     }
   });
+
+  $: {
+    isWorkspaceTabOpen =
+      activeTabType === TabTypeEnum.WORKSPACE &&
+      activeTabId === currentWorkspaceId;
+  }
+
+  $: {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      isExpandCollection.set(true);
+    }
+  }
 
   // export let isExpandCollection = false;
   // export let isExpandEnvironment = false;
@@ -292,6 +319,23 @@
             isExpandCollection.set(true);
           },
         },
+        ...(!isGuestUser
+          ? [
+              {
+                name: "Add Mock Collection",
+                icon: DatabaseStackRegular,
+                iconColor: "var(--icon-secondary-130)",
+                iconSize: "13px",
+                onclick: () => {
+                  onItemCreated("mockCollection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                  isExpandCollection.set(true);
+                },
+              },
+            ]
+          : []),
         {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
@@ -309,6 +353,17 @@
               source: "curl import popup",
             });
             showImportCurlPopup();
+          },
+        },
+        {
+          name: `Add AI Request`,
+          icon: BotRegular,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "16px",
+          endIcon: BetaVectorIcon,
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
           },
         },
         {
@@ -387,6 +442,23 @@
             isExpandCollection.set(true);
           },
         },
+        ...(!isGuestUser
+          ? [
+              {
+                name: "Add Mock Collection",
+                icon: DatabaseStackRegular,
+                iconColor: "var(--icon-secondary-130)",
+                iconSize: "13px",
+                onclick: () => {
+                  onItemCreated("mockCollection", {
+                    workspaceId: currentWorkspaceId,
+                    collection: collectionList,
+                  });
+                  isExpandCollection.set(true);
+                },
+              },
+            ]
+          : []),
         {
           name: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
           icon: VectorIcon,
@@ -404,6 +476,17 @@
               source: "curl import popup",
             });
             showImportCurlPopup();
+          },
+        },
+        {
+          name: `Add AI Request`,
+          icon: BotRegular,
+          iconColor: "var(--icon-secondary-130)",
+          iconSize: "16px",
+          endIcon: BetaVectorIcon,
+          onclick: () => {
+            onItemCreated("Ai-Request-Tab", {});
+            // MixpanelEvent(Events.Add_WebSocket);
           },
         },
         {
@@ -641,13 +724,17 @@
       </div>
 
       {#if $isTestFlowTourGuideOpen && $currentStep == 1}
-        <div style="position:fixed; top:53px; left:-19px; z-index:9999;">
+        <div
+          style="position:fixed; top:96px; left:{isWebApp
+            ? '335px'
+            : '310px'}; z-index:9999;"
+        >
           <TestFlowTourGuide
-            targetId="addButton"
-            title="Getting Started  🎉"
-            pulsePosition={{ top: "-58px", left: "14px" }}
-            description={`Welcome! Let’s kick off by creating your test flow. You can add a new flow by clicking here, using the '+' icon, or navigating from the home page. Let's get started!`}
-            tipPosition="top-left"
+            targetIds={["addButton"]}
+            title="Welcome to Test Flow!"
+            description={`Let’s begin by creating your first flow. Click the ‘+ Add’ button to get started.`}
+            CardNumber={1}
+            totalCards={7}
             onNext={() => {
               currentStep.set(2);
               addButtonMenu = true;
@@ -663,15 +750,15 @@
       {#if $isTestFlowTourGuideOpen && $currentStep == 2}
         <div
           style="position:fixed; top:{isWebApp
-            ? '234px'
-            : '266px'}; left:220px; z-index:9999;"
+            ? '330px'
+            : '340px'}; left:{isWebApp ? '620px' : '550px'}; z-index:9999;"
         >
           <TestFlowTourGuide
-            targetId="addButton"
-            title="Add Your Flow 🌊"
-            description={`Next, just click 'Add Test Flow'—and voilà, it's instantly added! Quick and easy, right? You’re all set for the next step!`}
-            tipPosition="left-top"
-            pulsePosition={{ top: isWebApp ? "10px" : "12px", left: "-150px" }}
+            targetIds={["dropdown-items"]}
+            title="Add Your Flow"
+            description={`Click ‘Add Test Flow’ to instantly create a new flow. It’s that simple—your workspace is ready!`}
+            CardNumber={2}
+            totalCards={7}
             onNext={() => {
               currentStep.set(3);
               onCreateTestflow();
@@ -685,11 +772,43 @@
         </div>
       {/if}
     </div>
+    {#if !isGuestUser}
+      <div
+        class="d-flex flex-row justify-content-between align-items-center border-radius-2 collection-container {isWorkspaceTabOpen
+          ? 'selected'
+          : ''}"
+        style="cursor:pointer; margin-top:5px;margin: 5px 5px 0 7px; height:32px;"
+        tabindex="0"
+        on:click={() => {
+          // Open workspace tab when clicked
+          if ($currentWorkspace) {
+            onOpenWorkspace($currentWorkspace._id);
+          }
+        }}
+      >
+        <div class="d-flex flex-row align-items-center flex-grow-1">
+          <span style="display: flex; margin-left:5px;">
+            <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
+          </span>
+          <span
+            class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
+            style="max-width: 110px;"
+          >
+            {currentWorkspaceName}
+          </span>
+        </div>
+        <span class="button-container">
+          <ArrowRightRegular size="16px" color="var(--text-ds-neutral-50)" />
+        </span>
+      </div>
+
+      <hr class="my-1 ms-1 me-1" />
+    {/if}
 
     <!-- LHS Side of Collection Enivironment & Test Flows -->
     <div
       class="d-flex flex-column collections-list"
-      style="overflow:hidden; margin-top:5px;  flex:1; "
+      style="overflow:hidden; margin-top:{isGuestUser ? '5px' : '0'};  flex:1; "
     >
       <!-----Collection Section------>
       <div
@@ -724,6 +843,7 @@
           {handleTabUpdate}
           {onCompareCollection}
           {onSyncCollection}
+          {onUpdateRunningState}
         />
       </div>
 
@@ -857,6 +977,35 @@
 {/if}
 
 <style>
+  .collection-container .button-container {
+    visibility: hidden;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-right: 8px;
+  }
+
+  .collection-container:hover .button-container {
+    visibility: visible;
+  }
+
+  .collection-container:hover {
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+  }
+
+  .collection-container.selected {
+    background-color: var(--bg-ds-surface-500);
+    border-radius: 4px;
+  }
+
+  .collection-container.selected:hover {
+    background-color: var(--bg-ds-surface-500);
+  }
+
+  .button-container:hover {
+    background-color: transparent;
+  }
+
   .not-opened-any {
     height: 40px;
   }

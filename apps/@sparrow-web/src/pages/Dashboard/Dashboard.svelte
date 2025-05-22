@@ -225,7 +225,9 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
-    if (!guestUser) await _viewModel.connectWebSocket();
+    // Connect websocket for guest users also for AI testing tab -> (while rest api chatbot will be disabled from UI)
+    await _viewModel.connectWebSocket();
+
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
@@ -311,7 +313,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     }
@@ -339,7 +340,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening collection:", error);
@@ -370,7 +370,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening folder:", error);
@@ -393,7 +392,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening workspace:", error);
@@ -423,7 +421,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error); 
       closeGlobalSearch();
       handlehideGlobalSearch(false);
       console.error("Error opening environment:", error);
@@ -453,7 +450,6 @@
       closeGlobalSearch();
       handlehideGlobalSearch(false);
     } catch (error) {
-      Sentry.captureException(error); 
       console.error("Error opening testflow:", error);
       closeGlobalSearch();
       handlehideGlobalSearch(false);

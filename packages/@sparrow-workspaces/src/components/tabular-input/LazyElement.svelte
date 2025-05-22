@@ -10,6 +10,7 @@
   import { Checkbox } from "@sparrow/library/forms";
   import { DeleteRegular, MathFormulaRegular } from "@sparrow/library/icons";
   import { isDynamicExpressionModalOpen } from "../../features/testflow-explorer/store/testflow";
+  import { handleEventOnClickDynamicExpressionButton } from "@sparrow/common/utils";
 
   export let element;
   export let dynamicExpression = false;
@@ -47,7 +48,11 @@
   use:inview={options}
   on:inview_change={handleChange}
   class="pair-data-row d-flex align-items-center w-100 {customClass}"
-  style="padding-right:1rem; padding-left: 4px;"
+  style="padding-right: {dynamicExpression &&
+  isCheckBoxEditable &&
+  pairs.length - 1 === index
+    ? '2.7rem'
+    : '1rem'}; padding-left: 4px;"
 >
   {#if isInView}
     <!-- <div class="button-container">
@@ -131,6 +136,11 @@
                 type="teritiary-regular"
                 startIcon={MathFormulaRegular}
                 onClick={() => {
+                  handleEventOnClickDynamicExpressionButton(
+                    "LazyElement",
+                    "fx_icon",
+                    "headers && parameters",
+                  );
                   handleOpenCurrentDynamicExpression({
                     destination: {
                       row: "value",

@@ -5,6 +5,9 @@
     Background,
     type Node,
     type NodeTypes,
+    type EdgeTypes,
+    useSvelteFlow,
+    SvelteFlowProvider,
   } from "@xyflow/svelte";
 
   import {
@@ -23,6 +26,7 @@
     ResponseHeaders,
     TestFlowName,
     SaveTestflow,
+    Edge,
   } from "../components";
   import {
     RequestDatasetEnum,
@@ -61,8 +65,10 @@
   } from "@sparrow/common/types/workspace/testflow";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     Debounce,
+    handleEventOnOpenDE,
     InitFolderTab,
     InitRequestTab,
     OSDetector,
@@ -118,6 +124,8 @@
   export let onUpdateEnvironment;
   export let runSingleNode;
   export let onPreviewExpression;
+  export let redirectDocsTestflow: () => void;
+  export let handleEventOnClickQuestionMark;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -171,8 +179,11 @@
   let updateNodeMethod: string;
   let updateNodeUrl: string;
   let updateNodeFolderId: any;
+  let dynamicExpressionDeleteWarning: boolean = false;
   // Flag to control whether nodes are draggable
-  let isNodesDraggable = false;
+  let isNodesDraggable = true;
+  let isNodeDeletable = false;
+  let isEdgeDeletable = false;
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let collectionListDocument: CollectionDocument[];
@@ -181,21 +192,28 @@
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
+  setTimeout(() => {}, 1000);
 
   /**
    * Checks if edges exist for the given node ID.
    * @param _id - Node ID to check for connected edges.
    * @returns True if edges exist, otherwise false.
    */
-  const checkIfEdgesExist = (_id: string) => {
+  const checkIfEdgesExist = (_id: string, _direction = "right") => {
     let edge: TFEdgeHandlerType[] = [];
     edges.subscribe((value) => {
       edge = value;
     })();
     let response = false;
     edge.forEach((it) => {
-      if (it.id.replace("xy-edge__", "").split("-")[0] === _id) {
-        response = true;
+      if (_direction === "right") {
+        if (it.id.replace("xy-edge__", "").split("-")[0] === _id) {
+          response = true;
+        }
+      } else {
+        if (it.id.replace("xy-edge__", "").split("-")[1] === _id) {
+          response = true;
+        }
       }
     });
     return response;
@@ -376,10 +394,13 @@
 
   let dynamicExpressionEditorContent = "";
   let dynamicExpressionModal = {};
+  let dynamicExpressionPath: string = "";
   let handleOpenCurrentDynamicExpression = (obj) => {
     dynamicExpressionModal = {};
     dynamicExpressionModal = obj;
     dynamicExpressionEditorContent = obj?.source?.content?.slice(4, -4) || "";
+    dynamicExpressionPath = obj?.type;
+    handleEventOnOpenDE("TestFlowExplorer", obj?.type);
     isDynamicExpressionModalOpen = true;
   };
 
@@ -404,6 +425,27 @@
       });
     }
     isDynamicExpressionModalOpen = false;
+  };
+
+  const dfs = (adj: any[], start: number, visited = new Set()) => {
+    if (visited.has(start)) return;
+
+    nodes.update((nodes) => {
+      for (let i = 0; i < nodes.length; i++) {
+        if (Number(nodes[i].id) === start) {
+          nodes[i].position = {
+            x: nodes[i].position.x + 350,
+            y: nodes[i].position.y,
+          };
+        }
+      }
+      return nodes;
+    });
+    visited.add(start);
+
+    for (const neighbor of adj[start]) {
+      dfs(adj, neighbor, visited);
+    }
   };
 
   /**
@@ -560,6 +602,7 @@
     }
   });
 
+  let dynamicExpressionDependencyCount = 0;
   /**
    * Opens the delete confirmation modal and sets the ID of the node to be deleted.
    * Also triggers the count of the next node to be deleted.
@@ -567,6 +610,7 @@
    * @param id - The ID of the node to be deleted.
    */
   const handleDeleteModal = (id: string) => {
+    dynamicExpressionDependencyCount = 0;
     if (!id) return;
     if (id === "1") return;
     isDeleteNodeModalOpen = true;
@@ -575,7 +619,32 @@
       (node) => node.id === id,
     ) as unknown as TFNodeHandlerType[];
     deleteNodeName = filteredNodes[0]?.data?.name;
-    countNextDeletedNode(id);
+
+    nodes.update((_nodes) => {
+      for (let i = 0; i < _nodes.length; i++) {
+        if (_nodes[i].id === id) {
+          continue;
+        }
+        const requestData = JSON.stringify(_nodes[i]?.data?.requestData);
+        if (
+          requestData.includes(
+            "$$" +
+              filteredNodes[0]?.data?.requestData?.name?.replace(
+                /[^a-zA-Z0-9_]/g,
+                "_",
+              ),
+          ) ||
+          requestData.includes(
+            "$$" +
+              filteredNodes[0]?.data?.blockName?.replace(/[^a-zA-Z0-9_]/g, "_"),
+          )
+        ) {
+          dynamicExpressionDependencyCount =
+            dynamicExpressionDependencyCount + 1;
+        }
+      }
+      return _nodes;
+    });
   };
 
   /**
@@ -674,7 +743,11 @@
    * Creates a new node and connects it to the existing node.
    * @param _id - The ID of the existing node.
    */
-  const createNewNode = async (_id: string, _requestData = undefined) => {
+  const createNewNode = async (
+    _id: string,
+    _requestData = undefined,
+    _direction = "add-block-after",
+  ) => {
     if (!_id) return;
 
     let requestData;
@@ -694,20 +767,20 @@
       return;
     }
 
-    if (checkIfEdgesExist(_id)) {
-      return;
-    }
+    // if (checkIfEdgesExist(_id)) {
+    //   return;
+    // }
 
-    const targetNode = findNextNodeId($nodes);
+    const newNodeId = findNextNodeId($nodes);
 
     nodes.update((_nodes: Node[] | any[]) => {
       let nextNodePosition;
       // Find the next node position based on the current node's position
       for (let i = 0; i < _nodes?.length; i++) {
         if (_nodes[i].id === _id) {
-          const additionValue = i === 0 ? 0 : 50;
+          // const additionValue = i === 0 ? 0 : 50;
           nextNodePosition = {
-            x: _nodes[i].position.x + 300 + additionValue,
+            x: _nodes[i].position.x,
             y: _nodes[i].position.y,
           };
         }
@@ -715,17 +788,17 @@
       return [
         ...(_nodes || []),
         {
-          id: targetNode,
+          id: newNodeId,
           type: "requestBlock",
           data: {
-            blockName: `Block ${targetNode - 1}`,
+            blockName: `Block ${newNodeId - 1}`,
             blocks: nodes,
             connector: edges,
             onClick: function (_id: string, _options = undefined) {
               createNewNode(_id, _options);
             },
-            onCheckEdges: function (_id: string) {
-              return checkIfEdgesExist(_id);
+            onCheckEdges: function (_id: string, _direction: string) {
+              return checkIfEdgesExist(_id, _direction);
             },
             onContextMenu: function (id: string, _event: string) {
               if (_event === "delete") {
@@ -735,6 +808,11 @@
                 _event === "run-till-here"
               ) {
                 partialRun(id, _event);
+              } else if (
+                _event === "add-block-before" ||
+                _event === "add-block-after"
+              ) {
+                createNewNode(id, undefined, _event);
               }
             },
             onOpenAddCustomRequestModal: function (id: string) {
@@ -757,8 +835,8 @@
                 folderId,
               );
             },
-            updateBlockName: function (field: string, value: string) {
-              handleUpdateRequestData(field, value);
+            updateBlockName: function (_id: string, value: string) {
+              handleUpdateBlockName(_id, value);
             },
             collectionId: _requestData?.collectionId,
             folderId: _requestData?.folderId,
@@ -768,21 +846,136 @@
             requestData: requestData || createBlankRequestObject("", "", ""),
           },
           position: nextNodePosition,
-          deletable: false,
+          deletable: isNodeDeletable,
           draggable: isNodesDraggable, // Disable dragging for this node
         },
       ];
     });
-    edges.update((edges) => {
-      return [
-        ...edges,
-        {
-          id: "xy-edge__" + _id + "-" + targetNode,
-          source: _id,
-          target: targetNode,
-          deletable: false,
-        },
-      ];
+
+    ////////////////////////////////////////////////////////////
+    if (_direction === "add-block-after") {
+      /**
+       * Future work: Have to handle case if multiple blocks connected to the same node to the right.
+       */
+      let destinationId: string;
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          if (edges[i].source === _id) {
+            // afterward block exist
+            destinationId = edges[i].target;
+            edges[i].target = newNodeId;
+            edges[i].id = "xy-edge__" + _id + "-" + newNodeId;
+          }
+        }
+        if (destinationId) {
+          // afterward block exist
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + newNodeId + "-" + destinationId,
+              source: newNodeId,
+              target: destinationId,
+              deletable: isEdgeDeletable,
+            },
+          ];
+        } else {
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + _id + "-" + newNodeId,
+              source: _id,
+              target: newNodeId,
+              deletable: isEdgeDeletable,
+            },
+          ];
+        }
+      });
+
+      let maxNodeId = 1;
+      nodes.update((nodes) => {
+        for (let i = 0; i < nodes.length; i++) {
+          maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+        }
+        return nodes;
+      });
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          graph[Number(edges[i].source)].push(Number(edges[i].target));
+        }
+        return edges;
+      });
+      dfs(graph, Number(newNodeId));
+    } else if (_direction === "add-block-before") {
+      /**
+       * Future work: Have to handle case if multiple blocks connected to the same node to the left.
+       */
+      let destinationId: any;
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          if (edges[i].target === _id) {
+            destinationId = edges[i].source;
+            edges[i].source = newNodeId;
+            edges[i].id = "xy-edge__" + newNodeId + "-" + _id;
+          }
+        }
+        if (destinationId) {
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + destinationId + "-" + newNodeId,
+              source: destinationId,
+              target: newNodeId,
+              deletable: isEdgeDeletable,
+            },
+          ];
+        } else {
+          return [
+            ...edges,
+            {
+              id: "xy-edge__" + newNodeId + "-" + _id,
+              source: newNodeId,
+              target: _id,
+              deletable: isEdgeDeletable,
+            },
+          ];
+        }
+      });
+
+      let maxNodeId = 1;
+      nodes.update((nodes) => {
+        for (let i = 0; i < nodes.length; i++) {
+          maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+        }
+        return nodes;
+      });
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+      edges.update((edges) => {
+        for (let i = 0; i < edges.length; i++) {
+          graph[Number(edges[i].source)].push(Number(edges[i].target));
+        }
+        return edges;
+      });
+      dfs(graph, Number(_id));
+      // debugger;
+    }
+  };
+
+  const handleUpdateBlockName = async (id: string, value: string) => {
+    if (!id) return;
+    nodes.update((_nodes) => {
+      for (let i = 0; i < _nodes.length; i++) {
+        if (_nodes[i].id === id) {
+          _nodes[i].data.blockName = value;
+        }
+      }
+      return _nodes;
     });
   };
 
@@ -805,8 +998,8 @@
             onClick: function (_id: string, _options = undefined) {
               createNewNode(_id, _options);
             },
-            onCheckEdges: function (_id: string) {
-              return checkIfEdgesExist(_id);
+            onCheckEdges: function (_id: string, _direction: string) {
+              return checkIfEdgesExist(_id, _direction);
             },
             onContextMenu: function (id: string, _event: string) {
               if (_event === "delete") {
@@ -816,6 +1009,11 @@
                 _event === "run-till-here"
               ) {
                 partialRun(id, _event);
+              } else if (
+                _event === "add-block-before" ||
+                _event === "add-block-after"
+              ) {
+                createNewNode(id, undefined, _event);
               }
             },
             onOpenAddCustomRequestModal: function (id: string) {
@@ -838,8 +1036,8 @@
                 folderId,
               );
             },
-            updateBlockName: function (field: string, value: string) {
-              handleUpdateRequestData(field, value);
+            updateBlockName: function (_id: string, value: string) {
+              handleUpdateBlockName(_id, value);
             },
             collectionId: dbNodes[i].data?.collectionId,
             requestId: dbNodes[i].data?.requestId,
@@ -852,8 +1050,8 @@
             x: dbNodes[i].position.x,
             y: dbNodes[i].position.y,
           },
-          deletable: dbNodes[i].id === "1" ? false : false,
-          draggable: isNodesDraggable, // Disable dragging for this node
+          deletable: dbNodes[i].id === "1" ? false : isNodeDeletable,
+          draggable: dbNodes[i].id === "1" ? false : isNodesDraggable, // Disable dragging for this node
         });
       }
       return res;
@@ -865,8 +1063,13 @@
         res.push({
           id: dbEdges[i].id,
           source: dbEdges[i].source,
+          type: "edge",
           target: dbEdges[i].target,
-          deletable: false,
+          deletable: isEdgeDeletable,
+          data: {
+            onDeleteEdge: deleteEdges,
+            onCreateNode: createNewNode,
+          },
         });
       }
       return res;
@@ -897,6 +1100,11 @@
     requestBlock: RequestBlock,
   } as unknown as NodeTypes;
 
+  const edgeTypes = {
+    edge: Edge,
+  } as unknown as EdgeTypes;
+
+  let isRunButtonEnabled = false;
   // Subscribe to changes in the nodes
   const nodesSubscriber = nodes.subscribe((val: Node[]) => {
     if (val && val.length) {
@@ -915,9 +1123,32 @@
     }
   });
 
+  let prevEdgeLength = 0;
   // Subscribe to changes in the edges
   const edgesSubscriber = edges.subscribe((val) => {
-    if (val) onUpdateEdges(val);
+    isRunButtonEnabled = false;
+    if (val) {
+      onUpdateEdges(val);
+      if (prevEdgeLength !== val.length) {
+        edges.update((edges) => {
+          val.forEach((edge) => {
+            edge.type = "edge";
+            edge.data = {
+              onDeleteEdge: deleteEdges,
+              onCreateNode: createNewNode,
+            };
+            edge.deletable = isEdgeDeletable;
+          });
+          return val;
+        });
+      }
+      prevEdgeLength = val.length || 0;
+      val.find((edge) => {
+        if (edge.source === "1") {
+          isRunButtonEnabled = true;
+        }
+      });
+    }
   });
 
   /**
@@ -956,63 +1187,35 @@
    * the `nodes` and `edges` stores, and performs necessary cleanup actions.
    * @param id - The ID of the node to delete.
    */
-  const handleDeleteNode = (id: string) => {
+  const handleDeleteNode = (idToDelete: string) => {
     nodes.update((_nodes) => {
-      const remainingNodes = _nodes.filter(
-        (node) => Number(node.id) < Number(id),
-      );
-      return remainingNodes;
+      return _nodes.filter((node) => node.id !== idToDelete);
     });
 
     edges.update((_edges) => {
-      const remainingEdges = _edges.filter(
-        (edge) =>
-          Number(edge.source) !== Number(id) &&
-          Number(edge.target) < Number(id),
-      );
-      return remainingEdges;
+      const incomingEdge = _edges.find((edge) => edge.target === idToDelete);
+      const outgoingEdge = _edges.find((edge) => edge.source === idToDelete);
+      let newEdge = [];
+      if (incomingEdge && outgoingEdge) {
+        // Reconnect source of incomingEdge to target of outgoingEdge
+        newEdge.push({
+          id: `xy-edge__${incomingEdge.source}-${outgoingEdge.target}`,
+          source: incomingEdge.source,
+          target: outgoingEdge.target,
+          deletable: isEdgeDeletable,
+        });
+      }
+      const filteredEdges = _edges.filter((edge) => {
+        if (edge.source === idToDelete || edge.target === idToDelete) {
+          return false;
+        }
+        return true;
+      });
+      return [...filteredEdges, ...newEdge];
     });
-
     deleteNodeResponse($tab.tabId, selectedNodeId);
     unselectNodes();
-
     isDeleteNodeModalOpen = false;
-  };
-
-  /**
-   *  Count nodes with an id greater than the one being deleted
-   * @param id - node id from which count starts
-   */
-  const countNextDeletedNode = (id: string) => {
-    nodes.subscribe((_nodes) => {
-      deleteCount = _nodes.filter(
-        (node) => Number(node.id) > Number(id),
-      ).length;
-    });
-  };
-
-  /**
-   * Handles key press events, preventing default behavior for "Backspace" and "Delete" keys.
-   * If "Delete" is pressed, it triggers the deletion modal for the selected node.
-   *
-   * @param event - The key press event object.
-   */
-  const handleKeyPress = async (event: KeyboardEvent) => {
-    // if (event.key === "Backspace") {
-    //   try {
-    //     if (userOS === "macos") {
-    //       event.preventDefault();
-    //       handleDeleteModal(selectedNodeId);
-    //     }
-    //   } catch (error) {
-    //     console.error("Failed to determine platform:", error);
-    //   }
-    // }
-    // if (event.key === "Delete") {
-    //   debugger;
-    //   event.preventDefault();
-    //   handleDeleteModal(selectedNodeId);
-    // }
   };
 
   /**
@@ -1138,6 +1341,41 @@
   // };
 
   let isDynamicExpressionModalOpen = false;
+
+  const deleteEdges = (_source: string, _target: string) => {
+    edges.update((_edges) => {
+      const filteredEdges = _edges.filter((edge) => {
+        if (edge.source === _source && edge.target === _target) {
+          return false;
+        }
+        return true;
+      });
+
+      return [...filteredEdges];
+    });
+  };
+
+  const handleEventOnRunBlocks = () => {
+    let matchedNames = new Set();
+    nodes.update((_nodes) => {
+      const regex = /\$\$([a-zA-Z0-9_]+)/g;
+      for (let i = 0; i < _nodes.length; i++) {
+        const requestData = JSON.stringify(_nodes[i]?.data?.requestData || {});
+        let match;
+        while ((match = regex.exec(requestData)) !== null) {
+          matchedNames.add(match[1]);
+        }
+      }
+      return _nodes;
+    });
+    const matchedNamesArray = Array.from(matchedNames);
+    if (matchedNamesArray.length > 0) {
+      captureEvent("send_request_with_expression", {
+        component: "TestExplorer",
+        blockNames: matchedNamesArray.toString(),
+      });
+    }
+  };
 </script>
 
 <div
@@ -1175,7 +1413,7 @@
         </div>
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
-        {#if nodesValue > 1}
+        {#if isRunButtonEnabled}
           {#if testflowStore?.isTestFlowRunning}
             <Button
               type="secondary"
@@ -1185,29 +1423,32 @@
               onClick={onClickStop}
             />
           {:else}
-            <Button
-              type="primary"
-              size="medium"
-              startIcon={PlayFilled}
-              title="Run"
-              onClick={async () => {
-                unselectNodes();
-                await onClickRun();
-                selectNode("2");
-                MixpanelEvent(Events.Run_TestFlows);
-              }}
-            />
+            <div id="testflow-run-button">
+              <Button
+                type="primary"
+                size="medium"
+                startIcon={PlayFilled}
+                title="Run"
+                onClick={async () => {
+                  unselectNodes();
+                  await onClickRun();
+                  selectNode("2");
+                  MixpanelEvent(Events.Run_TestFlows);
+                  handleEventOnRunBlocks();
+                }}
+              />
+            </div>
           {/if}
         {/if}
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
-          <div style="position:absolute;  top:60px; right:320px">
+          <div style="position:absolute; top:50px; right:350px">
             <TestFlowTourGuide
-              targetId="run-btn"
-              title="Ready, Set, Run 🏃🏻‍♂️"
-              pulsePosition={{ top: "-62px", left: "260px" }}
-              description={`The flow is almost ready, just waiting for you to hit 'Run' and watch the magic happen! <br/> Alternatively, you can use the "Start" play button to initiate the flow as well.`}
-              tipPosition="top-right"
+              targetIds={["testflow-run-button"]}
+              title="Run Your Test Flow"
+              description={`Almost there! With your blocks and API in place, go ahead and click ‘Run’ to execute your test flow.`}
+              CardNumber={6}
+              totalCards={7}
               onNext={async () => {
                 currentStep.set(7);
               }}
@@ -1250,30 +1491,34 @@
   <div
     bind:this={divElement}
     tabindex="0"
-    on:keydown={handleKeyPress}
     on:click={focusDiv}
     style="flex:1; overflow:auto; outline: none; position:realtive;"
+    id="testflow-container-main"
   >
-    <SvelteFlow {nodes} {edges} {nodeTypes}>
-      <Background
-        bgColor={"var(--bg-ds-surface-900)"}
-        patternColor={"var(--bg-ds-surface-500)"}
-        size={4}
-        gap={20}
-      />
-    </SvelteFlow>
+    <SvelteFlowProvider>
+      <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes}>
+        <Background
+          bgColor={"var(--bg-ds-surface-900)"}
+          patternColor={"var(--bg-ds-surface-500)"}
+          size={4}
+          gap={20}
+        />
+      </SvelteFlow>
+    </SvelteFlowProvider>
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:260px; left:265px; z-index:1000;">
+      <div style="position:absolute; top:196px; left:370px; z-index:1000;">
         <TestFlowTourGuide
-          title="One Block At A Time 🧱"
-          pulsePosition={{ top: "-64px", left: "30px" }}
-          description={`Wow! You’ve made it to the canvas! Now, just click 'Add Block' and you’re almost there.`}
-          tipPosition="top-left"
+          targetIds={["add-block"]}
+          title="Add Your First Block"
+          CardNumber={3}
+          totalCards={7}
+          description={`Welcome to the canvas! Click ‘Add Block’ to start building your flow. You're just a few steps away.`}
           onNext={() => {
             currentStep.set(4);
             createNewNode("1");
           }}
+          shouldDelay={true}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
           }}
@@ -1282,12 +1527,13 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:232px; left:638px; z-index:1000;">
+      <div style="position:absolute; top:198px; left:685px; z-index:1000;">
         <TestFlowTourGuide
-          title="Block Added! 👏 "
-          description={`Now, just one more step—click on the dropdown to select an API. Don’t worry, we’ve provided a sample API in case you don’t have one ready in your collection.`}
-          tipPosition="left-top"
-          pulsePosition={{ top: "8px", left: "-150px" }}
+          targetIds={["request-block"]}
+          title="Select an API"
+          description={`Block added—nice! Now, click the dropdown to select an API. Don’t have one? No worries, a sample API is available for you to use.`}
+          CardNumber={4}
+          totalCards={7}
           onNext={() => {
             currentStep.set(5);
           }}
@@ -1299,14 +1545,41 @@
     {/if}
 
     {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <div style="position:absolute; top:265px; left:632px; z-index:1000;">
+      <div style="position:absolute; top:265px; left:680px; z-index:1000;">
         <TestFlowTourGuide
-          title="Sample API waiting...⏱️"
-          description={`Ready for you to get selected and move ahead! Just choose it from the dropdown and you’re good to go.`}
-          tipPosition="left-top"
-          pulsePosition={{ top: "10px", left: "-145px" }}
+          targetIds={["request-block", "dropdown-request-items"]}
+          title="Sample API Ready"
+          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
+          CardNumber={5}
+          totalCards={7}
           onNext={() => {
             currentStep.set(6);
+          }}
+          onClose={() => {
+            isTestFlowTourGuideOpen.set(false);
+          }}
+        />
+      </div>
+    {/if}
+    {#if $isTestFlowTourGuideOpen && $currentStep == 7}
+      <div
+        style="position:absolute; top:200px; left:{isWebApp
+          ? '700px'
+          : '700px'};"
+      >
+        <TestFlowTourGuide
+          targetIds={["request-block", "testflow-bottom-panel"]}
+          isLastStep={true}
+          title="You Did It!"
+          description={`Congratulations! Your test flow is running successfully. You can re-run the API at any time to update values as needed.`}
+          rightButtonName="Finish"
+          CardNumber={7}
+          additionTopValue={isWebApp ? -140 : -280}
+          additionHeightValue={isWebApp ? 260 : 280}
+          totalCards={7}
+          onNext={() => {
+            currentStep.set(-1);
+            isTestFlowTourGuideOpen.set(false);
           }}
           onClose={() => {
             isTestFlowTourGuideOpen.set(false);
@@ -1334,7 +1607,10 @@
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
-    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
+    <div
+      style=" background-color: transparent; margin: 0px 13px 12px 13px;"
+      id="testflow-bottom-panel"
+    >
       <!-- Request Response Nav -->
       <TestFlowBottomPanel
         selectedBlock={{
@@ -1418,6 +1694,11 @@
   type={"dark"}
   width={"851px"}
   zIndex={1000}
+  helpingIcon={true}
+  onClickHelpIcon={() => {
+    handleEventOnClickQuestionMark();
+    redirectDocsTestflow();
+  }}
   isOpen={isDynamicExpressionModalOpen}
   handleModalState={() => {
     isDynamicExpressionModalOpen = false;
@@ -1426,16 +1707,18 @@
   <TestflowDynamicExpression
     {dynamicExpressionEditorContent}
     requestApis={$nodes}
+    edges={$edges}
     {onInsertExpression}
     {handleAddingNested}
     {selectedBlock}
     {environmentVariables}
     {onPreviewExpression}
+    {dynamicExpressionPath}
   />
 </Modal>
 
 <Modal
-  title={"Delete block?"}
+  title={"Delete Block?"}
   type={"dark"}
   width={"540px"}
   zIndex={1000}
@@ -1448,7 +1731,7 @@
     {deletedNodeId}
     {deleteNodeName}
     {handleDeleteNode}
-    {deleteCount}
+    deleteCount={dynamicExpressionDependencyCount}
     handleModalState={(flag = false) => {
       isDeleteNodeModalOpen = flag;
     }}
@@ -1508,6 +1791,7 @@
   :global(.svelte-flow__attribution) {
     display: none;
   }
+
   .loader {
     color: var(--bg-primary-300);
     width: 2px;

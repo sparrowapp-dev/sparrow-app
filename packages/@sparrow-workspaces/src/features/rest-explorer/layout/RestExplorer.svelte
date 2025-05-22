@@ -92,7 +92,9 @@
   import { AIChatInterface } from "../../chat-bot/components";
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
+  import { policyConfig } from "@sparrow/common/store";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -132,6 +134,7 @@
   export let onUpdateCollectionGuide: (query, isActive) => void;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
+  export let onUpdateAiModel;
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
 
@@ -300,6 +303,13 @@
     // isMergeViewLoading = true;
   };
 
+  const handleEventOnInsertSuggestion = (suggestion_type: string) => {
+    captureEvent("copilot_suggestion_applied", {
+      component: "RestExplorer",
+      suggestion_type: suggestion_type,
+    });
+  };
+
   /**
    * Embeds the changes suggested by AI in request data
    * @param target Where to insert the changes (Request Body or Headers or Parameters)
@@ -324,7 +334,7 @@
       notifications.error("Please accept the current suggested changes first.");
       return;
     }
-
+    handleEventOnInsertSuggestion(target);
     try {
       switch (target) {
         case RequestSectionEnum.REQUEST_BODY: {
@@ -419,7 +429,23 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
+  const handleEventOnClickAI = (
+    responseStatus: string | undefined,
+    requestMethod: string | undefined,
+  ) => {
+    captureEvent("help_me_debug_cta_clicked", {
+      component: "Rest Explorer",
+      button_text: "Help me Bug",
+      error_code: responseStatus,
+      http_method: requestMethod,
+    });
+  };
+
   const handleOnClickAIDebug = async () => {
+    handleEventOnClickAI(
+      storeData?.response?.status,
+      tab.property?.request?.method,
+    );
     isAIDebugBtnEnable = false;
 
     // adjusting the panel layout
@@ -552,6 +578,29 @@
         {isGuestUser}
       />
 
+      {#if isPopoverContainer}
+        <div class="pt-2"></div>
+        <Popover
+          onClose={closeCollectionHelpText}
+          heading={`Welcome to Sparrow`}
+        >
+          <p class="mb-0 text-fs-12">
+            Your one-stop solution for API testing and management. Start
+            organizing your API requests into collections, utilize environment
+            variables, and streamline your development process. Get started now
+            by creating your first collection or exploring our features
+            <span
+              on:click={() => {
+                isGuidePopup = true;
+              }}
+              class="link p-0 border-0"
+              style="font-size: 12px;"
+              >See how it works.
+            </span>
+          </p>
+        </Popover>
+        <div class="pt-2"></div>
+      {/if}
       <div
         bind:this={splitpaneContainer}
         style="flex:1; overflow:auto; margin-top: 12px;"
@@ -559,29 +608,6 @@
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
             <!--Disabling the Quick Help feature, will be taken up in next release-->
-            {#if isPopoverContainer}
-              <Popover
-                onClose={closeCollectionHelpText}
-                heading={`Welcome to Sparrow`}
-              >
-                <p class="mb-0 text-fs-12">
-                  Your one-stop solution for API testing and management. Start
-                  organizing your API requests into collections, utilize
-                  environment variables, and streamline your development
-                  process. Get started now by creating your first collection or
-                  exploring our features
-                  <span
-                    on:click={() => {
-                      isGuidePopup = true;
-                    }}
-                    class="link p-0 border-0"
-                    style="font-size: 12px;"
-                    >See how it works.
-                  </span>
-                </p>
-              </Popover>
-              <div class="pt-2"></div>
-            {/if}
 
             {#if !isLoading}
               <Splitpanes
@@ -750,26 +776,28 @@
                               />
 
                               <div class="d-flex">
-                                <!-- AI debugging trigger button -->
-                                <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
-                                <div
-                                  class="d-flex"
-                                  style="height: 32px;
+                                {#if $policyConfig.enableAIAssistance}
+                                  <!-- AI debugging trigger button -->
+                                  <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
+                                  <div
+                                    class="d-flex"
+                                    style="height: 32px;
                                   {isAIDebugBtnEnable
-                                    ? 'border: 2px solid #316CF6;'
-                                    : ''} border-radius: 4px; background-color: {isAIDebugBtnEnable
-                                    ? '#272935;'
-                                    : '#14181f'}"
-                                >
-                                  <Button
-                                    title="Help me debug"
-                                    size={"small"}
-                                    type={"secondary"}
-                                    startIcon={SparkleFilled}
-                                    disable={!isAIDebugBtnEnable}
-                                    onClick={handleOnClickAIDebug}
-                                  ></Button>
-                                </div>
+                                      ? 'border: 2px solid #316CF6;'
+                                      : ''} border-radius: 4px; background-color: {isAIDebugBtnEnable
+                                      ? '#272935;'
+                                      : '#14181f'}"
+                                  >
+                                    <Button
+                                      title="Help me debug"
+                                      size={"small"}
+                                      type={"secondary"}
+                                      startIcon={SparkleFilled}
+                                      disable={!isAIDebugBtnEnable}
+                                      onClick={handleOnClickAIDebug}
+                                    ></Button>
+                                  </div>
+                                {/if}
 
                                 <ResponseStatus response={storeData.response} />
                               </div>
@@ -821,7 +849,7 @@
             {/if}
           </Pane>
           <!-- AI Chatbot Interface -->
-          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive}
+          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive && $policyConfig.enableAIAssistance}
             <Pane
               class="position-relative bg-transparent"
               minSize={minSizePct}
@@ -832,6 +860,7 @@
                 {tab}
                 {onUpdateAiPrompt}
                 {onUpdateAiConversation}
+                {onUpdateAiModel}
                 {onUpdateRequestState}
                 {onGenerateAiResponse}
                 {onStopGeneratingAIResponse}
@@ -943,7 +972,7 @@
 </Modal>
 
 <!-- ChatBot Toggler -->
-{#if !isGuestUser}
+{#if !isGuestUser && $policyConfig.enableAIAssistance}
   <div
     style="position: fixed;
         bottom: 28px;

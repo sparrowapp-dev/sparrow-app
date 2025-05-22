@@ -7,6 +7,7 @@
   import DynamicContent from "../components/dynamic-content/DynamicContent.svelte";
   import FunctionsOptions from "../components/function-options/FunctionsOptions.svelte";
   import { isDynamicExpressionContent } from "../../testflow-explorer/store";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let requestApis: any;
   export let environmentVariables: any;
@@ -15,8 +16,11 @@
   let expression = dynamicExpressionEditorContent;
   export let handleAddingNested: (value: string) => void;
   export let selectedBlock;
-
+  export let edges;
   export let onPreviewExpression;
+  export let dynamicExpressionPath: string = "";
+
+  let dispatcher;
 
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
@@ -62,17 +66,51 @@
   $: currentOpenItem = $isDynamicExpressionContent.find(
     (item) => item.isCurrentOpen,
   );
-  let cursorPosition: number | null = 0;
+  $: {
+    if (
+      dynamicExpressionPath === "raw" ||
+      dynamicExpressionPath === "urlencoded" ||
+      dynamicExpressionPath === "formdata"
+    ) {
+      dynamicExpressionPath = "body" + " > " + dynamicExpressionPath;
+    }
+  }
+
+  const getFirstMatchingType = (expression: string) => {
+    const types = [
+      "response.body",
+      "response.header",
+      "request.body",
+      "request.header",
+      "request.parameter",
+      "variable",
+    ];
+    for (const type of types) {
+      if (expression.includes(type)) {
+        return type;
+      }
+    }
+    return null;
+  };
+
+  const handleEventOnClickInsertDE = () => {
+    captureEvent("expression_inserted", {
+      component: "TestFlowDynamicExpression",
+      buttonText: "Insert Dynamic Expression",
+      sourceLocation: `${dynamicExpressionPath}`,
+      insertType: getFirstMatchingType(expression),
+    });
+  };
 </script>
 
-<div class="d-flex justify-content-between" style="gap: 12px;">
+<div class="d-flex justify-content-between" style="gap: 12px; margin-top:16px;">
   <div class="w-50">
     <ExpressionEditor
       bind:expression
       {onPreviewExpression}
       {handleAddingNested}
       bind:selectedApiRequestType
-      bind:cursorPosition
+      bind:dispatcher
     />
   </div>
   <div class="w-50">
@@ -96,10 +134,11 @@
               {requestApis}
               {environmentVariables}
               bind:selectedApiRequestType
-              bind:cursorPosition
+              bind:dispatcher
+              {edges}
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
-            <FunctionsOptions bind:expression />
+            <FunctionsOptions bind:expression bind:dispatcher />
           {/if}
         {/key}
       </div>
@@ -111,10 +150,9 @@
   style="margin-top: 24px;"
 >
   <div>
-    <!-- <p style="margin: 0px;">
-      {currentOpenItem?.blockName} > {currentOpenItem?.method} > {currentOpenItem?.requestType}
-      > {currentOpenItem?.key}
-    </p> -->
+    <p style="margin: 0px;" class="dynamic-path-title">
+      Location: {selectedBlock?.data?.blockName} > {dynamicExpressionPath}
+    </p>
   </div>
   <div>
     <Button
@@ -123,6 +161,7 @@
       disable={!expression}
       size="medium"
       onClick={() => {
+        handleEventOnClickInsertDE();
         onInsertExpression(expression);
       }}
     />
@@ -135,5 +174,13 @@
     padding: 12px;
     border-radius: 4px;
     /* height: "440px"; */
+  }
+  .dynamic-path-title {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0px;
+    color: #82858a;
   }
 </style>

@@ -21,7 +21,7 @@
     let tab1 = tabs;
     for (let tab of tab1) {
       if (tab.disabled) {
-        allDisableState = true;
+        // allDisableState = true;
         break;
       }
     }
@@ -30,7 +30,7 @@
     let tab1 = tabs;
     for (let tab of tab1) {
       if (tab.disabled) {
-        allDisableState = true;
+        // allDisableState = true;
         break;
       }
     }

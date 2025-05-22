@@ -12,6 +12,8 @@
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
+  import constants from "@app/constants/constants";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let tab;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
@@ -170,6 +172,12 @@
       refreshEnvironment();
     }
   }
+  const handleEventOnClickQuestionMark = () => {
+    captureEvent("documentation_link_clicked", {
+      component: "TestFlowExplorer",
+      targetUrl: constants.TESTFLOW_DOCS_URL,
+    });
+  };
 </script>
 
 {#if render}
@@ -200,5 +208,7 @@
     {userRole}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
+    redirectDocsTestflow={_viewModel.redirectDocsTestflow}
+    {handleEventOnClickQuestionMark}
   />
 {/if}

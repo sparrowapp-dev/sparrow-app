@@ -114,7 +114,6 @@
       applyAllFilters();
       loading = false;
     } catch (error) {
-      Sentry.captureException(error); 
       loading = false;
     }
   };

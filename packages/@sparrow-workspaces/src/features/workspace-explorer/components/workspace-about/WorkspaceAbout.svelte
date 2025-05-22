@@ -3,6 +3,7 @@
   import { Input } from "@sparrow/library/forms";
   import { CopyRegular } from "@sparrow/library/icons";
   import { Button, notifications } from "@sparrow/library/ui";
+  import {policyConfig} from "@sparrow/common/store"
 
   /**
    * The description of the workspace.
@@ -28,6 +29,7 @@
   export let onShareWorkspace;
   export let isWorkspaceSharing = false;
   export let onUpdateWorkspaceName;
+  export let isShareModalOpen;
   let isWorkspaceUpdating = false;
 
   const handleInputDescription = (event: Event) => {
@@ -60,7 +62,7 @@
         </span>
         <Input
           width={"410px"}
-          placeholder={""}
+          placeholder={"Enter your workspace name"}
           type={"text"}
           value={workspaceName}
           size="small"
@@ -98,7 +100,7 @@
       </div>
     </div>
 
-    {#if workspaceType === WorkspaceType.PRIVATE}
+    {#if workspaceType === WorkspaceType.PRIVATE && !$policyConfig.restrictPublicWorkspaceCreation}
       <div class="flex flex-column" style="gap:8px;">
         <span class="textarea-header">Make your Workspace public</span>
         <div
@@ -112,18 +114,13 @@
     {/if}
     {#if workspaceType === WorkspaceType.PUBLIC}
       <Button
-        title={isWorkspaceSharing ? "Link Copied" : "Share workspace"}
+        title={"Share workspace"}
         type={"secondary"}
-        onClick={async () => {
-          await onShareWorkspace();
-          isWorkspaceSharing = true;
-          setTimeout(() => {
-            isWorkspaceSharing = false;
-          }, 3000);
+        onClick={() => {
+          isShareModalOpen = true;
         }}
-        startIcon={isWorkspaceSharing ? CopyRegular : ""}
       ></Button>
-    {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN}
+    {:else if userRole === WorkspaceRole.WORKSPACE_ADMIN && !$policyConfig.restrictPublicWorkspaceCreation}
       <Button
         title="Make it public"
         type={"secondary"}
@@ -149,7 +146,7 @@
   }
   textarea:focus,
   textarea:hover {
-    border: 1px solid var(--border-primary-300) !important;
+    border: 1px solid var(--border-ds-neutral-300) !important;
   }
   .textarea-header {
     font-size: 12px;

@@ -6,13 +6,15 @@
   } from "@sparrow/library/icons";
   import { Accordion, Button } from "@sparrow/library/ui";
   import { getMethodStyle } from "@sparrow/common/utils";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let requestApis: any = [];
   export let expression = "";
   export let environmentVariables: any;
   export let selectedApiRequestType: string;
   export let selectedBlock: any;
-  export let cursorPosition: number | null = 0;
+  export let dispatcher;
+  export let edges = [];
 
   let selectedAPI: any = null;
   let hoverdIndexRequest: number | null = null;
@@ -36,6 +38,14 @@
   };
 
   const handleSelectVariable = (requestVariable: any) => {
+    const cursorPosition = dispatcher?.state?.selection?.main?.head || 0;
+    if (cursorPosition) {
+      expression =
+        expression.slice(0, cursorPosition) +
+        `{{${requestVariable.key}}}` +
+        expression.slice(cursorPosition);
+      return;
+    }
     expression = `${expression}{{${requestVariable.key}}}`;
   };
 
@@ -49,6 +59,13 @@
     return open >= 2 && close >= 2;
   }
 
+  const handleEventOnSelectVariable = (variable: string) => {
+    captureEvent("variables_selected", {
+      component: "DynamicContent",
+      Variable_name: variable,
+    });
+  };
+
   const handleSelectRequestType = (
     requestType: string,
     requestName: string,
@@ -58,6 +75,7 @@
     }
     const sanitizedRequestName = requestName.replace(/[^a-zA-Z0-9_]/g, "_");
     const current = `$$${sanitizedRequestName}.${requestType}`;
+    const cursorPosition = dispatcher?.state?.selection?.main?.head || 0;
     if (cursorPosition !== null && expression) {
       expression =
         expression.slice(0, cursorPosition) +
@@ -78,20 +96,49 @@
 
   let currentApis: any[] = [];
 
-  $: {
-    const matchedIndex = requestApis.findIndex(
-      (api: any) => api?.data?.blockName === selectedBlock?.data?.blockName,
-    );
+  const findConnectedNodes = (
+    adj: any[],
+    start: number,
+    nodes,
+    result,
+    visited = new Set(),
+  ) => {
+    if (visited.has(start)) return;
 
-    if (matchedIndex !== -1) {
-      currentApis = requestApis.slice(0, matchedIndex + 1);
-      currentApis = currentApis.filter((item) => {
-        if (item?.data?.requestId !== undefined) {
-          return item;
-        }
-      });
-    } else {
-      currentApis = requestApis.slice(0, 1);
+    for (let i = 0; i < nodes.length; i++) {
+      if (Number(nodes[i].id) === start && nodes[i]?.data?.requestId) {
+        result.push(nodes[i]);
+      }
+    }
+
+    visited.add(start);
+
+    for (const neighbor of adj[start]) {
+      findConnectedNodes(adj, neighbor, nodes, result, visited);
+    }
+  };
+
+  $: {
+    let maxNodeId = 1;
+    for (let i = 0; i < requestApis.length; i++) {
+      maxNodeId = Math.max(maxNodeId, Number(requestApis[i].id));
+    }
+
+    // Initialize adjacency list
+    const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+    // Populate adjacency list
+
+    for (let i = 0; i < edges.length; i++) {
+      graph[Number(edges[i].target)].push(Number(edges[i].source));
+    }
+
+    let result = [];
+    findConnectedNodes(graph, Number(selectedBlock.id), requestApis, result);
+    const res = [...result.reverse()] || [];
+
+    if (res?.length >= 1) {
+      res.pop();
+      currentApis = res;
     }
   }
 </script>
@@ -149,7 +196,7 @@
               on:click={() =>
                 handleSelectRequestType(
                   type.requestType,
-                  selectedAPI?.requestData?.name,
+                  selectedAPI?.blockName,
                 )}
             >
               <div class="d-flex justify-content-start align-items-center">
@@ -162,46 +209,46 @@
             <hr class="request-line" />
           {/each}
         </div>
-      {:else}
-        {#each currentApis as requestApi, index}
-          {#if index !== 0}
+      {:else if currentApis.length >= 1}
+        {#each currentApis as requestApi}
+          <div
+            class="d-flex flex-row justify-content-between align-items-center request-api-block"
+            style="height:28px; border-radius:4px; padding:5px 8px; cursor: pointer;"
+            on:click={() => {
+              handleSelectApi(requestApi?.data);
+            }}
+          >
             <div
-              class="d-flex flex-row justify-content-between align-items-center request-api-block"
-              style="height:28px; border-radius:4px; padding:5px 8px; cursor: pointer;"
-              on:click={() => {
+              class="d-flex justify-content-start align-items-center ellipsis"
+              style="gap: 8px;"
+            >
+              <p
+                class="request-block-method text-{getMethodStyle(
+                  requestApi?.data?.requestData?.method,
+                )}"
+                style="margin: 0;"
+              >
+                {requestApi?.data?.requestData?.method}
+              </p>
+
+              <p class="request-block-title ellipsis" style="margin: 0;">
+                {requestApi?.data?.blockName} | {requestApi?.data?.requestData
+                  ?.name}
+              </p>
+            </div>
+
+            <Button
+              type="teritiary-regular"
+              size="extra-small"
+              startIcon={ChevronRightRegular}
+              onClick={() => {
                 handleSelectApi(requestApi?.data);
               }}
-            >
-              <div
-                class="d-flex justify-content-start align-items-center ellipsis"
-                style="gap: 8px;"
-              >
-                <p
-                  class="request-block-method text-{getMethodStyle(
-                    requestApi?.data?.requestData?.method,
-                  )}"
-                  style="margin: 0;"
-                >
-                  {requestApi?.data?.requestData?.method}
-                </p>
-
-                <p class="request-block-title ellipsis" style="margin: 0;">
-                  {requestApi?.data?.blockName} | {requestApi?.data?.requestData
-                    ?.name}
-                </p>
-              </div>
-
-              <Button
-                type="teritiary-regular"
-                size="extra-small"
-                startIcon={ChevronRightRegular}
-                onClick={() => {
-                  handleSelectApi(requestApi?.data);
-                }}
-              />
-            </div>
-          {/if}
+            />
+          </div>
         {/each}
+      {:else}
+        <p class="text-fs-12">No results found.</p>
       {/if}
     </div>
   </Accordion>
@@ -251,6 +298,7 @@
             on:mouseenter={() => (hoveredVariableKey = variable.key)}
             on:mouseleave={() => (hoveredVariableKey = null)}
             on:click={() => {
+              handleEventOnSelectVariable(variable);
               handleSelectVariable(variable);
             }}
           >

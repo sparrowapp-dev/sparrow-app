@@ -3,12 +3,13 @@
   import { Button } from "@sparrow/library/ui";
   import { Editor } from "@sparrow/library/forms";
   import { selectedRequestTypes } from "../../../testflow-explorer/store";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let expression = "";
   export let handleAddingNested: (value: string) => void;
   export let selectedApiRequestType: string;
   export let onPreviewExpression;
-  export let cursorPosition: number | null = 0;
+  export let dispatcher;
 
   let expressionPreviewResult = "";
   let expressionErrorResult = "";
@@ -61,6 +62,13 @@
       }
     }
   };
+
+  const handleEventOnSelectFunction = () => {
+    captureEvent("expression_preview_clicked", {
+      component: "ExpressionEditor",
+      buttonText: "Run Preview",
+    });
+  };
 </script>
 
 <div
@@ -78,7 +86,7 @@
           on:change={handleCodeMirrorChange}
           isEditable={true}
           isEnterKeyNotAllowed={true}
-          bind:cursorPosition
+          bind:dispatcher
         />
       </div>
       <div>
@@ -123,6 +131,7 @@
         size="small"
         disable={!expression}
         onClick={async () => {
+          handleEventOnSelectFunction();
           expressionPreviewResult = "";
           expressionErrorResult = "";
           expressionResultContentType = "Text";
@@ -142,12 +151,14 @@
         }}
       />
     </div>
-    <p
-      class="text-fs-12 mb-0 ellipsis-5"
-      style="color: var(--text-ds-danger-300)"
-    >
-      {expressionErrorResult}
-    </p>
+    {#if expressionErrorResult}
+      <p
+        class="text-fs-12 mb-0 ellipsis-5"
+        style="color: var(--text-ds-danger-300)"
+      >
+        No preview available. Please check your expression and try again.
+      </p>
+    {/if}
   </div>
 </div>
 

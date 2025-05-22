@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 21,
+  version: 22,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1278,6 +1278,127 @@ export const tabSchemaLiteral = {
                   },
                 },
                 required: ["id", "source", "target"],
+              },
+            },
+          },
+        },
+        aiRequest: {
+          type: "object",
+          properties: {
+            aiModelProvider: {
+              type: "string",
+            },
+            aiModelVariant: {
+              type: "string",
+            },
+            systemPrompt: {
+              type: "string",
+            },
+            state: {
+              type: "object",
+              properties: {
+                aiAuthNavigation: {
+                  type: "string",
+                },
+                aiNavigation: {
+                  type: "string",
+                },
+                aiLeftSplitterWidthPercentage: {
+                  type: "number",
+                },
+                aiRightSplitterWidthPercentage: {
+                  type: "number",
+                },
+                isAiSendRequestInProgress: {
+                  type: "boolean",
+                  default: false,
+                },
+                isSaveDescriptionInProgress: {
+                  type: "boolean",
+                  default: false,
+                },
+                isSaveRequestInProgress: {
+                  type: "boolean",
+                },
+                isChatbotActive: {
+                  type: "boolean",
+                },
+                isChatbotSuggestionsActive: {
+                  type: "boolean",
+                },
+                isChatbotGeneratingResponse: {
+                  type: "boolean",
+                }
+              },
+            },
+            auth: {
+              type: "object",
+              properties: {
+                bearerToken: {
+                  type: "string",
+                },
+                basicAuth: {
+                  type: "object",
+                  properties: {
+                    username: {
+                      type: "string",
+                    },
+                    password: {
+                      type: "string",
+                    },
+                  },
+                },
+                apiKey: {
+                  type: "object",
+                  properties: {
+                    authKey: {
+                      type: "string",
+                    },
+                    authValue: {
+                      type: "string",
+                    },
+                    addTo: {
+                      type: "string",
+                    },
+                  },
+                },
+              },
+            },
+            ai: {
+              type: "object",
+              properties: {
+                prompt: {
+                  type: "string",
+                },
+                threadId: {
+                  type: "string",
+                },
+                conversations: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      messageId: {
+                        type: "string",
+                      },
+                      message: {
+                        type: "string",
+                      },
+                      type: {
+                        type: "string",
+                      },
+                      isLiked: {
+                        type: "boolean",
+                      },
+                      isDisliked: {
+                        type: "boolean",
+                      },
+                      status: {
+                        type: "boolean",
+                      },
+                    },
+                  },
+                },
               },
             },
           },

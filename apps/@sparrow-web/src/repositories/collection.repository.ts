@@ -46,6 +46,11 @@ export class CollectionRepository {
       if (data.selectedAuthType) value.selectedAuthType = data.selectedAuthType;
       if (data.auth) value.auth = data.auth;
       if (data.branches) value.branches = data.branches;
+      if (
+        data?.isMockCollectionRunning === true ||
+        data?.isMockCollectionRunning === false
+      )
+        value.isMockCollectionRunning = data.isMockCollectionRunning;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
       if (data.currentBranch) value.currentBranch = data.currentBranch;
       if (data.localRepositoryPath)
@@ -906,7 +911,6 @@ export class CollectionRepository {
         },
       });
     } catch (error) {
-      Sentry.captureException(error); 
       console.error("Error updating block data:", error);
     }
   };

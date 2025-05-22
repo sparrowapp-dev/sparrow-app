@@ -2,7 +2,7 @@
   // ---- document models
   import type { WorkspaceDocument } from "@app/database/database";
   // ---- library
-  import { Input, LabelField } from "@sparrow/library/forms";
+  import { Input, LabelField, Checkbox } from "@sparrow/library/forms";
   import { Button, Avatar } from "@sparrow/library/ui";
   export let isWorkspacePublicModalOpen = false;
   export let workspace: WorkspaceDocument;
@@ -14,6 +14,7 @@
   let inputName = "";
   let inputNameError = "";
   let loader: boolean = false;
+  let isCheckboxChecked: boolean = false;
 </script>
 
 <div class="workspace-delete-confirmation">
@@ -30,7 +31,7 @@
       style="color: var(--text-ds-neutral-200); margin-bottom:7px; margin-top:18px;"
       class="text-ds-font-size-14 text-ds-line-height-143"
     >
-      Publish "{workspace?.name}" workspace
+      Publish "{workspace?.name}" Workspace
     </p>
     <p
       class="text-ds-font-size-12"
@@ -43,7 +44,7 @@
     <div class="d-flex" style="align-items:center;">
       <Button
         title="Terms of Service"
-        type={"link-secondary"}
+        type={"link-primary"}
         onClick={async () => {
           "click dont save";
           await onRedirectTermsService();
@@ -63,7 +64,7 @@
       </p>
       <Button
         title="Privacy Policy"
-        type={"link-secondary"}
+        type={"link-primary"}
         onClick={async () => {
           "click dont save";
           await onRedirectPrivacyPolicy();
@@ -77,13 +78,13 @@
         >Privacy Policy</span
       > -->
 
-    <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
+    <!-- <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
       To proceed, type <span style="color: var(--text-ds-neutral-200);"
         >workspace name</span
       > below.
-    </p>
+    </p> -->
 
-    <Input
+    <!-- <Input
       bind:value={inputName}
       id={inputId}
       placeholder={"Type workspace name to proceed"}
@@ -93,13 +94,27 @@
       isEditIconRequired={false}
       type={"text"}
       placeholderColor={"var(--text-secondary-200)"}
-    />
+    /> -->
+    <div class="checkbox-container">
+      <Checkbox
+        size={"small"}
+        bind:checked={isCheckboxChecked}
+        on:input={() => {
+          isCheckboxChecked = !isCheckboxChecked;
+        }}
+      />
+      <span
+        class="text-ds-font-size-12 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-200);"
+        >I accept and agree to make this workspace public.</span
+      >
+    </div>
   </LabelField>
 
   <div class="d-flex" style="align-items:center;">
     <Button
       title="Learn More"
-      type={"link-secondary"}
+      type={"link-primary"}
       onClick={async () => {
         "click dont save";
         await onRedirectDocs();
@@ -144,25 +159,23 @@
         {loader}
         onClick={async () => {
           loader = true;
-          inputName = inputName.replace(/’/g, "'");
-          if (inputName === "") {
-            inputNameError = `Workspace name cannot be empty. Please enter the workspace name.`;
-          } else if (inputName !== workspace?.name) {
-            inputNameError = `Workspace name doesn’t match.`;
-          } else {
-            inputNameError = "";
-            await onMakePublicWorkspace();
-            isWorkspacePublicModalOpen = false;
-          }
+          await onMakePublicWorkspace();
+          isWorkspacePublicModalOpen = false;
           loader = false;
         }}
-        disable={loader}
+        disable={!isCheckboxChecked || loader}
       />
     </div>
   </div>
 </div>
 
 <style lang="scss">
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    padding-left: 0;
+  }
+
   .workspace-delete-confirmation {
     .team-icon {
       height: 24px;

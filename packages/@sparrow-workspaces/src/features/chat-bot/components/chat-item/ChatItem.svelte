@@ -16,6 +16,7 @@
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import { Events } from "@sparrow/common/enums";
   import {
     MessageTypeEnum,
@@ -381,11 +382,24 @@
           await navigator.clipboard.writeText(code);
           notifications.success("Code copied to clipboard.");
         } catch (err) {
-          Sentry.captureException(err);
           console.error("Failed to copy code: ", err);
         }
       }
     }
+  };
+
+  const handleEventClickOnPreview = () => {
+    captureEvent("copilot_suggestion_previewed", {
+      component: "ChatItem",
+      buttonText: "Preview",
+    });
+  };
+
+  const handleEventClickOnCopyCode = () => {
+    captureEvent("copilot_suggestion_copied", {
+      component: "ChatItem",
+      buttonText: "Copy",
+    });
   };
 
   /**
@@ -401,6 +415,7 @@
     if (!originalCodeBlock || !originalPreElement) return;
     const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
     onClickCodeBlockPreview(preClone);
+    handleEventClickOnPreview();
   };
 
   /**
@@ -417,7 +432,6 @@
       }, 5000);
       MixpanelEvent(Events.AI_Copy_Response);
     } catch (err) {
-      Sentry.captureException(err);
       console.error("Failed to copy response: ", err);
     }
   };
@@ -432,6 +446,7 @@
    */
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
+    handleEventClickOnCopyCode();
 
     setTimeout(() => {
       const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);
@@ -633,7 +648,14 @@
     .message-wrapper .markdown span,
     .message-wrapper .markdown code
   ) {
-    font-size: 12px;
+    font-size: 12px !important;
+  }
+  :global(
+    .message-wrapper .markdown pre,
+    .message-wrapper .markdown code,
+    .message-wrapper .markdown code span
+  ) {
+    font-family: "JetBrains Mono", monospace !important;
   }
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;

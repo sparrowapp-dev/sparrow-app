@@ -1,6 +1,7 @@
 import type { FolderBaseInterface } from "./folder-base";
 import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
+import type { HttpRequestMockBaseInterface } from "./http-request-mock-base";
 import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
@@ -12,6 +13,7 @@ export enum CollectionItemTypeBaseEnum {
   SOCKETIO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
   SAVED_REQUEST = "REQUEST_RESPONSE",
+  MOCK_REQUEST = "MOCK_REQUEST",
 }
 
 export interface CollectionItemBaseInterface {
@@ -26,6 +28,7 @@ export interface CollectionItemBaseInterface {
   socketio?: SocketIORequestBaseInterface;
   graphql?: GraphqlRequestBaseInterface;
   requestResponse?: HttpRequestSavedBaseInterface;
+  mockRequest?: HttpRequestMockBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
@@ -52,6 +55,11 @@ export enum CollectionAuthTypeBaseEnum {
   BASIC_AUTH = "Basic Auth",
 }
 
+export enum CollectionTypeBaseEnum {
+  MOCK = "MOCK",
+  STANDARD = "STANDARD",
+}
+
 export interface CollectionAuthBaseInterface {
   bearerToken: string;
   basicAuth: {
@@ -71,6 +79,9 @@ export interface CollectionBaseInterface {
   name: string;
   totalRequests: number;
   description: string;
+  collectionType?: CollectionTypeBaseEnum;
+  mockCollectionUrl?: string;
+  isMockCollectionRunning?: boolean;
   items: CollectionItemBaseInterface[];
   uuid?: string;
   activeSync?: boolean;
@@ -98,6 +109,7 @@ export interface CollectionArgsBaseInterface {
   socketio?: CollectionItemBaseInterface;
   graphql?: CollectionItemBaseInterface;
   requestResponse?: CollectionItemBaseInterface;
+  mockRequest?: CollectionItemBaseInterface;
   newName?: string;
   importCurl?: string;
   deletedIds?: string[];
