@@ -14,7 +14,7 @@
   import { HttpStatusCodes } from "../../../../features/rest-explorer-mock/utils/http-status-codes";
   import type { RequestMethodEnum } from "@sparrow/common/types/workspace/http-request-mock-tab";
   import { Select } from "@sparrow/library/forms";
-  import HistoryTableExpanded from "../history-table-expanded/HistoryTableExpanded.svelte";
+  import HistoryTableExpanded from "./sub-component/history-table-expanded/HistoryTableExpanded.svelte";
 
   interface ApiHistoryItem {
     id: string;
