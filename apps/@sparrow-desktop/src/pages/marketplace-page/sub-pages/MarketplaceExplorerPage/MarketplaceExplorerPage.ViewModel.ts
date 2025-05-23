@@ -30,9 +30,9 @@ class MarketplaceExplorerViewModel {
     return constants.API_URL;
   };
 
-  public fetchPublicWorkpsace = async () => {
+  public fetchPublicWorkpsace = async (currentPage) => {
     const workspaces =
-      await this.workspaceService.fetchPublicWorkspaceList("1");
+      await this.workspaceService.fetchPublicWorkspaceList(currentPage);
     if (workspaces?.isSuccessful) {
       const workspaceList = workspaces?.data?.data.workspaces;
       const clientUser = getClientUser();
@@ -61,7 +61,7 @@ class MarketplaceExplorerViewModel {
             _id,
             name,
             description,
-            workspaceType: "PUBLIC",
+            workspaceType: workspaceType,
             isShared: true,
             users: [
               {

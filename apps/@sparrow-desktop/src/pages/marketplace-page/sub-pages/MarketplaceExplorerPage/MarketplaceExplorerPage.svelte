@@ -10,8 +10,17 @@
   const _viewModel = new MarketplaceExplorerViewModel();
   const workspaceList: Observable<WorkspaceDocument[]> =
     _viewModel.publicWorkspaces;
+
+  let currentPage = 1;
+  let isLoading = false;
+
+  const loadMore = async () => {
+    isLoading =true;
+    currentPage += 1;
+    await _viewModel.fetchPublicWorkpsace(currentPage);
+  }
   onMount(async () => {
-    await _viewModel.fetchPublicWorkpsace();
+    await _viewModel.fetchPublicWorkpsace(currentPage);
   });
 </script>
 

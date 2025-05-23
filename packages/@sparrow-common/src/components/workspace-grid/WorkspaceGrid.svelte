@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { ThreeDotIcon } from "@sparrow/library/assets";
-  import { formatDateInString } from "../../utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
@@ -15,6 +13,7 @@
   // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
   import { Tag } from "@sparrow/library/ui";
   import { WorkspaceType } from "@sparrow/common/enums";
+  import { Button } from "@sparrow/library/ui";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -32,6 +31,7 @@
   let noOfColumns = 180;
   let noOfRows = 3;
   let isWorkspaceLinkCopied = false;
+  export let cardType: "teams" | "marketplace" = "teams";
 
   const handleOpenWorkspace = async () => {
     onSwitchWorkspace(workspace._id);
@@ -139,60 +139,6 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
-    {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
-      {#if isWorkspaceLinkCopied}
-        <p
-          class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
-          style="color: var(--text-ds-neutral-400); top:25px; right:60px;"
-        >
-          Copied
-        </p>
-        <button
-          bind:this={workspaceTabWrapper}
-          class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-          style="top:27px; right:36px;"
-        >
-          <StatusSuccess
-            height="14"
-            width="14"
-            color="var(--icon-ds-success-400)"
-          />
-        </button>
-      {:else}
-        <div bind:this={workspaceTabWrapper}>
-          <span
-            class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
-            style="color: var(--text-ds-neutral-400); top:28px; right:65px;"
-          >
-            Copy Public Link
-          </span>
-        </div>
-        <button
-          bind:this={workspaceTabWrapper}
-          class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
-          style="top:27px; right:35px;"
-          on:click={async () => {
-            await onCopyLink(workspace._id);
-            isWorkspaceLinkCopied = true;
-            setTimeout(() => {
-              isWorkspaceLinkCopied = false;
-            }, 2000);
-          }}
-        >
-          <LinkRegular />
-        </button>
-      {/if}
-    {/if}
-    <button
-      bind:this={workspaceTabWrapper}
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
-        ? 'threedot-active'
-        : ''}"
-      style="top:26px; right:15px;"
-      on:click={(e) => rightClickContextMenu(e)}
-    >
-      <MoreVerticalRegular />
-    </button>
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"
@@ -204,35 +150,106 @@
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
-      <div class="d-flex" style="justify-content: space-between;">
-        {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
-          <Tag
-            text={WorkspaceType.PUBLIC}
-            type="green"
-            endIcon={GlobeRegular}
-          />
-        {:else}
-          <Tag
-            text={WorkspaceType.PRIVATE}
-            type="cyan"
-            endIcon={LockClosedRegular}
-          />
-        {/if}
-      </div>
+      <div>
+        <div class="d-flex flex-column" style="gap: 10px">
+          {#if cardType === "teams"}
+            <div class="d-flex" style="justify-content: space-between;">
+              {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+                <Tag
+                  text={WorkspaceType.PUBLIC}
+                  type="green"
+                  endIcon={GlobeRegular}
+                />
+              {:else}
+                <Tag
+                  text={WorkspaceType.PRIVATE}
+                  type="cyan"
+                  endIcon={LockClosedRegular}
+                />
+              {/if}
+            </div>
+          {/if}
 
-      <div
-        class="d-flex overflow-hidden justify-content-between"
-        style={isWebEnvironment
-          ? "width:calc(100% - 130px); margin-top:10px;"
-          : "margin-top:10px;"}
-      >
-        <h4 class="ellipsis overflow-hidden me-4">
-          <span
-            class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium"
-            style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
+          <div
+            class="d-flex overflow-hidden justify-content-between"
+            style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
           >
-        </h4>
+            <h4 class="ellipsis overflow-hidden">
+              <span
+                class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium"
+                style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
+              >
+            </h4>
+          </div>
+        </div>
+        <div>
+          {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+            {#if isWorkspaceLinkCopied}
+              <p
+                class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
+                style="color: var(--text-ds-neutral-400); top:27px; right:60px;"
+              >
+                Copied
+              </p>
+              <button
+                bind:this={workspaceTabWrapper}
+                class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
+                style="top:27px; right:36px;"
+              >
+                <StatusSuccess
+                  height="14"
+                  width="14"
+                  color="var(--icon-ds-success-400)"
+                />
+              </button>
+            {:else}
+              <div bind:this={workspaceTabWrapper}>
+                <span
+                  class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
+                  style="color: var(--text-ds-neutral-400); top:28px; right:65px;"
+                >
+                  Copy Public Link
+                </span>
+              </div>
+              <button
+                bind:this={workspaceTabWrapper}
+                class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
+                style="top:27px; right:35px;"
+                on:click={async () => {
+                  await onCopyLink(workspace._id);
+                  isWorkspaceLinkCopied = true;
+                  setTimeout(() => {
+                    isWorkspaceLinkCopied = false;
+                  }, 2000);
+                }}
+              >
+                <LinkRegular />
+              </button>
+            {/if}
+          {/if}
+
+          {#if cardType === "teams"}
+            <button
+              bind:this={workspaceTabWrapper}
+              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
+                ? 'threedot-active'
+                : ''}"
+              style="top:26px; right:15px;"
+              on:click={(e) => rightClickContextMenu(e)}
+            >
+              <MoreVerticalRegular />
+            </button>
+          {/if}
+        </div>
       </div>
+      {#if cardType != "teams"}
+        <Button
+          title="Learn More"
+          type={"link-primary"}
+          size="small"
+          buttonClassProp="ps-0 pe-1"
+        />
+      {/if}
       <p
         class="teams-workspace__para mb-1"
         style={`${
@@ -273,7 +290,7 @@
           >
         </p>
 
-        {#if isWebEnvironment && !workspace?.isShared}
+        {#if isWebEnvironment && !workspace?.isShared && cardType === "teams"}
           <button
             class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
             on:click|stopPropagation={() => {
