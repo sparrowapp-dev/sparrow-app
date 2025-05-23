@@ -17,7 +17,6 @@
   export let userId: string;
 
   const tableHeaderContent = ["Users", "", "", "", "Roles", "Actions"];
-
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -36,16 +35,15 @@
       >
         <tbody class="overflow-y-auto position-relative z-0">
           {#each invites as list, index}
-            {#if  new Date(list?.expiresAt) > new Date()}
-              <InviteRow 
-              user={list?.email} 
-              role={list?.role} 
-              {index} 
-              {onWithDrawInvite} 
-              {onResendInvite} 
-              {openTeam} 
-              {userId}/>
-            {/if}
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
           {/each}
         </tbody>
       </Table>

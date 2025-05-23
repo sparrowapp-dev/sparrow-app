@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
-  import { basicSetup, basicTheme } from "./theme";
+  import { getBasicSetup, getTheme } from "./theme";
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import handleCodeMirrorSyntaxFormat from "./editor";
   import { EditorView } from "codemirror";
@@ -45,6 +45,7 @@
   export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
+  export let isMinimalMode = false;
 
   // For merge view props
   export let isMergeViewEnabled = false;
@@ -58,6 +59,8 @@
   const languageConf = new Compartment();
   const lintConf = new Compartment(); // Compartment for linting
   const mergeConf = new Compartment(); // Compartment for diff/merge view
+  const themeConf = new Compartment(); // Compartment for theme
+  const setupConf = new Compartment(); // Compartment for basic setup
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
@@ -279,8 +282,8 @@
     let extensions: Extension[];
     extensions = [
       ...(isEnterKeyNotAllowed ? [keyBindings] : []),
-      basicSetup,
-      basicTheme,
+      setupConf.of(getBasicSetup(isMinimalMode)),
+      themeConf.of(getTheme(isMinimalMode)),
       expressionPlugin,
       dragDropPlugin,
       languageConf.of([]),
@@ -326,11 +329,15 @@
 
   function updateLinting() {
     // Reconfigure linting dynamically based on `isErrorVisible` and `errorMessage`
-    if (codeMirrorView) {
+    if (codeMirrorView && !isMinimalMode) {
       codeMirrorView.dispatch({
         effects: lintConf.reconfigure(
           isErrorVisible && errorMessage ? [lintExtension] : [],
         ),
+      });
+    } else if (codeMirrorView && isMinimalMode) {
+      codeMirrorView.dispatch({
+        effects: lintConf.reconfigure([]),
       });
     }
   }

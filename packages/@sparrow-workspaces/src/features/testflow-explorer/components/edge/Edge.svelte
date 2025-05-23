@@ -64,7 +64,7 @@
     height="22"
   >
     <div class="d-flex justify-content-center align-items-center h-100 gap-1">
-      <span class="position-relative icon-parent" on:click={handleDeleteEdge}>
+      <span class="icon-parent" on:click={handleDeleteEdge}>
         <DismissCircleFilled
           size={"14px"}
           color={"var(--icon-ds-danger-300)"}
@@ -80,7 +80,7 @@
           style="top:-15px; left:50%; transform: translateX(-50%) translateY(-100%) rotate(45deg); "
         ></span>
       </span>
-      <span class="position-relative icon-parent" on:click={handleAddNode}>
+      <span class="icon-parent" on:click={handleAddNode}>
         <AddCircleRegular size={"14px"} />
         <div
           class="icon-tooltip position-absolute text-fs-12 rounded d-flex justify-content-center align-items-center z-2"
@@ -103,7 +103,7 @@
 <style lang="scss">
   .btn-container {
     overflow: visible;
-    transform: translateX(-6%) translateY(-8%);
+    transform: translateX(-16px) translateY(-11px);
     background-color: var(--bg-ds-surface-300);
     display: none;
   }
