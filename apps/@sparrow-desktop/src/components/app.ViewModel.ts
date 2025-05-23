@@ -308,7 +308,7 @@ export class AppViewModel {
     try {
       const os = await platform();
 
-      if (os === "windows") {
+      if (os === "windows" || os === "linux") {
         await listen("deep-link-urls", this.deepLinkHandlerWindows);
       } else if (os === "macos") {
         await onOpenUrl(this.deepLinkHandlerMacOs);
