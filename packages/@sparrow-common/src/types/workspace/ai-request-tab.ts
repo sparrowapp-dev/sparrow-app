@@ -1,13 +1,10 @@
 import {
     AiRequestAuthTypeBaseEnum,
     AiModelProviderEnum,
-    type AIConfig,
-    type AIModelVariant
-
+    type AIModelVariant,
+    type AiConfigurations
 } from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
-
-
 
 ///////////////////////////////////////////////////////////////////
 //                   AI Request Interface
@@ -27,9 +24,6 @@ export enum MessageTypeEnum {
 export enum UntrackedItemsEnum {
     UNTRACKED = "UNTRACKED-",
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////
 //            Managing AI Request Tab State
@@ -106,7 +100,7 @@ export interface AiSystemPromptWrapper {
 }
 
 export interface AiConfigurationsWrapper {
-    configurations: AIConfig;
+    configurations: AiConfigurations;
 }
 
 export interface ResponseStatusWrapper {

@@ -1,8 +1,5 @@
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
-
-
-
 ///////////////////////////////////////////////////////////////
 //              AI Request Auth Base Interface
 ///////////////////////////////////////////////////////////////
@@ -37,10 +34,10 @@ interface AiRequestAuthBaseInterface {
 //              LLM Providers
 ///////////////////////////////////////////////////////////////
 export enum AiModelProviderEnum {
-    Anthropic = "Anthropic",
-    Google = "Google",
+    Anthropic = "anthropic",
+    Google = "google",
     OpenAI = "openai",
-    DeepSeek = "DeepSeek",
+    DeepSeek = "deepseek",
 }
 
 ///////////////////////////////////////////////////////////////
@@ -50,7 +47,6 @@ export enum AiModelProviderEnum {
 // — Anthropic Claude 3 family: Haiku (fast), Sonnet (balanced), Opus (capable)
 export enum AnthropicModelEnum {
     Claude3_Haiku = "claude-3-haiku",
-    Claude3_Sonnet = "claude-3-sonnet",
     Claude3_Opus = "claude-3-opus",
     Claude3_5_Haiku = "claude-3.5-haiku",
     Claude3_5_Sonnet = "claude-3.5-sonnet",
@@ -58,11 +54,10 @@ export enum AnthropicModelEnum {
 
 // — Google Gemini family (multimodal, varying size & speed)
 export enum GoogleModelEnum {
-    Gemini_Ultra = "gemini-ultra",
+    Gemini_1_5_Flash = "gemini-1.5-flash",
+    Gemini_1_5_Flash_8B = "gemini-1.5-flash-8b",
     Gemini_1_5_Pro = "gemini-1.5-pro",
-    Gemini_1_5_Flash_8b = "gemini-1.5-flash-8b",
-    Gemini_Nano = "gemini-nano",
-    Gemini_2_5_Pro_Exp = "gemini-2.5-pro-preview",
+    Gemini_2_0_Flash = "gemini-2.0-flash",
 }
 
 // — OpenAI GPT family
@@ -102,123 +97,108 @@ export type systemPrompt = {
     description: string;
     systemPrompt: string;
     systemPromptId: string;
-    systemPromptSource: string;
-    systemPromptCreatedAt: string;
-    systemPromptUpdatedAt: string;
-    systemPromptCreatedBy: string;
-    systemPromptUpdatedBy: string;
-    systemPromptIsDeleted: boolean;
-    systemPromptIsActive: boolean;
-    systemPromptIsSaved: boolean;
-    systemPromptIsDefault: boolean;
 }
-
-
 
 ///////////////////////////////////////////////////////////////
 //              AI Request Base Interface
 ///////////////////////////////////////////////////////////////
 
 // - 1) Anthropic (Claude 3 family) Configurations
-export interface AnthropicGenerationConfig {
-    max_tokens: number;
+export interface AnthropicModelsConfig {
+    streamResponse?: boolean;
+    maxTokens?: number;
     temperature?: number;
     top_p?: number;
-    top_k?: number;
-    stop_sequences?: string[];
-    stream?: boolean;
-    system?: string | Array<{ type: string; text: string }>;
-    thinking?: { type: 'enabled'; budget_tokens: number } | { type: 'disabled' };
-    tool_choice?:
-    | 'auto' | 'any' | 'tool' | 'none'
-    | { type: 'function'; function: string };
-    tools?: Array<{
-        name: string;
-        description?: string;
-        input_schema: Record<string, any>;
-    }>;
-    metadata?: { user_id?: string | null };
 }
 
 // - 2) OpenAI (GPT‑3.5, GPT‑4 family) Configurations
-export interface OpenAIChatConfig {
+export interface OpenAiModelsConfig {
     streamResponse?: boolean;
-    responseFormat?: boolean;
+    jsonResponseFormat?: boolean;
     maxTokens?: number;
     temperature?: number;
-    frequencePenalty?: number;
+    frequencyPenalty?: number;
     presencePenalty?: number;
 }
 
 // - 3) Google (Gemini family) Configurations
-export interface GeminiGenerationConfig {
+export interface GeminiModelsConfig {
+    streamResponse?: boolean;
+    jsonResponseFormat?: boolean;
     temperature?: number;
-    topP?: number;
-    topK?: number;
-    candidateCount?: number;
-    maxOutputTokens?: number;
-    presencePenalty?: number;
-    frequencyPenalty?: number;
-    stopSequences?: string[];
-    seed?: number;
-    responseLogprobs?: boolean;
-    logprobs?: number;
-    audioTimestamp?: boolean;
-    responseMimeType?: string;
-    responseSchema?: Record<string, any>;
+    max_tokens?: number;
+    top_p?: number;
 }
 
 // - 4) DeepSeek (DeepSeek family) Configurations
-
 // DeepSeek’s OpenRouter‑compatible endpoint supports the same parameters as OpenAI’s Chat API. In other words:
 // (DeepSeek‑Reasoner is a special CoT model that ignores temperature, top_p, etc.
 // https://api-docs.deepseek.com/guides/reasoning_model?utm_source=chatgpt.com
-export type DeepSeekConfig = OpenAIChatConfig;
+export type DeepSeekModelsConfig = OpenAiModelsConfig;
 
 ///////////////////////////////////////////////////////////////
 //              AI Request Base Interface
 ///////////////////////////////////////////////////////////////
-// 2) Make a union of all configs
-export type AIConfig =
-    AnthropicGenerationConfig
-    | OpenAIChatConfig
-    | GeminiGenerationConfig
-    | DeepSeekConfig;
-
-
-///////////////////////////////////////////////////////////////
-//              AI Request Base Interface
-///////////////////////////////////////////////////////////////
-export interface HttpRequestBaseInterface {
-    aiModelProvider: AiModelProviderEnum;
-    aiModelVariant: AIModelVariant;
-    selectedAuthType: AiRequestAuthBaseInterface;
-    auth: AiRequestAuthBaseInterface;
-    systemPrompt: systemPrompt;
-    aiConfigurations: AIConfig;
-}
-
+export type AiConfigurations = {
+    openai: OpenAiModelsConfig;
+    deepseek: DeepSeekModelsConfig;
+    anthropic: AnthropicModelsConfig;
+    google: GeminiModelsConfig;
+};
 
 ///////////////////////////////////////////////////////////////
-//              Models id to name mapping
+//              id<->name mapping
 ///////////////////////////////////////////////////////////////
 export enum ModelIdNameMapping {
     openai = "OpenAI",
-    anthropic = "Google",
-    google = "Bearer Token",
+    anthropic = "Anthropic",
+    google = "Google",
     deepseek = "DeepSeek",
 }
 
 export enum ModelVariantIdNameMapping {
-  "gpt-4o" = "GPT_4o",
-  "gpt-4o-mini" = "GPT_4o_Mini",
-  "gpt-4.5-preview" = "GPT_4_5_Preview",
-  "gpt-4-turbo" = "GPT_4_Turbo",
-  "gpt-4" = "GPT_4",
-  "gpt-4.1" = "GPT_4_1",
-  "o1" = "GPT_o1",
-  "o1-mini" = "GPT_o1_Mini",
-  "o3-mini" = "GPT_o3_Mini",
-  "gpt-3.5-turbo" = "GPT_3_5_Turbo"
-} 
+    "gpt-4o" = "GPT_4o",
+    "gpt-4o-mini" = "GPT_4o_Mini",
+    "gpt-4.5-preview" = "GPT_4_5_Preview",
+    "gpt-4-turbo" = "GPT_4_Turbo",
+    "gpt-4" = "GPT_4",
+    "gpt-4.1" = "GPT_4_1",
+    "o1" = "GPT_o1",
+    "o1-mini" = "GPT_o1_Mini",
+    "o3-mini" = "GPT_o3_Mini",
+    "gpt-3.5-turbo" = "GPT_3_5_Turbo"
+}
+
+
+
+export const DefaultAiConfigurations = {
+    OPENAI: {
+        streamResponse: true,
+        jsonResponseFormat: false,
+        temperature: 1.0,
+        presencePenalty: 0,
+        frequencyPenalty: 0,
+        maxTokens: 68,
+    },
+    DEEPSEEK: {
+        streamResponse: false,
+        jsonResponseFormat: false,
+        temperature: 1.0,
+        presencePenalty: 0,
+        frequencyPenalty: 0,
+        maxTokens: 1024,
+    },
+    ANTHROPIC: {
+        streamResponse: false,
+        maxTokens: 1024,
+        temperature: 0.5,
+        top_p: 0.75,
+    },
+    GOOGLE: {
+        temperature: 1.0,
+        top_p: 0.95,
+        presencePenalty: 0,
+        frequencyPenalty: 0,
+    }
+};
 

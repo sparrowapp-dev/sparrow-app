@@ -42,6 +42,7 @@
   export let onUpdateAiConversation;
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
+  export let onUpdateAiConfigurations;
 
   // Role of user in active workspace
   export let userRole;
@@ -97,6 +98,18 @@
   });
   onDestroy(() => {});
 
+  $: {
+    const property = $tab?.property;
+    const aiRequest = property?.aiRequest;
+    const modPro = aiRequest?.aiModelProvider;
+    const modVer = aiRequest?.aiModelVariant;
+    const configurations = aiRequest?.configurations;
+
+    // if (property && modPro && modVer && configurations?.[modPro]) {
+    // console.log("kk :>> ", property);
+    console.log("configurations :>> ", configurations);
+    // }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -157,7 +170,16 @@
                     {onOpenCollection}
                   />
                 {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                  <AiConfigs {onUpdateRequestState} />
+                  <AiConfigs
+                    currSelectedModel={$tab.property?.aiRequest
+                      ?.aiModelProvider}
+                    currSelectedModelVariant={$tab.property?.aiRequest
+                      ?.aiModelVariant}
+                    config={$tab.property?.aiRequest?.configurations?.[
+                      $tab.property?.aiRequest?.aiModelProvider
+                    ] || {}}
+                    {onUpdateAiConfigurations}
+                  />
                 {/if}
               </div>
             </div>

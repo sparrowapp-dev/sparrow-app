@@ -12,7 +12,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/ai-request-base";
+import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant, DefaultAiConfigurations } from "../types/workspace/ai-request-base";
 import { AiRequestSectionEnum } from "../types/workspace/ai-request-tab";
 class InitAiRequestTab {
     private _tab: Tab;
@@ -35,8 +35,8 @@ class InitAiRequestTab {
             property: {
                 aiRequest: {
                     // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    aiModelProvider: 'openai',
-                    aiModelVariant: 'gpt-4o',
+                    aiModelProvider: AiModelProviderEnum.OpenAI,
+                    aiModelVariant: OpenAIModelEnum.GPT_4o,
                     systemPrompt: "",
                     auth: {
                         bearerToken: "",
@@ -50,7 +50,12 @@ class InitAiRequestTab {
                             addTo: CollectionRequestAddToBaseEnum.HEADER, // ToDo (remove while pushing): This "addTo" needs to removed, because api key handling is done from backend so on frontend no need to decided headers or params
                         },
                     },
-                    configurations: {},
+                    configurations: {
+                        openai: DefaultAiConfigurations.OPENAI,
+                        deepseek: DefaultAiConfigurations.DEEPSEEK,
+                        anthropic: DefaultAiConfigurations.ANTHROPIC,
+                        google: DefaultAiConfigurations.GOOGLE,
+                    },
                     ai: {
                         prompt: "",
                         conversations: [],

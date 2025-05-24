@@ -37,6 +37,7 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import type { AiModelProviderEnum, AnthropicModelsConfig, DeepSeekModelsConfig, GeminiModelsConfig, OpenAiModelsConfig } from "@sparrow/common/types/workspace/ai-request-base";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -419,6 +420,22 @@ class AiRequestExplorerViewModel {
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error(
+        "Failed to update the documentation. Please try again",
+      );
+    }
+    // this.compareRequestWithServer();
+  };
+
+  public updateAiConfigurations = async (model: AiModelProviderEnum, _configUpdates: OpenAiModelsConfig | DeepSeekModelsConfig | AnthropicModelsConfig | GeminiModelsConfig) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
+    this.tab = progressiveTab;
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      console.log("config ::>>> ", _configUpdates)
     } catch (error) {
       Sentry.captureException(error);
       notifications.error(
