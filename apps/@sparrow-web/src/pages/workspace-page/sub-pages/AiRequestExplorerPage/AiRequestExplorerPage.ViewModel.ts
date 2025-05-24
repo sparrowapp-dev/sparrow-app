@@ -570,16 +570,29 @@ class AiRequestExplorerViewModel {
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
+    const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
+    console.log("isChatAutoClearActive :>> ", isChatAutoClearActive);
+    let formattedConversations: {role: 'user' | 'assistant'; content: string;}[] = []; // Sending the chat history for context
+    if(!isChatAutoClearActive) {
+      const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
+      formattedConversations = rawConversations.map(({ type, message }) => ({
+        role: type === 'Sender' ? 'user' : 'assistant',
+        content: message
+      }));
+      console.log("formattedConversations :>> ", formattedConversations);
+
+    }
+
     const aiRequestData = {
       feature: "llm-evaluation",
-      // model: componentData.property.aiRequest.AI_Model_Provider || "openai",
-      model: "openai",
+      model: componentData.property.aiRequest.aiModelProvider || "openai",
       modelVersion: componentData.property.aiRequest.aiModelVariant || "gpt-3.5-turbo",
-      // modelVersion: "gpt-3.5-turbo",
-      // model: "openai",
       authKey: componentData.property.aiRequest.auth.apiKey.authValue,
       systemPrompt: finalSP || "Answer my queries.",
       userInput: prompt,
+      ...(formattedConversations.length > 0 && !isChatAutoClearActive && {
+    conversation: formattedConversations,
+  }),
       configs: {
         streamResponse: true,
         jsonResponseFormat: false,
@@ -589,6 +602,8 @@ class AiRequestExplorerViewModel {
         maxTokens: -1
       }
     }
+
+    console.log("api data :>> ", aiRequestData)
 
     try {
       // const userEmail = getClientUser().email;

@@ -28,17 +28,31 @@
 
   const sendPrompt = async (text: string) => {
     if (text) {
-      onUpdateAiConversation([
-        // ...$tab?.property?.aiRequest?.ai?.conversations,
-        {
-          message: text,
-          messageId: "",
-          type: MessageTypeEnum.SENDER,
-          isLiked: false,
-          isDisliked: false,
-          status: true,
-        },
-      ]);
+      const isAutoClearEnabled =
+        $tab?.property?.aiRequest?.state?.isChatAutoClearActive || false;
+      const updatedConverstaion = isAutoClearEnabled
+        ? [
+            {
+              message: text,
+              messageId: "",
+              type: MessageTypeEnum.SENDER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+            },
+          ]
+        : [
+            ...$tab?.property?.aiRequest?.ai?.conversations,
+            {
+              message: text,
+              messageId: "",
+              type: MessageTypeEnum.SENDER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+            },
+          ];
+      onUpdateAiConversation(updatedConverstaion);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
@@ -46,6 +60,12 @@
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
+    }
+  };
+
+  const clearChat = async () => {
+    if ($tab?.property?.aiRequest?.ai?.conversations.length) {
+      onUpdateAiConversation([]);
     }
   };
 
@@ -82,6 +102,7 @@
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
       modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
+      onChatClear={clearChat}
       bind:scrollList
     />
   </div>

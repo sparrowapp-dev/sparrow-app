@@ -66,6 +66,10 @@ export interface IsChatbotActive {
     isChatbotActive: boolean;
 }
 
+export interface IsChatAutoClearActive {
+    isChatAutoClearActive: boolean;
+}
+
 export interface IsChatbotSuggestionsActive {
     isChatbotSuggestionsActive: boolean;
 }
@@ -220,6 +224,7 @@ export interface State
     IsSaveDescriptionInProgressWrapper,
     IsSaveRequestInProgressWrapper,
     IsChatbotActive,
+    IsChatAutoClearActive,
     IsChatbotSuggestionsActive,
     IsChatbotGeneratingResponse { }
 
@@ -233,5 +238,6 @@ export interface StatePartial
     Partial<IsSaveDescriptionInProgressWrapper>,
     Partial<IsSaveRequestInProgressWrapper>,
     Partial<IsChatbotActive>,
+    Partial<IsChatAutoClearActive>,
     Partial<IsChatbotSuggestionsActive>,
     Partial<IsChatbotGeneratingResponse> { }

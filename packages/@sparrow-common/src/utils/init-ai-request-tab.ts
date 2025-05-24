@@ -64,6 +64,7 @@ class InitAiRequestTab {
                         isSaveDescriptionInProgress: false,
                         isSaveRequestInProgress: false,
                         isChatbotActive: true,
+                        isChatAutoClearActive: false,
                         isChatbotSuggestionsActive: true,
                         isChatbotGeneratingResponse: false,
                     },

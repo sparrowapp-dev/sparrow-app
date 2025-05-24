@@ -13,14 +13,19 @@
   import { cubicOut } from "svelte/easing";
   import { generatingImage, SparrowLogo } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@sparrow/common/enums";
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
-  import { SparrowPrimaryIcon } from "@sparrow/common/icons";
-  import { Modal, Toggle } from "@sparrow/library/ui";
+  import {
+    Button,
+    Loader,
+    Modal,
+    notifications,
+    Toggle,
+    Tooltip,
+  } from "@sparrow/library/ui";
   import { tick } from "svelte";
-  import { StatusCode } from "@sparrow/common/utils";
   import { type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -35,6 +40,8 @@
   export let scrollList;
   export let responseData: AiRequestExplorerData | undefined;
   export let modelVariant = "gpt-4os";
+  export let onChatClear;
+  let isChatLoadingActive = false;
 
   let chatContainer: HTMLElement;
   /**
@@ -135,43 +142,99 @@
               </button> -->
             </div>
             <div class="d-flex align-items-center gap-2">
-              <!-- <div class="d-flex align-items-center gap-2">
-        <span class="small text-white-50">Auto Clear</span>
-        <Toggle isActive={false} disabled={false} onChange={() => {}} />
-      </div> -->
-              <div
-                class="d-flex flex-row gap-2 text-ds-font-size-12 fw-medium"
-                style="color: var(--text-ds-neutral-100);"
-              >
-                <span
-                  >{isResponseGenerating
-                    ? 0
-                    : conversations[conversations.length - 1]?.inputTokens || 0}
-                  input tokens</span
-                >
-                <span
-                  >{isResponseGenerating
-                    ? 0
-                    : conversations[conversations.length - 1]?.outputTokens ||
-                      0} output tokens</span
-                >
+              <div class="d-flex align-items-center gap-2">
+                <!-- <span class="small text-white-50">Auto Clear</span> -->
+                <Toggle
+                  label={"Auto Clear"}
+                  textColor={"var(--text-ds-neutral-100)"}
+                  isActive={false}
+                  disabled={false}
+                  onChange={(event) => {
+                    onUpdateRequestState({
+                      isChatAutoClearActive: event?.target.checked,
+                    });
+                  }}
+                />
               </div>
-              <!-- <button class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent">
-        <BroomRegular size={"20px"} />
-      </button>
-      <button class="btn btn-sm d-flex align-items-center gap-1 rounded-2 border border-white-25 btn-transparent">
-        <FormNewRegular name="document-add" size="18" />
-        <span>New</span>
-      </button> -->
+
+              <Tooltip
+                title={"Clear chat"}
+                placement={"left-center"}
+                zIndex={701}
+                show={true}
+              >
+                <span class="add-icon-container">
+                  <Button
+                    id={`clear-chat-history`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={BroomRegular}
+                    onClick={async (e) => {
+                      isChatLoadingActive = true;
+                      await new Sleep().setTime(1500).exec();
+                      onChatClear();
+                      notifications.success(
+                        "Chat history cleared successfully.",
+                      );
+                      isChatLoadingActive = false;
+                    }}
+                  />
+                </span>
+              </Tooltip>
+
+              <!-- <Tooltip
+                title={"New Conversation"}
+                placement={"left-center"}
+                zIndex={701}
+                show={true}
+              >
+                <span class="add-icon-container">
+                  <Button
+                    id={`start-new-conversation`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={FormNewRegular}
+                    onClick={async (e) => {}}
+                  />
+                </span>
+              </Tooltip> -->
             </div>
+          </div>
+          <div
+            class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
+            style="font-size: 10px;"
+          >
+            <span style="color: var(--text-ds-success-300);"
+              >{isResponseGenerating
+                ? 0
+                : conversations[conversations.length - 1]?.inputTokens || 0}
+              input tokens</span
+            >
+            <span style="color: var(--text-ds-danger-300);"
+              >{isResponseGenerating
+                ? 0
+                : conversations[conversations.length - 1]?.outputTokens || 0} output
+              tokens</span
+            >
           </div>
         </div>
 
         <div
           bind:this={chatContainer}
-          class="my-2"
+          class="my-2 position-relative"
           style="flex:1; overflow-x:hidden; overflow-y:auto;"
         >
+          {#if isChatLoadingActive}
+            <div
+              class="d-flex align-items-center justify-content-center w-100 h-100"
+              style="z-index:3; position:absolute;"
+            >
+              <Loader loaderSize={"20px"} />
+            </div>
+          {/if}
+
           <div
             class="d-flex flex-column h-100 align-items-center justify-content-center"
           >
@@ -186,8 +249,8 @@
                     <SparrowLogo width={"116"} height={"120px"} />
                   </span>
                   <p
-                    class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-semi-bold text-secondary-250 mb-0"
-                    style="letter-spacing: -0.02em; color: var(--text-ds-neutral-500);"
+                    class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-medium text-secondary-250 mb-0"
+                    style="letter-spacing: 0; color: var(--text-ds-neutral-500);"
                   >
                     Enter a prompt to start the conversation.
                   </p>

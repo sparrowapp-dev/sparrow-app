@@ -366,6 +366,7 @@ export class AiAssistantWebSocketService {
     authKey: string;
     systemPrompt: string;
     userInput: string;
+    conversation?:{role: 'user' | 'assistant'; content: string;}[],
     configs: {
       streamResponse: boolean;
       jsonResponseFormat: boolean;
