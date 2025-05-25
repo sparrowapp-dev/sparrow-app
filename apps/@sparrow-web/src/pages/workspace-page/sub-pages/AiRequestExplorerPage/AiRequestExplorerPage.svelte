@@ -169,7 +169,9 @@
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
+  isWebApp={true}
   storeData={AiRequestExplorerData}
+  onSaveAiRequest={_viewModel.saveAiRequest}
   onUpdateAIModel={_viewModel.onUpdateAIModel}
   onUpdateRequestName={_viewModel.updateRequestName}
   onUpdateRequestAuth={_viewModel.updateRequestAuth}
@@ -178,8 +180,13 @@
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
-  isWebApp={true}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
+  readWorkspace={_viewModel.readWorkspace}
+  onSave={_viewModel.saveAsRequest}
+  onCreateFolder={_viewModel.createFolder}
+  onCreateCollection={_viewModel.createCollection}
+  onRenameCollection={_viewModel.handleRenameCollection}
+  onRenameFolder={_viewModel.handleRenameFolder}
 />
