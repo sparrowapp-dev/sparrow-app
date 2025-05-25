@@ -117,9 +117,9 @@
   }
 </script>
 
-<div class="body-viewer">
-  <div class="section-header">
-    <span class="section-toggle">
+<div class="d-flex flex-column">
+  <div class="d-flex align-items-center">
+    <span class="me-2">
       <Button
         startIcon={isExpanded ? ChevronDownRegular : ChevronRightRegular}
         size={"small"}
@@ -127,7 +127,7 @@
         onClick={(e) => handleToggleClick(e)}
       />
     </span>
-    <span class="section-title">{getSectionTitle()}</span>
+    <span class="text-fs-12">{getSectionTitle()}</span>
   </div>
 
   {#if isExpanded}
@@ -155,27 +155,6 @@
 </div>
 
 <style>
-  .body-viewer {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    padding: 0;
-  }
-
-  .section-toggle {
-    margin-right: 8px;
-  }
-
-  .section-title {
-    font-size: 12px;
-    color: var(--text-ds-neutral-50);
-  }
-
   .section-content {
     max-height: 240px;
     overflow-y: auto;

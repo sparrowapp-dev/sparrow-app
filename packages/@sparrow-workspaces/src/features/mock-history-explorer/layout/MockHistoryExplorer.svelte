@@ -9,14 +9,130 @@
   import { writable } from "svelte/store";
   import { Search } from "@sparrow/library/forms";
   import { HistoryTable } from "../components";
-  // import type { CollectionDocument, TabDocument } from "@app/database/database";
+  import type { RequestMethodEnum } from "@sparrow/common/types/workspace/http-request-mock-tab";
+  import { HttpStatusCodes } from "../../rest-explorer-mock/utils";
+
+  interface ApiHistoryItem {
+    id: string;
+    timestamp: string;
+    name: string;
+    url: string;
+    method: RequestMethodEnum;
+    responseStatus: string;
+    duration: number;
+    requestHeaders: KeyValuePair[];
+    requestBody?: any;
+    responseHeaders?: KeyValuePair[];
+    responseBody?: any;
+    selectedRequestBodyType?: string;
+    selectedResponseBodyType?: string;
+  }
+
+  interface KeyValuePair {
+    key: string;
+    value: string;
+    checked?: boolean;
+  }
 
   export let tab: Observable<Tab>;
-  // export let tab: TabDocument;
-
   export let collection;
 
   let searchTerm = "";
+  let sortDirection: "asc" | "desc" = "desc";
+
+  const COLUMNS = [
+    { key: "timestamp", label: "Time", sortable: true, width: "15%" },
+    { key: "name", label: "Name", sortable: false, width: "15%" },
+    { key: "url", label: "API Endpoint", sortable: false, width: "30%" },
+    {
+      key: "responseStatus",
+      label: "Status Code",
+      sortable: false,
+      width: "30%",
+    },
+    { key: "duration", label: "Duration", sortable: false, width: "10%" },
+  ];
+
+  const statusMessagesMap = new Map(
+    HttpStatusCodes.map((status) => [status.id, status.name]),
+  );
+
+  function getStatusMessage(responseStatus: string): string {
+    if (!responseStatus) return "No Response";
+    return statusMessagesMap.get(responseStatus) || `${responseStatus} Unknown`;
+  }
+
+  function formatRelativeTime(timestamp: string): string {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return "Just Now";
+    } else if (diffInSeconds < 3600) {
+      const mins = Math.floor(diffInSeconds / 60);
+      return `${mins} min${mins > 1 ? "s" : ""} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hr${hours > 1 ? "s" : ""} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    }
+  }
+
+  const formatDuration = (ms: number): string => `${ms}ms`;
+
+  function getSortedItems(
+    items: ApiHistoryItem[],
+    direction: "asc" | "desc",
+  ): ApiHistoryItem[] {
+    return [...items].sort((a, b) => {
+      const comparison =
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      return direction === "asc" ? comparison : -comparison;
+    });
+  }
+
+  function getFilteredItems(
+    items: ApiHistoryItem[],
+    term: string,
+  ): ApiHistoryItem[] {
+    if (!term) return items;
+
+    const lowerTerm = term.toLowerCase();
+    return items.filter((item) => {
+      const nameMatch = item.name.toLowerCase().includes(lowerTerm);
+      const urlMatch = item.url.toLowerCase().includes(lowerTerm);
+      const methodMatch = item.method.toLowerCase().includes(lowerTerm);
+      const statusMatch = getStatusMessage(item.responseStatus)
+        .toLowerCase()
+        .includes(lowerTerm);
+      const durationMatch = formatDuration(item.duration)
+        .toLowerCase()
+        .includes(lowerTerm);
+      const timeMatch = formatRelativeTime(item.timestamp)
+        .toLowerCase()
+        .includes(lowerTerm);
+      const methodUrlMatch = `${item.method} ${item.url}`
+        .toLowerCase()
+        .includes(lowerTerm);
+
+      return (
+        nameMatch ||
+        urlMatch ||
+        methodMatch ||
+        statusMatch ||
+        durationMatch ||
+        timeMatch ||
+        methodUrlMatch
+      );
+    });
+  }
+
+  function handleSort() {
+    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+  }
 
   $: historyItems = writable(
     (collection?.mockRequestHistory || []).sort(
@@ -34,6 +150,12 @@
     );
   }
 
+  $: sortedItems = getSortedItems($historyItems, sortDirection);
+  $: filteredItems = getFilteredItems(sortedItems, searchTerm);
+  $: searchHasNoResults = searchTerm && filteredItems.length === 0;
+  $: hasHistoryData =
+    collection?.mockRequestHistory && collection.mockRequestHistory.length > 0;
+
   function handleRefresh() {
     if (collection?.mockRequestHistory) {
       historyItems.set(
@@ -44,25 +166,13 @@
       );
     }
   }
-
-  $: filteredItems = searchTerm
-    ? $historyItems.filter(
-        (item) =>
-          item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.url?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.method?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.responseStatus?.toString().includes(searchTerm),
-      )
-    : $historyItems;
-
-  $: searchHasNoResults = searchTerm && filteredItems.length === 0;
-
-  $: hasHistoryData =
-    collection?.mockRequestHistory && collection.mockRequestHistory.length > 0;
 </script>
 
 {#if $tab.tabId && collection}
-  <div class="d-flex mock-history-explorer-layout h-100">
+  <div
+    class="d-flex mock-history-explorer-layout h-100"
+    style="background-color: var(--bg-ds-surface-900);"
+  >
     <div class="w-100 d-flex flex-column h-100 p-3 pb-0 gap-3">
       <div class="d-flex justify-content-between align-items-center">
         <p
@@ -129,6 +239,12 @@
           <HistoryTable
             historyItems={filteredItems}
             {searchTerm}
+            {sortDirection}
+            {COLUMNS}
+            {formatRelativeTime}
+            {formatDuration}
+            {getStatusMessage}
+            onSort={handleSort}
             onRowClick={() => {}}
           />
         </div>
@@ -138,135 +254,4 @@
 {/if}
 
 <style>
-  .mock-history-explorer-layout {
-    background-color: var(--bg-ds-surface-900);
-  }
-
-  .history-table-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: var(--bg-ds-surface-900);
-    color: var(--text-ds-neutral-50);
-    overflow: auto;
-  }
-
-  .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  .table-header {
-    height: 36px;
-    padding: 10px 16px 0 16px;
-    text-align: left;
-    align-items: center;
-    color: var(--text-ds-neutral-400);
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-    border-bottom: 1px solid var(--border-ds-surface-100);
-    cursor: default;
-  }
-
-  .table-header.sortable {
-    cursor: pointer;
-  }
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .history-row {
-    border-bottom: 1px solid var(--border-ds-surface-600);
-    height: 36px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  .history-row:hover {
-    background-color: var(--bg-ds-surface-600);
-  }
-
-  .history-row td {
-    padding-inline: 16px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .history-row .icon {
-    padding: 0px;
-    padding-left: 8px;
-  }
-
-  .history-row.expanded {
-    background-color: var(--bg-ds-surface-700);
-  }
-
-  .method-badge {
-    display: inline-block;
-    font-weight: 600;
-    margin-right: 8px;
-  }
-
-  .endpoint {
-    opacity: 0.9;
-  }
-
-  /* Expanded content styles */
-  .expanded-content-row td {
-    padding: 0;
-    border-bottom: 1px solid var(--border-ds-surface-700);
-  }
-
-  .expanded-content {
-    padding: 8px;
-    background-color: var(--bg-ds-surface-800);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .expanded-content-grid {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .empty-state {
-    padding-left: 16px;
-    color: var(--text-ds-neutral-200);
-    font-size: 12px;
-  }
-
-  .empty-table {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 0;
-  }
-
-  .empty-icon {
-    margin-bottom: 16px;
-    color: var(--text-ds-neutral-400);
-  }
-
-  .empty-text {
-    color: var(--text-ds-neutral-400);
-    font-size: 12px;
-  }
-
-  .table-footer {
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    color: var(--text-ds-neutral-400);
-    font-size: 12px;
-    border-top: 1px solid var(--border-ds-surface-700);
-  }
 </style>

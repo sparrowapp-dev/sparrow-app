@@ -8,10 +8,6 @@
     ChevronRightRegular,
   } from "@sparrow/library/icons";
   import { Button, Tooltip } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
-  import { writable } from "svelte/store";
-  import type { Writable } from "svelte/store";
-  import { HttpStatusCodes } from "../../../../features/rest-explorer-mock/utils/http-status-codes";
   import type { RequestMethodEnum } from "@sparrow/common/types/workspace/http-request-mock-tab";
   import { Select } from "@sparrow/library/forms";
   import HistoryTableExpanded from "./sub-component/history-table-expanded/HistoryTableExpanded.svelte";
@@ -38,14 +34,25 @@
     checked?: boolean;
   }
 
+  interface Column {
+    key: string;
+    label: string;
+    sortable: boolean;
+    width: string;
+  }
+
   export let historyItems: ApiHistoryItem[] = [];
   export let searchTerm: string = "";
-  export let onRowClick: (item: ApiHistoryItem) => void = () => {};
   export let sortDirection: "asc" | "desc" = "desc";
+  export let COLUMNS: Column[] = [];
+  export let formatRelativeTime: (timestamp: string) => string;
+  export let formatDuration: (ms: number) => string;
+  export let getStatusMessage: (responseStatus: string) => string;
+  export let onSort: () => void;
+  export let onRowClick: (item: ApiHistoryItem) => void = () => {};
 
-  const expandedItems: Writable<Set<string>> = writable(new Set());
-  const expandedSections: Writable<Record<string, Record<string, boolean>>> =
-    writable({});
+  let expandedItems: Set<string> = new Set();
+  let expandedSections: Record<string, Record<string, boolean>> = {};
 
   let currentPage = 1;
   let itemsPerPage = 10;
@@ -55,19 +62,6 @@
     { name: "20 per page", id: "20" },
     { name: "30 per page", id: "30" },
     { name: "40 per page", id: "40" },
-  ];
-
-  const COLUMNS = [
-    { key: "timestamp", label: "Time", sortable: true, width: "15%" },
-    { key: "name", label: "Name", sortable: false, width: "15%" },
-    { key: "url", label: "API Endpoint", sortable: false, width: "30%" },
-    {
-      key: "responseStatus",
-      label: "Status Code",
-      sortable: false,
-      width: "30%",
-    },
-    { key: "duration", label: "Duration", sortable: false, width: "10%" },
   ];
 
   const METHOD_COLORS = {
@@ -83,120 +77,60 @@
     "application/x-www-form-urlencoded",
   ]);
 
-  const statusMessagesMap = new Map(
-    HttpStatusCodes.map((status) => [status.id, status.name]),
-  );
-
-  $: sortedItems = getSortedItems(historyItems, sortDirection);
-  $: filteredItems = getFilteredItems(sortedItems, searchTerm);
-  $: totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  $: totalPages = Math.ceil(historyItems.length / itemsPerPage);
   $: {
     if (currentPage > totalPages && totalPages > 0) {
       currentPage = 1;
     }
   }
-  $: paginatedItems = filteredItems.slice(
+  $: paginatedItems = historyItems.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
-  function getSortedItems(
-    items: ApiHistoryItem[],
-    direction: "asc" | "desc",
-  ): ApiHistoryItem[] {
-    return [...items].sort((a, b) => {
-      const comparison =
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-      return direction === "asc" ? comparison : -comparison;
-    });
-  }
-
-  function getFilteredItems(
-    items: ApiHistoryItem[],
-    term: string,
-  ): ApiHistoryItem[] {
-    if (!term) return items;
-
-    const lowerTerm = term.toLowerCase();
-    return items.filter(
-      (item) =>
-        item.name.toLowerCase().includes(lowerTerm) ||
-        item.url.toLowerCase().includes(lowerTerm) ||
-        item.method.toLowerCase().includes(lowerTerm) ||
-        getStatusMessage(item.responseStatus).toLowerCase().includes(lowerTerm),
-    );
-  }
-
-  function handleSort() {
-    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-  }
-
-  function toggleRowExpand(item: ApiHistoryItem, event: MouseEvent) {
+  const toggleRowExpand = (item: ApiHistoryItem, event: MouseEvent) => {
     event.stopPropagation();
 
-    expandedItems.update((items) => {
-      const newItems = new Set(items);
-      if (newItems.has(item.id)) {
-        newItems.delete(item.id);
-      } else {
-        newItems.clear();
-        newItems.add(item.id);
-        expandedSections.update((sections) => ({
-          ...sections,
-          [item.id]: {
-            requestHeaders: true,
-            requestBody: true,
-            responseHeaders: true,
-            responseBody: true,
-          },
-        }));
-      }
-      return newItems;
-    });
+    // Direct manipulation of the Set - Svelte will detect the change
+    if (expandedItems.has(item.id)) {
+      expandedItems.delete(item.id);
+    } else {
+      expandedItems.clear();
+      expandedItems.add(item.id);
+      expandedSections = {
+        ...expandedSections,
+        [item.id]: {
+          requestHeaders: true,
+          requestBody: true,
+          responseHeaders: true,
+          responseBody: true,
+        },
+      };
+    }
+    // Trigger reactivity
+    expandedItems = expandedItems;
 
     onRowClick(item);
-  }
+  };
 
-  function toggleSection(itemId: string, section: string, event: MouseEvent) {
+  const toggleSection = (
+    itemId: string,
+    section: string,
+    event: MouseEvent,
+  ) => {
     event.stopPropagation();
 
-    expandedSections.update((sections) => ({
-      ...sections,
+    expandedSections = {
+      ...expandedSections,
       [itemId]: {
-        ...sections[itemId],
-        [section]: !sections[itemId]?.[section],
+        ...expandedSections[itemId],
+        [section]: !expandedSections[itemId]?.[section],
       },
-    }));
-  }
-
-  function formatRelativeTime(timestamp: string): string {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) {
-      return "Just Now";
-    } else if (diffInSeconds < 3600) {
-      const mins = Math.floor(diffInSeconds / 60);
-      return `${mins} min${mins > 1 ? "s" : ""} ago`;
-    } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600);
-      return `${hours} hr${hours > 1 ? "s" : ""} ago`;
-    } else {
-      const days = Math.floor(diffInSeconds / 86400);
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    }
-  }
-
-  const formatDuration = (ms: number): string => `${ms}ms`;
+    };
+  };
 
   const getStatusColor = (statusCode: string): string =>
     statusCode ? "var(--text-ds-neutral-50)" : "var(--text-ds-danger-300)";
-
-  const getStatusMessage = (responseStatus: string): string => {
-    if (!responseStatus) return "No Response";
-    return statusMessagesMap.get(responseStatus) || `${responseStatus} Unknown`;
-  };
 
   const getMethodColor = (method: string): string =>
     METHOD_COLORS[method as keyof typeof METHOD_COLORS] ||
@@ -216,19 +150,24 @@
   };
 </script>
 
-<div class="history-table-container">
-  <div class="table-header-container">
-    <table class="header-table">
+<div
+  class="h-100 w-100 d-flex flex-column"
+  style="color: var(--text-ds-neutral-50);"
+>
+  <div style="border-bottom: 1px solid var(--border-ds-surface-100);">
+    <table style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
-          <th class="table-header" style="width: 44px;"></th>
+          <th
+            class="table-header align-items-center text-fs-12"
+            style="width: 44px;"
+          ></th>
           {#each COLUMNS as column}
             <th
-              class="table-header {column.sortable ? 'sortable' : ''}"
+              class="table-header align-items-center text-fs-12"
               style="width: {column.width};"
-              on:click={() => column.sortable && handleSort()}
             >
-              <div class="header-content">
+              <div class="d-flex align-items-center justify-content-between">
                 <span>{column.label}</span>
                 {#if column.sortable}
                   <span>
@@ -236,6 +175,9 @@
                       startIcon={ArrowSortRegular}
                       size={"extra-small"}
                       type={"teritiary-regular"}
+                      onClick={() => {
+                        column.sortable && onSort();
+                      }}
                     />
                   </span>
                 {/if}
@@ -246,12 +188,12 @@
       </thead>
     </table>
   </div>
-  <div class="table-body-container">
-    <table class="body-table">
+  <div style="flex: 1; overflow-y: auto;">
+    <table style="width: 100%; table-layout: fixed;">
       <tbody>
         {#each paginatedItems as item, index (item.id)}
-          {@const isExpanded = $expandedItems.has(item.id)}
-          {@const expandedSectionsState = $expandedSections[item.id] || {
+          {@const isExpanded = expandedItems.has(item.id)}
+          {@const expandedSectionsState = expandedSections[item.id] || {
             requestHeaders: true,
             requestBody: true,
             responseHeaders: true,
@@ -261,11 +203,11 @@
           {@const isLast = index === paginatedItems.length - 1}
 
           <tr
-            class="history-row {isExpanded ? 'expanded' : ''} {isFirst
-              ? 'first-row'
-              : ''} {isLast ? 'last-row' : ''}"
+            class="history-row text-fs-12 text-ds-font-weight-semi-bold {isExpanded
+              ? 'expanded'
+              : ''} {isFirst ? 'first-row' : ''} {isLast ? 'last-row' : ''}"
           >
-            <td class="icon" style="width: 44px;">
+            <td class="ps-2" style="width: 44px;">
               <Tooltip
                 title={isExpanded ? "Hide Details" : "View Details"}
                 placement={"top-center"}
@@ -284,7 +226,7 @@
             <td style="width: 15%;">{item.name}</td>
             <td style="width: 30%;">
               <span
-                class="method-badge"
+                class="d-inline-block text-fs-9 fw-semibold me-2"
                 style="color: {getMethodColor(item.method)}"
               >
                 {item.method}
@@ -300,11 +242,14 @@
           </tr>
 
           {#if isExpanded}
-            <tr class="expanded-content-row">
+            <tr>
               <td colspan={COLUMNS.length + 1}>
-                <div class="expanded-content">
-                  <div class="expanded-content-grid">
-                    <div class="section-container section-left">
+                <div class="expanded-content d-flex flex-column p-2">
+                  <div class="d-flex flex-row">
+                    <div
+                      class="d-flex flex-column"
+                      style="width: 40%;  border-right: 1px solid var(--border-ds-surface-100);"
+                    >
                       <HistoryTableExpanded
                         bodyContent={item.requestHeaders?.slice(0, -1)}
                         contentType="headers"
@@ -317,7 +262,7 @@
                       />
                     </div>
 
-                    <div class="section-container section-right">
+                    <div class="d-flex flex-column ps-2" style="width: 60%;">
                       <HistoryTableExpanded
                         bodyContent={isMultipartContent(
                           item.selectedRequestBodyType,
@@ -335,8 +280,11 @@
 
                   <div class="section-divider" />
 
-                  <div class="expanded-content-grid">
-                    <div class="section-container section-left">
+                  <div class="d-flex flex-row">
+                    <div
+                      class="d-flex flex-column"
+                      style="width: 40%;  border-right: 1px solid var(--border-ds-surface-100);"
+                    >
                       <HistoryTableExpanded
                         bodyContent={item.responseHeaders?.slice(0, -1)}
                         contentType="headers"
@@ -349,7 +297,7 @@
                       />
                     </div>
 
-                    <div class="section-container section-right">
+                    <div class="d-flex flex-column ps-2" style="width: 60%;">
                       <HistoryTableExpanded
                         bodyContent={item.responseBody}
                         contentType={item.selectedResponseBodyType}
@@ -369,13 +317,15 @@
     </table>
   </div>
 
-  <div class="table-footer">
-    <div class="footer-left">
-      <div class="pagination-info">
+  <div
+    class="table-footer d-flex justify-content-between align-items-center text-ds-font-size-12"
+  >
+    <div class="d-flex align-items-center gap-3">
+      <div>
         Showing {Math.min(
           (currentPage - 1) * itemsPerPage + 1,
-          filteredItems.length,
-        )}-{Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length}
+          historyItems.length,
+        )}-{Math.min(currentPage * itemsPerPage, historyItems.length)} of {historyItems.length}
       </div>
       <div>
         <Select
@@ -402,7 +352,7 @@
       </div>
     </div>
 
-    <div class="pagination-controls">
+    <div class="d-flex align-items-center gap-1">
       <Button
         startIcon={ChevronDoubleLeftRegular}
         size={"small"}
@@ -436,67 +386,16 @@
 </div>
 
 <style>
-  .history-table-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: var(--bg-ds-surface-900);
-    color: var(--text-ds-neutral-50);
-  }
-
-  .table-header-container {
-    flex-shrink: 0;
-    background-color: var(--bg-ds-surface-900);
-    border-bottom: 1px solid var(--border-ds-surface-100);
-  }
-
-  .header-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  .table-body-container {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .body-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
   .table-header {
     height: 40px;
     padding: 10px 16px 0 16px;
-    text-align: left;
-    align-items: center;
     color: var(--text-ds-neutral-400);
-    font-size: 12px;
     font-weight: 600;
-    white-space: nowrap;
-    cursor: default;
-  }
-
-  .table-header.sortable {
-    cursor: pointer;
-  }
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
 
   .history-row {
     border-bottom: 1px solid var(--border-ds-surface-600);
     height: 36px;
-    font-size: 12px;
-    font-weight: 500;
   }
 
   .history-row:hover {
@@ -529,56 +428,15 @@
     border-bottom-right-radius: 0;
   }
 
-  .history-row .icon {
-    padding-left: 8px;
-  }
-
   .history-row.expanded {
     background-color: var(--bg-ds-surface-700);
     border: none;
   }
 
-  .method-badge {
-    display: inline-block;
-    font-weight: 600;
-    margin-right: 8px;
-  }
-
-  .endpoint {
-    opacity: 0.9;
-  }
-
-  .expanded-content-row td {
-    padding: 0;
-  }
-
   .expanded-content {
-    padding: 8px;
     background-color: var(--bg-ds-surface-800);
-    display: flex;
-    flex-direction: column;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-  }
-
-  .expanded-content-grid {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .section-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .section-left {
-    width: 40%;
-    border-right: 1px solid var(--border-ds-surface-100);
-  }
-
-  .section-right {
-    width: 60%;
-    padding-left: 8px;
   }
 
   .section-divider {
@@ -588,30 +446,8 @@
   }
 
   .table-footer {
-    flex-shrink: 0;
     padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     color: var(--text-ds-neutral-400);
-    font-size: 12px;
     border-top: 1px solid var(--border-ds-surface-700);
-    background-color: var(--bg-ds-surface-900);
-  }
-
-  .footer-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .pagination-info {
-    white-space: nowrap;
   }
 </style>
