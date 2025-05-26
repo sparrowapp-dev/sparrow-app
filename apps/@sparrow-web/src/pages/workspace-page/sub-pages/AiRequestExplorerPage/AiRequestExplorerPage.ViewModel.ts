@@ -436,7 +436,6 @@ class AiRequestExplorerViewModel {
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-      console.log("config ::>>> ", _configUpdates)
     } catch (error) {
       Sentry.captureException(error);
       notifications.error(
