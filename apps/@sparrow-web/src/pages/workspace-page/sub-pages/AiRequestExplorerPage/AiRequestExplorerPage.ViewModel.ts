@@ -38,6 +38,7 @@ import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import type { AiModelProviderEnum, AnthropicModelsConfig, DeepSeekModelsConfig, GeminiModelsConfig, OpenAiModelsConfig } from "@sparrow/common/types/workspace/ai-request-base";
+import { disableModelBasedNavigationFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -595,7 +596,9 @@ class AiRequestExplorerViewModel {
       // modelVersion: "gpt-3.5-turbo",
       // model: "openai",
       authKey: componentData.property.aiRequest.auth.apiKey.authValue,
-      systemPrompt: finalSP || "Answer my queries.",
+      ...(disableModelBasedNavigationFeatures["System Prompt"].includes(componentData.property.aiRequest.aiModelVariant)
+        ? {}
+        : { systemPrompt: finalSP || "Answer my queries." }),
       userInput: prompt,
       configs: {
         streamResponse: true,
