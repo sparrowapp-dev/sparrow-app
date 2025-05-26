@@ -19,9 +19,6 @@
   export let isLoading = false;
   let cardType = "marketplace";
   export let workspaceList: WorkspaceDocument[] = [];
-  $: {
-    console.log("workspaceList------", workspaceList);
-  }
 
   let scrollContainer;
   let showLoadMoreButton = false;
@@ -50,9 +47,6 @@
       scrollContainer.removeEventListener("scroll", handleScroll);
     }
   });
-  $: {
-    console.log("nnnnn------", showLoadMoreButton);
-  }
 </script>
 
 <div class="d-flex flex-row justify-content-between image-wrapper">
