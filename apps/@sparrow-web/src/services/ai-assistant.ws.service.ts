@@ -6,7 +6,7 @@ import type {
 } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import * as Sentry from "@sentry/svelte";
-import type { AiModelProviderEnum, AIModelVariant, AnthropicModelsConfig, DeepSeekModelsConfig, GeminiModelsConfig, modelsConfigType, OpenAiModelsConfig } from "@sparrow/common/types/workspace/ai-request-base";
+import type { AiModelProviderEnum, AIModelVariant, modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 
 /**
  * Service for managing WebSocket connections and communication
