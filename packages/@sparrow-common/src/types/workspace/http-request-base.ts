@@ -17,10 +17,10 @@ export enum HttpRequestAuthTypeBaseEnum {
   API_KEY = "API Key",
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
-  INHERIT_AUTH = "Inherit Auth"
+  INHERIT_AUTH = "Inherit Auth",
 }
 
-interface HttpRequestBodyBaseInterface {
+export interface HttpRequestBodyBaseInterface {
   raw?: string;
   urlencoded?: HttpRequestKeyValueCheckedBaseInterface[];
   formdata?: {
@@ -68,7 +68,7 @@ export enum HttpRequestContentTypeBaseEnum {
   "application/javascript" = "application/javascript",
   "text/plain" = "text/plain",
   "text/html" = "text/html",
-  "none" = "none"
+  "none" = "none",
 }
 
 export interface HttpRequestBaseInterface {
