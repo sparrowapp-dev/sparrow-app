@@ -2,39 +2,7 @@
   import { SparrowLogo } from "@sparrow/common/images";
   import { WorkspaceRegular } from "@sparrow/library/icons";
   import { List } from "@sparrow/library/ui";
-  let topFiveWorkspaces = [
-    {
-      name: "API Testing Workspace",
-      team: { teamName: "Development Team" },
-      users: [{ id: 1 }, { id: 2 }],
-      _id: "1"
-    },
-    {
-      name: "E-Commerce Testing",
-      team: { teamName: "QA Team" },
-      users: [{ id: 1 }, { id: 2 }, { id: 3 }],
-      _id: "2"
-    },
-    {
-      name: "Mobile App Testing",
-      team: { teamName: "Mobile Team" },
-      users: [{ id: 1 }, { id: 2 }],
-      _id: "3"
-    },
-    {
-      name: "Performance Testing",
-      team: { teamName: "DevOps Team" },
-      users: [{ id: 1 }, { id: 2 }],
-      _id: "4"
-    },
-    {
-      name: "Security Testing",
-      team: { teamName: "Security Team" },
-      users: [{ id: 1 }, { id: 2 }, { id: 3 }],
-      _id: "5"
-    }
-  ];
-
+  let RecentWorkspaces = [];
 </script>
 
 <div class="h-100" style="width: 270px; gap: 12px">
@@ -44,53 +12,56 @@
     >
   </div>
   <hr style="color: var(--border-ds-surface-100);" />
-  <!-- <div>
-    <div class="container">
-      <SparrowLogo width={"120px"} height={"120px"} />
+  {#if RecentWorkspaces.length == 0}
+    <div>
+      <div class="container">
+        <SparrowLogo width={"120px"} height={"120px"} />
+      </div>
+      <p
+        style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;text-align:center"
+      >
+        You haven’t visited any <br /> workspaces yet.
+      </p>
     </div>
-    <p
-      style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;text-align:center"
-    >
-      You haven’t visited any <br /> workspaces yet.
-    </p>
-  </div> -->
-  <List classProps={"px-1 py-0"}>
-    {#each topFiveWorkspaces as list, index}
-      {#if index < 5}
-        <div
-          tabindex="0"
-          class="recentWorkspace-tab"
-          on:click={() => console.log("Workspace clicked")}
-        >
+  {:else}
+    <List classProps={"px-1 py-0"}>
+      {#each RecentWorkspaces as list, index}
+        {#if index < 5}
           <div
-            class="w-100 py-2 px-3 overflow-hidden rounded justify-content-between d-flex workspace-list-data"
+            tabindex="0"
+            class="recentWorkspace-tab"
+            on:click={() => console.log("Workspace clicked")}
           >
             <div
-              class="overflow-hidden ellipsis"
-              style="width: 100%; height:35px"
+              class="w-100 py-2 px-3 overflow-hidden rounded justify-content-between d-flex workspace-list-data"
             >
-              <p
-                class="list-name mb-0 ellipsis overflow-hidden ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-                style=" color:var(--text-ds-neutral-50);"
+              <div
+                class="overflow-hidden ellipsis"
+                style="width: 100%; height:35px"
               >
-                {list?.name || ""}
-              </p>
-              <p
-                class="team-name mb-0 title ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
-                style=" border-radius:0; line-height:18px;"
-              >
-                {list?.team?.teamName || ""}
-              </p>
-            </div>
+                <p
+                  class="list-name mb-0 ellipsis overflow-hidden ellipsis text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                  style=" color:var(--text-ds-neutral-50);"
+                >
+                  {list?.name || ""}
+                </p>
+                <p
+                  class="team-name mb-0 title ellipsis overflow-hidden text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+                  style=" border-radius:0; line-height:18px;"
+                >
+                  {list?.team?.teamName || ""}
+                </p>
+              </div>
 
-            <span class={`${list.users.length <= 1 && "d-none"} my-2 me-1`}>
-              <WorkspaceRegular size={"16px"} />
-            </span>
+              <span class={`${list.users.length <= 1 && "d-none"} my-2 me-1`}>
+                <WorkspaceRegular size={"16px"} />
+              </span>
+            </div>
           </div>
-        </div>
-      {/if}
-    {/each}
-  </List>
+        {/if}
+      {/each}
+    </List>
+  {/if}
 </div>
 
 <style>
@@ -116,5 +87,4 @@
     background-color: var(--bg-ds-surface-500);
     cursor: pointer;
   }
-
 </style>

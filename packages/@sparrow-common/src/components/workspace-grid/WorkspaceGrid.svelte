@@ -13,6 +13,7 @@
   // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
   import { Tag } from "@sparrow/library/ui";
   import { WorkspaceType } from "@sparrow/common/enums";
+  import { Tooltip } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
 
   export let workspace: any;
@@ -190,46 +191,42 @@
         <div>
           {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
             {#if isWorkspaceLinkCopied}
-              <p
-                class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
-                style="color: var(--text-ds-neutral-400); top:27px; right:55px;"
-              >
-                Copied
-              </p>
-              <button
-                bind:this={workspaceTabWrapper}
-                class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-                style="top:27px; right:31px;"
-              >
-                <StatusSuccess
-                  height="14"
-                  width="14"
-                  color="var(--icon-ds-success-400)"
-                />
-              </button>
-            {:else}
-              <div bind:this={workspaceTabWrapper}>
-                <span
-                  class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
-                  style="color: var(--text-ds-neutral-400); top:28px; right:60px;"
+              <Tooltip placement="top-right" distance={40} title="Copied">
+                <button
+                  bind:this={workspaceTabWrapper}
+                  class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
+                  style="top:27px; right:31px;"
                 >
-                  Copy Public Link
-                </span>
+                  <StatusSuccess
+                    height="14"
+                    width="14"
+                    color="var(--icon-ds-success-400)"
+                  />
+                </button>
+              </Tooltip>
+            {:else}
+              <div style="">
+                <Tooltip
+                  placement="top-right"
+                  distance={40}
+                  title="Copy Public Link"
+                >
+                  <button
+                    bind:this={workspaceTabWrapper}
+                    class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
+                    style="top:27px; right:30px;"
+                    on:click={async () => {
+                      await onCopyLink(workspace._id);
+                      isWorkspaceLinkCopied = true;
+                      setTimeout(() => {
+                        isWorkspaceLinkCopied = false;
+                      }, 2000);
+                    }}
+                  >
+                    <LinkRegular />
+                  </button>
+                </Tooltip>
               </div>
-              <button
-                bind:this={workspaceTabWrapper}
-                class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
-                style="top:27px; right:30px;"
-                on:click={async () => {
-                  await onCopyLink(workspace._id);
-                  isWorkspaceLinkCopied = true;
-                  setTimeout(() => {
-                    isWorkspaceLinkCopied = false;
-                  }, 2000);
-                }}
-              >
-                <LinkRegular />
-              </button>
             {/if}
           {/if}
 
@@ -250,7 +247,8 @@
       {#if cardType != "teams"}
         <span
           class="text-ds-font-size-12 text-ds-font-weight-semi-bold"
-          style="color: var(--text-ds-primary-300);">{workspace.team.name}</span
+          style="color: var(--text-ds-primary-300);"
+          >By {workspace.team.name}</span
         >
       {/if}
       <p
