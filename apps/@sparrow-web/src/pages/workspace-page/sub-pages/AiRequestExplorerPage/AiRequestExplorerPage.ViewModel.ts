@@ -64,6 +64,7 @@ import {
   CollectionItemTypeBaseEnum,
   type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
+import type { AiRequestCreateUpdateInCollectionPayloadDtoInterface, AiRequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/ai-request-dto";
 
 
 class AiRequestExplorerViewModel {
@@ -515,6 +516,7 @@ class AiRequestExplorerViewModel {
    * @returns save status
    */
   public saveAiRequest = async () => {
+    console.log("saveAiRequest called :>> ");
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;
@@ -558,13 +560,13 @@ class AiRequestExplorerViewModel {
         type: ItemType.FOLDER,
         items: {
           ...requestMetaData,
-          request: unadaptedRequest,
+          aiRequest: unadaptedRequest,
         },
       };
     } else {
       itemSource = {
         ...requestMetaData,
-        request: unadaptedRequest,
+        aiRequest: unadaptedRequest,
       };
     }
 
@@ -607,13 +609,15 @@ class AiRequestExplorerViewModel {
         message: "",
       };
     }
-    const res = await updateCollectionRequest(_id, folderId, collectionId, {
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const res = await this.collectionService.updateAiRequestInCollection(_id, {
       collectionId: collectionId,
       workspaceId: workspaceId,
       ...folderSource,
       ...userSource,
       items: itemSource,
-    });
+    } as | AiRequestCreateUpdateInCollectionPayloadDtoInterface | AiRequestCreateUpdateInFolderPayloadDtoInterface, baseUrl);
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
@@ -670,6 +674,7 @@ class AiRequestExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
+    console.log("saveAsRequest called :>> ");
     const componentData = this._tab.getValue();
     let userSource = {};
     if (path.length > 0) {
@@ -680,7 +685,7 @@ class AiRequestExplorerViewModel {
         name: tabName,
         description,
         type: ItemType.AI_REQUEST,
-        request: unadaptedRequest,
+        aiRequest: unadaptedRequest,
         source: "USER",
         isDeleted: false,
         createdBy: "Guest User",
@@ -774,7 +779,7 @@ class AiRequestExplorerViewModel {
           return;
         }
         const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
-        const res = await insertCollectionRequest(
+        const res = await this.collectionService.addAiRequestInCollection(
           {
             collectionId: path[path.length - 1].id,
             workspaceId: _workspaceMeta.id,
@@ -782,7 +787,7 @@ class AiRequestExplorerViewModel {
             items: {
               name: tabName,
               description,
-              type: ItemType.AI_REQUEST,
+              type: CollectionItemTypeBaseEnum.AI_REQUEST,
               aiRequest: unadaptedRequest,
             },
           },
@@ -945,7 +950,7 @@ class AiRequestExplorerViewModel {
           };
         }
         const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
-        const res = await insertCollectionRequest(
+        const res = await this.collectionService.addAiRequestInCollection(
           {
             collectionId: path[0].id,
             workspaceId: _workspaceMeta.id,
@@ -954,11 +959,11 @@ class AiRequestExplorerViewModel {
             items: {
               id: path[path.length - 1].id,
               name: path[path.length - 1].name,
-              type: ItemType.FOLDER,
+              type: CollectionItemTypeBaseEnum.FOLDER,
               items: {
                 name: tabName,
                 description,
-                type: ItemType.REQUEST,
+                type: CollectionItemTypeBaseEnum.AI_REQUEST,
                 aiRequest: unadaptedRequest,
               },
             },
