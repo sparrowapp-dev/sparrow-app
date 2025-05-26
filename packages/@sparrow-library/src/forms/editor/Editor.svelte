@@ -45,7 +45,10 @@
   export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
-  export let isMinimalMode = false;
+  export let showLineNumbers = true;
+  export let highlightActiveLine = true;
+  export let highlightActiveLineGutter = true;
+  export let enableLinting = true;
 
   // For merge view props
   export let isMergeViewEnabled = false;
@@ -279,11 +282,17 @@
   );
 
   function initalizeCodeMirrorEditor(value: string) {
+    const editorOptions = {
+      showLineNumbers,
+      highlightActiveLine,
+      highlightActiveLineGutter,
+    };
+
     let extensions: Extension[];
     extensions = [
       ...(isEnterKeyNotAllowed ? [keyBindings] : []),
-      setupConf.of(getBasicSetup(isMinimalMode)),
-      themeConf.of(getTheme(isMinimalMode)),
+      setupConf.of(getBasicSetup(editorOptions)),
+      themeConf.of(getTheme(editorOptions)),
       expressionPlugin,
       dragDropPlugin,
       languageConf.of([]),
@@ -329,13 +338,13 @@
 
   function updateLinting() {
     // Reconfigure linting dynamically based on `isErrorVisible` and `errorMessage`
-    if (codeMirrorView && !isMinimalMode) {
+    if (codeMirrorView && enableLinting) {
       codeMirrorView.dispatch({
         effects: lintConf.reconfigure(
           isErrorVisible && errorMessage ? [lintExtension] : [],
         ),
       });
-    } else if (codeMirrorView && isMinimalMode) {
+    } else if (codeMirrorView && !enableLinting) {
       codeMirrorView.dispatch({
         effects: lintConf.reconfigure([]),
       });

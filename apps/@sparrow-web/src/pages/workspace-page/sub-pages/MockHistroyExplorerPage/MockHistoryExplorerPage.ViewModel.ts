@@ -164,6 +164,28 @@ class MockHistoryExplorerPage {
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
+
+  public getCollectionByIdAndWorkspace = async (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.geCollectionByIdAndWorkspace(
+      collectionId,
+      workspaceId,
+      baseUrl,
+    );
+
+    if (response?.isSuccessful) {
+      await this.collectionRepository.updateCollection(collectionId, {
+        ...response.data.data,
+        id: response.data.data._id,
+        workspaceId: workspaceId,
+      });
+    } else {
+      notifications.error("Failed to fetch collection. Please try again.");
+    }
+  };
 }
 
 export default MockHistoryExplorerPage;

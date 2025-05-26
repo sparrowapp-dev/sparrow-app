@@ -14,10 +14,7 @@
 
   export let tab: Observable<Tab>;
   export let collection;
-  export let fetchCollection: (
-    id: string,
-    workspaceId?: string,
-  ) => Promise<any>;
+  export let fetchCollection;
 
   let isRefreshing = false;
   let searchTerm = "";

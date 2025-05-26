@@ -84,12 +84,12 @@
     }
   }
 
-  function truncateText(text: string, maxLength: number = 20): string {
+  function truncateText(text: string, maxLength: number = 18): string {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
   }
 
-  function shouldTruncate(text: string, maxLength: number = 20): boolean {
+  function shouldTruncate(text: string, maxLength: number = 18): boolean {
     return text.length > maxLength;
   }
 
@@ -126,7 +126,7 @@
               (customTitle ? "" : " body")} available.
         </div>
       {:else if isHeadersContent()}
-        <div class="headers-container">
+        <div class="headers-container ms-3">
           {#each bodyContent as header}
             <div class="header-item d-flex mb-1">
               {#if shouldTruncate(header.key)}
@@ -159,7 +159,10 @@
             isEditable={false}
             {isBodyBeautified}
             beautifySyntaxCallback={updateBeautifiedState}
-            isMinimalMode={true}
+            showLineNumbers={false}
+            highlightActiveLine={false}
+            highlightActiveLineGutter={false}
+            enableLinting={false}
           />
         </div>
       {/if}

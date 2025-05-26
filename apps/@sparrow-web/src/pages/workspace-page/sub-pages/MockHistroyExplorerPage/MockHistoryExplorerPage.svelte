@@ -14,7 +14,6 @@
    * folder tab document
    */
   export let tab: TabDocument;
-  export let fetchCollection;
 
   // ViewModel initialization
   const _viewModel = new MockHistoryExplorerPage(tab);
@@ -38,4 +37,8 @@
   });
 </script>
 
-<MockHistoryExplorer tab={_viewModel.tab} bind:collection {fetchCollection} />
+<MockHistoryExplorer
+  tab={_viewModel.tab}
+  bind:collection
+  fetchCollection={_viewModel.getCollectionByIdAndWorkspace}
+/>

@@ -914,10 +914,7 @@
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
-                        <MockHistoryExplorerPage
-                          tab={$activeTab}
-                          fetchCollection={_viewModel.getCollectionByIdAndWorkspace}
-                        />
+                        <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}

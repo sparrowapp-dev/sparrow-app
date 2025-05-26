@@ -50,6 +50,12 @@ import {
 import { hoverTooltip } from "@codemirror/view";
 import { EditorFont } from "@sparrow/common/constants/fonts.constant";
 
+export interface EditorOptions {
+  showLineNumbers?: boolean;
+  highlightActiveLine?: boolean;
+  highlightActiveLineGutter?: boolean;
+}
+
 export const basicTheme = EditorView.theme({
   "&": {
     height: "100%",
@@ -350,31 +356,50 @@ export const minimalHighlightStyle = HighlightStyle.define([
   { tag: t.string, color: "var(--text-ds-info-300)" },
 ]);
 
-export const getHighlightStyle = (
-  isMinimalMode: boolean = false,
+export const getMinimalThemeOverrides = (
+  options: EditorOptions = {},
 ): Extension => {
-  if (isMinimalMode) {
-    return syntaxHighlighting(basicHighlightStyle);
-  } else {
-    return [
-      syntaxHighlighting(basicHighlightStyle),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-    ];
+  const overrides: Record<string, any> = {};
+
+  if (!options.highlightActiveLine) {
+    overrides[".cm-activeLine"] = { backgroundColor: "transparent" };
   }
+
+  if (!options.highlightActiveLineGutter) {
+    overrides[".cm-activeLineGutter"] = {
+      backgroundColor: "transparent",
+      display: "none",
+    };
+  }
+
+  return EditorView.theme(overrides);
 };
 
-export const getBasicSetup = (isMinimalMode: boolean = false): Extension => {
+export const getHighlightStyle = (): Extension => {
+  return [
+    syntaxHighlighting(basicHighlightStyle),
+    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+  ];
+};
+
+export const getBasicSetup = (options: EditorOptions = {}): Extension => {
+  const {
+    showLineNumbers = true,
+    highlightActiveLine: highlightActiveLineOpt = true,
+    highlightActiveLineGutter: highlightActiveLineGutterOpt = true,
+  } = options;
+
   const baseExtensions = [
     highlightSpecialChars(),
     history(),
     foldGutter({
-      openText: isMinimalMode ? "▼" : "▾",
-      closedText: isMinimalMode ? "▶" : "▸",
+      openText: "▾",
+      closedText: "▸",
     }),
     dropCursor(),
     EditorState.allowMultipleSelections.of(true),
     indentOnInput(),
-    getHighlightStyle(isMinimalMode),
+    getHighlightStyle(),
     bracketMatching(),
     autocompletion(),
     rectangularSelection(),
@@ -404,22 +429,33 @@ export const getBasicSetup = (isMinimalMode: boolean = false): Extension => {
     }),
   ];
 
-  if (!isMinimalMode) {
-    baseExtensions.push(
-      lineNumbers(),
-      highlightActiveLineGutter(),
-      highlightActiveLine(),
-    );
+  if (showLineNumbers) {
+    baseExtensions.push(lineNumbers());
+  }
+
+  if (highlightActiveLineGutterOpt) {
+    baseExtensions.push(highlightActiveLineGutter());
+  }
+
+  if (highlightActiveLineOpt) {
+    baseExtensions.push(highlightActiveLine());
   }
 
   return baseExtensions;
 };
 
-export const getTheme = (isMinimalMode: boolean = false): Extension => {
-  return isMinimalMode ? [basicTheme, minimalTheme] : basicTheme;
+export const getTheme = (options: EditorOptions = {}): Extension => {
+  const themes = [basicTheme];
+
+  const minimalOverrides = getMinimalThemeOverrides(options);
+  if (minimalOverrides) {
+    themes.push(minimalOverrides);
+  }
+
+  return themes;
 };
 
-export const basicSetup: Extension = getBasicSetup(false);
+export const basicSetup: Extension = getBasicSetup();
 
 export const jsonSetup: Extension = [
   closeBrackets(),
