@@ -1,10 +1,30 @@
-export const disableModelBasedNavigationFeatures = {
+import { AiModelProviderEnum, type AIModelVariant } from "./ai-request-base";
+
+// Disabling model specific features that are not supported 
+export const disabledModelFeatures = {
   "System Prompt": ['o1', 'o1-mini'], // system prompt is not supported in o1 and o1-mini
-  Configurations: [], // configurations are not supported in 
-  Authorization: [], // Authorization is not supported in 
+  "Configurations": [], // configurations are not supported in 
+  "Authorization": [], // Authorization is not supported in 
 }
 
-export const configFormat = {
+// Model configuration format for different AI model providers.
+// This format defines the structure and types of configuration 
+// options available for each model variant, and used to generate 
+// the configuration form in the UI.
+export const configFormat: {
+  [modelProvider in AiModelProviderEnum]?: {
+    [modelVariant in AIModelVariant]?: {
+      [configKey: string]: {
+        type: "number" | "boolean";
+        displayName: string;
+        description: string;
+        defaultValue: number | boolean;
+        min?: string;
+        max?: string;
+      };
+    };
+  };
+} = {
   openai: {
     "gpt-4o": {
       streamResponse: {
@@ -411,7 +431,6 @@ export const configFormat = {
     }
   },
 
-
   anthropic: {
     "claude-3-opus": {
       streamResponse: {
@@ -466,6 +485,7 @@ export const configFormat = {
       },
     },
   },
+
   google: {
     "gemini-pro": {
       streamResponse: {
@@ -494,6 +514,7 @@ export const configFormat = {
       },
     },
   },
+
   deepseek: {
     "deepseek-chat": {
       streamResponse: {
@@ -523,115 +544,3 @@ export const configFormat = {
     },
   },
 };
-
-
-// const sharedParams = {
-//   streamResponse: {
-//     type: "boolean",
-//     displayName: "Stream Response",
-//     description: "Enables real-time output of the model's generated content.",
-//     defaultValue: true,
-//   },
-//   temperature: {
-//     type: "number",
-//     min: "0",
-//     max: "2",
-//     displayName: "Temperature",
-//     description: "Controls the randomness of output. Higher values increase creativity.",
-//     defaultValue: 1,
-//   },
-//   maxTokens: (max: number) => ({
-//     type: "number",
-//     min: "1",
-//     max: String(max),
-//     displayName: "Max Tokens",
-//     description: "Maximum number of tokens to generate in the response.",
-//     defaultValue: 1024,
-//   }),
-// };
-
-
-
-// const openAICommonParams = {
-//   streamResponse: sharedParams.streamResponse,
-//   responseFormat: {
-//     type: "boolean",
-//     displayName: "Response Format (JSON)",
-//     description: "Forces the model to adhere strictly to JSON formatting.",
-//     defaultValue: false,
-//   },
-//   temperature: sharedParams.temperature,
-//   presencePenalty: {
-//     type: "number",
-//     min: "-2",
-//     max: "2",
-//     displayName: "Presence Penalty",
-//     description: "Controls introduction of new/unrelated topics.",
-//     defaultValue: 0,
-//   },
-//   frequencyPenalty: {
-//     type: "number",
-//     min: "-2",
-//     max: "2",
-//     displayName: "Frequency Penalty",
-//     description: "Controls repetition of terms in output.",
-//     defaultValue: 0,
-//   },
-// };
-
-
-
-
-// export const configFormat = {
-//   openai: {
-//     "gpt-4": {
-//       ...openAICommonParams,
-//       maxTokens: sharedParams.maxTokens(8192),
-//     },
-//     "gpt-4o": {
-//       ...openAICommonParams,
-//       maxTokens: sharedParams.maxTokens(4096),
-//     },
-//   },
-//   anthropic: {
-//     "claude-3-opus": {
-//       streamResponse: sharedParams.streamResponse,
-//       temperature: {
-//         ...sharedParams.temperature,
-//         max: "1",
-//         defaultValue: 0.7,
-//       },
-//       maxTokens: sharedParams.maxTokens(4096),
-//     },
-//     "claude-3-sonnet": {
-//       streamResponse: sharedParams.streamResponse,
-//       temperature: {
-//         ...sharedParams.temperature,
-//         max: "1",
-//         defaultValue: 0.7,
-//       },
-//       maxTokens: sharedParams.maxTokens(4096),
-//     },
-//   },
-//   google: {
-//     "gemini-pro": {
-//       streamResponse: sharedParams.streamResponse,
-//       temperature: {
-//         ...sharedParams.temperature,
-//         max: "1",
-//         defaultValue: 0.9,
-//       },
-//       maxTokens: {
-//         ...sharedParams.maxTokens(2048),
-//         displayName: "Max Output Tokens",
-//       },
-//     },
-//   },
-//   deepseek: {
-//     "deepseek-r1": {
-//       streamResponse: sharedParams.streamResponse,
-//       temperature: sharedParams.temperature,
-//       maxTokens: sharedParams.maxTokens(4096),
-//     },
-//   },
-// };

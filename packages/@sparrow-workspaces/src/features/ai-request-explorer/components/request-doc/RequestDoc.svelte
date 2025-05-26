@@ -15,7 +15,7 @@
           id={"editor2"}
           onInput={onUpdateAiSystemPrompt}
           value={requestDoc}
-          isReadOnly={isEditable}
+          isReadOnly={false}
         />
       </div>
     </div>
@@ -23,17 +23,9 @@
 </div>
 
 <style>
-  /* .request-doc-wrapper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  } */
-
   .disabled {
-    /* pointer-events: none; */
-    cursor: not-allowed !important;
-    opacity: 0.5; /* Make it visually appear disabled */
+    /* cursor: not-allowed !important;
+    opacity: 0.5; */
   }
 
   .editor-area {

@@ -1,73 +1,60 @@
 <script lang="ts">
   import type {
     AIModelVariant,
-    AnthropicModelsConfig,
-    DeepSeekModelsConfig,
-    GeminiModelsConfig,
-    OpenAiModelsConfig,
+    modelsConfigType,
   } from "@sparrow/common/types/workspace/ai-request-base";
   import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
   import { configFormat } from "@sparrow/common/types/workspace/ai-request-dto";
-  import { Toggle } from "@sparrow/library/ui";
+  import { Button, Toggle } from "@sparrow/library/ui";
 
-  // Props
   export let isActive = true;
   export let currSelectedModel: AiModelProviderEnum;
   export let currSelectedModelVariant: AIModelVariant;
   export let onUpdateAiConfigurations: (updates: Record<string, any>) => void;
-  export let config:
-    | OpenAiModelsConfig
-    | AnthropicModelsConfig
-    | DeepSeekModelsConfig
-    | GeminiModelsConfig;
+  export let config: modelsConfigType;
 
-  // Get current model configuration metadata
   $: currentModelConfig =
-    configFormat[currSelectedModel]?.[currSelectedModelVariant] || {};
-
-  // Get configuration entries for the current model
-  $: configEntries = Object.entries(currentModelConfig);
+    configFormat[currSelectedModel]?.[currSelectedModelVariant] || {}; // Get current model configuration metadata
+  $: configEntries = Object.entries(currentModelConfig); // Get configuration entries for the current model
 
   // Event handler for config changes
   const handleConfigChange = (key, value) => {
     const updatedConfig = { ...config, [key]: value };
-
-    // Call the update function to persist changes
-    onUpdateAiConfigurations(currSelectedModel, updatedConfig);
+    onUpdateAiConfigurations(currSelectedModel, updatedConfig); // Call the update function to persist changes
   };
 
   // Reset to default values
   const handleResetToDefault = () => {
-    console.log("in handleResetToDefault() :>> ");
     const defaultConfig = {};
-
     Object.entries(currentModelConfig).forEach(
       ([key, metadata]: [string, any]) => {
         defaultConfig[key] = metadata.defaultValue;
       },
     );
-
-    console.log("def :>> ", defaultConfig);
     onUpdateAiConfigurations(currSelectedModel, defaultConfig);
   };
 
   // Handle input changes for different types
   const handleInputChange = (key, event) => {
-    console.log("in handleInputChange() :>> ");
-    console.log("key :>> ", key);
     const format = configFormat[currSelectedModel][currSelectedModelVariant];
     let value = event.target.value;
 
-    if (format.type === "number") {
+    if (format[key].type === "number") {
       value = parseFloat(value);
       if (isNaN(value)) return;
 
       // Apply min/max constraints
-      if (format.min !== undefined && value < parseFloat(format.min)) {
-        value = parseFloat(format.min);
+      if (
+        format[key].min !== undefined &&
+        value < parseFloat(format[key].min)
+      ) {
+        value = parseFloat(format[key].min);
       }
-      if (format.max !== undefined && value > parseFloat(format.max)) {
-        value = parseFloat(format.max);
+      if (
+        format[key].max !== undefined &&
+        value > parseFloat(format[key].max)
+      ) {
+        value = parseFloat(format[key].max);
       }
     }
 
@@ -76,7 +63,6 @@
 
   // Handle toggle changes
   const handleToggleChange = (key, value) => {
-    console.log("in handleToggleChange :>> ", key, value);
     handleConfigChange(key, value);
   };
 
@@ -88,14 +74,14 @@
 <div class="ai-config-container">
   <div
     class="d-flex justify-content-between align-items-start mb-3"
-    style="border-bottom: 0.8px solid var(--bg-ds-surface-300); height: 34px;"
+    style="border-bottom: 0.2px solid var(--bg-ds-surface-300); height: 34px;"
   >
     <p
       class="config-header text-ds-font-size-14 text-ds-font-weight-medium mb-0"
     >
       Configurations
     </p>
-    <button
+    <!-- <button
       class="btn btn-sm btn-link text-ds-font-size-12"
       class:disabled={!isActive}
       style="color: var(--bg-ds-neutral-500); text-decoration: none; font-size: 12px;"
@@ -103,7 +89,15 @@
       disabled={!isActive}
     >
       Reset to default
-    </button>
+    </button> -->
+
+    <Button
+      title={"Reset to default"}
+      size={"extra-small"}
+      type={"teritiary-regular"}
+      disable={true}
+      onClick={() => {}}
+    ></Button>
   </div>
 
   {#if configEntries.length === 0}
@@ -141,7 +135,7 @@
                 value={getCurrentValue(key, metadata) || 0}
                 min={metadata.min}
                 max={metadata.max}
-                step={key === "maxTokens" ? "1" : "0.1"}
+                step={key === "maxTokens" ? 1 : 0.1}
                 disabled={!isActive}
                 on:input={(e) => handleInputChange(key, e)}
               />
@@ -175,7 +169,7 @@
 
   .config-desc {
     color: var(--text-ds-neutral-200);
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 2px;
   }
 
@@ -189,7 +183,6 @@
 
   .config-input {
     font-size: 12px;
-    /* font-family: inter, "sans-serif"; */
     width: 70px;
     text-align: right;
     background-color: var(--bg-ds-surface-400);
@@ -215,10 +208,10 @@
     pointer-events: none;
   }
 
-  .btn:disabled {
+  /* .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
+  } */
 
   :global(.form-control:focus) {
     color: var(--white-color);

@@ -37,8 +37,8 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import type { AiModelProviderEnum, AnthropicModelsConfig, DeepSeekModelsConfig, GeminiModelsConfig, OpenAiModelsConfig } from "@sparrow/common/types/workspace/ai-request-base";
-import { disableModelBasedNavigationFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
+import type { AiModelProviderEnum, AnthropicModelsConfig, DeepSeekModelsConfig, GeminiModelsConfig, modelsConfigType, OpenAiModelsConfig } from "@sparrow/common/types/workspace/ai-request-base";
+import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -580,38 +580,38 @@ class AiRequestExplorerViewModel {
   public generateAIResponseWS = async (prompt = "") => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-    const tabId = componentData.tabId; // or any string key
+    const tabId = componentData.tabId;
+    const modelProvider = componentData.property.aiRequest.aiModelProvider;
+    const modelVariant = componentData.property.aiRequest.aiModelVariant;
+    const authKey = componentData.property.aiRequest.auth.apiKey;
+    const systemPrompt = componentData.property.aiRequest.systemPrompt;
+    const currConfigurations = componentData.property.aiRequest.configurations;
 
     let finalSP = null;
-    if (componentData.property.aiRequest.systemPrompt.length) {
-      const SPDatas = JSON.parse(componentData.property.aiRequest.systemPrompt);
+    if (systemPrompt.length) {
+      const SPDatas = JSON.parse(systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
+    const modelSpecificConfig: modelsConfigType = {};
+    const allowedConfigs = configFormat[modelProvider][modelVariant];
+    Object.keys(allowedConfigs).forEach((key) => {
+      modelSpecificConfig[key] = currConfigurations[modelProvider][key];
+    });
+
     const aiRequestData = {
       feature: "llm-evaluation",
-      // model: componentData.property.aiRequest.AI_Model_Provider || "openai",
-      model: "openai",
-      modelVersion: componentData.property.aiRequest.aiModelVariant || "gpt-3.5-turbo",
-      // modelVersion: "gpt-3.5-turbo",
-      // model: "openai",
-      authKey: componentData.property.aiRequest.auth.apiKey.authValue,
-      ...(disableModelBasedNavigationFeatures["System Prompt"].includes(componentData.property.aiRequest.aiModelVariant)
+      userInput: prompt,
+      authKey: authKey.authValue,
+      configs: modelSpecificConfig,
+      model: modelProvider || "openai",
+      modelVersion: modelVariant || "gpt-3.5-turbo",
+      ...(disabledModelFeatures["System Prompt"].includes(modelVariant)
         ? {}
         : { systemPrompt: finalSP || "Answer my queries." }),
-      userInput: prompt,
-      configs: {
-        streamResponse: true,
-        jsonResponseFormat: false,
-        temperature: 0.5,
-        presencePenalty: 0.5,
-        frequencePenalty: 0.5,
-        maxTokens: -1
-      }
     }
 
     try {
-      // const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message

@@ -12,7 +12,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant, DefaultAiConfigurations } from "../types/workspace/ai-request-base";
+import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant, DefaultAiConfig } from "../types/workspace/ai-request-base";
 import { AiRequestSectionEnum } from "../types/workspace/ai-request-tab";
 class InitAiRequestTab {
     private _tab: Tab;
@@ -51,10 +51,10 @@ class InitAiRequestTab {
                         },
                     },
                     configurations: {
-                        openai: DefaultAiConfigurations.OPENAI,
-                        deepseek: DefaultAiConfigurations.DEEPSEEK,
-                        anthropic: DefaultAiConfigurations.ANTHROPIC,
-                        google: DefaultAiConfigurations.GOOGLE,
+                        openai: DefaultAiConfig.OPENAI,
+                        deepseek: DefaultAiConfig.DEEPSEEK,
+                        anthropic: DefaultAiConfig.ANTHROPIC,
+                        google: DefaultAiConfig.GOOGLE,
                     },
                     ai: {
                         prompt: "",

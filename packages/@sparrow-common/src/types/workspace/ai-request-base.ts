@@ -136,15 +136,27 @@ export interface GeminiModelsConfig {
 // https://api-docs.deepseek.com/guides/reasoning_model?utm_source=chatgpt.com
 export type DeepSeekModelsConfig = OpenAiModelsConfig;
 
-///////////////////////////////////////////////////////////////
-//              AI Request Base Interface
-///////////////////////////////////////////////////////////////
+export type modelsConfigType = AnthropicModelsConfig | OpenAiModelsConfig | GeminiModelsConfig | DeepSeekModelsConfig;
+
 export type AiConfigurations = {
     openai: OpenAiModelsConfig;
     deepseek: DeepSeekModelsConfig;
     anthropic: AnthropicModelsConfig;
     google: GeminiModelsConfig;
 };
+
+///////////////////////////////////////////////////////////////
+//              AI Request Base Interface
+///////////////////////////////////////////////////////////////
+export interface HttpRequestBaseInterface {
+    aiModelProvider: AiModelProviderEnum;
+    aiModelVariant: AIModelVariant;
+    selectedAuthType: AiRequestAuthBaseInterface;
+    auth: AiRequestAuthBaseInterface;
+    systemPrompt: systemPrompt;
+    configurations: AiConfigurations;
+}
+
 
 ///////////////////////////////////////////////////////////////
 //              id<->name mapping
@@ -170,15 +182,15 @@ export enum ModelVariantIdNameMapping {
 }
 
 
-
-export const DefaultAiConfigurations = {
+// Default AI Initial Configurations to setup AI Request Tab
+export const DefaultAiConfig = {
     OPENAI: {
         streamResponse: true,
         jsonResponseFormat: false,
         temperature: 1.0,
         presencePenalty: 0,
         frequencyPenalty: 0,
-        maxTokens: 68,
+        maxTokens: -1,
     },
     DEEPSEEK: {
         streamResponse: false,
