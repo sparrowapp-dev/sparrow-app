@@ -15,6 +15,6 @@
     "isolatedModules": true,
     "paths": {}
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "../@sparrow-common/src/utils/workspacetimeUtils.ts"],
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
