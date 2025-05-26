@@ -7341,4 +7341,25 @@ export default class CollectionsViewModel {
       notifications.error("Failed to open workspace. Please try again.");
     }
   };
+  public getCollectionByIdAndWorkspace = async (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.geCollectionByIdAndWorkspace(
+      collectionId,
+      workspaceId,
+      baseUrl,
+    );
+
+    if (response?.isSuccessful) {
+      await this.collectionRepository.updateCollection(collectionId, {
+        ...response.data.data,
+        id: response.data.data._id,
+        workspaceId: workspaceId,
+      });
+    } else {
+      notifications.error("Failed to fetch collection. Please try again.");
+    }
+  };
 }

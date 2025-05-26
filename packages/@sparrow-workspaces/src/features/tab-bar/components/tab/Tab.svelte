@@ -28,6 +28,8 @@
     CopyRegular,
     BoardRegular,
     BotRegular,
+    HistoryRegular,
+    HistoryIcon2,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -84,7 +86,6 @@
   export let onClickForceCloseTabs: (tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
   export let userRole;
-
 
   let noOfColumns = 200;
   let showTabControlMenu = false;
@@ -301,6 +302,10 @@
         <span>
           <BotRegular height={"17px"} width={"15px"} />
         </span>
+      {:else if tab.type === TabTypeEnum.MOCK_HISTORY}
+        <span>
+          <HistoryIcon2 height={"16px"} width={"16px"} />
+        </span>
       {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
         <span>
           <!-- <GraphIcon
@@ -350,8 +355,8 @@
         class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
         !tab.isActive ? 'inactive-close-btn' : ''} btn"
         on:click={(e) => {
-            e.stopPropagation();
-            onTabClosed(tab.id, tab);
+          e.stopPropagation();
+          onTabClosed(tab.id, tab);
         }}
         style="overflow:hidden; height: 18px; width:18px;"
       >

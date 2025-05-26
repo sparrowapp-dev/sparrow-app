@@ -9,34 +9,17 @@
   import { writable } from "svelte/store";
   import { Search } from "@sparrow/library/forms";
   import { HistoryTable } from "../components";
-  import type { RequestMethodEnum } from "@sparrow/common/types/workspace/http-request-mock-tab";
   import { HttpStatusCodes } from "../../rest-explorer-mock/utils";
-
-  interface ApiHistoryItem {
-    id: string;
-    timestamp: string;
-    name: string;
-    url: string;
-    method: RequestMethodEnum;
-    responseStatus: string;
-    duration: number;
-    requestHeaders: KeyValuePair[];
-    requestBody?: any;
-    responseHeaders?: KeyValuePair[];
-    responseBody?: any;
-    selectedRequestBodyType?: string;
-    selectedResponseBodyType?: string;
-  }
-
-  interface KeyValuePair {
-    key: string;
-    value: string;
-    checked?: boolean;
-  }
+  import type { ApiHistoryItem } from "../types";
 
   export let tab: Observable<Tab>;
   export let collection;
+  export let fetchCollection: (
+    id: string,
+    workspaceId?: string,
+  ) => Promise<any>;
 
+  let isRefreshing = false;
   let searchTerm = "";
   let sortDirection: "asc" | "desc" = "desc";
 
@@ -59,7 +42,7 @@
 
   function getStatusMessage(responseStatus: string): string {
     if (!responseStatus) return "No Response";
-    return statusMessagesMap.get(responseStatus) || `${responseStatus} Unknown`;
+    return statusMessagesMap.get(responseStatus) || `200 Ok`;
   }
 
   function formatRelativeTime(timestamp: string): string {
@@ -111,9 +94,6 @@
       const durationMatch = formatDuration(item.duration)
         .toLowerCase()
         .includes(lowerTerm);
-      const timeMatch = formatRelativeTime(item.timestamp)
-        .toLowerCase()
-        .includes(lowerTerm);
       const methodUrlMatch = `${item.method} ${item.url}`
         .toLowerCase()
         .includes(lowerTerm);
@@ -124,7 +104,6 @@
         methodMatch ||
         statusMatch ||
         durationMatch ||
-        timeMatch ||
         methodUrlMatch
       );
     });
@@ -133,6 +112,18 @@
   function handleSort() {
     sortDirection = sortDirection === "asc" ? "desc" : "asc";
   }
+
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    try {
+      isRefreshing = true;
+      await fetchCollection(collection.id, collection.workspaceId);
+    } catch (error) {
+      console.error("Failed to refresh collection:", error);
+    } finally {
+      isRefreshing = false;
+    }
+  };
 
   $: historyItems = writable(
     (collection?.mockRequestHistory || []).sort(
@@ -155,17 +146,6 @@
   $: searchHasNoResults = searchTerm && filteredItems.length === 0;
   $: hasHistoryData =
     collection?.mockRequestHistory && collection.mockRequestHistory.length > 0;
-
-  function handleRefresh() {
-    if (collection?.mockRequestHistory) {
-      historyItems.set(
-        [...collection.mockRequestHistory].sort(
-          (a, b) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-        ),
-      );
-    }
-  }
 </script>
 
 {#if $tab.tabId && collection}
@@ -190,10 +170,11 @@
             bind:value={searchTerm}
           />
           <Button
-            startIcon={ArrowClockWiseRegular}
+            startIcon={isRefreshing ? "" : ArrowClockWiseRegular}
             type="secondary"
             size="medium"
             iconSize={20}
+            loader={isRefreshing}
             onClick={handleRefresh}
           />
         </div>

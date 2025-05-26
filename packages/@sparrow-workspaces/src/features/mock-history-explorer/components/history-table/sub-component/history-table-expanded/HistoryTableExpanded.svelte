@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Editor } from "@sparrow/library/forms";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import {
     ChevronDownRegular,
     ChevronRightRegular,
@@ -20,46 +20,6 @@
 
   function updateBeautifiedState(value: boolean) {
     isBodyBeautified = value;
-  }
-
-  function formatHeaders(
-    headers: Array<{ key: string; value: string; checked?: boolean }>,
-  ): string {
-    if (!headers || headers.length === 0) return "";
-
-    const headerObj = headers.reduce(
-      (acc, header) => {
-        acc[header.key] = header.value;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-
-    try {
-      return JSON.stringify(headerObj, null, 2);
-    } catch (e) {
-      return headers
-        .map((header) => `"${header.key}": "${header.value}"`)
-        .join(",\n");
-    }
-  }
-
-  function formatContent(content: any, contentType: string): string {
-    if (content === null || content === undefined) return "";
-
-    if (contentType.includes("headers") && Array.isArray(content)) {
-      return formatHeaders(content);
-    }
-
-    if (typeof content === "string") {
-      return content;
-    } else {
-      try {
-        return JSON.stringify(content, null, 2);
-      } catch (e) {
-        return String(content);
-      }
-    }
   }
 
   function setEditorLanguage(
@@ -106,8 +66,35 @@
     return false;
   }
 
+  function isHeadersContent(): boolean {
+    return contentType.includes("headers") && Array.isArray(bodyContent);
+  }
+
+  function getEditorValue(): string {
+    if (bodyContent === null || bodyContent === undefined) return "";
+
+    if (typeof bodyContent === "string") {
+      return bodyContent;
+    } else {
+      try {
+        return JSON.stringify(bodyContent, null, 2);
+      } catch (e) {
+        return String(bodyContent);
+      }
+    }
+  }
+
+  function truncateText(text: string, maxLength: number = 20): string {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  }
+
+  function shouldTruncate(text: string, maxLength: number = 20): boolean {
+    return text.length > maxLength;
+  }
+
   $: {
-    editorValue = formatContent(bodyContent, contentType);
+    editorValue = getEditorValue();
     editorLang = setEditorLanguage(contentType);
   }
 
@@ -137,6 +124,32 @@
           No {customTitle ||
             (isRequestBody ? "request" : "response") +
               (customTitle ? "" : " body")} available.
+        </div>
+      {:else if isHeadersContent()}
+        <div class="headers-container">
+          {#each bodyContent as header}
+            <div class="header-item d-flex mb-1">
+              {#if shouldTruncate(header.key)}
+                <Tooltip title={header.key} placement={"top-center"}>
+                  <span class="header-key me-2"
+                    >{truncateText(header.key)}:</span
+                  >
+                </Tooltip>
+              {:else}
+                <span class="header-key me-2">{header.key}:</span>
+              {/if}
+
+              {#if shouldTruncate(header.value)}
+                <Tooltip title={header.value} placement={"top-center"}>
+                  <span class="header-value"
+                    >"{truncateText(header.value)}"</span
+                  >
+                </Tooltip>
+              {:else}
+                <span class="header-value">"{header.value}"</span>
+              {/if}
+            </div>
+          {/each}
         </div>
       {:else}
         <div class="editor-container">
@@ -176,5 +189,34 @@
     max-height: 200px;
     overflow-x: hidden;
     overflow-y: auto;
+  }
+
+  .headers-container {
+    padding-left: 20px;
+    padding-top: 4px;
+  }
+
+  .header-item {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .header-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .header-key {
+    color: var(--text-ds-neutral-100);
+    font-weight: 500;
+    min-width: fit-content;
+    word-break: break-word;
+    font-family: "JetBrains Mono", monospace !important;
+  }
+
+  .header-value {
+    color: var(--text-ds-info-300);
+    word-break: break-word;
+    flex: 1;
+    font-family: "JetBrains Mono", monospace !important;
   }
 </style>

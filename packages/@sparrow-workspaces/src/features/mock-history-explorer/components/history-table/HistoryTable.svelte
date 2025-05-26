@@ -8,38 +8,10 @@
     ChevronRightRegular,
   } from "@sparrow/library/icons";
   import { Button, Tooltip } from "@sparrow/library/ui";
-  import type { RequestMethodEnum } from "@sparrow/common/types/workspace/http-request-mock-tab";
   import { Select } from "@sparrow/library/forms";
   import HistoryTableExpanded from "./sub-component/history-table-expanded/HistoryTableExpanded.svelte";
-
-  interface ApiHistoryItem {
-    id: string;
-    timestamp: string;
-    name: string;
-    url: string;
-    method: RequestMethodEnum;
-    responseStatus: string;
-    duration: number;
-    requestHeaders: KeyValuePair[];
-    requestBody?: any;
-    responseHeaders?: KeyValuePair[];
-    responseBody?: any;
-    selectedRequestBodyType?: string;
-    selectedResponseBodyType?: string;
-  }
-
-  interface KeyValuePair {
-    key: string;
-    value: string;
-    checked?: boolean;
-  }
-
-  interface Column {
-    key: string;
-    label: string;
-    sortable: boolean;
-    width: string;
-  }
+  import type { ApiHistoryItem, Column } from "../../types";
+  import { getMethodStyle } from "@sparrow/common/utils";
 
   export let historyItems: ApiHistoryItem[] = [];
   export let searchTerm: string = "";
@@ -63,14 +35,6 @@
     { name: "30 per page", id: "30" },
     { name: "40 per page", id: "40" },
   ];
-
-  const METHOD_COLORS = {
-    GET: "var(--text-ds-success-300)",
-    POST: "var(--text-ds-warning-300)",
-    PUT: "var(--text-ds-secondary-300)",
-    DELETE: "var(--text-ds-danger-300)",
-    PATCH: "var(--bg-ds-accent-300)",
-  } as const;
 
   const MULTIPART_CONTENT_TYPES = new Set([
     "multipart/form-data",
@@ -130,11 +94,9 @@
   };
 
   const getStatusColor = (statusCode: string): string =>
-    statusCode ? "var(--text-ds-neutral-50)" : "var(--text-ds-danger-300)";
-
-  const getMethodColor = (method: string): string =>
-    METHOD_COLORS[method as keyof typeof METHOD_COLORS] ||
-    "var(--text-ds-neutral-50)";
+    statusCode === "404"
+      ? "var(--text-ds-danger-300)"
+      : "var(--text-ds-neutral-50)";
 
   const isMultipartContent = (contentType: string): boolean =>
     MULTIPART_CONTENT_TYPES.has((contentType ?? "").toLowerCase());
@@ -226,8 +188,9 @@
             <td style="width: 15%;">{item.name}</td>
             <td style="width: 30%;">
               <span
-                class="d-inline-block text-fs-9 fw-semibold me-2"
-                style="color: {getMethodColor(item.method)}"
+                class="d-inline-block text-fs-9 fw-semibold me-2 text-{getMethodStyle(
+                  item.method,
+                )}"
               >
                 {item.method}
               </span>
