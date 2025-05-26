@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ThreeDotIcon } from "@sparrow/library/assets";
   import { UserProfileList } from "@sparrow/teams/compopnents";
-  import { MenuView } from "@sparrow/teams/compopnents";
+  import { MenuView } from "@sparrow/common/components";
   import {
     TeamRole,
     WorkspaceMemberRole,
