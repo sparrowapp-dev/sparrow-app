@@ -162,7 +162,6 @@
             showLineNumbers={false}
             highlightActiveLine={false}
             highlightActiveLineGutter={false}
-            enableLinting={false}
           />
         </div>
       {/if}

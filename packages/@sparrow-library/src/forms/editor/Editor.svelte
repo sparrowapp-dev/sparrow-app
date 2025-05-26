@@ -48,7 +48,6 @@
   export let showLineNumbers = true;
   export let highlightActiveLine = true;
   export let highlightActiveLineGutter = true;
-  export let enableLinting = true;
 
   // For merge view props
   export let isMergeViewEnabled = false;
@@ -338,15 +337,11 @@
 
   function updateLinting() {
     // Reconfigure linting dynamically based on `isErrorVisible` and `errorMessage`
-    if (codeMirrorView && enableLinting) {
+    if (codeMirrorView) {
       codeMirrorView.dispatch({
         effects: lintConf.reconfigure(
           isErrorVisible && errorMessage ? [lintExtension] : [],
         ),
-      });
-    } else if (codeMirrorView && !enableLinting) {
-      codeMirrorView.dispatch({
-        effects: lintConf.reconfigure([]),
       });
     }
   }
