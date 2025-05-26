@@ -95,6 +95,11 @@
       },
     };
   };
+
+  let isChatClearPopupOpened = false;
+  const handleClosePopupBackdrop = (flag: boolean) => {
+    isChatClearPopupOpened = flag;
+  };
 </script>
 
 <!-- Code Block Preview Modal -->
@@ -170,14 +175,9 @@
                     customWidth={"24px"}
                     type="teritiary-regular"
                     startIcon={BroomRegular}
+                    disable={!conversations?.length}
                     onClick={async (e) => {
-                      isChatLoadingActive = true;
-                      await new Sleep().setTime(1500).exec();
-                      onChatClear();
-                      notifications.success(
-                        "Chat history cleared successfully.",
-                      );
-                      isChatLoadingActive = false;
+                      isChatClearPopupOpened = true;
                     }}
                   />
                 </span>
@@ -316,6 +316,57 @@
     </div>
   </div>
 </div>
+
+<Modal
+  title={"Delete Conversation"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isChatClearPopupOpened}
+  width={"43%"}
+  handleModalState={() => handleClosePopupBackdrop(false)}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-fs-14 text-ds-font-weight-medium text-ds-line-height-143"
+      style="color: lightgray; letter-spacing: 0;"
+    >
+      This will permanently delete the current conversation. The system prompt
+      will remain unchanged, but all previous user inputs and model responses
+      will be cleared.<br /><br />
+      Are you sure you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        handleClosePopupBackdrop(false);
+      }}
+    ></Button>
+    <Button
+      title={"Delete"}
+      size={"medium"}
+      type={"danger"}
+      customWidth={"95px"}
+      onClick={async (e) => {
+        chatContainer.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+        handleClosePopupBackdrop(false);
+        isChatLoadingActive = true;
+        await new Sleep().setTime(1500).exec();
+        onChatClear();
+        notifications.success("Chat history cleared successfully.");
+        isChatLoadingActive = false;
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <style>
   .ai-chat-panel {

@@ -1339,6 +1339,9 @@ export const tabSchemaLiteral = {
                 },
                 isChatbotGeneratingResponse: {
                   type: "boolean",
+                },
+                isChatAutoClearActive: {
+                  type: "boolean",
                 }
               },
             },

@@ -562,11 +562,21 @@ class AiRequestExplorerViewModel {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const tabId = componentData.tabId; // or any string key
+    const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
 
     let finalSP = null;
     if (componentData.property.aiRequest.systemPrompt.length) {
       const SPDatas = JSON.parse(componentData.property.aiRequest.systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
+    }
+
+    let formattedConversations: {role: 'user' | 'assistant'; content: string;}[] = []; // Sending the chat history for context
+    if(!isChatAutoClearActive) {
+      const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
+      formattedConversations = rawConversations.map(({ type, message }) => ({
+        role: type === 'Sender' ? 'user' : 'assistant',
+        content: message
+      }));
     }
 
     const aiRequestData = {
@@ -579,6 +589,9 @@ class AiRequestExplorerViewModel {
       authKey: componentData.property.aiRequest.auth.apiKey.authValue,
       systemPrompt: finalSP || "Answer my queries.",
       userInput: prompt,
+      ...(formattedConversations.length > 0 && !isChatAutoClearActive && {
+        conversation: formattedConversations,
+      }),
       configs: {
         streamResponse: true,
         jsonResponseFormat: false,
