@@ -24,6 +24,7 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
+  import { disableModelBasedNavigationFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -154,6 +155,9 @@
                 {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
                   <RequestDoc
                     {onUpdateAiSystemPrompt}
+                    isEditable={disableModelBasedNavigationFeatures[
+                      $tab.property.aiRequest?.state?.aiNavigation
+                    ].includes($tab.property.aiRequest?.aiModelVariant)}
                     requestDoc={$tab.property.aiRequest.systemPrompt}
                   />
                 {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}

@@ -1,3 +1,9 @@
+export const disableModelBasedNavigationFeatures = {
+  "System Prompt": ['o1', 'o1-mini'], // system prompt is not supported in o1 and o1-mini
+  Configurations: [], // configurations are not supported in 
+  Authorization: [], // Authorization is not supported in 
+}
+
 export const configFormat = {
   openai: {
     "gpt-4o": {

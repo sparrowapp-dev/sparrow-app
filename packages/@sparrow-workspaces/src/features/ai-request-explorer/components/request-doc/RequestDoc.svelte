@@ -3,9 +3,10 @@
 
   export let onUpdateAiSystemPrompt;
   export let requestDoc: string;
+  export let isEditable: boolean = false;
 </script>
 
-<div class="request-doc-wrapper">
+<div class="request-doc-wrapper {isEditable ? 'disabled' : ''}">
   <div class="editor-area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div id="editor2">
@@ -14,7 +15,7 @@
           id={"editor2"}
           onInput={onUpdateAiSystemPrompt}
           value={requestDoc}
-          isReadOnly={false}
+          isReadOnly={isEditable}
         />
       </div>
     </div>
@@ -28,6 +29,12 @@
     flex-direction: column;
     overflow: hidden;
   } */
+
+  .disabled {
+    /* pointer-events: none; */
+    cursor: not-allowed !important;
+    opacity: 0.5; /* Make it visually appear disabled */
+  }
 
   .editor-area {
     flex: 1;
