@@ -37,4 +37,8 @@
   });
 </script>
 
-<MockHistoryExplorer tab={_viewModel.tab} bind:collection />
+<MockHistoryExplorer
+  tab={_viewModel.tab}
+  bind:collection
+  fetchCollection={_viewModel.getCollectionByIdAndWorkspace}
+/>
