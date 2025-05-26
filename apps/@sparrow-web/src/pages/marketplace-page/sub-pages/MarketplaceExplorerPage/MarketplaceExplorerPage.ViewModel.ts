@@ -32,7 +32,7 @@ class MarketplaceExplorerViewModel {
 
   public fetchPublicWorkpsace = async (currentPage) => {
     const workspaces =
-      await this.workspaceService.fetchPublicWorkspaceList("currentPage");
+      await this.workspaceService.fetchPublicWorkspaceList(currentPage);
     if (workspaces?.isSuccessful) {
       const workspaceList = workspaces?.data?.data.workspaces;
       const clientUser = getClientUser();

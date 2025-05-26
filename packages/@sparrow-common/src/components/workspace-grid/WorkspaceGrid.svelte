@@ -174,12 +174,17 @@
             class="d-flex overflow-hidden justify-content-between"
             style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
           >
-            <h4 class="ellipsis overflow-hidden">
+            <div
+              class="ellipsis overflow-hidden"
+              style={`
+                  ${cardType === "teams" ? "margin-bottom: 8px" : ""}
+                `}
+            >
               <span
                 class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium"
                 style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
               >
-            </h4>
+            </div>
           </div>
         </div>
         <div>
@@ -187,14 +192,14 @@
             {#if isWorkspaceLinkCopied}
               <p
                 class="text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute justify-content-center align-items-center"
-                style="color: var(--text-ds-neutral-400); top:27px; right:60px;"
+                style="color: var(--text-ds-neutral-400); top:27px; right:55px;"
               >
                 Copied
               </p>
               <button
                 bind:this={workspaceTabWrapper}
                 class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-                style="top:27px; right:36px;"
+                style="top:27px; right:31px;"
               >
                 <StatusSuccess
                   height="14"
@@ -206,7 +211,7 @@
               <div bind:this={workspaceTabWrapper}>
                 <span
                   class="public-link-txt text-ds-font-size-12 text-ds-font-weight-semi-bold position-absolute"
-                  style="color: var(--text-ds-neutral-400); top:28px; right:65px;"
+                  style="color: var(--text-ds-neutral-400); top:28px; right:60px;"
                 >
                   Copy Public Link
                 </span>
@@ -214,7 +219,7 @@
               <button
                 bind:this={workspaceTabWrapper}
                 class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
-                style="top:27px; right:35px;"
+                style="top:27px; right:30px;"
                 on:click={async () => {
                   await onCopyLink(workspace._id);
                   isWorkspaceLinkCopied = true;
@@ -234,7 +239,7 @@
               class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
                 ? 'threedot-active'
                 : ''}"
-              style="top:26px; right:15px;"
+              style="top:26px; right:10px;"
               on:click={(e) => rightClickContextMenu(e)}
             >
               <MoreVerticalRegular />
@@ -243,12 +248,10 @@
         </div>
       </div>
       {#if cardType != "teams"}
-        <Button
-          title="Learn More"
-          type={"link-primary"}
-          size="small"
-          buttonClassProp="ps-0 pe-1"
-        />
+        <span
+          class="text-ds-font-size-12 text-ds-font-weight-semi-bold"
+          style="color: var(--text-ds-primary-300);">{workspace.team.name}</span
+        >
       {/if}
       <p
         class="teams-workspace__para mb-1"

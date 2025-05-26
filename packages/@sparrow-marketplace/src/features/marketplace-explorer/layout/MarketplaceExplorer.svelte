@@ -21,7 +21,11 @@
   export let workspaceList: WorkspaceDocument[] = [];
 
   let scrollContainer;
-  let showLoadMoreButton = false;
+  let showLoadMoreButton = true; 
+  export let currentPage;
+  export let totalPages;
+  let showTopOverlay = false;
+  let showBottomOverlay = false;
 
   // Function to check scroll position
   const handleScroll = () => {
@@ -33,7 +37,13 @@
 
     // Show button when scrolled halfway through content
     const scrollPercentage = scrollPosition / (scrollHeight - clientHeight);
-    showLoadMoreButton = scrollPercentage >= 0.5;
+    showTopOverlay = scrollPosition > 30;
+    showBottomOverlay = scrollPercentage >= 0.5;
+    showLoadMoreButton = scrollPercentage >= 0.9 && currentPage < totalPages;;
+  };
+  const handleLoadMoreClick = () => {
+    showLoadMoreButton = false;
+    loadMore();
   };
 
   onMount(() => {
@@ -47,7 +57,7 @@
       scrollContainer.removeEventListener("scroll", handleScroll);
     }
   });
-</script>
+  </script>
 
 <div class="d-flex flex-row justify-content-between image-wrapper">
   <img src={SparrowMarketplaceBg} alt="Marketplace Background" class="bg-img" />
@@ -58,14 +68,16 @@
   >
     <div
       class="d-flex flex-row text-ds-font-size-24 text-ds-font-weight-semi-bold"
-      style="color: var(--text-ds-neutral-50); padding-left:21px; gap: 4px;"
+      style="color: var(--text-ds-neutral-50); padding-left:17px;"
     >
-      <CartRegular size="24px" />
-      <span>MarketPlace</span>
+      <div class="d-flex" style="padding:4px; gap: 4px;">
+        <CartRegular size="24px" />
+        <span>MarketPlace</span>
+      </div>
     </div>
     <div class="d-flex mx-auto">
       <Search
-        variant="primary"
+        variant="primary-gradient"
         id="search-input"
         customWidth={"300px"}
         placeholder="Search workspaces in marketplace"
@@ -76,7 +88,9 @@
       class="d-flex flex-wrap sparrow-thin-scrollbar"
       style="gap: 16px; padding: 24px; overflow: auto;"
     >
-      <div class="overlay top-overlay"></div>
+      {#if showTopOverlay}
+        <div class="overlay top-overlay"></div>
+      {/if}
       {#if workspaceList.length === 0}
         <div
           class="d-flex flex-column align-items-center justify-content-center"
@@ -103,7 +117,9 @@
           {/each}
         </div>
       {/if}
-      <div class="overlay bottom-overlay"></div>
+      {#if showBottomOverlay}
+        <div class="overlay bottom-overlay"></div>
+      {/if}
     </div>
     <!-- Only show the button when scrolled halfway -->
     {#if showLoadMoreButton}
@@ -113,18 +129,9 @@
           type="outline-secondary"
           buttonClassProp="text-ds-font-size-16 text-ds-font-weight-semi-bold"
           buttonStyleProp="padding: 8px 16px; margin-top: 16px;"
-          onClick={loadMore}
+          onClick={handleLoadMoreClick}
           disabled={isLoading}
-        >
-          {#if isLoading}
-            <div class="spinner-border spinner-border-sm me-2" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
-            Loading...
-          {:else}
-            Load More
-          {/if}
-        </Button>
+        />
       </div>
     {/if}
   </div>
@@ -135,9 +142,17 @@
     position: sticky;
     left: 0;
     width: 100%;
-    height: 150px;
     z-index: 2;
     pointer-events: none;
+  }
+
+  /* Add the requested scrollbar styling */
+  .sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--bg-secondary-330);
+  }
+
+  .sparrow-thin-scrollbar::-webkit-scrollbar-button {
+    color: var(--bg-secondary-330);
   }
 
   /* Top overlay specific styles */
@@ -145,9 +160,10 @@
     top: -24px;
     background: linear-gradient(
       to bottom,
-      var(--bg-ds-surface-900) 0%,
+      var(--bg-ds-surface-800) 0%,
       transparent 100%
     );
+    height: 100px;
     margin-bottom: -150px;
   }
 
@@ -156,10 +172,11 @@
     bottom: -24px;
     background: linear-gradient(
       to top,
-      var(--bg-ds-surface-900) 0%,
+      var(--bg-ds-surface-800) 0%,
       transparent 100%
     );
-    margin-top: -150px;
+    height: 120px;
+    margin-top: -130px;
   }
   .image-wrapper {
     position: relative;

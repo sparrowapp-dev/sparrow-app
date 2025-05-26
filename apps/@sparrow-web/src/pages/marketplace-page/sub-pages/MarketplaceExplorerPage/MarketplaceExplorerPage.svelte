@@ -8,30 +8,39 @@
   import type { WorkspaceDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   const _viewModel = new MarketplaceExplorerViewModel();
-  const workspaceList: Observable<WorkspaceDocument[]> =
-    _viewModel.publicWorkspaces;
+
   let currentPage = 1;
   let isLoading = false;
+  let totalPages = 0;
+  let workspaces: WorkspaceDocument[] = [];
 
   const loadMore = async () => {
     isLoading = true;
     currentPage += 1;
-    await _viewModel.fetchPublicWorkpsace(currentPage);
+    const result = await _viewModel.fetchPublicWorkpsace(currentPage);
+    // Store the fetched workspaces
+    if (result?.isSuccessful && result?.data?.data?.workspaces) {
+      workspaces = [...workspaces, ...result.data.data.workspaces];
+      totalPages = result.data.data.totalPages;
+    }
   };
   onMount(async () => {
     isLoading = true;
-    await _viewModel.fetchPublicWorkpsace(currentPage);
+    const result = await _viewModel.fetchPublicWorkpsace(currentPage);
+    // Store the initial workspaces
+    if (result?.isSuccessful && result?.data?.data?.workspaces) {
+      workspaces = result.data.data.workspaces;
+      totalPages = result.data.data.totalPages;
+    }
     isLoading = false;
   });
-  $:{
-    console.log("ddd",currentPage);
-  }
 </script>
 
 <MarketplaceExplorer
-  workspaceList={$workspaceList}
+  workspaceList={workspaces}
   {loadMore}
   {currentPage}
+  {totalPages}
   {isLoading}
 />
 
