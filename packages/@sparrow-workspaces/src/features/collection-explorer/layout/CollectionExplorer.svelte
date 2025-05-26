@@ -93,6 +93,7 @@
     FolderAddRegular,
     FolderIcon,
     GraphIcon,
+    HistoryRegular,
     OpenRegular,
     PlayCircleRegular,
     RecordStopRegular,
@@ -106,6 +107,7 @@
   import { Input } from "@sparrow/library/forms";
   import { onDestroy, onMount } from "svelte";
   import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import { getMethodStyle } from "@sparrow/common/utils";
 
   /**
    * Role of user in active workspace
@@ -780,7 +782,10 @@
               Coming Soon
             </div>
           </div>
-          <div class="mock-url-section d-flex flex-column" style="flex: 1;">
+          <div
+            class="mock-url-section d-flex flex-column"
+            style="flex: 1; height: 100%; display: flex; flex-direction: column;"
+          >
             <div
               class="d-flex align-items-center justify-content-between"
               style="width: 100%;"
@@ -789,23 +794,72 @@
                 Recent Requests
               </div>
               <div class="d-flex gap-2 align-items-center">
-                <Tooltip title={"Coming Soon"} placement={"top-center"}>
-                  <Button
-                    size="small"
-                    type={"link-primary"}
-                    title="View All History"
-                    disable={true}
-                    onClick={() => {}}
-                    endIcon={ArrowRightRegular}
-                  />
-                </Tooltip>
+                <Button
+                  size="small"
+                  type={"link-primary"}
+                  title="View All"
+                  disable={false}
+                  onClick={() => {
+                    onItemCreated("mockHistory", {
+                      collection: collection,
+                    });
+                  }}
+                  endIcon={ArrowRightRegular}
+                />
               </div>
             </div>
             <div
-              class="d-flex align-items-center justify-content-center text-ds-font-size-12"
-              style="color: var(--text-ds-neutral-300); height: 100%; margin:auto;"
+              class="d-flex flex-column"
+              style="height: 100%; margin:auto; width: 100%;"
             >
-              Coming Soon
+              <div class="recent-requests-list custom-scrollbar">
+                {#if collection?.mockRequestHistory && collection.mockRequestHistory.length > 0}
+                  {#each collection.mockRequestHistory
+                    .slice()
+                    .reverse()
+                    .slice(0, 5) as request}
+                    <div
+                      class="request-item d-flex justify-content-between align-items-center py-2 mb-2"
+                    >
+                      <div class="d-flex align-items-center overflow-hidden">
+                        <span
+                          class="method-label text-{getMethodStyle(
+                            request?.method,
+                          )} me-2"
+                          >{request?.method?.toUpperCase() === "DELETE"
+                            ? "DEL"
+                            : request?.method?.toUpperCase()}</span
+                        >
+                        <span class="request-title">{request.name}</span>
+                        <span
+                          class="request-url text-ds-font-size-12 ms-2"
+                          style="color: var(--text-ds-neutral-300);"
+                          >{request.url}</span
+                        >
+                      </div>
+                      <span
+                        class="request-time text-ds-font-size-12"
+                        style="color: var(--text-ds-neutral-100);"
+                        >{syncedTimeAgo(request.timestamp)}</span
+                      >
+                    </div>
+                  {/each}
+                {:else}
+                  <div
+                    class="d-flex flex-column align-items-center justify-content-center text-ds-font-size-12 py-3"
+                    style="color: var(--text-ds-neutral-300); height: 100%; width: 100%;"
+                  >
+                    <HistoryRegular
+                      size={"32px"}
+                      color={"var(--text-ds-neutral-500)"}
+                    />
+                    <div class="text-center">
+                      No recent requests yet. Run a request in this collection
+                      to see it here.
+                    </div>
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         </div>
@@ -947,5 +1001,42 @@
     gap: 12px;
     border: 1px solid var(--border-ds-surface-100);
     border-radius: 8px;
+  }
+  .recent-requests-list {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 4px;
+    height: 100%;
+  }
+
+  .request-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-600);
+  }
+  .method-label {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 45px;
+    text-align: center;
+  }
+
+  .request-title {
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--text-ds-neutral-50);
+    text-overflow: ellipsis;
+    max-width: 170px;
+    overflow: hidden;
+  }
+
+  .request-url {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
   }
 </style>
