@@ -96,12 +96,6 @@
     }, 0);
   });
   onDestroy(() => {});
-
-  $: {
-    if ($tab?.property?.aiRequest) {
-      console.log("tab data :>> ", $tab.property?.aiRequest?.state);
-    }
-  }
 </script>
 
 {#if $tab.tabId}
