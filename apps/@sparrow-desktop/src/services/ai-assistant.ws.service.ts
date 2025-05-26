@@ -6,6 +6,7 @@ import type {
 } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import * as Sentry from "@sentry/svelte";
+import type { AiModelProviderEnum, AIModelVariant, modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 
 /**
  * Service for managing WebSocket connections and communication
@@ -361,20 +362,12 @@ export class AiAssistantWebSocketService {
   };
 
   public sendAiRequest = async (data: {
-    model: string;
-    modelVersion: string;
+    model: AiModelProviderEnum;
+    modelVersion: AIModelVariant;
     authKey: string;
-    systemPrompt: string;
+    systemPrompt?: string;
     userInput: string;
-    configs: {
-      streamResponse: boolean;
-      jsonResponseFormat: boolean;
-      temperature: number;
-      presencePenalty: number;
-      frequencePenalty: number;
-      maxTokens: number;
-    }
-
+    configs: modelsConfigType
   }): Promise<boolean> => {
 
     if (!this.webSocket || !this.isWsConnected()) {

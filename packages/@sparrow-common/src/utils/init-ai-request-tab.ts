@@ -62,7 +62,7 @@ class InitAiRequestTab {
                         threadId: "",
                     },
                     state: {
-                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.NO_AUTH,
+                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,
                         aiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
                         aiLeftSplitterWidthPercentage: 50,
                         aiRightSplitterWidthPercentage: 50,

@@ -12,13 +12,6 @@
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import type {
-    SaveRequestType,
-    UpdateRequestAuthType,
-    UpdateRequestDescriptionType,
-    UpdateRequestNameType,
-    UpdateRequestStateType,
-  } from "@sparrow/workspaces/type";
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";

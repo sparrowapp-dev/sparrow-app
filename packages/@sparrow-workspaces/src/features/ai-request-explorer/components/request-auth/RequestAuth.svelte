@@ -38,10 +38,10 @@
           <WithSelect
             id={"hash999"}
             data={[
-              {
-                name: "No Auth",
-                id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
-              },
+              // {
+              //   name: "No Auth",
+              //   id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+              // },
               // {
               //   name: "Inherit Auth",
               //   id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,

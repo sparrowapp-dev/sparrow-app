@@ -37,6 +37,8 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import type { AiModelProviderEnum, modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
+import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -554,6 +556,22 @@ class AiRequestExplorerViewModel {
     } else console.error("chunk not found!");
   }
 
+  public updateAiConfigurations = async (model: AiModelProviderEnum, _configUpdates: modelsConfigType) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
+    this.tab = progressiveTab;
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      console.log("config ::>>> ", _configUpdates)
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error(
+        "Failed to update the documentation. Please try again",
+      );
+    }
+    // this.compareRequestWithServer();
+  };
+
   /**
    * Generates the AI Response from server with websocket communication protocol
    * @param Prompt - Prompt from the user
@@ -561,32 +579,35 @@ class AiRequestExplorerViewModel {
   public generateAIResponseWS = async (prompt = "") => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-    const tabId = componentData.tabId; // or any string key
+    const tabId = componentData.tabId;
+    const modelProvider = componentData.property.aiRequest.aiModelProvider;
+    const modelVariant = componentData.property.aiRequest.aiModelVariant;
+    const authKey = componentData.property.aiRequest.auth.apiKey;
+    const systemPrompt = componentData.property.aiRequest.systemPrompt;
+    const currConfigurations = componentData.property.aiRequest.configurations;
 
     let finalSP = null;
-    if (componentData.property.aiRequest.systemPrompt.length) {
-      const SPDatas = JSON.parse(componentData.property.aiRequest.systemPrompt);
+    if (systemPrompt.length) {
+      const SPDatas = JSON.parse(systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
+    const modelSpecificConfig: modelsConfigType = {};
+    const allowedConfigs = configFormat[modelProvider][modelVariant];
+    Object.keys(allowedConfigs).forEach((key) => {
+      modelSpecificConfig[key] = currConfigurations[modelProvider][key];
+    });
+
     const aiRequestData = {
       feature: "llm-evaluation",
-      // model: componentData.property.aiRequest.AI_Model_Provider || "openai",
-      model: "openai",
-      modelVersion: componentData.property.aiRequest.aiModelVariant || "gpt-3.5-turbo",
-      // modelVersion: "gpt-3.5-turbo",
-      // model: "openai",
-      authKey: componentData.property.aiRequest.auth.apiKey.authValue,
-      systemPrompt: finalSP || "Answer my queries.",
       userInput: prompt,
-      configs: {
-        streamResponse: true,
-        jsonResponseFormat: false,
-        temperature: 0.5,
-        presencePenalty: 0.5,
-        frequencePenalty: 0.5,
-        maxTokens: -1
-      }
+      authKey: authKey.authValue,
+      configs: modelSpecificConfig,
+      model: modelProvider || "openai",
+      modelVersion: modelVariant || "gpt-3.5-turbo",
+      ...(disabledModelFeatures["System Prompt"].includes(modelVariant)
+        ? {}
+        : { systemPrompt: finalSP || "Answer my queries." }),
     }
 
     try {
