@@ -147,7 +147,7 @@ export class TestflowViewModel {
               requestData: null,
             },
           },
-      ],
+        ],
     }, baseUrl);
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
@@ -177,6 +177,8 @@ export class TestflowViewModel {
         isFirstTimeInTestFlow.set(false);
       }
       return;
+    } else if (response?.data?.statusCode) {
+      notifications.warning(response?.data?.mess);
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }
@@ -378,7 +380,7 @@ export class TestflowViewModel {
       currentTestflow?.path?.workspaceId as string,
     );
     const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
-    
+
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });

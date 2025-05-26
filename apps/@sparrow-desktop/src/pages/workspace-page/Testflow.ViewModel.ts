@@ -148,7 +148,7 @@ export class TestflowViewModel {
             },
           },
           
-      ],
+        ],
     }, baseUrl);
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
@@ -178,6 +178,8 @@ export class TestflowViewModel {
         isFirstTimeInTestFlow.set(false);
       }
       return;
+    } else if (response?.data?.statusCode) {
+      notifications.warning(response?.data?.message);
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }

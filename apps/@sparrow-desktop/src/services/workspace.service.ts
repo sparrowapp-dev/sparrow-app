@@ -151,4 +151,25 @@ export class WorkspaceService {
     );
     return response;
   };
+
+  public fetchWorkspacePlan = async (workspaceId: string, baseUrl: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/workspace/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    const planId = response?.data?.data?.plan?.id;
+    const planLimit = await makeRequest(
+      "GET",
+      `${baseUrl}/api/plan/${planId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    if (planLimit) {
+      return planLimit?.data?.data?.limits;
+    }
+  };
 }

@@ -7,7 +7,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
@@ -31,6 +31,7 @@
   let isGuestUser = false;
   let currentWorkspaceId = "";
   let currentWorkspace;
+  let planLimitTestFlowBlocks: number = 5;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -178,6 +179,17 @@
       targetUrl: constants.TESTFLOW_DOCS_URL,
     });
   };
+
+  const handleBlockLimitTestflow = async (WorkspaceId: string) => {
+    const limit = await _viewModel.userLimitBlockPerTestflow(WorkspaceId);
+    planLimitTestFlowBlocks = limit;
+  };
+
+  onMount(() => {
+    if (currentWorkspaceId) {
+      handleBlockLimitTestflow(currentWorkspaceId);
+    }
+  });
 </script>
 
 {#if render}
@@ -210,5 +222,6 @@
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
     {handleEventOnClickQuestionMark}
+    {planLimitTestFlowBlocks}
   />
 {/if}
