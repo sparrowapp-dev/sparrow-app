@@ -91,19 +91,6 @@
     }, 0);
   });
   onDestroy(() => {});
-
-  $: {
-    const property = $tab?.property;
-    const aiRequest = property?.aiRequest;
-    const modPro = aiRequest?.aiModelProvider;
-    const modVer = aiRequest?.aiModelVariant;
-    const configurations = aiRequest?.configurations;
-
-    // if (property && modPro && modVer && configurations?.[modPro]) {
-    // console.log("kk :>> ", property);
-    console.log("configurations :>> ", configurations);
-    // }
-  }
 </script>
 
 {#if $tab.tabId}
