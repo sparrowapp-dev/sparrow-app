@@ -37,7 +37,7 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import type { AiModelProviderEnum, AnthropicModelsConfig, DeepSeekModelsConfig, GeminiModelsConfig, modelsConfigType, OpenAiModelsConfig } from "@sparrow/common/types/workspace/ai-request-base";
+import type { AiModelProviderEnum, modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
@@ -376,7 +376,7 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     // this.compareRequestWithServer();
   };
-  
+
   /**
    *
    * @param _name - request name
@@ -430,7 +430,7 @@ class AiRequestExplorerViewModel {
     // this.compareRequestWithServer();
   };
 
-  public updateAiConfigurations = async (model: AiModelProviderEnum, _configUpdates: OpenAiModelsConfig | DeepSeekModelsConfig | AnthropicModelsConfig | GeminiModelsConfig) => {
+  public updateAiConfigurations = async (model: AiModelProviderEnum, _configUpdates: modelsConfigType) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
     this.tab = progressiveTab;
@@ -683,10 +683,10 @@ class AiRequestExplorerViewModel {
                   isLiked: false,
                   isDisliked: false,
                   status: false,
-                  inputTokens: 0, 
+                  inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  statusCode: response.statusCode, 
+                  statusCode: response.statusCode,
                   time: response.timeTaken.replace("ms", "")
                 },
               ]);
@@ -784,10 +784,10 @@ class AiRequestExplorerViewModel {
                 // Update the conversation messages with metrics
                 const componentData = this._tab.getValue();
                 const conversations = componentData?.property?.aiRequest.ai?.conversations || [];
-                
+
                 // Find indices for both the AI response and the preceding user message
                 let aiResponseIndex = -1;
-                
+
                 for (let i = 0; i < conversations.length; i++) {
                   if (conversations[i].messageId === responseMessageId) {
                     aiResponseIndex = i;
@@ -798,7 +798,7 @@ class AiRequestExplorerViewModel {
                 if (aiResponseIndex !== -1) {
                   // Create a shallow clone of the conversations array
                   const updatedConversations = [...conversations];
-                  
+
                   // Update the AI response message with response metrics
                   updatedConversations[aiResponseIndex] = {
                     ...updatedConversations[aiResponseIndex],
@@ -808,24 +808,24 @@ class AiRequestExplorerViewModel {
                     totalTokens: responseMetrics.totalTokens,
                     time: responseMetrics.time
                   };
-                  
+
                   // Also update the preceding user message (Sender) if it exists
                   // User message will be the one directly before this AI response
                   if (aiResponseIndex > 0 && updatedConversations[aiResponseIndex - 1].type === MessageTypeEnum.SENDER) {
                     updatedConversations[aiResponseIndex - 1] = {
                       ...updatedConversations[aiResponseIndex - 1],
-                      statusCode: responseMetrics.statusCode, 
-                      inputTokens: responseMetrics.inputTokens, 
+                      statusCode: responseMetrics.statusCode,
+                      inputTokens: responseMetrics.inputTokens,
                       outputTokens: responseMetrics.outputTokens,
                       totalTokens: responseMetrics.inputTokens,
                       time: responseMetrics.time
                     };
                   }
-                  
+
                   // Update the conversation data
                   await this.updateRequestAIConversation(updatedConversations);
                 }
-                
+
 
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>
