@@ -33,6 +33,7 @@
   import { OSDetector } from "@sparrow/common/utils";
   import { fade } from "svelte/transition";
   import { GlobalSearch } from "@sparrow/common/features";
+  import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -257,6 +258,13 @@
       id: SidebarItemIdEnum.WORKSPACE,
       route: "collections",
       heading: "Workspace",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.MARKETPLACE,
+      route: "marketplace",
+      heading: "Marketplace",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
@@ -578,6 +586,11 @@
       </Route>
       <!-- Route for Team and workspaces - Home Tab -->
       <Route path="/home/*"><Teams /></Route>
+
+      <!-- Route for Marketplace -->
+      <Route path="/marketplace/*">
+        <MarketplacePage />
+      </Route>
 
       <!-- Default Route: Navigate to collections -->
       <Route path="/*"><Navigate to="home" /></Route>

@@ -78,7 +78,8 @@
     "@sparrow/common": "*",
     "@sparrow/support": "*",
     "@sparrow/teams": "*",
-    "@sparrow/workspaces": "*"
+    "@sparrow/workspaces": "*",
+    "@sparrow/marketplace": "*"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",

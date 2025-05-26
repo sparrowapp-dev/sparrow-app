@@ -261,3 +261,4 @@ export { default as BotRegular } from "./BotRegular.svelte";
 export { default as ArrowUndoRegular } from "./ArrowUndoRegular.svelte";
 export { default as HistoryIcon2 } from "./HistoryIcon.svelte";
 export { default as BetaVectorIcon } from "./BetaVectorIcon.svelte";
+export { default as CartRegular } from "./CartRegular.svelte";

@@ -6,7 +6,7 @@
 
   export let placeholder = "Search";
   export let id = "";
-  export let variant: "primary" | "secondary" = "primary";
+  export let variant: "primary" | "secondary" | "primary-gradient" = "primary";
   export let size: "small" | "medium" | "large" = "small";
   export let customWidth = "";
   export let value = "";
@@ -27,6 +27,9 @@
       break;
     case "secondary":
       searchClassProp = "custom-surface900";
+      break;
+    case "primary-gradient":
+      searchClassProp = "primary-gradient-custom-surface700";
       break;
     default:
       searchClassProp = "custom-surface700";
@@ -185,6 +188,40 @@
   }
   // when it have text and not focused
   .custom-surface700:not(:focus):hover {
+    border: 1px solid var(--border-ds-neutral-300);
+  }
+  .primary-gradient-custom-surface700 {
+    background-color: var(--bg-ds-surface-400);
+    border: 2px solid transparent; /* Transparent border for gradient effect */
+    background-image: linear-gradient(
+        var(--bg-ds-surface-400),
+        var(--bg-ds-surface-400)
+      ),
+      linear-gradient(90deg, #11adf0, #316cf6, #6147ff); 
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    caret-color: var(--border-ds-primary-300);
+  }
+  // when focused without text
+  .primary-gradient-custom-surface700:focus {
+    background-color: var(--bg-ds-surface-300);
+    outline: none;
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // during typing
+  .primary-gradient-custom-surface700.has-text {
+    border: 1px solid var(--border-ds-primary-300);
+  }
+  // when it have text but not foucsed
+  .primary-gradient-custom-surface700.has-text:not(:focus) {
+    border: none;
+  }
+  // when it have text  and focused
+  .primary-gradient-custom-surface700.entered:focus {
+    border: 2px solid var(--border-ds-primary-300);
+  }
+  // when it have text and not focused
+  .primary-gradient-custom-surface700:not(:focus):hover {
     border: 1px solid var(--border-ds-neutral-300);
   }
 
