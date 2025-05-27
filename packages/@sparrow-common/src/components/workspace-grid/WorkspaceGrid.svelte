@@ -227,7 +227,7 @@
 
           <div
             class="d-flex overflow-hidden justify-content-between"
-            style={true ? "width:calc(100% - 60px);" : ""}
+            style={isWebEnvironment ? "width:calc(100% - 60px);" : ""}
           >
             <div
               class="ellipsis overflow-hidden"
