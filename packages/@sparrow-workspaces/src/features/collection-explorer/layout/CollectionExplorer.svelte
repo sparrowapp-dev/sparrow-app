@@ -87,6 +87,7 @@
     ArrowRightRegular,
     ArrowSwapRegular,
     ArrowSyncRegular,
+    BotRegular,
     CaretDownFilled,
     CaretUpFilled,
     CopyRegular,
@@ -247,6 +248,17 @@
       },
       name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
       icon: GraphIcon,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("aiRequestCollection", {
+          collection: collection,
+        });
+      },
+      name: `Add AI Request dd`,
+      icon: BotRegular,
       iconColor: "var(--icon-ds-neutral-50)",
       iconSize: "14px",
     },

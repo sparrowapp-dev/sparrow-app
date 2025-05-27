@@ -75,6 +75,7 @@
     SettingsRegular,
     HistoryRegular,
     CircleSmallFilled,
+    BotRegular,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -93,6 +94,7 @@
   let webSocketCount = 0;
   let socketIoCount = 0;
   let mockRequestCount = 0;
+  let aiRequestCount = 0;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -190,6 +192,7 @@
       deletedIds = [];
       requestCount = 0;
       mockRequestCount = 0;
+      aiRequestCount = 0;
       folderCount = 0;
       graphQLCount = 0;
       webSocketCount = 0;
@@ -215,6 +218,10 @@
             } else if (item.items[i].type === ItemType.MOCK_REQUEST) {
               mockRequestCount++;
               deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.AI_REQUEST) {
+              // don't know why this change - anish
+              aiRequestCount++;
+              deletedIds.push(item.items[i].id);
             }
           }
         } else if (item.type === ItemType.REQUEST) {
@@ -231,6 +238,9 @@
           deletedIds.push(item.id);
         } else if (item.type === ItemType.MOCK_REQUEST) {
           mockRequestCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.AI_REQUEST) {
+          aiRequestCount++;
           deletedIds.push(item.id);
         }
       });
@@ -428,6 +438,10 @@
       <div class="d-flex gap-1 text-ds-font-size-12">
         <span class="text-plusButton">{socketIoCount}</span>
         <p>Socket.IO</p>
+      </div>
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{aiRequestCount}</span>
+        <p>AI Request</p>
       </div>
     {:else}
       <div class="d-flex gap-1 text-ds-font-size-12">
@@ -666,6 +680,18 @@
         disabled: false,
         hidden: false,
         icon: GraphIcon,
+      },
+      {
+        onClick: () => {
+          onItemCreated("aiRequestCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add AI Request",
+        disabled: false,
+        hidden: false,
+        icon: BotRegular,
       },
     ]}
     {noOfColumns}
@@ -1184,6 +1210,38 @@
               }}
             >
               <GraphIcon
+                height={"13px"}
+                width={"13px"}
+                color={"var(--request-arc)"}
+              />
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            title={collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : `Add AI Request`}
+            placement={collection?.activeSync ? "top-left" : "bottom-center"}
+            distance={12}
+            zIndex={1000}
+          >
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px;"
+              role="button"
+              on:click={() => {
+                if (!collection?.activeSync) {
+                  onItemCreated("aiRequestCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  // MixpanelEvent(Events.Collection_GraphQL, {
+                  //   description: "Created GraphQL inside collection.",
+                  // });
+                }
+              }}
+            >
+              <BotRegular
                 height={"13px"}
                 width={"13px"}
                 color={"var(--request-arc)"}
