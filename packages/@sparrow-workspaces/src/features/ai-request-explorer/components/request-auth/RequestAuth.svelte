@@ -4,7 +4,7 @@
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { Button } from "@sparrow/library/ui";
+  import { Alert, Button } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
 
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
@@ -81,6 +81,32 @@
       Add the API key of your selected AI model.
     </p>
   </div>
+
+  <Alert
+    heading="OpenAI API Key"
+    description=""
+    varient="info"
+    ctaShow={false}
+    containerWidth={""}
+    closeIconRequired={false}
+    onClickClose={() => {}}
+  >
+    <ul slot="body-slot" class="alert-bullet-list">
+      <li class="alert-bullet-item">
+        Go to <a
+          href="https://platform.openai.com/api-keys"
+          target="_blank"
+          class="alert-link"
+          >OpenAI API Keys page<span class="external-arrow">↗</span></a
+        >.
+      </li>
+      <li class="alert-bullet-item">
+        Click on <strong>Create new secret key</strong>.
+      </li>
+      <li class="alert-bullet-item">Copy the key and paste it below.</li>
+    </ul>
+  </Alert>
+
   <section class="w-100" style="flex:1; overflow:auto;">
     {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
@@ -179,5 +205,54 @@
   /* Add a border bottom when the button is pressed (active) */
   button:active {
     border-bottom: 2px solid red; /* Replace 'yourColor' with the desired color */
+  }
+
+  .alert-bullet-list {
+    margin: 5px 0 8px 0;
+    padding-left: 16px;
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--text-ds-neutral-200);
+  }
+
+  .alert-bullet-item {
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .alert-bullet-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .alert-bullet-item::before {
+    content: "•";
+    position: absolute;
+    left: -12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 400;
+  }
+
+  .alert-link {
+    color: var(--text-ds-primary-300);
+    text-decoration: underline;
+    font-weight: 400;
+  }
+
+  .alert-link:hover {
+    text-decoration: underline;
+    color: var(--text-ds-primary-200);
+  }
+
+  .external-arrow {
+    font-size: 10px;
+    margin-left: 2px;
+    vertical-align: super;
+  }
+
+  .alert-bullet-item strong {
+    font-weight: 500;
+    color: var(--text-ds-neutral-50);
   }
 </style>

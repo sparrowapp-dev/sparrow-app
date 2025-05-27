@@ -86,6 +86,7 @@
         {/if}
 
         <div class="d-flex flex-column">
+          <slot name="body-slot" />
           <p
             class="mb-0 pe-3 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
             style=" color:var(--text-ds-neutral-50);"
@@ -202,7 +203,7 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(
       50% 50% at 50% 50%,
-      rgba(51, 204, 122, 0.25) 0%,
+      rgba(79, 172, 254, 0.25) 0%,
       rgba(29, 33, 43, 0) 100%
     );
   }
