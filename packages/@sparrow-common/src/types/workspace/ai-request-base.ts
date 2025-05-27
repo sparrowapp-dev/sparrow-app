@@ -49,11 +49,11 @@ export enum AiModelProviderEnum {
 
 // — Anthropic Claude 3 family: Haiku (fast), Sonnet (balanced), Opus (capable)
 export enum AnthropicModelEnum {
-    Claude3_Haiku = "claude-3-haiku",
-    Claude3_Sonnet = "claude-3-sonnet",
-    Claude3_Opus = "claude-3-opus",
-    Claude3_5_Haiku = "claude-3.5-haiku",
-    Claude3_5_Sonnet = "claude-3.5-sonnet",
+    Claude3_5_Sonnet = "claude-3-5-sonnet-20241022",
+    Claude3_5_Haiku = "claude-3-5-haiku-20241022",
+    Claude3_Opus = "claude-3-opus-20240229",
+    Claude3_Haiku = "claude-3-haiku-20240307",
+    Claude3_Sonnet = "claude-3-5-sonnet-20240620",
 }
 
 // — Google Gemini family (multimodal, varying size & speed)
@@ -81,8 +81,8 @@ export enum OpenAIModelEnum {
 
 // — DeepSeek (open‑source) family
 export enum DeepSeekModelEnum {
-    DeepSeek_V3 = "deepseek-v3",
-    R1 = "r1",
+    DeepSeek_V3 = "deepseek-chat",
+    R1 = "deepseek-reasoner",
 }
 
 ///////////////////////////////////////////////////////////////

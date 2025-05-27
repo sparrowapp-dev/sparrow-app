@@ -603,6 +603,16 @@ class AiRequestExplorerViewModel {
       }
     }
 
+    // console.log("AI Request Data:", aiRequestData);
+    console.log("convo :>> ", this.aiAssistentWebSocketService.prepareConversation( 
+      "DeepSeek",
+      prompt,
+      finalSP || "Answer my queries.",
+      !isChatAutoClearActive,
+      formattedConversations
+    ));
+    return;
+
     try {
       // const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
