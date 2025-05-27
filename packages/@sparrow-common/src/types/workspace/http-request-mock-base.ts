@@ -6,13 +6,13 @@ interface HttpRequestMockKeyValueCheckedWithBaseBaseInterface {
   checked: boolean;
   base: string;
 }
-interface HttpRequestMockKeyValueCheckedBaseInterface {
+export interface HttpRequestMockKeyValueCheckedBaseInterface {
   key: string;
   value: string;
   checked: boolean;
 }
 
-interface HttpRequestMockBodyBaseInterface {
+export interface HttpRequestMockBodyBaseInterface {
   raw?: string;
   urlencoded?: HttpRequestMockKeyValueCheckedBaseInterface[];
   formdata?: {

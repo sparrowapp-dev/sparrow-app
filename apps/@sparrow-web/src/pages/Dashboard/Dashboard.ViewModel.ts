@@ -35,6 +35,7 @@ import {
   GraphqlTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
+  TestflowTabAdapter,
   WorkspaceTabAdapter,
 } from "../../adapter";
 import { navigate } from "svelte-navigator";
@@ -685,26 +686,14 @@ export class DashboardViewModel {
   };
 
   public switchAndCreateTestflowTab = async (testflow: any) => {
-    const path = {
-      workspaceId: testflow.workspaceId,
-      testflowId: testflow._id,
-      collectionId: testflow.collectionId || "",
-      folderId: testflow.folderId || "",
-    };
     const testflowData = await this.testflowRepository.readTestflow(
       testflow._id,
     );
 
-    const tab = new InitTestflowTab(testflow._id, testflow.workspaceId);
-    tab.updateName(testflowData.name);
-    tab.updateDescription(testflowData.description || "");
-    tab.updatePath(path);
-    tab.setNodes(testflowData.nodes);
-    tab.setEdges(testflowData.edges);
-    tab.updateIsSave(true);
+    const testflowTab = new TestflowTabAdapter().adapt(testflow.workspaceId, testflowData.toMutableJSON());
 
     await new Sleep().setTime(100).exec();
-    await this.tabRepository.createTab(tab.getValue(), testflow.workspaceId);
+    await this.tabRepository.createTab(testflowTab, testflow.workspaceId);
     moveNavigation("right");
   };
 

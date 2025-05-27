@@ -1,7 +1,7 @@
 <script lang="ts">
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   import { Avatar, Button } from "@sparrow/library/ui";
-  import { MenuView } from "@sparrow/teams/compopnents";
+  import { MenuView } from "@sparrow/common/components";
 
   export let user: string;
   export let role: string;

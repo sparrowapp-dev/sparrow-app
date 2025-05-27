@@ -55,6 +55,8 @@ export class CollectionRepository {
         value.isMockCollectionRunning = data.isMockCollectionRunning;
       if (data.localRepositoryPath)
         value.localRepositoryPath = data.localRepositoryPath;
+      if (data.mockRequestHistory)
+        value.mockRequestHistory = data.mockRequestHistory;
       return value;
     });
 

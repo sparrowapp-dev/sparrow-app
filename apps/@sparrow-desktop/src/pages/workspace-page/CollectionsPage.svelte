@@ -93,6 +93,7 @@
   import { Spinner } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
+  import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -908,6 +909,12 @@
                           bind:isTourGuideOpen
                           tab={$activeTab}
                         />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}
