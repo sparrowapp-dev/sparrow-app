@@ -6,6 +6,8 @@
   import MarketplaceExplorerViewModel from "./MarketplaceExplorerPage.ViewModel";
   import { onMount } from "svelte";
   import type { WorkspaceDocument } from "@app/database/database";
+  import { copyToClipBoard } from "@sparrow/common/utils";
+  import constants from "src/constants/constants";
   import type { Observable } from "rxjs";
   const _viewModel = new MarketplaceExplorerViewModel();
 
@@ -34,6 +36,14 @@
     }
     isLoading = false;
   });
+
+
+  const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
+    await copyToClipBoard(
+      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
+    );
+  };
+
 </script>
 
 <MarketplaceExplorer
@@ -42,6 +52,7 @@
   {currentPage}
   {totalPages}
   {isLoading}
+  onCopyLink = {handleCopyPublicWorkspaceLink}
 />
 
 <style lang="scss">
