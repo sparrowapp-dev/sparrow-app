@@ -66,7 +66,7 @@
     >
       <div class="d-flex" style="padding:4px; gap: 4px;">
         <CartRegular size="24px" />
-        <span>MarketPlace</span>
+        <span>Marketplace</span>
       </div>
     </div>
     <div class="d-flex mx-auto">

@@ -246,7 +246,7 @@
       {#if cardType != "teams"}
         <span
           class="ellipsis overflow-hidden text-ds-font-size-12 text-ds-font-weight-semi-bold"
-          style="color: var(--text-ds-primary-300);"
+          style="color: var(--text-ds-primary-300); display: block; margin-bottom: 5px; margin-top:3px;"
           >By {workspace.team.name}</span
         >
       {/if}
@@ -285,7 +285,7 @@
         >
           <span
             class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-            style=" color:var(--text-secondary-200)"
+            style=" color:var(--text-secondary-200); margin-right: 5px;"
             >Last updated
           </span><span
             class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
