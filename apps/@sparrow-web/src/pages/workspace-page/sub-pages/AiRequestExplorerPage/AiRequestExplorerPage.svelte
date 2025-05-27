@@ -177,6 +177,7 @@
   onUpdateAiSystemPrompt={_viewModel.updateAiSystemPrompt}
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
+  onUpdateAiConfigurations={_viewModel.updateAiConfigurations}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   isWebApp={true}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}

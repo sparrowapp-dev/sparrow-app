@@ -6,7 +6,7 @@ import type {
 } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum,  } from "@sparrow/common/types/workspace/ai-request-base";
+import { AiModelProviderEnum, type AIModelVariant, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 
 /**
  * Service for managing WebSocket connections and communication
@@ -362,21 +362,13 @@ export class AiAssistantWebSocketService {
   };
 
   public sendAiRequest = async (data: {
-    model: string;
-    modelVersion: string;
+    model: AiModelProviderEnum;
+    modelVersion: AIModelVariant;
     authKey: string;
-    systemPrompt: string;
-    userInput: string;
-    conversation?:{role: 'user' | 'assistant' | 'system'; content: string;}[],
-    configs: {
-      streamResponse: boolean;
-      jsonResponseFormat: boolean;
-      temperature: number;
-      presencePenalty: number;
-      frequencePenalty: number;
-      maxTokens: number;
-    }
-
+    systemPrompt?: string;
+    userInput: { role: 'user' | 'assistant' | 'system'; content: string; }[];
+    // conversation?: { role: 'user' | 'assistant' | 'system'; content: string; }[],
+    configs: modelsConfigType;
   }): Promise<boolean> => {
 
     if (!this.webSocket || !this.isWsConnected()) {
@@ -405,9 +397,9 @@ export class AiAssistantWebSocketService {
 
     switch (modelProvider) {
       case AiModelProviderEnum.OpenAI:
-        return this.prepareOpenAIConversation(isContextOn, systemPrompt, conversations);
+        return this.prepareOpenAIConversation(isContextOn, userPrompt, systemPrompt, conversations);
       case AiModelProviderEnum.DeepSeek:
-        return this.prepareDeepSeekConversation(isContextOn, systemPrompt, conversations);
+        return this.prepareDeepSeekConversation(isContextOn, userPrompt, systemPrompt, conversations);
       case AiModelProviderEnum.Anthropic:
         return this.prepareAnthropicConversation(isContextOn, userPrompt, systemPrompt, conversations);
       case AiModelProviderEnum.Google:
@@ -415,43 +407,41 @@ export class AiAssistantWebSocketService {
       default:
         console.error("Unsupported model provider:", modelProvider);
         // return conversations;
-        return ;
+        return;
     }
 
   }
 
-  private prepareOpenAIConversation = (isContextOn:boolean, systemPrompt: string, conversations: {role: 'user' | 'assistant' | 'system'; content: string;}[]) => {
-    const systemPromptContext = {role: 'system', content: systemPrompt};
+  private prepareOpenAIConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'system', content: systemPrompt };
+    if (isContextOn) {
+      return [systemPromptContext, ...conversations]; // If context is on, prepend the system prompt to the conversation
+    }
+    return [systemPromptContext, { "role": "user", "content": userPrompt }]; // If context is off, return the conversation as is
+  }
+
+  private prepareDeepSeekConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'system', content: systemPrompt };
     if (isContextOn) {
       // If context is on, prepend the system prompt to the conversation
       return [systemPromptContext, ...conversations];
     }
     // If context is off, return the conversation as is
-    return conversations;
+    return [systemPromptContext, { "role": "user", "content": userPrompt }];
   }
-  
-  private prepareDeepSeekConversation = (isContextOn:boolean, systemPrompt: string, conversations: {role: 'user' | 'assistant' | 'system'; content: string;}[]) => {
-    const systemPromptContext = {role: 'system', content: systemPrompt};
+
+  private prepareAnthropicConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'user', content: `${systemPrompt} + ${userPrompt}` };
     if (isContextOn) {
       // If context is on, prepend the system prompt to the conversation
       return [systemPromptContext, ...conversations];
     }
     // If context is off, return the conversation as is
-    return conversations;
+    return [systemPromptContext];
   }
-  
-  private prepareAnthropicConversation = (isContextOn:boolean, userPrompt: string, systemPrompt: string, conversations: {role: 'user' | 'assistant' | 'system'; content: string;}[]) => {
-    const systemPromptContext = {role: 'user', content: `${systemPrompt} + ${userPrompt}`};
-    if (isContextOn) {
-      // If context is on, prepend the system prompt to the conversation
-      return [systemPromptContext, ...conversations];
-    }
-    // If context is off, return the conversation as is
-    return conversations;
-  }
-  
-  private prepareGeminiConversation = (isContextOn:boolean, userPrompt: string, systemPrompt: string, conversations: {role: 'user' | 'assistant' | 'system'; content: string;}[]) => {
-    const systemPromptContext = {role: 'user', content: `${systemPrompt} + ${userPrompt}`};
+
+  private prepareGeminiConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'user', content: `${systemPrompt} + ${userPrompt}` };
     if (isContextOn) {
       // If context is on, prepend the system prompt to the conversation
       return [systemPromptContext, ...conversations];

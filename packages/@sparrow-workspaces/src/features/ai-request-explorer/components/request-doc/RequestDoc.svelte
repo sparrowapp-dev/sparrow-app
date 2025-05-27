@@ -3,9 +3,10 @@
 
   export let onUpdateAiSystemPrompt;
   export let requestDoc: string;
+  export let isEditable: boolean = false;
 </script>
 
-<div class="request-doc-wrapper">
+<div class="request-doc-wrapper {isEditable ? 'disabled' : ''}">
   <div class="editor-area">
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div id="editor2">
@@ -22,12 +23,10 @@
 </div>
 
 <style>
-  /* .request-doc-wrapper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  } */
+  .disabled {
+    /* cursor: not-allowed !important;
+    opacity: 0.5; */
+  }
 
   .editor-area {
     flex: 1;

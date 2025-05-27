@@ -12,18 +12,12 @@
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import type {
-    SaveRequestType,
-    UpdateRequestAuthType,
-    UpdateRequestDescriptionType,
-    UpdateRequestNameType,
-    UpdateRequestStateType,
-  } from "@sparrow/workspaces/type";
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
+  import { disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -42,6 +36,7 @@
   export let onUpdateAiConversation;
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
+  export let onUpdateAiConfigurations;
 
   // Role of user in active workspace
   export let userRole;
@@ -140,6 +135,9 @@
                 {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
                   <RequestDoc
                     {onUpdateAiSystemPrompt}
+                    isEditable={disabledModelFeatures[
+                      $tab.property.aiRequest?.state?.aiNavigation
+                    ].includes($tab.property.aiRequest?.aiModelVariant)}
                     requestDoc={$tab.property.aiRequest.systemPrompt}
                   />
                 {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
@@ -156,7 +154,16 @@
                     {onOpenCollection}
                   />
                 {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                  <AiConfigs {onUpdateRequestState} />
+                  <AiConfigs
+                    currSelectedModel={$tab.property?.aiRequest
+                      ?.aiModelProvider}
+                    currSelectedModelVariant={$tab.property?.aiRequest
+                      ?.aiModelVariant}
+                    config={$tab.property?.aiRequest?.configurations?.[
+                      $tab.property?.aiRequest?.aiModelProvider
+                    ]}
+                    {onUpdateAiConfigurations}
+                  />
                 {/if}
               </div>
             </div>

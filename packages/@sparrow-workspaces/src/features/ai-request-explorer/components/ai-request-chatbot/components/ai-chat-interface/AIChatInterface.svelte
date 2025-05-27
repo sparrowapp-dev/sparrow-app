@@ -41,6 +41,7 @@
   export let responseData: AiRequestExplorerData | undefined;
   export let modelVariant = "gpt-4os";
   export let onChatClear;
+  export let isChatAutoClearActive = false;
   let isChatLoadingActive = false;
 
   let chatContainer: HTMLElement;
@@ -152,7 +153,7 @@
                 <Toggle
                   label={"Auto Clear"}
                   textColor={"var(--text-ds-neutral-100)"}
-                  isActive={false}
+                  isActive={isChatAutoClearActive}
                   disabled={false}
                   onChange={(event) => {
                     onUpdateRequestState({

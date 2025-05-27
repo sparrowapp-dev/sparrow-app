@@ -103,6 +103,8 @@
       {handleApplyChangeOnAISuggestion}
       modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
       onChatClear={clearChat}
+      isChatAutoClearActive={$tab?.property?.aiRequest?.state
+        ?.isChatAutoClearActive}
       bind:scrollList
     />
   </div>

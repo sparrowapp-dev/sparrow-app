@@ -37,6 +37,8 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import type { AiModelProviderEnum, modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
+import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -374,7 +376,7 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     // this.compareRequestWithServer();
   };
-  
+
   /**
    *
    * @param _name - request name
@@ -416,6 +418,21 @@ class AiRequestExplorerViewModel {
   public updateAiSystemPrompt = async (_description: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.systemPrompt = _description;
+    this.tab = progressiveTab;
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error(
+        "Failed to update the documentation. Please try again",
+      );
+    }
+    // this.compareRequestWithServer();
+  };
+
+  public updateAiConfigurations = async (model: AiModelProviderEnum, _configUpdates: modelsConfigType) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -562,17 +579,22 @@ class AiRequestExplorerViewModel {
   public generateAIResponseWS = async (prompt = "") => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-    const tabId = componentData.tabId; // or any string key
+    const tabId = componentData.tabId;
+    const modelProvider = componentData.property.aiRequest.aiModelProvider;
+    const modelVariant = componentData.property.aiRequest.aiModelVariant;
+    const authKey = componentData.property.aiRequest.auth.apiKey;
+    const systemPrompt = componentData.property.aiRequest.systemPrompt;
+    const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
 
     let finalSP = null;
-    if (componentData.property.aiRequest.systemPrompt.length) {
-      const SPDatas = JSON.parse(componentData.property.aiRequest.systemPrompt);
+    if (systemPrompt.length) {
+      const SPDatas = JSON.parse(systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
-    let formattedConversations: {role: 'user' | 'assistant'; content: string;}[] = []; // Sending the chat history for context
-    if(!isChatAutoClearActive) {
+    let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
+    if (!isChatAutoClearActive) {
       const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
       formattedConversations = rawConversations.map(({ type, message }) => ({
         role: type === 'Sender' ? 'user' : 'assistant',
@@ -580,41 +602,46 @@ class AiRequestExplorerViewModel {
       }));
     }
 
-    const aiRequestData = {
-      feature: "llm-evaluation",
-      // model: componentData.property.aiRequest.AI_Model_Provider || "openai",
-      model: "openai",
-      modelVersion: componentData.property.aiRequest.aiModelVariant || "gpt-3.5-turbo",
-      // modelVersion: "gpt-3.5-turbo",
-      // model: "openai",
-      authKey: componentData.property.aiRequest.auth.apiKey.authValue,
-      systemPrompt: finalSP || "Answer my queries.",
-      userInput: prompt,
-      ...(formattedConversations.length > 0 && !isChatAutoClearActive && {
-        conversation: formattedConversations,
-      }),
-      configs: {
-        streamResponse: true,
-        jsonResponseFormat: false,
-        temperature: 0.5,
-        presencePenalty: 0.5,
-        frequencePenalty: 0.5,
-        maxTokens: -1
-      }
-    }
-
-    // console.log("AI Request Data:", aiRequestData);
-    console.log("convo :>> ", this.aiAssistentWebSocketService.prepareConversation( 
-      "DeepSeek",
+    const modelSpecificConfig: modelsConfigType = {};
+    const allowedConfigs = configFormat[modelProvider][modelVariant];
+    Object.keys(allowedConfigs).forEach((key) => {
+      modelSpecificConfig[key] = currConfigurations[modelProvider][key];
+    });
+    const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
+      modelProvider,
       prompt,
       finalSP || "Answer my queries.",
       !isChatAutoClearActive,
       formattedConversations
-    ));
-    return;
+    );
+
+    const aiRequestData = {
+      feature: "llm-evaluation",
+      // userInput: prompt,
+      userInput: userInputConvo,
+      authKey: authKey.authValue,
+      configs: modelSpecificConfig,
+      model: modelProvider || "openai",
+      modelVersion: modelVariant || "gpt-3.5-turbo",
+      ...(disabledModelFeatures["System Prompt"].includes(modelVariant)
+        ? {}
+        : { systemPrompt: finalSP || "Answer my queries." }),
+      // ...(formattedConversations.length > 0 && !isChatAutoClearActive && {
+      //   conversation: formattedConversations,
+      // }),
+    }
+
+    // console.log("AI Request Data:", aiRequestData);
+    // console.log("convo :>> ", this.aiAssistentWebSocketService.prepareConversation(
+    //   modelProvider,
+    //   prompt,
+    //   finalSP || "Answer my queries.",
+    //   !isChatAutoClearActive,
+    //   formattedConversations
+    // ));
+    // return;
 
     try {
-      // const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
@@ -686,10 +713,10 @@ class AiRequestExplorerViewModel {
                   isLiked: false,
                   isDisliked: false,
                   status: false,
-                  inputTokens: 0, 
+                  inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  statusCode: response.statusCode, 
+                  statusCode: response.statusCode,
                   time: response.timeTaken.replace("ms", "")
                 },
               ]);
@@ -787,10 +814,10 @@ class AiRequestExplorerViewModel {
                 // Update the conversation messages with metrics
                 const componentData = this._tab.getValue();
                 const conversations = componentData?.property?.aiRequest.ai?.conversations || [];
-                
+
                 // Find indices for both the AI response and the preceding user message
                 let aiResponseIndex = -1;
-                
+
                 for (let i = 0; i < conversations.length; i++) {
                   if (conversations[i].messageId === responseMessageId) {
                     aiResponseIndex = i;
@@ -801,7 +828,7 @@ class AiRequestExplorerViewModel {
                 if (aiResponseIndex !== -1) {
                   // Create a shallow clone of the conversations array
                   const updatedConversations = [...conversations];
-                  
+
                   // Update the AI response message with response metrics
                   updatedConversations[aiResponseIndex] = {
                     ...updatedConversations[aiResponseIndex],
@@ -811,24 +838,24 @@ class AiRequestExplorerViewModel {
                     totalTokens: responseMetrics.totalTokens,
                     time: responseMetrics.time
                   };
-                  
+
                   // Also update the preceding user message (Sender) if it exists
                   // User message will be the one directly before this AI response
                   if (aiResponseIndex > 0 && updatedConversations[aiResponseIndex - 1].type === MessageTypeEnum.SENDER) {
                     updatedConversations[aiResponseIndex - 1] = {
                       ...updatedConversations[aiResponseIndex - 1],
-                      statusCode: responseMetrics.statusCode, 
-                      inputTokens: responseMetrics.inputTokens, 
+                      statusCode: responseMetrics.statusCode,
+                      inputTokens: responseMetrics.inputTokens,
                       outputTokens: responseMetrics.outputTokens,
                       totalTokens: responseMetrics.inputTokens,
                       time: responseMetrics.time
                     };
                   }
-                  
+
                   // Update the conversation data
                   await this.updateRequestAIConversation(updatedConversations);
                 }
-                
+
 
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>
