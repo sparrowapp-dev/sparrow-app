@@ -191,7 +191,7 @@
         <div>
           {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
             {#if isWorkspaceLinkCopied}
-              <Tooltip placement="top-right" distance={40} title="Copied">
+              <Tooltip placement="top-right" distance={cardType === "teams" ? 75 : 40}  title="Copied">
                 <button
                   bind:this={workspaceTabWrapper}
                   class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
@@ -208,7 +208,7 @@
               <div style="">
                 <Tooltip
                   placement="top-right"
-                  distance={40}
+                  distance={cardType === "teams" ? 75 : 40} 
                   title="Copy Public Link"
                 >
                   <button
@@ -246,7 +246,7 @@
       </div>
       {#if cardType != "teams"}
         <span
-          class="text-ds-font-size-12 text-ds-font-weight-semi-bold"
+          class="ellipsis overflow-hidden text-ds-font-size-12 text-ds-font-weight-semi-bold"
           style="color: var(--text-ds-primary-300);"
           >By {workspace.team.name}</span
         >
@@ -257,7 +257,11 @@
           showMenu ? "color: var(--sparrow-text-color) !important;" : null
         }`}
       >
-        <span>{workspace?.collections?.length ?? 0}</span>
+        <span
+          >{cardType === "teams"
+            ? workspace?.collections?.length
+            : (workspace?.collection?.length ?? 0)}</span
+        >
         <span
           class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           style="color:var(--text-secondary-200)"

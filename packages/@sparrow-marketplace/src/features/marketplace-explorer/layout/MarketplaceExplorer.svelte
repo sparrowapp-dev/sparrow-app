@@ -7,16 +7,9 @@
   import { WorkspaceGrid } from "@sparrow/common/components";
   import type { WorkspaceDocument } from "@app/database/database";
 
-  // Mock handlers
-  const mockHandlers = {
-    onAddMember: () => {},
-    onSwitchWorkspace: () => {},
-    onDeleteWorkspace: () => {},
-    openInDesktop: () => {},
-    onCopyLink: () => {},
-  };
   export let loadMore = () => {};
   export let isLoading = false;
+  export let onCopyLink;
   let cardType = "marketplace";
   export let workspaceList: WorkspaceDocument[] = [];
 
@@ -105,13 +98,8 @@
           {#each workspaceList as workspace}
             <WorkspaceGrid
               {workspace}
-              onAddMember={mockHandlers.onAddMember}
-              onSwitchWorkspace={mockHandlers.onSwitchWorkspace}
-              isAdminOrOwner={true}
-              onDeleteWorkspace={mockHandlers.onDeleteWorkspace}
-              openInDesktop={mockHandlers.openInDesktop}
-              isWebEnvironment={true}
-              onCopyLink={mockHandlers.onCopyLink}
+              onSwitchWorkspace={()=>{}}
+              onCopyLink={onCopyLink}
               {cardType}
             />
           {/each}
