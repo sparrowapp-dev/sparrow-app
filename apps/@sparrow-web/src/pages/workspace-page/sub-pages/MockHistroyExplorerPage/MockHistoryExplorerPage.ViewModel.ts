@@ -21,6 +21,7 @@ import {
 import { BehaviorSubject, type Observable } from "rxjs";
 import { FolderTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
+import { notifications } from "@sparrow/library/ui";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
