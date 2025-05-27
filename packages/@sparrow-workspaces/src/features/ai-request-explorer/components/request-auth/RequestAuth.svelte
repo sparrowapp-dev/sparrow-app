@@ -91,19 +91,24 @@
     closeIconRequired={false}
     onClickClose={() => {}}
   >
-    <ul slot="body-slot" class="alert-bullet-list">
-      <li class="alert-bullet-item">
+    <ul
+      slot="body-slot"
+      class="alert-bullet-list text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150 ps-3 mt-1 me-0 mb-2 ms-1"
+    >
+      <li class="alert-bullet-item position-relative">
         Go to <a
           href="https://platform.openai.com/api-keys"
           target="_blank"
-          class="alert-link"
+          class="alert-link text-ds-font-size-12"
           >OpenAI API Keys page<span class="external-arrow">↗</span></a
         >.
       </li>
-      <li class="alert-bullet-item">
+      <li class="alert-bullet-item position-relative">
         Click on <strong>Create new secret key</strong>.
       </li>
-      <li class="alert-bullet-item">Copy the key and paste it below.</li>
+      <li class="alert-bullet-item position-relative">
+        Copy the key and paste it below.
+      </li>
     </ul>
   </Alert>
 
@@ -208,45 +213,22 @@
   }
 
   .alert-bullet-list {
-    margin: 5px 0 8px 0;
-    padding-left: 16px;
-    list-style: none;
-    font-size: 12px;
-    line-height: 1.5;
-    font-weight: 400;
+    font-style: inter, sans-serif;
     color: var(--text-ds-neutral-200);
-  }
-
-  .alert-bullet-item {
-    position: relative;
-    margin-bottom: 4px;
-  }
-
-  .alert-bullet-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .alert-bullet-item::before {
-    content: "•";
-    position: absolute;
-    left: -12px;
-    color: var(--text-ds-neutral-200);
-    font-weight: 400;
   }
 
   .alert-link {
     color: var(--text-ds-primary-300);
-    text-decoration: underline;
+    text-decoration: none;
     font-weight: 400;
   }
 
   .alert-link:hover {
     text-decoration: underline;
-    color: var(--text-ds-primary-200);
   }
 
   .external-arrow {
-    font-size: 10px;
+    font-size: 12px;
     margin-left: 2px;
     vertical-align: super;
   }
