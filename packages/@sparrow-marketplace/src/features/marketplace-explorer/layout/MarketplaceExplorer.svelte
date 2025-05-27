@@ -12,9 +12,10 @@
   export let onCopyLink;
   let cardType = "marketplace";
   export let workspaceList: WorkspaceDocument[] = [];
+  export let onSwitchWorkspace;
 
   let scrollContainer;
-  let showLoadMoreButton = true; 
+  let showLoadMoreButton = true;
   export let currentPage;
   export let totalPages;
   let showTopOverlay = false;
@@ -32,7 +33,7 @@
     const scrollPercentage = scrollPosition / (scrollHeight - clientHeight);
     showTopOverlay = scrollPosition > 30;
     showBottomOverlay = scrollPercentage >= 0.5;
-    showLoadMoreButton = scrollPercentage >= 0.9 && currentPage < totalPages;;
+    showLoadMoreButton = scrollPercentage >= 0.9 && currentPage < totalPages;
   };
   const handleLoadMoreClick = () => {
     showLoadMoreButton = false;
@@ -50,7 +51,7 @@
       scrollContainer.removeEventListener("scroll", handleScroll);
     }
   });
-  </script>
+</script>
 
 <div class="d-flex flex-row justify-content-between image-wrapper">
   <img src={SparrowMarketplaceBg} alt="Marketplace Background" class="bg-img" />
@@ -98,8 +99,8 @@
           {#each workspaceList as workspace}
             <WorkspaceGrid
               {workspace}
-              onSwitchWorkspace={()=>{}}
-              onCopyLink={onCopyLink}
+              {onCopyLink}
+              {onSwitchWorkspace}
               {cardType}
             />
           {/each}

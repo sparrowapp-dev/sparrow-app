@@ -55,6 +55,7 @@
   }
   let userId = "";
   let userRole = "";
+  let isSharedWorkspace = false;
   user.subscribe((value) => {
     if (value) {
       userId = value._id;
@@ -96,6 +97,7 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        isSharedWorkspace = value._data.isShared;
         workspaceType = value._data?.workspaceType || "PRIVATE";
       }
     },
@@ -128,6 +130,7 @@
   bind:userRole
   bind:isShareModalOpen
   tab={_viewModel.tab}
+  {isSharedWorkspace}
   {workspaceUpdatesList}
   {workspaceType}
   collectionLength={$collectionList?.filter(

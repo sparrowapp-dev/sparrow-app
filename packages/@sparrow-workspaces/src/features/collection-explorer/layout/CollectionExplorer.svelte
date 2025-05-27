@@ -117,6 +117,7 @@
   export let onSaveCollection;
   export let onItemCreated;
   export let onUpdateRunningState;
+  export let userRole;
 
   /**
    * Local variables
@@ -675,6 +676,7 @@
                 startIcon={collection?.isMockCollectionRunning
                   ? RecordStopRegular
                   : PlayCircleRegular}
+                disable={userRole === "viewer" || isSharedWorkspace}
               />
             </div>
           </div>
