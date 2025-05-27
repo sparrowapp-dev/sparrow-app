@@ -140,6 +140,60 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
+    <div class="d-flex gap-1 position-absolute" style="top:20px; right:16px;">
+      {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+        {#if isWorkspaceLinkCopied}
+          <div
+            class="border-0 rounded d-flex justify-content-center align-items-center justify-content-center p-2 public-link-icon"
+          >
+            <StatusSuccess
+              height="14"
+              width="14"
+              color="var(--icon-ds-success-400)"
+            />
+          </div>
+        {:else}
+          <div
+            class="border-0 rounded d-flex justify-content-center align-items-center public-link-icon"
+          >
+            <Tooltip
+              placement="top-center"
+              distance={10}
+              title="Copy Public Link"
+            >
+              <Button
+                startIcon={LinkRegular}
+                type={"secondary"}
+                size={"small"}
+                onClick={async () => {
+                  await onCopyLink(workspace._id);
+                  isWorkspaceLinkCopied = true;
+                  setTimeout(() => {
+                    isWorkspaceLinkCopied = false;
+                  }, 2000);
+                }}
+              />
+            </Tooltip>
+          </div>
+        {/if}
+      {/if}
+
+      {#if cardType === "teams"}
+        <div
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          bind:this={workspaceTabWrapper}
+        >
+          <Button
+            type={"secondary"}
+            size={"small"}
+            startIcon={MoreVerticalRegular}
+            onClick={(e) => rightClickContextMenu(e)}
+          />
+        </div>
+      {/if}
+    </div>
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"
@@ -173,7 +227,7 @@
 
           <div
             class="d-flex overflow-hidden justify-content-between"
-            style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
+            style={true ? "width:calc(100% - 60px);" : ""}
           >
             <div
               class="ellipsis overflow-hidden"
@@ -187,61 +241,6 @@
               >
             </div>
           </div>
-        </div>
-        <div>
-          {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
-            {#if isWorkspaceLinkCopied}
-              <Tooltip placement="top-right" distance={cardType === "teams" ? 75 : 40}  title="Copied">
-                <button
-                  bind:this={workspaceTabWrapper}
-                  class="border-0 rounded d-flex justify-content-center align-items-center position-absolute"
-                  style="top:27px; right:31px;"
-                >
-                  <StatusSuccess
-                    height="14"
-                    width="14"
-                    color="var(--icon-ds-success-400)"
-                  />
-                </button>
-              </Tooltip>
-            {:else}
-              <div style="">
-                <Tooltip
-                  placement="top-right"
-                  distance={cardType === "teams" ? 75 : 40} 
-                  title="Copy Public Link"
-                >
-                  <button
-                    bind:this={workspaceTabWrapper}
-                    class="public-link-icon border-0 d-flex justify-content-center align-items-center position-absolute"
-                    style="top:27px; right:30px;"
-                    on:click={async () => {
-                      await onCopyLink(workspace._id);
-                      isWorkspaceLinkCopied = true;
-                      setTimeout(() => {
-                        isWorkspaceLinkCopied = false;
-                      }, 2000);
-                    }}
-                  >
-                    <LinkRegular />
-                  </button>
-                </Tooltip>
-              </div>
-            {/if}
-          {/if}
-
-          {#if cardType === "teams"}
-            <button
-              bind:this={workspaceTabWrapper}
-              class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
-                ? 'threedot-active'
-                : ''}"
-              style="top:26px; right:10px;"
-              on:click={(e) => rightClickContextMenu(e)}
-            >
-              <MoreVerticalRegular />
-            </button>
-          {/if}
         </div>
       </div>
       {#if cardType != "teams"}
