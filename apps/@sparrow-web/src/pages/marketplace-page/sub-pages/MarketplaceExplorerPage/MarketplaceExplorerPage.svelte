@@ -15,18 +15,61 @@
   let isLoading = false;
   let totalPages = 0;
   let workspaces: WorkspaceDocument[] = [];
+  let isSearchMode = false;
+  let currentSearchTerm = "";
 
   const loadMore = async () => {
     isLoading = true;
     currentPage += 1;
-    const result = await _viewModel.fetchPublicWorkpsace(currentPage);
-    // Store the fetched workspaces
+
+    let result;
+    if (isSearchMode && currentSearchTerm) {
+      result = await _viewModel.searchPublicWorkspaces(
+        currentSearchTerm,
+        currentPage,
+      );
+    } else {
+      result = await _viewModel.fetchPublicWorkpsace(currentPage);
+    }
+
     if (result?.isSuccessful && result?.data?.data?.workspaces) {
       workspaces = [...workspaces, ...result.data.data.workspaces];
       totalPages = result.data.data.totalPages;
     }
+
+    isLoading = false;
   };
-  onMount(async () => {
+
+  const handleSearch = async (query: string, page: number = 1) => {
+    isLoading = true;
+    currentSearchTerm = query.trim();
+
+    if (currentSearchTerm) {
+      isSearchMode = true;
+      currentPage = page;
+
+      const result = await _viewModel.searchPublicWorkspaces(
+        currentSearchTerm,
+        page,
+      );
+      if (result?.isSuccessful && result?.data?.data?.workspaces) {
+        workspaces = result.data.data.workspaces;
+        totalPages = result.data.data.totalPages;
+      } else {
+        workspaces = [];
+        totalPages = 0;
+      }
+    } else {
+      isSearchMode = false;
+      currentPage = 1;
+      currentSearchTerm = "";
+      await loadInitialWorkspaces();
+    }
+
+    isLoading = false;
+  };
+
+  const loadInitialWorkspaces = async () => {
     isLoading = true;
     const result = await _viewModel.fetchPublicWorkpsace(currentPage);
     // Store the initial workspaces
@@ -35,15 +78,17 @@
       totalPages = result.data.data.totalPages;
     }
     isLoading = false;
-  });
+  };
 
+  onMount(async () => {
+    await loadInitialWorkspaces();
+  });
 
   const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
     await copyToClipBoard(
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
   };
-
 </script>
 
 <MarketplaceExplorer
@@ -52,7 +97,9 @@
   {currentPage}
   {totalPages}
   {isLoading}
-  onCopyLink = {handleCopyPublicWorkspaceLink}
+  onCopyLink={handleCopyPublicWorkspaceLink}
+  {isSearchMode}
+  onSearchWorkspaces={handleSearch}
 />
 
 <style lang="scss">
