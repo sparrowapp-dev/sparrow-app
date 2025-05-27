@@ -15,6 +15,7 @@
   let isLoading = false;
   let totalPages = 0;
   let workspaces: WorkspaceDocument[] = [];
+  let isWebEnvironment = false;
 
   const loadMore = async () => {
     isLoading = true;
@@ -52,6 +53,7 @@
   {isLoading}
   {totalPages}
   onCopyLink = {handleCopyPublicWorkspaceLink}
+  {isWebEnvironment}
 />
 
 <style lang="scss">
