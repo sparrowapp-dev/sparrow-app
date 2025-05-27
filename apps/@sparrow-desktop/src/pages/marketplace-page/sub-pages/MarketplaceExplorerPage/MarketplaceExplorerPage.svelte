@@ -15,6 +15,7 @@
   let isLoading = false;
   let totalPages = 0;
   let workspaces: WorkspaceDocument[] = [];
+  let isWebEnvironment = false;
   let isSearchMode = false;
   let currentSearchTerm = "";
 
@@ -98,6 +99,7 @@
   {isLoading}
   {totalPages}
   onCopyLink={handleCopyPublicWorkspaceLink}
+  {isWebEnvironment}
   {isSearchMode}
   onSearchWorkspaces={handleSearch}
 />

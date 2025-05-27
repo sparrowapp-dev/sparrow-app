@@ -13,6 +13,7 @@
   export let onCopyLink;
   let cardType = "marketplace";
   export let workspaceList: WorkspaceDocument[] = [];
+  export let isWebEnvironment;
   export let onSearchWorkspaces = (name: string, page?: number) => {};
 
   let searchInput = "";
@@ -159,6 +160,7 @@
               {workspace}
               onSwitchWorkspace={() => {}}
               {onCopyLink}
+              {isWebEnvironment}
               {cardType}
             />
           {/each}
