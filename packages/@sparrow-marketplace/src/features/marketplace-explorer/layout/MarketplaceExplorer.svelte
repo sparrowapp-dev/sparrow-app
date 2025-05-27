@@ -13,6 +13,7 @@
   let cardType = "marketplace";
   export let workspaceList: WorkspaceDocument[] = [];
   export let onSwitchWorkspace;
+  export let isWebEnvironment;
 
   let scrollContainer;
   let showLoadMoreButton = true;
@@ -101,6 +102,7 @@
               {workspace}
               {onCopyLink}
               {onSwitchWorkspace}
+              {isWebEnvironment}
               {cardType}
             />
           {/each}
