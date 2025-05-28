@@ -1095,6 +1095,9 @@
       if (!isIdExist) {
         selectedNode = undefined;
       }
+      if (testflowStore?.history.length > 0) {
+        handleTestFlowHistoryLimit();
+      }
     }
   }
 
@@ -1382,6 +1385,16 @@
       });
     }
   };
+
+  const handleTestFlowHistoryLimit = () => {
+    if (testflowStore?.history) {
+      const updateHistoryItems = testflowStore.history.slice(
+        0,
+        planLimitTestFlowBlocks,
+      );
+      testflowStore.history = updateHistoryItems;
+    }
+  };
 </script>
 
 <div
@@ -1490,6 +1503,7 @@
           testflowName={$tab?.name}
           {toggleHistoryDetails}
           {toggleHistoryContainer}
+          {planLimitTestFlowBlocks}
         />
       </div>
     </div>
