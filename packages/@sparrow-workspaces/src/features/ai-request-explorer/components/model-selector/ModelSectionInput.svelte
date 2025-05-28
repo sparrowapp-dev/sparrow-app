@@ -110,8 +110,9 @@
       <!-- Wrap with a div to handle the click event -->
       <div on:click={handleInputClick} style="cursor: pointer;">
         <CodeMirrorInput
-          value={`${ModelIdNameMapping[selectedModelProvider]} | ${ModelVariantIdNameMapping[selectedModel]}` ||
-            "Select a Model"}
+          value={selectedModelProvider && selectedModel
+            ? `${ModelIdNameMapping[selectedModelProvider]} | ${ModelVariantIdNameMapping[selectedModel]}`
+            : "Select a Model"}
           onUpdateInput={onUpdateAIModel}
           placeholder={"Select a Model"}
           {theme}

@@ -153,7 +153,10 @@
                 ? 'selected-card'
                 : ''}"
               on:click={() => {
-                if (activeProvider.id !== selectedModelProvider) {
+                if (
+                  selectedModelProvider &&
+                  activeProvider.id !== selectedModelProvider
+                ) {
                   isModelProviderChangeAlertPopupOpen = true;
                   nextModelSelectRequest = model;
                   return;
