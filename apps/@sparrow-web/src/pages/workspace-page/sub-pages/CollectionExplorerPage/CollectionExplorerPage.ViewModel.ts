@@ -796,9 +796,11 @@ class CollectionExplorerPage {
     let totalSocketIo = 0;
     let totalGraphQl = 0;
     let totalMockRequests = 0;
+    let totalAiRequests = 0;
 
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
+        console.log("coll ;>> ", collectionItem)
         if (collectionItem.type === ItemType.REQUEST) {
           totalRequests++;
         } else if (collectionItem.type === ItemType.WEB_SOCKET) {
@@ -809,6 +811,8 @@ class CollectionExplorerPage {
           totalGraphQl++;
         } else if (collectionItem.type === ItemType.MOCK_REQUEST) {
           totalMockRequests++;
+        } else if (collectionItem.type === ItemType.AI_REQUEST) {
+          totalAiRequests++;
         } else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
           if (collectionItem?.items)
@@ -823,6 +827,8 @@ class CollectionExplorerPage {
                 totalGraphQl++;
               } else if (item.type === ItemType.MOCK_REQUEST) {
                 totalMockRequests++;
+              } else if (item.type === ItemType.AI_REQUEST) {
+                totalAiRequests++;
               }
             });
         }
@@ -861,6 +867,7 @@ class CollectionExplorerPage {
       totalFolders,
       lastUpdated,
       totalMockRequests,
+      totalAiRequests
     };
   };
 
@@ -1246,7 +1253,6 @@ class CollectionExplorerPage {
     workspaceId: string,
     collection: CollectionDto,
   ) => {
-    console.log("came here 1:>> ")
     const aiRequest = new InitAiRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
@@ -1275,7 +1281,6 @@ class CollectionExplorerPage {
         } as AiRequestBaseInterface,
       },
     };
-    console.log("came here 2")
     await this.collectionRepository.addRequestOrFolderInCollection(
       collection.id,
       {
@@ -1315,7 +1320,7 @@ class CollectionExplorerPage {
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const response = await this.collectionService.addRequestInCollection(
+    const response = await this.collectionService.addAiRequestInCollection(
       aiRequestObj,
       baseUrl,
     );

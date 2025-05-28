@@ -774,7 +774,7 @@
         <AiRequest
           {userRole}
           {isSharedWorkspace}
-          socketIo={explorer}
+          aiRequest={explorer}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}

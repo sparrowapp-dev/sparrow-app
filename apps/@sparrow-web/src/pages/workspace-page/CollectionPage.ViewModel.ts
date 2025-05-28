@@ -3308,6 +3308,30 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handles opening a AI Request on a tab
+   * @param aiRequest : - The AI Request going to be opened on tab
+   * @param path : - The path to the AI Request
+   */
+  public handleOpenAiRequest = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    aiRequest: CollectionItemsDto,
+  ) => {
+    console.log("In handleOpenItem :>> ", aiRequest)
+    const aiRequestTabAdapter = new AiRequestTabAdapter();
+    const adaptedAiRequest = aiRequestTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      aiRequest,
+    );
+    adaptedAiRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
+    this.tabRepository.createTab(adaptedAiRequest);
+    moveNavigation("right");
+  };
+
+  /**
    * Handles opening a socket io on a tab
    * @param _workspaceId  Workspace id of which tab belongs to.
    * @param _collection  Collection of which tab belongs to.
@@ -3496,6 +3520,147 @@ export default class CollectionsViewModel {
           MixpanelEvent(Events.RENAME_REQUEST, {
             source: "Collection list",
           });
+        }
+      }
+    }
+  };
+
+  /**
+   * Handles renaming a AI request
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which the request is saved
+   * @param folder : - the folder in which the request is saved(if AI request if saved inside a folder)
+   * @param request : - the AI request which is going to be renamed
+   * @param newRequestName : - the new name of the request
+   */
+  private handleRenameAiRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    aiRequest: CollectionItemsDto,
+    newRequestName: string,
+  ) => {
+    let userSource = {};
+    if (aiRequest.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (collection.id && workspaceId && !folder.id) {
+        const response =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            aiRequest.id,
+          );
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
+        await this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          aiRequest.id,
+          { name: newRequestName },
+        );
+        this.updateTab(aiRequest.id, {
+          name: newRequestName,
+        });
+        // MixpanelEvent(Events.RENAME_REQUEST, {
+        //   source: "Collection list",
+        // });
+      } else if (collection.id && workspaceId && folder.id) {
+        const response = await this.collectionRepository.readRequestInFolder(
+          collection.id,
+          folder.id,
+          aiRequest.id,
+        );
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
+        await this.collectionRepository.updateRequestInFolder(
+          collection.id,
+          folder.id,
+          aiRequest.id,
+          { name: newRequestName },
+        );
+        this.updateTab(aiRequest.id, {
+          name: newRequestName,
+        });
+        // MixpanelEvent(Events.RENAME_REQUEST, {
+        //   source: "Collection list",
+        // });
+      }
+      return;
+    }
+
+    if (newRequestName) {
+      if (collection.id && workspaceId && !folder.id) {
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
+        const response = await this.collectionService.updateAiRequestInCollection(
+          aiRequest.id,
+          {
+            collectionId: collection.id,
+            workspaceId: workspaceId,
+            ...userSource,
+            items: storage,
+          },
+          baseUrl,
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestOrFolderInCollection(
+            collection.id,
+            aiRequest.id,
+            response.data.data,
+          );
+          this.updateTab(aiRequest.id, {
+            name: newRequestName,
+          });
+          // MixpanelEvent(Events.RENAME_REQUEST, {
+          //   source: "Collection list",
+          // });
+        }
+      } else if (collection.id && workspaceId && folder.id) {
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
+        const response = await this.collectionService.updateAiRequestInCollection(
+          aiRequest.id,
+          {
+            collectionId: collection.id,
+            workspaceId: workspaceId,
+            ...userSource,
+            folderId: folder.id,
+            items: {
+              name: folder.name,
+              id: folder.id,
+              type: ItemType.FOLDER,
+              items: storage,
+            },
+          },
+          baseUrl,
+        );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestInFolder(
+            collection.id,
+            folder.id,
+            aiRequest.id,
+            response.data.data,
+          );
+          this.updateTab(aiRequest.id, {
+            name: newRequestName,
+          });
+          // MixpanelEvent(Events.RENAME_REQUEST, {
+          //   source: "Collection list",
+          // });
         }
       }
     }
@@ -4513,6 +4678,102 @@ export default class CollectionsViewModel {
   /**
    * Handle deleting request from repository as well as backend
    * @param workspaceId :string
+   * @param collection :CollectionDocument - The collection in which the AI Request is saved
+   * @param aiRequest : - The AI Request to be deleted
+   * @param folder : - The folder in which the AI Request is saved(if is saved in a folder)
+   * @returns :void
+   */
+  private handleDeleteAiRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    aiRequest: CollectionItemsDto,
+    folder: CollectionItemsDto,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    let aiRequestObject = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      folderId: "",
+      ...userSource,
+    };
+
+    if (folder && collection.id && workspaceId) {
+      aiRequestObject = {
+        ...aiRequestObject,
+        folderId: folder.id,
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          collection.id,
+          folder.id,
+          aiRequest.id,
+        );
+        this.handleRemoveTab(aiRequest.id);
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          collection.id,
+          aiRequest.id,
+        );
+        this.handleRemoveTab(aiRequest.id);
+      }
+
+      return true;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.deleteAiRequestInCollection(
+      aiRequest.id,
+      aiRequestObject,
+      baseUrl,
+    );
+
+    if (response.isSuccessful) {
+      if (
+        aiRequestObject.folderId &&
+        aiRequestObject.collectionId &&
+        aiRequestObject.workspaceId
+      ) {
+        await this.collectionRepository.deleteRequestInFolder(
+          aiRequestObject.collectionId,
+          aiRequestObject.folderId,
+          aiRequest.id,
+        );
+      } else if (aiRequestObject.workspaceId && aiRequestObject.collectionId) {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          aiRequestObject.collectionId,
+          aiRequest.id,
+        );
+      }
+
+      // Deleting the main tab no child exists
+      this.handleRemoveTab(aiRequest.id);
+
+      notifications.success(`"${aiRequest.name}" AI request deleted.`);
+      // MixpanelEvent(Events.DELETE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return true;
+    } else {
+      notifications.error("Failed to delete AI request. Please try again.");
+      return false;
+    }
+  };
+
+  /**
+   * Handle deleting request from repository as well as backend
+   * @param workspaceId :string
    * @param collection :CollectionDocument - The collection in which the request is saved
    * @param request : - The request to be deleted
    * @param folder : - The folder in which the request is saved(if is saved in a folder)
@@ -5454,7 +5715,7 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
-      case "aiRequestTab":
+      case "aiRequest":
         await this.createAiRequestNewTab();
         break;
       case "aiRequestCollection":
@@ -5503,6 +5764,14 @@ export default class CollectionsViewModel {
           args.workspaceId,
           args.collection as CollectionDto,
           args.request as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
+        );
+        break;
+      case "aiRequest":
+        this.handleDeleteAiRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.aiRequest as CollectionItemsDto,
           args.folder as CollectionItemsDto,
         );
         break;
@@ -5582,6 +5851,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+          args.newName as string,
+        );
+        break;
+      case "aiRequest":
+        this.handleRenameAiRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.aiRequest as CollectionItemsDto,
           args.newName as string,
         );
         break;
@@ -5676,6 +5954,14 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+        );
+        break;
+      case "aiRequest":
+        this.handleOpenAiRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.aiRequest as CollectionItemsDto,
         );
         break;
       case "saved_request":

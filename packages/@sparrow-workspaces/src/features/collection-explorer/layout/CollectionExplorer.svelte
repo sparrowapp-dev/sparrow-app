@@ -128,6 +128,7 @@
   let lastUpdated: string = "";
   let totalFolders: number = 0;
   let totalRequests: number = 0;
+  let totalAiRequests: number = 0;
   let totalWebSocket: number = 0;
   let totalSocketIo: number = 0;
   let totalGraphQl: number = 0;
@@ -148,6 +149,7 @@
       lastUpdated = res.lastUpdated;
       totalFolders = res.totalFolders;
       totalRequests = res.totalRequests;
+      totalAiRequests = res.totalAiRequests;
       totalWebSocket = res.totalWebSocket;
       totalSocketIo = res.totalSocketIo;
       totalGraphQl = res.totalGraphQl;
@@ -257,7 +259,7 @@
           collection: collection,
         });
       },
-      name: `Add AI Request dd`,
+      name: `Add AI Request`,
       icon: BotRegular,
       iconColor: "var(--icon-ds-neutral-50)",
       iconSize: "14px",
@@ -870,6 +872,10 @@
             <div class="d-flex align-items-center gap-2">
               <span class="fs-4 highlighted-number">{totalSocketIo}</span>
               <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4 highlighted-number">{totalAiRequests}</span>
+              <p style="font-size: 12px;" class="mb-0">AI Requests</p>
             </div>
           </div>
           <hr />

@@ -18,7 +18,6 @@
     type CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
-  import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 
   /**
    * Callback for Item Deleted
@@ -47,9 +46,9 @@
    */
   export let folder: CollectionItemBaseInterface | null;
   /**
-   * Selected socketIo details
+   * Selected aiRequest details
    */
-  export let socketIo: CollectionItemBaseInterface;
+  export let aiRequest: CollectionItemBaseInterface;
   /**
    * Current Tab Path
    */
@@ -81,7 +80,7 @@
 
   function handleSelectClick(event: MouseEvent) {
     const selectElement = document.getElementById(
-      `show-more-socket-io-${socketIo.id}`,
+      `show-more-ai-request-${aiRequest.id}`,
     );
     if (selectElement && !selectElement.contains(event.target as Node)) {
       showMenu = false;
@@ -97,11 +96,11 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
-      await onItemRenamed("socket-io", {
+      await onItemRenamed("aiRequest", {
         workspaceId: collection.workspaceId,
         collection,
         folder: folder ? folder : { id: "" },
-        socketio: socketIo,
+        aiRequest: aiRequest,
         newName: newRequestName,
       });
     }
@@ -112,7 +111,7 @@
   const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(
-        "renameInputFieldSocketIo",
+        "renameInputFieldAiRequest",
       ) as HTMLInputElement;
       inputField.blur();
     }
@@ -125,7 +124,7 @@
 />
 
 <Modal
-  title={`Delete ${SocketIORequestDefaultAliasBaseEnum.NAME}?`}
+  title={`Delete AI Request`}
   type={"danger"}
   width={"35%"}
   zIndex={1000}
@@ -136,10 +135,10 @@
     class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
   >
     <p>
-      Are you sure you want to delete this {SocketIORequestDefaultAliasBaseEnum.NAME}?
+      Are you sure you want to delete this AI Request
       <span
         class="text-ds-font-weight-semi-bold"
-        style="color: var(--text-ds-neutral-50);">"{socketIo.name}"</span
+        style="color: var(--text-ds-neutral-50);">"{aiRequest.name}"</span
       >
       will be removed and cannot be restored.
     </p>
@@ -168,10 +167,10 @@
       loader={deleteLoader}
       onClick={() => {
         deleteLoader = true;
-        onItemDeleted("socket-io", {
+        onItemDeleted("aiRequest", {
           workspaceId: collection.workspaceId,
           collection,
-          socketio: socketIo,
+          aiRequest: aiRequest,
           folder,
         });
         deleteLoader = false;
@@ -192,14 +191,14 @@
     menuItems={[
       {
         onClick: () => {
-          onItemOpened("socket-io", {
+          onItemOpened("aiRequest", {
             workspaceId: collection.workspaceId,
             collection,
             folder,
-            socketio: socketIo,
+            aiRequest: aiRequest,
           });
         },
-        displayText: `Open ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+        displayText: `Open AI Request`,
         disabled: false,
         hidden: false,
       },
@@ -208,11 +207,11 @@
           isRenaming = true;
           setTimeout(() => inputField.focus(), 100);
         },
-        displayText: `Rename ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+        displayText: `Rename AI Request`,
         disabled: false,
         hidden:
           !collection.activeSync ||
-          (socketIo.source === "USER" && collection.activeSync)
+          (aiRequest.source === "USER" && collection.activeSync)
             ? false
             : true,
       },
@@ -224,8 +223,8 @@
         disabled: false,
         hidden:
           !collection.activeSync ||
-          (socketIo.source === "USER" && collection.activeSync) ||
-          socketIo.isDeleted
+          (aiRequest.source === "USER" && collection.activeSync) ||
+          aiRequest.isDeleted
             ? false
             : true,
       },
@@ -237,7 +236,7 @@
 <div
   tabindex="0"
   bind:this={requestTabWrapper}
-  class="d-flex align-items-center justify-content-between my-button btn-primary {socketIo.id ===
+  class="d-flex align-items-center justify-content-between my-button btn-primary {aiRequest.id ===
   activeTabId
     ? 'active-request-tab'
     : ''} "
@@ -248,18 +247,18 @@
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
       if (!isRenaming) {
-        onItemOpened("socket-io", {
+        onItemOpened("aiRequest", {
           workspaceId: collection.workspaceId,
           collection,
           folder,
-          socketio: socketIo,
+          aiRequest: aiRequest,
         });
       }
     }}
     style={folder?.id
       ? "padding-left: 41.5px; height:100%;"
       : "padding-left: 29px; height:100%;  "}
-    class="main-file d-flex align-items-center position-relative bg-transparent border-0 {socketIo.id?.includes(
+    class="main-file d-flex align-items-center position-relative bg-transparent border-0 {aiRequest.id?.includes(
       UntrackedItems.UNTRACKED,
     )
       ? 'unclickable'
@@ -279,12 +278,12 @@
 
     {#if isRenaming}
       <input
-        class="py-0 rename-input-field-socket-io text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        class="py-0 rename-input-field-ai-request text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         style="  width: calc(100% - 50px);"
-        id="renameInputFieldSocketIo"
+        id="renameInputFieldAiRequest"
         type="text"
         maxlength={100}
-        value={socketIo.name}
+        value={aiRequest.name}
         on:click|stopPropagation={() => {}}
         bind:this={inputField}
         on:input={handleRenameInput}
@@ -293,18 +292,18 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {socketIo?.isDeleted && 'api-name-deleted'} "
+        class="api-name ellipsis {aiRequest?.isDeleted && 'api-name-deleted'} "
       >
         <p
           class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
         >
-          {socketIo.name}
+          {aiRequest.name}
         </p>
       </div>
     {/if}
   </button>
 
-  {#if socketIo.id?.includes(UntrackedItems.UNTRACKED)}
+  {#if aiRequest.id?.includes(UntrackedItems.UNTRACKED)}
     <Spinner size={"15px"} />
   {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
     <Tooltip
@@ -317,7 +316,7 @@
       <span class="threedot-icon-container d-flex">
         <Button
           tabindex={"-1"}
-          id={`show-more-socket-io-${socketIo.id}`}
+          id={`show-more-ai-request-${aiRequest.id}`}
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
@@ -462,7 +461,7 @@
   .unclickable {
     pointer-events: none;
   }
-  .rename-input-field-socket-io {
+  .rename-input-field-ai-request {
     height: 24px;
     border: none;
     background-color: transparent;
@@ -472,7 +471,7 @@
     padding: 4px 2px;
     caret-color: var(--bg-ds-primary-300);
   }
-  .rename-input-field-socket-io:focus {
+  .rename-input-field-ai-request:focus {
     border: 1px solid var(--border-ds-primary-300) !important;
   }
   .main-file {
