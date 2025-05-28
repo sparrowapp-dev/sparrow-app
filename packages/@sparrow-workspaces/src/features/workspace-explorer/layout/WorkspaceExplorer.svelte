@@ -239,7 +239,7 @@
 <style>
   .background-icon {
     position: absolute;
-    top: 120%;
+    top: 140%;
     left: 50%;
     opacity: 0.04;
     transform: translate(-50%, -50%);
