@@ -107,10 +107,6 @@
     }
   };
 
-  $: {
-    console.log("sss", activeWorkspace);
-    console.log("vvvs", tab);
-  }
 </script>
 
 {#if isSharedWorkspace && workspaceType === WorkspaceType.PUBLIC}
