@@ -15,6 +15,7 @@
   export let workspaceList: WorkspaceDocument[] = [];
   export let isWebEnvironment;
   export let onSearchWorkspaces = (name: string, page?: number) => {};
+  export let isInitialDataLoading;
 
   let searchInput = "";
   let scrollContainer;
@@ -102,86 +103,98 @@
     style="gap: 24px; width: calc(100vw - 270px);
       height: calc(100vh - 45px);"
   >
-    <div
-      class="d-flex flex-row text-ds-font-size-24 text-ds-font-weight-semi-bold"
-      style="color: var(--text-ds-neutral-50); padding-left:17px;"
-    >
-      <div class="d-flex" style="padding:4px; gap: 4px;">
-        <CartRegular size="24px" />
-        <span>MarketPlace</span>
-      </div>
-    </div>
-    <div class="d-flex mx-auto">
-      <Search
-        variant="primary-gradient"
-        id="search-input"
-        customWidth={"300px"}
-        placeholder="Search workspaces in marketplace"
-        on:input={handleSearch}
-        value={searchInput}
-      />
-    </div>
-    {#if isSearchLoading}
+    {#if isInitialDataLoading}
       <div
         class="d-flex flex-column align-items-center justify-content-center"
         style="width: 100%; height: 100%;"
       >
-        <Loader loaderSize={"20px"} />
-      </div>
-    {:else if workspaceList.length === 0}
-      <div
-        class="d-flex flex-column align-items-center justify-content-center"
-        style="width: 100%; height: 60%;"
-      >
-        <div class="container">
-          <SparrowLogo width={"180px"} height={"180px"} />
-        </div>
-        <div>
-          <span
-            style="color:var(--text-ds-neutral-400); font-size: 12px; font-weight:400; text-align:center;"
-          >
-            {searchInput ? "No result found." : "No workspaces found."}
-          </span>
-        </div>
+        <Loader loaderSize={"32px"} />
       </div>
     {:else}
       <div
-        bind:this={scrollContainer}
-        class="d-flex flex-wrap sparrow-thin-scrollbar"
-        style="gap: 16px; padding: 24px; overflow: auto;"
-        on:scroll={handleScroll}
+        class="d-flex flex-row text-ds-font-size-24 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50); padding-left:17px;"
       >
-        {#if showTopOverlay}
-          <div class="overlay top-overlay"></div>
-        {/if}
-        <div class="d-flex flex-row flex-wrap" style="gap: 16px; width: 100%;">
-          {#each workspaceList as workspace}
-            <WorkspaceGrid
-              {workspace}
-              onSwitchWorkspace={() => {}}
-              {onCopyLink}
-              {isWebEnvironment}
-              {cardType}
-            />
-          {/each}
+        <div class="d-flex" style="padding:4px; gap: 4px;">
+          <CartRegular size="24px" />
+          <span>MarketPlace</span>
         </div>
-        {#if showBottomOverlay}
-          <div class="overlay bottom-overlay"></div>
-        {/if}
       </div>
-
-      <!-- Show load more button with improved conditions -->
-      {#if showLoadMoreButton && workspaceList.length > 0}
-        <div class="load-more-container">
-          <Button
-            title="Load More"
-            type="outline-secondary"
-            buttonClassProp="text-ds-font-size-16 text-ds-font-weight-semi-bold"
-            buttonStyleProp="padding: 8px 16px; margin-top: 16px;"
-            onClick={handleLoadMoreClick}
-            disabled={isLoading}
-          />
+      <div class="d-flex mx-auto">
+        <Search
+          variant="primary-gradient"
+          id="search-input"
+          customWidth={"300px"}
+          placeholder="Search workspaces in marketplace"
+          on:input={handleSearch}
+          value={searchInput}
+        />
+      </div>
+      {#if isSearchLoading}
+        <div
+          class="d-flex flex-column align-items-center justify-content-center"
+          style="width: 100%; height: 100%;"
+        >
+          <Loader loaderSize={"20px"} />
         </div>
+      {:else if workspaceList.length === 0}
+        <div
+          class="d-flex flex-column align-items-center justify-content-center"
+          style="width: 100%; height: 60%;"
+        >
+          <div class="container">
+            <SparrowLogo width={"180px"} height={"180px"} />
+          </div>
+          <div>
+            <span
+              style="color:var(--text-ds-neutral-400); font-size: 12px; font-weight:400; text-align:center;"
+            >
+              {searchInput ? "No result found." : "No workspaces found."}
+            </span>
+          </div>
+        </div>
+      {:else}
+        <div
+          bind:this={scrollContainer}
+          class="d-flex flex-wrap sparrow-thin-scrollbar"
+          style="gap: 16px; padding: 24px; overflow: auto;"
+          on:scroll={handleScroll}
+        >
+          {#if showTopOverlay}
+            <div class="overlay top-overlay"></div>
+          {/if}
+          <div
+            class="d-flex flex-row flex-wrap"
+            style="gap: 16px; width: 100%;"
+          >
+            {#each workspaceList as workspace}
+              <WorkspaceGrid
+                {workspace}
+                onSwitchWorkspace={() => {}}
+                {onCopyLink}
+                {isWebEnvironment}
+                {cardType}
+              />
+            {/each}
+          </div>
+          {#if showBottomOverlay}
+            <div class="overlay bottom-overlay"></div>
+          {/if}
+        </div>
+
+        <!-- Show load more button with improved conditions -->
+        {#if showLoadMoreButton && workspaceList.length > 0}
+          <div class="load-more-container">
+            <Button
+              title="Load More"
+              type="outline-secondary"
+              buttonClassProp="text-ds-font-size-16 text-ds-font-weight-semi-bold"
+              buttonStyleProp="padding: 8px 16px; margin-top: 16px;"
+              onClick={handleLoadMoreClick}
+              disabled={isLoading}
+            />
+          </div>
+        {/if}
       {/if}
     {/if}
   </div>

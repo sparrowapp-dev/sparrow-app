@@ -18,6 +18,7 @@
   let isWebEnvironment = true;
   let isSearchMode = false;
   let currentSearchTerm = "";
+  let isInitialDataLoading = false;
 
   const loadMore = async () => {
     isLoading = true;
@@ -82,7 +83,9 @@
   };
 
   onMount(async () => {
+    isInitialDataLoading = true;
     await loadInitialWorkspaces();
+    isInitialDataLoading = false;
   });
 
   const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
@@ -102,6 +105,7 @@
   {isWebEnvironment}
   {isSearchMode}
   onSearchWorkspaces={handleSearch}
+  {isInitialDataLoading}
 />
 
 <style lang="scss">
