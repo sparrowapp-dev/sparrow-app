@@ -168,21 +168,17 @@
             class="history-row text-fs-12 text-ds-font-weight-semi-bold {isExpanded
               ? 'expanded'
               : ''} {isFirst ? 'first-row' : ''} {isLast ? 'last-row' : ''}"
+            on:click={(e) => toggleRowExpand(item, e)}
           >
             <td class="ps-2" style="width: 44px;">
-              <Tooltip
-                title={isExpanded ? "Hide Details" : "View Details"}
-                placement={"top-center"}
-              >
-                <Button
-                  startIcon={isExpanded
-                    ? ChevronDownRegular
-                    : ChevronRightRegular}
-                  size={"small"}
-                  type={"teritiary-regular"}
-                  onClick={(e) => toggleRowExpand(item, e)}
-                />
-              </Tooltip>
+              <Button
+                startIcon={isExpanded
+                  ? ChevronDownRegular
+                  : ChevronRightRegular}
+                size={"small"}
+                type={"teritiary-regular"}
+                onClick={(e) => toggleRowExpand(item, e)}
+              />
             </td>
             <td style="width: 15%;">{formatRelativeTime(item.timestamp)}</td>
             <td style="width: 15%;">{item.name}</td>
@@ -359,6 +355,7 @@
   .history-row {
     border-bottom: 1px solid var(--border-ds-surface-600);
     height: 36px;
+    cursor: pointer;
   }
 
   .history-row:hover {
