@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 7,
+  version: 8,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1305,6 +1305,96 @@ export const tabSchemaLiteral = {
             systemPrompt: {
               type: "string",
             },
+            configurations: {
+              type: "object",
+              properties: {
+                openai: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                  },
+                },
+                deepseek: {
+                  type: "object",
+                  properties: {
+                    type: "object",
+                    properties: {
+                      streamResponse: {
+                        type: "boolean",
+                      },
+                      jsonResponseFormat: {
+                        type: "boolean",
+                      },
+                      temperature: {
+                        type: "number",
+                      },
+                      presencePenalty: {
+                        type: "number",
+                      },
+                      frequencyPenalty: {
+                        type: "number",
+                      },
+                      maxTokens: {
+                        type: "number",
+                      },
+                    },
+                  },
+                },
+                anthropic: {
+                  type: "object",
+                  properties: {
+                    type: "object",
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    top_p: {
+                      type: "number",
+                    },
+                  },
+                },
+                google: {
+                  type: "object",
+                  properties: {
+                    type: "object",
+                    temperature: {
+                      type: "number",
+                    },
+                    top_p: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                  },
+                }
+              }
+            },
             state: {
               type: "object",
               properties: {
@@ -1340,6 +1430,9 @@ export const tabSchemaLiteral = {
                 isChatbotGeneratingResponse: {
                   type: "boolean",
                 },
+                isChatAutoClearActive: {
+                  type: "boolean",
+                }
               },
             },
             auth: {
