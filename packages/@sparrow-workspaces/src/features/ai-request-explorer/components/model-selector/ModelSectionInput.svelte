@@ -112,7 +112,7 @@
         <CodeMirrorInput
           value={selectedModelProvider && selectedModel
             ? `${ModelIdNameMapping[selectedModelProvider]} | ${ModelVariantIdNameMapping[selectedModel]}`
-            : "Select a Model"}
+            : ""}
           onUpdateInput={onUpdateAIModel}
           placeholder={"Select a Model"}
           {theme}
