@@ -5,13 +5,6 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import constants from "@app/constants/constants";
 import { getClientUser } from "@app/utils/jwt";
 import { TabRepository } from "src/repositories/tab.repository";
-import { CollectionService } from "src/services/collection.service";
-import { CollectionRepository } from "src/repositories/collection.repository";
-import { EnvironmentService } from "src/services/environment.service";
-import { EnvironmentRepository } from "src/repositories/environment.repository";
-import { TestflowService } from "src/services/testflow.service";
-import { TestflowRepository } from "src/repositories/testflow.repository";
-import { createDeepCopy } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
 import { WorkspaceTabAdapter } from "src/adapter";
 
@@ -19,12 +12,6 @@ class MarketplaceExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private workspaceService = new WorkspaceService();
   private tabRepository = new TabRepository();
-  private collectionService = new CollectionService();
-  private collectionRepository = new CollectionRepository();
-  private environmentService = new EnvironmentService();
-  private environmentRepository = new EnvironmentRepository();
-  private testflowService = new TestflowService();
-  private testflowRepository = new TestflowRepository();
 
   constructor() {}
 
