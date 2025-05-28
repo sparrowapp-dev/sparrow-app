@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from "svelte";
   import { fly, fade } from "svelte/transition";
-  import { Navigator } from "@sparrow/library/ui";
+  import { Button, Modal, Navigator } from "@sparrow/library/ui";
   import {
     ChannelRegular,
     OpenAIVectorIcon,
@@ -15,6 +15,8 @@
   export let selectedModelProvider: string = "openai";
   export let selectedModel: string = "gpt-4o";
   export let isOpen: boolean = false;
+  let isModelProviderChangeAlertPopupOpen = false;
+  let nextModelSelectRequest;
 
   // Props
   export let onSelect: (
@@ -102,7 +104,7 @@
 
   // Handle model selection
   const handleModelSelection = (model: { name: string; id: string }) => {
-    selectedModel = model.id;
+    // selectedModel = model.id;
     onSelect(activeProvider.id, model);
     isOpen = false;
     dispatch("close");
@@ -150,7 +152,14 @@
               class=" h-10 model-card p-2 {selectedModel === model.id
                 ? 'selected-card'
                 : ''}"
-              on:click={() => handleModelSelection(model)}
+              on:click={() => {
+                if (activeProvider.id !== selectedModelProvider) {
+                  isModelProviderChangeAlertPopupOpen = true;
+                  nextModelSelectRequest = model;
+                  return;
+                }
+                handleModelSelection(model);
+              }}
             >
               <div
                 class="p-0 d-flex align-items-center justify-content-between"
@@ -192,6 +201,52 @@
     </div>
   </div>
 {/if}
+
+<Modal
+  title={"Confirm Model Change!"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isModelProviderChangeAlertPopupOpen}
+  width={"42%"}
+  handleModalState={() => {
+    isModelProviderChangeAlertPopupOpen = false;
+    nextModelSelectRequest = null;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p class="lightGray text-fs-14" style="color: lightGray;">
+      Changing the model will reset your current conversation and reset any
+      model-specific configurations. This action cannot be undone. Are you sure
+      you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isModelProviderChangeAlertPopupOpen = false;
+        nextModelSelectRequest = null;
+      }}
+    ></Button>
+    <Button
+      title={"Proceed"}
+      size={"medium"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"95px"}
+      disable={false}
+      onClick={() => {
+        handleModelSelection(nextModelSelectRequest);
+        isModelProviderChangeAlertPopupOpen = false;
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <style>
   /* Custom styles for elements that Bootstrap can't easily handle */

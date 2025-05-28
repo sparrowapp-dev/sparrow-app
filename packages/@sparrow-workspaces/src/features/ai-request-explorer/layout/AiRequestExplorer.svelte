@@ -91,6 +91,12 @@
     }, 0);
   });
   onDestroy(() => {});
+
+  $: {
+    if ($tab) {
+      console.log("tab : ", $tab?.property?.aiRequest);
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -116,6 +122,7 @@
         {isGuestUser}
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
+        {onUpdateAiConversation}
       />
 
       <div
