@@ -163,7 +163,7 @@
             >
               <Button
                 startIcon={LinkRegular}
-                type={"secondary"}
+                type={"teritiary-regular"}
                 size={"small"}
                 onClick={async () => {
                   await onCopyLink(workspace._id);
@@ -186,7 +186,7 @@
           bind:this={workspaceTabWrapper}
         >
           <Button
-            type={"secondary"}
+            type={"teritiary-regular"}
             size={"small"}
             startIcon={MoreVerticalRegular}
             onClick={(e) => rightClickContextMenu(e)}
@@ -371,7 +371,6 @@
     background-color: transparent;
   }
   .public-link-icon {
-    padding: 2px;
     visibility: hidden;
     background-color: transparent;
   }
@@ -384,16 +383,8 @@
   .threedot-icon-container:active {
     background-color: var(--bg-tertiary-800) !important;
   }
-  .public-link-icon:hover {
-    background-color: var(--bg-ds-surface-100) !important;
-    border-radius: 2px;
-    padding: 2px;
-  }
   .workspace-card-outer:hover .public-link-icon {
     visibility: visible;
-  }
-  .public-link-icon:active {
-    background-color: var(--bg-ds-surface-100) !important;
   }
   .public-link-txt {
     visibility: hidden;
