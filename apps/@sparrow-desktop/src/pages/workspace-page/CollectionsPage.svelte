@@ -564,7 +564,7 @@
       if (prevWorkspaceId !== value._id) {
         isInitialDataLoading = true;
         activeTab = undefined;
-        await handleRefreshApicalls(value?._id);
+        handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {

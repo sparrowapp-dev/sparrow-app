@@ -6,8 +6,10 @@
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Alert, Button } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
-
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { apiKeyInstructions } from "@sparrow/common/types/workspace/ai-request-dto";
+  import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
+
   export let auth;
   export let environmentVariables;
   export let requestStateAuth;
@@ -17,7 +19,7 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
-  export let selectedModelProvider = "anthropic";
+  export let selectedModelProvider: AiModelProviderEnum;
 
   // Get instructions for the selected provider
   $: currentInstructions = apiKeyInstructions[selectedModelProvider];
@@ -33,99 +35,6 @@
       destination: aiAuthNavigation,
     });
   };
-
-  // API Key generation instructions for different providers
-  const apiKeyInstructions = {
-    openai: {
-      heading: "OpenAI API Key",
-      instructions: [
-        {
-          text: "Go to ",
-          link: {
-            url: "https://platform.openai.com/api-keys",
-            text: "OpenAI API Keys page",
-          },
-        },
-        {
-          text: "Click on ",
-          bold: "Create new secret key",
-          suffix: ".",
-        },
-        {
-          text: "Copy the key and paste it below.",
-        },
-      ],
-    },
-    anthropic: {
-      heading: "Anthropic API Key",
-      instructions: [
-        {
-          text: "Log in to the ",
-          link: {
-            url: "https://console.anthropic.com/",
-            text: "Console",
-          },
-        },
-        {
-          text: "Navigate to the API Keys section within Account Settings",
-        },
-        {
-          text: "Click the Create Key button on the top right",
-        },
-        {
-          text: 'Give the key a descriptive name (e.g., "My_First_Claude_App")',
-        },
-        {
-          text: "Click Create Key.",
-        },
-      ],
-    },
-    gemini: {
-      heading: "Google Gemini API Key",
-      instructions: [
-        {
-          text: "Go to ",
-          link: {
-            url: "https://aistudio.google.com/app/apikey",
-            text: "Google AI Studio",
-          },
-        },
-        {
-          text: "Click on Create API Key",
-        },
-        {
-          text: "Select your Google Cloud project or create a new one",
-        },
-        {
-          text: "Copy the generated API key and paste it below",
-        },
-      ],
-    },
-    deepseek: {
-      heading: "DeepSeek API Key",
-      instructions: [
-        {
-          text: "Go to ",
-          link: {
-            url: "https://platform.deepseek.com/api_keys",
-            text: "DeepSeek API Keys page",
-          },
-        },
-        {
-          text: "Sign in to your DeepSeek account",
-        },
-        {
-          text: "Click on Create new API key",
-        },
-        {
-          text: "Give your key a descriptive name",
-        },
-        {
-          text: "Copy the generated key and paste it below",
-        },
-      ],
-    },
-  };
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -136,10 +45,10 @@
           <WithSelect
             id={"hash999"}
             data={[
-              {
-                name: "No Auth",
-                id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
-              },
+              // {
+              //   name: "No Auth",
+              //   id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+              // },
               // {
               //   name: "Inherit Auth",
               //   id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,
@@ -179,36 +88,6 @@
       Add the API key of your selected AI model.
     </p>
   </div>
-
-  <!-- <Alert
-    heading="OpenAI API Key"
-    description=""
-    varient="info"
-    ctaShow={false}
-    containerWidth={""}
-    closeIconRequired={false}
-    onClickClose={() => {}}
-  >
-    <ul
-      slot="body-slot"
-      class="alert-bullet-list text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150 ps-3 mt-1 me-0 mb-2 ms-1"
-    >
-      <li class="alert-bullet-item position-relative">
-        Go to <a
-          href="https://platform.openai.com/api-keys"
-          target="_blank"
-          class="alert-link text-ds-font-size-12"
-          >OpenAI API Keys page<span class="external-arrow">↗</span></a
-        >.
-      </li>
-      <li class="alert-bullet-item position-relative">
-        Click on <strong>Create new secret key</strong>.
-      </li>
-      <li class="alert-bullet-item position-relative">
-        Copy the key and paste it below.
-      </li>
-    </ul>
-  </Alert> -->
 
   <Alert
     heading={currentInstructions.heading}

@@ -1,13 +1,10 @@
 import {
     AiRequestAuthTypeBaseEnum,
     AiModelProviderEnum,
-    type AIConfig,
-    type AIModelVariant
-
+    type AIModelVariant,
+    type AiConfigurations
 } from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
-
-
 
 ///////////////////////////////////////////////////////////////////
 //                   AI Request Interface
@@ -27,9 +24,6 @@ export enum MessageTypeEnum {
 export enum UntrackedItemsEnum {
     UNTRACKED = "UNTRACKED-",
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////
 //            Managing AI Request Tab State
@@ -64,6 +58,10 @@ export interface IsSaveRequestInProgressWrapper {
 
 export interface IsChatbotActive {
     isChatbotActive: boolean;
+}
+
+export interface IsChatAutoClearActive {
+    isChatAutoClearActive: boolean;
 }
 
 export interface IsChatbotSuggestionsActive {
@@ -106,7 +104,7 @@ export interface AiSystemPromptWrapper {
 }
 
 export interface AiConfigurationsWrapper {
-    Configurations: AIConfig;
+    configurations: AiConfigurations;
 }
 
 export interface ResponseStatusWrapper {
@@ -220,6 +218,7 @@ export interface State
     IsSaveDescriptionInProgressWrapper,
     IsSaveRequestInProgressWrapper,
     IsChatbotActive,
+    IsChatAutoClearActive,
     IsChatbotSuggestionsActive,
     IsChatbotGeneratingResponse { }
 
@@ -233,5 +232,6 @@ export interface StatePartial
     Partial<IsSaveDescriptionInProgressWrapper>,
     Partial<IsSaveRequestInProgressWrapper>,
     Partial<IsChatbotActive>,
+    Partial<IsChatAutoClearActive>,
     Partial<IsChatbotSuggestionsActive>,
     Partial<IsChatbotGeneratingResponse> { }
