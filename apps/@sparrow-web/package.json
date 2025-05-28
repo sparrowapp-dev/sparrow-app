@@ -49,7 +49,8 @@
     "posthog-js": "1.236.7",
     "@sparrow/library": "*",
     "@sparrow/common": "*",
-    "@sparrow/teams": "*"
+    "@sparrow/teams": "*",
+    "@sparrow/marketplace": "*"
   },
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [

@@ -153,7 +153,7 @@
       icon: StackIcon,
       nav: (item) => handleGlobalSearchEnvironmentNavigation(item),
       getName: (item) => item.title,
-      getPath: (item) => "",
+      getPath: (item) => item.path || "",
     },
     flows: {
       items: filteredTestflows,
@@ -162,7 +162,7 @@
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
-      getPath: (item) => item.description || "",
+      getPath: (item) => item.path || "",
     },
   };
 

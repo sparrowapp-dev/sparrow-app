@@ -634,11 +634,15 @@ const waitForAbort = (signal: AbortSignal): Promise<never> => {
       return reject(new Error("Aborted before starting"));
     }
 
-    signal?.addEventListener("abort", () => {
+    signal?.addEventListener(
+      "abort",
+      () => {
         reject(new Error("Aborted during request"));
-    }, { once: true });
+      },
+      { once: true },
+    );
   });
-}
+};
 
 /**
  *
@@ -665,11 +669,14 @@ const makeHttpRequestV2 = async (
     let response;
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
-      response = await Promise.race([axios({
+      response = await Promise.race([
+        axios({
           data: { url, method, headers, body, contentType },
           url: proxyUrl,
           method: "POST",
-      }), waitForAbort(signal)]); 
+        }),
+        waitForAbort(signal),
+      ]);
     } else {
       try {
         let jsonHeader;
@@ -730,23 +737,52 @@ const makeHttpRequestV2 = async (
           headersObject["Content-Type"] = contentType;
         }
 
-        const axiosResponse = await Promise.race([axios({
+        const axiosResponse = await Promise.race([
+          axios({
             method,
             url,
             data: requestData || {},
             headers: { ...headersObject },
+            responseType: "arraybuffer",
             validateStatus: function (status) {
               return true;
             },
-        }), waitForAbort(signal)]);
+          }),
+          waitForAbort(signal),
+        ]);
+        let responseData = "";
+        const responseContentType = axiosResponse.headers["content-type"] || "";
+        if (responseContentType.startsWith("image/")) {
+          const base64 = btoa(
+            new Uint8Array(axiosResponse.data).reduce(
+              (data, byte) => data + String.fromCharCode(byte),
+              "",
+            ),
+          );
 
-        response = {
-          data: {
-            status: `${axiosResponse.status} ${axiosResponse.statusText}`,
-            data: axiosResponse.data,
-            headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
-          },
-        };
+          responseData = `data:${contentType};base64,${base64}`;
+
+          response = {
+            data: {
+              status: `${axiosResponse.status} ${axiosResponse.statusText || new StatusCode().getText(axiosResponse.status)}`,
+              data: `${responseData}`,
+              headers: Object.fromEntries(
+                Object.entries(axiosResponse.headers),
+              ),
+            },
+          };
+        } else {
+          responseData = new TextDecoder("utf-8").decode(axiosResponse.data);
+          response = {
+            data: {
+              status: `${axiosResponse.status} ${new StatusCode().getText(axiosResponse.status)}`,
+              data: responseData,
+              headers: Object.fromEntries(
+                Object.entries(axiosResponse.headers),
+              ),
+            },
+          };
+        }
       } catch (axiosError: any) {
         if (signal?.aborted) {
           throw new Error();
