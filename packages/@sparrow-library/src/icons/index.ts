@@ -262,3 +262,4 @@ export { default as ArrowUndoRegular } from "./ArrowUndoRegular.svelte";
 export { default as HistoryIcon2 } from "./HistoryIcon.svelte";
 export { default as BetaVectorIcon } from "./BetaVectorIcon.svelte";
 export { default as CartRegular } from "./CartRegular.svelte";
+export {default as ShareMultipleRegular } from "./ShareMultipleRegular.svelte";

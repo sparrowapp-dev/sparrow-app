@@ -641,6 +641,7 @@ const waitForAbort = (signal: AbortSignal): Promise<never> => {
       },
       { once: true },
     );
+
   });
 };
 
@@ -669,14 +670,12 @@ const makeHttpRequestV2 = async (
     let response;
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
-      response = await Promise.race([
-        axios({
+      response = await Promise.race([axios({
           data: { url, method, headers, body, contentType },
           url: proxyUrl,
           method: "POST",
-        }),
-        waitForAbort(signal),
-      ]);
+      }), waitForAbort(signal)]); 
+
     } else {
       try {
         let jsonHeader;
