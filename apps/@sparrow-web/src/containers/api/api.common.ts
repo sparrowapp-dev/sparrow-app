@@ -731,24 +731,6 @@ const makeHttpRequestV2 = async (
         }
 
         const axiosResponse = await Promise.race([axios({
-<<<<<<< HEAD
-            method,
-            url,
-            data: requestData || {},
-            headers: { ...headersObject },
-            validateStatus: function (status) {
-              return true;
-            },
-        }), waitForAbort(signal)]);
-
-        response = {
-          data: {
-            status: `${axiosResponse.status} ${axiosResponse.statusText}`,
-            data: axiosResponse.data,
-            headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
-          },
-        };
-=======
           method,
           url,
           data: requestData || {},
@@ -787,7 +769,6 @@ const makeHttpRequestV2 = async (
         }
 
         
->>>>>>> development
       } catch (axiosError: any) {
         if (signal?.aborted) {
           throw new Error();
