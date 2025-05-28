@@ -27,20 +27,30 @@ export class WorkspaceRepository {
     return RxDB.getInstance().rxdb.workspace.find().$;
   };
 
+  public getWorkspaceId = (workspaceId: string): WorkspaceDocument => {
+    return RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+  };
+
   public getWorkspacesDocs = (): WorkspaceDocument[] => {
     return RxDB.getInstance().rxdb.workspace.find().exec();
   };
 
-    /**
+  /**
    * Get only public workspaces (workspaceType === 'PUBLIC')
    */
-    public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
-      return RxDB.getInstance().rxdb.workspace.find({
-        selector: {
-          workspaceType: "PUBLIC",
-        },
-      }).$;
-    };
+  public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        workspaceType: "PUBLIC",
+      },
+    }).$;
+  };
 
   /**
    * get filtered workspaces

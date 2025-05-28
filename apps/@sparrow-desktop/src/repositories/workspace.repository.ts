@@ -32,6 +32,16 @@ export class WorkspaceRepository {
     return RxDB.getInstance().rxdb.workspace.find().exec();
   };
 
+  public getWorkspaceId = (workspaceId: string): WorkspaceDocument => {
+    return RxDB.getInstance()
+      .rxdb.workspace.findOne({
+        selector: {
+          _id: workspaceId,
+        },
+      })
+      .exec();
+  };
+
   /**
    * Get only public workspaces (workspaceType === 'PUBLIC')
    */

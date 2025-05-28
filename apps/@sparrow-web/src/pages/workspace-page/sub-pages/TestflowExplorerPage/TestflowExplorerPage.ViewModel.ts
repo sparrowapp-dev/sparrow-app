@@ -1656,7 +1656,6 @@ export class TestflowExplorerPageViewModel {
   public userLimitBlockPerTestflow = async (workspaceId: string) => {
     const data = await this.workspaceService.fetchWorkspacePlan(
       workspaceId,
-      constants.API_URL,
     );
     return data?.blocksPerTestflow?.value;
   };

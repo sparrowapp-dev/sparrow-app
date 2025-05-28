@@ -81,6 +81,18 @@ export const teamSchemaLiteral = {
       type: "boolean",
       default: false,
     },
+    plan: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+        },
+        name: {
+          type: "string",
+        },
+      },
+      required: ["id", "name"],
+    },
     isOpen: {
       type: "boolean",
       default: false,
