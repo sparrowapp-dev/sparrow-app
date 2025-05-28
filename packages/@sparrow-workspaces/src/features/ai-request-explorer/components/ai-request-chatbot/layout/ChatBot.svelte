@@ -39,6 +39,8 @@
               isLiked: false,
               isDisliked: false,
               status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
             },
           ]
         : [
@@ -50,6 +52,8 @@
               isLiked: false,
               isDisliked: false,
               status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
             },
           ];
       onUpdateAiConversation(updatedConverstaion);
@@ -101,7 +105,6 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
       onChatClear={clearChat}
       isChatAutoClearActive={$tab?.property?.aiRequest?.state
         ?.isChatAutoClearActive}
