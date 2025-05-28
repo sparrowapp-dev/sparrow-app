@@ -63,6 +63,7 @@ import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from 
 import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/http-request-base";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { MockHistoryTabAdapter } from "src/adapter/mock-history-tab";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -1639,6 +1640,18 @@ class CollectionExplorerPage {
     }
   };
 
+  public handleOpenMockHistory = (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const mockHistroyTab = new MockHistoryTabAdapter().adapt(
+      workspaceId,
+      collection.id,
+    );
+    this.tabRepository.createTab(mockHistroyTab);
+    moveNavigation("right");
+  };
+
   /**
    * Handle control of creating items
    * @param entityType :string - type of entity, collection, folder or request
@@ -1682,6 +1695,12 @@ class CollectionExplorerPage {
         break;
       case "graphqlCollection":
         await this.handleCreateGraphqlInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "mockHistory":
+        this.handleOpenMockHistory(
           args.collection.workspaceId,
           args.collection as CollectionDto,
         );

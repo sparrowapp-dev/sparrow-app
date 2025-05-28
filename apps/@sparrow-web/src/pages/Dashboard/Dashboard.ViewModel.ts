@@ -35,6 +35,7 @@ import {
   GraphqlTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
+  TestflowTabAdapter,
   WorkspaceTabAdapter,
 } from "../../adapter";
 import { navigate } from "svelte-navigator";
@@ -685,26 +686,14 @@ export class DashboardViewModel {
   };
 
   public switchAndCreateTestflowTab = async (testflow: any) => {
-    const path = {
-      workspaceId: testflow.workspaceId,
-      testflowId: testflow._id,
-      collectionId: testflow.collectionId || "",
-      folderId: testflow.folderId || "",
-    };
     const testflowData = await this.testflowRepository.readTestflow(
       testflow._id,
     );
 
-    const tab = new InitTestflowTab(testflow._id, testflow.workspaceId);
-    tab.updateName(testflowData.name);
-    tab.updateDescription(testflowData.description || "");
-    tab.updatePath(path);
-    tab.setNodes(testflowData.nodes);
-    tab.setEdges(testflowData.edges);
-    tab.updateIsSave(true);
+    const testflowTab = new TestflowTabAdapter().adapt(testflow.workspaceId, testflowData.toMutableJSON());
 
     await new Sleep().setTime(100).exec();
-    await this.tabRepository.createTab(tab.getValue(), testflow.workspaceId);
+    await this.tabRepository.createTab(testflowTab, testflow.workspaceId);
     moveNavigation("right");
   };
 
@@ -1126,15 +1115,37 @@ export class DashboardViewModel {
     workspace = workspace.map((_value) => _value._data);
 
     let testflow = await this.searchTestflow(searchText);
-    testflow = testflow.map((_value) => _value._data);
-
-    let environment = await this.searchEnvironment(searchText);
-    environment = environment.map((_environment) => ({
-      title: _environment.name,
-      workspace: _environment.workspaceId,
-      id: _environment.id,
-      variable: _environment.variable,
-    }));
+    testflow = testflow.map((_value) => 
+      {
+        const workspaceDetails = workspaceMap[_value._data.workspaceId];
+          const path: string[] = [];
+          if (workspaceDetails) {
+            path.push(workspaceDetails.teamName);
+            path.push(workspaceDetails.workspaceName);
+          }
+        return {
+          ..._value._data,
+          path: this.createPath(path),
+        }
+  
+      }  
+      );
+      
+      let environment = await this.searchEnvironment(searchText);
+      environment = environment.map((_environment) => {
+        const workspaceDetails = workspaceMap[_value._data.workspaceId];
+        const path: string[] = [];
+        if (workspaceDetails) {
+          path.push(workspaceDetails.teamName);
+          path.push(workspaceDetails.workspaceName);
+        }
+        return {
+          title: _environment.name,
+          workspace: _environment.workspaceId,
+          id: _environment.id,
+          variable: _environment.variable,
+          path: this.createPath(path),
+      }});
 
     return { collection, folder, file, workspace, testflow, environment };
   }

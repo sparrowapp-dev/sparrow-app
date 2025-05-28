@@ -731,6 +731,7 @@ const makeHttpRequestV2 = async (
         }
 
         const axiosResponse = await Promise.race([axios({
+<<<<<<< HEAD
             method,
             url,
             data: requestData || {},
@@ -747,6 +748,46 @@ const makeHttpRequestV2 = async (
             headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
           },
         };
+=======
+          method,
+          url,
+          data: requestData || {},
+          headers: { ...headersObject },
+          responseType: 'arraybuffer',
+          validateStatus: function (status) {
+            return true;
+          },
+        }), waitForAbort(signal)]);
+        let responseData = "";
+        const responseContentType = axiosResponse.headers['content-type'] || '';
+        if(responseContentType.startsWith('image/')){
+          const base64 = btoa(
+            new Uint8Array(axiosResponse.data)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+      
+          responseData = `data:${contentType};base64,${base64}`;
+
+          response = {
+            data: {
+              status: `${axiosResponse.status} ${axiosResponse.statusText || new StatusCode().getText(axiosResponse.status)}`,
+              data: `${responseData}`,
+              headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+            },
+          };
+        }else{
+          responseData = new TextDecoder('utf-8').decode(axiosResponse.data);
+          response = {
+            data: {
+              status: `${axiosResponse.status} ${new StatusCode().getText(axiosResponse.status)}`,
+              data: responseData,
+              headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+            },
+          };
+        }
+
+        
+>>>>>>> development
       } catch (axiosError: any) {
         if (signal?.aborted) {
           throw new Error();

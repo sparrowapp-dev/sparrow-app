@@ -13,7 +13,8 @@
     "./packages/@sparrow-common",
     "./packages/@sparrow-teams",
     "./packages/@sparrow-workspaces",
-    "./packages/@sparrow-support"
+    "./packages/@sparrow-support",
+    "./packages/@sparrow-marketplace"
   ],
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
@@ -46,6 +47,8 @@
     "support-pretty": "yarn workspace @sparrow/support pretty",
     "common-lint": "yarn workspace @sparrow/common lint",
     "common-pretty": "yarn workspace @sparrow/common pretty",
+    "marketplace-lint": "yarn workspace @sparrow/marketplace lint",
+    "marketplace-pretty": "yarn workspace @sparrow/marketplace pretty",
     "postinstall": "husky install"
   },
   "dependencies": {
