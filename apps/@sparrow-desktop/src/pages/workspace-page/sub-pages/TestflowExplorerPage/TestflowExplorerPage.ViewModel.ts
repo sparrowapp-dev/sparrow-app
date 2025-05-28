@@ -57,12 +57,14 @@ import { isGuestUserActive } from "@app/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { WorkspaceService } from "@app/services/workspace.service";
 import { open } from "@tauri-apps/plugin-shell";
 
 export class TestflowExplorerPageViewModel {
  private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
   private collectionRepository = new CollectionRepository();
+  private workspaceService = new WorkspaceService();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
@@ -1635,5 +1637,16 @@ export class TestflowExplorerPageViewModel {
   public redirectDocsTestflow = async () => {
     await open(constants.TESTFLOW_DOCS_URL);
     return;
+  };
+
+  /**
+   * @description - This function will provide the block limit to users according to their plan.
+   */
+  public userLimitBlockPerTestflow = async (workspaceId: string) => {
+    const data = await this.workspaceService.fetchWorkspacePlan(
+      workspaceId,
+      constants.API_URL,
+    );
+    return data?.blocksPerTestflow?.value;
   };
 }

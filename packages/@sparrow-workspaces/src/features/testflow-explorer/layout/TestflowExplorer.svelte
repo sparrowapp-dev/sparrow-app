@@ -126,6 +126,7 @@
   export let onPreviewExpression;
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
+  export let planLimitTestFlowBlocks: number = 5;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -749,7 +750,12 @@
     _direction = "add-block-after",
   ) => {
     if (!_id) return;
-
+    if ($nodes.length === planLimitTestFlowBlocks + 1) {
+      notifications.warning(
+        `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
+      );
+      return;
+    }
     let requestData;
     if (_requestData) {
       requestData = await createCustomRequestObject(
@@ -1089,6 +1095,9 @@
       if (!isIdExist) {
         selectedNode = undefined;
       }
+      if (testflowStore?.history.length > 0) {
+        handleTestFlowHistoryLimit();
+      }
     }
   }
 
@@ -1376,6 +1385,16 @@
       });
     }
   };
+
+  const handleTestFlowHistoryLimit = () => {
+    if (testflowStore?.history) {
+      const updateHistoryItems = testflowStore.history.slice(
+        0,
+        planLimitTestFlowBlocks,
+      );
+      testflowStore.history = updateHistoryItems;
+    }
+  };
 </script>
 
 <div
@@ -1484,6 +1503,7 @@
           testflowName={$tab?.name}
           {toggleHistoryDetails}
           {toggleHistoryContainer}
+          {planLimitTestFlowBlocks}
         />
       </div>
     </div>
