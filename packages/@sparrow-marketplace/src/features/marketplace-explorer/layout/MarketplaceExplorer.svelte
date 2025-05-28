@@ -13,6 +13,7 @@
   export let onCopyLink;
   let cardType = "marketplace";
   export let workspaceList: WorkspaceDocument[] = [];
+  export let onSwitchWorkspace;
   export let isWebEnvironment;
   export let onSearchWorkspaces = (name: string, page?: number) => {};
   export let isInitialDataLoading;
@@ -173,7 +174,7 @@
             {#each workspaceList as workspace}
               <WorkspaceGrid
                 {workspace}
-                onSwitchWorkspace={() => {}}
+                {onSwitchWorkspace}
                 {onCopyLink}
                 {isWebEnvironment}
                 {cardType}

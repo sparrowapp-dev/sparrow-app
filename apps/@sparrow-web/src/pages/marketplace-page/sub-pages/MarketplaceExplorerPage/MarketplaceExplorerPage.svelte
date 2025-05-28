@@ -93,6 +93,20 @@
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
   };
+
+  const handleSwitchWorkspace = (workspaceId: string) => {
+    // Find the workspace data by ID
+    const workspaceData = workspaces.find(
+      (workspace) => workspace._id === workspaceId,
+    );
+
+    if (workspaceData) {
+      // Call the ViewModel function and pass the workspace data
+      _viewModel.addAndSwitchWorkspace(workspaceData);
+    } else {
+      console.error(`Workspace with ID ${workspaceId} not found.`);
+    }
+  };
 </script>
 
 <MarketplaceExplorer
@@ -102,6 +116,7 @@
   {totalPages}
   {isLoading}
   onCopyLink={handleCopyPublicWorkspaceLink}
+  onSwitchWorkspace={handleSwitchWorkspace}
   {isWebEnvironment}
   {isSearchMode}
   onSearchWorkspaces={handleSearch}

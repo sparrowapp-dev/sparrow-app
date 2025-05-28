@@ -38,7 +38,11 @@ import type {
 //Emuns
 
 import { ItemType, UntrackedItems } from "@sparrow/common/enums/item-type.enum";
-import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
+import {
+  ContentTypeEnum,
+  ResponseStatusCode,
+  WorkspaceType,
+} from "@sparrow/common/enums";
 //-----
 
 import { moveNavigation } from "@sparrow/common/utils/navigation";
@@ -206,10 +210,21 @@ export default class CollectionsViewModel {
     };
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const res = await this.collectionService.fetchCollection(
-      workspaceId,
-      baseUrl,
-    );
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let res;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      res = await this.collectionService.fetchPublicCollection(
+        workspaceId,
+        constants.API_URL,
+      );
+    } else {
+      res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
+    }
     if (res?.isSuccessful && res?.data?.data) {
       const collections = res.data.data;
       await this.collectionRepository.bulkInsertData(
