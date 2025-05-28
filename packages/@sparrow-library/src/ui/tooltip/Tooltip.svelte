@@ -299,7 +299,7 @@
     isDelayed = false;
   }}
   bind:this={tooltipWrapper}
-  class={"tooltip-wrapper"}
+  class={""}
 >
   <slot />
 </div>
@@ -327,9 +327,9 @@
     transform: translateX(-100%) scale(1);
   }
 
-  .tooltip-wrapper {
+  /* .tooltip-wrapper {
     width: fit-content;
-  }
+  } */
 
   .bottom-left {
     transform: translateX(0) scale(0.5);

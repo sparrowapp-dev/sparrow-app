@@ -171,7 +171,7 @@
 
 <style>
   .section-content {
-    max-height: 240px;
+    max-height: 200px;
     overflow-y: auto;
     margin: 0 12px;
   }

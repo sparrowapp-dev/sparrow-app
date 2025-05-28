@@ -108,6 +108,7 @@
   import { onDestroy, onMount } from "svelte";
   import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   /**
    * Role of user in active workspace
@@ -117,6 +118,7 @@
   export let onSaveCollection;
   export let onItemCreated;
   export let onUpdateRunningState;
+  export let userRole;
 
   /**
    * Local variables
@@ -675,6 +677,8 @@
                 startIcon={collection?.isMockCollectionRunning
                   ? RecordStopRegular
                   : PlayCircleRegular}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                  isSharedWorkspace}
               />
             </div>
           </div>
