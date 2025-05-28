@@ -4,10 +4,14 @@ import { WorkspaceService } from "@app/services/workspace.service";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import constants from "@app/constants/constants";
 import { getClientUser } from "@app/utils/jwt";
+import { TabRepository } from "src/repositories/tab.repository";
+import { navigate } from "svelte-navigator";
+import { WorkspaceTabAdapter } from "src/adapter";
 
 class MarketplaceExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private workspaceService = new WorkspaceService();
+  private tabRepository = new TabRepository();
 
   constructor() {}
 
@@ -33,59 +37,93 @@ class MarketplaceExplorerViewModel {
   public fetchPublicWorkpsace = async (currentPage) => {
     const workspaces =
       await this.workspaceService.fetchPublicWorkspaceList(currentPage);
-    if (workspaces?.isSuccessful) {
-      const workspaceList = workspaces?.data?.data.workspaces;
-      const clientUser = getClientUser();
+    return workspaces;
+  };
 
-      workspaceList.forEach(async (workspaceData) => {
-        const existingWorkspace = await this.workspaceRepository.readWorkspace(
-          workspaceData._id,
-        );
-        if (!existingWorkspace) {
-          const {
-            _id,
-            name,
-            description,
-            workspaceType,
-            users,
-            admins,
-            team,
-            createdAt,
-            createdBy,
-            collection,
-            updatedAt,
-            updatedBy,
-            isNewInvite,
-          } = workspaceData;
-          const item = {
-            _id,
-            name,
-            description,
-            workspaceType: workspaceType,
-            isShared: true,
-            users: [
-              {
-                email: clientUser?.email,
-                id: clientUser?.id,
-                name: clientUser?.name,
-                role: "viewer",
-              },
-            ],
-            collections: collection ? collection : [],
-            admins: admins,
-            team,
-            environmentId: "",
-            isActiveWorkspace: false,
-            createdAt,
-            createdBy,
-            updatedAt,
-            updatedBy,
-            isNewInvite,
-          };
-          await this.workspaceRepository.addWorkspace(item);
-        }
-      });
+  /**
+   * Adds a workspace to repository and switches to it
+   * @param workspace - Workspace document to add and switch to
+   */
+  public addAndSwitchWorkspace = async (workspace) => {
+    const clientUser = getClientUser();
+    // Check if workspace already exists
+    const existingWorkspace = await this.workspaceRepository.readWorkspace(
+      workspace._id,
+    );
+
+    // If workspace doesn't exist, add it to repository
+    if (!existingWorkspace) {
+      const {
+        _id,
+        name,
+        description,
+        workspaceType,
+        users,
+        admins,
+        team,
+        createdAt,
+        createdBy,
+        collection,
+        updatedAt,
+        updatedBy,
+        isNewInvite,
+      } = workspace;
+
+      const item = {
+        _id,
+        name,
+        description,
+        workspaceType: workspaceType,
+        isShared: true,
+        users: [
+          {
+            email: clientUser?.email,
+            id: clientUser?.id,
+            name: clientUser?.name,
+            role: "viewer",
+          },
+        ],
+        collections: collection ? collection : [],
+        admins: admins,
+        team: {
+          teamId: team.id,
+          teamName: team.name,
+          hubUrl: team?.hubUrl || "",
+        },
+        environmentId: "",
+        isActiveWorkspace: false,
+        createdAt,
+        createdBy,
+        updatedAt,
+        updatedBy,
+        isNewInvite,
+      };
+
+      await this.workspaceRepository.addWorkspace(item);
     }
+
+    // Switch to the workspace
+    const workspaceData =
+      existingWorkspace ||
+      (await this.workspaceRepository.readWorkspace(workspace._id));
+
+    const initWorkspaceTab = new WorkspaceTabAdapter().adapt(
+      workspace._id,
+      workspaceData,
+    );
+    await this.tabRepository.createTab(initWorkspaceTab, workspace._id);
+    await this.workspaceRepository.setActiveWorkspace(workspace._id);
+    navigate("collections");
+  };
+
+  public searchPublicWorkspaces = async (
+    searchTerm: string,
+    page: number = 1,
+  ) => {
+    const workspaces = await this.workspaceService.searchPublicWorkspaces(
+      searchTerm,
+      page,
+    );
     return workspaces;
   };
 }

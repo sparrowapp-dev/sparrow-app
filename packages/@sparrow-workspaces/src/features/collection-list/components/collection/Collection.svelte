@@ -334,7 +334,6 @@
         onCompareCollection(collection.id)
           .then((result) => {
             activeSyncChanges = result;
-            console.log("changes ---->", activeSyncChanges);
             if (activeSyncChanges.percentChange > 0) {
               // isSyncChangesAvailable = true;
               updateActiveSyncStates(collection.id, {

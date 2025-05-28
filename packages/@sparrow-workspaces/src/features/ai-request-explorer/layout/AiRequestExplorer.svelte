@@ -148,6 +148,8 @@
                     requestStateAuth={$tab.property.aiRequest.state
                       .aiAuthNavigation}
                     auth={$tab.property.aiRequest.auth}
+                    selectedModelProvider={$tab.property.aiRequest
+                      ?.aiModelProvider}
                     collectionAuth={$collectionAuth}
                     {onUpdateRequestState}
                     {onUpdateRequestAuth}

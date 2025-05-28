@@ -2,7 +2,7 @@ import { notifications } from "@sparrow/library/ui";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { EnvironmentService } from "../../services/environment.service";
-import { Events, UntrackedItems } from "@sparrow/common/enums";
+import { Events, UntrackedItems, WorkspaceType } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { InitTab } from "@sparrow/common/factory";
@@ -58,10 +58,25 @@ export class EnvironmentViewModel {
       return {};
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const response = await this.environmentService.fetchAllEnvironments(
-      workspaceId,
-      baseUrl,
-    );
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let response;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      response = await this.environmentService.fetchAllPublicEnvironments(
+        workspaceId,
+        constants.API_URL,
+      );
+    } else {
+      response = await this.environmentService.fetchAllEnvironments(
+        workspaceId,
+        baseUrl,
+      );
+    }
+
     if (response?.isSuccessful && response?.data?.data) {
       const environments = response.data.data;
       await this.environmentRepository.refreshEnvironment(
