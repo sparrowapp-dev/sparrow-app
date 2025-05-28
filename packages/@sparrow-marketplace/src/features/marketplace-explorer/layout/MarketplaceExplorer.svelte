@@ -2,10 +2,11 @@
   import { CartRegular } from "@sparrow/library/icons";
   import { onMount, onDestroy } from "svelte";
   import { Search } from "@sparrow/library/forms";
-  import { Button } from "@sparrow/library/ui";
-  import { SparrowMarketplaceBg } from "@sparrow/common/images";
+  import { Button, Loader } from "@sparrow/library/ui";
+  import { SparrowLogo, SparrowMarketplaceBg } from "@sparrow/common/images";
   import { WorkspaceGrid } from "@sparrow/common/components";
   import type { WorkspaceDocument } from "@app/database/database";
+  import { Debounce } from "@sparrow/common/utils";
 
   export let loadMore = () => {};
   export let isLoading = false;
@@ -14,36 +15,78 @@
   export let workspaceList: WorkspaceDocument[] = [];
   export let onSwitchWorkspace;
   export let isWebEnvironment;
+  export let onSearchWorkspaces = (name: string, page?: number) => {};
+  export let isInitialDataLoading;
 
+  let searchInput = "";
   let scrollContainer;
-  let showLoadMoreButton = true;
+  let showLoadMoreButton = false;
   export let currentPage;
   export let totalPages;
+  export let isSearchMode = false;
   let showTopOverlay = false;
   let showBottomOverlay = false;
+  let isSearchLoading = false;
 
-  // Function to check scroll position
+  const debounceInstance = new Debounce();
+  const debouncedSearch = debounceInstance.debounce(async (value: string) => {
+    await onSearchWorkspaces(value, 1);
+    isSearchLoading = false;
+  }, 300);
+
+  const handleSearch = (event: { detail: string }) => {
+    searchInput = event.detail;
+    isSearchLoading = true;
+    debouncedSearch(searchInput);
+  };
+
+  const shouldShowLoadMore = () => {
+    return currentPage < totalPages && workspaceList.length > 0 && !isLoading;
+  };
+
   const handleScroll = () => {
     if (!scrollContainer) return;
 
     const scrollPosition = scrollContainer.scrollTop;
     const scrollHeight = scrollContainer.scrollHeight;
     const clientHeight = scrollContainer.clientHeight;
+    if (scrollHeight <= clientHeight) {
+      showLoadMoreButton = shouldShowLoadMore();
+      return;
+    }
 
-    // Show button when scrolled halfway through content
     const scrollPercentage = scrollPosition / (scrollHeight - clientHeight);
     showTopOverlay = scrollPosition > 30;
     showBottomOverlay = scrollPercentage >= 0.5;
-    showLoadMoreButton = scrollPercentage >= 0.9 && currentPage < totalPages;
+    showLoadMoreButton = scrollPercentage >= 0.7 && shouldShowLoadMore();
   };
+
   const handleLoadMoreClick = () => {
-    showLoadMoreButton = false;
     loadMore();
   };
+
+  $: {
+    if (scrollContainer) {
+      setTimeout(() => {
+        handleScroll();
+      }, 0);
+    } else if (workspaceList.length > 0) {
+      showLoadMoreButton = shouldShowLoadMore();
+    }
+  }
+
+  $: if (workspaceList) {
+    setTimeout(() => {
+      if (scrollContainer) {
+        handleScroll();
+      }
+    }, 100);
+  }
 
   onMount(() => {
     if (scrollContainer) {
       scrollContainer.addEventListener("scroll", handleScroll);
+      handleScroll();
     }
   });
 
@@ -54,76 +97,109 @@
   });
 </script>
 
-<div class="d-flex flex-row justify-content-between image-wrapper">
+<div
+  class="d-flex flex-row justify-content-between image-wrapper"
+  style="width: calc(100% - 270px);"
+>
   <img src={SparrowMarketplaceBg} alt="Marketplace Background" class="bg-img" />
   <div
     class="d-flex flex-column flex-grow-1 content"
     style="gap: 24px; width: 100%;
       height: calc(100vh - 45px);"
   >
-    <div
-      class="d-flex flex-row text-ds-font-size-24 text-ds-font-weight-semi-bold"
-      style="color: var(--text-ds-neutral-50); padding-left:17px;"
-    >
-      <div class="d-flex" style="padding:4px; gap: 4px;">
-        <CartRegular size="24px" />
-        <span>MarketPlace</span>
+    {#if isInitialDataLoading}
+      <div
+        class="d-flex flex-column align-items-center justify-content-center"
+        style="width: 100%; height: 100%;"
+      >
+        <Loader loaderSize={"32px"} />
       </div>
-    </div>
-    <div class="d-flex mx-auto">
-      <Search
-        variant="primary-gradient"
-        id="search-input"
-        customWidth={"300px"}
-        placeholder="Search workspaces in marketplace"
-      />
-    </div>
-    <div
-      bind:this={scrollContainer}
-      class="d-flex flex-wrap sparrow-thin-scrollbar"
-      style="gap: 16px; padding: 24px; overflow: auto;"
-    >
-      {#if showTopOverlay}
-        <div class="overlay top-overlay"></div>
-      {/if}
-      {#if workspaceList.length === 0}
+    {:else}
+      <div
+        class="d-flex flex-row text-ds-font-size-24 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50); padding-left:17px;"
+      >
+        <div class="d-flex" style="padding:4px; gap: 4px;">
+          <CartRegular size="24px" />
+          <span>MarketPlace</span>
+        </div>
+      </div>
+      <div class="d-flex mx-auto">
+        <Search
+          variant="primary-gradient"
+          id="search-input"
+          customWidth={"300px"}
+          placeholder="Search workspaces in marketplace"
+          on:input={handleSearch}
+          value={searchInput}
+        />
+      </div>
+      {#if isSearchLoading}
         <div
           class="d-flex flex-column align-items-center justify-content-center"
           style="width: 100%; height: 100%;"
         >
-          <span class="text-ds-font-size-16 text-ds-font-weight-semi-bold">
-            No workspaces found
-          </span>
+          <Loader loaderSize={"20px"} />
+        </div>
+      {:else if workspaceList.length === 0}
+        <div
+          class="d-flex flex-column align-items-center justify-content-center"
+          style="width: 100%; height: 60%;"
+        >
+          <div class="container d-flex flex-column align-items-center">
+            <SparrowLogo width={"180px"} height={"180px"} />
+          </div>
+          <div>
+            <span
+              style="color:var(--text-ds-neutral-400); font-size: 12px; font-weight:400; text-align:center;"
+            >
+              {searchInput ? "No result found." : "No workspaces found."}
+            </span>
+          </div>
         </div>
       {:else}
-        <div class="d-flex flex-row flex-wrap" style="gap: 16px; width: 100%;">
-          {#each workspaceList as workspace}
-            <WorkspaceGrid
-              {workspace}
-              {onCopyLink}
-              {onSwitchWorkspace}
-              {isWebEnvironment}
-              {cardType}
-            />
-          {/each}
+        <div
+          bind:this={scrollContainer}
+          class="d-flex flex-wrap sparrow-thin-scrollbar"
+          style="gap: 16px; padding: 24px; overflow: auto;"
+          on:scroll={handleScroll}
+        >
+          {#if showTopOverlay}
+            <div class="overlay top-overlay"></div>
+          {/if}
+          <div
+            class="d-flex flex-row flex-wrap"
+            style="gap: 16px; width: 100%;"
+          >
+            {#each workspaceList as workspace}
+              <WorkspaceGrid
+                {workspace}
+                {onSwitchWorkspace}
+                {onCopyLink}
+                {isWebEnvironment}
+                {cardType}
+              />
+            {/each}
+          </div>
+          {#if showBottomOverlay}
+            <div class="overlay bottom-overlay"></div>
+          {/if}
         </div>
+
+        <!-- Show load more button with improved conditions -->
+        {#if showLoadMoreButton && workspaceList.length > 0}
+          <div class="load-more-container">
+            <Button
+              title="Load More"
+              type="outline-secondary"
+              buttonClassProp="text-ds-font-size-16 text-ds-font-weight-semi-bold"
+              buttonStyleProp="padding: 8px 16px; margin-top: 16px;"
+              onClick={handleLoadMoreClick}
+              disabled={isLoading}
+            />
+          </div>
+        {/if}
       {/if}
-      {#if showBottomOverlay}
-        <div class="overlay bottom-overlay"></div>
-      {/if}
-    </div>
-    <!-- Only show the button when scrolled halfway -->
-    {#if showLoadMoreButton}
-      <div class="load-more-container">
-        <Button
-          title="Load More"
-          type="outline-secondary"
-          buttonClassProp="text-ds-font-size-16 text-ds-font-weight-semi-bold"
-          buttonStyleProp="padding: 8px 16px; margin-top: 16px;"
-          onClick={handleLoadMoreClick}
-          disabled={isLoading}
-        />
-      </div>
     {/if}
   </div>
 </div>
@@ -191,5 +267,9 @@
     justify-content: center;
     bottom: 16px;
     z-index: 100;
+  }
+
+  .container {
+    padding: 0px 78px 24px;
   }
 </style>

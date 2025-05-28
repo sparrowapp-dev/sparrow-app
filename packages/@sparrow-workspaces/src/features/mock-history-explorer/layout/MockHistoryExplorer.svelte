@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Tooltip } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import {
@@ -166,14 +166,16 @@
             customWidth=""
             bind:value={searchTerm}
           />
-          <Button
-            startIcon={isRefreshing ? "" : ArrowClockWiseRegular}
-            type="secondary"
-            size="medium"
-            iconSize={20}
-            loader={isRefreshing}
-            onClick={handleRefresh}
-          />
+          <Tooltip title={"Refresh History"} placement={"top-center"}>
+            <Button
+              startIcon={isRefreshing ? "" : ArrowClockWiseRegular}
+              type="secondary"
+              size="medium"
+              iconSize={20}
+              loader={isRefreshing}
+              onClick={handleRefresh}
+            />
+          </Tooltip>
         </div>
       </div>
       {#if !hasHistoryData}
