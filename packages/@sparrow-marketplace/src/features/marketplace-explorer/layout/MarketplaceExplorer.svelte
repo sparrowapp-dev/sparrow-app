@@ -96,11 +96,14 @@
   });
 </script>
 
-<div class="d-flex flex-row justify-content-between image-wrapper">
+<div
+  class="d-flex flex-row justify-content-between image-wrapper"
+  style="width: calc(100% - 270px);"
+>
   <img src={SparrowMarketplaceBg} alt="Marketplace Background" class="bg-img" />
   <div
     class="d-flex flex-column flex-grow-1 content"
-    style="gap: 24px; width: calc(100vw - 270px);
+    style="gap: 24px; width: 100%;
       height: calc(100vh - 45px);"
   >
     {#if isInitialDataLoading}
@@ -142,7 +145,7 @@
           class="d-flex flex-column align-items-center justify-content-center"
           style="width: 100%; height: 60%;"
         >
-          <div class="container">
+          <div class="container d-flex flex-column align-items-center">
             <SparrowLogo width={"180px"} height={"180px"} />
           </div>
           <div>
@@ -266,9 +269,6 @@
   }
 
   .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 0px 78px 24px;
   }
 </style>
