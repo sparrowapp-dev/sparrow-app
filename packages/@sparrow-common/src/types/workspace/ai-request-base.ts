@@ -171,15 +171,15 @@ export enum ModelIdNameMapping {
 
 export enum ModelVariantIdNameMapping {
     // — OpenAI GPT family
-    "gpt-4o" = "GPT-4o",
-    "gpt-4o-mini" = "GPT-4o Mini",
-    "gpt-4.5-preview" = "GPT-4.5 Preview",
-    "gpt-4-turbo" = "GPT-4 Turbo",
-    "gpt-4" = "GPT-4",
-    "gpt-4.1" = "GPT-4.1",
-    "o1" = "GPT-o1",
-    "o1-mini" = "GPT-o1 Mini",
-    "o3-mini" = "GPT-o3 Mini",
+    "gpt-4o" = "GPT 4o",
+    "gpt-4o-mini" = "GPT 4o Mini",
+    "gpt-4.5-preview" = "GPT 4.5 Preview",
+    "gpt-4-turbo" = "GPT 4 Turbo",
+    "gpt-4" = "GPT 4",
+    "gpt-4.1" = "GPT 4.1",
+    "o1" = "o1",
+    "o1-mini" = "o1 Mini",
+    "o3-mini" = "o3 Mini",
     "gpt-3.5-turbo" = "GPT-3.5 Turbo",
 
     // — Anthropic Claude 3 family
