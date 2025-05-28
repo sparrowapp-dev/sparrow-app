@@ -567,7 +567,7 @@
           <p class="mb-0">{message}</p>
         </div>
       {/if}
-      <div class="d-flex gap-1">
+      <div class="d-flex gap-0">
         <!--
         -- 
         -- REGENERATE / COPY
@@ -593,7 +593,7 @@
               {/if}
             </button>
           </Tooltip>
-          <Tooltip placement="top-center" title="Like" distance={13}>
+          <!-- <Tooltip placement="top-center" title="Like" distance={13}>
             <span
               role="button"
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
@@ -624,7 +624,7 @@
                 <ThumbDislikeRegular size={"16px"} />
               {/if}
             </span>
-          </Tooltip>
+          </Tooltip> -->
           <Tooltip placement="top-center" title="Regenerate" distance={13}>
             <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
