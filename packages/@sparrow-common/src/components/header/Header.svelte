@@ -9,6 +9,8 @@
     QuestionCirlceReqular,
     DocumentRegular,
     GiftReqular,
+    HomeRegular,
+    CartRegular,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType } from "@sparrow/common/enums";
@@ -388,7 +390,7 @@
             <div
               class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
             >
-              {currentTeamName}
+              Recent workspaces
             </div>
           </div>
           <div
@@ -399,25 +401,29 @@
             <div class="lower-underline"></div>
             <div
               class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium"
-              on:click={handleViewWorkspaces}
+              on:click={() => {
+                navigate("/app/marketplace");
+              }}
             >
-              <span>View all Workspaces</span>
+              <span>Marketplace</span>
               <Button
                 type="teritiary-regular"
-                startIcon={ArrowRightRegular}
+                startIcon={CartRegular}
                 size="small"
               />
             </div>
             <div class="lower-underline"></div>
             <div
               class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium"
-              on:click={onCreateWorkspace}
+              on:click={() => {
+                navigate("/app/home");
+              }}
             >
-              <span>Create New Workspace</span>
+              <span>Home</span>
               <div style="align-content: flex-end;">
                 <Button
                   type="teritiary-regular"
-                  startIcon={AddRegular}
+                  startIcon={HomeRegular}
                   size="small"
                 />
               </div>
