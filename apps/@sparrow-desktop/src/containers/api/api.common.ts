@@ -175,6 +175,8 @@ const makeRequest = async (
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
+    } else if (e.response?.data?.statusCode === 403) {
+      return error("Forbidden", e.response?.data);
     } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
@@ -850,9 +852,9 @@ const connectSocketIo = async (
 };
 
 /**
- * 
+ *
  * @param signal - AbortSignal to listen for abort events
- * @returns 
+ * @returns
  */
 const waitForAbort = (signal: AbortSignal): Promise<never> => {
   return new Promise((_, reject) => {
@@ -861,7 +863,7 @@ const waitForAbort = (signal: AbortSignal): Promise<never> => {
     }
 
     signal?.addEventListener("abort", () => {
-      reject(new Error("Aborted during request"));
+        reject(new Error("Aborted during request"));
     }, { once: true });
   });
 }
@@ -889,11 +891,11 @@ const makeHttpRequestV2 = async (
 
   try {
     const data = await Promise.race([invoke("make_http_request_v2", {
-      url,
-      method,
-      headers,
-      body,
-      request,
+        url,
+        method,
+        headers,
+        body,
+        request,
     }), waitForAbort(signal)])
     // Handle the response and update UI accordingly
     if (signal?.aborted) {

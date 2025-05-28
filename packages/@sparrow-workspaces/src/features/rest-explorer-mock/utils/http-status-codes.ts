@@ -252,10 +252,6 @@ export const HttpStatusCodes = [
     id: "496",
   },
   {
-    id: "496",
-    name: "496 SSL Certificate Required (nginx)",
-  },
-  {
     id: "497",
     name: "497 HTTP Request Sent to HTTPS Port (nginx)",
   },

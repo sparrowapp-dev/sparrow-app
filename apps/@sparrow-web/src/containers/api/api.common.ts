@@ -187,6 +187,8 @@ const makeRequest = async (
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
+    } else if (e.response?.data?.statusCode === 403) {
+      return error("Forbidden", e.response?.data);
     } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
@@ -622,9 +624,9 @@ const connectWebSocket = async (
 };
 
 /**
- * 
+ *
  * @param signal - AbortSignal to listen for abort events
- * @returns 
+ * @returns
  */
 const waitForAbort = (signal: AbortSignal): Promise<never> => {
   return new Promise((_, reject) => {
@@ -633,7 +635,7 @@ const waitForAbort = (signal: AbortSignal): Promise<never> => {
     }
 
     signal?.addEventListener("abort", () => {
-      reject(new Error("Aborted during request"));
+        reject(new Error("Aborted during request"));
     }, { once: true });
   });
 }
@@ -664,9 +666,9 @@ const makeHttpRequestV2 = async (
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await Promise.race([axios({
-        data: { url, method, headers, body, contentType },
-        url: proxyUrl,
-        method: "POST",
+          data: { url, method, headers, body, contentType },
+          url: proxyUrl,
+          method: "POST",
       }), waitForAbort(signal)]); 
     } else {
       try {

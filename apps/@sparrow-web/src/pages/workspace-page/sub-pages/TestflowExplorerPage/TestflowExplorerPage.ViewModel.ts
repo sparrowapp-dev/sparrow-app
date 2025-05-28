@@ -58,13 +58,14 @@ import { isGuestUserActive } from "src/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
 import type { EnvironmentDocType } from "src/models/environment.model";
 import { DecodeTestflow } from "@sparrow/workspaces/features/testflow-explorer/utils";
+import { WorkspaceService } from "src/services/workspace.service";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
 
 export class TestflowExplorerPageViewModel {
    private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
-  
+  private workspaceService = new WorkspaceService();
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -1647,5 +1648,16 @@ export class TestflowExplorerPageViewModel {
   public redirectDocsTestflow = async () => {
     window.open(constants.TESTFLOW_DOCS_URL, "_blank");
     return;
+  };
+
+  /**
+   * @description - This function will provide the block limit to users according to their plan.
+   */
+  public userLimitBlockPerTestflow = async (workspaceId: string) => {
+    const data = await this.workspaceService.fetchWorkspacePlan(
+      workspaceId,
+      constants.API_URL,
+    );
+    return data?.blocksPerTestflow?.value;
   };
 }

@@ -239,7 +239,7 @@ export { default as StatusSuccess } from "./StatusSuccess.svelte";
 export { default as LinkedinOrgIcon } from "./LinkdinIcon.svelte";
 export { default as XIcon } from "./XIcon.svelte";
 export { default as ArrowEnterRegular } from "./ArrowEnterRegular.svelte";
-export { default as ArrowExitRegular} from "./ArrowExitRegular.svelte";
+export { default as ArrowExitRegular } from "./ArrowExitRegular.svelte";
 export { default as DismissCircleFilled } from "./DismissCircleFilled.svelte";
 export { default as AddCircleRegular } from "./AddCircleRegular.svelte";
 export { default as DatabaseStackRegular } from "./DatabaseStackRegular.svelte";
@@ -259,5 +259,7 @@ export { default as BotSparkleFilled } from "./BotSparkleFilled.svelte";
 export { default as ChannelRegular } from "./ChannelRegular.svelte";
 export { default as BotRegular } from "./BotRegular.svelte";
 export { default as ArrowUndoRegular } from "./ArrowUndoRegular.svelte";
-
+export { default as HistoryIcon2 } from "./HistoryIcon.svelte";
 export { default as BetaVectorIcon } from "./BetaVectorIcon.svelte";
+export { default as CartRegular } from "./CartRegular.svelte";
+export {default as ShareMultipleRegular } from "./ShareMultipleRegular.svelte";

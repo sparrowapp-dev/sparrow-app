@@ -327,6 +327,10 @@
     transform: translateX(-100%) scale(1);
   }
 
+  /* .tooltip-wrapper {
+    width: fit-content;
+  } */
+
   .bottom-left {
     transform: translateX(0) scale(0.5);
   }

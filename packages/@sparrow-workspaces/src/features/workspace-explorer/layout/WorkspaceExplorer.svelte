@@ -9,6 +9,9 @@
     WorkspaceUpdates,
   } from "../components";
   import { WorkspaceType } from "@sparrow/common/enums";
+  import { Button } from "@sparrow/library/ui";
+  import { ShareMultipleRegular } from "@sparrow/library/icons";
+  import { SparrowOutlineIcon } from "@sparrow/common/icons";
 
   /**
    * The length of collections related to the workspace.
@@ -63,6 +66,11 @@
    */
   export let userRole: any;
 
+  /**
+   * Details of active workspace
+   */
+  export let activeWorkspace;
+
   export let isShareModalOpen;
 
   let workspaceID = $tab?.id;
@@ -74,58 +82,168 @@
   export let isSharedWorkspace = false;
   export let onMakeWorkspacePublic;
   export let onShareWorkspace;
+
+  const formateUpdateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+    const months = Math.floor(days / 30); // Approximation
+
+    if (seconds < 60) {
+      return "just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } else if (months) {
+      return `${months} month${months > 1 ? "s" : ""} ago`;
+    } else {
+      return ``;
+    }
+  };
 </script>
 
-<div class="d-flex h-100" style="width: 100%;">
-  <div
-    class="h-100 d-flex flex-column p-3"
-    style="border-right:2px solid #000000; width: calc(100% - 280px);"
-  >
-    <WorkspaceHeader
-      {userRole}
-      {isSharedWorkspace}
-      {workspaceType}
-      bind:isWorkspaceInviteModalOpen
-      {onDeleteWorkspace}
-      {onUpdateWorkspaceName}
-      workspaceName={$tab?.name}
-      {workspaceID}
-      {onSaveWorkspace}
-      isSaved={$tab?.isSaved}
-    />
-    <hr />
-    <section style="flex:1; overflow:auto;">
-      {#if workspaceNavigatorId === "about"}
-        <WorkspaceAbout
-          bind:isShareModalOpen
-          {userRole}
-          workspaceName={$tab?.name}
-          {onUpdateWorkspaceDescription}
-          workspaceDescription={$tab?.description}
-          {workspaceType}
-          {onMakeWorkspacePublic}
-          {onShareWorkspace}
-          {onUpdateWorkspaceName}
-        />
-      {:else if workspaceNavigatorId === "settings"}
-        <WorkspaceSetting
-          users={currentWorkspace?.users}
-          {currentWorkspace}
-          {onRemoveUserFromWorkspace}
-          {onChangeUserRoleAtWorkspace}
-        />
-      {/if}
-    </section>
+{#if isSharedWorkspace && workspaceType === WorkspaceType.PUBLIC}
+  <div style="padding:8px;">
+    <div class="d-flex flex-column" style="padding: 4px; ">
+      <div class="d-flex flex-column">
+        <div>
+          <div
+            class="d-flex flex-row justify-content-between align-items-center"
+            style="gap:20px;"
+          >
+            <div
+              class="text-ds-font-size-20 text-ds-font-weight-semi-bold ellipsis"
+              style="color:var(--text-ds-neutral-50); max-width: 75%;"
+            >
+              {activeWorkspace?.name}
+            </div>
+            <div>
+              <Button
+                title={"Share workspace"}
+                type={"secondary"}
+                size="medium"
+                onClick={() => {
+                  isShareModalOpen = true;
+                }}
+                startIcon={ShareMultipleRegular}
+              ></Button>
+            </div>
+          </div>
+          <Button
+            title={`By ${
+              activeWorkspace?.team?.teamName.length > 100
+                ? activeWorkspace?.team?.teamName.slice(0, 100) + "..."
+                : activeWorkspace?.team?.teamName
+            }`}
+            type={"link-primary"}
+            size="small"
+            buttonClassProp="ps-0 pe-1"
+          />
+        </div>
+        <hr style="color: var(--border-ds-surface-50); margin-top:0" />
+      </div>
+      <div class="d-flex flex-column" style="gap: 8px; position: relative;">
+        <div
+          class="d-flex flex-column text-ds-font-size-14 text-ds-font-weight-regular"
+          style="gap:8px; color: var(--text-ds-neutral-50);"
+        >
+          <span
+            >Last Updated: {formateUpdateTime(activeWorkspace?.updatedAt)}</span
+          >
+          <div class="d-flex flex-row" style="gap:4px;">
+            <span style="color: var(--text-ds-primary-300);"
+              >{collectionLength}</span
+            >
+            <span>Collections</span>
+          </div>
+        </div>
+        <div style="color: var(--text-ds-neutral-50); gap: 14px">
+          <span class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
+            >Workspace Summary</span
+          >
+          <p
+            class="text-ds-font-size-14 text-ds-font-weight-regular text-ds-line-height-143"
+            style="width: 60%;"
+          >
+            {activeWorkspace?.description}
+          </p>
+        </div>
+        <div class="background-icon">
+          <SparrowOutlineIcon width={350} height={350} />
+        </div>
+      </div>
+    </div>
   </div>
+{:else}
+  <div class="d-flex h-100" style="width: 100%;">
+    <div
+      class="h-100 d-flex flex-column p-3"
+      style="border-right:2px solid #000000; width: calc(100% - 280px);"
+    >
+      <WorkspaceHeader
+        {userRole}
+        {isSharedWorkspace}
+        {workspaceType}
+        bind:isWorkspaceInviteModalOpen
+        {onDeleteWorkspace}
+        {onUpdateWorkspaceName}
+        workspaceName={$tab?.name}
+        {workspaceID}
+        {onSaveWorkspace}
+        isSaved={$tab?.isSaved}
+      />
+      <hr />
+      <section style="flex:1; overflow:auto;">
+        {#if workspaceNavigatorId === "about"}
+          <WorkspaceAbout
+            bind:isShareModalOpen
+            {userRole}
+            workspaceName={$tab?.name}
+            {onUpdateWorkspaceDescription}
+            workspaceDescription={$tab?.description}
+            {workspaceType}
+            {onMakeWorkspacePublic}
+            {onShareWorkspace}
+            {onUpdateWorkspaceName}
+          />
+        {:else if workspaceNavigatorId === "settings"}
+          <WorkspaceSetting
+            users={currentWorkspace?.users}
+            {currentWorkspace}
+            {onRemoveUserFromWorkspace}
+            {onChangeUserRoleAtWorkspace}
+          />
+        {/if}
+      </section>
+    </div>
 
-  <div class="d-flex flex-column h-100 p-3" style=" width:280px;">
-    <WorkspaceNavigator bind:workspaceNavigatorId {userRole} />
-    <WorkspaceUpdates
-      workspaceUpdatesList={$workspaceUpdatesList}
-      {onWorkspaceUpdateScroll}
-      {isSharedWorkspace}
-    />
-    <hr />
-    <CollectionCount {collectionLength} />
+    <div class="d-flex flex-column h-100 p-3" style=" width:280px;">
+      <WorkspaceNavigator bind:workspaceNavigatorId {userRole} />
+      <WorkspaceUpdates
+        workspaceUpdatesList={$workspaceUpdatesList}
+        {onWorkspaceUpdateScroll}
+        {isSharedWorkspace}
+      />
+      <hr />
+      <CollectionCount {collectionLength} />
+    </div>
   </div>
-</div>
+{/if}
+
+<style>
+  .background-icon {
+    position: absolute;
+    top: 120%;
+    left: 50%;
+    opacity: 0.04;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
