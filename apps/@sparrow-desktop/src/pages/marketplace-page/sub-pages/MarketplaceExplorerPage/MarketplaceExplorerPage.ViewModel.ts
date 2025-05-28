@@ -88,6 +88,17 @@ class MarketplaceExplorerViewModel {
     }
     return workspaces;
   };
+
+  public searchPublicWorkspaces = async (
+    searchTerm: string,
+    page: number = 1,
+  ) => {
+    const workspaces = await this.workspaceService.searchPublicWorkspaces(
+      searchTerm,
+      page,
+    );
+    return workspaces;
+  };
 }
 
 export default MarketplaceExplorerViewModel;
