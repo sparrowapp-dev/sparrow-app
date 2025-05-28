@@ -119,31 +119,6 @@ class MarketplaceExplorerViewModel {
     const workspaceData =
       existingWorkspace ||
       (await this.workspaceRepository.readWorkspace(workspace._id));
-    const [
-      fetchCollectionsResult,
-      refreshEnvironmentResult,
-      refreshTestflowResult,
-    ] = await Promise.all([
-      this.fetchCollections(workspaceData._id),
-      this.refreshEnvironment(workspaceData._id),
-      this.refreshTestflow(workspaceData._id),
-    ]);
-    const collectionTabsToBeDeleted =
-      fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
-    const environmentTabsToBeDeleted =
-      refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
-    const testflowTabsToBeDeleted =
-      refreshTestflowResult?.testflowTabsToBeDeleted || [];
-
-    const totalTabsToBeDeleted = [
-      ...collectionTabsToBeDeleted,
-      ...environmentTabsToBeDeleted,
-      ...testflowTabsToBeDeleted,
-    ];
-    await this.tabRepository.deleteTabsWithTabIdInAWorkspace(
-      workspaceData._id,
-      totalTabsToBeDeleted,
-    );
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(
       workspace._id,
       workspaceData,
