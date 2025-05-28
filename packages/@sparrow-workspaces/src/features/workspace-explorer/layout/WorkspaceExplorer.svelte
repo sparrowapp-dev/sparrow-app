@@ -106,23 +106,20 @@
       return ``;
     }
   };
-
 </script>
 
 {#if isSharedWorkspace && workspaceType === WorkspaceType.PUBLIC}
   <div style="padding:8px;">
-    <div
-      class="d-flex flex-column"
-      style="padding: 4px; gap: 20px; "
-    >
+    <div class="d-flex flex-column" style="padding: 4px; ">
       <div class="d-flex flex-column">
         <div>
           <div
             class="d-flex flex-row justify-content-between align-items-center"
+            style="gap:20px;"
           >
             <div
-              class="text-ds-font-size-28 text-ds-font-weight-semi-bold"
-              style="color:var(--text-ds-neutral-50);"
+              class="text-ds-font-size-20 text-ds-font-weight-semi-bold ellipsis"
+              style="color:var(--text-ds-neutral-50); max-width: 75%;"
             >
               {activeWorkspace?.name}
             </div>
@@ -130,6 +127,7 @@
               <Button
                 title={"Share workspace"}
                 type={"secondary"}
+                size="medium"
                 onClick={() => {
                   isShareModalOpen = true;
                 }}
@@ -138,17 +136,21 @@
             </div>
           </div>
           <Button
-            title="By {activeWorkspace?.team?.teamName}"
+            title={`By ${
+              activeWorkspace?.team?.teamName.length > 100
+                ? activeWorkspace?.team?.teamName.slice(0, 100) + "..."
+                : activeWorkspace?.team?.teamName
+            }`}
             type={"link-primary"}
             size="small"
             buttonClassProp="ps-0 pe-1"
           />
         </div>
-        <hr style="color: var(--border-ds-surface-50);" />
+        <hr style="color: var(--border-ds-surface-50); margin-top:0" />
       </div>
-      <div class="d-flex flex-column" style="gap:26px; position: relative;">
+      <div class="d-flex flex-column" style="gap: 8px; position: relative;">
         <div
-          class="d-flex flex-column text-ds-font-size-14 text-ds-font-weight-medium"
+          class="d-flex flex-column text-ds-font-size-14 text-ds-font-weight-regular"
           style="gap:8px; color: var(--text-ds-neutral-50);"
         >
           <span
@@ -161,20 +163,20 @@
             <span>Collections</span>
           </div>
         </div>
-        <div style="color: var(--text-ds-neutral-50); gap: 8px">
+        <div style="color: var(--text-ds-neutral-50); gap: 14px">
           <span class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
             >Workspace Summary</span
           >
           <p
-            class="text-ds-font-size-14 text-ds-font-size-medium"
+            class="text-ds-font-size-14 text-ds-font-weight-regular text-ds-line-height-143"
             style="width: 60%;"
           >
             {activeWorkspace?.description}
           </p>
         </div>
-         <div class="background-icon">
-        <SparrowOutlineIcon  width={350} height={350} />
-         </div>
+        <div class="background-icon">
+          <SparrowOutlineIcon width={350} height={350} />
+        </div>
       </div>
     </div>
   </div>
@@ -236,12 +238,12 @@
 
 <style>
   .background-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  opacity: 0.04;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 0;
-}
+    position: absolute;
+    top: 120%;
+    left: 50%;
+    opacity: 0.04;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 </style>
