@@ -160,6 +160,10 @@
     _viewModel.updateNameWithTestFlowList as any,
     1000,
   );
+  const handleTestflowCount = async () => {
+    const data = await _viewModel.fetchCountofTestFlow();
+    currentTestflowCount = data;
+  };
 
   let prevTabName = "";
   $: {
@@ -170,11 +174,10 @@
       prevTabName = tab.name;
       findUserRole();
     }
-
+    handleTestflowCount();
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
-    currentTestflowCount = _viewModel.fetchCountofTestFlow();
   }
   const handleEventOnClickQuestionMark = () => {
     captureEvent("documentation_link_clicked", {

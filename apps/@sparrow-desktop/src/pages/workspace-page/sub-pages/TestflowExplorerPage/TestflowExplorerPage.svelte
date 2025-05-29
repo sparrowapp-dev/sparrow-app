@@ -160,6 +160,10 @@
     _viewModel.updateNameWithTestFlowList as any,
     1000,
   );
+  const handleTestflowCount = async () => {
+    const data = await _viewModel.fetchCountofTestFlow();
+    currentTestflowCount = data;
+  };
 
   let prevTabName = "";
   $: {
@@ -174,7 +178,7 @@
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
-    currentTestflowCount = _viewModel.fetchCountofTestFlow();
+    handleTestflowCount();
   }
   const handleEventOnClickQuestionMark = () => {
     captureEvent("documentation_link_clicked", {
