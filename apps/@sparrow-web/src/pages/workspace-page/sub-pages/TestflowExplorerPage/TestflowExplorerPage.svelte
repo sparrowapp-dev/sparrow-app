@@ -33,6 +33,7 @@
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
+  let currentTestflowCount: number = 1;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -173,6 +174,7 @@
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
+    currentTestflowCount = _viewModel.fetchCountofTestFlow();
   }
   const handleEventOnClickQuestionMark = () => {
     captureEvent("documentation_link_clicked", {
@@ -228,6 +230,6 @@
     {handleEventOnClickQuestionMark}
     {planLimitTestFlowBlocks}
     {planLimitTestflow}
-    testflowCount={_viewModel.fetchCountofTestFlow()}
+    testflowCount={currentTestflowCount}
   />
 {/if}
