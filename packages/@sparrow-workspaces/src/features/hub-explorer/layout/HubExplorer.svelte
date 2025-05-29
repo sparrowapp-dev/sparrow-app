@@ -63,7 +63,7 @@
     <span class="text-ds-font-size-20 text-ds-font-weight-semi-bold"
       >Social Links</span
     >
-    {#if true}
+    {#if tab.property?.hub?.githubUrl}
       <div class="d-flex flex-row align-items-center">
         <GithubIcon color="white" />
         <a
