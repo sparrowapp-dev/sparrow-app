@@ -115,13 +115,22 @@ jobs:
           cd ..
           mv publishDir gh-pages
 
+      - name: Upload gh-pages artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gh-pages
+          path: gh-pages
   upload_to_s3:
     runs-on: ubuntu-latest
     needs: release_linux
     environment: development
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      
+      - name: Download gh-pages artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: gh-pages
+          path: gh-pages      
 
       - name: Upload to S3 bucket
         uses: jakejarvis/s3-sync-action@master
@@ -132,7 +141,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_DIR: 'gh-pages'
+          SOURCE_DIR: gh-pages
 
       - name: Notify Teams Channel
         run: |
