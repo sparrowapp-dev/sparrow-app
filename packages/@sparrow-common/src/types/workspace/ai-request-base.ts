@@ -180,7 +180,7 @@ export enum ModelVariantIdNameMapping {
     "o1" = "o1",
     "o1-mini" = "o1 Mini",
     "o3-mini" = "o3 Mini",
-    "gpt-3.5-turbo" = "GPT-3.5 Turbo",
+    "gpt-3.5-turbo" = "GPT 3.5 Turbo",
 
     // — Anthropic Claude 3 family
     "claude-3-5-sonnet-20241022" = "Claude 3.5 Sonnet",
