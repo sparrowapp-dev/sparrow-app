@@ -31,16 +31,16 @@ export class WorkspaceRepository {
     return RxDB.getInstance().rxdb.workspace.find().exec();
   };
 
-    /**
+  /**
    * Get only public workspaces (workspaceType === 'PUBLIC')
    */
-    public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
-      return RxDB.getInstance().rxdb.workspace.find({
-        selector: {
-          workspaceType: "PUBLIC",
-        },
-      }).$;
-    };
+  public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        workspaceType: "PUBLIC",
+      },
+    }).$;
+  };
 
   /**
    * get filtered workspaces

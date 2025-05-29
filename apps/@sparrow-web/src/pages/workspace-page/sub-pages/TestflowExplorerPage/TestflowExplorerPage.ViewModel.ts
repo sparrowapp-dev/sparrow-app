@@ -61,15 +61,19 @@ import { DecodeTestflow } from "@sparrow/workspaces/features/testflow-explorer/u
 import { WorkspaceService } from "src/services/workspace.service";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { PlanRepository } from "@app/repositories/plan.repository";
 
 export class TestflowExplorerPageViewModel {
-   private _tab = new BehaviorSubject<Partial<Tab>>({});
+  private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
   private workspaceService = new WorkspaceService();
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
+  private teamRepository = new TeamRepository();
+  private planRepository = new PlanRepository();
 
   private guestUserRepository = new GuestUserRepository();
   private testflowService = new TestflowService();
@@ -220,12 +224,7 @@ export class TestflowExplorerPageViewModel {
     }
 
     // nodes
-    else if (
-      !this.compareArray.init(
-        testflowServer.nodes,
-        tabServer.nodes,
-      )
-    ) {
+    else if (!this.compareArray.init(testflowServer.nodes, tabServer.nodes)) {
       result = false;
     }
 
@@ -391,13 +390,13 @@ export class TestflowExplorerPageViewModel {
   private findConnectedNodes  = (adj: any[], start: number,nodes, result, visited = new Set(), ) => {
     if (visited.has(start)) return;
 
-    
-      for (let i = 0; i < nodes.length; i++) {
-        if (Number(nodes[i].id) === start) {
-          result.push(nodes[i]);
-        }
+
+    for (let i = 0; i < nodes.length; i++) {
+      if (Number(nodes[i].id) === start) {
+        result.push(nodes[i]);
       }
-      
+    }
+
     visited.add(start);
 
     for (const neighbor of adj[start]) {
@@ -426,54 +425,54 @@ export class TestflowExplorerPageViewModel {
     if (_event === "run-from-here") {
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
-           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
-         }
-         
-       // Initialize adjacency list
-       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
-       // Populate adjacency list
-  
-     
+        maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+      }
+
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].source)].push(Number(edges[i].target));
       }
-      
+
       let result = [];
       this.findConnectedNodes(graph, Number(_id), nodes,result );
       runningNodes = [...result];
     } else if (_event === "run-till-here") {
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
-           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
-         }
-         
-       // Initialize adjacency list
-       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
-       // Populate adjacency list
-  
-     
+        maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+      }
+
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].target)].push(Number(edges[i].source));
       }
-      
+
       let result = [];
       this.findConnectedNodes(graph, Number(_id), nodes,result );
       runningNodes = [...(result.reverse())];
     } else {
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
-           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
-         }
-         
-       // Initialize adjacency list
-       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
-       // Populate adjacency list
-  
-     
+        maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+      }
+
+      // Initialize adjacency list
+      const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+      // Populate adjacency list
+
+
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].source)].push(Number(edges[i].target));
       }
-      
+
       let result = [];
       this.findConnectedNodes(graph, Number("1"), nodes,result );
       runningNodes = [...result];
@@ -564,47 +563,47 @@ export class TestflowExplorerPageViewModel {
             if (existingTestFlowData) {
               let resData: TFHistoryAPIResponseStoreType;
               // if (response.isSuccessful) {
-                const byteLength = new TextEncoder().encode(
-                  JSON.stringify(response),
-                ).length;
-                const responseSizeKB = byteLength / 1024;
-                const responseData: TFAPIResponseType = response.data;
-                const responseBody = responseData.body;
-                const formattedHeaders = Object.entries(
-                  response?.data?.headers || {},
-                ).map(([key, value]) => ({
-                  key,
-                  value,
-                })) as TFKeyValueStoreType[];
-                const responseStatus = response?.data?.status;
-                resData = {
-                  body: responseBody,
-                  headers: formattedHeaders,
-                  status: responseStatus,
-                  time: duration,
-                  size: responseSizeKB,
-                  responseContentType:
+              const byteLength = new TextEncoder().encode(
+                JSON.stringify(response),
+              ).length;
+              const responseSizeKB = byteLength / 1024;
+              const responseData: TFAPIResponseType = response.data;
+              const responseBody = responseData.body;
+              const formattedHeaders = Object.entries(
+                response?.data?.headers || {},
+              ).map(([key, value]) => ({
+                key,
+                value,
+              })) as TFKeyValueStoreType[];
+              const responseStatus = response?.data?.status;
+              resData = {
+                body: responseBody,
+                headers: formattedHeaders,
+                status: responseStatus,
+                time: duration,
+                size: responseSizeKB,
+                responseContentType:
                     this._decodeRequest.setResponseContentType(
                       formattedHeaders,
                     ),
-                };
+              };
 
-                if (
-                  Number(resData.status.split(" ")[0]) >= 200 &&
-                  Number(resData.status.split(" ")[0]) < 300
-                ) {
-                  successRequests++;
-                } else {
-                  failedRequests++;
-                }
-                totalTime += duration;
-                const req = {
-                  method: request?.request?.method as string,
-                  name: request?.name as string,
-                  status: resData.status,
-                  time: new ParseTime().convertMilliseconds(duration),
-                };
-                history.requests.push(req);
+              if (
+                Number(resData.status.split(" ")[0]) >= 200 &&
+                Number(resData.status.split(" ")[0]) < 300
+              ) {
+                successRequests++;
+              } else {
+                failedRequests++;
+              }
+              totalTime += duration;
+              const req = {
+                method: request?.request?.method as string,
+                name: request?.name as string,
+                status: resData.status,
+                time: new ParseTime().convertMilliseconds(duration),
+              };
+              history.requests.push(req);
               // } else {
               //   resData = {
               //     body: "",
@@ -641,47 +640,47 @@ export class TestflowExplorerPageViewModel {
                 reqParam[key] = value;
               }
 
-                const headersObject = Object.fromEntries(
+              const headersObject = Object.fromEntries(
                   JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
-                );
+              );
 
 
-                let reqBody;
+              let reqBody;
                 if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
                   try{
-                    reqBody = JSON.parse(decodeData[3]);
+                  reqBody = JSON.parse(decodeData[3]);
                   }
                   catch(e){
-                    reqBody = {};
-                  }
+                  reqBody = {};
+                }
                 }
                 else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
-                  const formDataObject = Object.fromEntries(
+                const formDataObject = Object.fromEntries(
                     JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
-                  );
+                );
                   reqBody = formDataObject || {}
                 }
                 else{
-                  reqBody = decodeData[3];
-                }
+                reqBody = decodeData[3];
+              }
                 requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
-                  response: {
+                response: {
                     body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
                     headers: response?.data?.headers
-                  },
-                  request: {
-                    headers: headersObject || {},
+                },
+                request: {
+                  headers: headersObject || {},
                     body:reqBody,
                     parameters:reqParam || {}
                   }
                 }
                 requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
-                  response: {
+                response: {
                     body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
                     headers: response?.data?.headers
-                  },
-                  request: {
-                    headers: headersObject || {},
+                },
+                request: {
+                  headers: headersObject || {},
                     body:reqBody,
                     parameters:reqParam || {}
                   }
@@ -692,7 +691,7 @@ export class TestflowExplorerPageViewModel {
             }
             return testFlowDataMap;
           });
-        } catch (error) { 
+        } catch (error) {
           if (error?.name === "AbortError") {
             break;
           }
@@ -791,12 +790,12 @@ export class TestflowExplorerPageViewModel {
     environmentVariables,
   ): string => {
     let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, squareContent) => {
-      const updated = squareContent
+        const updated = squareContent
       .replace(/\\/g, '').replace(/"/g, `'`)
-      .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
-        return `'{{${inner.trim()}}}'`;
-      });
-      return `[*$[${updated}]$*]`;
+          .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
+            return `'{{${inner.trim()}}}'`;
+          });
+        return `[*$[${updated}]$*]`;
     });
     environmentVariables.forEach((element) => {
       const regex = new RegExp(`{{(${element.key})}}`, "g");
@@ -845,19 +844,19 @@ export class TestflowExplorerPageViewModel {
 
  public handlePreviewExpression = async(expression) => {
 
-  const progressiveTab = createDeepCopy(this._tab.getValue());
-  const environments = await this.getActiveEnvironments(
-    progressiveTab.path.workspaceId,
-  );
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const environments = await this.getActiveEnvironments(
+      progressiveTab.path.workspaceId,
+    );
 
-  let runner = {};
-  testFlowDataStore.update((testFlowDataMap) => {
-    let wsData = testFlowDataMap.get(progressiveTab.tabId);
-    if (wsData) {
-      runner = wsData.runner;
-    } 
-    return testFlowDataMap;
-  });
+    let runner = {};
+    testFlowDataStore.update((testFlowDataMap) => {
+      let wsData = testFlowDataMap.get(progressiveTab.tabId);
+      if (wsData) {
+        runner = wsData.runner;
+      }
+      return testFlowDataMap;
+    });
   return this.setDynamicExpression2(this.setEnvironmentVariables("[*$[" + expression + "]$*]", environments?.filtered || []), runner);
  }
 
@@ -1081,7 +1080,7 @@ export class TestflowExplorerPageViewModel {
     _requestId: string,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const workspaceId = progressiveTab.path.workspaceId; 
+    const workspaceId = progressiveTab.path.workspaceId;
     const errorMessage = "id can't be empty while redirecting request!";
     // base conditions
     if (!workspaceId) {
@@ -1188,7 +1187,7 @@ export class TestflowExplorerPageViewModel {
       currentTestflow?.path?.workspaceId as string,
     );
     const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
-   
+
     // await this.updateEnvironmentState({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
@@ -1653,11 +1652,28 @@ export class TestflowExplorerPageViewModel {
   /**
    * @description - This function will provide the block limit to users according to their plan.
    */
-  public userLimitBlockPerTestflow = async (workspaceId: string) => {
-    const data = await this.workspaceService.fetchWorkspacePlan(
-      workspaceId,
-      constants.API_URL,
-    );
-    return data?.blocksPerTestflow?.value;
+  public userLimitBlockPerTestflow = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    let teamPlanId;
+    teamPlanId = teamData?._data?.plan?.id;
+    let userPlan;
+    if (teamPlanId) {
+      userPlan = await this.planRepository.getPlan(teamPlanId);
+    }
+    if (userPlan) {
+      return userPlan?.toMutableJSON().limits;
+    }
+  };
+
+  /**
+   * @description - This function will provide the Count of TestFlow are Created.
+   */
+  public fetchCountofTestFlow = async() => {
+    let count = 0;
+    const data = await this.testflowRepository.getTestflowDoc();
+    count = data?.length;
+    return count;
   };
 }

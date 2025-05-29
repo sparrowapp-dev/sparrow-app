@@ -19,6 +19,9 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { BehaviorSubject, Observable } from "rxjs";
 import { WorkspaceService } from "../../services/workspace.service";
+import { PlanRepository } from "src/repositories/plan.repository";
+import { PlanService } from "src/services/plan.service";
+import constants from "src/constants/constants";
 
 export class TeamsViewModel {
   constructor() {}
@@ -30,6 +33,8 @@ export class TeamsViewModel {
   private githubService = new GithubService();
   private workspaceService = new WorkspaceService();
   private guestUserRepository = new GuestUserRepository();
+  private planRepository = new PlanRepository();
+  private planService = new PlanService();
 
   private collectionRepository = new CollectionRepository();
   private userService = new UserService();
@@ -88,9 +93,11 @@ export class TeamsViewModel {
     if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
     let isAnyTeamsOpen: undefined | string = undefined;
+    const userPlans = [];
     if (response?.isSuccessful && response?.data?.data) {
       const data = [];
       for (const elem of response.data.data) {
+        userPlans.push(elem?.plan?.id.toString());
         const {
           _id,
           name,
@@ -103,6 +110,7 @@ export class TeamsViewModel {
           logo,
           workspaces,
           owner,
+          plan,
           admins,
           plan,
           createdAt,
@@ -142,6 +150,48 @@ export class TeamsViewModel {
           invites,
         };
         data.push(item);
+      }
+      const missingPlanIds: string[] = [];
+      for (const planId of userPlans) {
+        const planExist = await this.planRepository.getPlan(planId);
+        if (!planExist) {
+          missingPlanIds.push(planId);
+        }
+      }
+      if (missingPlanIds.length > 0) {
+        const fetchedPlans = await this.planService.getPlansByIds(
+          missingPlanIds,
+          constants.API_URL,
+        );
+        for (const planData of fetchedPlans) {
+          const rawData = planData;
+          if (!rawData?._id) continue;
+          const planDetails = {
+            planId: rawData._id,
+            name: rawData.name,
+            description: rawData.description,
+            active: rawData.active,
+            limits: {
+              workspacesPerHub: {
+                area: rawData.limits.workspacesPerHub.area,
+                value: rawData.limits.workspacesPerHub.value,
+              },
+              testflowPerWorkspace: {
+                area: rawData.limits.testflowPerWorkspace.area,
+                value: rawData.limits.testflowPerWorkspace.value,
+              },
+              blocksPerTestflow: {
+                area: rawData.limits.blocksPerTestflow.area,
+                value: rawData.limits.blocksPerTestflow.value,
+              },
+            },
+            createdAt: rawData.createdAt,
+            updatedAt: rawData.updatedAt,
+            createdBy: rawData.createdBy,
+            updatedBy: rawData.updatedBy,
+          };
+          await this.planRepository.insert(planDetails);
+        }
       }
 
       await this.teamRepository.bulkInsertData(data);

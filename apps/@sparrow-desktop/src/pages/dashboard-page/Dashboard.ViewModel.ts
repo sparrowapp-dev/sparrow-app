@@ -46,6 +46,8 @@ import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
 import { open } from "@tauri-apps/plugin-shell";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { PlanRepository } from "@app/repositories/plan.repository";
+import { PlanService } from "@app/services/plan.service";
 
 export class DashboardViewModel {
   constructor() {}
@@ -63,6 +65,8 @@ export class DashboardViewModel {
     AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
+  private planRepository = new PlanRepository();
+  private planService = new PlanService();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -168,9 +172,11 @@ export class DashboardViewModel {
     if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
     let isAnyTeamsOpen: undefined | string = undefined;
+    const userPlans = [];
     if (response?.isSuccessful && response?.data?.data) {
       const data = [];
       for (const elem of response.data.data) {
+        userPlans.push(elem?.plan?.id.toString());
         const {
           _id,
           name,
@@ -183,6 +189,7 @@ export class DashboardViewModel {
           logo,
           workspaces,
           owner,
+          plan,
           admins,
           plan,
           createdAt,
@@ -209,6 +216,7 @@ export class DashboardViewModel {
           logo,
           workspaces: updatedWorkspaces,
           owner,
+          plan,
           admins,
           plan,
           isActiveTeam: false,
@@ -220,6 +228,48 @@ export class DashboardViewModel {
           isOpen: isOpenTeam,
         };
         data.push(item);
+      }
+      const missingPlanIds: string[] = [];
+      for (const planId of userPlans) {
+        const planExist = await this.planRepository.getPlan(planId);
+        if (!planExist) {
+          missingPlanIds.push(planId);
+        }
+      }
+      if (missingPlanIds.length > 0) {
+        const fetchedPlans = await this.planService.getPlansByIds(
+          missingPlanIds,
+          constants.API_URL,
+        );
+        for (const planData of fetchedPlans) {
+          const rawData = planData;
+          if (!rawData?._id) continue;
+          const planDetails = {
+            planId: rawData._id,
+            name: rawData.name,
+            description: rawData.description,
+            active: rawData.active,
+            limits: {
+              workspacesPerHub: {
+                area: rawData.limits.workspacesPerHub.area,
+                value: rawData.limits.workspacesPerHub.value,
+              },
+              testflowPerWorkspace: {
+                area: rawData.limits.testflowPerWorkspace.area,
+                value: rawData.limits.testflowPerWorkspace.value,
+              },
+              blocksPerTestflow: {
+                area: rawData.limits.blocksPerTestflow.area,
+                value: rawData.limits.blocksPerTestflow.value,
+              },
+            },
+            createdAt: rawData.createdAt,
+            updatedAt: rawData.updatedAt,
+            createdBy: rawData.createdBy,
+            updatedBy: rawData.updatedBy,
+          };
+          await this.planRepository.insert(planDetails);
+        }
       }
 
       await this.teamRepository.bulkInsertData(data);
@@ -620,7 +670,10 @@ export class DashboardViewModel {
     const testflowData = await this.testflowRepository.readTestflow(
       testflow._id,
     );
-    const testflowTab = new TestflowTabAdapter().adapt(testflow.workspaceId, testflowData.toMutableJSON());
+    const testflowTab = new TestflowTabAdapter().adapt(
+      testflow.workspaceId,
+      testflowData.toMutableJSON(),
+    );
     await new Sleep().setTime(100).exec();
     await this.tabRepository.createTab(testflowTab, testflow.workspaceId);
     moveNavigation("right");
@@ -1043,21 +1096,18 @@ export class DashboardViewModel {
     workspace = workspace.map((_value) => _value._data);
 
     let testflow = await this.searchTestflow(searchText);
-    testflow = testflow.map((_value) => 
-    {
+    testflow = testflow.map((_value) => {
       const workspaceDetails = workspaceMap[_value._data.workspaceId];
-        const path: string[] = [];
-        if (workspaceDetails) {
-          path.push(workspaceDetails.teamName);
-          path.push(workspaceDetails.workspaceName);
-        }
+      const path: string[] = [];
+      if (workspaceDetails) {
+        path.push(workspaceDetails.teamName);
+        path.push(workspaceDetails.workspaceName);
+      }
       return {
         ..._value._data,
         path: this.createPath(path),
-      }
-
-    }  
-    );
+      };
+    });
 
     let environment = await this.searchEnvironment(searchText);
     environment = environment.map((_environment) => {
@@ -1073,7 +1123,8 @@ export class DashboardViewModel {
         id: _environment.id,
         variable: _environment.variable,
         path: this.createPath(path),
-    }});
+      };
+    });
 
     return { collection, folder, file, workspace, testflow, environment };
   }
