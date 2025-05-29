@@ -230,11 +230,7 @@
       calculateLimitedVisitedWorkspace();
     }
   }
-  $: {
-    if (recentVisitedWorkspaces) {
-      console.log("recentVisitedWorkspaces", recentVisitedWorkspaces);
-    }
-  }
+
   const handleViewWorkspaces = () => {
     navigate("/app/home");
   };
@@ -252,7 +248,6 @@
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
-  // import { icon } from "../../features/global-search/components/RecentItems/sub-components/ItemBar.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
