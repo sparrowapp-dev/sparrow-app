@@ -728,6 +728,19 @@
     mockCollectionUrl = url;
     isMockURLModelOpen = true;
   };
+
+  let createMockCollection = false;
+  let currentCollectionId: string;
+  let currentWorkspaceId: string;
+  let isCreateMockCollectionPopup: boolean;
+  const handleCreateMockCollectionModel = (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    currentCollectionId = collectionId;
+    currentWorkspaceId = workspaceId;
+    isCreateMockCollectionPopup = true;
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -794,6 +807,7 @@
           onSyncCollection={handleSyncCollection}
           onUpdateRunningState={_viewModel.handleMockCollectionState}
           onOpenWorkspace={_viewModel.handleOpenWorkspace}
+          onCreateMockCollection={handleCreateMockCollectionModel}
         />
       </Pane>
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
@@ -1614,6 +1628,57 @@
         </Tooltip>
       </div>
     </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Create Mock Collection"}
+  width={"36%"}
+  zIndex={1000}
+  isOpen={isCreateMockCollectionPopup}
+  handleModalState={() => (isCreateMockCollectionPopup = false)}
+>
+  <div class="text-lightGray mb-4 mt-2">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+    >
+      The mock collection only supports REST API requests. Requests using
+      GraphQL, WebSocket, or other request types will be excluded.
+      <br />
+      Do you want to continue?
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      disable={createMockCollection}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isCreateMockCollectionPopup = false;
+      }}
+    />
+
+    <Button
+      disable={createMockCollection}
+      title={"Yes, Continue"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"primary"}
+      loader={createMockCollection}
+      onClick={async () => {
+        createMockCollection = true;
+        await _viewModel.handleCreateMockCollectionFromExisting(
+          currentCollectionId,
+          currentWorkspaceId,
+        );
+        createMockCollection = false;
+        isCreateMockCollectionPopup = false;
+      }}
+    />
   </div>
 </Modal>
 

@@ -777,4 +777,19 @@ export class CollectionService {
     );
     return response;
   };
+
+  public createMockCollectionFromExisting = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/create-mock`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
