@@ -240,7 +240,7 @@ export class DashboardViewModel {
           constants.API_URL,
         );
         for (const planData of fetchedPlans) {
-          const rawData = planData?.data?.data;
+          const rawData = planData;
           if (!rawData?._id) continue;
           const planDetails = {
             planId: rawData._id,
@@ -1121,7 +1121,8 @@ export class DashboardViewModel {
         id: _environment.id,
         variable: _environment.variable,
         path: this.createPath(path),
-    }});
+      };
+    });
 
     return { collection, folder, file, workspace, testflow, environment };
   }
