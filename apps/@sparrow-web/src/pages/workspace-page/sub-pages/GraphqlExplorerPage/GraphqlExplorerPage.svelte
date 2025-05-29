@@ -16,6 +16,7 @@
   } from "@sparrow/common/types/workspace/environment-base";
   import { getClientUser } from "@app/utils/jwt";
   export let tab;
+  export let userRole;
 
   const _viewModel = new GraphqlExplorerViewModel(tab);
   const environments = _viewModel.environments;
@@ -163,4 +164,5 @@
   updateOperationSearch={_viewModel.updateRequestOperationSearch}
   checkQueryErrorStatus={_viewModel.updateQueryErrorState}
   isWebApp={true}
+  {userRole}
 />
