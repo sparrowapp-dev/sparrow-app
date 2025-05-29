@@ -31,6 +31,11 @@
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
   export let onUpdateRunningState;
+  export let onCreateMockCollection: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
+  export let isGuestUser = false;
 
   import {
     openedComponent,
@@ -504,6 +509,14 @@
       },
       {
         onClick: () => {
+          onCreateMockCollection(collection.id, collection.workspaceId);
+        },
+        displayText: "Create Mock Collection",
+        disabled: false,
+        hidden: isGuestUser ? true : false,
+      },
+      {
+        onClick: () => {
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
@@ -771,12 +784,23 @@
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
-        <div style="display: flex;">
-          <Tag
-            type={collection?.isMockCollectionRunning ? "green" : "grey"}
-            text={"Mock"}
-          />
-        </div>
+        {#if !collection?.isMockCollectionRunning}
+          <Tooltip
+            title="This mock collection is inactive. Run it to activate."
+            placement="top-center"
+            distance={13}
+            zIndex={701}
+          >
+            <div style="display: flex;">
+              <Tag type="grey" text="Mock" />
+            </div>
+          </Tooltip>
+        {:else}
+          <div style="display: flex;">
+            <Tag type="green" text="Mock" />
+          </div>
+        {/if}
+
         <Tooltip
           title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}

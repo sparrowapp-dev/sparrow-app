@@ -42,6 +42,10 @@
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
+  export let onCreateMockCollection: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
   export let onSearchCollection: (
     collection: CollectionDocument[],
@@ -445,6 +449,8 @@
                     {onCompareCollection}
                     {onSyncCollection}
                     {onUpdateRunningState}
+                    {onCreateMockCollection}
+                    {isGuestUser}
                   />
                 {/each}
               </List>
@@ -492,6 +498,8 @@
                     {onCompareCollection}
                     {onSyncCollection}
                     {onUpdateRunningState}
+                    {onCreateMockCollection}
+                    {isGuestUser}
                   />
                 {/if}
               {/each}
