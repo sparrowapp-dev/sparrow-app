@@ -3,14 +3,11 @@ name: Development release
 on:
   push:
     branches:
-      - development
-      - design-system
       - feat/sparrow-plans
   workflow_dispatch:
 
 env:
-  
-  VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
+  VITE_API_URL: ${{ vars.VITE_API_URL_SPARROW_PLANS }}
   VITE_MIX_PANEL_TOKEN: ${{ vars.VITE_MIX_PANEL_TOKEN }}
   VITE_ENABLE_MIX_PANEL: ${{ vars.VITE_ENABLE_MIX_PANEL_DEV }}
   VITE_API_TIMEOUT: ${{ vars.VITE_API_TIMEOUT }}
@@ -29,7 +26,7 @@ env:
   VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
   VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
   VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
-  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
+  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH_SPARROW_PLANS }}
   VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
   VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
   VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
@@ -136,7 +133,7 @@ jobs:
                   "body" = @(
                     @{
                       "type" = "TextBlock"
-                      "text" = "🚀 New Windows Build Available"
+                      "text" = "🚀 New Sparrow Plans Windows Build Available"
                       "weight" = "bolder"
                       "size" = "large"
                     }
@@ -251,7 +248,7 @@ jobs:
                     \"body\": [
                       {
                         \"type\": \"TextBlock\",
-                        \"text\": \"🍎 New macOS Build Available\",
+                        \"text\": \"🍎 New macOS Sparrow Plans Build Available\",
                         \"weight\": \"bolder\",
                         \"size\": \"large\"
                       },
