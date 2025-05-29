@@ -5,7 +5,7 @@ import type { Tab } from "@sparrow/common/types/workspace/tab";
 /**
  * @class - this class makes history tab compatible with collection server
  */
-export class HubtabAdapter {
+export class HubTabAdapter {
   constructor() {}
 
   /**

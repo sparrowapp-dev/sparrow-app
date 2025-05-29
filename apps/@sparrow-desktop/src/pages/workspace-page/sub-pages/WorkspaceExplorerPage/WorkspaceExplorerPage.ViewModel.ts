@@ -6,6 +6,7 @@ import {
   copyToClipBoard,
   createDeepCopy,
   Debounce,
+  InitHubTab,
   moveNavigation,
   throttle,
 } from "@sparrow/common/utils";
@@ -32,7 +33,6 @@ import {
 import { WorkspaceTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { TeamService } from "@app/services/team.service";
-import { InitHubTab } from "../../../../../../../packages/@sparrow-common/src/utils/init-hub-tab";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories

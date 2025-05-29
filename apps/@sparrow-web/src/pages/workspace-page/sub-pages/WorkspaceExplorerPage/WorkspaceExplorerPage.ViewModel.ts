@@ -32,7 +32,7 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 import constants from "src/constants/constants";
-import { InitHubTab } from "../../../../../../../packages/@sparrow-common/src/utils/init-hub-tab";
+import { InitHubTab } from "@sparrow/common/utils";
 import { TeamService } from "src/services/team.service";
 
 export default class WorkspaceExplorerViewModel {
