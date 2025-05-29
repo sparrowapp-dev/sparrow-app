@@ -8,7 +8,7 @@
   import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Tag } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
   import {
@@ -299,7 +299,9 @@
           <div
             class="team-heading d-flex justify-content-between position-relative pb-3"
           >
-            <h2 class="d-flex ellipsis overflow-visible mb-0 team-title">
+            <h2
+              class="d-flex ellipsis overflow-visible mb-0 team-title align-items-center"
+            >
               {#if openTeam?.logo?.size}
                 <Avatar
                   type="image"
@@ -317,6 +319,12 @@
               <span
                 class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
                 >{openTeam?.name || ""}
+              </span>
+              <span class="ps-2">
+                <Tag
+                  type={"cyan"}
+                  text={openTeam?.toMutableJSON()?.plan?.name || "Invalid Plan"}
+                />
               </span>
               <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
               {#if !isGuestUser && openTeam?.teamId !== "sharedWorkspaceTeam"}
@@ -691,7 +699,7 @@
       brightness(103%) contrast(104%);
   }
   .team-title {
-    width: calc(100% - 351px);
+    width: calc(100% - 370px);
   }
   .heading {
     max-width: calc(100% - 150px);
