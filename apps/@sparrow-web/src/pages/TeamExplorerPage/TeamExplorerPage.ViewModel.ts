@@ -428,9 +428,13 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
       );
     } else {
-      notifications.error(
-        response?.message || "Failed to send invite. Please try again.",
-      );
+      if(response?.message === "Plan limit reached"){
+        notifications.error("Failed to send invite. please upgrade your plan.");
+      }else{
+        notifications.error(
+          response?.message || "Failed to send invite. Please try again.",
+        );
+      }
     }
     return response;
   };
