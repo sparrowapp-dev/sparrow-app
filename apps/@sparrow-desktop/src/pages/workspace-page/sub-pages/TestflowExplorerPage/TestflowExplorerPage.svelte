@@ -32,6 +32,8 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
+  let planLimitTestflow: number = 3;
+  let currentTestflowCount: number = 1;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -158,6 +160,10 @@
     _viewModel.updateNameWithTestFlowList as any,
     1000,
   );
+  const handleTestflowCount = async () => {
+    const data = await _viewModel.fetchCountofTestFlow();
+    currentTestflowCount = data;
+  };
 
   let prevTabName = "";
   $: {
@@ -172,6 +178,7 @@
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
+    handleTestflowCount();
   }
   const handleEventOnClickQuestionMark = () => {
     captureEvent("documentation_link_clicked", {
@@ -180,15 +187,16 @@
     });
   };
 
-  const handleBlockLimitTestflow = async (WorkspaceId: string) => {
-    const limit = await _viewModel.userLimitBlockPerTestflow(WorkspaceId);
-    planLimitTestFlowBlocks = limit;
+  const handleBlockLimitTestflow = async () => {
+    const planlimits = await _viewModel.userLimitBlockPerTestflow();
+    if (planlimits) {
+      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
+      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+    }
   };
 
   onMount(() => {
-    if (currentWorkspaceId) {
-      handleBlockLimitTestflow(currentWorkspaceId);
-    }
+    handleBlockLimitTestflow();
   });
 </script>
 
@@ -223,5 +231,7 @@
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
     {handleEventOnClickQuestionMark}
     {planLimitTestFlowBlocks}
+    {planLimitTestflow}
+    testflowCount={currentTestflowCount}
   />
 {/if}
