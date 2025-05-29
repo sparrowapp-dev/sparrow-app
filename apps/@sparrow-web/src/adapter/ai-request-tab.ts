@@ -88,9 +88,9 @@ export class AiRequestTabAdapter {
     adaptedAiRequest.updateTabType(TabPersistenceTypeEnum.PERMANENT);
 
     // parsing request auth
-    const selectedRequestAuthType = request.aiRequest?.selectedRequestAuthType;
-    if (selectedRequestAuthType) {
-      const AuthType = this.setAuthType(request.aiRequest?.selectedRequestAuthType);
+    const selectedAuthType = request.aiRequest?.selectedAuthType;
+    if (selectedAuthType) {
+      const AuthType = this.setAuthType(request.aiRequest?.selectedAuthType);
       adaptedAiRequest.updateState({
         aiAuthNavigation: AuthType,
       });
@@ -106,7 +106,7 @@ export class AiRequestTabAdapter {
       aiModelVariant: requestTab.property.aiRequest?.aiModelVariant,
       systemPrompt: requestTab.property.aiRequest?.systemPrompt,
       auth: requestTab.property.aiRequest?.auth,
-      selectedRequestAuthType: this.unsetAuthType(
+      selectedAuthType: this.unsetAuthType(
         requestTab.property.aiRequest?.state?.aiAuthNavigation as AiRequestAuthTypeBaseEnum,
       ),
     };

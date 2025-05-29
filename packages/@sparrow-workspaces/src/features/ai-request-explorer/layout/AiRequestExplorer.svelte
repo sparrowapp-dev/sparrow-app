@@ -20,12 +20,14 @@
     UpdateRequestStateType,
   } from "@sparrow/workspaces/type";
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
+  import { ModelIdNameMapping } from "@sparrow/common/types/workspace/ai-request-base";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
   import { Modal } from "@sparrow/library/ui";
   import { SaveAsCollectionItem } from "../../save-as-request";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -210,9 +212,8 @@
       onClick={(flag = false) => {
         isExposeSaveAsRequest = flag;
       }}
-      aiModelProvider={$tab.property.aiRequest?.aiModelProvider}
-      aiModelVariant={$tab.property.aiRequest?.aiModelVariant}
-      systemPrompt={$tab.property.aiRequest?.systemPrompt}
+      requestMethod={TabTypeEnum.AI_REQUEST}
+      requestUrl={ModelIdNameMapping[$tab.property.aiRequest?.aiModelProvider]}
       requestName={$tab.name}
       requestDescription={$tab.description}
       requestPath={$tab.path}

@@ -74,6 +74,7 @@ class AiRequestExplorerViewModel {
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
   private guestUserRepository = new GuestUserRepository();
+  private compareArray = new CompareArray();
 
   // Services
   private environmentService = new EnvironmentService();
@@ -87,33 +88,33 @@ class AiRequestExplorerViewModel {
     return this.collectionRepository.subscribeCollection(_collectionId);
   }
 
-  private fetchCollection = async (_collectionId: string) => {
-    const collectionRx =
-      await this.collectionRepository.readCollection(_collectionId);
-    const collectionDoc = collectionRx?.toMutableJSON();
-    if (collectionDoc?.auth) {
-      this.collectionAuth = {
-        auth: collectionDoc?.auth,
-        collectionAuthNavigation: collectionDoc?.selectedAuthType,
-      } as HttpRequestCollectionLevelAuthTabInterface;
-    } else {
-      this.collectionAuth = {
-        auth: {
-          bearerToken: "",
-          basicAuth: {
-            username: "",
-            password: "",
-          },
-          apiKey: {
-            authKey: "",
-            authValue: "",
-            addTo: CollectionRequestAddToBaseEnum.HEADER,
-          },
-        },
-        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
-      };
-    }
-  };
+  // private fetchCollection = async (_collectionId: string) => {
+  //   const collectionRx =
+  //     await this.collectionRepository.readCollection(_collectionId);
+  //   const collectionDoc = collectionRx?.toMutableJSON();
+  //   if (collectionDoc?.auth) {
+  //     this.collectionAuth = {
+  //       auth: collectionDoc?.auth,
+  //       collectionAuthNavigation: collectionDoc?.selectedAuthType,
+  //     } as HttpRequestCollectionLevelAuthTabInterface;
+  //   } else {
+  //     this.collectionAuth = {
+  //       auth: {
+  //         bearerToken: "",
+  //         basicAuth: {
+  //           username: "",
+  //           password: "",
+  //         },
+  //         apiKey: {
+  //           authKey: "",
+  //           authValue: "",
+  //           addTo: CollectionRequestAddToBaseEnum.HEADER,
+  //         },
+  //       },
+  //       collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+  //     };
+  //   }
+  // };
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -143,93 +144,124 @@ class AiRequestExplorerViewModel {
     this._tab.next(value);
   }
 
-    /**
-   * Compares the current request tab with the server version and updates the saved status accordingly.
-   * This method is debounced to reduce the number of server requests.
-   * @return A promise that resolves when the comparison is complete.
-   */
+  /**
+ * Compares the current request tab with the server version and updates the saved status accordingly.
+ * This method is debounced to reduce the number of server requests.
+ * @return A promise that resolves when the comparison is complete.
+ */
+
   private compareRequestWithServerDebounced = async () => {
-      let result = true;
-      const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-      let clientCollectionItem: CollectionItemBaseInterface;
-      if (progressiveTab.path.folderId) {
-        clientCollectionItem =
-          (await this.collectionRepository.readRequestInFolder(
-            progressiveTab.path.collectionId,
-            progressiveTab.path.folderId,
-            progressiveTab.id,
-          )) as CollectionItemBaseInterface;
-      } else {
-        clientCollectionItem =
-          (await this.collectionRepository.readRequestOrFolderInCollection(
-            progressiveTab.path.collectionId,
-            progressiveTab.id,
-          )) as CollectionItemBaseInterface;
-      }
-  
-      let requestServer;
-      if (clientCollectionItem) {
-        requestServer = new AiRequestTabAdapter().adapt(
-          progressiveTab.path.workspaceId,
+    let result = true;
+    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
+    const requestTabAdapter = new AiRequestTabAdapter();
+    const unadaptedRequest = requestTabAdapter.unadapt(progressiveTab);
+    let requestServer;
+    if (progressiveTab.path.folderId) {
+      requestServer = await this.collectionRepository.readRequestInFolder(
+        progressiveTab.path.collectionId,
+        progressiveTab.path.folderId,
+        progressiveTab.id,
+      );
+    } else {
+      requestServer =
+        await this.collectionRepository.readRequestOrFolderInCollection(
           progressiveTab.path.collectionId,
-          progressiveTab.path.folderId,
-          clientCollectionItem,
+          progressiveTab.id,
         );
-      }
-  
-      if (!requestServer) result = false;
-      // description
-      else if (requestServer.description !== progressiveTab.description) {
-        result = false;
-      }
-      // name
-      else if (requestServer.name !== progressiveTab.name) {
-        result = false;
-      }
-      // Model Provider
-      else if (requestServer.property?.aiRequest) {
-        if (
-          requestServer.property.aiRequest.aiModelProvider !==
-          progressiveTab.property.aiRequest?.aiModelProvider
-        ) {
-          result = false;
-        }
-        // Model Variant
-        else if (
-          requestServer.property.aiRequest.aiModelVariant !==
-          progressiveTab.property.aiRequest?.aiModelVariant
-        ) {
-          result = false;
-        } else if (
-          requestServer.property.aiRequest.systemPrompt !==
-          progressiveTab.property.aiRequest?.systemPrompt
-        ) {
-          result = false;
-        }
-        else if (
-          requestServer.property.aiRequest.selectedRequestAuthType !==
-          progressiveTab.property.aiRequest.state.aiAuthNavigation
-        ) {
-          result = false;
-        }
-        
-      }
-  
-      // result
-      if (result) {
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: true,
-        });
-        progressiveTab.isSaved = true;
-        this.tab = progressiveTab;
-      } else {
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: false,
-        });
-        progressiveTab.isSaved = false;
-        this.tab = progressiveTab;
-      }
-    };
+    }
+
+    if (!requestServer) result = false;
+
+    // description
+    else if (requestServer.description !== progressiveTab.description) {
+      result = false;
+    }
+    // name
+    else if (requestServer.name !== progressiveTab.name) {
+      result = false;
+    }
+    // aiModelProvider
+    else if (
+      requestServer.aiRequest.aiModelProvider !== progressiveTab.property.aiRequest.aiModelProvider
+    ) {
+      result = false;
+    }
+    // aiModelVariant
+    else if (
+      requestServer.aiRequest.aiModelVariant !== progressiveTab.property.aiRequest.aiModelVariant
+    ) {
+      result = false;
+    }
+    // systemPrompt
+    else if (
+      requestServer.aiRequest.systemPrompt !==
+      progressiveTab.property.aiRequest.systemPrompt
+    ) {
+      result = false;
+    } else if (
+      requestServer.aiRequest.selectedAuthType !==
+      progressiveTab.property.aiRequest.state.aiAuthNavigation
+    ) {
+      result = false;
+    }
+    // auth key
+    else if (
+      requestServer.aiRequest.auth.apiKey.authKey !==
+      progressiveTab.property.aiRequest.auth.apiKey.authKey
+    ) {
+      result = false;
+    }
+    // auth value
+    else if (
+      requestServer.aiRequest.auth.apiKey.authValue !==
+      progressiveTab.property.aiRequest.auth.apiKey.authValue
+    ) {
+      result = false;
+    }
+    // // addTo
+    else if (
+      requestServer.aiRequest.auth.apiKey.addTo !==
+      progressiveTab.property.aiRequest.auth.apiKey.addTo
+    ) {
+      result = false;
+    }
+    // username
+    else if (
+      requestServer.aiRequest.auth.basicAuth.username !==
+      progressiveTab.property.aiRequest.auth.basicAuth.username
+    ) {
+      result = false;
+    }
+    // password
+    else if (
+      requestServer.aiRequest.auth.basicAuth.password !==
+      progressiveTab.property.aiRequest.auth.basicAuth.password
+    ) {
+      result = false;
+    }
+    // bearer tokem
+    else if (
+      requestServer.aiRequest.auth.bearerToken !==
+      progressiveTab.property.aiRequest.auth.bearerToken
+    ) {
+      result = false;
+    }
+
+    // result
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+      });
+      progressiveTab.isSaved = true;
+      this.tab = progressiveTab;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+      });
+      progressiveTab.isSaved = false;
+      this.tab = progressiveTab;
+    }
+  };
 
   /**
    * Debounced method to compare the current request tab with the server version.
@@ -581,7 +613,7 @@ class AiRequestExplorerViewModel {
         name: requestMetaData.name,
         description: requestMetaData.description,
         type: "AI_REQUEST",
-        request: unadaptedRequest,
+        aiRequest: unadaptedRequest,
         updatedAt: "",
         updatedBy: "Guest User",
       };
@@ -653,14 +685,14 @@ class AiRequestExplorerViewModel {
   };
 
 
-   /**
-   *
-   * @param _workspaceMeta - workspace meta data
-   * @param path - request stack path
-   * @param tabName - request name
-   * @param description - request description
-   * @param type - save over all request or description only
-   */
+  /**
+  *
+  * @param _workspaceMeta - workspace meta data
+  * @param path - request stack path
+  * @param tabName - request name
+  * @param description - request description
+  * @param type - save over all request or description only
+  */
   public saveAsRequest = async (
     _workspaceMeta: {
       id: string;
@@ -674,7 +706,6 @@ class AiRequestExplorerViewModel {
     tabName: string,
     description: string,
   ) => {
-    console.log("saveAsRequest called :>> ");
     const componentData = this._tab.getValue();
     let userSource = {};
     if (path.length > 0) {
@@ -735,24 +766,7 @@ class AiRequestExplorerViewModel {
               progressiveTab.tabId,
               progressiveTab,
             );
-            // await this.fetchCollection(expectedPath.collectionId as string);
-            // if (
-            //   progressiveTab.property.aiRequest?.state.aiAuthNavigation ===
-            //   AiRequestAuthTypeBaseEnum.INHERIT_AUTH
-            // ) {
-            //   this.authHeader = new ReduceAuthHeader(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            //   this.authParameter = new ReduceAuthParameter(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            // }
+
           } else {
             /**
              * Create new copy of the existing request
@@ -822,24 +836,7 @@ class AiRequestExplorerViewModel {
               progressiveTab.tabId,
               progressiveTab,
             );
-            // await this.fetchCollection(expectedPath.collectionId as string);
-            // if (
-            //   progressiveTab.property.request?.state.requestAuthNavigation ===
-            //   HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
-            // ) {
-            //   this.authHeader = new ReduceAuthHeader(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            //   this.authParameter = new ReduceAuthParameter(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            // }
+
           } else {
             /**
              * Create new copy of the existing request
@@ -911,24 +908,7 @@ class AiRequestExplorerViewModel {
               progressiveTab.tabId,
               progressiveTab,
             );
-            // await this.fetchCollection(expectedPath.collectionId as string);
-            // if (
-            //   progressiveTab.property.request?.state.requestAuthNavigation ===
-            //   HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
-            // ) {
-            //   this.authHeader = new ReduceAuthHeader(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            //   this.authParameter = new ReduceAuthParameter(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            // }
+
           } else {
             const initAiRequestTab = new InitAiRequestTab(req.id, "UNTRACKED-");
             initAiRequestTab.updateName(req.name);
@@ -994,24 +974,7 @@ class AiRequestExplorerViewModel {
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-            // await this.fetchCollection(expectedPath.collectionId as string);
-            // if (
-            //   progressiveTab.property.request?.state.requestAuthNavigation ===
-            //   HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
-            // ) {
-            //   this.authHeader = new ReduceAuthHeader(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            //   this.authParameter = new ReduceAuthParameter(
-            //     this._collectionAuth.getValue()
-            //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-            //     this._collectionAuth.getValue()
-            //       .auth as CollectionAuthBaseInterface,
-            //   ).getValue();
-            // }
+
           } else {
             const initAiRequestTab = new InitAiRequestTab(
               res.data.data.id,
@@ -1538,7 +1501,7 @@ class AiRequestExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
-    this.compareRequestWithServer();
+    // this.compareRequestWithServer();
   };
 
   /**
