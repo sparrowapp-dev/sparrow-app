@@ -39,7 +39,6 @@
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
   export let responseData: AiRequestExplorerData | undefined;
-  export let modelVariant = "gpt-4os";
   export let onChatClear;
   export let isChatAutoClearActive = false;
   let isChatLoadingActive = false;
@@ -263,7 +262,6 @@
                   <div in:fade={{ duration: 200, delay: index * 50 }}>
                     <ChatItem
                       message={chat.message}
-                      chatResponse={responseData}
                       aiResponseMetrices={{
                         response: {
                           messageId: chat.messageId,
@@ -272,6 +270,8 @@
                           totalTokens: chat.totalTokens,
                           statusCode: chat.statusCode,
                           time: chat.time,
+                          modelProvider: chat.modelProvider,
+                          modelVariant: chat.modelVariant,
                         },
                       }}
                       messageId={chat.messageId}
@@ -287,7 +287,6 @@
                         : false}
                       {isResponseGenerating}
                       {handleApplyChangeOnAISuggestion}
-                      {modelVariant}
                     />
                   </div>
                 {/each}

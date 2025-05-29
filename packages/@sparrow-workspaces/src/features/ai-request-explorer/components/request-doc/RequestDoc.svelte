@@ -11,7 +11,7 @@
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div id="editor2">
         <TextEditor
-          placeholder={"Give the modal context to understand the task and provide tailored responses."}
+          placeholder={"Give the model context to understand the task and provide tailored responses."}
           id={"editor2"}
           onInput={onUpdateAiSystemPrompt}
           value={requestDoc}

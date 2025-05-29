@@ -1,8 +1,5 @@
 <script lang="ts">
-  import type {
-    KeyValuePair,
-    KeyValuePairWithBase,
-  } from "@sparrow/common/interfaces/request.interface";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
   import { afterUpdate, onMount } from "svelte";
   import { Tooltip, Button, notifications } from "@sparrow/library/ui";
@@ -24,27 +21,8 @@
   } from "@sparrow/common/utils";
 
   export let environmentVariables;
-  export let handleDynamicExpression:
-    | ((key: string, index: number, id: string) => void)
-    | undefined = undefined;
-  export let handleRemoveDynamicExpression: (
-    key: string,
-    index: number,
-    id: string,
-  ) => void;
   export let handleOpenCurrentDynamicExpression;
-  export let getDEByKeyAndValue: (
-    key: string,
-    value: string,
-    index: number,
-    blockName: string,
-  ) => void | undefined;
-  export let handleDynamicNewExpression: (key: string, index: number) => void;
-  export let handleRemoveDynamicExpressionKey: (
-    key: string,
-    index: number,
-  ) => void;
-  export let blockName: string;
+
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
@@ -930,13 +908,7 @@
             isInputBoxEditable={false}
             isCheckBoxEditable={false}
             {dynamicExpression}
-            {getDEByKeyAndValue}
-            {blockName}
-            {handleDynamicExpression}
-            {handleRemoveDynamicExpression}
             {handleOpenCurrentDynamicExpression}
-            {handleDynamicNewExpression}
-            {handleRemoveDynamicExpressionKey}
           />
         {/if}
 
@@ -961,12 +933,7 @@
               isCheckBoxEditable={true}
               customClass={`diff-row diff-${element.diffType}`}
               {dynamicExpression}
-              {getDEByKeyAndValue}
-              {blockName}
-              {handleDynamicExpression}
-              {handleRemoveDynamicExpression}
               {handleOpenCurrentDynamicExpression}
-              {handleDynamicNewExpression}
             />
             <!-- isInputBoxEditable={element.diffType !== "deleted"} -->
             <!-- isCheckBoxEditable={element.diffType !== "deleted"} -->
@@ -1058,12 +1025,7 @@
               {isInputBoxEditable}
               {isCheckBoxEditable}
               {dynamicExpression}
-              {getDEByKeyAndValue}
-              {blockName}
-              {handleDynamicExpression}
-              {handleRemoveDynamicExpression}
               {handleOpenCurrentDynamicExpression}
-              {handleDynamicNewExpression}
             />
           {/each}
         {/if}
@@ -1173,6 +1135,7 @@
               bind:isMergeViewLoading
               bind:isMergeViewEnabled={showMergeView}
               bind:newModifiedContent={diffBulkText}
+              handleOpenDE={handleOpenCurrentDynamicExpression}
             />
           {/if}
         </div>

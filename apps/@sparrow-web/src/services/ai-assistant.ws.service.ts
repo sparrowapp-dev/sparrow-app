@@ -366,8 +366,8 @@ export class AiAssistantWebSocketService {
     modelVersion: AIModelVariant;
     authKey: string;
     systemPrompt?: string;
-    userInput: { role: 'user' | 'assistant' | 'system'; content: string; }[];
-    // conversation?: { role: 'user' | 'assistant' | 'system'; content: string; }[],
+    userInput: { role: 'user' | 'assistant' | 'system'; content: string; }[] | string;
+    conversation?: string,
     configs: modelsConfigType;
   }): Promise<boolean> => {
 
@@ -441,13 +441,37 @@ export class AiAssistantWebSocketService {
   }
 
   private prepareGeminiConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
-    const systemPromptContext = { role: 'user', content: `${systemPrompt} + ${userPrompt}` };
-    if (isContextOn) {
-      // If context is on, prepend the system prompt to the conversation
-      return [systemPromptContext, ...conversations];
+    if (isContextOn && conversations.length > 0) {
+      // Convert conversations to Gemini format
+      const geminiConversations = conversations.map(conv => {
+        if (conv.role === 'user') {
+          return {
+            role: 'user',
+            parts: [{ text: conv.content }]
+          };
+        } else if (conv.role === 'assistant') {
+          return {
+            role: 'model',
+            parts: [{ text: conv.content }]
+          };
+        }
+        // Skip system messages as they're handled separately in Gemini
+        return null;
+      }).filter(conv => conv !== null);
+
+      // Add current user prompt to the conversation
+      geminiConversations.push({
+        role: 'user',
+        parts: [{ text: userPrompt }]
+      });
+
+      // Return as JSON string as expected by the API
+      return JSON.stringify(geminiConversations);
+    } else {
+      // For non-conversational or when context is off, return empty string
+      // The userInput will be sent separately
+      return "";
     }
-    // If context is off, return the conversation as is
-    return conversations;
   }
 
 

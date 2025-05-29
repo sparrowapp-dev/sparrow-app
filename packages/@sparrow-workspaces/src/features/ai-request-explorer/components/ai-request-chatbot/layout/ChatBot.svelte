@@ -22,7 +22,8 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
-  export let responseData: AiRequestExplorerData | undefined;
+  export let responseData: AiRequestExplorerData;
+  export let disabled = false;
 
   let scrollList: ScrollList;
 
@@ -39,6 +40,8 @@
               isLiked: false,
               isDisliked: false,
               status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
             },
           ]
         : [
@@ -50,6 +53,8 @@
               isLiked: false,
               isDisliked: false,
               status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
             },
           ];
       onUpdateAiConversation(updatedConverstaion);
@@ -87,7 +92,7 @@
 </script>
 
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
-  <div class="h-100">
+  <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       {responseData}
@@ -101,7 +106,6 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
       onChatClear={clearChat}
       isChatAutoClearActive={$tab?.property?.aiRequest?.state
         ?.isChatAutoClearActive}
@@ -111,6 +115,10 @@
 {/if}
 
 <style lang="scss">
+  .disabled-chatbot {
+    pointer-events: none;
+    opacity: 0.6;
+  }
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
     height: 40px;

@@ -7,11 +7,13 @@ import { getClientUser } from "@app/utils/jwt";
 import { TabRepository } from "src/repositories/tab.repository";
 import { navigate } from "svelte-navigator";
 import { WorkspaceTabAdapter } from "src/adapter";
+import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 
 class MarketplaceExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private workspaceService = new WorkspaceService();
   private tabRepository = new TabRepository();
+  private recentWorkspaceRepository = new RecentWorkspaceRepository();
 
   constructor() {}
 
@@ -114,6 +116,76 @@ class MarketplaceExplorerViewModel {
     await this.tabRepository.createTab(initWorkspaceTab, workspace._id);
     await this.workspaceRepository.setActiveWorkspace(workspace._id);
     navigate("collections");
+    // Update the recent workspace repository
+    const existingRecentWorkspace =
+      await this.recentWorkspaceRepository.readWorkspace(workspace._id);
+    if (!existingRecentWorkspace) {
+      const {
+        _id,
+        name,
+        description,
+        workspaceType,
+        team,
+        createdAt,
+        createdBy,
+        updatedAt,
+        updatedBy,
+      } = workspace;
+      const recentWorkspaceItem = {
+        _id,
+        name,
+        description,
+        workspaceType,
+        isShared: true,
+        team: {
+          teamId: team.id,
+          teamName: team.name,
+          hubUrl: team?.hubUrl || "",
+        },
+        lastVisited: new Date().toISOString(),
+        createdAt,
+        createdBy,
+        updatedAt,
+        updatedBy,
+      };
+      await this.recentWorkspaceRepository.addRecentWorkspace(
+        recentWorkspaceItem,
+      );
+      // Limit public workspaces to 15 most recently visited
+      await this.limitPublicWorkspaces(10);
+    } else {
+      // Update last visited time for existing recent workspace
+      await this.recentWorkspaceRepository.updateWorkspace(workspace._id, {
+        lastVisited: new Date().toISOString(),
+      });
+    }
+  };
+
+  private limitPublicWorkspaces = async (maxCount: number): Promise<void> => {
+    // Get all public workspaces sorted by lastVisited
+    const allPublicWorkspaces =
+      await this.recentWorkspaceRepository.getRecentWorkspacesDocs();
+    const publicWorkspaces = allPublicWorkspaces.filter(
+      (workspace) => workspace.workspaceType === "PUBLIC",
+    );
+
+    // If we have more than the max count, remove the oldest ones
+    if (publicWorkspaces.length > maxCount) {
+      // Sort by lastVisited (most recent first)
+      const sortedWorkspaces = publicWorkspaces.sort((a, b) => {
+        const dateA = a.lastVisited ? new Date(a.lastVisited).getTime() : 0;
+        const dateB = b.lastVisited ? new Date(b.lastVisited).getTime() : 0;
+        return dateB - dateA;
+      });
+
+      // Get the workspaces to remove (oldest ones)
+      const workspacesToRemove = sortedWorkspaces.slice(maxCount);
+
+      // Delete each workspace that exceeds our limit
+      for (const workspace of workspacesToRemove) {
+        await this.recentWorkspaceRepository.deleteWorkspace(workspace._id);
+      }
+    }
   };
 
   public searchPublicWorkspaces = async (
