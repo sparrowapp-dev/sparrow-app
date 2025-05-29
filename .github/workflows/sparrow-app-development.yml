@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-
   VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
   VITE_MIX_PANEL_TOKEN: ${{ vars.VITE_MIX_PANEL_TOKEN }}
   VITE_ENABLE_MIX_PANEL: ${{ vars.VITE_ENABLE_MIX_PANEL_DEV }}
