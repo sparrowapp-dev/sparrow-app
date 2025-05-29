@@ -127,6 +127,8 @@
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
   export let planLimitTestFlowBlocks: number = 5;
+  export let planLimitTestFlows: number = 3;
+  export let testflowCount: number = 1;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -1695,16 +1697,18 @@
   {/if}
 
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    <p
-      class="mb-0 pb-0 text-fs-14"
-      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
-      on:click={() => {
-        currentStep.set(1);
-        isTestFlowTourGuideOpen.set(true);
-      }}
-    >
-      Need help?
-    </p>
+    {#if testflowCount !== planLimitTestFlows}
+      <p
+        class="mb-0 pb-0 text-fs-14"
+        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
+        on:click={() => {
+          currentStep.set(1);
+          isTestFlowTourGuideOpen.set(true);
+        }}
+      >
+        Need help?
+      </p>
+    {/if}
   </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->

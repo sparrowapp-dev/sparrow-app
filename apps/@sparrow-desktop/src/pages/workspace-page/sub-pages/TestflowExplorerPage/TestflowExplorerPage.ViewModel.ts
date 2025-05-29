@@ -1643,9 +1643,19 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will provide the block limit to users according to their plan.
    */
   public userLimitBlockPerTestflow = async (workspaceId: string) => {
-    const data = await this.workspaceService.fetchWorkspacePlan(
-      workspaceId,
-    );
-    return data?.blocksPerTestflow?.value;
+    const data = await this.workspaceService.fetchWorkspacePlan(workspaceId);
+    return data;
+  };
+
+  /**
+   * @description - This function will provide the Count of TestFlow are Created.
+   */
+  public fetchCountofTestFlow = () => {
+    let count = 0;
+    const data = this.testflowRepository.getTestflowsObserver();
+    data?.subscribe((items) => {
+      count = items.length;
+    });
+    return count;
   };
 }

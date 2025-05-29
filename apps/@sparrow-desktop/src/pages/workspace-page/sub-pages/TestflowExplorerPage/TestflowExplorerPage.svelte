@@ -32,6 +32,7 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
+  let planLimitTestflow: number = 3;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -181,8 +182,11 @@
   };
 
   const handleBlockLimitTestflow = async (WorkspaceId: string) => {
-    const limit = await _viewModel.userLimitBlockPerTestflow(WorkspaceId);
-    planLimitTestFlowBlocks = limit;
+    const planlimits = await _viewModel.userLimitBlockPerTestflow(WorkspaceId);
+    if (planlimits) {
+      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
+      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+    }
   };
 
   onMount(() => {
@@ -223,5 +227,7 @@
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
     {handleEventOnClickQuestionMark}
     {planLimitTestFlowBlocks}
+    {planLimitTestflow}
+    testflowCount={_viewModel.fetchCountofTestFlow()}
   />
 {/if}
