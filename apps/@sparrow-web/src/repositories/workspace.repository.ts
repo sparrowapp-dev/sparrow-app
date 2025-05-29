@@ -27,16 +27,6 @@ export class WorkspaceRepository {
     return RxDB.getInstance().rxdb.workspace.find().$;
   };
 
-  public getWorkspaceId = (workspaceId: string): WorkspaceDocument => {
-    return RxDB.getInstance()
-      .rxdb.workspace.findOne({
-        selector: {
-          _id: workspaceId,
-        },
-      })
-      .exec();
-  };
-
   public getWorkspacesDocs = (): WorkspaceDocument[] => {
     return RxDB.getInstance().rxdb.workspace.find().exec();
   };

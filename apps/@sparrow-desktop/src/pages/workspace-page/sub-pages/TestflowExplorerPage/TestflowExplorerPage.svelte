@@ -183,8 +183,8 @@
     });
   };
 
-  const handleBlockLimitTestflow = async (WorkspaceId: string) => {
-    const planlimits = await _viewModel.userLimitBlockPerTestflow(WorkspaceId);
+  const handleBlockLimitTestflow = async () => {
+    const planlimits = await _viewModel.userLimitBlockPerTestflow();
     if (planlimits) {
       planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
@@ -192,9 +192,7 @@
   };
 
   onMount(() => {
-    if (currentWorkspaceId) {
-      handleBlockLimitTestflow(currentWorkspaceId);
-    }
+    handleBlockLimitTestflow();
   });
 </script>
 

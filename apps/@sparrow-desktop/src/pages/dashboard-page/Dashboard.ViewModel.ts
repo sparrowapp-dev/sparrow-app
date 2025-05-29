@@ -227,15 +227,22 @@ export class DashboardViewModel {
         };
         data.push(item);
       }
-      for (const planItem of userPlans) {
-        const planExist = await this.planRepository.getPlan(planItem);
+      const missingPlanIds: string[] = [];
+      for (const planId of userPlans) {
+        const planExist = await this.planRepository.getPlan(planId);
         if (!planExist) {
-          const planData = await this.planService.getPlanById(
-            planItem,
-            constants.API_URL,
-          );
+          missingPlanIds.push(planId);
+        }
+      }
+      if (missingPlanIds.length > 0) {
+        const fetchedPlans = await this.planService.getPlansByIds(
+          missingPlanIds,
+          constants.API_URL,
+        );
+        for (const planData of fetchedPlans) {
           const rawData = planData?.data?.data;
-          const plandetails = {
+          if (!rawData?._id) continue;
+          const planDetails = {
             planId: rawData._id,
             name: rawData.name,
             description: rawData.description,
@@ -259,7 +266,7 @@ export class DashboardViewModel {
             createdBy: rawData.createdBy,
             updatedBy: rawData.updatedBy,
           };
-          await this.planRepository.insert(plandetails);
+          await this.planRepository.insert(planDetails);
         }
       }
 

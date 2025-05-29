@@ -8,17 +8,11 @@ import type {
 } from "@sparrow/common/dto";
 import type { WorkspaceRole } from "@sparrow/common/enums";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
-import { WorkspaceRepository } from "@app/repositories/workspace.repository";
-import { TeamRepository } from "@app/repositories/team.repository";
-import { PlanRepository } from "@app/repositories/plan.repository";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
   constructor() {}
-  private workspaceRepository = new WorkspaceRepository();
-  private teamRepository = new TeamRepository();
-  private planRepository = new PlanRepository();
   public fetchWorkspaces = async (userId: string) => {
     const response = await makeRequest(
       "GET",
@@ -183,22 +177,5 @@ export class WorkspaceService {
       },
     );
     return response;
-  };
-
-  public fetchWorkspacePlan = async (workspaceId: string) => {
-    const response = await this.workspaceRepository.getWorkspaceId(workspaceId);
-    const teamId = response?._data?.team?.teamId || "";
-    const teamData = await this.teamRepository.getTeam(teamId);
-    let teamPlanId;
-    teamData.subscribe((value) => {
-      teamPlanId = value?._data?.plan?.id;
-    });
-    let userPlan;
-    if (teamPlanId) {
-      userPlan = await this.planRepository.getPlan(teamPlanId);
-    }
-    if (userPlan) {
-      return userPlan?._data?.limits;
-    }
   };
 }

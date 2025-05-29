@@ -61,6 +61,8 @@ import { DecodeTestflow } from "@sparrow/workspaces/features/testflow-explorer/u
 import { WorkspaceService } from "src/services/workspace.service";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { PlanRepository } from "@app/repositories/plan.repository";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -70,6 +72,8 @@ export class TestflowExplorerPageViewModel {
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
+  private teamRepository = new TeamRepository();
+  private planRepository = new PlanRepository();
 
   private guestUserRepository = new GuestUserRepository();
   private testflowService = new TestflowService();
@@ -220,12 +224,7 @@ export class TestflowExplorerPageViewModel {
     }
 
     // nodes
-    else if (
-      !this.compareArray.init(
-        testflowServer.nodes,
-        tabServer.nodes,
-      )
-    ) {
+    else if (!this.compareArray.init(testflowServer.nodes, tabServer.nodes)) {
       result = false;
     }
 
@@ -391,7 +390,7 @@ export class TestflowExplorerPageViewModel {
   private findConnectedNodes  = (adj: any[], start: number,nodes, result, visited = new Set(), ) => {
     if (visited.has(start)) return;
 
-    
+
     for (let i = 0; i < nodes.length; i++) {
       if (Number(nodes[i].id) === start) {
         result.push(nodes[i]);
@@ -433,7 +432,7 @@ export class TestflowExplorerPageViewModel {
       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
       // Populate adjacency list
 
-     
+
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].source)].push(Number(edges[i].target));
       }
@@ -451,7 +450,7 @@ export class TestflowExplorerPageViewModel {
       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
       // Populate adjacency list
 
-     
+
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].target)].push(Number(edges[i].source));
       }
@@ -469,7 +468,7 @@ export class TestflowExplorerPageViewModel {
       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
       // Populate adjacency list
 
-     
+
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].source)].push(Number(edges[i].target));
       }
@@ -1650,11 +1649,26 @@ export class TestflowExplorerPageViewModel {
     return;
   };
 
+  public fetchWorkspacePlan = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    let teamPlanId;
+    teamPlanId = teamData?._data?.plan?.id;
+    let userPlan;
+    if (teamPlanId) {
+      userPlan = await this.planRepository.getPlan(teamPlanId);
+    }
+    if (userPlan) {
+      return userPlan?.toMutableJSON().limits;
+    }
+  };
+
   /**
    * @description - This function will provide the block limit to users according to their plan.
    */
-  public userLimitBlockPerTestflow = async (workspaceId: string) => {
-    const data = await this.workspaceService.fetchWorkspacePlan(workspaceId);
+  public userLimitBlockPerTestflow = async () => {
+    const data = await this.fetchWorkspacePlan();
     return data;
   };
 
