@@ -145,11 +145,11 @@ export class RecentWorkspaceRepository {
     }).$;
   };
 
-  public getRecentWorkspaces = async (): Promise<RecentWorkspaceDocument[]> => {
-    return await RxDB.getInstance()
-      .rxdb.recentworkspace.find({
-        sort: [{ lastVisited: "desc" }],
-      })
-      .exec();
+  public getRecentVisitedWorkspaces = (): Observable<
+    RecentWorkspaceDocument[]
+  > => {
+    return RxDB.getInstance().rxdb.recentworkspace.find({
+      sort: [{ lastVisited: "desc" }],
+    }).$;
   };
 }
