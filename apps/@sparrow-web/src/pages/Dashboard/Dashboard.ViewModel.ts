@@ -810,7 +810,7 @@ export class DashboardViewModel {
         tree.type === ItemType.SOCKET_IO ||
         tree.type === ItemType.WEB_SOCKET
       ) {
-        const currentFolderDetails =
+        let currentFolderDetails =
           tree.folderId && tree.folderName
             ? { id: tree.folderId, name: tree.folderName }
             : tree.parentFolder
@@ -1032,15 +1032,15 @@ export class DashboardViewModel {
       { teamName: string; workspaceName: string }
     > = {},
   ) {
-    const collectionTree = await this.collectionRepository.getCollectionDocs();
+    let collectionTree = await this.collectionRepository.getCollectionDocs();
     const s = collectionTree.map((_t) => {
       return _t.toMutableJSON();
     });
 
-    const newtree = s;
-    const collection = [];
-    const folder = [];
-    const file = [];
+    let newtree = s;
+    let collection = [];
+    let folder = [];
+    let file = [];
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
