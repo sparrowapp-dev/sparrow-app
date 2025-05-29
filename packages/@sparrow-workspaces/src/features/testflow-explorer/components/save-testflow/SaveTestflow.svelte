@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { SaveRegular } from "@sparrow/library/icons";
 
   import { Tooltip } from "@sparrow/library/ui";
@@ -7,6 +7,25 @@
   export let isTestflowEditable;
   export let onSaveTestflow;
   export let testFlowRunning = false;
+
+  /**
+   * @description - handles different key press
+   * @param event - keyboard events
+   */
+  const handleKeyPress = (event: KeyboardEvent) => {
+    const isSaveDisabled =
+      isSave || !isTestflowEditable ? true : false || testFlowRunning;
+    if (
+      !isSaveDisabled &&
+      (event.metaKey || event.ctrlKey) &&
+      event.code === "KeyS"
+    ) {
+      event.preventDefault();
+      onSaveTestflow();
+    } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
+      event.preventDefault();
+    }
+  };
 </script>
 
 <div class="pe-1">
@@ -21,3 +40,5 @@
     />
   </Tooltip>
 </div>
+
+<svelte:window on:keydown={handleKeyPress} />
