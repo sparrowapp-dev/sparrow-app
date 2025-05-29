@@ -403,7 +403,10 @@ export class DashboardViewModel {
     window.open(constants.SPARROW_GITHUB + "/sparrow-app/releases");
     return;
   };
-
+  onAdminRedirect = async () => {
+    await open(`${constants.SPARROW_WEB_ADMIN_URL}`);
+    return;
+  };
   /**
    * add guest user in local db
    */
@@ -690,7 +693,10 @@ export class DashboardViewModel {
       testflow._id,
     );
 
-    const testflowTab = new TestflowTabAdapter().adapt(testflow.workspaceId, testflowData.toMutableJSON());
+    const testflowTab = new TestflowTabAdapter().adapt(
+      testflow.workspaceId,
+      testflowData.toMutableJSON(),
+    );
 
     await new Sleep().setTime(100).exec();
     await this.tabRepository.createTab(testflowTab, testflow.workspaceId);
@@ -804,7 +810,7 @@ export class DashboardViewModel {
         tree.type === ItemType.SOCKET_IO ||
         tree.type === ItemType.WEB_SOCKET
       ) {
-        let currentFolderDetails =
+        const currentFolderDetails =
           tree.folderId && tree.folderName
             ? { id: tree.folderId, name: tree.folderName }
             : tree.parentFolder
@@ -1026,15 +1032,15 @@ export class DashboardViewModel {
       { teamName: string; workspaceName: string }
     > = {},
   ) {
-    let collectionTree = await this.collectionRepository.getCollectionDocs();
+    const collectionTree = await this.collectionRepository.getCollectionDocs();
     const s = collectionTree.map((_t) => {
       return _t.toMutableJSON();
     });
 
-    let newtree = s;
-    let collection = [];
-    let folder = [];
-    let file = [];
+    const newtree = s;
+    const collection = [];
+    const folder = [];
+    const file = [];
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
@@ -1115,37 +1121,35 @@ export class DashboardViewModel {
     workspace = workspace.map((_value) => _value._data);
 
     let testflow = await this.searchTestflow(searchText);
-    testflow = testflow.map((_value) => 
-      {
-        const workspaceDetails = workspaceMap[_value._data.workspaceId];
-          const path: string[] = [];
-          if (workspaceDetails) {
-            path.push(workspaceDetails.teamName);
-            path.push(workspaceDetails.workspaceName);
-          }
-        return {
-          ..._value._data,
-          path: this.createPath(path),
-        }
-  
-      }  
-      );
-      
-      let environment = await this.searchEnvironment(searchText);
-      environment = environment.map((_environment) => {
-        const workspaceDetails = workspaceMap[_value._data.workspaceId];
-        const path: string[] = [];
-        if (workspaceDetails) {
-          path.push(workspaceDetails.teamName);
-          path.push(workspaceDetails.workspaceName);
-        }
-        return {
-          title: _environment.name,
-          workspace: _environment.workspaceId,
-          id: _environment.id,
-          variable: _environment.variable,
-          path: this.createPath(path),
-      }});
+    testflow = testflow.map((_value) => {
+      const workspaceDetails = workspaceMap[_value._data.workspaceId];
+      const path: string[] = [];
+      if (workspaceDetails) {
+        path.push(workspaceDetails.teamName);
+        path.push(workspaceDetails.workspaceName);
+      }
+      return {
+        ..._value._data,
+        path: this.createPath(path),
+      };
+    });
+
+    let environment = await this.searchEnvironment(searchText);
+    environment = environment.map((_environment) => {
+      const workspaceDetails = workspaceMap[_value._data.workspaceId];
+      const path: string[] = [];
+      if (workspaceDetails) {
+        path.push(workspaceDetails.teamName);
+        path.push(workspaceDetails.workspaceName);
+      }
+      return {
+        title: _environment.name,
+        workspace: _environment.workspaceId,
+        id: _environment.id,
+        variable: _environment.variable,
+        path: this.createPath(path),
+      };
+    });
 
     return { collection, folder, file, workspace, testflow, environment };
   }

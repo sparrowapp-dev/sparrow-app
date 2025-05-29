@@ -264,3 +264,4 @@ export { default as BetaVectorIcon } from "./BetaVectorIcon.svelte";
 export { default as CartRegular } from "./CartRegular.svelte";
 export { default as HomeRegular } from "./HomeRegular.svelte";
 export { default as ShareMultipleRegular } from "./ShareMultipleRegular.svelte";
+export { default as AdminLoginLogo } from "./AdminLoginLogo.svelte";

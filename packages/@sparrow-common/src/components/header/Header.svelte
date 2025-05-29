@@ -199,6 +199,7 @@
   };
   export let user;
   export let onLogout;
+  export let onAdminRedirect;
 
   import { profileTabIcon as profile } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
@@ -624,6 +625,7 @@
           {isGuestUser}
           item={sidebarModalItem}
           {onLogout}
+          {onAdminRedirect}
           bind:showProfileModal
         />
       </div>
