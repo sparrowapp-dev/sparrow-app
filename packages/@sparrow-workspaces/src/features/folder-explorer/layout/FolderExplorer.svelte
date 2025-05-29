@@ -64,6 +64,7 @@
   import {
     AddRegular,
     ArrowSwapRegular,
+    BotRegular,
     CaretDownFilled,
     CaretUpFilled,
     FolderAddRegular,
@@ -136,6 +137,19 @@
       },
       name: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
       icon: GraphIcon,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("aiRequestFolder", {
+          workspaceId: collection.workspaceId,
+          collection: collection,
+          folder: folder,
+        });
+      },
+      name: `Add AI Request`,
+      icon: BotRegular,
       iconColor: "var(--icon-ds-neutral-50)",
       iconSize: "14px",
     },
