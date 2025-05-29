@@ -8,7 +8,7 @@ export const teamSchemaLiteral = {
   title: "team",
   primaryKey: "teamId",
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
     teamId: {
       type: "string",

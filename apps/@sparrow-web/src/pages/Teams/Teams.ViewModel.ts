@@ -112,7 +112,6 @@ export class TeamsViewModel {
           owner,
           plan,
           admins,
-          plan,
           createdAt,
           createdBy,
           updatedAt,
