@@ -171,16 +171,16 @@ export enum ModelIdNameMapping {
 
 export enum ModelVariantIdNameMapping {
     // — OpenAI GPT family
-    "gpt-4o" = "GPT_4o",
-    "gpt-4o-mini" = "GPT_4o_Mini",
-    "gpt-4.5-preview" = "GPT_4_5_Preview",
-    "gpt-4-turbo" = "GPT_4_Turbo",
-    "gpt-4" = "GPT_4",
-    "gpt-4.1" = "GPT_4_1",
-    "o1" = "GPT_o1",
-    "o1-mini" = "GPT_o1_Mini",
-    "o3-mini" = "GPT_o3_Mini",
-    "gpt-3.5-turbo" = "GPT_3_5_Turbo",
+    "gpt-4o" = "GPT 4o",
+    "gpt-4o-mini" = "GPT 4o Mini",
+    "gpt-4.5-preview" = "GPT 4.5 Preview",
+    "gpt-4-turbo" = "GPT 4 Turbo",
+    "gpt-4" = "GPT 4",
+    "gpt-4.1" = "GPT 4.1",
+    "o1" = "o1",
+    "o1-mini" = "o1 Mini",
+    "o3-mini" = "o3 Mini",
+    "gpt-3.5-turbo" = "GPT 3.5 Turbo",
 
     // — Anthropic Claude 3 family
     "claude-3-5-sonnet-20241022" = "Claude 3.5 Sonnet",
@@ -192,6 +192,12 @@ export enum ModelVariantIdNameMapping {
     // — Deepseek family
     "deepseek-chat" = "DeepSeek V3",
     "deepseek-reasoner" = "DeepSeek R1",
+
+    // — Gemini family
+    "gemini-1.5-flash" = "Gemini 1.5 Flash",
+    "gemini-1.5-flash-8b" = "Gemini 1.5 Flash 8b",
+    "gemini-1.5-pro" = "Gemini 1.5 Pro",
+    "gemini-2.0-flash" = "Gemini 2.0 Flash",
 }
 
 
@@ -220,10 +226,11 @@ export const DefaultAiConfig = {
         top_p: 0.75,
     },
     GOOGLE: {
+        streamResponse: false,
+        jsonResponseFormat: false,
         temperature: 1.0,
+        maxTokens: 1024,
         top_p: 0.95,
-        presencePenalty: 0,
-        frequencyPenalty: 0,
     }
 };
 

@@ -37,7 +37,7 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import type { AiModelProviderEnum, modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
+import { AiModelProviderEnum, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
@@ -618,7 +618,7 @@ class AiRequestExplorerViewModel {
     const aiRequestData = {
       feature: "llm-evaluation",
       // userInput: prompt,
-      userInput: userInputConvo,
+      userInput: (modelProvider === AiModelProviderEnum.Google) ? prompt : userInputConvo,
       authKey: authKey.authValue,
       configs: modelSpecificConfig,
       model: modelProvider || "openai",
@@ -626,9 +626,12 @@ class AiRequestExplorerViewModel {
       ...(disabledModelFeatures["System Prompt"].includes(modelVariant)
         ? {}
         : { systemPrompt: finalSP || "Answer my queries." }),
-      // ...(formattedConversations.length > 0 && !isChatAutoClearActive && {
-      //   conversation: formattedConversations,
+      // ...(modelProvider === AiModelProviderEnum.Google && !isChatAutoClearActive && {
+      //   conversation: userInputConvo,
       // }),
+      ...(modelProvider === AiModelProviderEnum.Google && {
+        conversation: isChatAutoClearActive ? "" : userInputConvo,
+      }),
     }
 
     // console.log("AI Request Data:", aiRequestData);
@@ -717,7 +720,9 @@ class AiRequestExplorerViewModel {
                   outputTokens: 0,
                   totalTokens: 0,
                   statusCode: response.statusCode,
-                  time: response.timeTaken.replace("ms", "")
+                  time: response.timeTaken.replace("ms", ""),
+                  modelProvider, 
+                  modelVariant
                 },
               ]);
               await this.updateRequestState({
@@ -731,7 +736,9 @@ class AiRequestExplorerViewModel {
                   inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  time: response.timeTaken.replace("ms", "")
+                  time: response.timeTaken.replace("ms", ""),
+                  modelProvider, 
+                  modelVariant
                 },
               };
 
@@ -769,6 +776,8 @@ class AiRequestExplorerViewModel {
                       isLiked: false,
                       isDisliked: false,
                       status: true,
+                      modelProvider, 
+                      modelVariant
                     },
                   ]);
                   messageCreated = true;

@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 24,
+  version: 25,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1368,16 +1368,19 @@ export const tabSchemaLiteral = {
                   type: "object",
                   properties: {
                     type: "object",
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
                     temperature: {
                       type: "number",
                     },
                     top_p: {
                       type: "number",
                     },
-                    presencePenalty: {
-                      type: "number",
-                    },
-                    frequencyPenalty: {
+                    maxTokens: {
                       type: "number",
                     },
                   },
