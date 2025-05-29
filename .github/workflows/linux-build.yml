@@ -116,7 +116,7 @@ jobs:
           mv publishDir gh-pages
 
       - name: Upload gh-pages artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gh-pages
           path: gh-pages
@@ -127,7 +127,7 @@ jobs:
     steps:
       
       - name: Download gh-pages artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: gh-pages
           path: gh-pages      
