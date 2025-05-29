@@ -965,10 +965,10 @@ export class DashboardViewModel {
       return _t.toMutableJSON();
     });
 
-    const newtree = s;
-    const collection = [];
-    const folder = [];
-    const file = [];
+    let newtree = s;
+    let collection = [];
+    let folder = [];
+    let file = [];
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
