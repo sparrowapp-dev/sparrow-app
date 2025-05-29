@@ -122,11 +122,12 @@
   tabindex="0"
 >
   {#if list.icon}
-    <div class="me-2">
+    <div class="me-2 mt-1">
       <svelte:component
         this={list.icon}
         {...list.iconProps}
         class="menu-icon"
+        size="16px"
       />
     </div>
   {/if}
