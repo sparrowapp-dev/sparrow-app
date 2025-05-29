@@ -6,6 +6,7 @@ import {
   copyToClipBoard,
   createDeepCopy,
   Debounce,
+  moveNavigation,
   throttle,
 } from "@sparrow/common/utils";
 import type {
@@ -31,6 +32,8 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 import constants from "src/constants/constants";
+import { InitHubTab } from "../../../../../../../packages/@sparrow-common/src/utils/init-hub-tab";
+import { TeamService } from "src/services/team.service";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -45,6 +48,7 @@ export default class WorkspaceExplorerViewModel {
   private collectionService = new CollectionService();
   private workspaceService = new WorkspaceService();
   private updatesService = new UpdatesService();
+  private teamService = new TeamService();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
@@ -577,7 +581,7 @@ export default class WorkspaceExplorerViewModel {
         progressiveTab.id,
         updatedata,
       );
-    } 
+    }
     return response;
   };
 
@@ -587,5 +591,18 @@ export default class WorkspaceExplorerViewModel {
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
     );
     notifications.success("Link copied to clipboard.");
+  };
+
+  public handleHubTabCreation = async (teamId: string, workspaceId: string) => {
+    const team = await this.teamService.fetchPublicTeam(teamId);
+    if (team.isSuccessful && team?.data?.data) {
+      const teamData = team.data.data;
+      const hubTab = new InitHubTab(teamData._id, workspaceId);
+      hubTab.updateName(teamData.name);
+      hubTab.updateDescription(teamData.description);
+      hubTab.updateHubProperty(teamData);
+      await this.tabRepository.createTab(hubTab.getValue());
+      moveNavigation("right");
+    }
   };
 }

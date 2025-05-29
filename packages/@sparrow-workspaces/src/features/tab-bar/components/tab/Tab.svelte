@@ -254,6 +254,10 @@
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
         </span>
+      {:else if tab.type === TabTypeEnum.HUB}
+        <span>
+          <BookIcon />
+        </span>
       {:else if tab.type === TabTypeEnum.WORKSPACE}
         <span>
           <BookIcon />

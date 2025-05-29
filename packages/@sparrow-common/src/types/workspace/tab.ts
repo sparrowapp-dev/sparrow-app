@@ -10,6 +10,7 @@ import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-t
 import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab";
 import type { AiRequestWrapper } from "./ai-request-tab";
 import type { MockHistoryWrapper } from "./mock-history-tab";
+import type { HubWrapper } from "./hub-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -26,6 +27,7 @@ export enum TabTypeEnum {
   AI_REQUEST = "AI_REQUEST",
   MOCK_REQUEST = "MOCK_REQUEST",
   MOCK_HISTORY = "MOCK_HISTORY",
+  HUB = "HUB",
 }
 
 export enum TabPersistenceTypeEnum {
@@ -108,7 +110,8 @@ export interface Property
     Partial<GraphqlRequestWrapperTabInterface>,
     Partial<HttpRequestMockWrapperTabInterface>,
     Partial<HttpRequestSavedWrapperTabInterface>,
-    Partial<AiRequestWrapper> {}
+    Partial<AiRequestWrapper>,
+    Partial<HubWrapper> {}
 
 export interface PropertyWrapper {
   property: Property;
