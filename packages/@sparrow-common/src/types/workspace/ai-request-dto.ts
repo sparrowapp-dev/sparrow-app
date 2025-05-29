@@ -450,7 +450,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "4096",
         displayName: "Max Tokens",
         description:
@@ -486,7 +486,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "4096",
         displayName: "Max Tokens",
         description:
@@ -522,7 +522,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "4096",
         displayName: "Max Tokens",
         description:
@@ -558,7 +558,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "4096",
         displayName: "Max Tokens",
         description:
@@ -595,7 +595,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "4096",
         displayName: "Max Tokens",
         description:
@@ -640,7 +640,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "2048",
         displayName: "Max Output Tokens",
         description:
@@ -682,7 +682,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "2048",
         displayName: "Max Output Tokens",
         description:
@@ -724,7 +724,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "2048",
         displayName: "Max Output Tokens",
         description:
@@ -767,7 +767,7 @@ export const configFormat: {
       },
       maxTokens: {
         type: "number",
-        min: "1",
+        min: "-1",
         max: "2048",
         displayName: "Max Output Tokens",
         description:
