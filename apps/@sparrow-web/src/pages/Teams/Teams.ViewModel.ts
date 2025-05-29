@@ -163,7 +163,7 @@ export class TeamsViewModel {
           constants.API_URL,
         );
         for (const planData of fetchedPlans) {
-          const rawData = planData?.data?.data;
+          const rawData = planData;
           if (!rawData?._id) continue;
           const planDetails = {
             planId: rawData._id,
