@@ -1,4 +1,4 @@
-name: Development release
+name: sparrow plans release
 
 on:
   push:
