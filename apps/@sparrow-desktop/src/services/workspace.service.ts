@@ -163,6 +163,17 @@ export class WorkspaceService {
     return response;
   };
 
+  public fetchPublicWorkspace = async (workspaceId: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/public/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public searchPublicWorkspaces = async (
     searchTerm: string,
     page: number = 1,
