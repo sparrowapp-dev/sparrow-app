@@ -171,7 +171,9 @@
             class="text-ds-font-size-14 text-ds-font-weight-regular text-ds-line-height-143"
             style="width: 60%;"
           >
-            {activeWorkspace?.description}
+            {activeWorkspace?.description
+              ? activeWorkspace.description
+              : "No summary added."}
           </p>
         </div>
         <div class="background-icon">
