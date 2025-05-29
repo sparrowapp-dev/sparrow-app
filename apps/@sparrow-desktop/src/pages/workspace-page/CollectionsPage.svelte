@@ -908,7 +908,7 @@
                   {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
-                        <GraphqlExplorerPage tab={$activeTab} {userRole} />
+                        <GraphqlExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
