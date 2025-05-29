@@ -258,7 +258,11 @@ export class TeamsViewModel {
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New hub ${team.name} is created.`);
     } else {
-      notifications.error("Failed to create a new hub. Please try again.");
+      if(response?.message === "Plan limit reached"){
+        notifications.error("Failed to create hub. please upgrade your plan.");
+      }else{
+        notifications.error("Failed to create hub. Please try again.");
+      }
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;

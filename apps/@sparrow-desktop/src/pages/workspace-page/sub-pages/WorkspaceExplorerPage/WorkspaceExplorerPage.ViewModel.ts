@@ -323,7 +323,12 @@ export default class WorkspaceExplorerViewModel {
         `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
       );
     } else {
-      notifications.error(`Failed to send invite. Please try again.`);
+      if(response?.message === "Plan limit reached"){
+        notifications.error("Failed to send invite. please upgrade your plan.");
+      }
+      else{
+        notifications.error(`Failed to send invite. Please try again.`);
+      }
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
