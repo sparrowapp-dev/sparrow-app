@@ -615,12 +615,19 @@ export const configFormat: {
   },
 
   google: {
-    "gemini-pro": {
+    "gemini-1.5-flash": {
       streamResponse: {
         type: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+      },
+      jsonResponseFormat: {
+        type: "boolean",
+        displayName: "Response Format (JSON)",
+        description:
+          "Forces the model to adhere strictly to JSON formatting in its output.",
+        defaultValue: false,
       },
       temperature: {
         type: "number",
@@ -640,6 +647,143 @@ export const configFormat: {
           "The maximum number of tokens that can be generated in the response.",
         defaultValue: 1024,
       },
+      top_p: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Top P",
+        description:
+          "Controls the randomness of the LLM response.",
+        defaultValue: 0,
+      },
+    },
+    "gemini-1.5-flash-8b": {
+      streamResponse: {
+        type: "boolean",
+        displayName: "Stream Response",
+        description: "Enables real-time output of the model's generated content.",
+        defaultValue: true,
+      },
+      jsonResponseFormat: {
+        type: "boolean",
+        displayName: "Response Format (JSON)",
+        description:
+          "Forces the model to adhere strictly to JSON formatting in its output.",
+        defaultValue: false,
+      },
+      temperature: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Temperature",
+        description:
+          "Controls the randomness of the output. Higher values increase creativity.",
+        defaultValue: 0.9,
+      },
+      maxTokens: {
+        type: "number",
+        min: "1",
+        max: "2048",
+        displayName: "Max Output Tokens",
+        description:
+          "The maximum number of tokens that can be generated in the response.",
+        defaultValue: 1024,
+      },
+      top_p: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Top P",
+        description:
+          "Controls the randomness of the LLM response.",
+        defaultValue: 0,
+      },
+    },
+    "gemini-1.5-pro": {
+      streamResponse: {
+        type: "boolean",
+        displayName: "Stream Response",
+        description: "Enables real-time output of the model's generated content.",
+        defaultValue: true,
+      },
+      jsonResponseFormat: {
+        type: "boolean",
+        displayName: "Response Format (JSON)",
+        description:
+          "Forces the model to adhere strictly to JSON formatting in its output.",
+        defaultValue: false,
+      },
+      temperature: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Temperature",
+        description:
+          "Controls the randomness of the output. Higher values increase creativity.",
+        defaultValue: 0.9,
+      },
+      maxTokens: {
+        type: "number",
+        min: "1",
+        max: "2048",
+        displayName: "Max Output Tokens",
+        description:
+          "The maximum number of tokens that can be generated in the response.",
+        defaultValue: 1024,
+      },
+      top_p: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Top P",
+        description:
+          "Controls the randomness of the LLM response.",
+        defaultValue: 0,
+      },
+      
+    },
+    "gemini-2.0-flash": {
+      streamResponse: {
+        type: "boolean",
+        displayName: "Stream Response",
+        description: "Enables real-time output of the model's generated content.",
+        defaultValue: true,
+      },
+      jsonResponseFormat: {
+        type: "boolean",
+        displayName: "Response Format (JSON)",
+        description:
+          "Forces the model to adhere strictly to JSON formatting in its output.",
+        defaultValue: false,
+      },
+      temperature: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Temperature",
+        description:
+          "Controls the randomness of the output. Higher values increase creativity.",
+        defaultValue: 0.9,
+      },
+      maxTokens: {
+        type: "number",
+        min: "1",
+        max: "2048",
+        displayName: "Max Output Tokens",
+        description:
+          "The maximum number of tokens that can be generated in the response.",
+        defaultValue: 1024,
+      },
+      top_p: {
+        type: "number",
+        min: "0",
+        max: "1",
+        displayName: "Top P",
+        description:
+          "Controls the randomness of the LLM response.",
+        defaultValue: 0,
+      },
+      
     },
   },
 

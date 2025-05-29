@@ -192,6 +192,12 @@ export enum ModelVariantIdNameMapping {
     // — Deepseek family
     "deepseek-chat" = "DeepSeek V3",
     "deepseek-reasoner" = "DeepSeek R1",
+
+    // — Gemini family
+    "gemini-1.5-flash" = "Gemini 1.5 Flash",
+    "gemini-1.5-flash-8b" = "Gemini 1.5 Flash 8b",
+    "gemini-1.5-pro" = "Gemini 1.5 Pro",
+    "gemini-2.0-flash" = "Gemini 2.0 Flash",
 }
 
 
@@ -220,10 +226,11 @@ export const DefaultAiConfig = {
         top_p: 0.75,
     },
     GOOGLE: {
+        streamResponse: false,
+        jsonResponseFormat: false,
         temperature: 1.0,
+        maxTokens: 1024,
         top_p: 0.95,
-        presencePenalty: 0,
-        frequencyPenalty: 0,
     }
 };
 
