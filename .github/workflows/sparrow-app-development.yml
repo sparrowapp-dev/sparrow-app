@@ -398,8 +398,19 @@ jobs:
         with:
           args: --acl public-read --delete
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}   sparrow-assest
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}   
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'  # Update if your bucket is in another region
           SOURCE_DIR: 'gh-pages'
+
+      - name: Notify Teams Channel
+        run: |
+          curl -H 'Content-Type: application/json' \
+            -d '{
+              "title": "Sparrow Debian Repo Updated",
+              "text": "The latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ secrets.AWS_S3_BUCKET }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com"
+            }' \
+            ${{ secrets.TEAMS_WEBHOOK_URL }}
+        env:
+          AWS_REGION: 'us-east-1'  # Change if different
