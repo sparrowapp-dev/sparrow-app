@@ -11,14 +11,14 @@ export class PlanService {
   };
 
   public getPlansByIds = async (planIds: string[], baseUrl: string) => {
-    const plans = await Promise.all(
-      planIds.map(async (planId) => {
-        return await makeRequest("GET", `${baseUrl}/api/plan/${planId}`, {
-          headers: getAuthHeaders(),
-        });
-      }),
+    const plans = await await makeRequest(
+      "POST",
+      `${baseUrl}/api/plan/details`,
+      {
+        headers: getAuthHeaders(),
+        body: planIds,
+      },
     );
-
-    return plans.filter((plan) => plan !== null);
+    return plans;
   };
 }

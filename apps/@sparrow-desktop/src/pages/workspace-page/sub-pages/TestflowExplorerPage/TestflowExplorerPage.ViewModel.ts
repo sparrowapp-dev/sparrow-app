@@ -1664,12 +1664,10 @@ export class TestflowExplorerPageViewModel {
   /**
    * @description - This function will provide the Count of TestFlow are Created.
    */
-  public fetchCountofTestFlow = () => {
+  public fetchCountofTestFlow = async() => {
     let count = 0;
-    const data = this.testflowRepository.getTestflowsObserver();
-    data?.subscribe((items) => {
-      count = items.length;
-    });
+    const data = await this.testflowRepository.getTestflowDoc();
+    count = data?.length;
     return count;
   };
 }
