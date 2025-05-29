@@ -7,7 +7,8 @@
   import { Alert, Button } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
-  import { apiKeyInstructions } from "@sparrow/common/types/workspace/ai-request-dto";
+  // import { apiKeyInstructions } from "@sparrow/common/types/workspace/ai-request-dto";
+  import { ApiKeyInstructions } from "./constants";
   import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
 
   export let auth;
@@ -22,7 +23,7 @@
   export let selectedModelProvider: AiModelProviderEnum;
 
   // Get instructions for the selected provider
-  $: currentInstructions = apiKeyInstructions[selectedModelProvider];
+  $: currentInstructions = ApiKeyInstructions[selectedModelProvider];
 
   const handlecollection_ai_tab_auth_changed = ({
     aiAuthNavigation,
