@@ -261,6 +261,12 @@ export class RxDB {
           6: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          7: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          8: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -276,6 +282,9 @@ export class RxDB {
             return oldDoc;
           },
           4: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },

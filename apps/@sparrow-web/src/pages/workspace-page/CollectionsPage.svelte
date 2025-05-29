@@ -94,6 +94,7 @@
   import { Spinner } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
+  import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -236,6 +237,10 @@
    * Handle close tab functionality in tab bar list
    */
   const closeTab = async (id: string, tab: Tab) => {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      _viewModel.handleRemoveTab(id);
+      return;
+    }
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -284,8 +289,11 @@
     }
 
     const wsId = currentWOrkspaceValue._id;
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
     _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
-
     for (let tab of unSavedTabs) {
       // Wait for user confirmation before moving to the next tab
       await closeTab(tab.id, tab);
@@ -293,6 +301,12 @@
   };
   // Methods for Tab Controls - start
   const tabsForceCloseInitiator = (currentTabId: string) => {
+    // For viewer role, directly force close without popup
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
+
     tabsToForceClose = $tabList;
     tabIdWhoRecivedForceClose = currentTabId;
 
@@ -568,7 +582,7 @@
       if (prevWorkspaceId !== value._id) {
         isInitialDataLoading = true;
         activeTab = undefined;
-        await handleRefreshApicalls(value?._id);
+        handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -828,6 +842,7 @@
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
           onUpdateRunningState={_viewModel.handleMockCollectionState}
+          onOpenWorkspace={_viewModel.handleOpenWorkspace}
         />
       </Pane>
       <Pane
@@ -860,6 +875,7 @@
               onClickCloseOtherTabs={softCloseTabs}
               onClickForceCloseTabs={tabsForceCloseInitiator}
               onClickDuplicateTab={handleTabDuplication}
+              {userRole}
             />
             <div style="flex:1; overflow: hidden;">
               <Route>
@@ -947,6 +963,12 @@
                           bind:isTourGuideOpen
                           tab={$activeTab}
                         />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}

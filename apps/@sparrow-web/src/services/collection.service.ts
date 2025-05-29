@@ -783,4 +783,19 @@ export class CollectionService {
     );
     return response;
   };
+
+  public geCollectionByIdAndWorkspace = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

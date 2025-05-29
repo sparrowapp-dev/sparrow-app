@@ -55,6 +55,8 @@ export class CollectionRepository {
       if (data.currentBranch) value.currentBranch = data.currentBranch;
       if (data.localRepositoryPath)
         value.localRepositoryPath = data.localRepositoryPath;
+      if (data.mockRequestHistory)
+        value.mockRequestHistory = data.mockRequestHistory;
       return value;
     });
 

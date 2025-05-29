@@ -139,7 +139,7 @@ export function groupChanges(changes: MergeChange[], editorView: EditorView): Me
   for (const change of changes) {
     // If we don't have a current group or this change is far from the current group
     if (!currentGroup ||
-      (editorView.lineBlockAt(change.from).from - editorView.lineBlockAt(currentGroup.to).to >= 1)) {
+      (editorView.lineBlockAt(change.from).from - editorView.lineBlockAt(currentGroup.to).to > 1)) {
       // Start a new group
       //   currentGroup = { ...change };
       currentGroup = {

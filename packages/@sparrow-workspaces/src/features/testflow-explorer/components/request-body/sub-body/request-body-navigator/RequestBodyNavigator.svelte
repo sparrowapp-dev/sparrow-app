@@ -10,6 +10,7 @@
     requestBodyTypes,
   } from "../../../../../../../../@sparrow-common/src/utils/testFlow.helper";
   import { MathFormulaRegular } from "@sparrow/library/icons";
+  import { handleEventOnClickDynamicExpressionButton } from "@sparrow/common/utils";
 
   export let method = "GET";
   export let onUpdateRequestState;
@@ -112,6 +113,11 @@
           startIcon={MathFormulaRegular}
           title={"Insert Dynamic Content"}
           onClick={() => {
+            handleEventOnClickDynamicExpressionButton(
+              "RequestBodyNavigator",
+              "cta_button",
+              "body",
+            );
             handleOpenCurrentDynamicExpression({
               type: "raw",
               dispatch: dispatcher,

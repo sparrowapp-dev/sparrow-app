@@ -77,7 +77,7 @@
           onUpdateInput={() => {
             handleAuthChange();
           }}
-          placeholder={"Enter auth value"}
+          placeholder={"Paste your API key here ..."}
           {theme}
           {disabled}
           {environmentVariables}

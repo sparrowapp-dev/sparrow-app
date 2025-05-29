@@ -38,10 +38,10 @@
           <WithSelect
             id={"hash999"}
             data={[
-              {
-                name: "No Auth",
-                id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
-              },
+              // {
+              //   name: "No Auth",
+              //   id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+              // },
               // {
               //   name: "Inherit Auth",
               //   id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,
@@ -78,7 +78,7 @@
       class="text-ds-font-size-12 text-ds-font-weight-regular"
       style="color:var(--text-ds-neutral-400)"
     >
-      Add the api key you've got from your provdier
+      Add the API key of your selected AI model.
     </p>
   </div>
   <section class="w-100" style="flex:1; overflow:auto;">

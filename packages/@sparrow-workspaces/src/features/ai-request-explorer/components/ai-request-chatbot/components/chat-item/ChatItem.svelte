@@ -513,9 +513,7 @@
     <div class="send-item">
       <ResponseStatus
         response={{
-          tokenCount: isResponseGenerating
-            ? 0
-            : aiResponseMetrices?.response.inputTokens || 0,
+          tokenCount: aiResponseMetrices?.response.inputTokens || 0,
           AI_Model_Variant: modelVariant,
         }}
         responseType={"Sender"}
@@ -548,17 +546,17 @@
     -- 
     -->
     <div class="recieve-item p-2">
-      {#if !isResponseGenerating}
-        <ResponseStatus
-          response={{
-            time: aiResponseMetrices?.response.time || 0,
-            status: aiResponseMetrices?.response.statusCode || "",
-            tokenCount: aiResponseMetrices?.response.outputTokens || 0,
-            AI_Model_Variant: OpenAIModelEnum.GPT_4o,
-          }}
-          responseType={"Receiver"}
-        />
-      {/if}
+      <!-- {#if !isResponseGenerating} -->
+      <ResponseStatus
+        response={{
+          time: aiResponseMetrices?.response.time || 0,
+          status: aiResponseMetrices?.response.statusCode || "",
+          tokenCount: aiResponseMetrices?.response.outputTokens || 0,
+          AI_Model_Variant: OpenAIModelEnum.GPT_4o,
+        }}
+        responseType={"Receiver"}
+      />
+      <!-- {/if} -->
       {#if status}
         <div class="markdown">
           {@html extractedMessage}
@@ -696,7 +694,11 @@
     min-width: 276px;
     max-height: 400px;
     min-height: 70px;
-    background: var(--sparrow-black) !important;
+
+    /* *sparrow black is not rendering, so using hardcode hexcode* */
+    /* background: var(--sparrow-black) !important; */
+    background: #000 !important;
+
     border: 2px solid var(--border-ds-surface-400);
     border-radius: 8px;
     overflow-y: auto;

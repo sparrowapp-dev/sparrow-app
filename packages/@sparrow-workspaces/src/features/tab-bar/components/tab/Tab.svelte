@@ -28,6 +28,8 @@
     CopyRegular,
     BoardRegular,
     BotRegular,
+    HistoryRegular,
+    HistoryIcon2,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -36,6 +38,7 @@
   import { type Tab } from "@sparrow/common/types/workspace/tab";
   import { Badge, Spinner, Options, Dropdown, Tag } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
   // ----
 
   // ------ Props ------
@@ -82,6 +85,8 @@
   export let onClickCloseOtherTabs: (tabId: string) => void;
   export let onClickForceCloseTabs: (tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
+  export let userRole;
+
   let noOfColumns = 200;
   let showTabControlMenu = false;
 
@@ -297,6 +302,10 @@
         <span>
           <BotRegular height={"17px"} width={"15px"} />
         </span>
+      {:else if tab.type === TabTypeEnum.MOCK_HISTORY}
+        <span>
+          <HistoryIcon2 height={"16px"} width={"16px"} />
+        </span>
       {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
         <span>
           <!-- <GraphIcon
@@ -336,7 +345,7 @@
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
         >
-          {#if tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted}
+          {#if (tab?.source !== "SPEC" || !tab?.activeSync || tab?.isDeleted) && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <Badge type="dot" variant="danger" size="medium" />
           {/if}
         </div>

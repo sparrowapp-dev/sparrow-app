@@ -38,7 +38,11 @@ import type {
 //Emuns
 
 import { ItemType, UntrackedItems } from "@sparrow/common/enums/item-type.enum";
-import { ContentTypeEnum, ResponseStatusCode } from "@sparrow/common/enums";
+import {
+  ContentTypeEnum,
+  ResponseStatusCode,
+  WorkspaceType,
+} from "@sparrow/common/enums";
 //-----
 
 import { moveNavigation } from "@sparrow/common/utils/navigation";
@@ -136,7 +140,10 @@ import type { CollectionNavigationTabEnum } from "@sparrow/common/types/workspac
 import { WorkspaceService } from "@app/services/workspace.service";
 import constants from "@app/constants/constants";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
+import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
+import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -204,10 +211,22 @@ export default class CollectionsViewModel {
     };
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const res = await this.collectionService.fetchCollection(
-      workspaceId,
-      baseUrl,
-    );
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let res;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      res = await this.collectionService.fetchPublicCollection(
+        workspaceId,
+        constants.API_URL,
+      );
+    } else {
+      res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
+    }
+
     if (res?.isSuccessful && res?.data?.data) {
       const collections = res.data.data;
       await this.collectionRepository.bulkInsertData(
@@ -406,7 +425,7 @@ export default class CollectionsViewModel {
     }
   };
 
-   /**
+  /**
    * Create ai request new tab with untracked id
    */
   private createAiRequestNewTab = async () => {
@@ -2973,6 +2992,19 @@ export default class CollectionsViewModel {
     this.tabRepository.createTab(collectionTabAdapter);
     moveNavigation("right");
   };
+
+  public handleOpenMockHistory = (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const mockHistroyTab = new MockHistoryTabAdapter().adapt(
+      workspaceId,
+      collection.id,
+    );
+    this.handleCreateTab(mockHistroyTab);
+    moveNavigation("right");
+  };
+
   /**
    * Handles renaming a request
    * @param workspaceId :string
@@ -5315,6 +5347,12 @@ export default class CollectionsViewModel {
           args.graphql as CollectionItemsDto,
         );
         break;
+      case "mockHistory":
+        this.handleOpenMockHistory(
+          args.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
     }
   };
 
@@ -7269,6 +7307,17 @@ export default class CollectionsViewModel {
       notifications.error(response.message);
     } else {
       notifications.error("Failed to update running state. Please try again.");
+    }
+  };
+  public handleOpenWorkspace = async (id: string) => {
+    if (!id) return;
+    try {
+      const res = await this.workspaceRepository.readWorkspace(id);
+      const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+      await this.tabRepository.createTab(initWorkspaceTab, id);
+    } catch (error) {
+      console.error("Error opening workspace:", error);
+      notifications.error("Failed to open workspace. Please try again.");
     }
   };
 }

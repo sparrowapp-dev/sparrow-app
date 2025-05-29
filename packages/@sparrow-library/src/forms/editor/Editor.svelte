@@ -1,10 +1,9 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
-  import { basicSetup, basicTheme } from "./theme";
+  import { getBasicSetup, getTheme } from "./theme";
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import handleCodeMirrorSyntaxFormat from "./editor";
   import { EditorView } from "codemirror";
-  import { EditorSelection } from "@codemirror/state";
   import { createEventDispatcher } from "svelte";
   import {
     placeholder as CreatePlaceHolder,
@@ -20,6 +19,10 @@
   import { RangeSetBuilder } from "@codemirror/state";
   import { MathFormulaFunction } from "@sparrow/library/assets";
   import { DismissIcon } from "@sparrow/library/assets";
+  import {
+    handleEventonClickApplyChangesAI,
+    handleEventOnClickApplyUndoAI,
+  } from "@sparrow/common/utils";
   import MergeView from "./MergeView.svelte";
 
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
@@ -42,6 +45,9 @@
   export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
+  export let showLineNumbers = true;
+  export let highlightActiveLine = true;
+  export let highlightActiveLineGutter = true;
 
   // For merge view props
   export let isMergeViewEnabled = false;
@@ -55,20 +61,22 @@
   const languageConf = new Compartment();
   const lintConf = new Compartment(); // Compartment for linting
   const mergeConf = new Compartment(); // Compartment for diff/merge view
+  const themeConf = new Compartment(); // Compartment for theme
+  const setupConf = new Compartment(); // Compartment for basic setup
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
-    if (update.docChanged || update.selectionSet) {
+    if (update.docChanged) {
       const isAutoChange = update?.transactions?.some((transaction) =>
         transaction?.annotations?.some((annotation) => annotation?.autoChange),
       );
-      const content = update.state.doc.toString();
-      const cursor = update.state.selection.main.head;
-      cursorPosition = cursor;
-      if (!isAutoChange && update.docChanged) {
-        dispatch("change", content);
+      if (!isAutoChange) {
+        // only hits for input, blur etc type of events.
+        const content = update.state.doc.toString(); // Get the new content
+        cursorPosition = update.state.selection.main.head;
+        dispatch("change", content); // Dispatch the new content to parent.
       }
     }
   });
@@ -272,32 +280,18 @@
     createDiagnostics(view.state.doc.toString()),
   );
 
-  const findCursorPosition = (text: string): number => {
-    if (!text || text.length === 0) return 0;
-
-    const lines = text.split("\n");
-    let lineIndex = lines.length - 1;
-    while (lineIndex >= 0 && lines[lineIndex].trim() === "") {
-      lineIndex--;
-    }
-
-    if (lineIndex < 0) return 0;
-
-    let position = 0;
-    for (let i = 0; i < lineIndex; i++) {
-      position += lines[i].length + 1;
-    }
-
-    position += lines[lineIndex].length;
-    return position;
-  };
-
   function initalizeCodeMirrorEditor(value: string) {
+    const editorOptions = {
+      showLineNumbers,
+      highlightActiveLine,
+      highlightActiveLineGutter,
+    };
+
     let extensions: Extension[];
     extensions = [
       ...(isEnterKeyNotAllowed ? [keyBindings] : []),
-      basicSetup,
-      basicTheme,
+      setupConf.of(getBasicSetup(editorOptions)),
+      themeConf.of(getTheme(editorOptions)),
       expressionPlugin,
       dragDropPlugin,
       languageConf.of([]),
@@ -309,11 +303,12 @@
       CreatePlaceHolder(placeholder),
     ];
 
-    const cursorPos = findCursorPosition(value);
     let state = EditorState.create({
       doc: value,
       extensions: extensions,
-      selection: EditorSelection.cursor(cursorPos),
+      selection: autofocus
+        ? { anchor: value.length, head: value.length }
+        : { anchor: 0, head: 0 },
     });
 
     codeMirrorView = new EditorView({
@@ -325,7 +320,7 @@
       setTimeout(() => {
         codeMirrorView.focus();
         codeMirrorView.dispatch({
-          effects: EditorView.scrollIntoView(cursorPos),
+          effects: EditorView.scrollIntoView(value.length),
         });
       }, 100);
     }
@@ -366,22 +361,22 @@
   afterUpdate(() => {
     // Handling the mergeview state while component state changes
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
-      const cursorPos = findCursorPosition(value);
-
       codeMirrorView.dispatch({
         changes: {
           from: 0,
           to: codeMirrorView.state.doc.length,
           insert: value,
         },
-        selection: EditorSelection.cursor(cursorPos),
+        selection: autofocus
+          ? { anchor: value.length, head: value.length }
+          : { anchor: 0, head: 0 },
         annotations: [{ autoChange: true }],
       });
 
       if (autofocus && isEditable) {
         codeMirrorView.focus();
         codeMirrorView.dispatch({
-          effects: EditorView.scrollIntoView(cursorPos),
+          effects: EditorView.scrollIntoView(value.length),
         });
       }
     }

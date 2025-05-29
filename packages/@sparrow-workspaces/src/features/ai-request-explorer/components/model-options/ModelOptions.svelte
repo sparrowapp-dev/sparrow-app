@@ -47,14 +47,24 @@
     {
       name: "Anthropic",
       id: "anthropic",
-      disabled: true,
+      disabled: false,
       icon: AnthropicVectorIcon,
       models: [
-        { name: "Claude 3 Opus", id: "claude-3-opus" },
-        { name: "Claude 3 Sonnet", id: "claude-3-sonnet" },
-        { name: "Claude 3 Haiku", id: "claude-3-haiku" },
-        { name: "Claude 3.5 Sonnet", id: "claude-3.5-sonnet" },
-        { name: "Claude 3.5 Haiku", id: "claude-3.5-haiku" },
+        { name: "Claude 3.5 Sonnet", id: "claude-3-5-sonnet-20241022" },
+        { name: "Claude 3.5 Haiku", id: "claude-3-5-haiku-20241022" },
+        { name: "Claude 3 Opus", id: "claude-3-opus-20240229" },
+        { name: "Claude 3 Haiku", id: "claude-3-haiku-20240307" },
+        { name: "Claude 3 Sonnet", id: "claude-3-5-sonnet-20240620" },
+      ],
+    },
+    {
+      name: "DeepSeek",
+      id: "deepseek",
+      disabled: false,
+      icon: DeepseekVectorIcon,
+      models: [
+        { name: "DeepSeek V3", id: "deepseek-chat" },
+        { name: "DeepSeek R1", id: "deepseek-reasoner" },
       ],
     },
     {
@@ -65,16 +75,6 @@
       models: [
         { name: "Gemini Pro", id: "gemini-pro" },
         { name: "Gemini Ultra", id: "gemini-ultra" },
-      ],
-    },
-    {
-      name: "DeepSeek",
-      id: "deepseek",
-      disabled: true,
-      icon: DeepseekVectorIcon,
-      models: [
-        { name: "DeepSeek Coder", id: "deepseek-coder" },
-        { name: "DeepSeek Chat", id: "deepseek-chat" },
       ],
     },
   ];
@@ -203,7 +203,7 @@
 
   .models-container {
     max-height: 230px;
-    min-height: 100px;
+    min-height: 170px;
   }
 
   .model-card {

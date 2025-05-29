@@ -7,6 +7,7 @@
   import DynamicContent from "../components/dynamic-content/DynamicContent.svelte";
   import FunctionsOptions from "../components/function-options/FunctionsOptions.svelte";
   import { isDynamicExpressionContent } from "../../testflow-explorer/store";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   export let requestApis: any;
   export let environmentVariables: any;
@@ -18,6 +19,8 @@
   export let edges;
   export let onPreviewExpression;
   export let dynamicExpressionPath: string = "";
+
+  let dispatcher;
 
   let currentTabId: TFDynamicExpressionTabsEnum =
     TFDynamicExpressionTabsEnum.DYNAMICCONTENT;
@@ -72,7 +75,32 @@
       dynamicExpressionPath = "body" + " > " + dynamicExpressionPath;
     }
   }
-  let cursorPosition: number | null = 0;
+
+  const getFirstMatchingType = (expression: string) => {
+    const types = [
+      "response.body",
+      "response.header",
+      "request.body",
+      "request.header",
+      "request.parameter",
+      "variable",
+    ];
+    for (const type of types) {
+      if (expression.includes(type)) {
+        return type;
+      }
+    }
+    return null;
+  };
+
+  const handleEventOnClickInsertDE = () => {
+    captureEvent("expression_inserted", {
+      component: "TestFlowDynamicExpression",
+      buttonText: "Insert Dynamic Expression",
+      sourceLocation: `${dynamicExpressionPath}`,
+      insertType: getFirstMatchingType(expression),
+    });
+  };
 </script>
 
 <div class="d-flex justify-content-between" style="gap: 12px; margin-top:16px;">
@@ -82,7 +110,7 @@
       {onPreviewExpression}
       {handleAddingNested}
       bind:selectedApiRequestType
-      bind:cursorPosition
+      bind:dispatcher
     />
   </div>
   <div class="w-50">
@@ -106,11 +134,11 @@
               {requestApis}
               {environmentVariables}
               bind:selectedApiRequestType
-              bind:cursorPosition
+              bind:dispatcher
               {edges}
             />
           {:else if currentTabId === TFDynamicExpressionTabsEnum.FUNCTIONS}
-            <FunctionsOptions bind:expression bind:cursorPosition />
+            <FunctionsOptions bind:expression bind:dispatcher />
           {/if}
         {/key}
       </div>
@@ -133,6 +161,7 @@
       disable={!expression}
       size="medium"
       onClick={() => {
+        handleEventOnClickInsertDE();
         onInsertExpression(expression);
       }}
     />

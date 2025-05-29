@@ -7,7 +7,7 @@
   } from "@sparrow/library/assets";
   import type { WorkspaceDocument } from "@app/database/database";
   import { Button, Spinner } from "@sparrow/library/ui";
-  import { WorkspaceGrid } from "@sparrow/teams/compopnents";
+  import { WorkspaceGrid } from "@sparrow/common/components";
   import { TeamSkeleton } from "../../images";
   import { SparrowLogo } from "@sparrow/common/icons";
   import {
@@ -83,9 +83,9 @@
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
     if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 5);
+      return filteredWorkspaces.slice(0, 6);
     } else {
-      const startIndex = 5 + (currPage - 2) * 6;
+      const startIndex = 6 + (currPage - 2) * 6;
       return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
     }
   })();
@@ -93,13 +93,13 @@
   // This will calculate the total number of pages
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
-    if (total <= 5) return 1;
-    return Math.ceil((total - 5) / 6) + 1;
+    if (total <= 6) return 1;
+    return Math.ceil((total - 6) / 6) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
+  $: startIndex = currPage === 1 ? 1 : 6 + (currPage - 2) * 6 + 1;
   $: endIndex = Math.min(
-    currPage === 1 ? 5 : startIndex + 5,
+    currPage === 1 ? 6 : startIndex + 5,
     filteredWorkspaces.length,
   );
 

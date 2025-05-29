@@ -42,6 +42,7 @@
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import { GlobalSearch } from "@sparrow/common/features";
   import * as Sentry from "@sentry/svelte";
+  import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -226,7 +227,10 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
-    if (!guestUser) await _viewModel.connectWebSocket();
+
+    // Connect websocket for guest users also for AI testing tab -> (while rest api chatbot will be disabled from UI)
+    await _viewModel.connectWebSocket();
+
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
@@ -314,6 +318,13 @@
       id: SidebarItemIdEnum.WORKSPACE,
       route: "collections",
       heading: "Workspace",
+      disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.MARKETPLACE,
+      route: "marketplace",
+      heading: "Marketplace",
       disabled: false,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
@@ -635,6 +646,10 @@
 
       <!-- Route for Team and workspaces - Home Tab -->
       <Route path="/home/*"><Teams /></Route>
+
+      <Route path="/marketplace/*">
+        <MarketplacePage />
+      </Route>
 
       <!-- Route for Help -->
       <Route path="/help/*"><HelpPage /></Route>
