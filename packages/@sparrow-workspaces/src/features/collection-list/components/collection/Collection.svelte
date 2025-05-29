@@ -784,23 +784,20 @@
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
-        {#if !collection?.isMockCollectionRunning}
-          <Tooltip
-            title="This mock collection is inactive. Run it to activate."
-            placement="top-center"
-            distance={13}
-            zIndex={701}
-          >
-            <div style="display: flex;">
-              <Tag type="grey" text="Mock" />
-            </div>
-          </Tooltip>
-        {:else}
+        <Tooltip
+          title={"This mock collection is inactive. Run it to activate."}
+          placement={"top-center"}
+          distance={13}
+          show={!collection?.isMockCollectionRunning}
+          zIndex={701}
+        >
           <div style="display: flex;">
-            <Tag type="green" text="Mock" />
+            <Tag
+              type={collection?.isMockCollectionRunning ? "green" : "grey"}
+              text={"Mock"}
+            />
           </div>
-        {/if}
-
+        </Tooltip>
         <Tooltip
           title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}
