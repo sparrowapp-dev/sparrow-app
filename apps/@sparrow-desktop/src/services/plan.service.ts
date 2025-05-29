@@ -13,8 +13,8 @@ export class PlanService {
   public getPlansByIds = async (planIds: string[], baseUrl: string) => {
     const plans = await makeRequest("POST", `${baseUrl}/api/plan/details`, {
       headers: getAuthHeaders(),
-      body: planIds,
+      body: { planIds: planIds },
     });
-    return plans?.data;
+    return plans?.data?.data;
   };
 }
