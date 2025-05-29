@@ -10,7 +10,6 @@ jobs:
   release_linux:
     runs-on: ubuntu-latest
     environment: development
-    needs: release_macos
 
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
