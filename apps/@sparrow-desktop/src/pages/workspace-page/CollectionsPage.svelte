@@ -94,6 +94,7 @@
   import { OpenRegular } from "@sparrow/library/icons";
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
+  import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -929,6 +930,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
                         <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.HUB}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}
