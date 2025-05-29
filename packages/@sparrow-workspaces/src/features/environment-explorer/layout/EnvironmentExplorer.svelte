@@ -198,28 +198,29 @@
               placeholder="Search"
             />
           </div>
-
-          <div class="position-relative">
-            <Tooltip
-              title="Save (Ctrl+S)"
-              placement="bottom-center"
-              distance={10}
-            >
-              <Button
-                type="primary"
-                startIcon={SaveRegular}
-                onClick={onSaveEnvironment}
-                title="Save"
-                size="medium"
-                disable={$currentEnvironment?.property?.environment?.state
-                  ?.isSaveInProgress ||
-                  $currentEnvironment?.isSaved ||
-                  userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                loader={$currentEnvironment?.property?.environment?.state
-                  ?.isSaveInProgress}
-              />
-            </Tooltip>
-          </div>
+          {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+            <div class="position-relative">
+              <Tooltip
+                title="Save (Ctrl+S)"
+                placement="bottom-center"
+                distance={10}
+              >
+                <Button
+                  type="primary"
+                  startIcon={SaveRegular}
+                  onClick={onSaveEnvironment}
+                  title="Save"
+                  size="medium"
+                  disable={$currentEnvironment?.property?.environment?.state
+                    ?.isSaveInProgress ||
+                    $currentEnvironment?.isSaved ||
+                    userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                  loader={$currentEnvironment?.property?.environment?.state
+                    ?.isSaveInProgress}
+                />
+              </Tooltip>
+            </div>
+          {/if}
           <span>
             <Tooltip title="Help" placement="bottom-center" distance={10}>
               <Button
