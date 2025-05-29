@@ -15,8 +15,11 @@
     EnvironmentLocalGlobalJoinBaseInterface,
   } from "@sparrow/common/types/workspace/environment-base";
   import { getClientUser } from "@app/utils/jwt";
+  import { user } from "@app/store/auth.store";
+
   export let tab;
-  export let userRole;
+  let userId = "";
+  let userRole = "";
 
   const _viewModel = new GraphqlExplorerViewModel(tab);
   const environments = _viewModel.environments;
@@ -28,6 +31,26 @@
     1000,
   );
 
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace = await _viewModel.getWorkspaceById(
+      tab?.path?.workspaceId as string,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role as string;
+      }
+    });
+  };
+
   let prevTabName = "";
   $: {
     if (tab) {
@@ -35,6 +58,7 @@
         renameWithCollectionList(tab.name);
       }
       prevTabName = tab.name;
+      findUserRole();
     }
   }
 
@@ -133,6 +157,7 @@
 </script>
 
 <GraphqlExplorer
+  bind:userRole
   collections={_viewModel.collection}
   tab={_viewModel.tab}
   requestAuthHeader={_viewModel.authHeader}
@@ -164,5 +189,4 @@
   updateOperationSearch={_viewModel.updateRequestOperationSearch}
   checkQueryErrorStatus={_viewModel.updateQueryErrorState}
   isWebApp={false}
-  {userRole}
 />
