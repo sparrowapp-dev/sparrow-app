@@ -1649,7 +1649,10 @@ export class TestflowExplorerPageViewModel {
     return;
   };
 
-  public fetchWorkspacePlan = async () => {
+  /**
+   * @description - This function will provide the block limit to users according to their plan.
+   */
+  public userLimitBlockPerTestflow = async () => {
     const response = await this.workspaceRepository.getActiveWorkspaceDoc();
     const teamId = response?._data?.team?.teamId || "";
     const teamData = await this.teamRepository.getTeamDoc(teamId);
@@ -1662,14 +1665,6 @@ export class TestflowExplorerPageViewModel {
     if (userPlan) {
       return userPlan?.toMutableJSON().limits;
     }
-  };
-
-  /**
-   * @description - This function will provide the block limit to users according to their plan.
-   */
-  public userLimitBlockPerTestflow = async () => {
-    const data = await this.fetchWorkspacePlan();
-    return data;
   };
 
   /**
