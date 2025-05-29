@@ -5,6 +5,7 @@
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
+  import DummyPreview  from "../pages/DummyPreview/DummyPreview.svelte";
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
   import { initPostHog } from "@app/utils/posthog/posthogConfig";
@@ -22,6 +23,7 @@
   <Authguard>
     <section slot="loggedIn">
       <Route path="/app/*" component={Dashboard} />
+      <Route path="/app/preview" component={DummyPreview} />
       <Route path="/*"><Navigate to="/app/" /></Route>
     </section>
     <section slot="guestUser">

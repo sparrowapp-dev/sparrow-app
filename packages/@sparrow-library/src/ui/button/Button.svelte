@@ -20,6 +20,8 @@
 
   export let customWidth = "auto";
 
+  export let maxWidth = "100%";
+
   // export let buttonIcon;
   export let size: "small" | "medium" | "large" | "extra-small" = "medium";
   let buttonSize = 28;
@@ -238,7 +240,7 @@
       <Spinner size={`${iconSize}px`} />
     </span>
   {:else if title}
-    <span class={`btn-title ${btnTextStyle}`}>
+    <span class={`ellipsis btn-title ${btnTextStyle} `} style= "max-width: {maxWidth};">
       {title}
     </span>
   {/if}
