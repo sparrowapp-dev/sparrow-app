@@ -708,7 +708,9 @@ class AiRequestExplorerViewModel {
                   outputTokens: 0,
                   totalTokens: 0,
                   statusCode: response.statusCode,
-                  time: response.timeTaken.replace("ms", "")
+                  time: response.timeTaken.replace("ms", ""),
+                  modelProvider, 
+                  modelVariant
                 },
               ]);
               await this.updateRequestState({
@@ -722,7 +724,9 @@ class AiRequestExplorerViewModel {
                   inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  time: response.timeTaken.replace("ms", "")
+                  time: response.timeTaken.replace("ms", ""),
+                  modelProvider, 
+                  modelVariant
                 },
               };
 
@@ -760,6 +764,8 @@ class AiRequestExplorerViewModel {
                       isLiked: false,
                       isDisliked: false,
                       status: true,
+                      modelProvider, 
+                      modelVariant
                     },
                   ]);
                   messageCreated = true;
