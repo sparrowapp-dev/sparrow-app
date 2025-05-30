@@ -704,7 +704,9 @@
         ? 'main-collection-mock'
         : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
-    on:contextmenu|preventDefault={rightClickContextMenu}
+    on:contextmenu|preventDefault={isMockCollection
+      ? rightClickContextMenuMock
+      : rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         visibility = !visibility;
