@@ -1,4 +1,4 @@
-name: Development release
+name: Plans release
 
 on:
   push:
@@ -140,7 +140,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: development"
+                      "text" = "Branch: feat/sparrow-plans"
                       "wrap" = $true
                     }
                     @{
@@ -255,7 +255,7 @@ jobs:
                       },
                       {
                         \"type\": \"TextBlock\",
-                        \"text\": \"Branch: development\",
+                        \"text\": \"Branch: feat/sparrow-plans\",
                         \"wrap\": true
                       },
                       {
