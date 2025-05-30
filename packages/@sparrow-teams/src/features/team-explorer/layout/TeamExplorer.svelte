@@ -11,7 +11,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
-  import {WorkspaceType} from "@sparrow/common/enums";
+  import { WorkspaceType } from "@sparrow/common/enums";
   import {
     AddRegular,
     GlobeRegular,
@@ -437,7 +437,7 @@
         <div style="flex:1; overflow:auto;">
           {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
             <div class="h-100 d-flex flex-column">
-              {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
+              {#if openTeam && !isGuestUser}
                 <div
                   class="d-flex align-items-center"
                   style="gap: 20px; justify-content:space-between; align-items:center;"

@@ -50,7 +50,6 @@
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
   export let selectedFilter;
-  
 
   let workspacePerPage = 5;
   let filterText = "";
@@ -129,34 +128,28 @@
           {:else if searchQuery !== "" && filteredWorkspaces.length === 0}
             <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
-            {:else if workspaces.length === 0}
+          {:else if workspaces.length === 0}
             <div class="container">
               <div class="sparrow-logo">
                 <SparrowLogo />
               </div>
               {#if selectedFilter === WorkspaceType.PUBLIC}
                 <p
-                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
                 >
-                  Public workspaces let you share your APIs and tools with the
+                  Welcome to Sparrow! Explore your public workspaces here.
                 </p>
+              {:else if selectedFilter === WorkspaceType.PRIVATE}
                 <p
                   style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
                 >
-                  community. Create one to start collaborating openly.
+                  Welcome to Sparrow! Explore your private workspaces here.
                 </p>
               {:else}
                 <p
-                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
-                >
-                  Welcome to Sparrow! Let's create your first workspace to
-                  unlock
-                </p>
-                <p
                   style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
                 >
-                  powerful tools and bring your team together in one organized
-                  space.
+                  Welcome to Sparrow! Explore your all workspaces here.
                 </p>
               {/if}
             </div>
@@ -180,7 +173,7 @@
               {/if}
             </div>
           {/if} -->
-     
+
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
               {onAddMember}
@@ -256,7 +249,8 @@
     flex-direction: column;
     align-items: center;
     height: 100%;
-    padding: 150px 35px 24px;
+    padding: 5%;
+    gap: 16px;
   }
   .tab-head {
     padding: 8px;
