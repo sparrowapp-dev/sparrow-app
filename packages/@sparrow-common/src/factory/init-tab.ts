@@ -13,6 +13,7 @@ import {
 import { InitSocketIoTab } from "../utils/init-socket-io-tab";
 import { InitWorkspaceTab } from "../utils/init-workspace-tab";
 import { InitMockHistoryTab } from "../utils/init-mock-history-tab";
+import { InitHubTab } from "../utils/init-hub-tab";
 
 class InitTab {
   constructor() {}
@@ -110,6 +111,13 @@ class InitTab {
    */
   public mockHistory = (_id: string, _workspaceId: string) => {
     return new InitMockHistoryTab(_id, _workspaceId);
+  };
+  /**
+   * @param _id - folder mongo document id
+   * @param _workspaceId - Workspace mongo id to which folder belongs to
+   */
+  public hub = (_id: string, _workspaceId: string) => {
+    return new InitHubTab(_id, _workspaceId);
   };
 }
 

@@ -35,8 +35,10 @@ class InitAiRequestTab {
             property: {
                 aiRequest: {
                     // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    aiModelProvider: AiModelProviderEnum.OpenAI,
-                    aiModelVariant: OpenAIModelEnum.GPT_4o,
+                    // aiModelProvider: AiModelProviderEnum.OpenAI,
+                    // aiModelVariant: OpenAIModelEnum.GPT_4o,
+                    aiModelProvider: "",
+                    aiModelVariant: "",
                     systemPrompt: "",
                     auth: {
                         bearerToken: "",

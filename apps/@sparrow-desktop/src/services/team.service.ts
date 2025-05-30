@@ -147,7 +147,7 @@ export class TeamService {
     return response;
   };
 
-   public withdrawInvite = async (
+  public withdrawInvite = async (
     teamId: string,
     email: string,
     baseUrl: string,
@@ -162,10 +162,7 @@ export class TeamService {
     return response;
   };
 
-  public acceptInvite = async (
-    teamId: string,
-    baseUrl: string,
-  ) => {
+  public acceptInvite = async (teamId: string, baseUrl: string) => {
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/team/${teamId}/invite/user/accept`,
@@ -176,10 +173,7 @@ export class TeamService {
     return response;
   };
 
-  public ignoreInvite= async (
-     teamId: string,
-     baseUrl: string,
-  ) => {
+  public ignoreInvite = async (teamId: string, baseUrl: string) => {
     const response = await makeRequest(
       "DELETE",
       `${baseUrl}/api/team/${teamId}/invite/not-accepted`,
@@ -188,8 +182,16 @@ export class TeamService {
       },
     );
     return response;
-    }
+  };
 
+  public fetchPublicTeam = async (teamId: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/team/public/${teamId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
-
-

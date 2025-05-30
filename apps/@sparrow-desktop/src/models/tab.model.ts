@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 24,
+  version: 26,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1368,21 +1368,24 @@ export const tabSchemaLiteral = {
                   type: "object",
                   properties: {
                     type: "object",
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
                     temperature: {
                       type: "number",
                     },
                     top_p: {
                       type: "number",
                     },
-                    presencePenalty: {
-                      type: "number",
-                    },
-                    frequencyPenalty: {
+                    maxTokens: {
                       type: "number",
                     },
                   },
-                }
-              }
+                },
+              },
             },
             state: {
               type: "object",
@@ -1498,6 +1501,71 @@ export const tabSchemaLiteral = {
         },
         mockHistory: {
           type: "string",
+        },
+        hub: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              maxLength: 100,
+            },
+            name: {
+              type: "string",
+            },
+            description: {
+              type: "string",
+            },
+            hubUrl: {
+              type: "string",
+            },
+            githubUrl: {
+              type: "string",
+            },
+            xUrl: {
+              type: "string",
+            },
+            linkedinUrl: {
+              type: "string",
+            },
+            logo: {
+              type: "object",
+            },
+            owner: {
+              type: "string",
+            },
+            users: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                  },
+                  email: {
+                    type: "string",
+                  },
+                  name: {
+                    type: "string",
+                  },
+                  role: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+            createdAt: {
+              type: "string",
+            },
+            createdBy: {
+              type: "string",
+            },
+            updatedAt: {
+              type: "string",
+            },
+            updatedBy: {
+              type: "string",
+            },
+          },
         },
       },
     },

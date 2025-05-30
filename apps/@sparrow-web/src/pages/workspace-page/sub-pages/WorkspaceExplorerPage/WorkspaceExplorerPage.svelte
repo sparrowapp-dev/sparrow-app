@@ -147,6 +147,7 @@
   onMakeWorkspacePublic={() => (isWorkspacePublicModalOpen = true)}
   onShareWorkspace={_viewModel.handleShareWorkspace}
   activeWorkspace={$activeWorkspace}
+  onClickHubUrl={_viewModel.handleHubTabCreation}
 />
 
 <Modal

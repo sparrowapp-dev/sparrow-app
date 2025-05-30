@@ -1,3 +1,4 @@
+import type { AiModelProviderEnum, AIModelVariant } from "@sparrow/common/types/workspace/ai-request-base";
 import { writable } from "svelte/store";
 
 export type AiRequestExplorerData = {
@@ -8,6 +9,8 @@ export type AiRequestExplorerData = {
         outputTokens: number,
         totalTokens: number,
         time: number;
+        modelProvider: AiModelProviderEnum,
+        modelVariant: AIModelVariant
         // size: number;
     };
 };

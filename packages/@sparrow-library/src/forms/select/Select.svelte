@@ -30,6 +30,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    icon?: GitBranchIcon;
   }>;
 
   export let iconColor = "grey";

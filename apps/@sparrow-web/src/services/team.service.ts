@@ -183,4 +183,15 @@ export class TeamService {
     );
     return response;
   };
+
+  public fetchPublicTeam = async (teamId: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/team/public/${teamId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

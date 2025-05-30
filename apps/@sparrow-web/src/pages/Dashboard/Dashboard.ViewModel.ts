@@ -45,6 +45,7 @@ import { Events, ItemType } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import constants from "src/constants/constants";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
+import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 
 export class DashboardViewModel {
   constructor() {}
@@ -62,6 +63,7 @@ export class DashboardViewModel {
     AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
+  private recentWorkspaceRepository = new RecentWorkspaceRepository();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -84,6 +86,13 @@ export class DashboardViewModel {
    */
   get environments() {
     return this.environmentRepository.getEnvironment();
+  }
+
+  /**
+   * @description - get recent visited public workspace list from local db
+   */
+  public get recentVisitedWorkspaces() {
+    return this.recentWorkspaceRepository.getRecentVisitedWorkspaces();
   }
 
   /**
@@ -488,8 +497,65 @@ export class DashboardViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     if (!id) return;
-    const ws = await this.workspaceRepository.readWorkspace(id);
-    if (!ws) return;
+    let ws = await this.workspaceRepository.readWorkspace(id);
+    let retrievedWorkspaceData;
+    if (!ws) {
+      const clientUser = getClientUser();
+      const res = await this.workspaceService.fetchPublicWorkspace(id);
+      if (res.isSuccessful && res?.data?.data) {
+        retrievedWorkspaceData = res?.data?.data;
+        const {
+          _id,
+          name,
+          description,
+          workspaceType,
+          users,
+          admins,
+          team,
+          createdAt,
+          createdBy,
+          collection,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = retrievedWorkspaceData;
+        const item = {
+          _id,
+          name,
+          description,
+          workspaceType: workspaceType,
+          isShared: true,
+          users: [
+            {
+              email: clientUser?.email,
+              id: clientUser?.id,
+              name: clientUser?.name,
+              role: "viewer",
+            },
+          ],
+          collections: collection ? collection : [],
+          admins: admins,
+          team: {
+            teamId: team.id,
+            teamName: team.name,
+            hubUrl: team?.hubUrl || "",
+          },
+          environmentId: "",
+          isActiveWorkspace: false,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        };
+        await this.workspaceRepository.addWorkspace(item);
+      } else {
+        // Handle error if workspace fetch fails
+        notifications.error("Failed to switch workspace.");
+        return;
+      }
+    }
+    ws = await this.workspaceRepository.readWorkspace(id);
 
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, ws);
     await this.tabRepository.createTab(initWorkspaceTab, id);

@@ -82,6 +82,7 @@
   export let isSharedWorkspace = false;
   export let onMakeWorkspacePublic;
   export let onShareWorkspace;
+  export let onClickHubUrl;
 
   const formateUpdateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -144,6 +145,12 @@
             type={"link-primary"}
             size="small"
             buttonClassProp="ps-0 pe-1"
+            onClick={() => {
+              onClickHubUrl(
+                activeWorkspace?.team?.teamId,
+                currentWorkspace?.id,
+              );
+            }}
           />
         </div>
         <hr style="color: var(--border-ds-surface-50); margin-top:0" />
@@ -171,7 +178,9 @@
             class="text-ds-font-size-14 text-ds-font-weight-regular text-ds-line-height-143"
             style="width: 60%;"
           >
-            {activeWorkspace?.description}
+            {activeWorkspace?.description
+              ? activeWorkspace.description
+              : "No summary added."}
           </p>
         </div>
         <div class="background-icon">

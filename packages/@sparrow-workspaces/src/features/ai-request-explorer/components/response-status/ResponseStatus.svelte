@@ -8,11 +8,26 @@
     DotIcon,
     CoinMultipleRegular,
     OpenAIVectorIcon,
+    AnthropicVectorIcon,
+    GoogleVectorIcon,
+    DeepseekVectorIcon,
   } from "@sparrow/library/icons";
   import type { AIResponseInfo } from "@sparrow/common/types/workspace/ai-request-tab";
   import { Tooltip } from "@sparrow/library/ui";
+  import { ModelVariantIdNameMapping } from "@sparrow/common/types/workspace/ai-request-base";
   export let response: AIResponseInfo;
   export let responseType: "Sender" | "Receiver" = "Receiver";
+
+  const iconMap = {
+    openai: OpenAIVectorIcon,
+    anthropic: AnthropicVectorIcon,
+    google: GoogleVectorIcon,
+    deepseek: DeepseekVectorIcon,
+  };
+
+  // Normalize or fallback for model provider
+  let modelProvider = response.AI_Model_Provider?.toLowerCase() || "openai";
+  let IconComponent = iconMap[modelProvider] || OpenAIVectorIcon;
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -132,9 +147,9 @@
           </Tooltip> -->
         {/if}
 
-        {#if responseType === "Sender"}
+        {#if response.AI_Model_Variant && responseType === "Sender"}
           <Tooltip
-            title={response.AI_Model_Variant}
+            title={ModelVariantIdNameMapping[response.AI_Model_Variant]}
             placement={"top-center"}
             zIndex={500}
           >
@@ -143,14 +158,21 @@
               style="font-size: 12px;"
             >
               <span class="d-flex" style="margin-right: 1px;">
-                <OpenAIVectorIcon
+                <!-- <OpenAIVectorIcon
                   height={"16px"}
                   width={"16px"}
+                  color="var(--icon-ds-neutral-50)"
+                /> -->
+
+                <svelte:component
+                  this={IconComponent}
+                  height="16px"
+                  width="16px"
                   color="var(--icon-ds-neutral-50)"
                 />
               </span>
               <p class="mb-0 ms-1" style="font-size: 12px;">
-                {response.AI_Model_Variant}
+                {ModelVariantIdNameMapping[response.AI_Model_Variant]}
               </p>
             </span>
           </Tooltip>

@@ -9,7 +9,6 @@
   } from "svelte-inview";
   import { Checkbox } from "@sparrow/library/forms";
   import { DeleteRegular, MathFormulaRegular } from "@sparrow/library/icons";
-  import { isDynamicExpressionModalOpen } from "../../features/testflow-explorer/store/testflow";
   import { handleEventOnClickDynamicExpressionButton } from "@sparrow/common/utils";
 
   export let element;

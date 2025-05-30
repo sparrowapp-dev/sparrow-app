@@ -7,6 +7,7 @@
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   let componentClass = "";
   export { componentClass as class };
@@ -22,6 +23,7 @@
   export let isSave;
   export let isGraphqlEditable;
   export let isSaveLoad = false;
+  export let userRole;
 
   const theme = new UrlInputTheme().build();
   /**
@@ -57,14 +59,14 @@
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-       if (requestUrl === "") {
-          const codeMirrorElement = document.querySelector(
-            ".input-url .cm-editor",
-          );
-          if (codeMirrorElement) {
-            codeMirrorElement.classList.add("url-red-border");
-          }
+      if (requestUrl === "") {
+        const codeMirrorElement = document.querySelector(
+          ".input-url .cm-editor",
+        );
+        if (codeMirrorElement) {
+          codeMirrorElement.classList.add("url-red-border");
         }
+      }
       onSendButtonClicked(environmentVariables?.filtered || []);
     }
   };
@@ -83,7 +85,6 @@
         codeId={"url"}
         class={"input-url"}
         isFocusedOnMount={false}
-        
       />
     </div>
   </div>
@@ -123,22 +124,28 @@
       }}
     />
   {/if}
-
-  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <Button
-      type="secondary"
-      size="medium"
-      loader={isSaveLoad}
-      startIcon={isSaveLoad ? "" : SaveRegular}
-      disable={isSave || !isGraphqlEditable ? true : false}
-      onClick={() => {
-        handleSaveRequest();
-        MixpanelEvent(Events.Save_GraphQL_Request, {
-          description: "Save GraphQL Request",
-        });
-      }}
-    />
-  </Tooltip>
+  {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+    <Tooltip
+      title={"Save"}
+      placement={"bottom-center"}
+      distance={12}
+      zIndex={10}
+    >
+      <Button
+        type="secondary"
+        size="medium"
+        loader={isSaveLoad}
+        startIcon={isSaveLoad ? "" : SaveRegular}
+        disable={isSave || !isGraphqlEditable ? true : false}
+        onClick={() => {
+          handleSaveRequest();
+          MixpanelEvent(Events.Save_GraphQL_Request, {
+            description: "Save GraphQL Request",
+          });
+        }}
+      />
+    </Tooltip>
+  {/if}
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
