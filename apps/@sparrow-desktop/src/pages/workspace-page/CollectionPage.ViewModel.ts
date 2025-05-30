@@ -1319,12 +1319,6 @@ export default class CollectionsViewModel {
       await this.collectionService.importCollectionFromCurl(importCurl);
 
     if (response.isSuccessful) {
-      const req = response.data.data.request;
-      const reducedQueryParams = new ReduceQueryParams(req.queryParams);
-      const paramString = reducedQueryParams.getValue();
-      if (paramString) {
-        response.data.data.request.url = req.url + "?" + paramString;
-      }
       const requestTabAdapter = new RequestTabAdapter();
       const tabId = UntrackedItems.UNTRACKED + uuidv4();
       const adaptedRequest = requestTabAdapter.adapt(
