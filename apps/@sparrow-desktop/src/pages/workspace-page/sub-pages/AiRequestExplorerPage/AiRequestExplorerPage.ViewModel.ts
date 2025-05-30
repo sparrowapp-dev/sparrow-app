@@ -37,7 +37,7 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
+import { AiModelProviderEnum, OpenAIModelEnum, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
 
 class AiRequestExplorerViewModel {
@@ -585,6 +585,8 @@ class AiRequestExplorerViewModel {
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
+    const isJsonFormatConfigAvailable = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
+    const isJsonFormatEnabed = isJsonFormatConfigAvailable ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
 
     let finalSP = null;
     if (systemPrompt.length) {
@@ -592,13 +594,16 @@ class AiRequestExplorerViewModel {
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
+    if(isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
     let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
     if (!isChatAutoClearActive) {
       const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-      formattedConversations = rawConversations.map(({ type, message }) => ({
-        role: type === 'Sender' ? 'user' : 'assistant',
-        content: message
-      }));
+      formattedConversations = rawConversations
+        .filter(({ status }) => status !== false) // Exclude items with status === false
+        .map(({ type, message }) => ({
+          role: type === 'Sender' ? 'user' : 'assistant',
+          content: isJsonFormatEnabed ?  `${message} (Give Response In JSON Format)` : message,
+        }));
     }
 
     const modelSpecificConfig: modelsConfigType = {};
@@ -617,8 +622,7 @@ class AiRequestExplorerViewModel {
 
     const aiRequestData = {
       feature: "llm-evaluation",
-      // userInput: prompt,
-      userInput: (modelProvider === AiModelProviderEnum.Google) ? prompt : userInputConvo,
+      userInput: (modelProvider === AiModelProviderEnum.Google || (modelProvider === AiModelProviderEnum.OpenAI && modelVariant === OpenAIModelEnum.GPT_o1_Mini)) ? prompt : userInputConvo,
       authKey: authKey.authValue,
       configs: modelSpecificConfig,
       model: modelProvider || "openai",
@@ -626,16 +630,12 @@ class AiRequestExplorerViewModel {
       ...(disabledModelFeatures["System Prompt"].includes(modelVariant)
         ? {}
         : { systemPrompt: finalSP || "Answer my queries." }),
-      // ...(modelProvider === AiModelProviderEnum.Google && !isChatAutoClearActive && {
-      //   conversation: userInputConvo,
-      // }),
       ...(modelProvider === AiModelProviderEnum.Google && {
         conversation: isChatAutoClearActive ? "" : userInputConvo,
       }),
     }
 
     try {
-      // const userEmail = getClientUser().email;
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
