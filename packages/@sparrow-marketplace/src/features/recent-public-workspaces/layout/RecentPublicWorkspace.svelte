@@ -8,7 +8,7 @@
 
 <div
   class="recent-workspaces-container"
-  style="width: 270px; gap: 12px; background-color: var(--bg-ds-surface-800); height: 100vh;"
+  style="width: 270px; gap: 12px; background-color: var(--bg-ds-surface-800); height: calc(100vh - 50px);"
 >
   <div class="header" style="padding:8px">
     <span class="text-ds-font-size-14" style="color: var(--text-ds-neutral-300)"
