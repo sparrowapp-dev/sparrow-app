@@ -280,6 +280,9 @@ export class RxDB {
           10: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          11: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
