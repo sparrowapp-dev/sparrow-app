@@ -335,6 +335,7 @@ export class WorkspaceRepository {
         selectedWorkspacesToBeDeleted as string[],
       );
     }
+    return selectedWorkspacesToBeDeleted;
   };
 
   public updateUserRoleInWorkspace = async (

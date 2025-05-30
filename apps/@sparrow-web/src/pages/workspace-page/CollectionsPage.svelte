@@ -1051,7 +1051,7 @@
       }}
       disabled={false}
     />
-    <p class="m-0">I understand, don't show this agian.</p>
+    <p class="m-0">I understand, don't show this again.</p>
   </div>
 
   <div
