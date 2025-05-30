@@ -345,7 +345,7 @@ export class TeamExplorerPageViewModel {
       notifications.success("New Workspace Created");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     } else if (response?.data?.statusCode) {
-      notifications.warning(response?.data?.message);
+      notifications.error(response?.data?.message);
     }
   };
 

@@ -175,15 +175,13 @@ const makeRequest = async (
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
-    } else if (e.response?.data?.statusCode === 403) {
-      return error("Forbidden", e.response?.data);
     } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
       return error(e.message);
     } else if (e.response?.data) {
-      return error(e.response?.data?.message);
+      return error(e.response?.data?.message, e.response?.data);
     }
     return error(e);
   } finally {

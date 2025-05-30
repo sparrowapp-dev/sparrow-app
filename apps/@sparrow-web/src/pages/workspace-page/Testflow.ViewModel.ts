@@ -178,7 +178,7 @@ export class TestflowViewModel {
       }
       return;
     } else if (response?.data?.statusCode) {
-      notifications.warning(response?.data?.message);
+      notifications.error(response?.data?.message);
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }
