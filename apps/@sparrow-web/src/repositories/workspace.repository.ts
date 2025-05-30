@@ -31,16 +31,16 @@ export class WorkspaceRepository {
     return RxDB.getInstance().rxdb.workspace.find().exec();
   };
 
-    /**
+  /**
    * Get only public workspaces (workspaceType === 'PUBLIC')
    */
-    public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
-      return RxDB.getInstance().rxdb.workspace.find({
-        selector: {
-          workspaceType: "PUBLIC",
-        },
-      }).$;
-    };
+  public getPublicWorkspacesDocs = (): Observable<WorkspaceDocument[]> => {
+    return RxDB.getInstance().rxdb.workspace.find({
+      selector: {
+        workspaceType: "PUBLIC",
+      },
+    }).$;
+  };
 
   /**
    * get filtered workspaces
@@ -317,7 +317,10 @@ export class WorkspaceRepository {
         for (let i = 0; i < _workspaceIds.length; i++) {
           if (
             _workspaceIds[i] === _workspace._id ||
-            _workspace.team?.teamId === "sharedWorkspaceTeam"
+            _workspace.team?.teamId === "sharedWorkspaceTeam" ||
+            (_workspace.workspaceType === "PUBLIC" &&
+              _workspace.isActiveWorkspace &&
+              _workspace.isShared)
           ) {
             return false;
           }
@@ -476,4 +479,21 @@ export class WorkspaceRepository {
       })
       .exec();
   };
+
+  /**
+   * Fetches workspace that is shared, public, and active
+   * @returns Promise with the workspace document or null if not found
+   */
+  public getSharedPublicActiveWorkspace =
+    async (): Promise<WorkspaceDocument | null> => {
+      return await RxDB.getInstance()
+        .rxdb.workspace.findOne({
+          selector: {
+            isShared: true,
+            workspaceType: "PUBLIC",
+            isActiveWorkspace: true,
+          },
+        })
+        .exec();
+    };
 }
