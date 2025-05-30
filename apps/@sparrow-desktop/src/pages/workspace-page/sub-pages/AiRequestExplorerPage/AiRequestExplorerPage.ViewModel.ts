@@ -38,7 +38,7 @@ import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import { AiModelProviderEnum, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
-import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
+import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
 
 class AiRequestExplorerViewModel {
   // Repository

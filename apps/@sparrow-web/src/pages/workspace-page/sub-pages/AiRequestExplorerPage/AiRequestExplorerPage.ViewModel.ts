@@ -38,7 +38,7 @@ import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import { AiModelProviderEnum, type modelsConfigType , type AIModelVariant, OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
-import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
+import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -586,18 +586,18 @@ class AiRequestExplorerViewModel {
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
- 
-    const jsonResponseFormatAvailableForCurrModel = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
-    const isJsonResponseFormatEnable = jsonResponseFormatAvailableForCurrModel ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
+    const isJsonFormatConfigAvailable = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
+    const isJsonFormatEnabed = isJsonFormatConfigAvailable ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
    
-    prompt = isJsonResponseFormatEnable ? `${prompt} (Give Response In JSON Format)` : prompt ;
- 
+    
     let finalSP = null;
     if (systemPrompt.length) {
       const SPDatas = JSON.parse(systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
+    if(isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
+    
     let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
     if (!isChatAutoClearActive) {
       const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
@@ -606,7 +606,7 @@ class AiRequestExplorerViewModel {
         .filter(({ status }) => status !== false) // Exclude items with status === false
         .map(({ type, message }) => ({
           role: type === 'Sender' ? 'user' : 'assistant',
-          content: isJsonResponseFormatEnable ?  `${message} (Give Response In JSON Format)` : message,
+          content: isJsonFormatEnabed ?  `${message} (Give Response In JSON Format)` : message,
         }));
     }
 
@@ -633,23 +633,10 @@ class AiRequestExplorerViewModel {
       ...(disabledModelFeatures["System Prompt"].includes(modelVariant)
         ? {}
         : { systemPrompt: finalSP || "Answer my queries." }),
-      // ...(modelProvider === AiModelProviderEnum.Google && !isChatAutoClearActive && {
-      //   conversation: userInputConvo,
-      // }),
       ...(modelProvider === AiModelProviderEnum.Google && {
         conversation: isChatAutoClearActive ? "" : userInputConvo,
       }),
     }
-
-    // console.log("AI Request Data:", aiRequestData);
-    // console.log("convo :>> ", this.aiAssistentWebSocketService.prepareConversation(
-    //   modelProvider,
-    //   prompt,
-    //   finalSP || "Answer my queries.",
-    //   !isChatAutoClearActive,
-    //   formattedConversations
-    // ));
-    // return;
 
     try {
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response

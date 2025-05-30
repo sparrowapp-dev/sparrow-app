@@ -185,12 +185,7 @@
                 </div>
               </Tooltip>
 
-              <Tooltip
-                title={"Clear chat"}
-                placement={"left-center"}
-                zIndex={701}
-                show={true}
-              >
+              <Tooltip title={"Clear chat"} placement={"top-center"}>
                 <span class="add-icon-container">
                   <Button
                     id={`clear-chat-history`}

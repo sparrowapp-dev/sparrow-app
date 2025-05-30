@@ -17,7 +17,8 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
+  import { disabledModelFeatures } from "../constants";
+
   import {
     BotRegular,
     SettingsRegular,

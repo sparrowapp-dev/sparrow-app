@@ -127,7 +127,7 @@ export interface GeminiModelsConfig {
     streamResponse?: boolean;
     jsonResponseFormat?: boolean;
     temperature?: number;
-    max_tokens?: number;
+    maxTokens?: number;
     top_p?: number;
 }
 
@@ -195,42 +195,7 @@ export enum ModelVariantIdNameMapping {
 
     // — Gemini family
     "gemini-1.5-flash" = "Gemini 1.5 Flash",
-    "gemini-1.5-flash-8b" = "Gemini 1.5 Flash 8b",
+    "gemini-1.5-flash-8b" = "Gemini 1.5 Flash 8B",
     "gemini-1.5-pro" = "Gemini 1.5 Pro",
     "gemini-2.0-flash" = "Gemini 2.0 Flash",
 }
-
-
-// Default AI Initial Configurations to setup AI Request Tab
-export const DefaultAiConfig = {
-    OPENAI: {
-        streamResponse: true,
-        jsonResponseFormat: false,
-        temperature: 1.0,
-        presencePenalty: 0,
-        frequencyPenalty: 0,
-        maxTokens: -1,
-    },
-    DEEPSEEK: {
-        streamResponse: false,
-        jsonResponseFormat: false,
-        temperature: 1.0,
-        presencePenalty: 0,
-        frequencyPenalty: 0,
-        maxTokens: 1024,
-    },
-    ANTHROPIC: {
-        streamResponse: false,
-        maxTokens: 1024,
-        temperature: 0.5,
-        top_p: 0.75,
-    },
-    GOOGLE: {
-        streamResponse: false,
-        jsonResponseFormat: false,
-        temperature: 1.0,
-        maxTokens: 1024,
-        top_p: 0.95,
-    }
-};
-
