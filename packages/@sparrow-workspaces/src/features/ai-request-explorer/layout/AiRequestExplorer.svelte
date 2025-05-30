@@ -96,6 +96,11 @@
     }, 0);
   });
   onDestroy(() => {});
+
+  // $: {
+  //   if ($tab)
+  //     console.log("tab :>> ", $tab?.property?.aiRequest?.configurations);
+  // }
 </script>
 
 {#if $tab.tabId}
@@ -198,8 +203,8 @@
                         class="text-muted mb-0 px-3"
                         style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
                       >
-                        No LLM Selected. Please select a LLM to Add
-                        Authentication.
+                        No model selected. Please select a model to add
+                        authentication.
                       </p>
                     </div>
                   {/if}

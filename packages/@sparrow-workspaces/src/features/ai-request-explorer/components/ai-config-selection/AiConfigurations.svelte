@@ -24,6 +24,18 @@
   };
 
   // Reset to default values
+  // const handleResetToDefault = () => {
+  //   const defaultConfig = {};
+  //   Object.entries(currentModelConfig).forEach(
+  //     ([key, metadata]: [string, any]) => {
+  //       defaultConfig[key] = metadata.defaultValue;
+  //     },
+  //   );
+  //   console.log("in reset ;>> ");
+  //   onUpdateAiConfigurations(currSelectedModel, defaultConfig);
+  // };
+
+  // Reset to default values
   const handleResetToDefault = () => {
     const defaultConfig = {};
     Object.entries(currentModelConfig).forEach(
@@ -55,6 +67,14 @@
         value > parseFloat(format[key].max)
       ) {
         value = parseFloat(format[key].max);
+      }
+
+      // Update the input field directly with the constrained value
+      const inputElement = document.getElementById(
+        `config-field-${format[key].displayName}`,
+      );
+      if (inputElement) {
+        inputElement.value = value;
       }
     }
 
@@ -122,6 +142,7 @@
 
           {#if metadata.type === "boolean"}
             <Toggle
+              id={`toggle-field-${metadata.displayName}`}
               isActive={getCurrentValue(key, metadata)}
               disabled={!isActive}
               onChange={(event) =>
@@ -130,6 +151,7 @@
           {:else if metadata.type === "number"}
             <div class="config-value d-flex justify-content-end">
               <input
+                id={`config-field-${metadata.displayName}`}
                 type="number"
                 class="form-control form-control-sm config-input"
                 value={getCurrentValue(key, metadata) || 0}
@@ -137,7 +159,7 @@
                 max={metadata.max}
                 step={key === "maxTokens" ? 1 : 0.1}
                 disabled={!isActive}
-                on:input={(e) => handleInputChange(key, e)}
+                on:change={(e) => handleInputChange(key, e)}
               />
             </div>
           {:else}

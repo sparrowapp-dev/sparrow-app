@@ -37,7 +37,7 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
+import { AiModelProviderEnum, type modelsConfigType , type AIModelVariant, OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
 
 class AiRequestExplorerViewModel {
@@ -586,7 +586,12 @@ class AiRequestExplorerViewModel {
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
-
+ 
+    const jsonResponseFormatAvailableForCurrModel = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
+    const isJsonResponseFormatEnable = jsonResponseFormatAvailableForCurrModel ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
+   
+    prompt = isJsonResponseFormatEnable ? `${prompt} (Give Response In JSON Format)` : prompt ;
+ 
     let finalSP = null;
     if (systemPrompt.length) {
       const SPDatas = JSON.parse(systemPrompt);
@@ -596,10 +601,13 @@ class AiRequestExplorerViewModel {
     let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
     if (!isChatAutoClearActive) {
       const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-      formattedConversations = rawConversations.map(({ type, message }) => ({
-        role: type === 'Sender' ? 'user' : 'assistant',
-        content: message
-      }));
+ 
+      formattedConversations = rawConversations
+        .filter(({ status }) => status !== false) // Exclude items with status === false
+        .map(({ type, message }) => ({
+          role: type === 'Sender' ? 'user' : 'assistant',
+          content: isJsonResponseFormatEnable ?  `${message} (Give Response In JSON Format)` : message,
+        }));
     }
 
     const modelSpecificConfig: modelsConfigType = {};
@@ -617,8 +625,7 @@ class AiRequestExplorerViewModel {
 
     const aiRequestData = {
       feature: "llm-evaluation",
-      // userInput: prompt,
-      userInput: (modelProvider === AiModelProviderEnum.Google) ? prompt : userInputConvo,
+      userInput: (modelProvider === AiModelProviderEnum.Google || (modelProvider === AiModelProviderEnum.OpenAI && modelVariant === OpenAIModelEnum.GPT_o1_Mini)) ? prompt : userInputConvo,
       authKey: authKey.authValue,
       configs: modelSpecificConfig,
       model: modelProvider || "openai",
