@@ -16,7 +16,7 @@
     >
   </div>
   <hr style="color: var(--border-ds-surface-100); border-width:2px;" />
-  <div class="content-container">
+  <div class="content-container sparrow-thin-scrollbar">
     {#if recentPublicWorkspaces.length == 0}
       <div>
         <div class="container">
@@ -69,6 +69,14 @@
 </div>
 
 <style>
+  .sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--bg-secondary-330);
+  }
+
+  .sparrow-thin-scrollbar::-webkit-scrollbar-button {
+    color: var(--bg-secondary-330);
+  }
+
   .recent-workspaces-container {
     display: flex;
     flex-direction: column;
