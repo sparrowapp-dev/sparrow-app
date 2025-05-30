@@ -34,7 +34,7 @@
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
   import * as Sentry from "@sentry/svelte";
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
-  import {policyConfig} from "@sparrow/common/store"
+  import { policyConfig } from "@sparrow/common/store";
 
   let isEntry = false;
   let isHover = false;
@@ -115,7 +115,7 @@
       class="container-header text-fs-24 sparrow-fw-600 text-whiteColor text-center ms-2 me-2 mb-1"
       style="font-weight: 400; padding-top:20px; line-height:28px; text-align:center;"
     >
-      Welcome to Sparrow!
+      Welcome to Sparrow Plans!
     </p>
     <p class="sparrow-fs-12 mt-0" style="color: var(--text-secondary-200);">
       The only API Sidekick you need
