@@ -431,6 +431,8 @@
               >
                 {#each collectionFilter as col}
                   <Collection
+                    isMockCollection={col?.collectionType ===
+                      CollectionTypeBaseEnum.MOCK}
                     bind:userRole
                     {isSharedWorkspace}
                     {onItemCreated}

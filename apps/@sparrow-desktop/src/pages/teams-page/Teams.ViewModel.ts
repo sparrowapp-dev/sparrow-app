@@ -358,7 +358,9 @@ export class TeamsViewModel {
           return _workspace._id;
         }),
       );
-      if (!isAnyWorkspaceActive) {
+      const isSharedWorkspaceActive =
+        await this.workspaceRepository.getSharedPublicActiveWorkspace();
+      if (!isAnyWorkspaceActive && !isSharedWorkspaceActive) {
         this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
       }

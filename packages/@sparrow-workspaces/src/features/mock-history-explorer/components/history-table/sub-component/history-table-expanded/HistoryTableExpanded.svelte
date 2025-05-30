@@ -25,15 +25,15 @@
   function setEditorLanguage(
     contentType: string,
   ): "HTML" | "JSON" | "XML" | "JavaScript" | "Text" {
-    if (contentType.includes("headers")) {
+    if (contentType && contentType.includes("headers")) {
       return "JSON";
-    } else if (contentType.includes("json")) {
+    } else if (contentType && contentType.includes("json")) {
       return "JSON";
-    } else if (contentType.includes("html")) {
+    } else if (contentType && contentType.includes("html")) {
       return "HTML";
-    } else if (contentType.includes("xml")) {
+    } else if (contentType && contentType.includes("xml")) {
       return "XML";
-    } else if (contentType.includes("javascript")) {
+    } else if (contentType && contentType.includes("javascript")) {
       return "JavaScript";
     } else {
       return "Text";
@@ -67,7 +67,15 @@
   }
 
   function isHeadersContent(): boolean {
-    return contentType.includes("headers") && Array.isArray(bodyContent);
+    if (
+      contentType &&
+      bodyContent &&
+      contentType.includes("headers") &&
+      Array.isArray(bodyContent)
+    ) {
+      return true;
+    }
+    return false;
   }
 
   function getEditorValue(): string {
