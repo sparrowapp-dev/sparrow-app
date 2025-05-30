@@ -219,7 +219,13 @@ export class TeamsViewModel {
         await this.workspaceRepository.findWorkspaceByTeamId(
           "sharedWorkspaceTeam",
         );
-      if (!isAnyWorkspaceActive && !sharedWorkspce) {
+      const isSharedWorkspaceActive =
+        await this.workspaceRepository.getSharedPublicActiveWorkspace();
+      if (
+        !isAnyWorkspaceActive &&
+        !sharedWorkspce &&
+        !isSharedWorkspaceActive
+      ) {
         this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
       }

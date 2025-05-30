@@ -728,6 +728,7 @@
                           {onUpdateRequestDescription}
                           requestDoc={$tab.description}
                           {isGuestUser}
+                          {userRole}
                         />
                       {/if}
                     </div>
