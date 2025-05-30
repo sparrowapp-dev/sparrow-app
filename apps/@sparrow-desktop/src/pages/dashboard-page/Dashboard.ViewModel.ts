@@ -33,6 +33,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   CollectionTabAdapter,
   GraphqlTabAdapter,
+  RequestMockTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
   TestflowTabAdapter,
@@ -603,6 +604,17 @@ export class DashboardViewModel {
         await this.tabRepository.createTab(adaptedSocketIo, workspaceId);
         break;
       }
+      case "MOCK_REQUEST": {
+        const mockRequestTabAdapter = new RequestMockTabAdapter();
+        const adaptedMockRequest = mockRequestTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedMockRequest, workspaceId);
+        break;
+      }
       default: {
         const requestTabAdapter = new RequestTabAdapter();
         const adaptedRequest = requestTabAdapter.adapt(
@@ -740,6 +752,8 @@ export class DashboardViewModel {
         return tree.websocket?.url || "";
       case ItemType.REQUEST:
         return tree.request?.url || "";
+      case ItemType.MOCK_REQUEST:
+        return tree.mockRequest?.url || "";
       default:
         return "";
     }
@@ -795,6 +809,7 @@ export class DashboardViewModel {
     if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
       if (
         tree.type === ItemType.REQUEST ||
+        tree.type === ItemType.MOCK_REQUEST ||
         tree.type === ItemType.GRAPHQL ||
         tree.type === ItemType.SOCKET_IO ||
         tree.type === ItemType.WEB_SOCKET
@@ -807,7 +822,11 @@ export class DashboardViewModel {
             : folderDetails;
 
         const requestMethod =
-          tree.type === ItemType.REQUEST ? tree.request?.method : tree.type;
+          tree.type === ItemType.REQUEST
+            ? tree.request?.method
+            : tree.type === ItemType.MOCK_REQUEST
+            ? tree.mockRequest?.method
+            : tree.type;
 
         const requestData = {
           tree: JSON.parse(
@@ -843,6 +862,7 @@ export class DashboardViewModel {
         tree.type !== ItemType.FOLDER &&
         !Object.values([
           ItemType.REQUEST,
+          ItemType.MOCK_REQUEST,
           ItemType.GRAPHQL,
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
@@ -935,7 +955,11 @@ export class DashboardViewModel {
       const workspaceId = node.workspaceId || currentWorkspaceId;
 
       const requestMethod =
-        node.type === ItemType.REQUEST ? node.request?.method : node.type;
+        node.type === ItemType.REQUEST
+          ? node.request?.method
+          : node.type === ItemType.MOCK_REQUEST
+          ? node.mockRequest?.method
+          : node.type;
 
       const itemData = {
         tree: JSON.parse(
@@ -955,6 +979,7 @@ export class DashboardViewModel {
         type: node.type,
         folderDetails: [
           ItemType.REQUEST,
+          ItemType.MOCK_REQUEST,
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
           ItemType.GRAPHQL,
@@ -970,6 +995,7 @@ export class DashboardViewModel {
         case ItemType.REQUEST:
         case ItemType.SOCKET_IO:
         case ItemType.WEB_SOCKET:
+        case ItemType.MOCK_REQUEST:
         case ItemType.GRAPHQL:
           requests.push(itemData);
           break;
@@ -1124,7 +1150,7 @@ export class DashboardViewModel {
 
     let environment = await this.searchEnvironment(searchText);
     environment = environment.map((_environment) => {
-      const workspaceDetails = workspaceMap[_value._data.workspaceId];
+      const workspaceDetails = workspaceMap[_environment._data.workspaceId];
       const path: string[] = [];
       if (workspaceDetails) {
         path.push(workspaceDetails.teamName);

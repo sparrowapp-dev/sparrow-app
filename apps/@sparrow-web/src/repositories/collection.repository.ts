@@ -937,4 +937,22 @@ export class CollectionRepository {
 
     return node ?? null;
   };
+
+  /* Remove collections by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter collections
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeCollectionsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb?.collection.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
+  };
 }

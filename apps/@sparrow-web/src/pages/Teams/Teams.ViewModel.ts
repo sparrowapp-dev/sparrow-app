@@ -19,6 +19,8 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { BehaviorSubject, Observable } from "rxjs";
 import { WorkspaceService } from "../../services/workspace.service";
+import { EnvironmentRepository } from "src/repositories/environment.repository";
+import { TestflowRepository } from "src/repositories/testflow.repository";
 
 export class TeamsViewModel {
   constructor() {}
@@ -33,6 +35,8 @@ export class TeamsViewModel {
 
   private collectionRepository = new CollectionRepository();
   private userService = new UserService();
+  private environmentRepository = new EnvironmentRepository();
+  private testflowRepository = new TestflowRepository();
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
   );
@@ -210,11 +214,24 @@ export class TeamsViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
-      await this.workspaceRepository.deleteOrphanWorkspaces(
-        data.map((_workspace) => {
-          return _workspace._id;
-        }),
-      );
+      const selectedWorkspacesToBeDeleted =
+        await this.workspaceRepository.deleteOrphanWorkspaces(
+          data.map((_workspace) => {
+            return _workspace._id;
+          }),
+        );
+
+      if (selectedWorkspacesToBeDeleted?.length > 0) {
+        await this.collectionRepository.removeCollectionsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+        await this.environmentRepository.removeEnvironmentsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+        await this.testflowRepository.removeTestflowsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+      }
       const sharedWorkspce =
         await this.workspaceRepository.findWorkspaceByTeamId(
           "sharedWorkspaceTeam",

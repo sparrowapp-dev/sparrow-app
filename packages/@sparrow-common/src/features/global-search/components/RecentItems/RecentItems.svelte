@@ -76,6 +76,13 @@
           name: request.tree.name,
           description: request.tree.description || "",
         };
+      case "MOCK_REQUEST":
+        return {
+          url: request.tree.mockRequest?.url || "",
+          method: request.tree.mockRequest?.method || "",
+          name: request.tree.name,
+          description: request.tree.description || "",
+        };
       default:
         return {
           url: request.tree.request?.url || "",
