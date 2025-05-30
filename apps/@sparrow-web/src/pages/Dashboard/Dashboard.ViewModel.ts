@@ -412,7 +412,10 @@ export class DashboardViewModel {
     window.open(constants.SPARROW_GITHUB + "/sparrow-app/releases");
     return;
   };
-
+  onAdminRedirect = async () => {
+    await open(`${constants.SPARROW_WEB_ADMIN_URL}`);
+    return;
+  };
   /**
    * add guest user in local db
    */

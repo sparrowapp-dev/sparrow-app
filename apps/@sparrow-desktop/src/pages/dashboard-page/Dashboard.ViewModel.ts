@@ -142,6 +142,10 @@ export class DashboardViewModel {
     return;
   };
 
+  onAdminRedirect = async () => {
+    await open(`${constants.SPARROW_ADMIN_URL}`);
+    return;
+  };
   /**
    *
    * @returns guest user state
