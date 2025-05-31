@@ -141,7 +141,7 @@ import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspa
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
-import type { AiRequestBaseInterface } from "@sparrow/common/types/workspace/ai-request-base";
+import type { AiModelProviderEnum, AiRequestBaseInterface, AIModelVariant } from "@sparrow/common/types/workspace/ai-request-base";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -612,6 +612,47 @@ export default class CollectionsViewModel {
     }
   };
 
+  private createAiRequestDuplciateTab = async (tabId: string) => {
+    const originalTab = await this.tabRepository.getTabById(tabId); // Tab to be copied
+    const currWorkSpace =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+
+    if (currWorkSpace) {
+      const newAiRequestTab = this.initTab.aiRequest(
+        "UNTRACKED-" + uuidv4(),
+        currWorkSpace._id,
+      );
+      // MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+
+      // Copy values using setter methods (excluding id, tabId, and timestamp)
+      const { id, tabId, timestamp, ...restOfData } =
+        originalTab.toMutableJSON();
+
+      newAiRequestTab.updateName(restOfData.name);
+      newAiRequestTab.updateDescription(restOfData.description as string);
+      newAiRequestTab.updatePath(restOfData.path as TabPath);
+      newAiRequestTab.updateAIModelProvider(restOfData.property.aiRequest?.aiModelProvider as AiModelProviderEnum);
+      newAiRequestTab.updateAIModelVariant(
+        restOfData.property.aiRequest?.aiModelVariant as AIModelVariant,
+      );
+      newAiRequestTab.updateAISystemPrompt(
+        restOfData.property.aiRequest?.systemPrompt as string,
+      );
+      newAiRequestTab.updateAuth(restOfData.property.aiRequest?.auth as Auth);
+      newAiRequestTab.updateState(
+        restOfData.property.aiRequest?.state as StatePartial,
+      );
+      
+
+      const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
+      newAiRequestTab.updatePath(filteredPath as TabPath);
+      newAiRequestTab.updateIsSave(false);
+
+      this.tabRepository.createTab(newAiRequestTab.getValue());
+      moveNavigation("right");
+    }
+  };
+
   public createDuplicateTabByTabId = async (tabId: string) => {
     const originalTab = await this.tabRepository.getTabById(tabId); // Tab to be copied
     const originalTabType = originalTab.toMutableJSON().type as TabTypeEnum;
@@ -625,6 +666,8 @@ export default class CollectionsViewModel {
         return this.createSocketIODuplciateTab(tabId);
       case TabTypeEnum.GRAPHQL:
         return this.createGraphQLDuplciateTab(tabId);
+      case TabTypeEnum.AI_REQUEST:
+        return this.createAiRequestDuplciateTab(tabId);
       default:
         break;
     }

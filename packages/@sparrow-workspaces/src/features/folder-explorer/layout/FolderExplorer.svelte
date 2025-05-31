@@ -42,6 +42,7 @@
     totalSocketIo: number;
     totalWebSocket: number;
     totalMockRequests: number;
+    totalAiRequests: number;
   }>;
   /**
    * Role of user in active workspace
@@ -85,6 +86,7 @@
   let totalSocketIo: number = 0;
   let totalWebSocket: number = 0;
   let totalMockRequests: number = 0;
+  let totalAiRequests: number = 0;
   let showAddItemMenu = false;
 
   const addButtonData = [
@@ -166,6 +168,7 @@
       totalSocketIo = res.totalSocketIo;
       totalWebSocket = res.totalWebSocket;
       totalMockRequests = res.totalMockRequests;
+      totalAiRequests = res.totalAiRequests;
     }
   };
 
@@ -300,6 +303,10 @@
         <div class="d-flex align-items-center gap-2">
           <span class="fs-4 text-primary-300">{totalSocketIo}</span>
           <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fs-4 text-primary-300">{totalAiRequests}</span>
+          <p style="font-size: 12px;" class="mb-0">AI Requests</p>
         </div>
       {/if}
     </div>

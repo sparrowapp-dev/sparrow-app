@@ -186,9 +186,13 @@
             onClickDuplicateTab(tab.id);
           },
           displayText: "Duplicate Tab",
-          hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
-            tab.type,
-          ),
+          hidden: ![
+            "REQUEST",
+            "WEBSOCKET",
+            "SOCKETIO",
+            "GRAPHQL",
+            "AI_REQUEST",
+          ].includes(tab.type),
           icon: CopyRegular,
         },
       ]}

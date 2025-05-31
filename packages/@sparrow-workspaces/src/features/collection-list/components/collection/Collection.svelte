@@ -219,7 +219,6 @@
               mockRequestCount++;
               deletedIds.push(item.items[i].id);
             } else if (item.items[i].type === ItemType.AI_REQUEST) {
-              // don't know why this change - anish
               aiRequestCount++;
               deletedIds.push(item.items[i].id);
             }
