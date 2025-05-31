@@ -277,6 +277,12 @@
 
   .model-card:hover {
     cursor: pointer;
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .model-card:active {
+    background-color: var(--bg-ds-surface-700);
+    /* transform: scale(1.01);  */
   }
 
   .checkmark-container {
