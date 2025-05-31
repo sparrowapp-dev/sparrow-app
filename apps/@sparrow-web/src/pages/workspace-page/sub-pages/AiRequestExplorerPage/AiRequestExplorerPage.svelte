@@ -76,7 +76,7 @@
     }
   }
 
-  let environmentVariables;
+  let environmentVariables = [];
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
@@ -168,7 +168,6 @@
   {collection}
   {environmentVariables}
   {isGuestUser}
-  {isLoginBannerActive}
   isWebApp={true}
   storeData={AiRequestExplorerData}
   onSaveAiRequest={_viewModel.saveAiRequest}
@@ -189,4 +188,5 @@
   onCreateCollection={_viewModel.createCollection}
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
+  onOpenCollection={_viewModel.openCollection}
 />

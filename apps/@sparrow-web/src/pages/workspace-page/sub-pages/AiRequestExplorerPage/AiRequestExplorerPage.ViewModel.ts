@@ -54,10 +54,8 @@ import {
 import {
   Events,
   ItemType,
-  ResponseStatusCode,
-  UntrackedItems,
 } from "@sparrow/common/enums";
-import { AiRequestTabAdapter } from "src/adapter";
+import { AiRequestTabAdapter, CollectionTabAdapter } from "src/adapter";
 import { CollectionService } from "../../../../services/collection.service";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 import {
@@ -143,13 +141,24 @@ class AiRequestExplorerViewModel {
   private set tab(value: RequestTab) {
     this._tab.next(value);
   }
+  
+  public openCollection = async () => {
+    const collectionRx = await this.collectionRepository.readCollection(
+      this._tab.getValue().path.collectionId,
+    );
+    const collectionDoc = collectionRx?.toMutableJSON();
+    const collectionTab = new CollectionTabAdapter().adapt(
+      this._tab.getValue().path.workspaceId,
+      collectionDoc,
+    );
+    this.tabRepository.createTab(collectionTab);
+  };
 
   /**
  * Compares the current request tab with the server version and updates the saved status accordingly.
  * This method is debounced to reduce the number of server requests.
  * @return A promise that resolves when the comparison is complete.
  */
-
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
@@ -1346,6 +1355,29 @@ class AiRequestExplorerViewModel {
       }
       return response;
     }
+  };
+
+  /**
+   * Sets environment variables in a given text by replacing placeholders with corresponding values.
+   * @param {string} text - The text containing placeholders for environment variables.
+   * @param environmentVariables - Array of objects containing key-value pairs for environment variables.
+   * @returns {string} The text with placeholders replaced by environment variable values.
+   */
+  private setEnvironmentVariables = (
+    text: string,
+    environmentVariables,
+  ): string => {
+    let updatedText = text;
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+
+    console.log("in SetEnv text :>> ", text)
+    console.log("in SetEnv environmentVariables :>> ", environmentVariables), 
+    console.log("in SetEnv updatedText :>> ", updatedText)
+    
+    return updatedText;
   };
 
 
