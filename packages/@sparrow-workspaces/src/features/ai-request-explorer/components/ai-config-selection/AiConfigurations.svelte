@@ -31,13 +31,32 @@
   });
 
   // Reset to default values
+  // Reset to default values
   const handleResetToDefault = () => {
     const defaultConfig = {};
     Object.entries(currentModelConfig).forEach(
       ([key, metadata]: [string, any]) => {
         defaultConfig[key] = metadata.defaultValue;
+
+        // Update the UI elements directly
+        if (metadata.type === "number") {
+          const inputElement = document.getElementById(
+            `config-field-${metadata.displayName}`,
+          );
+          if (inputElement) {
+            inputElement.value = metadata.defaultValue || 0;
+          }
+        } else if (metadata.type === "boolean") {
+          const toggleElement = document.getElementById(
+            `toggle-field-${metadata.displayName}`,
+          );
+          if (toggleElement) {
+            toggleElement.checked = metadata.defaultValue || false;
+          }
+        }
       },
     );
+
     onUpdateAiConfigurations(currSelectedModel, defaultConfig);
   };
 
@@ -134,10 +153,11 @@
             {#if metadata.type === "boolean"}
               <Toggle
                 id={`toggle-field-${metadata.displayName}`}
-                isActive={getCurrentValue(key, metadata)}
+                isActive={config[key]}
                 disabled={!isActive}
-                onChange={(event) =>
-                  handleToggleChange(key, event.target.checked)}
+                onChange={(event) => {
+                  handleToggleChange(key, event.target.checked);
+                }}
               />
             {:else if metadata.type === "number"}
               <div class="config-value d-flex justify-content-end">

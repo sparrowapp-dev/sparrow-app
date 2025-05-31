@@ -2,6 +2,7 @@
   export let isActive: boolean = false;
   export let disabled: boolean = false;
   export let label = "";
+  export let id = "";
   export let textColor = "var(--text-ds-neutral-200)";
   export let fontSize = "12px";
   export let fontWeight = "500";
@@ -60,7 +61,7 @@
         on:click={handleClick}
         {disabled}
         aria-label={label}
-        id="toggle"
+        id={id ? id : "toggle"}
       />
       <span
         class="toggle-track"
