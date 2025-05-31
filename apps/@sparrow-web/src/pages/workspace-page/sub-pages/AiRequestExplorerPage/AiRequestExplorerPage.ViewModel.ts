@@ -557,7 +557,6 @@ class AiRequestExplorerViewModel {
    * @returns save status
    */
   public saveAiRequest = async () => {
-    console.log("saveAiRequest called :>> ");
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;

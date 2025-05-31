@@ -967,7 +967,7 @@ class FolderExplorerPage {
           name: aiRequest.getValue().name,
           type: aiRequest.getValue().type,
           description: "",
-          request: {
+          aiRequest: {
             aiModelProvider: aiRequest.getValue().property.aiRequest?.aiModelProvider,
             aiModelVariant: aiRequest.getValue().property.aiRequest?.aiModelVariant,
           },
@@ -1097,6 +1097,7 @@ class FolderExplorerPage {
           args.collection as CollectionBaseInterface,
           args.folder as CollectionItemBaseInterface,
         );
+        break;
       case "aiRequestFolder":
         await this.handleCreateAiRequestInFolder(
           args.workspaceId,

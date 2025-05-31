@@ -33,6 +33,11 @@ import type {
   SocketIORequestDeletePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import type {
+  AiRequestCreateUpdateInCollectionPayloadDtoInterface,
+  AiRequestCreateUpdateInFolderPayloadDtoInterface,
+  AiRequestDeletePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/ai-request-dto";
+import type {
   GraphqlRequestAuthDtoInterface,
   GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
   GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
@@ -530,6 +535,71 @@ export class CollectionService {
     );
     return response;
   };
+
+  public addAiRequestInCollection = async (
+    _aiRequest: 
+      AiRequestCreateUpdateInCollectionPayloadDtoInterface
+      | AiRequestCreateUpdateInFolderPayloadDtoInterface,
+    baseUrl: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    console.log("************* ANISH *************** :>> ", _aiRequest);
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/ai-request`,
+      {
+        body: _aiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateAiRequestInCollection = async (
+    _aiRequestId: string,
+    _aiRequest:
+      | AiRequestCreateUpdateInCollectionPayloadDtoInterface
+      | AiRequestCreateUpdateInFolderPayloadDtoInterface,
+    baseUrl: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "PUT",
+      `${baseUrl}/api/collection/ai-request/${_aiRequestId}`,
+      {
+        body: _aiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteAiRequestInCollection = async (
+    _aiRequestId: string,
+    _aiRequest: AiRequestDeletePayloadDtoInterface,
+    baseUrl: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/collection/ai-request/${_aiRequestId}`,
+      {
+        body: _aiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
 
   public connectSocketIo = async (
     _url: string,

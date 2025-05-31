@@ -800,7 +800,6 @@ class CollectionExplorerPage {
 
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
-        console.log("coll ;>> ", collectionItem)
         if (collectionItem.type === ItemType.REQUEST) {
           totalRequests++;
         } else if (collectionItem.type === ItemType.WEB_SOCKET) {
@@ -1803,7 +1802,7 @@ class CollectionExplorerPage {
           args.collection as CollectionDto,
         );
         break;
-      case "aiRequestCollection": // Dont know where it is calling - anish
+      case "aiRequestCollection":
         await this.handleCreateAiRequestInCollection(
           args.collection.workspaceId,
           args.collection as CollectionDto,

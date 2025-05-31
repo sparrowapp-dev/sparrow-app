@@ -2529,7 +2529,7 @@ export default class CollectionsViewModel {
           name: aiRequest.getValue().name,
           type: aiRequest.getValue().type,
           description: "",
-          request: {
+          aiRequest: {
             aiModelProvider: aiRequest.getValue().property.aiRequest?.aiModelProvider,
             aiModelVariant: aiRequest.getValue().property.aiRequest?.aiModelVariant,
           } as AiRequestBaseInterface,
@@ -2580,7 +2580,7 @@ export default class CollectionsViewModel {
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const response = await this.collectionService.addRequestInCollection(
+    const response = await this.collectionService.addAiRequestInCollection(
       aiRequestObj,
       baseUrl,
     );

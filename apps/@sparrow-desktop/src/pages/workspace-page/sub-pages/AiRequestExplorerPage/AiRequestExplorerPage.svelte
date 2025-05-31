@@ -76,7 +76,7 @@
     }
   }
 
-  let environmentVariables;
+  let environmentVariables = [];
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
@@ -168,7 +168,6 @@
   {collection}
   {environmentVariables}
   {isGuestUser}
-  {isLoginBannerActive}
   storeData={AiRequestExplorerData}
   onUpdateAIModel={_viewModel.onUpdateAIModel}
   onUpdateRequestName={_viewModel.updateRequestName}
@@ -178,8 +177,15 @@
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
-  isWebApp={true}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
+  readWorkspace={_viewModel.readWorkspace}
+  onSaveAiRequest={_viewModel.saveAiRequest}
+  onSave={_viewModel.saveAsRequest}
+  onCreateFolder={_viewModel.createFolder}
+  onCreateCollection={_viewModel.createCollection}
+  onRenameCollection={_viewModel.handleRenameCollection}
+  onRenameFolder={_viewModel.handleRenameFolder}
+  onOpenCollection={_viewModel.openCollection}
 />
