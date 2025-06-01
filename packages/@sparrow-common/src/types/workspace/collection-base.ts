@@ -2,7 +2,13 @@ import type { AiRequestBaseInterface } from "./ai-request-base";
 import type { FolderBaseInterface } from "./folder-base";
 import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
-import type { HttpRequestMockBaseInterface } from "./http-request-mock-base";
+import type {
+  HttpRequestMockBaseInterface,
+  HttpRequestMockBodyBaseInterface,
+  HttpRequestMockBodyModeBaseEnum,
+  HttpRequestMockKeyValueCheckedBaseInterface,
+  HttpResponseMockBodyModeBaseEnum,
+} from "./http-request-mock-base";
 import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
@@ -76,6 +82,22 @@ export interface CollectionAuthBaseInterface {
   };
 }
 
+export interface MockRequestHistoryBaseInterface {
+  id?: string;
+  timestamp: string;
+  name: string;
+  url: string;
+  method: string;
+  responseStatus?: string;
+  duration: number;
+  requestHeaders?: HttpRequestMockKeyValueCheckedBaseInterface[];
+  requestBody?: HttpRequestMockBodyBaseInterface[];
+  selectedRequestBodyType?: HttpRequestMockBodyModeBaseEnum;
+  selectedResponseBodyType?: HttpResponseMockBodyModeBaseEnum;
+  responseHeaders?: HttpRequestMockKeyValueCheckedBaseInterface[];
+  responseBody?: string;
+}
+
 export interface CollectionBaseInterface {
   collectionId?: string;
   id: string;
@@ -101,6 +123,7 @@ export interface CollectionBaseInterface {
   createdBy: string;
   updatedBy: string;
   syncedAt?: string;
+  mockRequestHistory?: MockRequestHistoryBaseInterface[];
 }
 
 export interface CollectionArgsBaseInterface {

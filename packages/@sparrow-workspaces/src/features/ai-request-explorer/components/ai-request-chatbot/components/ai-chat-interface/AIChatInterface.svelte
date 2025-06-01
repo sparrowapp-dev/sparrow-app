@@ -13,14 +13,19 @@
   import { cubicOut } from "svelte/easing";
   import { generatingImage, SparrowLogo } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import { Events } from "@sparrow/common/enums";
   import type { Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
-  import { SparrowPrimaryIcon } from "@sparrow/common/icons";
-  import { Modal, Toggle } from "@sparrow/library/ui";
+  import {
+    Button,
+    Loader,
+    Modal,
+    notifications,
+    Toggle,
+    Tooltip,
+  } from "@sparrow/library/ui";
   import { tick } from "svelte";
-  import { StatusCode } from "@sparrow/common/utils";
   import { type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -34,7 +39,9 @@
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
   export let responseData: AiRequestExplorerData | undefined;
-  export let modelVariant = "gpt-4os";
+  export let onChatClear;
+  export let isChatAutoClearActive = false;
+  let isChatLoadingActive = false;
 
   let chatContainer: HTMLElement;
   /**
@@ -88,6 +95,11 @@
       },
     };
   };
+
+  let isChatClearPopupOpened = false;
+  const handleClosePopupBackdrop = (flag: boolean) => {
+    isChatClearPopupOpened = flag;
+  };
 </script>
 
 <!-- Code Block Preview Modal -->
@@ -135,43 +147,94 @@
               </button> -->
             </div>
             <div class="d-flex align-items-center gap-2">
-              <!-- <div class="d-flex align-items-center gap-2">
-        <span class="small text-white-50">Auto Clear</span>
-        <Toggle isActive={false} disabled={false} onChange={() => {}} />
-      </div> -->
-              <div
-                class="d-flex flex-row gap-2 text-ds-font-size-12 fw-medium"
-                style="color: var(--text-ds-neutral-100);"
-              >
-                <span
-                  >{isResponseGenerating
-                    ? 0
-                    : conversations[conversations.length - 1]?.inputTokens || 0}
-                  input tokens</span
-                >
-                <span
-                  >{isResponseGenerating
-                    ? 0
-                    : conversations[conversations.length - 1]?.outputTokens ||
-                      0} output tokens</span
-                >
+              <div class="d-flex align-items-center gap-2">
+                <!-- <span class="small text-white-50">Auto Clear</span> -->
+                <Toggle
+                  label={"Auto Clear"}
+                  textColor={"var(--text-ds-neutral-100)"}
+                  isActive={isChatAutoClearActive}
+                  disabled={false}
+                  onChange={(event) => {
+                    onUpdateRequestState({
+                      isChatAutoClearActive: event?.target.checked,
+                    });
+                  }}
+                />
               </div>
-              <!-- <button class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent">
-        <BroomRegular size={"20px"} />
-      </button>
-      <button class="btn btn-sm d-flex align-items-center gap-1 rounded-2 border border-white-25 btn-transparent">
-        <FormNewRegular name="document-add" size="18" />
-        <span>New</span>
-      </button> -->
+
+              <Tooltip
+                title={"Clear chat"}
+                placement={"left-center"}
+                zIndex={701}
+                show={true}
+              >
+                <span class="add-icon-container">
+                  <Button
+                    id={`clear-chat-history`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={BroomRegular}
+                    disable={!conversations?.length}
+                    onClick={async (e) => {
+                      isChatClearPopupOpened = true;
+                    }}
+                  />
+                </span>
+              </Tooltip>
+
+              <!-- <Tooltip
+                title={"New Conversation"}
+                placement={"left-center"}
+                zIndex={701}
+                show={true}
+              >
+                <span class="add-icon-container">
+                  <Button
+                    id={`start-new-conversation`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={FormNewRegular}
+                    onClick={async (e) => {}}
+                  />
+                </span>
+              </Tooltip> -->
             </div>
+          </div>
+          <div
+            class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
+            style="font-size: 10px;"
+          >
+            <span style="color: var(--text-ds-success-300);"
+              >{isResponseGenerating
+                ? 0
+                : conversations[conversations.length - 1]?.inputTokens || 0}
+              input tokens</span
+            >
+            <span style="color: var(--text-ds-danger-300);"
+              >{isResponseGenerating
+                ? 0
+                : conversations[conversations.length - 1]?.outputTokens || 0} output
+              tokens</span
+            >
           </div>
         </div>
 
         <div
           bind:this={chatContainer}
-          class="my-2"
+          class="my-2 position-relative"
           style="flex:1; overflow-x:hidden; overflow-y:auto;"
         >
+          {#if isChatLoadingActive}
+            <div
+              class="d-flex align-items-center justify-content-center w-100 h-100"
+              style="z-index:3; position:absolute;"
+            >
+              <Loader loaderSize={"20px"} />
+            </div>
+          {/if}
+
           <div
             class="d-flex flex-column h-100 align-items-center justify-content-center"
           >
@@ -186,8 +249,8 @@
                     <SparrowLogo width={"116"} height={"120px"} />
                   </span>
                   <p
-                    class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-semi-bold text-secondary-250 mb-0"
-                    style="letter-spacing: -0.02em; color: var(--text-ds-neutral-500);"
+                    class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-medium text-secondary-250 mb-0"
+                    style="letter-spacing: 0; color: var(--text-ds-neutral-500);"
                   >
                     Enter a prompt to start the conversation.
                   </p>
@@ -199,7 +262,6 @@
                   <div in:fade={{ duration: 200, delay: index * 50 }}>
                     <ChatItem
                       message={chat.message}
-                      chatResponse={responseData}
                       aiResponseMetrices={{
                         response: {
                           messageId: chat.messageId,
@@ -208,6 +270,8 @@
                           totalTokens: chat.totalTokens,
                           statusCode: chat.statusCode,
                           time: chat.time,
+                          modelProvider: chat.modelProvider,
+                          modelVariant: chat.modelVariant,
                         },
                       }}
                       messageId={chat.messageId}
@@ -223,7 +287,6 @@
                         : false}
                       {isResponseGenerating}
                       {handleApplyChangeOnAISuggestion}
-                      {modelVariant}
                     />
                   </div>
                 {/each}
@@ -253,6 +316,57 @@
     </div>
   </div>
 </div>
+
+<Modal
+  title={"Delete Conversation"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isChatClearPopupOpened}
+  width={"43%"}
+  handleModalState={() => handleClosePopupBackdrop(false)}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-fs-14 text-ds-font-weight-medium text-ds-line-height-143"
+      style="color: lightgray; letter-spacing: 0;"
+    >
+      This will permanently delete the current conversation. The system prompt
+      will remain unchanged, but all previous user inputs and model responses
+      will be cleared.<br /><br />
+      Are you sure you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        handleClosePopupBackdrop(false);
+      }}
+    ></Button>
+    <Button
+      title={"Delete"}
+      size={"medium"}
+      type={"danger"}
+      customWidth={"95px"}
+      onClick={async (e) => {
+        chatContainer.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+        handleClosePopupBackdrop(false);
+        isChatLoadingActive = true;
+        await new Sleep().setTime(1500).exec();
+        onChatClear();
+        notifications.success("Chat history cleared successfully.");
+        isChatLoadingActive = false;
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <style>
   .ai-chat-panel {

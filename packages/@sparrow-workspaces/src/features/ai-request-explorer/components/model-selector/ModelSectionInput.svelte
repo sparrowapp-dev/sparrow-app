@@ -23,6 +23,7 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
+  export let onUpdateAiConversation;
   let isModelSelectorOpen = false;
   export let selectedModelProvider = "openai";
   export let selectedModel = "gpt-4o";
@@ -45,6 +46,10 @@
     provider: string,
     model: { name: string; id: string },
   ) => {
+    if (selectedModelProvider !== provider) {
+      onUpdateAiConversation([]);
+      // return;
+    }
     selectedModelProvider = provider;
     selectedModel = model.id;
     onUpdateAIModel(provider, model.id);
@@ -105,8 +110,9 @@
       <!-- Wrap with a div to handle the click event -->
       <div on:click={handleInputClick} style="cursor: pointer;">
         <CodeMirrorInput
-          value={`${ModelIdNameMapping[selectedModelProvider]} | ${ModelVariantIdNameMapping[selectedModel]}` ||
-            "Select a Model"}
+          value={selectedModelProvider && selectedModel
+            ? `${ModelIdNameMapping[selectedModelProvider]} | ${ModelVariantIdNameMapping[selectedModel]}`
+            : ""}
           onUpdateInput={onUpdateAIModel}
           placeholder={"Select a Model"}
           {theme}

@@ -341,7 +341,7 @@
   }
   .custom-btn-outline-secondary:hover {
     background-color: var(--bg-ds-surface-300);
-    border: 0px;
+    border: 1px solid var(--border-ds-surface-300);
     color: var(--text-ds-neutral-50);
   }
   .custom-btn-outline-secondary:focus-visible {
@@ -351,7 +351,7 @@
   }
   .custom-btn-outline-secondary:active {
     background-color: var(--bg-ds-surface-400);
-    border: 0px;
+    border: 1px solid var(--border-ds-surface-400);
     color: var(--text-ds-neutral-50);
   }
   .custom-btn-outline-secondary-disable {

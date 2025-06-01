@@ -123,6 +123,7 @@
         } else {
           isCollectionEditable = true;
         }
+        findUserRole();
       }
     },
   );
@@ -188,6 +189,7 @@
 </script>
 
 <CollectionExplorer
+  bind:userRole
   {onMockCollectionModelOpen}
   {isCollectionEditable}
   onUpdateEnvironment={_viewModel.updateEnvironment}
@@ -208,4 +210,5 @@
   onUpdateCollectionState={_viewModel.updateCollectionState}
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
   onUpdateRunningState={_viewModel.handleMockCollectionState}
+  currentWorkspace={currentWorkspace}
 />

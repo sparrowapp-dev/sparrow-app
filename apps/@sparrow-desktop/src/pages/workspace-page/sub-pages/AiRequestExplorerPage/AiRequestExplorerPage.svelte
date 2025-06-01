@@ -177,6 +177,7 @@
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
+  onUpdateAiConfigurations={_viewModel.updateAiConfigurations}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}

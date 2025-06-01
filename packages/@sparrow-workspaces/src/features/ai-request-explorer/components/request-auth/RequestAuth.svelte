@@ -4,10 +4,13 @@
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { Button } from "@sparrow/library/ui";
+  import { Alert, Button } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
-
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  // import { apiKeyInstructions } from "@sparrow/common/types/workspace/ai-request-dto";
+  import { ApiKeyInstructions } from "./constants";
+  import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
+
   export let auth;
   export let environmentVariables;
   export let requestStateAuth;
@@ -17,6 +20,11 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
+  export let selectedModelProvider: AiModelProviderEnum;
+
+  // Get instructions for the selected provider
+  $: currentInstructions = ApiKeyInstructions[selectedModelProvider];
+
   const handlecollection_ai_tab_auth_changed = ({
     aiAuthNavigation,
   }: {
@@ -38,10 +46,10 @@
           <WithSelect
             id={"hash999"}
             data={[
-              {
-                name: "No Auth",
-                id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
-              },
+              // {
+              //   name: "No Auth",
+              //   id: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+              // },
               // {
               //   name: "Inherit Auth",
               //   id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,
@@ -81,6 +89,43 @@
       Add the API key of your selected AI model.
     </p>
   </div>
+
+  <Alert
+    heading={currentInstructions.heading}
+    description=""
+    varient="info"
+    ctaShow={false}
+    containerWidth={""}
+    closeIconRequired={false}
+    onClickClose={() => {}}
+  >
+    <ul
+      slot="body-slot"
+      class="alert-bullet-list text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150 ps-3 mt-1 me-0 mb-2 ms-1"
+    >
+      {#each currentInstructions.instructions as instruction, index}
+        <li class="alert-bullet-item position-relative">
+          {instruction.text}
+          {#if instruction.link}
+            <a
+              href={instruction.link.url}
+              target="_blank"
+              class="alert-link text-ds-font-size-12"
+            >
+              {instruction.link.text}<span class="external-arrow">↗</span>
+            </a>
+          {/if}
+          {#if instruction.bold}
+            <strong>{instruction.bold}</strong>
+          {/if}
+          {#if instruction.suffix}
+            {instruction.suffix}
+          {/if}
+        </li>
+      {/each}
+    </ul>
+  </Alert>
+
   <section class="w-100" style="flex:1; overflow:auto;">
     {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
@@ -179,5 +224,31 @@
   /* Add a border bottom when the button is pressed (active) */
   button:active {
     border-bottom: 2px solid red; /* Replace 'yourColor' with the desired color */
+  }
+
+  .alert-bullet-list {
+    font-style: inter, sans-serif;
+    color: var(--text-ds-neutral-200);
+  }
+
+  .alert-link {
+    color: var(--text-ds-primary-300);
+    text-decoration: none;
+    font-weight: 400;
+  }
+
+  .alert-link:hover {
+    text-decoration: underline;
+  }
+
+  .external-arrow {
+    font-size: 12px;
+    margin-left: 2px;
+    vertical-align: super;
+  }
+
+  .alert-bullet-item strong {
+    font-weight: 500;
+    color: var(--text-ds-neutral-50);
   }
 </style>

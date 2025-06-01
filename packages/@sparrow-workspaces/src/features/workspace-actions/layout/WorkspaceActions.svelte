@@ -77,6 +77,10 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onCreateMockCollection: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
 
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let navigateToGithub: () => void;
@@ -844,6 +848,7 @@
           {onCompareCollection}
           {onSyncCollection}
           {onUpdateRunningState}
+          {onCreateMockCollection}
         />
       </div>
 

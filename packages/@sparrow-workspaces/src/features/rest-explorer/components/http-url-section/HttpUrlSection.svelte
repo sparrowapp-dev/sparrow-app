@@ -195,19 +195,25 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  
-  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <Button
-      type="secondary"
-      size="medium"
-      loader={isSaveLoad}
-      startIcon={isSaveLoad ? "" : SaveRegular}
-      onClick={handleSaveRequest}
-      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? true
-        : false}
-    />
-  </Tooltip>
+  {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+    <Tooltip
+      title={"Save"}
+      placement={"bottom-center"}
+      distance={12}
+      zIndex={10}
+    >
+      <Button
+        type="secondary"
+        size="medium"
+        loader={isSaveLoad}
+        startIcon={isSaveLoad ? "" : SaveRegular}
+        onClick={handleSaveRequest}
+        disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+          ? true
+          : false}
+      />
+    </Tooltip>
+  {/if}
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

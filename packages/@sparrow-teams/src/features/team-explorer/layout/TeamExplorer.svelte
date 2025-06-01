@@ -11,6 +11,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
+  import { WorkspaceType } from "@sparrow/common/enums";
   import {
     AddRegular,
     GlobeRegular,
@@ -177,7 +178,7 @@
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
         count: openTeam?.users?.length || 1,
-        visible: openTeam.teamId !== "sharedWorkspaceTeam",
+        visible: openTeam?.teamId !== "sharedWorkspaceTeam",
         disabled: isGuestUser === true ? true : false,
       },
       {
@@ -436,7 +437,7 @@
         <div style="flex:1; overflow:auto;">
           {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
             <div class="h-100 d-flex flex-column">
-              {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
+              {#if openTeam && !isGuestUser}
                 <div
                   class="d-flex align-items-center"
                   style="gap: 20px; justify-content:space-between; align-items:center;"
@@ -460,11 +461,11 @@
                     <span
                       role="button"
                       class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
-                        selectedFilter === "Private"
+                        selectedFilter === WorkspaceType.PRIVATE
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
                       }`}
-                      on:click={() => (selectedFilter = "Private")}
+                      on:click={() => (selectedFilter = WorkspaceType.PRIVATE)}
                     >
                       <LockClosedRegular size="16px" />
                       Private
@@ -472,11 +473,11 @@
                     <span
                       role="button"
                       class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
-                        selectedFilter === "Public"
+                        selectedFilter === WorkspaceType.PUBLIC
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
                       }`}
-                      on:click={() => (selectedFilter = "Public")}
+                      on:click={() => (selectedFilter = WorkspaceType.PUBLIC)}
                     >
                       <GlobeRegular size="16px" />
                       Public

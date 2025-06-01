@@ -76,6 +76,13 @@
           name: request.tree.name,
           description: request.tree.description || "",
         };
+      case "MOCK_REQUEST":
+        return {
+          url: request.tree.mockRequest?.url || "",
+          method: request.tree.mockRequest?.method || "",
+          name: request.tree.name,
+          description: request.tree.description || "",
+        };
       default:
         return {
           url: request.tree.request?.url || "",
@@ -153,7 +160,7 @@
       icon: StackIcon,
       nav: (item) => handleGlobalSearchEnvironmentNavigation(item),
       getName: (item) => item.title,
-      getPath: (item) => "",
+      getPath: (item) => item.path || "",
     },
     flows: {
       items: filteredTestflows,
@@ -162,7 +169,7 @@
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
-      getPath: (item) => item.description || "",
+      getPath: (item) => item.path || "",
     },
   };
 

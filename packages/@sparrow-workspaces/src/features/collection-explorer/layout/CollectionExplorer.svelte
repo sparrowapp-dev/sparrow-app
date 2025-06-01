@@ -94,6 +94,7 @@
     FolderAddRegular,
     FolderIcon,
     GraphIcon,
+    HistoryRegular,
     OpenRegular,
     PlayCircleRegular,
     RecordStopRegular,
@@ -107,6 +108,8 @@
   import { Input } from "@sparrow/library/forms";
   import { onDestroy, onMount } from "svelte";
   import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import { getMethodStyle } from "@sparrow/common/utils";
+  import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
 
   /**
    * Role of user in active workspace
@@ -116,6 +119,7 @@
   export let onSaveCollection;
   export let onItemCreated;
   export let onUpdateRunningState;
+  export let userRole;
 
   /**
    * Local variables
@@ -343,6 +347,7 @@
     });
     isMockRunning = !isMockRunning;
   };
+  export let currentWorkspace;
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -520,8 +525,9 @@
           </div>
         {/if} -->
       </div>
-      <div class="d-flex flex-row">
-        <!-- {#if collection?.activeSync}
+      {#if !(isSharedWorkspace && currentWorkspace?.workspaceType === WorkspaceType.PUBLIC)}
+        <div class="d-flex flex-row">
+          <!-- {#if collection?.activeSync}
           <div class="d-flex flex-column justify-content-center">
             <Button
               disable={!isCollectionEditable || refreshCollectionLoader}
@@ -541,67 +547,69 @@
             />
           </div>
         {/if} -->
-        {#if collection?.activeSync}
-          <div class="me-2">
-            <Button
-              id={`sync-collection`}
-              disable={!isCollectionEditable || isCollectionSyncing}
-              loader={isCollectionSyncing}
-              title={"Sync Collection"}
-              type={"secondary"}
-              onClick={async () => {
-                isCollectionSyncing = true;
-                await onSyncCollection(collection.id);
-                isCollectionSyncing = false;
-              }}
-              size="medium"
-              startIcon={ArrowSyncRegular}
-            />
-          </div>
-        {/if}
+          {#if collection?.activeSync}
+            <div class="me-2">
+              <Button
+                id={`sync-collection`}
+                disable={!isCollectionEditable || isCollectionSyncing}
+                loader={isCollectionSyncing}
+                title={"Sync Collection"}
+                type={"secondary"}
+                onClick={async () => {
+                  isCollectionSyncing = true;
+                  await onSyncCollection(collection.id);
+                  isCollectionSyncing = false;
+                }}
+                size="medium"
+                startIcon={ArrowSyncRegular}
+              />
+            </div>
+          {/if}
 
-        <div
-          class="d-flex me-2 flex-column justify-content-center"
-          bind:this={collectionTabButtonWrapper}
-        >
-          <Dropdown
-            zIndex={600}
-            buttonId={`add-item-collection`}
-            bind:isMenuOpen={showAddItemMenu}
-            bind:isBackgroundClickable
-            options={collection?.collectionType === CollectionTypeBaseEnum.MOCK
-              ? addButtonDataMock
-              : addButtonData}
-            horizontalPosition="left"
+          <div
+            class="d-flex me-2 flex-column justify-content-center"
+            bind:this={collectionTabButtonWrapper}
           >
-            <Button
-              id={`add-item-collection`}
-              disable={!isCollectionEditable ||
-                collection?.activeSync ||
-                isSharedWorkspace}
-              title={"New"}
-              type={"primary"}
-              onClick={() => {
-                showAddItemMenu = !showAddItemMenu;
-              }}
-              size="medium"
-              startIcon={AddRegular}
-              endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
-            />
-          </Dropdown>
+            <Dropdown
+              zIndex={600}
+              buttonId={`add-item-collection`}
+              bind:isMenuOpen={showAddItemMenu}
+              bind:isBackgroundClickable
+              options={collection?.collectionType ===
+              CollectionTypeBaseEnum.MOCK
+                ? addButtonDataMock
+                : addButtonData}
+              horizontalPosition="left"
+            >
+              <Button
+                id={`add-item-collection`}
+                disable={!isCollectionEditable ||
+                  collection?.activeSync ||
+                  isSharedWorkspace}
+                title={"New"}
+                type={"primary"}
+                onClick={() => {
+                  showAddItemMenu = !showAddItemMenu;
+                }}
+                size="medium"
+                startIcon={AddRegular}
+                endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+              />
+            </Dropdown>
+          </div>
+          <Button
+            disable={$tab?.isSaved || !isCollectionEditable
+              ? true
+              : false || isSharedWorkspace}
+            startIcon={SaveRegular}
+            type={"secondary"}
+            onClick={() => {
+              onSaveCollection();
+              handlecollection_collection_saved({ name: "Collection Saved" });
+            }}
+          />
         </div>
-        <Button
-          disable={$tab?.isSaved || !isCollectionEditable
-            ? true
-            : false || isSharedWorkspace}
-          startIcon={SaveRegular}
-          type={"secondary"}
-          onClick={() => {
-            onSaveCollection();
-            handlecollection_collection_saved({ name: "Collection Saved" });
-          }}
-        />
-      </div>
+      {/if}
     </div>
     <!-- {#if collection?.activeSync && !isSynced}
       <div
@@ -687,6 +695,8 @@
                 startIcon={collection?.isMockCollectionRunning
                   ? RecordStopRegular
                   : PlayCircleRegular}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                  isSharedWorkspace}
               />
             </div>
           </div>
@@ -758,71 +768,132 @@
                 disabled={!isCollectionEditable}
                 id="updateCollectionDescField"
                 value={$tab?.description || ""}
-                class=" border-0 text-fs-12 collection-area input-outline w-100 p-2"
-                placeholder="Add Description"
+                class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
+                  ? 'input-outline'
+                  : ''} w-100 p-2"
+                placeholder={isSharedWorkspace
+                ? "No description added."
+                : "Add Description"}
                 on:input={handleInputDescription}
+                style="background-color: {isSharedWorkspace
+                  ? 'var(--bg-ds-surface-900)'
+                  : 'var(--bg-ds-surface-600)'};"
               />
             </div>
           </div>
         </div>
-        <div class="d-flex gap-3" style="width: 100%; height: 100%;">
-          <div class="mock-url-section d-flex flex-column" style="flex: 1;">
-            <div
-              class="d-flex align-items-center justify-content-between"
-              style="width: 100%;"
-            >
-              <div class="text-ds-font-size-16" style="margin-bottom: 0px;">
-                Details
+        {#if !(isSharedWorkspace && currentWorkspace?.workspaceType === WorkspaceType.PUBLIC)}
+          <div class="d-flex gap-3" style="width: 100%; height: 100%;">
+            <div class="mock-url-section d-flex flex-column" style="flex: 1;">
+              <div
+                class="d-flex align-items-center justify-content-between"
+                style="width: 100%;"
+              >
+                <div class="text-ds-font-size-16" style="margin-bottom: 0px;">
+                  Details
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <Tooltip title={"Coming Soon"} placement={"top-center"}>
+                    <Button
+                      size="small"
+                      type={"link-primary"}
+                      title="Edit Configuration"
+                      disable={true}
+                      onClick={() => {}}
+                      endIcon={ArrowRightRegular}
+                    />
+                  </Tooltip>
+                </div>
               </div>
-              <div class="d-flex gap-2 align-items-center">
-                <Tooltip title={"Coming Soon"} placement={"top-center"}>
+              <div
+                class="d-flex align-items-center justify-content-center text-ds-font-size-12"
+                style="color: var(--text-ds-neutral-300); margin:auto;"
+              >
+                Coming Soon
+              </div>
+            </div>
+            <div
+              class="mock-url-section d-flex flex-column"
+              style="flex: 1; height: 100%; display: flex; flex-direction: column;"
+            >
+              <div
+                class="d-flex align-items-center justify-content-between"
+                style="width: 100%;"
+              >
+                <div class="text-ds-font-size-16" style="margin-bottom: 0px;">
+                  Recent Requests
+                </div>
+                <div class="d-flex gap-2 align-items-center">
                   <Button
                     size="small"
                     type={"link-primary"}
-                    title="Edit Configuration"
-                    disable={true}
-                    onClick={() => {}}
+                    title="View All"
+                    disable={false}
+                    onClick={() => {
+                      onItemCreated("mockHistory", {
+                        collection: collection,
+                      });
+                    }}
                     endIcon={ArrowRightRegular}
                   />
-                </Tooltip>
+                </div>
               </div>
-            </div>
-            <div
-              class="d-flex align-items-center justify-content-center text-ds-font-size-12"
-              style="color: var(--text-ds-neutral-300); margin:auto;"
-            >
-              Coming Soon
+              <div
+                class="d-flex flex-column"
+                style="height: 100%; margin:auto; width: 100%;"
+              >
+                <div class="recent-requests-list custom-scrollbar">
+                  {#if collection?.mockRequestHistory && collection.mockRequestHistory.length > 0}
+                    {#each collection.mockRequestHistory
+                      .slice()
+                      .reverse()
+                      .slice(0, 5) as request}
+                      <div
+                        class="request-item d-flex justify-content-between align-items-center py-2 mb-2"
+                      >
+                        <div class="d-flex align-items-center overflow-hidden">
+                          <span
+                            class="method-label text-{getMethodStyle(
+                              request?.method,
+                            )} me-2"
+                            >{request?.method?.toUpperCase() === "DELETE"
+                              ? "DEL"
+                              : request?.method?.toUpperCase()}</span
+                          >
+                          <span class="request-title">{request.name}</span>
+                          <span
+                            class="request-url text-ds-font-size-12 ms-2"
+                            style="color: var(--text-ds-neutral-300);"
+                            >{request.url}</span
+                          >
+                        </div>
+                        <span
+                          class="request-time text-ds-font-size-12"
+                          style="color: var(--text-ds-neutral-100);"
+                          >{syncedTimeAgo(request.timestamp)}</span
+                        >
+                      </div>
+                    {/each}
+                  {:else}
+                    <div
+                      class="d-flex flex-column align-items-center justify-content-center text-ds-font-size-12 py-3"
+                      style="color: var(--text-ds-neutral-300); height: 100%; width: 100%;"
+                    >
+                      <HistoryRegular
+                        size={"32px"}
+                        color={"var(--text-ds-neutral-500)"}
+                      />
+                      <div class="text-center">
+                        No recent requests yet. Run a request in this collection
+                        to see it here.
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+              </div>
             </div>
           </div>
-          <div class="mock-url-section d-flex flex-column" style="flex: 1;">
-            <div
-              class="d-flex align-items-center justify-content-between"
-              style="width: 100%;"
-            >
-              <div class="text-ds-font-size-16" style="margin-bottom: 0px;">
-                Recent Requests
-              </div>
-              <div class="d-flex gap-2 align-items-center">
-                <Tooltip title={"Coming Soon"} placement={"top-center"}>
-                  <Button
-                    size="small"
-                    type={"link-primary"}
-                    title="View All History"
-                    disable={true}
-                    onClick={() => {}}
-                    endIcon={ArrowRightRegular}
-                  />
-                </Tooltip>
-              </div>
-            </div>
-            <div
-              class="d-flex align-items-center justify-content-center text-ds-font-size-12"
-              style="color: var(--text-ds-neutral-300); height: 100%; margin:auto;"
-            >
-              Coming Soon
-            </div>
-          </div>
-        </div>
+        {/if}
       </div>
     {:else}
       <div class="d-flex pb-3" style="justify-content: space-between;">
@@ -878,15 +949,22 @@
               <p style="font-size: 12px;" class="mb-0">AI Requests</p>
             </div>
           </div>
-          <hr />
+          <hr style="margin-bottom: 12px;" />
           <div class="d-flex align-items-start ps-0 h-100 z-0">
             <textarea
               disabled={!isCollectionEditable}
               id="updateCollectionDescField"
               value={$tab?.description || ""}
-              class=" border-0 text-fs-12 collection-area input-outline w-100 p-2"
-              placeholder="Describe this collection and share code examples or usage tips for the APIs."
+              class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
+                ? 'input-outline'
+                : ''} w-100 p-2"
+              placeholder={isSharedWorkspace
+                ? "No description added."
+                : "Describe this collection and share code examples or usage tips for the APIs."}
               on:input={handleInputDescription}
+              style="background-color: {isSharedWorkspace
+                ? 'var(--bg-ds-surface-900)'
+                : 'var(--bg-ds-surface-600)'};"
             />
           </div>
         </div>
@@ -932,7 +1010,6 @@
     border: none;
     border-radius: 4px !important;
     color: var(--text-secondary-1000);
-    background-color: var(--bg-ds-surface-600);
     height: 168px;
   }
   textarea::placeholder {
@@ -965,5 +1042,42 @@
     gap: 12px;
     border: 1px solid var(--border-ds-surface-100);
     border-radius: 8px;
+  }
+  .recent-requests-list {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 4px;
+    height: 100%;
+  }
+
+  .request-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-600);
+  }
+  .method-label {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 45px;
+    text-align: center;
+  }
+
+  .request-title {
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--text-ds-neutral-50);
+    text-overflow: ellipsis;
+    max-width: 170px;
+    overflow: hidden;
+  }
+
+  .request-url {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
   }
 </style>

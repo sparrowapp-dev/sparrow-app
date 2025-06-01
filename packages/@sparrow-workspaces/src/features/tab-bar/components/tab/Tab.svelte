@@ -28,6 +28,8 @@
     CopyRegular,
     BoardRegular,
     BotRegular,
+    HistoryRegular,
+    HistoryIcon2,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -256,6 +258,10 @@
             style="width: 19px;heigh:19px;margin-right:5px;"
           />
         </span>
+      {:else if tab.type === TabTypeEnum.HUB}
+        <span>
+          <BookIcon />
+        </span>
       {:else if tab.type === TabTypeEnum.WORKSPACE}
         <span>
           <BookIcon />
@@ -303,6 +309,10 @@
       {:else if tab.type === TabTypeEnum.AI_REQUEST}
         <span>
           <BotRegular height={"17px"} width={"15px"} />
+        </span>
+      {:else if tab.type === TabTypeEnum.MOCK_HISTORY}
+        <span>
+          <HistoryIcon2 height={"16px"} width={"16px"} />
         </span>
       {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
         <span>

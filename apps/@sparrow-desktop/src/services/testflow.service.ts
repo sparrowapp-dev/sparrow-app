@@ -15,6 +15,18 @@ export class TestflowService {
     return response;
   };
 
+  public fetchAllPublicTestflow = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/workspace/public/${workspaceId}/testflow`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
   public fetchTestflow = async (_workspaceId: string, _testflowId: string) => {
     const response = await makeRequest(
       "GET",
@@ -24,32 +36,35 @@ export class TestflowService {
     return response;
   };
 
-  public addTestflow = async (_testflow: {
-    name: string;
-    workspaceId: string;
-    edges: {
-      id: string;
-      source: string;
-      target: string;
-    }[];
-    nodes: {
-      id: string;
-      type: string;
-      position: {
-        x: number;
-        y: number;
-      };
-      data: {
-        blockName: string;
-        requestId: string;
-        collectionId: string;
-        folderId: string;
-        workspaceId: string;
-        isDeleted: boolean;
-        requestData: object;
-      };
-    }[];
-  },baseUrl:string) => {
+  public addTestflow = async (
+    _testflow: {
+      name: string;
+      workspaceId: string;
+      edges: {
+        id: string;
+        source: string;
+        target: string;
+      }[];
+      nodes: {
+        id: string;
+        type: string;
+        position: {
+          x: number;
+          y: number;
+        };
+        data: {
+          blockName: string;
+          requestId: string;
+          collectionId: string;
+          folderId: string;
+          workspaceId: string;
+          isDeleted: boolean;
+          requestData: object;
+        };
+      }[];
+    },
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/workspace/testflow`,

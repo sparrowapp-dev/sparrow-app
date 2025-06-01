@@ -22,23 +22,42 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
-  export let responseData: AiRequestExplorerData | undefined;
+  export let responseData: AiRequestExplorerData;
+  export let disabled = false;
 
   let scrollList: ScrollList;
 
   const sendPrompt = async (text: string) => {
     if (text) {
-      onUpdateAiConversation([
-        // ...$tab?.property?.aiRequest?.ai?.conversations,
-        {
-          message: text,
-          messageId: "",
-          type: MessageTypeEnum.SENDER,
-          isLiked: false,
-          isDisliked: false,
-          status: true,
-        },
-      ]);
+      const isAutoClearEnabled =
+        $tab?.property?.aiRequest?.state?.isChatAutoClearActive || false;
+      const updatedConverstaion = isAutoClearEnabled
+        ? [
+            {
+              message: text,
+              messageId: "",
+              type: MessageTypeEnum.SENDER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+            },
+          ]
+        : [
+            ...$tab?.property?.aiRequest?.ai?.conversations,
+            {
+              message: text,
+              messageId: "",
+              type: MessageTypeEnum.SENDER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+            },
+          ];
+      onUpdateAiConversation(updatedConverstaion);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
@@ -46,6 +65,12 @@
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
+    }
+  };
+
+  const clearChat = async () => {
+    if ($tab?.property?.aiRequest?.ai?.conversations.length) {
+      onUpdateAiConversation([]);
     }
   };
 
@@ -67,7 +92,7 @@
 </script>
 
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
-  <div class="h-100">
+  <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       {responseData}
@@ -81,13 +106,19 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
+      onChatClear={clearChat}
+      isChatAutoClearActive={$tab?.property?.aiRequest?.state
+        ?.isChatAutoClearActive}
       bind:scrollList
     />
   </div>
 {/if}
 
 <style lang="scss">
+  .disabled-chatbot {
+    pointer-events: none;
+    opacity: 0.6;
+  }
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
     height: 40px;

@@ -442,10 +442,14 @@
   };
 
   const handleOnClickAIDebug = async () => {
-    handleEventOnClickAI(
-      storeData?.response?.status,
-      tab.property?.request?.method,
-    );
+    const statusCode = storeData?.response?.status || "Unknown Error";
+    const statusNumber = parseInt(statusCode.split(" ")[0]);
+    const tag =
+      statusNumber >= 500
+        ? "DEBUG_5XX_ERROR_REQUEST"
+        : "DEBUG_4XX_ERROR_REQUEST";
+
+    handleEventOnClickAI(statusCode, tab.property?.request?.method);
     isAIDebugBtnEnable = false;
 
     // adjusting the panel layout
@@ -471,12 +475,14 @@
       ]);
 
       // The prompt in the below format is required to trigger the 4xx error debugging instructions for AI model
-      const debugPrompt = `[DEBUG_4XX_ERROR_REQUEST]
-        I am getting the below mentioned error when I send request. 
-        Can you help me debug this error and tell me what changes I need to make in my request to solve this issue.
-        Error Response (${storeData.response.status || "4xx"}): ${JSON.stringify(storeData?.response)}
-        Please analyze this error and provide suggestions to fix it following your strict error debugging protocol. I need formatted suggestions that can be directly applied to my request configuration.
-        [/DEBUG_4XX_ERROR_REQUEST]`;
+      const debugPrompt = `[${tag}]
+      I am getting the below mentioned error when I send request. 
+      Can you help me debug this error and tell me what changes I need to make in my request to solve this issue.
+      Error Response (${statusCode}): ${JSON.stringify(storeData?.response)}
+      Please analyze this error and provide suggestions to fix it following your strict error debugging protocol.
+      - If it's a 4xx error: I need **precise, formatted suggestions** that I can directly apply to my request configuration.
+      - If it's a 5xx error: I need **server-side troubleshooting insights** and any client-side checks I can perform.
+      [/${tag}]`;
 
       // ToDo: Enable scroller
       // Scroller for user prompt
@@ -500,19 +506,18 @@
   };
 
   /**
-   * Checks whether the response status code indicates a client error (HTTP 4xx).
-   * @returns {boolean} - Returns true if the status code is between 400 and 499, otherwise false.
+   * Checks whether the response status code indicates a client or server error (HTTP 4xx or 5xx).
+   * @returns {boolean} - Returns true if the status code is between 400 and 599, otherwise false.
    */
-  const isClientError = () => {
+  const isErrorStatus = () => {
     const status = storeData?.response?.status;
     const code = parseInt(status?.split(" ")[0]);
-    return code >= 400 && code < 500;
+    return code >= 400 && code < 600;
   };
 
   $: {
     if (storeData) {
-      if (isClientError()) isAIDebugBtnEnable = true;
-      else isAIDebugBtnEnable = false;
+      isAIDebugBtnEnable = isErrorStatus();
     }
   }
 </script>
@@ -723,6 +728,7 @@
                           {onUpdateRequestDescription}
                           requestDoc={$tab.description}
                           {isGuestUser}
+                          {userRole}
                         />
                       {/if}
                     </div>

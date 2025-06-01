@@ -94,6 +94,8 @@
   import { Spinner } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
+  import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
+  import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -591,7 +593,7 @@
       if (prevWorkspaceId !== value._id) {
         isInitialDataLoading = true;
         activeTab = undefined;
-        await handleRefreshApicalls(value?._id);
+        handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -784,6 +786,19 @@
     mockCollectionUrl = url;
     isMockURLModelOpen = true;
   };
+
+  let createMockCollection = false;
+  let currentCollectionId: string;
+  let currentWorkspaceId: string;
+  let isCreateMockCollectionPopup: boolean;
+  const handleCreateMockCollectionModel = (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    currentCollectionId = collectionId;
+    currentWorkspaceId = workspaceId;
+    isCreateMockCollectionPopup = true;
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -852,6 +867,7 @@
           onSyncCollection={handleSyncCollection}
           onUpdateRunningState={_viewModel.handleMockCollectionState}
           onOpenWorkspace={_viewModel.handleOpenWorkspace}
+          onCreateMockCollection={handleCreateMockCollectionModel}
         />
       </Pane>
       <Pane
@@ -974,6 +990,18 @@
                         />
                       </div>
                     </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.HUB}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <HubExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
@@ -1033,7 +1061,7 @@
       }}
       disabled={false}
     />
-    <p class="m-0">I understand, don't show this agian.</p>
+    <p class="m-0">I understand, don't show this again.</p>
   </div>
 
   <div
@@ -1714,6 +1742,57 @@
         </Tooltip>
       </div>
     </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Create Mock Collection"}
+  width={"36%"}
+  zIndex={1000}
+  isOpen={isCreateMockCollectionPopup}
+  handleModalState={() => (isCreateMockCollectionPopup = false)}
+>
+  <div class="text-lightGray mb-4 mt-2">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+    >
+      The mock collection only supports REST API requests. Requests using
+      GraphQL, WebSocket, or other request types will be excluded.
+      <br />
+      Do you want to continue?
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      disable={createMockCollection}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isCreateMockCollectionPopup = false;
+      }}
+    />
+
+    <Button
+      disable={createMockCollection}
+      title={"Yes, Continue"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"primary"}
+      loader={createMockCollection}
+      onClick={async () => {
+        createMockCollection = true;
+        await _viewModel.handleCreateMockCollectionFromExisting(
+          currentCollectionId,
+          currentWorkspaceId,
+        );
+        createMockCollection = false;
+        isCreateMockCollectionPopup = false;
+      }}
+    />
   </div>
 </Modal>
 
