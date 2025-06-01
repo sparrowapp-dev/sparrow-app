@@ -76,7 +76,7 @@
       icon: GoogleVectorIcon,
       models: [
         { name: "Gemini 1.5 Flash", id: "gemini-1.5-flash" },
-        { name: "Gemini 1.5 Flash 8b", id: "gemini-1.5-flash-8b" },
+        { name: "Gemini 1.5 Flash 8B", id: "gemini-1.5-flash-8b" },
         { name: "Gemini 1.5 Pro", id: "gemini-1.5-pro" },
         { name: "Gemini 2.0 Flash", id: "gemini-2.0-flash" },
       ],
@@ -277,6 +277,12 @@
 
   .model-card:hover {
     cursor: pointer;
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .model-card:active {
+    background-color: var(--bg-ds-surface-700);
+    /* transform: scale(1.01);  */
   }
 
   .checkmark-container {

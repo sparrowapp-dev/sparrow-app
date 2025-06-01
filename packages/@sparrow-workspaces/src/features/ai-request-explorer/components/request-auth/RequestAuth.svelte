@@ -95,7 +95,7 @@
     description=""
     varient="info"
     ctaShow={false}
-    containerWidth={""}
+    containerWidth={"615px"}
     closeIconRequired={false}
     onClickClose={() => {}}
   >

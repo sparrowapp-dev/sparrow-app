@@ -18,7 +18,8 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { disabledModelFeatures } from "@sparrow/common/types/workspace/ai-request-dto";
+  import { disabledModelFeatures } from "../constants";
+
   import {
     BotRegular,
     SettingsRegular,
@@ -210,8 +211,8 @@
                         class="text-muted mb-0 px-3"
                         style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
                       >
-                        No LLM Selected. Please select a LLM to Add
-                        Authentication.
+                        No model selected. Please select a model to add
+                        authentication.
                       </p>
                     </div>
                   {/if}

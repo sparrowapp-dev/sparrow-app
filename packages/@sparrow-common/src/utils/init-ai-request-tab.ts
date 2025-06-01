@@ -12,7 +12,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant, DefaultAiConfig } from "../types/workspace/ai-request-base";
+import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/ai-request-base";
 import { AiRequestSectionEnum } from "../types/workspace/ai-request-tab";
 class InitAiRequestTab {
     private _tab: Tab;
@@ -53,10 +53,35 @@ class InitAiRequestTab {
                         },
                     },
                     configurations: {
-                        openai: DefaultAiConfig.OPENAI,
-                        deepseek: DefaultAiConfig.DEEPSEEK,
-                        anthropic: DefaultAiConfig.ANTHROPIC,
-                        google: DefaultAiConfig.GOOGLE,
+                        openai: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        deepseek: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        anthropic: {
+                            streamResponse: true,
+                            maxTokens: -1,
+                            temperature: 0.5,
+                            top_p: 0.95,
+                        },
+                        google: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            maxTokens: 1024,
+                            top_p: 0.95,
+                        },
                     },
                     ai: {
                         prompt: "",
