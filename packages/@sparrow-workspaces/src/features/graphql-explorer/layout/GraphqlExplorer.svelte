@@ -83,7 +83,7 @@
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
-  let isSchemaFetching = false;
+  let isSchemaFetching = true;
   let isQueryInvalid = false;
   let errorStartIndex = 0;
   let errorEndIndex = 0;
@@ -106,9 +106,7 @@
    * Sets the `isSchemaFetching` flag while fetching and resets it after completion.
    */
   const handleFetchSchema = async () => {
-    isSchemaFetching = true;
     await onFetchSchema(environmentVariables?.filtered || []);
-    isSchemaFetching = false;
   };
 
   /**
@@ -168,13 +166,19 @@
   };
 
   loadingState.subscribe((tab) => {
+    console.log("loadingState", tab);
     const tabIdValue = tab.get($tab.tabId);
+    debugger;
     if (tabIdValue === undefined) {
       loading.set(false);
     } else {
       loading.set(tabIdValue);
     }
   });
+  $: isSchemaFetching = $loading;
+  $: {
+    console.log("isSchemaFetching", isSchemaFetching);
+  }
 </script>
 
 {#if $tab.tabId}
@@ -424,7 +428,13 @@
                   />
                 </div> -->
                 <div style="flex:1; overflow: auto;">
-                  {#if $tab.property.graphql.state.isRequestSchemaFetched}
+                  {#if isSchemaFetching}
+                    <div
+                      style="display: flex; align-items: center; justify-content: center; height: 100%;"
+                    >
+                      <Loader loaderSize="20px" />
+                    </div>
+                  {:else if $tab.property.graphql.state.isRequestSchemaFetched}
                     <GenerateQuery
                       schema={$tab.property.graphql.schema}
                       updateSchema={handleUpdateSchema}
