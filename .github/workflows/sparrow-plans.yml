@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev/sparrow-plans//sparrow-plans/ --exclude "*" --include "*.zip" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -122,7 +122,7 @@ jobs:
         run: |
           $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/sparrow-plans/$msiFileName"
           
           $body = @{
             "type" = "message"
@@ -227,8 +227,8 @@ jobs:
 
       - name: Upload & download File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/sparrow-plans/ --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev/sparrow-plans/ --recursive --exclude "*" --include "*.dmg"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -237,7 +237,7 @@ jobs:
         run: |
           DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           DMG_FILENAME=$(basename "$DMG_FILE")
-          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
+          DMG_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/sparrow-plans/$DMG_FILENAME"
           
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
