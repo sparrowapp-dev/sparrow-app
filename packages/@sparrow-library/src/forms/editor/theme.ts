@@ -229,7 +229,11 @@ export const basicTheme = EditorView.theme({
   ".cm-chunkButtons button[name='reject']:hover": {
     // background: "#1859f1",
   },
-
+  ".cm-placeholder": {
+    pointerEvents: "none",
+    backgroundColor: "transparent",
+    whiteSpace: "nowrap",
+  },
   span: {
     fontFamily: EditorFont,
   },
