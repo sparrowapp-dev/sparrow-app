@@ -14,6 +14,7 @@
   export let requestState: any = {};
   export let method;
   export let onUpdateRequestState;
+  export let onUpdateEnvironment;
 
   let isBodyBeautified = false;
 
@@ -68,8 +69,8 @@
         onUpdateRequestBody={(pairs) => {
           onUpdateRequestState("urlencoded", pairs);
         }}
-        onUpdateEnvironment={() => {}}
         {handleOpenCurrentDynamicExpression}
+        {onUpdateEnvironment}
       />
     {:else if requestState.requestBodyNavigation === RequestDataset.BINARY}
       <Binary />
@@ -80,8 +81,8 @@
         onUpdateRequestBody={(pairs) => {
           onUpdateRequestState("formdata", { text: pairs, file: [] });
         }}
-        onUpdateEnvironment={() => {}}
         {handleOpenCurrentDynamicExpression}
+        {onUpdateEnvironment}
       />
     {/if}
   </div>

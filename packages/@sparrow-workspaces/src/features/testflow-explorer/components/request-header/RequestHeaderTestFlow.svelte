@@ -16,6 +16,7 @@
   export let handleOpenCurrentDynamicExpression;
   let isBulkEditRequired = true;
   let isBulkEditHeaderInfoRequired = true;
+  export let onUpdateEnvironment;
 
   //   let placeholderHeader=`Usage: Use bulk edit to manage multiple Headers quickly. Separate each entry with a new line.
   // Format: Header-Key: Header-Value
@@ -52,7 +53,7 @@
     keyValue={createDeepCopy(headers)}
     callback={handleHeaderChange}
     {environmentVariables}
-    onUpdateEnvironment={() => {}}
+    {onUpdateEnvironment}
     dynamicExpression={true}
     handleOpenCurrentDynamicExpression={(obj) => {
       handleOpenCurrentDynamicExpression({ ...obj, type: "headers" });
