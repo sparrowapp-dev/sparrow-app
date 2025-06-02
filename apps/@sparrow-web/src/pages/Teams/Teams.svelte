@@ -146,6 +146,10 @@
   });
 
   let isPopupOpen = false;
+
+  const handleChangeTab = async (tab: string) => {
+    await _viewModel.updateActiveTeamTab(tab, userId);
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -279,7 +283,7 @@
       >
         <TeamExplorerPage
           activeTeamTab={$activeTeamTab}
-          onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+          onUpdateActiveTab={handleChangeTab}
           bind:isPopupOpen
         />
       </Pane>

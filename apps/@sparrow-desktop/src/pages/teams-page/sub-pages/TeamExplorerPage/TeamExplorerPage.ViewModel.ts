@@ -86,8 +86,13 @@ export class TeamExplorerPageViewModel {
   /**
    * @description - Update the active team tab
    */
-  public updateActiveTeamTab = (tab: string) => {
-    this.activeTeamTab = tab;
+  public updateActiveTeamTab = async (tab: string, userId: string) => {
+    if (this._activeTeamTab.value !== tab) {
+      this._activeTeamTab.next(tab);
+      if (this._activeTeamTab.value === "Invites") {
+        await this.refreshTeams(userId);
+      }
+    }
   };
 
   /**
