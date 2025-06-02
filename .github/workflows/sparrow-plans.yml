@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev/sparrow-plans//sparrow-plans/ --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev/sparrow-plans/ --exclude "*" --include "*.zip" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
