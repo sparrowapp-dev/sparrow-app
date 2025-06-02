@@ -73,6 +73,10 @@
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
   };
+
+  const handleChangeTab = async (tab: string) => {
+    await _viewModel.updateActiveTeamTab(tab, userId);
+  };
 </script>
 
 <TeamExplorer
@@ -85,7 +89,7 @@
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
   onDeleteWorkspace={handleDeleteWorkspace}
-  onUpdateActiveTab={_viewModel.updateActiveTeamTab}
+  onUpdateActiveTab={handleChangeTab}
   onCreateWorkspace={_viewModel.handleCreateWorkspace}
   onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
