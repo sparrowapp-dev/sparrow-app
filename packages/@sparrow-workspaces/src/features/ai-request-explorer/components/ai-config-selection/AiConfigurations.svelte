@@ -69,6 +69,9 @@
       value = parseFloat(value);
       if (isNaN(value)) return;
 
+      // Convert to integer if it's maxTokens
+      if (key === "maxTokens") value = Math.floor(value);
+
       // Apply min/max constraints
       if (
         format[key].min !== undefined &&
