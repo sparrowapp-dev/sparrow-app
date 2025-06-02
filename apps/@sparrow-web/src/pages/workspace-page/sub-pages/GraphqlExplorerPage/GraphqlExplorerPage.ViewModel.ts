@@ -1998,6 +1998,7 @@ class GraphqlExplorerViewModel {
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
+    const tabId = graphqlTabData?.tabId;
     startLoading(tabId);
     if (!workspaceId || !collectionId) {
       stopLoading(tabId);
