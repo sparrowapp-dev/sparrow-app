@@ -1415,7 +1415,6 @@ class GraphqlExplorerViewModel {
    * @param _headers - request headers
    */
   public updateSchema = async (_schema: string) => {
-    debugger;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;

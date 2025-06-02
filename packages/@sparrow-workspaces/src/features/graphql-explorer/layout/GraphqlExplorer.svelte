@@ -166,9 +166,7 @@
   };
 
   loadingState.subscribe((tab) => {
-    console.log("loadingState", tab);
     const tabIdValue = tab.get($tab.tabId);
-    debugger;
     if (tabIdValue === undefined) {
       loading.set(false);
     } else {
@@ -176,9 +174,6 @@
     }
   });
   $: isSchemaFetching = $loading;
-  $: {
-    console.log("isSchemaFetching", isSchemaFetching);
-  }
 </script>
 
 {#if $tab.tabId}
