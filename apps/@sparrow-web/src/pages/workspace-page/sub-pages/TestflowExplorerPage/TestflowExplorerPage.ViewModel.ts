@@ -562,7 +562,7 @@ export class TestflowExplorerPageViewModel {
             );
             if (existingTestFlowData) {
               let resData: TFHistoryAPIResponseStoreType;
-              // if (response.isSuccessful) {
+              if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
                   JSON.stringify(response),
                 ).length;
@@ -604,30 +604,8 @@ export class TestflowExplorerPageViewModel {
                   time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
-              // } else {
-              //   resData = {
-              //     body: "",
-              //     headers: [],
-              //     status: ResponseStatusCode.ERROR,
-              //     time: duration,
-              //     size: 0,
-              //   };
-              //   failedRequests++;
-              //   totalTime += duration;
-              //   const req = {
-              //     method: request?.request?.method as string,
-              //     name: request?.name as string,
-              //     status: ResponseStatusCode.ERROR,
-              //     time: new ParseTime().convertMilliseconds(duration),
-              //   };
-              //   history.requests.push(req);
-              // }
-              existingTestFlowData.nodes.push({
-                id: element.id,
-                response: resData,
-                request: adaptedRequest,
-              });
 
+                
               const responseHeader = this._decodeRequest.setResponseContentType(
                 formattedHeaders,
               );
@@ -685,6 +663,30 @@ export class TestflowExplorerPageViewModel {
                     parameters:reqParam || {}
                   }
                 }
+              } else {
+                resData = {
+                  body: response.message,
+                  headers: [],
+                  status: ResponseStatusCode.ERROR,
+                  time: duration,
+                  size: 0,
+                };
+                failedRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: ResponseStatusCode.ERROR,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
+              }
+              existingTestFlowData.nodes.push({
+                id: element.id,
+                response: resData,
+                request: adaptedRequest,
+              });
+
 
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
@@ -692,6 +694,7 @@ export class TestflowExplorerPageViewModel {
             return testFlowDataMap;
           });
         } catch (error) { 
+          console.error(error);
           if (error?.name === "AbortError") {
             break;
           }
@@ -920,7 +923,6 @@ export class TestflowExplorerPageViewModel {
 
     const start = Date.now();
     let resData: TFHistoryAPIResponseStoreType;
-    let status: string;
     let duration = 0;
 
     try {
@@ -956,14 +958,13 @@ export class TestflowExplorerPageViewModel {
         };
       } else {
         resData = {
-          body: "",
+          body: response.message,
           headers: [],
           status: ResponseStatusCode.ERROR,
           time: duration,
           size: 0,
         };
       }
-      status = resData.status;
     } catch (error) {
       resData = {
         body: "",
@@ -972,7 +973,6 @@ export class TestflowExplorerPageViewModel {
         time: 0,
         size: 0,
       };
-      status = ResponseStatusCode.ERROR;
     }
 
     // Update testFlowDataStore with this single result
