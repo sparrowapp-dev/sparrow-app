@@ -329,7 +329,7 @@
       id: SidebarItemIdEnum.MARKETPLACE,
       route: "marketplace",
       heading: "Marketplace",
-      disabled: false,
+      disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
