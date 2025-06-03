@@ -15,6 +15,6 @@ export class PlanService {
       headers: getAuthHeaders(),
       body: { planIds: planIds },
     });
-    return plans?.data?.data;
+    return plans;
   };
 }

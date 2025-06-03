@@ -8,16 +8,16 @@ export class PlanRepository {
    * @params - Plan data to be inserted
    */
   public insert = async (plan: any) => {
-    await RxDB.getInstance().rxdb.plan.insert(plan);
+    await RxDB.getInstance().rxdb?.plan.insert(plan);
     return;
   };
 
   /**
    * Get plan document by id (not observable)
    */
-  public getPlan = async (planId: string): Promise<PlanDocument> => {
-    return RxDB.getInstance()
-      .rxdb.plan.findOne({
+  public getPlan = async (planId: string): Promise<PlanDocument | undefined | null> => {
+    return await RxDB.getInstance()
+      .rxdb?.plan?.findOne({
         selector: {
           planId: planId,
         },
@@ -30,13 +30,23 @@ export class PlanRepository {
    */
   public removePlan = async (planId: string) => {
     const plan = await RxDB.getInstance()
-      .rxdb.plan.findOne({
+      .rxdb?.plan.findOne({
         selector: {
           planId: planId,
         },
       })
       .exec();
 
-    return await plan.remove();
+    return await plan?.remove();
+  };
+
+  /**
+   * Refresh plans data
+   */
+  public upsertMany = async (_plans:  any[]): Promise<void> => {
+    if (_plans?.length) {
+      await RxDB.getInstance()?.rxdb?.plan.bulkUpsert(_plans);
+    }
+    return;
   };
 }

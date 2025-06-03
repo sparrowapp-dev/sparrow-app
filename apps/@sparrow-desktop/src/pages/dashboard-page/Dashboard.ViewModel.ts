@@ -227,48 +227,51 @@ export class DashboardViewModel {
         };
         data.push(item);
       }
-      const missingPlanIds: string[] = [];
-      for (const planId of userPlans) {
-        const planExist = await this.planRepository.getPlan(planId);
-        if (!planExist) {
-          missingPlanIds.push(planId);
-        }
-      }
-      if (missingPlanIds.length > 0) {
-        const fetchedPlans = await this.planService.getPlansByIds(
-          missingPlanIds,
+    
+      
+        const planResponse =  await this.planService.getPlansByIds(
+          userPlans,
           constants.API_URL,
         );
-        for (const planData of fetchedPlans) {
-          const rawData = planData;
-          if (!rawData?._id) continue;
-          const planDetails = {
-            planId: rawData._id,
-            name: rawData.name,
-            description: rawData.description,
-            active: rawData.active,
-            limits: {
-              workspacesPerHub: {
-                area: rawData.limits.workspacesPerHub.area,
-                value: rawData.limits.workspacesPerHub.value,
+        
+        const parsedPlans =  []; 
+        if(response.isSuccessful && planResponse.data.data) {
+          for (const planData of planResponse.data.data) {
+            const rawData = planData;
+            if (!rawData?._id) continue;
+            const planDetails = {
+              planId: rawData._id,
+              name: rawData.name,
+              description: rawData.description,
+              active: rawData.active,
+              limits: {
+                workspacesPerHub: {
+                  area: rawData.limits.workspacesPerHub.area,
+                  value: rawData.limits.workspacesPerHub.value,
+                },
+                testflowPerWorkspace: {
+                  area: rawData.limits.testflowPerWorkspace.area,
+                  value: rawData.limits.testflowPerWorkspace.value,
+                },
+                blocksPerTestflow: {
+                  area: rawData.limits.blocksPerTestflow.area,
+                  value: rawData.limits.blocksPerTestflow.value,
+                },
+                selectiveTestflowRun: {
+                  area: rawData.limits.selectiveTestflowRun.area,
+                  active: rawData.limits.selectiveTestflowRun.active,
+                },
               },
-              testflowPerWorkspace: {
-                area: rawData.limits.testflowPerWorkspace.area,
-                value: rawData.limits.testflowPerWorkspace.value,
-              },
-              blocksPerTestflow: {
-                area: rawData.limits.blocksPerTestflow.area,
-                value: rawData.limits.blocksPerTestflow.value,
-              },
-            },
-            createdAt: rawData.createdAt,
-            updatedAt: rawData.updatedAt,
-            createdBy: rawData.createdBy,
-            updatedBy: rawData.updatedBy,
-          };
-          await this.planRepository.insert(planDetails);
+              createdAt: rawData.createdAt,
+              updatedAt: rawData.updatedAt,
+              createdBy: rawData.createdBy,
+              updatedBy: rawData.updatedBy,
+            };
+            parsedPlans.push(planDetails);
+          } 
+          await this.planRepository.upsertMany(parsedPlans);
+
         }
-      }
 
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(

@@ -75,6 +75,7 @@ addRxPlugin(RxDBUpdatePlugin);
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
+export type PlanContainer = RxCollection<PlanDocType>
 export type CollectionDocument = RxDocument<CollectionDocType>;
 export type TeamDocument = RxDocument<TeamDocType>;
 export type TeamContainer = RxCollection<TeamDocType>;
@@ -108,7 +109,7 @@ export type DatabaseCollections = {
   windowSettings: WindowSettingsContainer;
   team: TeamContainer;
   testflow: TFRxContainerType;
-  plan: PlanDocType;
+  plan: PlanContainer;
 };
 
 // define the Rx database type
@@ -572,6 +573,16 @@ export class RxDB {
       },
       plan: {
         schema: planSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+
+        },
       },
       githubrepo: {
         schema: githubRepoSchema,

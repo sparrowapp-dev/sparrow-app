@@ -422,8 +422,18 @@ export class TestflowExplorerPageViewModel {
 
     let runningNodes: any[] = [];
 
-
+    const workspaceRxDoc = await this.workspaceRepository.readWorkspace(progressiveTab.path.workspaceId);
+    const workspaceObject = workspaceRxDoc.toMutableJSON();
+    const teamRxDoc = await this.teamRepository.getTeamDoc(workspaceObject?.team?.teamId as string);
+    const teamObject = teamRxDoc?.toMutableJSON();
+   
     if (_event === "run-from-here") {
+      const planRxDoc = await this.planRepository.getPlan(teamObject.plan?.id as string);
+      const planObject = planRxDoc?.toMutableJSON();
+      if(!planObject?.limits?.selectiveTestflowRun?.active){
+        notifications.error("Failed to run from here. please upgrade your plan.");
+        return;
+      }
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
         maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
@@ -442,6 +452,12 @@ export class TestflowExplorerPageViewModel {
       this.findConnectedNodes(graph, Number(_id), nodes,result );
       runningNodes = [...result];
     } else if (_event === "run-till-here") {
+      const planRxDoc = await this.planRepository.getPlan(teamObject.plan?.id as string);
+      const planObject = planRxDoc?.toMutableJSON();
+      if(!planObject?.limits?.selectiveTestflowRun?.active){
+        notifications.error("Failed to run till here. please upgrade your plan.");
+        return;
+      }
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
         maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
