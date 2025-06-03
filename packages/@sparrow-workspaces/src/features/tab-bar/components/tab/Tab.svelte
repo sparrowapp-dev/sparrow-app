@@ -103,6 +103,7 @@
   let mouseX = 0;
   let mouseY = 0;
   const handleRightClick = (event: MouseEvent, tab: Tab) => {
+    debugger;
     showTabControlMenu = !showTabControlMenu;
     mouseX = event.clientX;
     mouseY = event.clientY;
@@ -130,7 +131,7 @@
     onDragStart(index);
   }}
   tabindex="0"
-  class=" badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
+  class="badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab {tab.id}"
   style="width: {tabWidth}px;  margin-left:{index === 0 ? '4px' : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
