@@ -70,7 +70,7 @@ jobs:
         run: yarn workspace @sparrow/desktop tauri build --debug  
 
       - name: Generate DEB metadata
-        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        working-directory: apps/@sparrow-desktop/src-tauri/target/debug/bundle
         run: |
           mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
           cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
