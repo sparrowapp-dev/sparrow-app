@@ -103,7 +103,6 @@
   let mouseX = 0;
   let mouseY = 0;
   const handleRightClick = (event: MouseEvent, tab: Tab) => {
-    debugger;
     showTabControlMenu = !showTabControlMenu;
     mouseX = event.clientX;
     mouseY = event.clientY;
