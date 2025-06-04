@@ -21,7 +21,6 @@
   import { disabledModelFeatures } from "../constants";
 
   import {
-    BotRegular,
     SettingsRegular,
     BotSparkleRegular,
   } from "@sparrow/library/icons";

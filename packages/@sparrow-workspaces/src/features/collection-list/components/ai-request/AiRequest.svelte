@@ -269,11 +269,7 @@
       style="height: 24px; width:24px !important; margin-right:4px;"
     ></div>
     <span class="api-method">
-      <BotRegular
-        height={"12px"}
-        width={"12px"}
-        color={"var(--icon-ds-success-300)"}
-      />
+      <BotRegular height={"14px"} width={"14px"} />
     </span>
 
     {#if isRenaming}
@@ -347,7 +343,8 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    padding: 4px;
+    padding: 2px;
+    margin-bottom: 5px;
   }
   .api-name {
     height: 24px;
