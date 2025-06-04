@@ -1,0 +1,111 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "business",
+    "role": "maintainer",
+    "name": "Techdome",
+    "email": "rahul.joshi@techdome.net.in",
+    "phone": "+91-7723849516",
+    "description": "Techdome is a technology company focused on building open-source, AI-native developer tools. We maintain SparrowApp, an advanced API testing platform designed to streamline and automate API quality assurance, scaling and maintenance.",
+    "webpageUrl": {
+      "url": "https://sparrowapp.dev",
+      "wellKnown": "API sidekick for developers"
+    }
+  },
+  "projects": [
+    {
+      "guid": "sparrowapp",
+      "name": "SparrowApp",
+      "description": "SparrowApp is an open-source, AI-native API testing platform that empowers developers to efficiently test, automate, and monitor APIs with intelligent suggestions and streamlined workflows.",
+      "webpageUrl": {
+        "url": "https://sparrowapp.dev"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/sparrowapp-dev/sparrow-app"
+      },
+      "licenses": ["spdx:AGPL-3.0"],
+      "tags": [
+        "api-testing",
+        "open-source",
+        "ai-native",
+        "automation",
+        "developer-tools",
+        "quality-assurance",
+        "api",
+        "testing"
+      ]
+    }
+  ],
+  "community": {
+    "forums": ["https://www.linkedin.com/showcase/sparrow-app/"],
+    "chat": ["https://discord.com/channels/1174613445434413158/@home"],
+    "events": ["https://sparrowapp.dev/events"]
+  },
+  "contributors": [
+    {
+      "source": "https://github.com/sparrowapp-dev/sparrow-app/graphs/contributors"
+    }
+  ],
+  "roadmap": [
+    {
+      "source": "https://sparrowapp.canny.io/"
+    }
+  ],
+  "sustainability": {
+    "environmentalImpact": "Minimal server usage with green hosting providers",
+    "communityGrowth": "Monthly webinars and contributor onboarding sessions",
+    "financialTransparency": "Audited financials for FY2023-24 are available for Techdome"
+  },
+  "funding": {
+    "channels": [
+      {
+        "guid": "bank-transfer",
+        "type": "bank",
+        "address": "rahul.joshi@techdome.net.in",
+        "description": "For direct bank transfers, please contact us via email for details."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "infra-hosting",
+        "status": "active",
+        "name": "Infrastructure & Hosting",
+        "description": "Covers ongoing server and infrastructure costs for hosting public API endpoints, CI/CD pipelines, and documentation.",
+        "amount": 3000,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": ["bank-transfer"]
+      },
+      {
+        "guid": "dev-compensation",
+        "status": "active",
+        "name": "Developer Compensation",
+        "description": "Supports development, bug fixes, AI model improvements, and new feature implementation.",
+        "amount": 8000,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": ["bank-transfer"]
+      },
+      {
+        "guid": "marketing-sales-expense",
+        "status": "active",
+        "name": "Marketing & Sales Expense",
+        "description": "Funding to support marketing campaigns, customer acquisition, sales outreach, and brand awareness initiatives for SparrowApp.",
+        "amount": 2500,
+        "currency": "USD",
+        "frequency": "monthly",
+        "channels": ["bank-transfer"]
+      }
+    ],
+    "history": [
+      {
+        "year": 2023,
+        "income": 1000,
+        "expenses": 200000,
+        "taxes": 0,
+        "currency": "USD",
+        "description": "Initial year of community funding, infrastructure setup, and AI model development. Setting up base infrastructure for SparrowApp"
+      }
+    ]
+  }
+}
