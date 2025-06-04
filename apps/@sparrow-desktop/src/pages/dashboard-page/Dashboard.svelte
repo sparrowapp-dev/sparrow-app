@@ -58,6 +58,8 @@
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
   let collectionDocuments: Observable<CollectionDocument[]>;
+  let recentVisitedWorkspaces: Observable<RecentWorkspaceDocument[]> =
+    _viewModel.recentVisitedWorkspaces;
 
   let currentEnvironment = {
     id: "none",
@@ -97,6 +99,7 @@
   let currentWorkspaceName = "";
   let currentTeamName = "";
   let currentTeamId = "";
+  let currentWorkspaceType = "";
   let selectedType = "";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -106,6 +109,7 @@
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
+        currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -325,7 +329,7 @@
       id: SidebarItemIdEnum.MARKETPLACE,
       route: "marketplace",
       heading: "Marketplace",
-      disabled: false,
+      disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
@@ -581,6 +585,7 @@
     {currentWorkspaceName}
     {currentTeamName}
     {currentTeamId}
+    {currentWorkspaceType}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
@@ -594,6 +599,7 @@
     onSearchClick={handleViewGlobalSearch}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
+    recentVisitedWorkspaces={$recentVisitedWorkspaces}
   />
 
   <!--

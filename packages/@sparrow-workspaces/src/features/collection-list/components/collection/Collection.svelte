@@ -31,6 +31,11 @@
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
   export let onUpdateRunningState;
+  export let onCreateMockCollection: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
+  export let isGuestUser = false;
 
   import {
     openedComponent,
@@ -504,6 +509,14 @@
       },
       {
         onClick: () => {
+          onCreateMockCollection(collection.id, collection.workspaceId);
+        },
+        displayText: "Create Mock Collection",
+        disabled: false,
+        hidden: isGuestUser ? true : false,
+      },
+      {
+        onClick: () => {
           onItemOpened("collection", {
             workspaceId: collection.workspaceId,
             collection,
@@ -691,7 +704,9 @@
         ? 'main-collection-mock'
         : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
-    on:contextmenu|preventDefault={rightClickContextMenu}
+    on:contextmenu|preventDefault={isMockCollection
+      ? rightClickContextMenuMock
+      : rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         visibility = !visibility;
@@ -771,12 +786,20 @@
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
-        <div style="display: flex;">
-          <Tag
-            type={collection?.isMockCollectionRunning ? "green" : "grey"}
-            text={"Mock"}
-          />
-        </div>
+        <Tooltip
+          title={"This mock collection is inactive. Run it to activate."}
+          placement={"top-center"}
+          distance={13}
+          show={!collection?.isMockCollectionRunning}
+          zIndex={701}
+        >
+          <div style="display: flex;">
+            <Tag
+              type={collection?.isMockCollectionRunning ? "green" : "grey"}
+              text={"Mock"}
+            />
+          </div>
+        </Tooltip>
         <Tooltip
           title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}

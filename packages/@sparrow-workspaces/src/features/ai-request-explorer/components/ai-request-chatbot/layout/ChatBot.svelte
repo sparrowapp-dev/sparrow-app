@@ -83,6 +83,10 @@
   const regenerateAiResponse = async () => {
     const regenerateConversation =
       $tab?.property?.aiRequest?.ai?.conversations.slice(0, -1);
+    regenerateConversation[regenerateConversation.length - 1].modelProvider =
+      $tab.property.aiRequest.aiModelProvider;
+    regenerateConversation[regenerateConversation.length - 1].modelVariant =
+      $tab.property.aiRequest.aiModelVariant;
     onUpdateAiConversation(regenerateConversation);
     const response = await onGenerateAiResponse(
       regenerateConversation[regenerateConversation.length - 1].message,

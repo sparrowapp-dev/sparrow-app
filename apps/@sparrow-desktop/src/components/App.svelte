@@ -19,6 +19,9 @@
   import { listen } from "@tauri-apps/api/event";
   import { invoke } from "@tauri-apps/api/core";
   import { platform } from "@tauri-apps/plugin-os";
+  import { writable, derived } from "svelte/store";
+  import { policyConfig } from "@sparrow/common/store";
+  import { OSDetector } from "@sparrow/common/utils";
 
   const _viewModel = new AppViewModel();
 
@@ -43,6 +46,49 @@
       });
     }
   }
+
+  // Track loading state
+  export const policyLoading = writable(true);
+
+  // Create a derived store to check if policies are ready
+  export const policiesReady = derived(
+    [policyLoading, policyConfig],
+    ([$loading, $config]) => !$loading,
+  );
+
+  // Function to load policy config from the registry
+  async function loadPolicyConfig() {
+    try {
+      policyLoading.set(true);
+      const config = await invoke("get_policy_config");
+      policyConfig.set({
+        enableLogin: config.enable_login,
+        enableAIAssistance: config.enable_ai_assistance,
+        restrictPublicWorkspaceCreation:
+          config.restrict_public_workspace_creation,
+        disableActiveSync: config.disable_active_sync,
+        hubCreationAllowed: config.hub_creation_allowed,
+      });
+    } catch (error) {
+      console.error("Failed to load policy configuration:", error);
+    } finally {
+      policyLoading.set(false);
+    }
+  }
+
+  (async () => {
+    try {
+      const os = new OSDetector();
+      if (os.getOS() === "windows") {
+        await loadPolicyConfig();
+      } else {
+        policyLoading.set(false); // Still resolve loading
+      }
+    } catch (err) {
+      console.error("Platform detection failed:", err);
+      policyLoading.set(false);
+    }
+  })();
 
   onMount(async () => {
     if (typeof window !== "undefined") {

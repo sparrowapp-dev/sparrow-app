@@ -38,7 +38,7 @@
   export let onStopGeneratingAIResponse;
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
-  export let responseData: AiRequestExplorerData | undefined;
+  export let responseData: AiRequestExplorerData;
   export let onChatClear;
   export let isChatAutoClearActive = false;
   let isChatLoadingActive = false;
@@ -147,27 +147,45 @@
               </button> -->
             </div>
             <div class="d-flex align-items-center gap-2">
-              <div class="d-flex align-items-center gap-2">
-                <!-- <span class="small text-white-50">Auto Clear</span> -->
-                <Toggle
-                  label={"Auto Clear"}
-                  textColor={"var(--text-ds-neutral-100)"}
-                  isActive={isChatAutoClearActive}
-                  disabled={false}
-                  onChange={(event) => {
-                    onUpdateRequestState({
-                      isChatAutoClearActive: event?.target.checked,
-                    });
-                  }}
-                />
-              </div>
-
               <Tooltip
-                title={"Clear chat"}
-                placement={"left-center"}
+                title={"Clears chat context after each message."}
+                placement={"top-center"}
                 zIndex={701}
                 show={true}
               >
+                <div class="d-flex align-items-center gap-2">
+                  <Toggle
+                    label={"Auto Clear"}
+                    textColor={"var(--text-ds-neutral-100)"}
+                    isActive={isChatAutoClearActive}
+                    disabled={false}
+                    onChange={async (event) => {
+                      if (conversations?.length) {
+                        onUpdateRequestState({
+                          isChatAutoClearActive: event?.target.checked,
+                        });
+                        chatContainer.scrollTo({
+                          top: 0,
+                          behavior: "auto",
+                        });
+                        // handleClosePopupBackdrop(false);
+                        isChatLoadingActive = true;
+                        await new Sleep().setTime(1500).exec();
+                        onChatClear();
+                        isChatLoadingActive = false;
+                      }
+
+                      notifications.success(
+                        event?.target.checked
+                          ? "New prompts will now run in zero-shot mode with no chat history."
+                          : "Chat history will now persist across prompts.",
+                      );
+                    }}
+                  />
+                </div>
+              </Tooltip>
+
+              <Tooltip title={"Clear chat"} placement={"top-center"}>
                 <span class="add-icon-container">
                   <Button
                     id={`clear-chat-history`}
@@ -202,7 +220,7 @@
               </Tooltip> -->
             </div>
           </div>
-          <div
+          <!-- <div
             class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
             style="font-size: 10px;"
           >
@@ -218,6 +236,26 @@
                 : conversations[conversations.length - 1]?.outputTokens || 0} output
               tokens</span
             >
+          </div> -->
+
+          <div
+            class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
+            style="font-size: 10px;"
+          >
+            <span style="color: var(--text-ds-success-300);">
+              {isResponseGenerating
+                ? 0
+                : conversations
+                    .filter((c) => c.type === "Sender")
+                    .reduce((sum, c) => sum + (c.inputTokens || 0), 0)} input tokens
+            </span>
+            <span style="color: var(--text-ds-danger-300);">
+              {isResponseGenerating
+                ? 0
+                : conversations
+                    .filter((c) => c.type === "Receiver")
+                    .reduce((sum, c) => sum + (c.outputTokens || 0), 0)} output tokens
+            </span>
           </div>
         </div>
 

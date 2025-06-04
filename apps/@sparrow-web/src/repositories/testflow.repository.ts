@@ -199,4 +199,22 @@ export class TestflowRepository {
 
     return testflows;
   };
+
+  /* Remove testflows by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter testflows
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeTestflowsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb?.testflow.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
+  };
 }

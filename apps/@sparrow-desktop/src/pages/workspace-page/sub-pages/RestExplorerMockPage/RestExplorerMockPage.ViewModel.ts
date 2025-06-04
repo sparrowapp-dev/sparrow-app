@@ -1040,6 +1040,15 @@ class RestExplorerMockViewModel {
    */
   public sendRequest = async (environmentVariables = []) => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const collectionData = await this.collectionRepository.readCollection(
+      progressiveTab.path.collectionId,
+    );
+    if (!collectionData?.isMockCollectionRunning) {
+      notifications.error(
+        "Mock collection is inactive. Activate it to try the request.",
+      );
+      return;
+    }
     const initRequestTab = new InitTab().request(
       UntrackedItems.UNTRACKED + uuidv4(),
       progressiveTab.path.workspaceId,

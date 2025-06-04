@@ -97,6 +97,7 @@
     isDynamicExpressionContent,
     updateDynamicExpressionValue,
   } from "../store/testflow";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -1470,14 +1471,16 @@
           />
         </Tooltip>
       </div>
-      <div>
-        <SaveTestflow
-          isSave={$tab.isSaved}
-          {isTestflowEditable}
-          {onSaveTestflow}
-          testFlowRunning={testflowStore?.isTestFlowRunning}
-        />
-      </div>
+      {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+        <div>
+          <SaveTestflow
+            isSave={$tab.isSaved}
+            {isTestflowEditable}
+            {onSaveTestflow}
+            testFlowRunning={testflowStore?.isTestFlowRunning}
+          />
+        </div>
+      {/if}
       <div class="position-relative">
         <RunHistory
           {testflowStore}

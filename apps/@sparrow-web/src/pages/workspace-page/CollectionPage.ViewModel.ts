@@ -1332,12 +1332,6 @@ export default class CollectionsViewModel {
       await this.collectionService.importCollectionFromCurl(importCurl);
 
     if (response.isSuccessful) {
-      const req = response.data.data.request;
-      const reducedQueryParams = new ReduceQueryParams(req.queryParams);
-      const paramString = reducedQueryParams.getValue();
-      if (paramString) {
-        response.data.data.request.url = req.url + "?" + paramString;
-      }
       const requestTabAdapter = new RequestTabAdapter();
       const tabId = UntrackedItems.UNTRACKED + uuidv4();
       const adaptedRequest = requestTabAdapter.adapt(
@@ -7354,6 +7348,60 @@ export default class CollectionsViewModel {
     } catch (error) {
       console.error("Error opening workspace:", error);
       notifications.error("Failed to open workspace. Please try again.");
+    }
+  };
+
+  public handleCreateMockCollectionFromExisting = async (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    try {
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const response =
+        await this.collectionService.createMockCollectionFromExisting(
+          collectionId,
+          workspaceId,
+          baseUrl,
+        );
+
+      if (response.isSuccessful && response.data.data) {
+        const res = response.data.data;
+
+        await this.collectionRepository.addCollection({
+          ...res,
+          id: res._id,
+          workspaceId: workspaceId,
+          collectionType: CollectionTypeBaseEnum.MOCK,
+        });
+
+        const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, {
+          ...res,
+          id: res._id,
+        });
+        this.tabRepository.createTab(adaptCollection);
+        moveNavigation("right");
+
+        await this.workspaceRepository.updateCollectionInWorkspace(
+          workspaceId,
+          {
+            id: res._id,
+            name: res.name,
+          },
+        );
+
+        notifications.success(
+          `'${res.name}' mock collection created successfully.`,
+        );
+      } else {
+        notifications.error(
+          "Failed to create mock collection. Please try again.",
+        );
+      }
+    } catch (error) {
+      console.error("Error creating mock collection from existing:", error);
+      notifications.error(
+        "Failed to create mock collection. Please try again.",
+      );
     }
   };
 }

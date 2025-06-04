@@ -1044,6 +1044,15 @@ class RestExplorerMockViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       progressiveTab.path.workspaceId,
     );
+    const collectionData = await this.collectionRepository.readCollection(
+      progressiveTab.path.collectionId,
+    );
+    if (!collectionData?.isMockCollectionRunning) {
+      notifications.error(
+        "Mock collection is inactive. Activate it to try the request.",
+      );
+      return;
+    }
     initRequestTab.updateBody(progressiveTab.property.mockRequest?.body);
     initRequestTab.updateUrl(progressiveTab.property.mockRequest?.url);
     initRequestTab.updateName(progressiveTab.name);

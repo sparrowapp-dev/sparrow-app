@@ -33,6 +33,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   CollectionTabAdapter,
   GraphqlTabAdapter,
+  RequestMockTabAdapter,
   RequestTabAdapter,
   SocketIoTabAdapter,
   TestflowTabAdapter,
@@ -46,6 +47,7 @@ import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
 import { open } from "@tauri-apps/plugin-shell";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
 
 export class DashboardViewModel {
   constructor() {}
@@ -63,6 +65,7 @@ export class DashboardViewModel {
     AiAssistantWebSocketService.getInstance();
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
+  private recentWorkspaceRepository = new RecentWorkspaceRepository();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -85,6 +88,13 @@ export class DashboardViewModel {
    */
   get environments() {
     return this.environmentRepository.getEnvironment();
+  }
+
+  /**
+   * @description - get recent visited public workspace list from local db
+   */
+  public get recentVisitedWorkspaces() {
+    return this.recentWorkspaceRepository.getRecentVisitedWorkspaces();
   }
 
   /**
@@ -470,9 +480,65 @@ export class DashboardViewModel {
    */
   public handleSwitchWorkspace = async (id: string) => {
     if (!id) return;
-    const ws = await this.workspaceRepository.readWorkspace(id);
-    if (!ws) return;
-
+    let ws = await this.workspaceRepository.readWorkspace(id);
+    let retrievedWorkspaceData;
+    if (!ws) {
+      const clientUser = getClientUser();
+      const res = await this.workspaceService.fetchPublicWorkspace(id);
+      if (res.isSuccessful && res?.data?.data) {
+        retrievedWorkspaceData = res?.data?.data;
+        const {
+          _id,
+          name,
+          description,
+          workspaceType,
+          users,
+          admins,
+          team,
+          createdAt,
+          createdBy,
+          collection,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = retrievedWorkspaceData;
+        const item = {
+          _id,
+          name,
+          description,
+          workspaceType: workspaceType,
+          isShared: true,
+          users: [
+            {
+              email: clientUser?.email,
+              id: clientUser?.id,
+              name: clientUser?.name,
+              role: "viewer",
+            },
+          ],
+          collections: collection ? collection : [],
+          admins: admins,
+          team: {
+            teamId: team.id,
+            teamName: team.name,
+            hubUrl: team?.hubUrl || "",
+          },
+          environmentId: "",
+          isActiveWorkspace: false,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        };
+        await this.workspaceRepository.addWorkspace(item);
+      } else {
+        // Handle error if workspace fetch fails
+        notifications.error("Failed to switch workspace.");
+        return;
+      }
+    }
+    ws = await this.workspaceRepository.readWorkspace(id);
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, ws);
     await this.workspaceRepository.setActiveWorkspace(id);
     await this.tabRepository.createTab(initWorkspaceTab, id);
@@ -536,6 +602,17 @@ export class DashboardViewModel {
           tree,
         );
         await this.tabRepository.createTab(adaptedSocketIo, workspaceId);
+        break;
+      }
+      case "MOCK_REQUEST": {
+        const mockRequestTabAdapter = new RequestMockTabAdapter();
+        const adaptedMockRequest = mockRequestTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedMockRequest, workspaceId);
         break;
       }
       default: {
@@ -618,7 +695,10 @@ export class DashboardViewModel {
     const testflowData = await this.testflowRepository.readTestflow(
       testflow._id,
     );
-    const testflowTab = new TestflowTabAdapter().adapt(testflow.workspaceId, testflowData.toMutableJSON());
+    const testflowTab = new TestflowTabAdapter().adapt(
+      testflow.workspaceId,
+      testflowData.toMutableJSON(),
+    );
     await new Sleep().setTime(100).exec();
     await this.tabRepository.createTab(testflowTab, testflow.workspaceId);
     moveNavigation("right");
@@ -672,6 +752,8 @@ export class DashboardViewModel {
         return tree.websocket?.url || "";
       case ItemType.REQUEST:
         return tree.request?.url || "";
+      case ItemType.MOCK_REQUEST:
+        return tree.mockRequest?.url || "";
       default:
         return "";
     }
@@ -727,6 +809,7 @@ export class DashboardViewModel {
     if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
       if (
         tree.type === ItemType.REQUEST ||
+        tree.type === ItemType.MOCK_REQUEST ||
         tree.type === ItemType.GRAPHQL ||
         tree.type === ItemType.SOCKET_IO ||
         tree.type === ItemType.WEB_SOCKET
@@ -739,7 +822,11 @@ export class DashboardViewModel {
             : folderDetails;
 
         const requestMethod =
-          tree.type === ItemType.REQUEST ? tree.request?.method : tree.type;
+          tree.type === ItemType.REQUEST
+            ? tree.request?.method
+            : tree.type === ItemType.MOCK_REQUEST
+            ? tree.mockRequest?.method
+            : tree.type;
 
         const requestData = {
           tree: JSON.parse(
@@ -775,6 +862,7 @@ export class DashboardViewModel {
         tree.type !== ItemType.FOLDER &&
         !Object.values([
           ItemType.REQUEST,
+          ItemType.MOCK_REQUEST,
           ItemType.GRAPHQL,
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
@@ -867,7 +955,11 @@ export class DashboardViewModel {
       const workspaceId = node.workspaceId || currentWorkspaceId;
 
       const requestMethod =
-        node.type === ItemType.REQUEST ? node.request?.method : node.type;
+        node.type === ItemType.REQUEST
+          ? node.request?.method
+          : node.type === ItemType.MOCK_REQUEST
+          ? node.mockRequest?.method
+          : node.type;
 
       const itemData = {
         tree: JSON.parse(
@@ -887,6 +979,7 @@ export class DashboardViewModel {
         type: node.type,
         folderDetails: [
           ItemType.REQUEST,
+          ItemType.MOCK_REQUEST,
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
           ItemType.GRAPHQL,
@@ -902,6 +995,7 @@ export class DashboardViewModel {
         case ItemType.REQUEST:
         case ItemType.SOCKET_IO:
         case ItemType.WEB_SOCKET:
+        case ItemType.MOCK_REQUEST:
         case ItemType.GRAPHQL:
           requests.push(itemData);
           break;
@@ -1041,25 +1135,22 @@ export class DashboardViewModel {
     workspace = workspace.map((_value) => _value._data);
 
     let testflow = await this.searchTestflow(searchText);
-    testflow = testflow.map((_value) => 
-    {
+    testflow = testflow.map((_value) => {
       const workspaceDetails = workspaceMap[_value._data.workspaceId];
-        const path: string[] = [];
-        if (workspaceDetails) {
-          path.push(workspaceDetails.teamName);
-          path.push(workspaceDetails.workspaceName);
-        }
+      const path: string[] = [];
+      if (workspaceDetails) {
+        path.push(workspaceDetails.teamName);
+        path.push(workspaceDetails.workspaceName);
+      }
       return {
         ..._value._data,
         path: this.createPath(path),
-      }
-
-    }  
-    );
+      };
+    });
 
     let environment = await this.searchEnvironment(searchText);
     environment = environment.map((_environment) => {
-      const workspaceDetails = workspaceMap[_value._data.workspaceId];
+      const workspaceDetails = workspaceMap[_environment._data.workspaceId];
       const path: string[] = [];
       if (workspaceDetails) {
         path.push(workspaceDetails.teamName);
@@ -1071,7 +1162,8 @@ export class DashboardViewModel {
         id: _environment.id,
         variable: _environment.variable,
         path: this.createPath(path),
-    }});
+      };
+    });
 
     return { collection, folder, file, workspace, testflow, environment };
   }
