@@ -39,14 +39,14 @@
         defaultConfig[key] = metadata.defaultValue;
 
         // Update the UI elements directly
-        if (metadata.type === "number") {
+        if (metadata.dataType === "int" || metadata.dataType === "float") {
           const inputElement = document.getElementById(
             `config-field-${metadata.displayName}`,
           );
           if (inputElement) {
             inputElement.value = metadata.defaultValue || 0;
           }
-        } else if (metadata.type === "boolean") {
+        } else if (metadata.dataType === "boolean") {
           const toggleElement = document.getElementById(
             `toggle-field-${metadata.displayName}`,
           );
@@ -65,11 +65,11 @@
     const format = configFormat[currSelectedModel][currSelectedModelVariant];
     let value = event.target.value;
 
-    if (format[key].type === "number") {
+    if (format[key].dataType === "int" || format[key].dataType === "float") {
       value = parseFloat(value);
-      if (isNaN(value)) return;
+      if (isNaN(value)) value = format[key].defaultValue || 0;
 
-      if (key === "maxTokens") value = Math.floor(value);
+      if (format[key].dataType === "int") value = Math.floor(value);
 
       // Apply min/max constraints
       if (
@@ -138,45 +138,47 @@
       </div>
     {:else}
       {#each configEntries as [key, metadata]}
-        <div
-          class="config-item text-ds-font-size-12 mb-3"
-          class:option-disabled={!isActive}
-        >
+        {#if !metadata.hidden}
+          <!-- Render configuration item -->
           <div
-            class="d-flex justify-content-between align-items-start mb-2 gap-1"
+            class="config-item text-ds-font-size-12 mb-3"
+            class:option-disabled={metadata.disabled || !isActive}
           >
-            <div>
-              <div class="fw-medium">{metadata.displayName || key}</div>
-              <div class="config-desc text-ds-font-size-11">
-                {metadata.description || ""}
+            <div
+              class="d-flex justify-content-between align-items-start mb-2 gap-1"
+            >
+              <div>
+                <div class="fw-medium">{metadata.displayName || key}</div>
+                <div class="config-desc text-ds-font-size-11">
+                  {metadata.description || ""}
+                </div>
               </div>
-            </div>
 
-            {#if metadata.type === "boolean"}
-              <Toggle
-                id={`toggle-field-${metadata.displayName}`}
-                isActive={config[key]}
-                disabled={!isActive}
-                onChange={(event) => {
-                  handleToggleChange(key, event.target.checked);
-                }}
-              />
-            {:else if metadata.type === "number"}
-              <div class="config-value d-flex justify-content-end">
-                <input
-                  id={`config-field-${metadata.displayName}`}
-                  type="number"
-                  class="form-control form-control-sm config-input"
-                  value={getCurrentValue(key, metadata) || 0}
-                  min={metadata.min}
-                  max={metadata.max}
-                  step={key === "maxTokens" ? 1 : 0.1}
+              {#if metadata.dataType === "boolean"}
+                <Toggle
+                  id={`toggle-field-${metadata.displayName}`}
+                  isActive={config[key]}
                   disabled={!isActive}
-                  on:change={(e) => handleInputChange(key, e)}
+                  onChange={(event) => {
+                    handleToggleChange(key, event.target.checked);
+                  }}
                 />
-              </div>
-            {:else}
-              <!-- <div class="config-value d-flex justify-content-end">
+              {:else if metadata.dataType === "int" || metadata.dataType === "float"}
+                <div class="config-value d-flex justify-content-end">
+                  <input
+                    id={`config-field-${metadata.displayName}`}
+                    type="number"
+                    class="form-control form-control-sm config-input"
+                    value={getCurrentValue(key, metadata) || 0}
+                    min={metadata.min}
+                    max={metadata.max}
+                    step={metadata.dataType === "int" ? 1 : 0.1}
+                    disabled={!isActive}
+                    on:change={(e) => handleInputChange(key, e)}
+                  />
+                </div>
+              {:else}
+                <!-- <div class="config-value d-flex justify-content-end">
               <input
                 type="text"
                 class="form-control form-control-sm config-input"
@@ -185,9 +187,10 @@
                 on:input={(e) => handleInputChange(key, e)}
               />
             </div> -->
-            {/if}
+              {/if}
+            </div>
           </div>
-        </div>
+        {/if}
       {/each}
     {/if}
   </div>
