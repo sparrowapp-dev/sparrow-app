@@ -67,7 +67,7 @@ jobs:
         run: yarn
 
       - name: Build Tauri app
-        run: yarn workspace @sparrow/desktop tauri build
+        run: yarn workspace @sparrow/desktop tauri build --debug  
 
       - name: Generate DEB metadata
         working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
@@ -147,6 +147,6 @@ jobs:
         run: |
           curl -H 'Content-Type: application/json' \
             -d '{
-              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ env.AWS_S3_BUCKET }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com"
+              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
             }' \
-            ${{ secrets.TEAMS_WEBHOOK_URL }}
+            ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
