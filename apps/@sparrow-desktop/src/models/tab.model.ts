@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 22,
+  version: 27,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1294,6 +1294,94 @@ export const tabSchemaLiteral = {
             systemPrompt: {
               type: "string",
             },
+            configurations: {
+              type: "object",
+              properties: {
+                openai: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                  },
+                },
+                deepseek: {
+                  type: "object",
+                  properties: {
+                      streamResponse: {
+                        type: "boolean",
+                      },
+                      jsonResponseFormat: {
+                        type: "boolean",
+                      },
+                      temperature: {
+                        type: "number",
+                      },
+                      presencePenalty: {
+                        type: "number",
+                      },
+                      frequencyPenalty: {
+                        type: "number",
+                      },
+                      maxTokens: {
+                        type: "number",
+                      },
+                  },
+                },
+                anthropic: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    top_p: {
+                      type: "number",
+                    },
+                  },
+                },
+                google: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    top_p: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                  },
+                },
+              },
+            },
             state: {
               type: "object",
               properties: {
@@ -1328,7 +1416,10 @@ export const tabSchemaLiteral = {
                 },
                 isChatbotGeneratingResponse: {
                   type: "boolean",
-                }
+                },
+                isChatAutoClearActive: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
@@ -1400,6 +1491,74 @@ export const tabSchemaLiteral = {
                   },
                 },
               },
+            },
+          },
+        },
+        mockHistory: {
+          type: "string",
+        },
+        hub: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              maxLength: 100,
+            },
+            name: {
+              type: "string",
+            },
+            description: {
+              type: "string",
+            },
+            hubUrl: {
+              type: "string",
+            },
+            githubUrl: {
+              type: "string",
+            },
+            xUrl: {
+              type: "string",
+            },
+            linkedinUrl: {
+              type: "string",
+            },
+            logo: {
+              type: "object",
+            },
+            owner: {
+              type: "string",
+            },
+            users: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                  },
+                  email: {
+                    type: "string",
+                  },
+                  name: {
+                    type: "string",
+                  },
+                  role: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+            createdAt: {
+              type: "string",
+            },
+            createdBy: {
+              type: "string",
+            },
+            updatedAt: {
+              type: "string",
+            },
+            updatedBy: {
+              type: "string",
             },
           },
         },

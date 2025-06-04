@@ -147,7 +147,7 @@
         >
           <div class="custom-tooltip-wrapper">
             <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
-              <span>GPT-4o</span>
+              <span>GPT 4o</span>
               <Button
                 type="teritiary-regular"
                 startIcon={LockClosedRegular}

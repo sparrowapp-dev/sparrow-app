@@ -31,6 +31,11 @@
   let isSyncChangesAvailable = false;
   export let isMockCollection = false;
   export let onUpdateRunningState;
+  export let onCreateMockCollection: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
+  export let isGuestUser = false;
 
   import {
     openedComponent,
@@ -334,7 +339,6 @@
         onCompareCollection(collection.id)
           .then((result) => {
             activeSyncChanges = result;
-            console.log("changes ---->", activeSyncChanges);
             if (activeSyncChanges.percentChange > 0) {
               // isSyncChangesAvailable = true;
               updateActiveSyncStates(collection.id, {
@@ -502,6 +506,14 @@
         //   !(collection?.activeSync && !isBranchSynced)
         //     ? false
         //     : true,
+      },
+      {
+        onClick: () => {
+          onCreateMockCollection(collection.id, collection.workspaceId);
+        },
+        displayText: "Create Mock Collection",
+        disabled: false,
+        hidden: isGuestUser ? true : false,
       },
       {
         onClick: () => {
@@ -692,7 +704,9 @@
         ? 'main-collection-mock'
         : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
-    on:contextmenu|preventDefault={rightClickContextMenu}
+    on:contextmenu|preventDefault={isMockCollection
+      ? rightClickContextMenuMock
+      : rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         visibility = !visibility;
@@ -772,12 +786,20 @@
       > -->
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
       {#if isMockCollection}
-        <div style="display: flex;">
-          <Tag
-            type={collection?.isMockCollectionRunning ? "green" : "grey"}
-            text={"Mock"}
-          />
-        </div>
+        <Tooltip
+          title={"This mock collection is inactive. Run it to activate."}
+          placement={"top-center"}
+          distance={13}
+          show={!collection?.isMockCollectionRunning}
+          zIndex={701}
+        >
+          <div style="display: flex;">
+            <Tag
+              type={collection?.isMockCollectionRunning ? "green" : "grey"}
+              text={"Mock"}
+            />
+          </div>
+        </Tooltip>
         <Tooltip
           title={collection?.isMockCollectionRunning ? "Stop Mock" : "Run Mock"}
           placement={"top-center"}
@@ -952,15 +974,39 @@
         </div>
       </div>
       <div
-        style="height:32px; padding-left:68px; color: var(--text-ds-neutral-500)"
-        class="d-flex align-items-center text-ds-font-weight-semi-bold"
+        class="d-flex align-items-center justify-content-between my-button btn-primary {`mockHistory-${collection.id}` ===
+        activeTabId
+          ? 'active-history-tab'
+          : ''}"
+        style="height: 32px; padding-left: 3px; margin-bottom: 2px;"
       >
-        <div class="d-flex gap-2 text-ds-font-size-12">
-          <div class="d-flex align-items-center">
-            <HistoryRegular size="17px" />
+        <button
+          tabindex="-1"
+          on:click={() => {
+            onItemOpened("mockHistory", {
+              workspaceId: collection.workspaceId,
+              collection,
+            });
+          }}
+          style="padding-left: 29px; height: 100%;"
+          class="main-file d-flex align-items-center position-relative bg-transparent border-0"
+        >
+          <div
+            class="api-method"
+            style="height: 24px; width: 24px !important; margin-right: 2px;"
+          ></div>
+          <span class="api-method">
+            <HistoryRegular size={"16px"} />
+          </span>
+
+          <div class="api-name" style="color: var(--text-ds-neutral-50);">
+            <p
+              class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+            >
+              History
+            </p>
           </div>
-          <div>History</div>
-        </div>
+        </button>
       </div>
     {/if}
     <div class="">
@@ -1277,6 +1323,36 @@
   }
   .my-button:hover .add-icon-container {
     visibility: visible;
+  }
+
+  .main-file {
+    width: calc(100% - 28px);
+  }
+
+  .api-method {
+    font-size: 10px;
+    font-weight: 400;
+    width: 30px !important;
+    height: 24px;
+
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 4px;
+  }
+  .api-name {
+    font-weight: 500;
+    width: calc(100% - 58px);
+    text-align: left;
+    font-size: 12px;
+    line-height: 18px;
+    padding: 2px 4px;
+  }
+
+  .active-history-tab {
+    background-color: var(--bg-ds-surface-500) !important;
+    border-radius: 4px;
   }
 
   .list-icons {

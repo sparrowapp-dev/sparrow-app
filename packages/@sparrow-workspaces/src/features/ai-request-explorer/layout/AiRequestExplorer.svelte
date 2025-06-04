@@ -12,18 +12,18 @@
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import type {
-    SaveRequestType,
-    UpdateRequestAuthType,
-    UpdateRequestDescriptionType,
-    UpdateRequestNameType,
-    UpdateRequestStateType,
-  } from "@sparrow/workspaces/type";
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
+  import { disabledModelFeatures } from "../constants";
+
+  import {
+    BotRegular,
+    SettingsRegular,
+    BotSparkleRegular,
+  } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -42,6 +42,7 @@
   export let onUpdateAiConversation;
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
+  export let onUpdateAiConfigurations;
 
   // Role of user in active workspace
   export let userRole;
@@ -97,6 +98,10 @@
   });
   onDestroy(() => {});
 
+  // $: {
+  //   if ($tab)
+  //     console.log("tab :>> ", $tab?.property?.aiRequest?.configurations);
+  // }
 </script>
 
 {#if $tab.tabId}
@@ -122,6 +127,7 @@
         {isGuestUser}
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
+        {onUpdateAiConversation}
       />
 
       <div
@@ -139,25 +145,102 @@
               />
               <div style="flex:1; overflow:auto;" class="p-0">
                 {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
-                  <RequestDoc
-                    {onUpdateAiSystemPrompt}
-                    requestDoc={$tab.property.aiRequest.systemPrompt}
-                  />
+                  {#if $tab.property.aiRequest?.aiModelProvider}
+                    <RequestDoc
+                      {onUpdateAiSystemPrompt}
+                      isEditable={disabledModelFeatures[
+                        $tab.property.aiRequest?.state?.aiNavigation
+                      ].includes($tab.property.aiRequest?.aiModelVariant)}
+                      requestDoc={$tab.property.aiRequest.systemPrompt}
+                    />
+                  {:else}
+                    <div
+                      style="font-family: Inter, sans-serif;"
+                      class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                    >
+                      <div class="mb-3">
+                        <BotSparkleRegular
+                          size={"48px"}
+                          color={"var(--icon-ds-neutral-500)"}
+                        />
+                      </div>
+                      <p
+                        class="text-muted mb-0 px-3"
+                        style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                      >
+                        No model selected. Please choose a model to set its
+                        context for tailored responses.
+                      </p>
+                    </div>
+                  {/if}
                 {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
-                  <RequestAuth
-                    requestStateAuth={$tab.property.aiRequest.state
-                      .aiAuthNavigation}
-                    auth={$tab.property.aiRequest.auth}
-                    collectionAuth={$collectionAuth}
-                    {onUpdateRequestState}
-                    {onUpdateRequestAuth}
-                    {onUpdateEnvironment}
-                    {environmentVariables}
-                    {collection}
-                    {onOpenCollection}
-                  />
+                  {#if $tab.property.aiRequest?.aiModelProvider}
+                    <RequestAuth
+                      requestStateAuth={$tab.property.aiRequest.state
+                        .aiAuthNavigation}
+                      auth={$tab.property.aiRequest.auth}
+                      selectedModelProvider={$tab.property.aiRequest
+                        ?.aiModelProvider}
+                      collectionAuth={$collectionAuth}
+                      {onUpdateRequestState}
+                      {onUpdateRequestAuth}
+                      {onUpdateEnvironment}
+                      {environmentVariables}
+                      {collection}
+                      {onOpenCollection}
+                    />
+                  {:else}
+                    <div
+                      style="font-family: Inter, sans-serif;"
+                      class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                    >
+                      <div class="mb-3">
+                        <BotSparkleRegular
+                          size={"48px"}
+                          color={"var(--icon-ds-neutral-500)"}
+                        />
+                      </div>
+                      <p
+                        class="text-muted mb-0 px-3"
+                        style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                      >
+                        No model selected. Please select a model to add
+                        authentication.
+                      </p>
+                    </div>
+                  {/if}
                 {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                  <AiConfigs {onUpdateRequestState} />
+                  {#if $tab.property.aiRequest?.aiModelProvider}
+                    <AiConfigs
+                      currSelectedModel={$tab.property?.aiRequest
+                        ?.aiModelProvider}
+                      currSelectedModelVariant={$tab.property?.aiRequest
+                        ?.aiModelVariant}
+                      config={$tab.property?.aiRequest?.configurations?.[
+                        $tab.property?.aiRequest?.aiModelProvider
+                      ]}
+                      {onUpdateAiConfigurations}
+                    />
+                  {:else}
+                    <div
+                      style="font-family: Inter, sans-serif;"
+                      class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                    >
+                      <div class="mb-3">
+                        <SettingsRegular
+                          size={"48px"}
+                          color={"var(--icon-ds-neutral-500)"}
+                        />
+                      </div>
+                      <p
+                        class="text-muted mb-0 px-3"
+                        style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                      >
+                        No model selected. Please choose a model to configure
+                        its settings.
+                      </p>
+                    </div>
+                  {/if}
                 {/if}
               </div>
             </div>
@@ -171,6 +254,7 @@
           >
             <ChatBot
               {tab}
+              disabled={!$tab.property.aiRequest?.aiModelProvider}
               responseData={storeData}
               {onUpdateAiPrompt}
               {onUpdateAiConversation}
@@ -178,7 +262,6 @@
               {onGenerateAiResponse}
               {onStopGeneratingAIResponse}
               {onToggleLike}
-              handleApplyChangeOnAISuggestion={() => {}}
             />
           </Pane>
         </Splitpanes>

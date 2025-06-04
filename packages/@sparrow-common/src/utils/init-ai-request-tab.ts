@@ -35,8 +35,10 @@ class InitAiRequestTab {
             property: {
                 aiRequest: {
                     // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    aiModelProvider: 'openai',
-                    aiModelVariant: 'gpt-4o',
+                    // aiModelProvider: AiModelProviderEnum.OpenAI,
+                    // aiModelVariant: OpenAIModelEnum.GPT_4o,
+                    aiModelProvider: "",
+                    aiModelVariant: "",
                     systemPrompt: "",
                     auth: {
                         bearerToken: "",
@@ -50,13 +52,44 @@ class InitAiRequestTab {
                             addTo: CollectionRequestAddToBaseEnum.HEADER, // ToDo (remove while pushing): This "addTo" needs to removed, because api key handling is done from backend so on frontend no need to decided headers or params
                         },
                     },
+                    configurations: {
+                        openai: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        deepseek: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        anthropic: {
+                            streamResponse: true,
+                            maxTokens: -1,
+                            temperature: 0.5,
+                            top_p: 0.95,
+                        },
+                        google: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            maxTokens: 1024,
+                            top_p: 0.95,
+                        },
+                    },
                     ai: {
                         prompt: "",
                         conversations: [],
                         threadId: "",
                     },
                     state: {
-                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.NO_AUTH,
+                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,
                         aiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
                         aiLeftSplitterWidthPercentage: 50,
                         aiRightSplitterWidthPercentage: 50,
@@ -64,6 +97,7 @@ class InitAiRequestTab {
                         isSaveDescriptionInProgress: false,
                         isSaveRequestInProgress: false,
                         isChatbotActive: true,
+                        isChatAutoClearActive: false,
                         isChatbotSuggestionsActive: true,
                         isChatbotGeneratingResponse: false,
                     },

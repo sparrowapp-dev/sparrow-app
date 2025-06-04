@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from "svelte";
   import { fly, fade } from "svelte/transition";
-  import { Navigator } from "@sparrow/library/ui";
+  import { Button, Modal, Navigator } from "@sparrow/library/ui";
   import {
     ChannelRegular,
     OpenAIVectorIcon,
@@ -15,6 +15,8 @@
   export let selectedModelProvider: string = "openai";
   export let selectedModel: string = "gpt-4o";
   export let isOpen: boolean = false;
+  let isModelProviderChangeAlertPopupOpen = false;
+  let nextModelSelectRequest;
 
   // Props
   export let onSelect: (
@@ -32,49 +34,51 @@
       disabled: false,
       icon: OpenAIVectorIcon,
       models: [
-        { name: "GPT-4o", id: "gpt-4o" },
+        { name: "GPT 4o", id: "gpt-4o" },
         { name: "GPT 4o Mini", id: "gpt-4o-mini" },
         { name: "GPT 4.5 Preview", id: "gpt-4.5-preview" },
         { name: "GPT 4 Turbo", id: "gpt-4-turbo" },
-        { name: "GPT-4", id: "gpt-4" },
+        { name: "GPT 4", id: "gpt-4" },
         { name: "GPT 4.1", id: "gpt-4.1" },
-        // { name: "o1", id: "o1" },
-        // { name: "o1 Mini", id: "o1-mini" },
+        { name: "o1", id: "o1" },
+        { name: "o1 Mini", id: "o1-mini" },
         { name: "o3 Mini", id: "o3-mini" },
-        { name: "GPT-3.5 Turbo", id: "gpt-3.5-turbo" },
+        { name: "GPT 3.5 Turbo", id: "gpt-3.5-turbo" },
       ],
     },
     {
       name: "Anthropic",
       id: "anthropic",
-      disabled: true,
+      disabled: false,
       icon: AnthropicVectorIcon,
       models: [
-        { name: "Claude 3 Opus", id: "claude-3-opus" },
-        { name: "Claude 3 Sonnet", id: "claude-3-sonnet" },
-        { name: "Claude 3 Haiku", id: "claude-3-haiku" },
-        { name: "Claude 3.5 Sonnet", id: "claude-3.5-sonnet" },
-        { name: "Claude 3.5 Haiku", id: "claude-3.5-haiku" },
-      ],
-    },
-    {
-      name: "Google",
-      id: "google",
-      disabled: true,
-      icon: GoogleVectorIcon,
-      models: [
-        { name: "Gemini Pro", id: "gemini-pro" },
-        { name: "Gemini Ultra", id: "gemini-ultra" },
+        { name: "Claude 3.5 Sonnet", id: "claude-3-5-sonnet-20241022" },
+        { name: "Claude 3.5 Haiku", id: "claude-3-5-haiku-20241022" },
+        { name: "Claude 3 Opus", id: "claude-3-opus-20240229" },
+        { name: "Claude 3 Haiku", id: "claude-3-haiku-20240307" },
+        { name: "Claude 3 Sonnet", id: "claude-3-5-sonnet-20240620" },
       ],
     },
     {
       name: "DeepSeek",
       id: "deepseek",
-      disabled: true,
+      disabled: false,
       icon: DeepseekVectorIcon,
       models: [
-        { name: "DeepSeek Coder", id: "deepseek-coder" },
-        { name: "DeepSeek Chat", id: "deepseek-chat" },
+        { name: "DeepSeek V3", id: "deepseek-chat" },
+        { name: "DeepSeek R1", id: "deepseek-reasoner" },
+      ],
+    },
+    {
+      name: "Google",
+      id: "google",
+      disabled: false,
+      icon: GoogleVectorIcon,
+      models: [
+        { name: "Gemini 1.5 Flash", id: "gemini-1.5-flash" },
+        { name: "Gemini 1.5 Flash 8B", id: "gemini-1.5-flash-8b" },
+        { name: "Gemini 1.5 Pro", id: "gemini-1.5-pro" },
+        { name: "Gemini 2.0 Flash", id: "gemini-2.0-flash" },
       ],
     },
   ];
@@ -102,7 +106,7 @@
 
   // Handle model selection
   const handleModelSelection = (model: { name: string; id: string }) => {
-    selectedModel = model.id;
+    // selectedModel = model.id;
     onSelect(activeProvider.id, model);
     isOpen = false;
     dispatch("close");
@@ -150,7 +154,17 @@
               class=" h-10 model-card p-2 {selectedModel === model.id
                 ? 'selected-card'
                 : ''}"
-              on:click={() => handleModelSelection(model)}
+              on:click={() => {
+                if (
+                  selectedModelProvider &&
+                  activeProvider.id !== selectedModelProvider
+                ) {
+                  isModelProviderChangeAlertPopupOpen = true;
+                  nextModelSelectRequest = model;
+                  return;
+                }
+                handleModelSelection(model);
+              }}
             >
               <div
                 class="p-0 d-flex align-items-center justify-content-between"
@@ -193,6 +207,52 @@
   </div>
 {/if}
 
+<Modal
+  title={"Confirm Model Change!"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isModelProviderChangeAlertPopupOpen}
+  width={"42%"}
+  handleModalState={() => {
+    isModelProviderChangeAlertPopupOpen = false;
+    nextModelSelectRequest = null;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p class="lightGray text-fs-14" style="color: lightGray;">
+      Changing the model will reset your current conversation and reset any
+      model-specific configurations. This action cannot be undone. Are you sure
+      you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isModelProviderChangeAlertPopupOpen = false;
+        nextModelSelectRequest = null;
+      }}
+    ></Button>
+    <Button
+      title={"Proceed"}
+      size={"medium"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"95px"}
+      disable={false}
+      onClick={() => {
+        handleModelSelection(nextModelSelectRequest);
+        isModelProviderChangeAlertPopupOpen = false;
+      }}
+    ></Button>
+  </div>
+</Modal>
+
 <style>
   /* Custom styles for elements that Bootstrap can't easily handle */
   .dropdown-menu-custom {
@@ -217,6 +277,12 @@
 
   .model-card:hover {
     cursor: pointer;
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .model-card:active {
+    background-color: var(--bg-ds-surface-700);
+    /* transform: scale(1.01);  */
   }
 
   .checkmark-container {

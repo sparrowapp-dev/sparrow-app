@@ -1,2 +1,2 @@
 export { loadingState, startLoading, stopLoading } from "./loading";
-export { policyConfig, loadPolicyConfig } from "./policyStore";
+export { policyConfig } from "./policyStore";

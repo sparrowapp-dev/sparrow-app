@@ -76,6 +76,7 @@
   export let onUpdateVariables;
   export let updateOperationSearch;
   export let checkQueryErrorStatus;
+  export let userRole;
 
   export let isWebApp;
   const loading = writable<boolean>(false);
@@ -234,6 +235,7 @@
         {onUpdateRequestUrl}
         {toggleSaveRequest}
         {onSaveRequest}
+        {userRole}
       />
       <!--Disabling the Quick Help feature, will be taken up in next release-->
       <div class="" style="margin-top: 12px;"></div>

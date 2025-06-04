@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/common",
-  "version": "2.24.0",
+  "version": "2.25.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -32,6 +32,7 @@
     "./types/workspace": "./src/types/workspace/http-request-tab.ts",
     "./types/workspace/ai-request-tab": "./src/types/workspace/ai-request-tab.ts",
     "./types/workspace/ai-request-base": "./src/types/workspace/ai-request-base.ts",
+    "./types/workspace/ai-request-dto": "./src/types/workspace/ai-request-dto.ts",
     "./types/workspace/collection-base": "./src/types/workspace/collection-base.ts",
     "./types/workspace/collection-tab": "./src/types/workspace/collection-tab.ts",
     "./types/workspace/http-request-base": "./src/types/workspace/http-request-base.ts",

@@ -68,6 +68,21 @@ export class CollectionService {
     );
     return response;
   };
+
+  public fetchPublicCollection = async (
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/public/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public addCollection = async (
     collection: CreateCollectionPostBody,
     baseUrl: string,
@@ -742,6 +757,36 @@ export class CollectionService {
       `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/mock-status`,
       {
         body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public geCollectionByIdAndWorkspace = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public createMockCollectionFromExisting = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/create-mock`,
+      {
         headers: getAuthHeaders(),
       },
     );
