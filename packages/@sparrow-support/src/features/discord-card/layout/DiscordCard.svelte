@@ -1,8 +1,11 @@
 <script lang="ts">
   import {
     DiscordIcon,
+    DiscordLogo,
     HelpCenterIcon,
+    QuestionCircleRegular,
     SettingIcon,
+    SettingsRegular,
   } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import { DiscordIDs } from "@sparrow/support/constants/discord.constants";
@@ -13,24 +16,19 @@
 
 <div
   class="d-flex flex-column align-items-center gap-2"
-  style="height: 236px ; background-color: var(--text-tertiary-400) ; border-radius:4px;"
+  style="height: 234px ; background-color: var(--bg-ds-surface-600); border-radius: 6px;"
 >
-  <div style="padding-top:22px; ">
-    <div
-      class="d-flex justify-content-center align-items-center"
-      style="width:56px; height:56px; border-radius:15.56px ; background-color: var(--bg-primary-150 ); "
-    >
-      <DiscordIcon width="49px" height="49px" />
-    </div>
+  <div style="padding-top:22px;">
+    <DiscordLogo width="74px" height="56px" />
   </div>
   <div
-    class="fw-bold align-self-center text-ds-font-size-14 text-ds-font-weight-medium"
+    class="align-self-center text-ds-font-size-14 text-ds-font-weight-medium pt-1"
   >
     Join our Discord Channel
   </div>
   <div
-    class="fw-light text-center text-ds-font-size-14"
-    style="color: var(--text-secondary-250);  "
+    class="text-center text-ds-font-size-14"
+    style="color: var(--text-ds-neutral-400);"
   >
     <span> Join our Discord channel to </span>
     <span><br /> connect with the community.</span>
@@ -43,7 +41,7 @@
       <div
         class="w-100 join-button d-flex justify-content-center align-items-center gap-8 align-self-center"
         role="button"
-        style=" height:40px; background-color: var(--dropdown-button); border-radius:4px;"
+        style=" height:36px; background-color: var(--dropdown-button); border-radius:6px;"
         on:click={async () => {
           onJoin();
         }}
@@ -58,23 +56,27 @@
     </Tooltip>
   </div>
 </div>
-<div class="d-flex flex-column" style="padding-top:17px; padding-left:10px;">
+<div class="d-flex flex-column" style="padding-top:24px; padding-left:10px;">
   <div
-    class="d-flex p-2 gap-2 align-items-center pt-2"
-    style=" height: 44px;  color:var(--text-secondary-50);  "
+    class="d-flex align-items-center gap-2"
+    style="height: 36px; color:var(--text-ds-neutral-200);"
   >
     <Tooltip placement="right-center" title="Coming Soon">
-      <span style=""> <SettingIcon color={"var(--text-secondary-50)"} /> </span>
-      <span class="text-ds-font-size-14">Support</span>
+      <div class="d-flex gap-2">
+        <SettingsRegular />
+        <span class="text-ds-font-size-14">Support</span>
+      </div>
     </Tooltip>
   </div>
   <div
-    class="d-flex p-2 gap-2 align-items-center"
-    style="height: 44px; color:var(--text-secondary-50)"
+    class="d-flex align-items-center gap-2"
+    style="height: 36px; color:var(--text-ds-neutral-200);"
   >
     <Tooltip placement="right-center" title="Coming Soon">
-      <span> <HelpCenterIcon color={"var(--text-secondary-50)"} /> </span>
-      <span class="text-ds-font-size-14">Help Center</span>
+      <div class="d-flex gap-2">
+        <QuestionCircleRegular />
+        <span class="text-ds-font-size-14">Help Center</span>
+      </div>
     </Tooltip>
   </div>
 </div>
