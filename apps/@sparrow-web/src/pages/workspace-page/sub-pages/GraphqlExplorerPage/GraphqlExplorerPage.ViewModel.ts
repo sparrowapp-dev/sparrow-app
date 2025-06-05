@@ -1086,7 +1086,7 @@ class GraphqlExplorerViewModel {
   ) => {
     const componentData = this._tab.getValue()
     const tabId = componentData?.tabId;
-    startLoading(tabId);
+    startLoading(tabId + "fetchGraphqlSchema");
     const decodeData = this._decodeGraphql.init(
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
       _environmentVariables,
@@ -1181,7 +1181,7 @@ class GraphqlExplorerViewModel {
             progressiveTab,
           );
           notifications.success("Schema fetched successfully.");
-          stopLoading(tabId);
+          stopLoading(tabId + "fetchGraphqlSchema");
         })
         .catch(async (error) => {
           console.error(error);
@@ -1198,7 +1198,7 @@ class GraphqlExplorerViewModel {
               "Failed to fetch schema. Please check the URL and try again.",
             );
           }
-          stopLoading(tabId);
+          stopLoading(tabId + "fetchGraphqlSchema");
         });
     } catch (error) {
       console.error(error);
@@ -1214,7 +1214,7 @@ class GraphqlExplorerViewModel {
           "Failed to fetch schema. Please check the URL and try again.",
         );
       }
-      stopLoading(tabId);
+      stopLoading(tabId + "fetchGraphqlSchema");
     }
   };
 
