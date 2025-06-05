@@ -53,15 +53,19 @@ jobs:
 
       - name: Inject .env for Desktop
         run: |
-          cat > apps/@sparrow-desktop/.env << 'EOF'
-          ${{ secrets.DESKTOP_ENV_FILE_DEV }}
-          EOF
+          echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > apps/@sparrow-desktop/.env
+
+    # cat > apps/@sparrow-desktop/.env << 'EOF'
+    # ${{ secrets.DESKTOP_ENV_FILE_DEV }}
+    # EOF
 
       - name: Inject .env for WEB
         run: |
-          cat > apps/@sparrow-web/.env << 'EOF'
-          ${{ secrets.WEB_ENV_FILE_DEV }}
-          EOF
+          echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > apps/@sparrow-web/.env
+
+    # cat > apps/@sparrow-web/.env << 'EOF'
+    # ${{ secrets.WEB_ENV_FILE_DEV }}
+    # EOF
 
       - name: Install project dependencies
         run: yarn
