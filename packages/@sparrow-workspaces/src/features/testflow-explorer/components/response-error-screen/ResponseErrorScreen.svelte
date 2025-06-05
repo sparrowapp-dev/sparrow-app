@@ -2,6 +2,8 @@
   import { DangerIcon } from "@sparrow/library/icons";
   import { SparrowLogo } from "@sparrow/common/images";
   import { Alert } from "@sparrow/library/ui";
+
+  export let response;
 </script>
 
 <div class="response-default">
@@ -19,7 +21,7 @@
       <Alert
         heading="Error"
         varient="error"
-        description="Unable to reach the API endpoint. Please verify the request URL and try again."
+        description={response?.body || "An unexpected error occurred."}
       />
     </div>
   </div>
