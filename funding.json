@@ -1,15 +1,15 @@
 {
   "version": "v1.0.0",
   "entity": {
-    "type": "business",
+    "type": "organisation",
     "role": "maintainer",
     "name": "Techdome",
     "email": "rahul.joshi@techdome.net.in",
     "phone": "+91-7723849516",
     "description": "Techdome is a technology company focused on building open-source, AI-native developer tools. We maintain SparrowApp, an advanced API testing platform designed to streamline and automate API quality assurance, scaling and maintenance.",
     "webpageUrl": {
-      "url": "https://sparrowapp.dev",
-      "wellKnown": "API sidekick for developers"
+      "url": "https://sparrowapp.dev/",
+      "wellKnown": "https://sparrowapp.dev/.well-known/funding-manifest-urls"
     }
   },
   "projects": [
@@ -18,12 +18,15 @@
       "name": "SparrowApp",
       "description": "SparrowApp is an open-source, AI-native API testing platform that empowers developers to efficiently test, automate, and monitor APIs with intelligent suggestions and streamlined workflows.",
       "webpageUrl": {
-        "url": "https://sparrowapp.dev"
+        "url": "https://sparrowapp.dev",
+        "wellKnown": "https://sparrowapp.dev/.well-known/funding-manifest-urls"
       },
       "repositoryUrl": {
         "url": "https://github.com/sparrowapp-dev/sparrow-app"
       },
-      "licenses": ["spdx:AGPL-3.0"],
+      "licenses": [
+        "spdx:AGPL-3.0"
+      ],
       "tags": [
         "api-testing",
         "open-source",
@@ -36,7 +39,7 @@
       ]
     }
   ],
-  "community": {
+   "community": {
     "forums": ["https://www.linkedin.com/showcase/sparrow-app/"],
     "chat": ["https://discord.com/channels/1174613445434413158/@home"],
     "events": ["https://sparrowapp.dev/events"]
@@ -74,7 +77,9 @@
         "amount": 3000,
         "currency": "USD",
         "frequency": "monthly",
-        "channels": ["bank-transfer"]
+        "channels": [
+          "bank-transfer"
+        ]
       },
       {
         "guid": "dev-compensation",
@@ -84,7 +89,9 @@
         "amount": 8000,
         "currency": "USD",
         "frequency": "monthly",
-        "channels": ["bank-transfer"]
+        "channels": [
+          "bank-transfer"
+        ]
       },
       {
         "guid": "marketing-sales-expense",
@@ -94,7 +101,9 @@
         "amount": 2500,
         "currency": "USD",
         "frequency": "monthly",
-        "channels": ["bank-transfer"]
+        "channels": [
+          "bank-transfer"
+        ]
       }
     ],
     "history": [
