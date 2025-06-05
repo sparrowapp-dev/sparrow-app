@@ -29,5 +29,7 @@
 	<string>icon.icns</string>
 	<key>NSPrefPaneIconLabel</key>
 	<string>Sparrow</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+  	<false/>
 </dict>
 </plist>

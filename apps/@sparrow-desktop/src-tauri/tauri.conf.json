@@ -69,6 +69,10 @@
       }
     },
     "macOS": {
+      "entitlements": "./Entitlements.plist",
+      "files": {
+        "embedded.provisionprofile": "./assets/Sparrow_Desktop.provisionprofile"
+      },
       "dmg": {
         "background": "./icons/background.png",
         "appPosition": {
