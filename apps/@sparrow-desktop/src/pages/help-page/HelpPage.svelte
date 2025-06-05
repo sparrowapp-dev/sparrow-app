@@ -153,7 +153,7 @@
               <RoadmapIcon
                 color={activeTab === "roadmap"
                   ? "var(--text-secondary-100)"
-                  : ""}
+                  : "var(--text-primary-250)"}
               />
               Roadmap
             </div>

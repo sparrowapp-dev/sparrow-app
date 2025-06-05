@@ -61,13 +61,13 @@
 
   const getFontColor = (status) => {
     if (status === "in progress") {
-      return { fontColor: "var(--text-primary-440)" };
+      return { fontColor: "var(--text-ds-accent-200)" };
     }
     if (status === "planned") {
-      return { fontColor: "#FFE47E" };
+      return { fontColor: "var(--text-ds-warning-200)" };
     }
     if (status === "under review") {
-      return { fontColor: "#FBA574" };
+      return { fontColor: "var(--text-ds-tertiary-200)" };
     }
     return { fontColor: "var(--text-ds-neutral-50)" };
   };
