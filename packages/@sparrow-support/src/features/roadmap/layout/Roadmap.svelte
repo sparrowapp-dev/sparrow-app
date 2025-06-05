@@ -3,7 +3,9 @@
   import { Select } from "@sparrow/library/forms";
   import {
     CategoryIcon,
+    ChatOffRegular,
     CrossIcon,
+    DiversityRegular,
     MessageDisabledIcon,
     MessageIcon,
     StackIcon,
@@ -115,142 +117,140 @@
   });
 </script>
 
-<div style="height:100%; width:100%;">
-  <div class="container-data" style="padding: 20px;">
-    <div class="headerq">
-      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Roadmap</p>
-      <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
-        Stay updated with all feedback, from planning to progress, on a single
-        roadmap.
-      </p>
+<div class="container-data" style="padding: 20px; height: calc(100% - 136px)">
+  <div class="headerq">
+    <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold mb-2">
+      Roadmap
+    </p>
+    <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
+      Stay updated with all feedback, from planning to progress, on a single
+      roadmap.
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-between page-funationality">
+    <div
+      style="margin-bottom: 24px;"
+      class={`d-flex  rounded py-1 `}
+      on:click={() => {
+        MixpanelEvent(Events.Roadmap_Search);
+      }}
+    >
+      <Search
+        variant="primary"
+        size="small"
+        id="search-input"
+        placeholder="Search updates"
+        bind:value={searchTerm}
+      />
     </div>
 
-    <div class="d-flex justify-content-between page-funationality">
-      <div
-        style="margin-bottom: 37px;"
-        class={`d-flex  rounded py-1 px-2 `}
-        on:click={() => {
-          MixpanelEvent(Events.Roadmap_Search);
+    <div class="filter">
+      <Select
+        data={[
+          { name: "Feature Request", id: FeedbackType.FEATURE_REQUEST },
+          { name: "UI Improvement", id: FeedbackType.UI_IMPROVEMENT },
+          { name: "Bugs", id: FeedbackType.BUG },
+          { name: "All Categories", id: FeedbackType.ALL_CATEGORY },
+        ]}
+        onclick={(id = "") => {
+          type = id;
+          MixpanelEvent(Events.Roadmap_Categories_Filter);
         }}
-      >
-        <Search
-          variant="primary"
-          size="large"
-          id="search-input"
-          placeholder="Search updates"
-          bind:value={searchTerm}
-        />
-      </div>
-
-      <div class="filter">
-        <Select
-          data={[
-            { name: "Feature Request", id: FeedbackType.FEATURE_REQUEST },
-            { name: "UI Improvement", id: FeedbackType.UI_IMPROVEMENT },
-            { name: "Bugs", id: FeedbackType.BUG },
-            { name: "All Categories", id: FeedbackType.ALL_CATEGORY },
-          ]}
-          onclick={(id = "") => {
-            type = id;
-            MixpanelEvent(Events.Roadmap_Categories_Filter);
-          }}
-          titleId={type}
-          minHeaderWidth={"185px"}
-          headerHeight={"26px"}
-          iconRequired={true}
-          icon={CategoryIcon}
-          iconColor={"var(--icon-primary-300)"}
-          isDropIconFilled={true}
-          borderType={"none"}
-          borderActiveType={"none"}
-          headerHighlight={""}
-          headerTheme={"violet"}
-          menuItem={"v2"}
-          headerFontSize={"12px"}
-          maxHeaderWidth={"185px"}
-          zIndex={200}
-          bodyTheme={"violet"}
-          borderRounded={"2px"}
-          position={"absolute"}
-          placeholderText={"Category"}
-        />
-      </div>
+        titleId={type}
+        minHeaderWidth={"185px"}
+        headerHeight={"26px"}
+        iconRequired={true}
+        icon={DiversityRegular}
+        iconColor={"var(--icon-primary-300)"}
+        isDropIconFilled={true}
+        borderType={"none"}
+        borderActiveType={"none"}
+        headerHighlight={""}
+        headerTheme={"violet"}
+        menuItem={"v2"}
+        headerFontSize={"12px"}
+        maxHeaderWidth={"185px"}
+        zIndex={200}
+        bodyTheme={"violet"}
+        borderRounded={"2px"}
+        position={"absolute"}
+        placeholderText={"Category"}
+        variant={"secondary"}
+      />
     </div>
+  </div>
 
-    {#if isLoading}
-      <div class="mt-5">
-        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
-      </div>
-    {:else}
-      <div
-        class="d-flex justify-content-between gap-3 update-state-section"
-        style="width:100%;"
-      >
-        {#each filteredFeedbackStatus as { status, products, filteredFeedbacks }}
+  {#if isLoading}
+    <div class="mt-5">
+      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+    </div>
+  {:else}
+    <div
+      class="d-flex justify-content-between gap-3 update-state-section"
+      style="width:100%; min-height: 100%;"
+    >
+      {#each filteredFeedbackStatus as { status, products, filteredFeedbacks }}
+        <div
+          class="rounded-2"
+          style="width:100%; background-color: var(--bg-ds-surface-800); overflow: hidden; border: 1px solid var(--border-ds-surface-100)"
+        >
           <div
-            class="rounded-2"
-            style="width:100%; background-color: var(--bg-secondary-800); overflow: hidden; border:0.6px solid var(--border-secondary-300)"
+            style="font-weight:500; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-ds-surface-600); height:32px ;   color:{getFontColor(
+              status,
+            ).fontColor}; border-bottom:0.5px solid {getFontColor(status)
+              .fontColor};"
           >
+            {status
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+              .join(" ")}
+          </div>
+
+          {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
             <div
-              style="font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; background-color:var(--bg-secondary-870); height:32px ;   color:{getFontColor(
-                status,
-              ).fontColor}; border-bottom:0.5px solid {getFontColor(status)
-                .fontColor};"
+              class=" d-flex align-items-center justify-content-center"
+              style="height: calc(100% - 32px);"
             >
-              {status
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-                .join(" ")}
-            </div>
-
-            {#if filteredFeedbacks?.length == 0 && searchTerm === ""}
               <div
-                class=" d-flex align-items-center justify-content-center"
-                style="height: calc(100% - 32px);"
+                class="p-3"
+                style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
               >
-                <div
-                  class="p-3"
-                  style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
-                >
-                  <MessageDisabledIcon
-                    height={"30px"}
-                    width={"30px"}
-                    color={"var(--icon-primary-300)"}
-                  />
+                <ChatOffRegular
+                  size={"24px"}
+                  color={"var(--text-secondary-550)"}
+                />
 
-                  <p
-                    class="mx-1 mt-3 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
-                    style="color: var(--text-secondary-550); letter-spacing: 0.5px;  text-align:center;"
-                  >
-                    Share your feedback and check back here for updates.
-                  </p>
-                </div>
-              </div>
-              <!-- {/if} -->
-            {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
-              <div
-                class="w-100 h-100 mb-4"
-                style="display: flex; align-items-center; justify-content:center;"
-              >
                 <p
-                  class="mx-1 text-ds-font-size-12 mb-0 text-center mb-3"
-                  style="display:flex; align-items:center; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px; "
+                  class="mx-1 mt-3 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
+                  style="color: var(--text-secondary-550); letter-spacing: 0.5px;  text-align:center;"
                 >
-                  No result found.
+                  Share your feedback and check back here for updates.
                 </p>
               </div>
-            {:else}
-              <div
-                style="background-color: var(--bg-secondary-800); padding:12px;"
+            </div>
+            <!-- {/if} -->
+          {:else if filteredFeedbacks.length == 0 && searchTerm.length > 0}
+            <div
+              class="w-100 h-100 mb-4"
+              style="display: flex; align-items-center; justify-content:center;"
+            >
+              <p
+                class="mx-1 text-ds-font-size-12 mb-0 text-center mb-3"
+                style="display:flex; align-items:center; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px; "
               >
-                <HelpInfoCard {setPostId} status={filteredFeedbacks} />
-              </div>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </div>
+                No result found.
+              </p>
+            </div>
+          {:else}
+            <div style="padding:12px;">
+              <HelpInfoCard {setPostId} status={filteredFeedbacks} />
+            </div>
+          {/if}
+        </div>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
