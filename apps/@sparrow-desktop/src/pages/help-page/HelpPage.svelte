@@ -7,8 +7,12 @@
   } from "@sparrow/support/features";
   import {
     ActivityIcon,
+    BroadActivityFeedRegular,
     DocIcon,
+    DocumentTextRegular,
     GroupIcon,
+    MailInboxArrowDownRegular,
+    PeopleTeamRegular,
     RoadmapIcon,
     UpdateIcon,
   } from "@sparrow/library/icons";
@@ -85,19 +89,19 @@
    * @param {string} status - The status value to determine the colors for.
    * @returns {{ fontColor: string, backgroundColor: string }} An object containing the font and background colors.
    */
-     
+
   const getColor = (status) => {
     if (status === "new" || status === "open") {
-      return  "cyan";
+      return "cyan";
     }
     if (status === "fixed" || status === "in progress") {
-      return  "purple"; 
+      return "purple";
     }
     if (status === "improved" || status === "complete") {
       return "green";
     }
     if (status === "planned") {
-      return "yellow" ;
+      return "yellow";
     }
     if (status === "under review") {
       return "orange";
@@ -125,120 +129,108 @@
 <Motion {...pagesMotion} let:motion>
   <div class="h-100" use:motion>
     <div class="h-100 d-flex flex-column">
-      <!----Help Navigator-->
-      <div class="tabs px-3">
-        <div
-          class="tab d-flex align-items-center gap-2 {activeTab === 'roadmap'
-            ? 'active'
-            : ''}"
-          on:click={() => {
-            setActiveTab("roadmap");
-            isPostopenFromActivity = false;
-            MixpanelEvent(Events.Roadmap_Tab);
-          }}
-        >
-          <RoadmapIcon
-            height={"17px"}
-            width={"17px"}
-            color={activeTab === "roadmap"
-              ? "var(--text-primary-300)"
-              : "var(--text-secondary-100)"}
-          />
-          Roadmap
-        </div>
-        <div
-          class="tab align-items-center gap-2 {activeTab === 'feedback'
-            ? 'active'
-            : ''}"
-          on:click={() => {
-            setActiveTab("feedback");
-            isPostopenFromActivity = false;
-            MixpanelEvent(Events.Feedback_Tab);
-          }}
-        >
-          <DocIcon
-            height={"17px"}
-            width={"17px"}
-            color={activeTab === "feedback"
-              ? "var(--text-primary-300)"
-              : "var(--text-secondary-100)"}
-          />
-          Feedback
-        </div>
-        <div
-          class="tab align-items-center gap-2 {activeTab === 'updates'
-            ? 'active'
-            : ''}"
-          on:click={() => {
-            setActiveTab("updates");
-            isPostopenFromActivity = false;
-            MixpanelEvent(Events.Updates_Tab);
-          }}
-        >
-          <UpdateIcon
-            height={"17px"}
-            width={"17px"}
-            color={activeTab === "updates"
-              ? "var(--text-primary-300)"
-              : "var(--text-secondary-100)"}
-          />
-          Updates
-        </div>
-        <div
-          class="tab align-items-center gap-2 {activeTab === 'community'
-            ? 'active'
-            : ''}"
-          on:click={() => {
-            setActiveTab("community");
-            isPostopenFromActivity = false;
-            MixpanelEvent(Events.Community_Tab);
-          }}
-        >
-          <GroupIcon
-            height={"17px"}
-            width={"17px"}
-            color={activeTab === "community"
-              ? "var(--text-primary-300)"
-              : "var(--text-secondary-100)"}
-          />
-          Community
-        </div>
-
-        <div
-          class="tab align-items-center gap-2 {activeTab === 'myActivity'
-            ? 'active'
-            : ''}"
-          on:click={() => {
-            setActiveTab("myActivity");
-            isPostopenFromActivity = false;
-            MixpanelEvent(Events.Activity_Tab);
-          }}
-        >
-          <ActivityIcon
-            height={"17px"}
-            width={"17px"}
-            color={activeTab === "myActivity"
-              ? "var(--text-primary-300)"
-              : "var(--text-secondary-100)"}
-          />
-          My Activity
-        </div>
-
-        <div style="width: 400px;"></div>
-      </div>
-
       <!--
         -- Help Body 
       -->
       <div
-        class="w-100 d-flex jutify-content-center bg-secondary-900"
-        style="flex:1; overflow: auto;"
+        class="w-100 d-flex jutify-content-center h-100"
+        style="background-color:var(--bg-ds-surface-900)"
       >
-        <div
-          style="width: calc(100% - 274px );"
-          class="ps-3 pe-2 pt-3 pb-2 h-100"
-        >
-          <div class=" h-100 pe-2" style="margin-left:34px; overflow:auto;">
+        <div style="width: calc(100% - 274px );" class="h-100 py-3">
+          <!----Help Navigator-->
+          <div class="tabs px-3">
+            <div
+              class="tab d-flex align-items-center gap-2 {activeTab ===
+              'roadmap'
+                ? 'active'
+                : ''}"
+              on:click={() => {
+                setActiveTab("roadmap");
+                isPostopenFromActivity = false;
+                MixpanelEvent(Events.Roadmap_Tab);
+              }}
+            >
+              <RoadmapIcon
+                color={activeTab === "roadmap"
+                  ? "var(--text-secondary-100)"
+                  : "var(--text-primary-250)"}
+              />
+              Roadmap
+            </div>
+            <div
+              class="tab align-items-center gap-2 {activeTab === 'feedback'
+                ? 'active'
+                : ''}"
+              on:click={() => {
+                setActiveTab("feedback");
+                isPostopenFromActivity = false;
+                MixpanelEvent(Events.Feedback_Tab);
+              }}
+            >
+              <DocumentTextRegular
+                color={activeTab === "feedback"
+                  ? "var(--text-secondary-100)"
+                  : ""}
+              />
+              Feedback
+            </div>
+            <div
+              class="tab align-items-center gap-2 {activeTab === 'updates'
+                ? 'active'
+                : ''}"
+              on:click={() => {
+                setActiveTab("updates");
+                isPostopenFromActivity = false;
+                MixpanelEvent(Events.Updates_Tab);
+              }}
+            >
+              <MailInboxArrowDownRegular
+                color={activeTab === "updates"
+                  ? "var(--text-secondary-100)"
+                  : ""}
+              />
+              Updates
+            </div>
+            <div
+              class="tab align-items-center gap-2 {activeTab === 'community'
+                ? 'active'
+                : ''}"
+              on:click={() => {
+                setActiveTab("community");
+                isPostopenFromActivity = false;
+                MixpanelEvent(Events.Community_Tab);
+              }}
+            >
+              <PeopleTeamRegular
+                color={activeTab === "community"
+                  ? "var(--text-secondary-100)"
+                  : ""}
+              />
+              Community
+            </div>
+
+            <div
+              class="tab align-items-center gap-2 {activeTab === 'myActivity'
+                ? 'active'
+                : ''}"
+              on:click={() => {
+                setActiveTab("myActivity");
+                isPostopenFromActivity = false;
+                MixpanelEvent(Events.Activity_Tab);
+              }}
+            >
+              <BroadActivityFeedRegular
+                color={activeTab === "myActivity"
+                  ? "var(--text-secondary-100)"
+                  : ""}
+              />
+              My Activity
+            </div>
+          </div>
+          <div
+            class=""
+            style="flex: 1; overflow:auto; height: calc(100vh - 100px);"
+          >
             {#if activeTab === "feedback"}
               <FeedbackSection
                 onInputFeedback={_viewModel.createPost}
@@ -292,9 +284,12 @@
               />{/if}
           </div>
         </div>
-        <div style="width: 274px;" class="ps-2 pe-3 pt-3 pb-2 h-100">
-          <div class="h-100 pe-2" style="overflow:auto;">
-            <div class="mb-3">
+        <div
+          style="width: 274px; border-left: 1px solid var(--border-ds-surface-100);"
+          class="p-3"
+        >
+          <div class="h-100" style="overflow:auto;">
+            <div class="mb-4">
               <AddFeedback
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
@@ -315,14 +310,13 @@
   .tabs {
     display: flex;
     height: 37px;
-    border-bottom: 2px solid var(--border-secondary-900);
-    background-color: var(--bg-secondary-900);
+    border-bottom: 2px solid var(--bg-ds-surface-900);
   }
 
   .tab {
-    width: 260px;
+    width: 100%;
     display: flex;
-    padding: 10px 20px;
+    padding: 0 20px;
     cursor: pointer;
     color: var(--text-primary-250);
     position: relative;
