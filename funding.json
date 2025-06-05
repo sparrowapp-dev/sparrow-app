@@ -39,6 +39,26 @@
       ]
     }
   ],
+   "community": {
+    "forums": ["https://www.linkedin.com/showcase/sparrow-app/"],
+    "chat": ["https://discord.com/channels/1174613445434413158/@home"],
+    "events": ["https://sparrowapp.dev/events"]
+  },
+  "contributors": [
+    {
+      "source": "https://github.com/sparrowapp-dev/sparrow-app/graphs/contributors"
+    }
+  ],
+  "roadmap": [
+    {
+      "source": "https://sparrowapp.canny.io/"
+    }
+  ],
+  "sustainability": {
+    "environmentalImpact": "Minimal server usage with green hosting providers",
+    "communityGrowth": "Monthly webinars and contributor onboarding sessions",
+    "financialTransparency": "Audited financials for FY2023-24 are available for Techdome"
+  },
   "funding": {
     "channels": [
       {
