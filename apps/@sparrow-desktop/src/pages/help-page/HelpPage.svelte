@@ -269,7 +269,11 @@
               />
             {:else if activeTab === "community"}
               <Community />
-              <DiscordPost />
+              <div
+                style="padding-inline: 20px; padding-bottom: 20px; background: var(--bg-ds-surface-900);"
+              >
+                <DiscordPost />
+              </div>
             {:else if activeTab === "myActivity"}
               <ActivitySection
                 onInputFeedback={_viewModel.createPost}
