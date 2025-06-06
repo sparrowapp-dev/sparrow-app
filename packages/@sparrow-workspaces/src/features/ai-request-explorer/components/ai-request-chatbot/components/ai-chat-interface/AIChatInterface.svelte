@@ -41,6 +41,7 @@
   export let responseData: AiRequestExplorerData;
   export let onChatClear;
   export let isChatAutoClearActive = false;
+  export let activateGeneratePromptModal;
   let isChatLoadingActive = false;
 
   let chatContainer: HTMLElement;
@@ -348,6 +349,7 @@
         {onUpdateAiPrompt}
         {isResponseGenerating}
         {onStopGeneratingAIResponse}
+        {activateGeneratePromptModal}
         placeholder={"Write a prompt or generate one from generate prompt."}
         {sendPrompt}
       />

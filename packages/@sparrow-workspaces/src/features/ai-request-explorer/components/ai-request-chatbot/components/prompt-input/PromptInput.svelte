@@ -16,6 +16,7 @@
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
+  export let activateGeneratePromptModal;
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -100,9 +101,12 @@
     class="actions-container d-flex justify-content-between align-items-center"
   >
     <div id="generate-prompt-chip">
-      <Tooltip title={"Coming Soon"} placement={"top-center"}>
+      <Tooltip title={"Generate user prompt"} placement={"top-center"}>
         <button
-          class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1 opacity-50"
+          on:click={() => {
+            activateGeneratePromptModal("UserPrompt");
+          }}
+          class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1"
         >
           <BotSparkleFilled size={"15px"} color="#4387f4" />
           <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>

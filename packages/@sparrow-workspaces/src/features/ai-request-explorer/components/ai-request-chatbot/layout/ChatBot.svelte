@@ -24,6 +24,7 @@
   export let handleApplyChangeOnAISuggestion;
   export let responseData: AiRequestExplorerData;
   export let disabled = false;
+  export let activateGeneratePromptModal;
 
   let scrollList: ScrollList;
 
@@ -114,6 +115,7 @@
       isChatAutoClearActive={$tab?.property?.aiRequest?.state
         ?.isChatAutoClearActive}
       bind:scrollList
+      {activateGeneratePromptModal}
     />
   </div>
 {/if}

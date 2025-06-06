@@ -1,5 +1,5 @@
 // ---- Utils
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, MarkdownFormatter, moveNavigation, Sleep } from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -935,6 +935,126 @@ class AiRequestExplorerViewModel {
       console.error("Error stopping AI response generation:", error);
     }
   };
+
+
+  public updateUserPrompt = async (userInput: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.ai.prompt = userInput;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  }
+
+  public generateAiPrompt = async (target: "UserPrompt" | "SystemPrompt", prompt = ""): Promise<string | undefined> => {
+    await this.updateRequestState({ isDocGenerating: true });
+    const componentData = this._tab.getValue();
+    const apiData = {
+        "body": {
+            "raw": "",
+            "urlencoded": [
+                {
+                    "key": "",
+                    "value": "",
+                    "checked": false
+                }
+            ],
+            "formdata": [
+                {
+                    "key": "",
+                    "value": "",
+                    "base": "",
+                    "checked": false,
+                    "type": "text"
+                }
+            ]
+        },
+        "headers": [
+            {
+                "key": "",
+                "value": "",
+                "checked": false
+            }
+        ],
+        "method": "GET",
+        "queryParams": [
+            {
+                "key": "",
+                "value": "",
+                "checked": false
+            }
+        ],
+        "url": "www.google.com",
+        "auth": {
+            "bearerToken": "",
+            "basicAuth": {
+                "username": "",
+                "password": ""
+            },
+            "apiKey": {
+                "authKey": "",
+                "authValue": "",
+                "addTo": "Header"
+            }
+        }
+    }
+    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
+    const response = await this.aiAssistentService.generateAiResponse({
+      text: prompt,
+      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
+    });
+
+    let generatedPrompt = null;
+    if (response.isSuccessful) {
+      if(target === "UserPrompt") {
+        // await this.updateRequestAIPrompt(response.data.data.text);
+        generatedPrompt = response.data.data.result;
+        return generatedPrompt;
+      }
+      else if (target === "SystemPrompt") {
+        const formatter = new MarkdownFormatter();
+        const formattedData = await formatter.FormatData(
+          response.data.data.result,
+        );
+        const stringifyData = JSON.stringify(formattedData.blocks);
+        // await this.updateAiSystemPrompt(stringifyData);
+        // await this.updateRequestState({
+        //   isDocAlreadyGenerated: true,
+        // });
+
+        generatedPrompt = stringifyData;
+        return generatedPrompt;
+
+      } else if (response?.message === "Limit reached") {
+        notifications.error(
+          "Failed to generate documentation. Your monthly AI usage limit is reached.",
+        );
+        generatedPrompt = "Failed to generate documentation. Your monthly AI usage limit is reached.";
+        return generatedPrompt;
+      }
+      else {
+        return response?.message || "Something went wrong. Please try again";
+      }
+
+    // setTimeout(async () => {
+    //   // renders response before disabling the editor
+    //   await this.updateRequestState({ isDocGenerating: false });
+    // }, 1000);
+
+  }};
+
+
+  public handleInsertAiPrompt = async (target: "UserPrompt" | "SystemPrompt", response: string) => {
+    const componentData = this._tab.getValue();
+    console.log("In insertAiPrompt() :> ", response);
+    if (target === "UserPrompt") {
+      await this.updateUserPrompt(response);
+    } else if (target === "SystemPrompt") {
+      await this.updateAiSystemPrompt(response);
+      // await new Sleep().setTime(1500).exec();
+      // await this.updateRequestState({ aiNavigation: "Authorization" });
+      // await this.updateRequestState({ aiNavigation: "System Prompt" });
+    }
+    return response;
+  }
 
   /**
    * Toggles the like or dislike status of a chat message.

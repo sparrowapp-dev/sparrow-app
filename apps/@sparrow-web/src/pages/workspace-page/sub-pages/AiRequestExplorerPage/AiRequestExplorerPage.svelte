@@ -183,4 +183,6 @@
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
+  onGenerateAiPrompt={_viewModel.generateAiPrompt}
+  onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
 />

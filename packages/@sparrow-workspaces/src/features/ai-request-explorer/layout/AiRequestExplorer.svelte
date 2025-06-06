@@ -24,6 +24,9 @@
     SettingsRegular,
     BotSparkleRegular,
   } from "@sparrow/library/icons";
+  import { Alert, Button, Modal } from "@sparrow/library/ui";
+  import { Textarea } from "@sparrow/library/forms";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -43,6 +46,7 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let onUpdateAiConfigurations;
+  export let onGenerateAiPrompt;
 
   // Role of user in active workspace
   export let userRole;
@@ -51,7 +55,18 @@
   export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  export let onHandleInsertPrompt;
   const loading = writable<boolean>(false);
+
+  let isGeneratePromptModalOpen = false;
+  let isPromptGenerating = false;
+  let userPromptExpectation = "";
+  let aiPromptQueryResponse = "";
+  let insertBtnLoader = false;
+  let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" = "None";
+  const toggleGeneratePromptModal = () => {
+    isGeneratePromptModalOpen = !isGeneratePromptModalOpen;
+  };
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -98,10 +113,21 @@
   });
   onDestroy(() => {});
 
-  // $: {
-  //   if ($tab)
-  //     console.log("tab :>> ", $tab?.property?.aiRequest?.configurations);
-  // }
+  $: {
+    if ($tab) {
+      console.log("tab :>> ", $tab?.property?.aiRequest);
+    }
+  }
+
+  const activateGeneratePromptModal = (
+    target: "UserPrompt" | "SystemPrompt",
+  ) => {
+    isGeneratePromptModalOpen = true;
+    userPromptExpectation = "";
+    aiPromptQueryResponse = "";
+    isPromptGenerating = false;
+    generatePromptTarget = target;
+  };
 </script>
 
 {#if $tab.tabId}
@@ -152,6 +178,7 @@
                         $tab.property.aiRequest?.state?.aiNavigation
                       ].includes($tab.property.aiRequest?.aiModelVariant)}
                       requestDoc={$tab.property.aiRequest.systemPrompt}
+                      {activateGeneratePromptModal}
                     />
                   {:else}
                     <div
@@ -261,6 +288,7 @@
               {onUpdateRequestState}
               {onGenerateAiResponse}
               {onStopGeneratingAIResponse}
+              {activateGeneratePromptModal}
               {onToggleLike}
             />
           </Pane>
@@ -269,6 +297,153 @@
     </div>
   </div>
 {/if}
+
+<Modal
+  title={`Generate ${generatePromptTarget === "UserPrompt" ? "User Prompt" : "System Prompt"}`}
+  zIndex={1000}
+  isOpen={isGeneratePromptModalOpen}
+  width={"40%"}
+  handleModalState={() => {
+    console.log("Modal closed");
+    isGeneratePromptModalOpen = false;
+  }}
+>
+  <!-- Description Text -->
+  <div class="mb-4">
+    <p class="text-muted mb-0" style="font-size: 14px; line-height: 1.4;">
+      Describe your task or goal to generate a suitable prompt.
+    </p>
+  </div>
+
+  <!-- Two Column Layout -->
+  <div class="row g-3 mb-4">
+    <!-- Left Column - Your Message -->
+    <div class="col-6">
+      <div class="d-flex flex-column h-100">
+        <label
+          class="form-label mb-2 fw-medium"
+          style="font-size: 14px; color: var(--text-ds-neutral-200);"
+        >
+          Your Message
+        </label>
+        <Textarea
+          id={"user-prompt-textarea"}
+          bind:value={userPromptExpectation}
+          placeholder={"Describe your task..."}
+          height={"120px"}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="var(--border-ds-neutral-300)"
+          focusedBorderColor={"var(--border-ds-primary-300)"}
+          class="text-ds-font-size-12 bg-tertiary-300 text-ds-font-weight-medium p-2 border-radius-4 flex-grow-1"
+          style="outline:none; resize: none; min-height: 120px;"
+          disabled={false}
+          maxlength={1000}
+          placeholderColor={"var(--text-secondary-200)"}
+        />
+      </div>
+    </div>
+
+    <!-- Right Column - Generated Response -->
+    <div class="col-6">
+      <div class="d-flex flex-column h-100">
+        <label
+          class="form-label mb-2 fw-medium"
+          style="font-size: 14px; color: var(--text-ds-neutral-200);"
+        >
+          Generated Response
+        </label>
+        <Textarea
+          id={"ai-response-textarea"}
+          value={aiPromptQueryResponse}
+          placeholder={"Your response will be generated here"}
+          height={"120px"}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="var(--border-ds-neutral-300)"
+          focusedBorderColor={"var(--border-ds-primary-300)"}
+          class="text-ds-font-size-12 bg-tertiary-300 text-ds-font-weight-medium p-2 border-radius-4 flex-grow-1"
+          style="outline:none; resize: none; min-height: 120px;"
+          disabled={isPromptGenerating}
+          maxlength={1000}
+          placeholderColor={"var(--text-secondary-200)"}
+        />
+      </div>
+    </div>
+
+    <Alert
+      heading="Generate Prompt Monthly Limit Reached"
+      description="You’ve hit your monthly usage limit for generate prompt. You can resume next month or explore our discord community for feedback and discussions. Thanks for understanding!"
+      varient="info"
+      ctaShow={false}
+      containerWidth={"100%"}
+      closeIconRequired={false}
+      onClickClose={() => {}}
+    />
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="d-flex justify-content-between gap-2 mt-4 w-100">
+    <Button
+      title={aiPromptQueryResponse.length
+        ? "Regenerate Response"
+        : "Generate Response"}
+      size={"medium"}
+      customWidth={"160px"}
+      type={"outline-secondary"}
+      loader={isPromptGenerating}
+      disable={!userPromptExpectation.length}
+      onClick={async () => {
+        console.log("Generate Response clicked");
+        isPromptGenerating = true;
+        const res = await onGenerateAiPrompt(
+          generatePromptTarget,
+          userPromptExpectation,
+        );
+
+        aiPromptQueryResponse = res;
+        await new Sleep().setTime(2000).exec();
+        isPromptGenerating = false;
+        console.log("Generated Response: ", JSON.parse(res));
+      }}
+    />
+
+    <div class="d-flex align-items-center gap-2">
+      <Button
+        title={"Cancel"}
+        size={"medium"}
+        type={"secondary"}
+        customWidth={"100px"}
+        disable={isPromptGenerating}
+        onClick={() => {
+          isGeneratePromptModalOpen = false;
+        }}
+      />
+      <Button
+        title={"Insert"}
+        size={"medium"}
+        type={"primary"}
+        customWidth={"100px"}
+        disable={isPromptGenerating || !aiPromptQueryResponse.length}
+        loader={insertBtnLoader}
+        onClick={async () => {
+          insertBtnLoader = true;
+          await onHandleInsertPrompt(
+            generatePromptTarget,
+            aiPromptQueryResponse,
+          );
+          // await new Sleep().setTime(1500).exec();
+          // onUpdateRequestState({
+          // aiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
+          // });
+          userPromptExpectation = "";
+          aiPromptQueryResponse = "";
+          isPromptGenerating = false;
+          insertBtnLoader = false;
+          isGeneratePromptModalOpen = false;
+        }}
+      />
+    </div>
+  </div>
+</Modal>
 
 <style>
   .ai-request-explorer-layout {
