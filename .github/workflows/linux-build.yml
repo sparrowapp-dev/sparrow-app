@@ -51,24 +51,39 @@ jobs:
           sudo apt update
           sudo apt install -y yarn
 
+      # - name: Inject .env for Desktop
+      #   run: |
+      #     ls
+      #     echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env
+
       - name: Inject .env for Desktop
         run: |
+          pwd
           ls
-          echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env
+          cat > apps/@sparrow-desktop/.env << 'EOF'
+          ${{ secrets.DESKTOP_ENV_FILE_DEV }}
+          EOF
 
-
-      - name: cat .env for WEB
+      - name: cat .env for Desktop
         run: |
-          echo /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env  
+          cat /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env  
 
       - name: Inject .env for WEB
         run: |
+          pwd
           ls
-          echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env
+          cat > apps/@sparrow-web/.env << 'EOF'
+          ${{ secrets.WEB_ENV_FILE_DEV }}
+          EOF
+
+      # - name: Inject .env for WEB
+      #   run: |
+      #     ls
+      #     echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env
 
       - name: cat .env for WEB
         run: |
-          echo /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env    
+          cat /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env    
 
 
       - name: Install project dependencies
