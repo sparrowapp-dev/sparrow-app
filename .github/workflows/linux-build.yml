@@ -53,20 +53,22 @@ jobs:
 
       - name: Inject .env for Desktop
         run: |
+          ls
           echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env
 
 
-      # - name: cat .env for WEB
-      #   run: |
-      #     cat apps/@sparrow-web/.env   
+      - name: cat .env for WEB
+        run: |
+          echo /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env  
 
       - name: Inject .env for WEB
         run: |
+          ls
           echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env
 
-      # - name: cat .env for WEB
-      #   run: |
-      #     cat apps/@sparrow-web/.env    
+      - name: cat .env for WEB
+        run: |
+          echo /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env    
 
 
       - name: Install project dependencies
@@ -149,10 +151,10 @@ jobs:
           AWS_REGION: ${{ vars.AWS_REGION }}
           SOURCE_DIR: gh-pages
 
-      - name: Notify Teams Channel
-        run: |
-          curl -H 'Content-Type: application/json' \
-            -d '{
-              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
-            }' \
-            ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
+      # - name: Notify Teams Channel
+      #   run: |
+      #     curl -H 'Content-Type: application/json' \
+      #       -d '{
+      #         "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+      #       }' \
+      #       ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
