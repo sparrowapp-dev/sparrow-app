@@ -183,4 +183,27 @@
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
+  conversations={[
+    {
+      id: "1",
+      title: "Design Research Chat",
+      timestamp: "13/05/2025",
+      time: "12:45 AM",
+      inputTokens: 23,
+      outputTokens: 1489,
+      updatedBy: "Anish Kumar Singh",
+      isActive: true,
+    },
+    {
+      id: "2",
+      title: "UX Strategy Discussion",
+      timestamp: "13/05/2025",
+      time: "12:45 AM",
+      inputTokens: 23,
+      outputTokens: 1489,
+      updatedBy: "Raman",
+    },
+  ]}
+  onSelectConversation={(id) => console.log("Selected:", id)}
+  onDeleteConversation={(id) => console.log("Deleted:", id)}
 />
