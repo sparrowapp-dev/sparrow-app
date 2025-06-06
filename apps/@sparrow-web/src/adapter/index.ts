@@ -9,3 +9,4 @@ export { WorkspaceTabAdapter } from "./workspace-tab";
 export { TestflowTabAdapter } from "./testflow-tab";
 export { RequestMockTabAdapter } from "./request-mock-tab";
 export { RequestSavedTabAdapter } from "./request-saved-tab";
+export { AiRequestTabAdapter } from "./ai-request-tab";

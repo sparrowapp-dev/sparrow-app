@@ -12,6 +12,7 @@
     SocketIoIcon,
     GraphIcon,
     DatabaseStackRegular,
+    BotRegular,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -83,6 +84,15 @@
       iconSize={"18px"}
       onClick={() => {
         onItemCreated("request", {});
+      }}
+    />
+    <Card
+      icon={BotRegular}
+      label={`AI Request`}
+      iconColor="var(--text-primary-300)"
+      iconSize={"22px"}
+      onClick={() => {
+        onItemCreated("aiRequest", {});
       }}
     />
     <Card

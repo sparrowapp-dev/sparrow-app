@@ -366,7 +366,7 @@
           iconSize: "16px",
           endIcon: BetaVectorIcon,
           onclick: () => {
-            onItemCreated("Ai-Request-Tab", {});
+            onItemCreated("aiRequest", {});
             // MixpanelEvent(Events.Add_WebSocket);
           },
         },
@@ -489,7 +489,7 @@
           iconSize: "16px",
           endIcon: BetaVectorIcon,
           onclick: () => {
-            onItemCreated("Ai-Request-Tab", {});
+            onItemCreated("aiRequest", {});
             // MixpanelEvent(Events.Add_WebSocket);
           },
         },

@@ -26,6 +26,7 @@
     SocketIcon,
     SocketIoIcon,
     WorkspaceIcon,
+    BotRegular,
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { TextEditor } from "@sparrow/library/forms";
@@ -573,6 +574,10 @@
             <div class=" ps-2">
               <FileType name={col.name} type={ItemType.GRAPHQL} />
             </div>
+          {:else if col.type === ItemType.AI_REQUEST}
+            <div class=" ps-2">
+              <FileType name={col.name} type={ItemType.AI_REQUEST} />
+            </div>
           {:else if col?.collectionType !== CollectionTypeBaseEnum.MOCK}
             <div
               class="item ps-2"
@@ -807,6 +812,10 @@
             color={"var(--icon-danger-1100)"}
           /></span
         >
+      {:else if componentData?.property.request.method === TabTypeEnum.AI_REQUEST}
+        <span class={`text-fs-12 me-1 fw-bold `}
+          ><BotRegular height={"16px"} width={"16px"} /></span
+        >
       {:else}
         <span
           class={`text-fs-12 me-2 fw-bold text-${getMethodStyle(
@@ -818,7 +827,7 @@
         {componentData?.property.request.url}
       </p>
     </div>
-    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET || componentData?.property.request.method === TabTypeEnum.GRAPHQL || componentData?.property.request.method === TabTypeEnum.SOCKET_IO)}
+    {#if !(componentData?.property.request.method === TabTypeEnum.WEB_SOCKET || componentData?.property.request.method === TabTypeEnum.GRAPHQL || componentData?.property.request.method === TabTypeEnum.SOCKET_IO || componentData?.property.request.method === TabTypeEnum.AI_REQUEST)}
       <p class="save-text-clr mb-1 sparrow-fs-12">Description</p>
       <div style="height:77px; overflow:hidden !important;" class="mb-3">
         <div
@@ -965,6 +974,11 @@
                 notifications.success(
                   `${GraphqlRequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
                 );
+              } else if (
+                componentData?.property.request.method ===
+                TabTypeEnum.AI_REQUEST
+              ) {
+                notifications.success(`AI request request saved successfully.`);
               } else {
                 notifications.success(`REST API request saved successfully.`);
               }
@@ -987,6 +1001,13 @@
               ) {
                 notifications.error(
                   `Failed to save ${GraphqlRequestDefaultAliasBaseEnum.NAME} request. Please try again.`,
+                );
+              } else if (
+                componentData?.property.request.method ===
+                TabTypeEnum.AI_REQUEST
+              ) {
+                notifications.error(
+                  `Failed to save AI request. Please try again.`,
                 );
               } else {
                 notifications.error(

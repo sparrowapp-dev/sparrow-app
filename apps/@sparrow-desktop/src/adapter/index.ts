@@ -8,3 +8,4 @@ export { FolderTabAdapter } from "./folder-tab";
 export { WorkspaceTabAdapter } from "./workspace-tab";
 export { TestflowTabAdapter } from "./testflow-tab";
 export { RequestMockTabAdapter } from "./request-mock-tab";
+export { AiRequestTabAdapter  } from "./ai-request-tab";

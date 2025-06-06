@@ -147,19 +147,22 @@ class InitAiRequestTab {
             this._tab.property.aiRequest.aiModelVariant = _modalVariantName;
         }
     }
+    public updateAISystemPrompt(_systemPrompt: string) {
+        if (_systemPrompt && this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.systemPrompt = _systemPrompt;
+        }
+    }
+    // ToDo: Method to update AI modal configurations
+    // public updateAIConfigurations(_configurations) {
+    //     if (_configurations && this._tab.property.aiRequest) {
+    //         this._tab.property.aiRequest.configurations = _configurations;
+    //     }
+    // }
     public updateAuth(_auth: Auth) {
         if (_auth && this._tab.property.aiRequest) {
             this._tab.property.aiRequest.auth = _auth;
         }
     }
-
-    // ToDo: Method to update AI modal configurations
-    // public updateAIConfigurations(_headers: KeyValueChecked[]) {
-    //     if (_headers && this._tab.property.aiRequest) {
-    //         this._tab.property.aiRequest.Configurations = _headers;
-    //     }
-    // }
-
     public updateIsSave(_isSave: boolean) {
         this._tab.isSaved = _isSave;
     }
