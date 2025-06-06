@@ -53,30 +53,30 @@ jobs:
 
       - name: Inject .env for Desktop
         run: |
-          echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > apps/@sparrow-desktop/.env
+          echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env
 
 
-      - name: cat .env for WEB
-        run: |
-          cat apps/@sparrow-web/.env   
+      # - name: cat .env for WEB
+      #   run: |
+      #     cat apps/@sparrow-web/.env   
 
       - name: Inject .env for WEB
         run: |
-          echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > apps/@sparrow-web/.env
+          echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env
 
-      - name: cat .env for WEB
-        run: |
-          cat apps/@sparrow-web/.env    
+      # - name: cat .env for WEB
+      #   run: |
+      #     cat apps/@sparrow-web/.env    
 
 
       - name: Install project dependencies
         run: yarn
 
       - name: Build Tauri app
-        run: yarn workspace @sparrow/desktop tauri build --debug  
+        run: yarn workspace @sparrow/desktop tauri build
 
       - name: Generate DEB metadata
-        working-directory: apps/@sparrow-desktop/src-tauri/target/debug/bundle
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
         run: |
           mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
           cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
