@@ -203,7 +203,7 @@
   };
 </script>
 
-<div class="container" style="padding: 20px; height: 100%">
+<div style="padding: 20px; height: 100%;">
   <div class="mt-0">
     <p class="text-ds-font-size-20 fw-semibold mb-2">My Activity</p>
     <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
