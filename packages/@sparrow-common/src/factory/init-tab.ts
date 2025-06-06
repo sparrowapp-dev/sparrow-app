@@ -3,13 +3,17 @@ import {
   InitEnvironmentTab,
   InitFolderTab,
   InitGraphqlTab,
+  InitMockRequestTab,
   InitRequestTab,
   InitSavedRequestTab,
   InitTestflowTab,
   InitWebSocketTab,
+  InitAiRequestTab,
 } from "@sparrow/common/utils";
 import { InitSocketIoTab } from "../utils/init-socket-io-tab";
 import { InitWorkspaceTab } from "../utils/init-workspace-tab";
+import { InitMockHistoryTab } from "../utils/init-mock-history-tab";
+import { InitHubTab } from "../utils/init-hub-tab";
 
 class InitTab {
   constructor() {}
@@ -63,8 +67,23 @@ class InitTab {
    * @param _id - request mongo document id
    * @param _workspaceId - Workspace mongo id to which request belongs to
    */
+  public aiRequest = (_id: string, _workspaceId: string) => {
+    return new InitAiRequestTab(_id, _workspaceId);
+  };
+
+  /**
+   * @param _id - request mongo document id
+   * @param _workspaceId - Workspace mongo id to which request belongs to
+   */
   public savedRequest = (_id: string, _workspaceId: string) => {
     return new InitSavedRequestTab(_id, _workspaceId);
+  };
+  /**
+   * @param _id - request mongo document id
+   * @param _workspaceId - Workspace mongo id to which request belongs to
+   */
+  public mockRequest = (_id: string, _workspaceId: string) => {
+    return new InitMockRequestTab(_id, _workspaceId);
   };
   /**
    * @param _id - collection mongo document id
@@ -83,8 +102,22 @@ class InitTab {
   /**
    * @param _id - workspace mongo document id
    */
-  public workspace = (_id: string, _workspaceId : string) => {
-      return new InitWorkspaceTab(_id, _workspaceId);
+  public workspace = (_id: string, _workspaceId: string) => {
+    return new InitWorkspaceTab(_id, _workspaceId);
+  };
+  /**
+   * @param _id - folder mongo document id
+   * @param _workspaceId - Workspace mongo id to which folder belongs to
+   */
+  public mockHistory = (_id: string, _workspaceId: string) => {
+    return new InitMockHistoryTab(_id, _workspaceId);
+  };
+  /**
+   * @param _id - folder mongo document id
+   * @param _workspaceId - Workspace mongo id to which folder belongs to
+   */
+  public hub = (_id: string, _workspaceId: string) => {
+    return new InitHubTab(_id, _workspaceId);
   };
 }
 

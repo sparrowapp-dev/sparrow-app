@@ -2,13 +2,27 @@
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
-
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let auth;
   export let environmentVariables;
   export let requestStateAuth;
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
   export let onUpdateEnvironment;
+
+  const handleCollectionAuthEvent = ({
+    eventName,
+    collectionAuthNavigation,
+  }: {
+    eventName: string;
+    collectionAuthNavigation: string;
+  }) => {
+    captureEvent(eventName, {
+      component: "CollectionAuth",
+      button_text: collectionAuthNavigation,
+      destination: collectionAuthNavigation,
+    });
+  };
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -40,6 +54,11 @@
             titleId={requestStateAuth}
             onclick={(id = "") => {
               onUpdateRequestState({ collectionAuthNavigation: id });
+
+              handleCollectionAuthEvent({
+                eventName: "collection_auth_set",
+                collectionAuthNavigation: id,
+              });
             }}
             disabled={false}
           />

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
   import { copyIcon } from "@sparrow/library/assets";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     copyToClipBoard,
     handleDownloadResponse,
@@ -25,6 +26,7 @@
     SaveRegular,
   } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let response;
   export let apiState;
@@ -34,6 +36,7 @@
   export let isGuestUser;
   export let onSaveResponse;
   export let path;
+  export let userRole;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -122,6 +125,14 @@
     } else {
       console.error("Save dialog was canceled or no path was selected.");
     }
+  };
+
+  const handle_save_response = ({ event_name }: { event_name: string }) => {
+    captureEvent("save_response", {
+      component: "ResponseBodyNavigator",
+      button_text: event_name,
+      destination: event_name,
+    });
   };
 </script>
 
@@ -235,11 +246,14 @@
             Clear
           </button>
         </div>
-        {#if path?.collectionId}
+        {#if path?.collectionId && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <!-- Save button -->
           <Button
             startIcon={SaveRegular}
-            onClick={onSaveResponse}
+            onClick={() => {
+              onSaveResponse();
+              handle_save_response({ event_name: "Save Response" });
+            }}
             disable={false}
             loader={false}
             size={"small"}

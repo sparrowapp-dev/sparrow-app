@@ -162,4 +162,31 @@ export class WorkspaceService {
     );
     return response;
   };
+
+  public fetchPublicWorkspaceList = async (pageNumber: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/public-list?page=${pageNumber}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public searchPublicWorkspaces = async (
+    searchTerm: string,
+    page: number = 1,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${apiUrl}/api/workspace/public-search?name=${encodeURIComponent(
+        searchTerm,
+      )}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

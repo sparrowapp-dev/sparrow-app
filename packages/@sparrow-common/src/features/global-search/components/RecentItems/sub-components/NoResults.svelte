@@ -14,9 +14,9 @@
     class="text-container text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
   >
     {#if type === "Basic"}
-      <p>Nothing found for "{searchQuery}"</p>
+      <p class="ellipsis px-4">Nothing found for "{searchQuery}"</p>
     {:else}
-      <p>{customText}</p>
+      <p class="ellipsis px-4">{customText}</p>
     {/if}
   </div>
 </div>

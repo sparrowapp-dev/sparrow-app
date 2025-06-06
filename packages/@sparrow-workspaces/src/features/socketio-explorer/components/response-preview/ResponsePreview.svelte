@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Editor } from "@sparrow/library/forms";
   import type { SocketIORequestMessageTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
+  import * as Sentry from "@sentry/svelte";
 
   export let webSocket;
   let message = "";
@@ -25,7 +26,9 @@
           return "\n";
         }
         messageData = `${parse[1]}`;
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
 
       return messageData;
     }

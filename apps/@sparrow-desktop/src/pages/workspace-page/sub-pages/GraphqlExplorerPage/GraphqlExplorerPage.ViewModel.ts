@@ -70,6 +70,7 @@ import {
 import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import { parse, GraphQLError } from "graphql";
 import constants from "@app/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 class GraphqlExplorerViewModel {
   /**
@@ -1082,6 +1083,9 @@ class GraphqlExplorerViewModel {
     _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
     isFailedNotificationVisible: boolean = true,
   ) => {
+    const componentData = this._tab.getValue()
+    const tabId = componentData?.tabId;
+    startLoading(tabId + "fetchGraphqlSchema");
     const decodeData = this._decodeGraphql.init(
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
       _environmentVariables,
@@ -1172,6 +1176,7 @@ class GraphqlExplorerViewModel {
             progressiveTab,
           );
           notifications.success("Schema fetched successfully.");
+          stopLoading(tabId + "fetchGraphqlSchema");
         })
         .catch(async (error) => {
           console.error(error);
@@ -1188,6 +1193,7 @@ class GraphqlExplorerViewModel {
               "Failed to fetch schema. Please check the URL and try again.",
             );
           }
+          stopLoading(tabId + "fetchGraphqlSchema");
         });
     } catch (error) {
       console.error(error);
@@ -1203,6 +1209,7 @@ class GraphqlExplorerViewModel {
           "Failed to fetch schema. Please check the URL and try again.",
         );
       }
+      stopLoading(tabId + "fetchGraphqlSchema");
     }
   };
 

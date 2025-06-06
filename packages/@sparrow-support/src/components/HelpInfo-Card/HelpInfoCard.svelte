@@ -2,6 +2,7 @@
   import Upvote from "../Upvote.svelte";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { Tag } from "@sparrow/library/ui";
 
   export let status;
   export let setPostId;
@@ -10,22 +11,20 @@
 <div>
   {#each status as status}
     <div
-      class="p-2 review-card"
+      class="p-2 py-0 review-card"
       on:click={() => {
         setPostId("feedback", status.id);
         MixpanelEvent(Events.Roadmap_Feedback_Link);
       }}
     >
-      <div class=" d-flex justify-content-between align-items-center">
-        <div class="test">
+      <div class=" d-flex justify-content-between">
+        <div class="test d-flex flex-column">
           <p
-            class="card-title pb-0 mb-0 ellipsis text-ds-font-size-14 text-ds-font-weight-medium"
+            class="card-title pb-0 mb-0 ellipsis text-ds-font-size-12 text-ds-font-weight-semi-bold"
           >
             {status.title}
           </p>
-          <span class="category"
-            >{status?.category?.name || "Uncategorized"}</span
-          >
+          <Tag text={status?.category?.name || "Uncategorized"} />
         </div>
 
         <Upvote isHoverRequired={false} upvote={status.score} />
@@ -43,28 +42,19 @@
     text-decoration: underline;
   }
   .review-card {
-    height: 62px;
-    background-color: var(--background-dark);
+    height: 66px;
+    background-color: var(--bg-ds-surface-600);
     color: #fff;
     margin: 10px 0;
-    border-radius: 3px;
-    border: 1px solid var(--border-secondary-295);
+    border-radius: 4px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     margin-bottom: 22px;
   }
 
-  .category {
-    background-color: var(--bg-secondary-330);
-    padding: 2px 5px 2px 5px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 500;
-    color: #e0e0e0;
-  }
-
   .test {
-    width: calc(100% - 40px);
+    width: calc(100% - 70px);
+    gap: 6px;
   }
 </style>

@@ -19,7 +19,16 @@ export { handleDownloadResponse } from "./handle-downlod-rest";
 export { Sleep } from "./sleep";
 export { Base64Converter } from "./base64Converter";
 export { InitSavedRequestTab } from "./init-saved-request";
+export { InitMockRequestTab } from "./init-mock-request";
+export { InitHubTab } from "./init-hub-tab";
 export { StatusCode } from "./status-code";
+export {
+  handleEventonClickApplyChangesAI,
+  handleEventOnClickApplyUndoAI,
+  handleEventOnClickDynamicExpressionButton,
+  handleEventOnOpenDE,
+} from "./events";
+export { InitAiRequestTab } from "./init-ai-request-tab";
 export * from "./auth.helper";
 export * from "./common.helper";
 export * from "./conversion.helper";

@@ -3,6 +3,7 @@ import {
   workspaceLevelPermissions,
   workspaceLevelRolePermisson,
 } from "../constants/permissions.constant";
+import * as Sentry from "@sentry/svelte";
 //get path for url
 export function getPathFromUrl(url: string) {
   try {

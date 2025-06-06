@@ -6,6 +6,8 @@ import {
   copyToClipBoard,
   createDeepCopy,
   Debounce,
+  InitHubTab,
+  moveNavigation,
   throttle,
 } from "@sparrow/common/utils";
 import type {
@@ -30,6 +32,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { WorkspaceTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
+import { TeamService } from "@app/services/team.service";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -42,6 +45,7 @@ export default class WorkspaceExplorerViewModel {
 
   private workspaceService = new WorkspaceService();
   private updatesService = new UpdatesService();
+  private teamService = new TeamService();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
@@ -320,7 +324,7 @@ export default class WorkspaceExplorerViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} person for ${_workspaceName}.`,
       );
     } else {
       notifications.error(`Failed to send invite. Please try again.`);
@@ -572,11 +576,6 @@ export default class WorkspaceExplorerViewModel {
         progressiveTab.id,
         updatedata,
       );
-      notifications.success(
-        `Workspace published! ‘${progressiveTab.name}’ is now public.`,
-      );
-    } else {
-      notifications.error("Failed. The workspace could not be published.");
     }
     return response;
   };
@@ -586,6 +585,19 @@ export default class WorkspaceExplorerViewModel {
     await copyToClipBoard(
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
     );
-    notifications.success("Link Copied.");
+    notifications.success("Link copied to clipboard.");
+  };
+
+  public handleHubTabCreation = async (teamId: string, workspaceId: string) => {
+    const team = await this.teamService.fetchPublicTeam(teamId);
+    if (team.isSuccessful && team?.data?.data) {
+      const teamData = team.data.data;
+      const hubTab = new InitHubTab(teamData._id, workspaceId);
+      hubTab.updateName(teamData.name);
+      hubTab.updateDescription(teamData.description);
+      hubTab.updateHubProperty(teamData);
+      await this.tabRepository.createTab(hubTab.getValue());
+      moveNavigation("right");
+    }
   };
 }

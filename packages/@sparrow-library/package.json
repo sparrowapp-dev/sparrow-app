@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/library",
-  "version": "2.22.0",
+  "version": "2.25.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -22,7 +22,8 @@
     "./utils": "./src/utils/index.ts",
     "./ui/list/types": "./src/ui/list/types.ts",
     "./styles": "./src/styles/style.scss",
-    "./fluent-icons": "./src/fluent-icons/FluentSystemIcons-Resizable.css"
+    "./fluent-icons": "./src/fluent-icons/FluentSystemIcons-Resizable.css",
+    "./fluent-icons-regular": "./src/fluent-icons/FluentSystemIcons-Regular.css"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",

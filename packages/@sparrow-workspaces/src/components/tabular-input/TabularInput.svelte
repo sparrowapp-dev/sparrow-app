@@ -1,18 +1,28 @@
 <script lang="ts">
-  import type {
-    KeyValuePair,
-    KeyValuePairWithBase,
-  } from "@sparrow/common/interfaces/request.interface";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
-  import { onMount } from "svelte";
+  import { afterUpdate, onMount } from "svelte";
   import { Tooltip, Button, notifications } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
-  import { ErrorInfoIcon, Information } from "@sparrow/library/icons";
+  import {
+    ErrorInfoIcon,
+    Information,
+    CheckMarkIcon,
+    ArrowUndoRegular,
+    ArrowUpFilled,
+    ArrowDownRegular,
+  } from "@sparrow/library/icons";
   import BulkEditEditor from "./sub-component/BulkEditEditor.svelte";
   import LazyElement from "./LazyElement.svelte";
   import { Toggle } from "@sparrow/library/ui";
+  import {
+    handleEventOnClickApplyUndoAI,
+    handleEventonClickApplyChangesAI,
+  } from "@sparrow/common/utils";
 
   export let environmentVariables;
+  export let handleOpenCurrentDynamicExpression;
+
   export let onUpdateEnvironment;
   export let onToggleBulkEdit;
   export let isBulkEditActive = false;
@@ -22,6 +32,7 @@
   export let isTopHeaderRequired = true;
   export let isInputBoxEditable = true;
   export let bulkEditPlaceholder = "";
+  export let dynamicExpression = false;
   // export let type: "file" | "text" = "text";
 
   // exports
@@ -42,6 +53,11 @@
   let pairs: KeyValuePair[] = keyValue;
   let controller: boolean = false;
 
+  // New variables for diff navigation
+  let changedPairIndices: number[] = [];
+  let currentChangeIndex = 0;
+  let totalChanges = 0;
+
   let bulkText = "";
   let diffBulkText = ""; // contains new modified content for comparision for bulk editor
   let bulkToggle = isBulkEditActive;
@@ -51,6 +67,20 @@
 
   let isValidSyntax = true;
   let pairsContainer: HTMLElement;
+
+  // This is a flag to determine if we should scroll to the bottom
+  let shouldScrollToBottom = false;
+
+  // This is for scrolling into view when a new row is added and the component updates
+  afterUpdate(() => {
+    if (shouldScrollToBottom && pairsContainer) {
+      const lastRow = pairsContainer.lastElementChild;
+      if (lastRow) {
+        lastRow.scrollIntoView({ behavior: "auto", block: "end" });
+      }
+      shouldScrollToBottom = false;
+    }
+  });
 
   const theme = new TabularInputTheme().build();
 
@@ -190,13 +220,6 @@
       currentIndex: result.length - 1,
     };
 
-    isMergeViewLoading = false;
-
-    // Check for changes after calculating diff
-    setTimeout(() => {
-      checkForChanges();
-    }, 0);
-
     return [...result, lastEmptyRow];
   }
 
@@ -217,6 +240,8 @@
 
     // Update hasChanges state
     hasChanges = changes.length > 0;
+
+    updateChangedIndices(); // Update changed indices for navigation
 
     if (!hasChanges) {
       undoChanges(); // resetting the mergeview states and props
@@ -250,6 +275,16 @@
     diffPairs = calculateDiff();
     diffBulkText = diffPairsToBulkText();
     checkForChanges();
+    isMergeViewLoading = false;
+
+    // If there are changes, scroll to the first one automatically
+    if (totalChanges > 0) {
+      currentChangeIndex = 0;
+
+      setTimeout(() => {
+        scrollToChange(changedPairIndices[0]);
+      }, 200);
+    }
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 
@@ -298,8 +333,12 @@
     newModifiedPairs = [];
     hasChanges = false; // Reset after applying changes
 
+    currentChangeIndex = 0;
+    totalChanges = 0;
+
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventonClickApplyChangesAI("TabularInput", "headers && parameters");
   };
 
   // Function to undo all changes and revert to original state
@@ -311,9 +350,13 @@
     callback(pairs); // Notify parent of unchanged data
     hasChanges = false; // Reset hasChanges after undoing changes
 
+    currentChangeIndex = 0;
+    totalChanges = 0;
+
     isMergeViewLoading = true;
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventOnClickApplyUndoAI("TabularInput", "headers && parameters");
   };
 
   // Utility function to create a delay
@@ -363,20 +406,6 @@
     }
   };
 
-  /**
-   * Scrolls the container to bring the newly added row into view
-   */
-  const scrollToNewRow = async () => {
-    setTimeout(() => {
-      if (pairsContainer) {
-        const lastRow = pairsContainer.lastElementChild;
-        if (lastRow) {
-          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-      }
-    }, 0);
-  };
-
   const updateParam = async (index: number): Promise<void> => {
     pairs = pairs;
     if (
@@ -389,6 +418,7 @@
     ) {
       pairs[pairs.length - 1].checked = true;
       pairs.push({ key: "", value: "", checked: false });
+      shouldScrollToBottom = true;
       pairs = pairs;
       callback(pairs);
 
@@ -398,8 +428,6 @@
         diffBulkText = diffPairsToBulkText(); // ToDo: Calculate only if Bulk Edit mode is active (change in every place)
         checkForChanges();
       }
-
-      await scrollToNewRow();
     } else {
       callback(pairs);
     }
@@ -500,6 +528,12 @@
     if (event.target.checked) {
       handleBulkTextUpdate();
       diffBulkText = diffPairsToBulkText();
+    } else {
+      if (showMergeView) {
+        setTimeout(() => {
+          scrollToChange(changedPairIndices[currentChangeIndex]);
+        }, 30);
+      }
     }
   };
 
@@ -557,6 +591,237 @@
   const handleAutoGeneratedInfoHover = () => {
     isAutoGeneratedInfoHovered = !isAutoGeneratedInfoHovered;
   };
+
+  // ********** Diff/Merge Navigate & Accept per Line - Start ********
+  /**
+   * Update indices of changed rows for navigation
+   */
+  function updateChangedIndices(): void {
+    changedPairIndices = [];
+
+    for (let i = 0; i < diffPairs.length; i++) {
+      if (
+        diffPairs[i].diffType === "deleted" &&
+        diffPairs[i + 1] &&
+        diffPairs[i + 1].diffType === "modified"
+      ) {
+        changedPairIndices.push(i);
+        i += 1; // Skip the next one as it's part of the same group
+      } else if (
+        diffPairs[i].diffType === "added" ||
+        diffPairs[i].diffType === "deleted"
+      ) {
+        changedPairIndices.push(i);
+      }
+    }
+
+    totalChanges = changedPairIndices.length; // Update total changes and reset current index if needed
+
+    if (currentChangeIndex >= totalChanges) {
+      currentChangeIndex = totalChanges > 0 ? 0 : -1;
+    } else if (currentChangeIndex < 0 && totalChanges > 0) {
+      currentChangeIndex = 0;
+    }
+  }
+
+  /**
+   * Navigates to the next change in the diff view
+   */
+  function goToNextChange(): void {
+    if (totalChanges > 0) {
+      currentChangeIndex = (currentChangeIndex + 1) % totalChanges;
+      scrollToChange(changedPairIndices[currentChangeIndex]);
+    }
+  }
+
+  /**
+   * Navigates to the previous change in the diff view
+   */
+  function goToPreviousChange(): void {
+    if (totalChanges > 0) {
+      currentChangeIndex =
+        (currentChangeIndex - 1 + totalChanges) % totalChanges;
+      scrollToChange(changedPairIndices[currentChangeIndex]);
+    }
+  }
+
+  /**
+   * Scrolls to a specific row in the diff view
+   */
+  function scrollToChange(rowIndex: number): void {
+    if (pairsContainer && rowIndex >= 0) {
+      const rows = pairsContainer.querySelectorAll(".diff-row");
+
+      if (rows && rows[rowIndex]) {
+        // First, hide all diff-actions elements
+        rows.forEach((row) => {
+          // row.classList.remove("highlighted");
+
+          // Find the next sibling that has the diff-actions class
+          const diffActions = row.nextElementSibling?.classList.contains(
+            "diff-actions",
+          )
+            ? row.nextElementSibling
+            : null;
+
+          // Hide all diff-actions
+          if (diffActions) {
+            diffActions.style.display = "none";
+          }
+        });
+
+        rows[rowIndex].scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // Add the highlight class after a small delay to ensure scrolling has finished
+        setTimeout(() => {
+          // rows[rowIndex].classList.add("highlighted"); // Highlight the row
+
+          // Show the diff-actions for the highlighted row if it exists
+          const highlightedRowActions = rows[
+            rowIndex
+          ].nextElementSibling?.classList.contains("diff-actions")
+            ? rows[rowIndex].nextElementSibling
+            : null;
+
+          if (highlightedRowActions) {
+            highlightedRowActions.style.display = "flex";
+          }
+        }, 20);
+      }
+    }
+  }
+
+  /**
+   * Accept a specific change (either added or modified)
+   */
+  const acceptChange = async (index: number) => {
+    if (index < 0 || index >= diffPairs.length) return;
+
+    const change = diffPairs[index];
+    if (change.diffType === "added") {
+      // For added rows, add to original pairs
+      diffPairs[index].diffType = "unchanged";
+      const newPair = {
+        key: change.key,
+        value: change.value,
+        checked: change.checked || false,
+      };
+
+      // Add to pairs array (excluding the last empty row)
+      pairs = [
+        ...pairs.slice(0, -1),
+        newPair,
+        { key: "", value: "", checked: false },
+      ];
+    } else if (change.diffType === "deleted") {
+      const nextModifiedRow = diffPairs[index + 1];
+      if (nextModifiedRow && nextModifiedRow.diffType === "modified") {
+        nextModifiedRow.diffType = "unchanged";
+
+        // Update the corresponding pair in pairs array
+        const pairIndex = pairs.findIndex((p) => p.key === change.key);
+        if (pairIndex !== -1) {
+          pairs[pairIndex] = {
+            key: nextModifiedRow.key,
+            value: nextModifiedRow.value,
+            checked: nextModifiedRow.checked || false,
+          };
+          pairs = [...pairs]; // Trigger reactivity
+        }
+      }
+
+      const deletedIndex = diffPairs.findIndex(
+        (p) => p.diffType === "deleted" && p.key === change.key,
+      );
+
+      if (deletedIndex !== -1) {
+        diffPairs.splice(deletedIndex, 1);
+        diffPairs = [...diffPairs]; // Trigger reactivity
+      }
+    }
+
+    // ToDo: Will remove these setTimeouts whiling pushing to production
+    // setTimeout(() => {
+
+    updateChangedIndices(); // Update navigation indices
+    diffBulkText = diffPairsToBulkText(); // Update both diff bulk text and regular bulk text
+    // bulkText = pairsToBulkText(pairs);
+
+    callback(pairs); // Notify parent of changes
+
+    // If no more changes, potentially disable merge view
+    if (totalChanges === 0) {
+      isMergeViewLoading = true;
+      await sleep(2000);
+      showMergeView = false;
+      hasChanges = false;
+      isMergeViewLoading = false;
+    }
+    // }, 200); // Reduced timeout for better responsiveness
+
+    scrollToChange(changedPairIndices[0]);
+  };
+
+  /**
+   * Reject a specific change
+   */
+  const rejectChange = async (index: number) => {
+    if (index < 0 || index >= diffPairs.length) return;
+
+    const change = diffPairs[index];
+    if (change.diffType === "added") {
+      diffPairs.splice(index, 1); // Remove the added entry from diffPairs
+      diffPairs = [...diffPairs]; // Trigger reactivity
+    } else if (change.diffType === "deleted") {
+      change.diffType = "unchanged"; // Keep the original entry by marking it as unchanged
+
+      // Find and remove the corresponding modified row if it exists
+      const nextModifiedRow = diffPairs[index + 1];
+      if (nextModifiedRow && nextModifiedRow.diffType === "modified") {
+        const deletedIndex = diffPairs.findIndex(
+          (p) => p.diffType === "modified" && p.key === change.key,
+        );
+        if (deletedIndex !== -1) {
+          diffPairs.splice(deletedIndex, 1); // Remove the modified entry and keep the original
+
+          // Ensure the original entry is reflected in pairs array
+          const originalPair = {
+            key: change.key,
+            value: change.value,
+            checked: change.checked || false,
+          };
+
+          const pairIndex = pairs.findIndex((p) => p.key === change.key);
+          if (pairIndex !== -1) {
+            pairs[pairIndex] = originalPair;
+            pairs = [...pairs]; // Trigger reactivity
+          }
+        }
+      }
+      diffPairs = [...diffPairs]; // Trigger reactivity
+    }
+
+    // setTimeout(() => {
+
+    updateChangedIndices(); // Update navigation indices
+    diffBulkText = diffPairsToBulkText(); // Update both diff bulk text and regular bulk text
+    // bulkText = pairsToBulkText(pairs);
+    callback(pairs); // Notify parent of changes
+
+    // If no more changes, potentially disable merge view
+    if (totalChanges === 0) {
+      isMergeViewLoading = true;
+      await sleep(2000);
+      showMergeView = false;
+      hasChanges = false;
+      isMergeViewLoading = false;
+    }
+    // }, 200); // Reduced timeout for better responsiveness
+
+    scrollToChange(changedPairIndices[0]);
+  };
+
+  // ********** Diff/Merge Navigate & Accept per Line - End **********
 </script>
 
 <div>
@@ -577,7 +842,10 @@
           />
         </div>
 
-        <div class="d-flex gap-0" style="width: calc(100% - 188px);">
+        <div
+          class="d-flex gap-0"
+          style="width: calc(100% - {dynamicExpression ? '220px' : '188px'});"
+        >
           <div
             class="w-50 position-relative header-text"
             style="padding-left: 6px;"
@@ -639,6 +907,8 @@
             deleteParam={() => {}}
             isInputBoxEditable={false}
             isCheckBoxEditable={false}
+            {dynamicExpression}
+            {handleOpenCurrentDynamicExpression}
           />
         {/if}
 
@@ -662,19 +932,83 @@
               isInputBoxEditable={false}
               isCheckBoxEditable={true}
               customClass={`diff-row diff-${element.diffType}`}
+              {dynamicExpression}
+              {handleOpenCurrentDynamicExpression}
             />
             <!-- isInputBoxEditable={element.diffType !== "deleted"} -->
             <!-- isCheckBoxEditable={element.diffType !== "deleted"} -->
+
+            <!-- Add Accept/Reject buttons for each changed row -->
+            {#if element.diffType === "added" || element.diffType === "deleted"}
+              <div class="diff-actions">
+                <button
+                  class="diff-action-btn accept"
+                  on:click|stopPropagation={() => acceptChange(index)}
+                >
+                  <CheckMarkIcon color="white" size="16px" />
+                </button>
+                <button
+                  class="diff-action-btn reject"
+                  on:click|stopPropagation={() => rejectChange(index)}
+                >
+                  <ArrowUndoRegular color="white" size="16px" />
+                </button>
+              </div>
+            {/if}
           {/each}
 
-          <div class="d-flex justify-content-end mt-3 me-0 gap-2">
+          <div
+            class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns"
+          >
             <Button
-              title={"Keep the Changes!!"}
+              title={"Keep the Changes"}
+              size={"small"}
               type={"primary"}
               onClick={applyChanges}
             ></Button>
-            <Button title={"Undo"} type={"secondary"} onClick={undoChanges}
+            <Button
+              title={"Undo"}
+              size={"small"}
+              type={"secondary"}
+              onClick={undoChanges}
             ></Button>
+
+            <!-- MergeView Navigation controls - Old -->
+            <div class="merge-view-navigation">
+              <div class="merge-navigation-counter-wrapper">
+                <div class="merge-navigation-controls">
+                  <span class="merge-nav-counter">
+                    {totalChanges === 0
+                      ? "0 of 0"
+                      : `${currentChangeIndex + 1} of ${totalChanges}`}
+                  </span>
+
+                  <button
+                    class="merge-nav-button"
+                    on:click={goToPreviousChange}
+                    disabled={totalChanges === 0}
+                    title="Previous change (Alt+Up)"
+                  >
+                    <ArrowUpFilled
+                      size={"16px"}
+                      color={"var(--bg-ds-neutral-100)"}
+                    />
+                  </button>
+
+                  <button
+                    class="merge-nav-button"
+                    on:click={goToNextChange}
+                    disabled={totalChanges === 0}
+                    title="Next change (Alt+Down)"
+                  >
+                    <ArrowDownRegular
+                      size={"16px"}
+                      color={"var(--bg-ds-neutral-100)"}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         {:else}
           {#each pairs as element, index (index)}
@@ -690,6 +1024,8 @@
               {deleteParam}
               {isInputBoxEditable}
               {isCheckBoxEditable}
+              {dynamicExpression}
+              {handleOpenCurrentDynamicExpression}
             />
           {/each}
         {/if}
@@ -799,6 +1135,7 @@
               bind:isMergeViewLoading
               bind:isMergeViewEnabled={showMergeView}
               bind:newModifiedContent={diffBulkText}
+              handleOpenDE={handleOpenCurrentDynamicExpression}
             />
           {/if}
         </div>
@@ -831,6 +1168,32 @@
     align-items: center;
   }
 
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 10px;
+  }
+
+  .diff-actions {
+    position: absolute;
+    right: 12px;
+    transform: translateY(-103%);
+    /* display: flex; */
+    display: none;
+    /* gap: 4px; */
+    align-items: center;
+    background-color: var(--bg-ds-primary-400);
+  }
+
+  .diff-action-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background-color: transparent;
+  }
+  .diff-action-btn:hover {
+    background-color: var(--bg-ds-primary-500);
+  }
+
   /* Diff/Merge View: Style for new row added */
   :global(.diff-row.diff-added) {
     /* background-color: #113b21 !important ; */
@@ -847,5 +1210,74 @@
   :global(.diff-row.diff-deleted) {
     /* background-color: #3d1514 !important; */
     background-color: var(--bg-ds-danger-800) !important;
+  }
+
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 4px;
+  }
+
+  :global(.highlighted) {
+    border: 1px solid goldenrod !important;
+  }
+
+  /* Merge View Navigation Styles */
+  .merge-view-navigation {
+    display: inline-flex;
+    align-items: center;
+    /* margin-right: 12px; */
+  }
+
+  .merge-navigation-counter-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .merge-navigation-controls {
+    display: flex;
+    align-items: center;
+    height: 28px;
+    border: 1px solid var(--bg-ds-surface-400);
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-400);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .merge-nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 100%;
+    color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  .merge-nav-button:hover:not(:disabled) {
+    background-color: var(--bg-ds-surface-200);
+  }
+
+  .merge-nav-button:active:not(:disabled) {
+    background-color: var(--bg-ds-surface-200);
+  }
+
+  /* .merge-nav-button:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+  } */
+
+  .merge-nav-counter {
+    /* padding: 0 10px; */
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+    min-width: 60px;
+    text-align: center;
+    user-select: none;
   }
 </style>

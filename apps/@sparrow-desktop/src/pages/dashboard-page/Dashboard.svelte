@@ -41,6 +41,8 @@
     SidebarItemIdEnum,
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import { GlobalSearch } from "@sparrow/common/features";
+  import * as Sentry from "@sentry/svelte";
+  import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -56,6 +58,8 @@
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
   let collectionDocuments: Observable<CollectionDocument[]>;
+  let recentVisitedWorkspaces: Observable<RecentWorkspaceDocument[]> =
+    _viewModel.recentVisitedWorkspaces;
 
   let currentEnvironment = {
     id: "none",
@@ -95,6 +99,7 @@
   let currentWorkspaceName = "";
   let currentTeamName = "";
   let currentTeamId = "";
+  let currentWorkspaceType = "";
   let selectedType = "";
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -104,6 +109,7 @@
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
+        currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -225,7 +231,10 @@
     if (guestUser?.isBannerActive) {
       isLoginBannerActive = guestUser?.isBannerActive;
     }
-    if (!guestUser) await _viewModel.connectWebSocket();
+
+    // Connect websocket for guest users also for AI testing tab -> (while rest api chatbot will be disabled from UI)
+    await _viewModel.connectWebSocket();
+
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
@@ -288,6 +297,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
+      Sentry.captureException(e);
       notifications.error("Update Failed.");
       console.error(e);
     } finally {
@@ -313,6 +323,13 @@
       route: "collections",
       heading: "Workspace",
       disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.MARKETPLACE,
+      route: "marketplace",
+      heading: "Marketplace",
+      disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
@@ -568,6 +585,7 @@
     {currentWorkspaceName}
     {currentTeamName}
     {currentTeamId}
+    {currentWorkspaceType}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
@@ -581,6 +599,7 @@
     onSearchClick={handleViewGlobalSearch}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
+    recentVisitedWorkspaces={$recentVisitedWorkspaces}
   />
 
   <!--
@@ -633,6 +652,10 @@
 
       <!-- Route for Team and workspaces - Home Tab -->
       <Route path="/home/*"><Teams /></Route>
+
+      <Route path="/marketplace/*">
+        <MarketplacePage />
+      </Route>
 
       <!-- Route for Help -->
       <Route path="/help/*"><HelpPage /></Route>

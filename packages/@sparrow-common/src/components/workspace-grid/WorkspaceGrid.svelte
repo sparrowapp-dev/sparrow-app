@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { ThreeDotIcon } from "@sparrow/library/assets";
-  import { formatDateInString } from "../../utils/workspacetimeUtils";
   import { onDestroy } from "svelte";
   import Card from "../card/Card.svelte";
   import MenuView from "../menu-view/MenuView.svelte";
   import {
     ArrowForward,
     GlobeRegular,
+    LinkRegular,
     LockClosedRegular,
+    StatusSuccess,
   } from "@sparrow/library/icons";
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   // import Tags from "@sparrow-library/src/ui/tags/Tags.svelte";
   import { Tag } from "@sparrow/library/ui";
   import { WorkspaceType } from "@sparrow/common/enums";
+  import { Tooltip } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -21,6 +23,7 @@
   export let onAddMember;
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
+  export let onCopyLink;
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -28,6 +31,8 @@
   let menuItems = [];
   let noOfColumns = 180;
   let noOfRows = 3;
+  let isWorkspaceLinkCopied = false;
+  export let cardType: "teams" | "marketplace" = "teams";
 
   const handleOpenWorkspace = async () => {
     onSwitchWorkspace(workspace._id);
@@ -135,16 +140,60 @@
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
     cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
   >
-    <button
-      bind:this={workspaceTabWrapper}
-      class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center position-absolute {showMenu
-        ? 'threedot-active'
-        : ''}"
-      style="top:26px; right:15px;"
-      on:click={(e) => rightClickContextMenu(e)}
-    >
-      <MoreVerticalRegular />
-    </button>
+    <div class="d-flex gap-1 position-absolute" style="top:20px; right:16px;">
+      {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+        {#if isWorkspaceLinkCopied}
+          <div
+            class="border-0 rounded d-flex justify-content-center align-items-center justify-content-center p-2 public-link-icon"
+          >
+            <StatusSuccess
+              height="14"
+              width="14"
+              color="var(--icon-ds-success-400)"
+            />
+          </div>
+        {:else}
+          <div
+            class="border-0 rounded d-flex justify-content-center align-items-center public-link-icon"
+          >
+            <Tooltip
+              placement="top-center"
+              distance={10}
+              title="Copy Public Link"
+            >
+              <Button
+                startIcon={LinkRegular}
+                type={"teritiary-regular"}
+                size={"small"}
+                onClick={async () => {
+                  await onCopyLink(workspace._id);
+                  isWorkspaceLinkCopied = true;
+                  setTimeout(() => {
+                    isWorkspaceLinkCopied = false;
+                  }, 2000);
+                }}
+              />
+            </Tooltip>
+          </div>
+        {/if}
+      {/if}
+
+      {#if cardType === "teams"}
+        <div
+          class="threedot-icon-container border-0 rounded d-flex justify-content-center align-items-center {showMenu
+            ? 'threedot-active'
+            : ''}"
+          bind:this={workspaceTabWrapper}
+        >
+          <Button
+            type={"teritiary-regular"}
+            size={"small"}
+            startIcon={MoreVerticalRegular}
+            onClick={(e) => rightClickContextMenu(e)}
+          />
+        </div>
+      {/if}
+    </div>
     <div
       class="bg-tertiary-750 workspace-card p-4"
       tabindex="0"
@@ -156,40 +205,62 @@
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
-      <div class="d-flex" style="justify-content: space-between;">
-        {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
-          <Tag
-            text={WorkspaceType.PUBLIC}
-            type="green"
-            endIcon={GlobeRegular}
-          />
-        {:else}
-          <Tag
-            text={WorkspaceType.PRIVATE}
-            type="cyan"
-            endIcon={LockClosedRegular}
-          />
-        {/if}
-      </div>
+      <div>
+        <div class="d-flex flex-column" style="gap: 10px">
+          {#if cardType === "teams"}
+            <div class="d-flex" style="justify-content: space-between;">
+              {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
+                <Tag
+                  text={WorkspaceType.PUBLIC}
+                  type="green"
+                  endIcon={GlobeRegular}
+                />
+              {:else}
+                <Tag
+                  text={WorkspaceType.PRIVATE}
+                  type="cyan"
+                  endIcon={LockClosedRegular}
+                />
+              {/if}
+            </div>
+          {/if}
 
-      <div
-        class="d-flex overflow-hidden justify-content-between"
-        style={isWebEnvironment ? "width:calc(100% - 130px);" : ""}
-      >
-        <h4 class="ellipsis overflow-hidden me-4">
-          <span
-            class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium"
-            style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
+          <div
+            class="d-flex overflow-hidden justify-content-between"
+            style={isWebEnvironment ? "width:calc(100% - 60px);" : ""}
           >
-        </h4>
+            <div
+              class="ellipsis overflow-hidden"
+              style={`
+                  ${cardType === "teams" ? "margin-bottom: 8px" : ""}
+                `}
+            >
+              <span
+                class="text-ds-font-size-20 text-ds-line-height-150 text-ds-font-weight-medium"
+                style=" color:var(--text-ds-neutral-50)">{workspace.name}</span
+              >
+            </div>
+          </div>
+        </div>
       </div>
+      {#if cardType != "teams"}
+        <span
+          class="ellipsis overflow-hidden text-ds-font-size-12 text-ds-font-weight-semi-bold"
+          style="color: var(--text-ds-primary-300); display: block; margin-bottom: 5px; margin-top:3px;"
+          >By {workspace.team.name}</span
+        >
+      {/if}
       <p
         class="teams-workspace__para mb-1"
         style={`${
           showMenu ? "color: var(--sparrow-text-color) !important;" : null
         }`}
       >
-        <span>{workspace?.collections?.length ?? 0}</span>
+        <span
+          >{cardType === "teams"
+            ? workspace?.collections?.length
+            : (workspace?.collection?.length ?? 0)}</span
+        >
         <span
           class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
           style="color:var(--text-secondary-200)"
@@ -203,6 +274,7 @@
       >
         {workspace?.description ? workspace.description : "No summary added"}
       </p>
+      <hr style="color: var(--border-ds-surface-50);" />
 
       <div class="d-flex justify-content-between">
         <p
@@ -213,7 +285,7 @@
         >
           <span
             class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-            style=" color:var(--text-secondary-200)"
+            style=" color:var(--text-secondary-200); margin-right: 5px;"
             >Last updated
           </span><span
             class="text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold"
@@ -222,7 +294,7 @@
           >
         </p>
 
-        {#if isWebEnvironment}
+        {#if isWebEnvironment && !workspace?.isShared && cardType === "teams"}
           <button
             class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
             on:click|stopPropagation={() => {
@@ -298,6 +370,10 @@
     visibility: hidden;
     background-color: transparent;
   }
+  .public-link-icon {
+    visibility: hidden;
+    background-color: transparent;
+  }
   .workspace-card-outer:hover .threedot-icon-container {
     visibility: visible;
   }
@@ -306,6 +382,16 @@
   }
   .threedot-icon-container:active {
     background-color: var(--bg-tertiary-800) !important;
+  }
+  .workspace-card-outer:hover .public-link-icon {
+    visibility: visible;
+  }
+  .public-link-txt {
+    visibility: hidden;
+    background-color: transparent;
+  }
+  .workspace-card-outer:hover .public-link-txt {
+    visibility: visible;
   }
   .threedot-active {
     visibility: visible;

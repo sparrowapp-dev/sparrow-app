@@ -154,7 +154,9 @@ export class EnvironmentRepository {
       .exec();
   };
 
-    public searchEnvironments = async (searchQuery: string): Promise<EnvironmentDocument[]> => {
+  public searchEnvironments = async (
+    searchQuery: string,
+  ): Promise<EnvironmentDocument[]> => {
     if (!searchQuery.trim()) {
       // If search query is empty, return recently updated environments
       return await RxDB.getInstance()
@@ -178,7 +180,6 @@ export class EnvironmentRepository {
       .exec();
   };
 
-
   public getRecentEnvironments = async (): Promise<EnvironmentDocument[]> => {
     return await RxDB.getInstance()
       .rxdb.environment.find({
@@ -186,6 +187,22 @@ export class EnvironmentRepository {
       })
       .exec();
   };
+
+  /* Remove environments by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter environments
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeEnvironmentsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.environment.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
+  };
 }
-
-

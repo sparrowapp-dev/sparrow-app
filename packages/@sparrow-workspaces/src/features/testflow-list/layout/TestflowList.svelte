@@ -140,11 +140,13 @@
   }
   $: $isExpandTestflow =
     $isDefaultTourGuideOpen === true ? true : $isExpandTestflow;
+
+  let isNewTestflowCreating = false;
 </script>
 
 <div
-  class={`d-flex flex-column  pt-0 px-1`}
-  style="font-weight: 500;margin-bottom:2px; "
+  class={`d-flex flex-column h-100 pt-0 px-1`}
+  style="font-weight: 500;"
   id="testflow-container"
 >
   <!-- 
@@ -195,7 +197,7 @@
       title={`Add ${TFDefaultEnum.NAME}`}
       placement={"bottom-center"}
       distance={13}
-      show={isHovered}
+      show={isHovered && !isNewTestflowCreating}
       zIndex={701}
     >
       <span
@@ -209,9 +211,12 @@
           customWidth={"24px"}
           type="teritiary-regular"
           startIcon={AddRegular}
-          onClick={(e) => {
+          disable={isNewTestflowCreating}
+          onClick={async (e) => {
             e.stopPropagation();
-            handleCreateTestflow(e);
+            isNewTestflowCreating = true;
+            await handleCreateTestflow(e);
+            isNewTestflowCreating = false;
           }}
         />
       </span>

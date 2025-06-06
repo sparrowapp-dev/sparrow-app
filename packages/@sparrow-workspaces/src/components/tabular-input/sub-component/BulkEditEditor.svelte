@@ -4,15 +4,18 @@
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import { EditorView } from "codemirror";
   import { createEventDispatcher } from "svelte";
-
   import {
     ViewPlugin,
     Decoration,
     placeholder as CreatePlaceHolder,
+    ViewUpdate,
+    type DecorationSet,
+    MatchDecorator,
+    WidgetType,
   } from "@codemirror/view";
-
-  import { unifiedMergeView } from "@codemirror/merge";
-  import { Button } from "@sparrow/library/ui";
+  import BulkEditorMergeView from "./BulkEditorMergeView.svelte";
+  import { DismissIcon, MathFormulaFunction } from "@sparrow/library/assets";
+  export let handleOpenDE;
 
   export let placeholder: string;
 
@@ -25,7 +28,6 @@
   export let isMergeViewEnabled = false;
   export let isMergeViewLoading = false;
   export let newModifiedContent: string = ""; // New content to show in merge view
-  let previousMergeViewState = isMergeViewEnabled;
   let originalContent = value; // Store the original content for comparison
 
   const dispatch = createEventDispatcher();
@@ -36,21 +38,181 @@
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
-  // Create merge extension
-  function createMergeExtension(original: string) {
-    return unifiedMergeView({
-      original: original,
-      highlightChanges: true,
-      gutter: false,
-      mergeControls: false,
-    });
-  }
-
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
     const userInput = update.state.doc.toString();
     dispatch("change", userInput);
   });
+
+  /**
+   * Widget to render the dynamic expression.
+   */
+  class ExpressionWidget extends WidgetType {
+    constructor(
+      readonly name: string,
+      readonly from: number,
+      readonly to: number,
+    ) {
+      super();
+    }
+
+    toDOM(view: EditorView) {
+      const imgWrapper = document.createElement("span");
+      imgWrapper.className = "cm-expression-block-img";
+      const img = document.createElement("img");
+      img.src = MathFormulaFunction;
+      img.alt = "Expression Icon";
+      imgWrapper.appendChild(img);
+
+      const container = document.createElement("span");
+      container.className = "cm-expression-block";
+
+      const text = document.createElement("span");
+      text.textContent = this.name;
+
+      const close = document.createElement("span");
+      close.className = "cm-expression-block-close-span";
+
+      const closeIcon = document.createElement("img");
+      closeIcon.src = DismissIcon;
+      closeIcon.alt = "Expression Close Icon";
+      closeIcon.className = "cm-expression-block-close-img";
+      close.append(closeIcon);
+
+      close.onclick = (e) => {
+        const pos = view.posAtDOM(container);
+        e.stopPropagation();
+        view.dispatch({
+          changes: { from: pos, to: pos + this.to - this.from },
+        });
+      };
+
+      container.appendChild(imgWrapper);
+      container.appendChild(text);
+      container.appendChild(close);
+
+      container.onclick = (e) => {
+        const pos = view.posAtDOM(container);
+        e.stopPropagation();
+        const content = view.state.doc.sliceString(
+          pos,
+          pos + this.to - this.from,
+        );
+        handleOpenDE({
+          source: {
+            from: pos,
+            to: pos + this.to - this.from,
+            content,
+          },
+          dispatch: view,
+        });
+      };
+
+      // Handle dragging
+      container.setAttribute("draggable", "true");
+      container.addEventListener("dragstart", (e) => {
+        const pos = view.posAtDOM(container);
+        e.stopPropagation();
+        const content = view.state.doc.sliceString(
+          pos,
+          pos + this.to - this.from,
+        );
+        e.dataTransfer?.setData("application/x-expression", content);
+        e.dataTransfer?.setData("text/plain", content); // fallback
+        e.dataTransfer?.setData("text/from", String(pos));
+        e.dataTransfer?.setData("text/to", String(pos + this.to - this.from));
+      });
+      return container;
+    }
+
+    ignoreEvent() {
+      return true;
+    }
+  }
+
+  export const dragDropPlugin = ViewPlugin.fromClass(
+    class {
+      constructor(view: EditorView) {
+        this.view = view;
+
+        this.handleDrop = this.handleDrop.bind(this);
+        view.dom.addEventListener("drop", this.handleDrop);
+      }
+
+      handleDrop(event: DragEvent) {
+        event.preventDefault();
+
+        const content = event.dataTransfer?.getData("application/x-expression");
+        const from = parseInt(
+          event.dataTransfer?.getData("text/from") || "",
+          10,
+        );
+        const to = parseInt(event.dataTransfer?.getData("text/to") || "", 10);
+
+        if (!content || isNaN(from) || isNaN(to)) return;
+
+        const pos = this.view.posAtCoords({
+          x: event.clientX,
+          y: event.clientY,
+        });
+        if (pos == null) return;
+
+        if (pos >= from && pos <= to) return;
+      }
+
+      destroy() {
+        this.view.dom.removeEventListener("drop", this.handleDrop);
+      }
+    },
+  );
+
+  let currentIndex = 0;
+
+  /**
+   * Create regex matching pattern for the expression.
+   * @example [[expression]]
+   */
+
+  const expressionMatcher = new MatchDecorator({
+    regexp: /\[\*\$\[(.*?)\]\$\*\]/g,
+    decoration: (match) => {
+      return Decoration.replace({
+        widget: new ExpressionWidget(
+          match[1],
+          match.index,
+          match.index + match[0].length,
+        ),
+        inclusive: false,
+      });
+    },
+  });
+  /**
+   * Create a decoration set for the expression matcher.
+   * @param view - The editor view instance.
+   */
+  const expressionPlugin = ViewPlugin.fromClass(
+    class {
+      placeholders: DecorationSet;
+      constructor(view: EditorView) {
+        currentIndex = 0;
+        this.placeholders = expressionMatcher.createDeco(view);
+      }
+      update(update: ViewUpdate) {
+        currentIndex = 0;
+        this.placeholders = expressionMatcher.updateDeco(
+          update,
+          this.placeholders,
+        );
+      }
+    },
+    {
+      decorations: (instance) => instance.placeholders,
+      provide: (plugin) =>
+        EditorView.atomicRanges.of((view) => {
+          return view.plugin(plugin)?.placeholders || Decoration.none;
+        }),
+    },
+  );
 
   //  Define the key-value highlighting plugin
   const KEY_VALUE_REGEX = /([^:]+):(.+)/g;
@@ -104,6 +266,8 @@
       basicTheme,
       mergeConf.of([]), // Initialize empty merge compartment
       updateExtensionView,
+      expressionPlugin,
+      dragDropPlugin,
       EditorView.lineWrapping, // Enable line wrapping
       CreatePlaceHolder(placeholder),
     ];
@@ -128,115 +292,6 @@
     }
   }
 
-  // Update the merge view with current original content
-  function updateMergeView() {
-    if (codeMirrorView) {
-      codeMirrorView.dispatch({
-        effects: mergeConf.reconfigure(
-          isMergeViewEnabled ? [createMergeExtension(originalContent)] : [],
-        ),
-      });
-    }
-  }
-
-  /**
-   * Apply changes from the modified content
-   * This function accepts the changes and updates the original value
-   */
-  const applyChanges = () => {
-    if (!isMergeViewEnabled || !codeMirrorView) return;
-
-    const modifiedContent = codeMirrorView.state.doc.toString(); // Get the current modified content
-    value = modifiedContent; // Update the original value with the modified content
-    originalContent = modifiedContent; // Update internal state
-    // dispatch("applyChanges", modifiedContent); // Notify parent component of change
-
-    isMergeViewEnabled = false; // Exit merge view mode
-    newModifiedContent = ""; // reset the content
-    previousMergeViewState = false;
-    updateMergeView(); // Update the editor view
-  };
-
-  /**
-   * Undo changes and revert to the original content
-   * This function declines the changes and keeps the original value
-   */
-  const undoChanges = () => {
-    if (!isMergeViewEnabled || !codeMirrorView) return;
-
-    // Restore original content
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: originalContent,
-      },
-      annotations: [{ autoChange: true }],
-    });
-
-    // dispatch("undoChanges", originalContent); // Notify parent that changes were declined
-    isMergeViewEnabled = false; // Exit merge view mode
-    newModifiedContent = ""; // reset the content
-    previousMergeViewState = false;
-    updateMergeView(); // Update the editor view
-  };
-
-  // Handle changes to isMergeViewEnabled prop
-  $: if (codeMirrorView && isMergeViewEnabled !== previousMergeViewState) {
-    previousMergeViewState = isMergeViewEnabled;
-
-    if (isMergeViewEnabled) {
-      isMergeViewLoading = true;
-      originalContent = codeMirrorView.state.doc.toString(); // Store current content as original
-
-      // Apply new content if provided
-      if (newModifiedContent) {
-        codeMirrorView.dispatch({
-          changes: {
-            from: 0,
-            to: codeMirrorView.state.doc.length,
-            insert: newModifiedContent,
-          },
-          annotations: [{ autoChange: true }],
-        });
-        updateMergeView();
-
-        setTimeout(() => {
-          isMergeViewLoading = false;
-        }, 1000);
-      }
-    } else {
-      // If turning off merge view, restore original content
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: originalContent,
-        },
-        annotations: [{ autoChange: true }],
-      });
-    }
-
-    updateMergeView(); // Can be removed
-  }
-
-  // Handle changes to newModifiedContent when in merge view
-  $: if (codeMirrorView && isMergeViewEnabled && newModifiedContent) {
-    isMergeViewLoading = true;
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: newModifiedContent,
-      },
-      annotations: [{ autoChange: true }],
-    });
-    updateMergeView();
-    setTimeout(() => {
-      isMergeViewLoading = false;
-    }, 1000);
-  }
-
   afterUpdate(() => {
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
       codeMirrorView.dispatch({
@@ -252,7 +307,7 @@
 
   onMount(() => {
     initalizeCodeMirrorEditor(value);
-    originalContent = value;
+    // originalContent = value;
   });
 
   onDestroy(() => {
@@ -265,16 +320,19 @@
   bind:this={codeMirrorEditorDiv}
 />
 
-{#if !isMergeViewLoading && isMergeViewEnabled}
-  <div class="d-flex justify-content-end mt-3 me-0 gap-2">
-    <Button
-      title={"Keep the Changes"}
-      type={"primary"}
-      onClick={applyChanges}
-    />
-    <Button title={"Undo"} type={"secondary"} onClick={undoChanges} />
-  </div>
-{/if}
+<BulkEditorMergeView
+  {mergeConf}
+  {codeMirrorView}
+  bind:isMergeViewEnabled
+  bind:isMergeViewLoading
+  bind:newModifiedContent
+  bind:value
+  bind:originalContent
+  on:change={(e) => {
+    value = e.detail;
+    dispatch("change", e.detail); // Dispatch the new content to parent.
+  }}
+/>
 
 <style>
   .basic-codemirror-editor {
@@ -289,28 +347,5 @@
 
   :global(.value-highlight) {
     color: var(--white-color);
-  }
-
-  /* Merge view styles */
-  .merge-view :global(.cm-changedLine) {
-    /* background-color: #113b21; */
-    background: var(--bg-ds-success-800) !important;
-  }
-
-  .merge-view :global(.cm-deletedChunk) {
-    /* background-color: #3d1514; */
-    background-color: var(--bg-ds-danger-800) !important;
-  }
-
-  /* Specific styling for deleted text */
-  .merge-view :global(.cm-deletedText) {
-    /* background-color: #621b18; */
-    background-color: var(--bg-ds-danger-700) !important;
-  }
-
-  /* Specific styling for added text */
-  .merge-view :global(.cm-changedText) {
-    /* background: #14522e !important; */
-    background: var(--bg-ds-success-700) !important;
   }
 </style>

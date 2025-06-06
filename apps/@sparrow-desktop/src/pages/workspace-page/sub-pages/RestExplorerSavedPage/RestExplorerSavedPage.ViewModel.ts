@@ -68,6 +68,7 @@ import {
 import { InitTab } from "@sparrow/common/factory";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
 import constants from "@app/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 export class RestExplorerSavedViewModel {
   /**

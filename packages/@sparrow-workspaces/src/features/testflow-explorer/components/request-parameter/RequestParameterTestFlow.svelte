@@ -5,13 +5,14 @@
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums";
-  import { extractQueryParams } from "../../../../../../@sparrow-common/src/utils/testFlow.helper";
+
+  export let handleOpenCurrentDynamicExpression;
 
   export let requestUrl;
   export let params;
   export let environmentVariables;
   export let authParameter;
-  let isBulkEditRequired = false;
+  let isBulkEditRequired = true;
   export let onUpdateRequestState;
   export let isBulkEditActive;
   let bulkEditParamsPlaceholder =
@@ -33,11 +34,8 @@
     onUpdateRequestState("queryParams", pairs);
 
     const queryString = pairs
-      .filter((pair) => pair.key.trim() !== "" && pair.checked === true)
-      .map(
-        (pair) =>
-          `${encodeURIComponent(pair.key)}=${encodeURIComponent(pair.value)}`,
-      )
+      .filter((pair) => pair.checked === true)
+      .map((pair) => `${pair.key}=${pair.value}`)
       .join("&");
 
     const baseUrl = requestUrl.split("?")[0];
@@ -48,42 +46,8 @@
 
   const toggleBulkEdit = (value: boolean) => {
     MixpanelEvent(Events.Bulk_Edit_Parameters);
-    onUpdateRequestState({ isParameterBulkEditActive: value });
+    onUpdateRequestState("isParameterBulkEditActive", value);
   };
-
-  const setInitialParams = () => {
-    const urlParams = extractQueryParams(requestUrl);
-    const mergedArray = params;
-
-    // Add params only if key doesn't already exist
-    for (const param of urlParams) {
-      if (
-        param.key.trim() !== "" &&
-        !mergedArray.some(
-          (ele: object) => ele?.key.trim() !== param?.key.trim(),
-        )
-      ) {
-        mergedArray.push({
-          key: param.key,
-          value: param.value,
-          checked: param.checked,
-        });
-      }
-    }
-
-    // If nothing found, add an empty param
-    if (mergedArray.length === 0) {
-      queryParams = [{ key: "", value: "", checked: true }];
-    }
-
-    handleParamsChange(mergedArray);
-  };
-
-  onMount(() => {
-    if (requestUrl !== "") {
-      setInitialParams();
-    }
-  });
 </script>
 
 <section class="w-100" style="">
@@ -100,5 +64,9 @@
     callback={handleParamsChange}
     onUpdateEnvironment={() => {}}
     {environmentVariables}
+    dynamicExpression={true}
+    handleOpenCurrentDynamicExpression={(obj) => {
+      handleOpenCurrentDynamicExpression({ ...obj, type: "parameters" });
+    }}
   />
 </section>

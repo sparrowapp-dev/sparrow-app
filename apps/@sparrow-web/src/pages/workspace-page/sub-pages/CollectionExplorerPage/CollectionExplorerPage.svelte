@@ -26,6 +26,7 @@
   // Exports
   export let tab: TabDocument;
   export let onSyncCollection;
+  export let onMockCollectionModelOpen;
 
   // ViewModel initialization
   const _viewModel = new CollectionExplorerPage(tab);
@@ -122,6 +123,7 @@
         } else {
           isCollectionEditable = true;
         }
+        findUserRole();
       }
     },
   );
@@ -187,6 +189,8 @@
 </script>
 
 <CollectionExplorer
+  bind:userRole
+  {onMockCollectionModelOpen}
   {isCollectionEditable}
   onUpdateEnvironment={_viewModel.updateEnvironment}
   isWebApp={true}
@@ -206,4 +210,6 @@
   getLastUpdatedAndCount={_viewModel.getLastUpdatedAndCount}
   onUpdateCollectionState={_viewModel.updateCollectionState}
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
+  onUpdateRunningState={_viewModel.handleMockCollectionState}
+  currentWorkspace={currentWorkspace}
 />

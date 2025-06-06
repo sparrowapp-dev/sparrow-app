@@ -32,6 +32,10 @@
   import { leftIconIcon } from "@sparrow/library/assets";
   import { jwtDecode } from "@app/utils/jwt";
   import { handleLoginV2 } from "./sub-pages/login-page/login-page";
+  import * as Sentry from "@sentry/svelte";
+  import { identifyUser } from "@app/utils/posthog/posthogConfig";
+  import {policyConfig} from "@sparrow/common/store"
+
   let isEntry = false;
   let isHover = false;
   let externalSparrowLink =
@@ -123,30 +127,32 @@
       class=""
       style="display: flex ; flex-direction:column; align-items:center;"
     >
-      <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
-        <button
-          on:mousedown={() => (isPressed = true)}
-          on:mouseup={() => (isPressed = false)}
-          on:mouseleave={() => (isPressed = false)}
-          class="btn btn-primary w-100 border-0 {isPressed
-            ? 'shadow-pressed'
-            : 'shadow-none'}"
-          on:click={() => {
-            handleRedirect(true);
-            openDefaultBrowser();
-            isTokenFormEnabled = true;
-          }}
-          id="create_account_or_sign_in"
-        >
-          Login or Create</button
-        >
-      </div>
+      {#if $policyConfig.enableLogin}
+        <div class="d-flex" style="height:44px; width:100%; margin-top:44px;">
+          <button
+            on:mousedown={() => (isPressed = true)}
+            on:mouseup={() => (isPressed = false)}
+            on:mouseleave={() => (isPressed = false)}
+            class="btn btn-primary w-100 border-0 {isPressed
+              ? 'shadow-pressed'
+              : 'shadow-none'}"
+            on:click={() => {
+              handleRedirect(true);
+              openDefaultBrowser();
+              isTokenFormEnabled = true;
+            }}
+            id="create_account_or_sign_in"
+          >
+            Login or Create</button
+          >
+        </div>
 
-      <div class="divider w-100">
-        <span class="line"></span>
-        <span class="text" style="color:var(--text-secondary-200)">Or</span>
-        <span class="line"></span>
-      </div>
+        <div class="divider w-100">
+          <span class="line"></span>
+          <span class="text" style="color:var(--text-secondary-200)">Or</span>
+          <span class="line"></span>
+        </div>
+      {/if}
 
       <div class="d-flex" style="height:44px; width:100%;">
         <button
@@ -201,9 +207,9 @@
           on:blur={async () => {}}
         />
         {#if isTokenErrorMessage}
-          <div class="text-danger-200 text-fs-12 text-ds-line-height-100"
-            >The entered code is invalid or expired. Please enter a valid code.</div
-          >
+          <div class="text-danger-200 text-fs-12 text-ds-line-height-100">
+            The entered code is invalid or expired. Please enter a valid code.
+          </div>
         {/if}
       </div>
 
@@ -215,6 +221,8 @@
             const accessToken = params.get("accessToken");
             const refreshToken = params.get("refreshToken");
             const userDetails = jwtDecode(accessToken);
+
+            identifyUser(userDetails.email);
             const apiUrl = constants.API_URL;
             const userId = userDetails?._id;
             const userEmail = userDetails?.email;
@@ -286,10 +294,10 @@
       >
       <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
       <a
-      role="button"
-      on:click={async () => {
-        await open(constants.CANNY_FEEDBACK_URL);
-      }}
+        role="button"
+        on:click={async () => {
+          await open(constants.CANNY_FEEDBACK_URL);
+        }}
         class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
       >
     {:else}

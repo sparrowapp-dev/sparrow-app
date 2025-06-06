@@ -7,7 +7,7 @@
   } from "@sparrow/library/assets";
   import type { WorkspaceDocument } from "@app/database/database";
   import { Button, Spinner } from "@sparrow/library/ui";
-  import { WorkspaceGrid } from "@sparrow/teams/compopnents";
+  import { WorkspaceGrid } from "@sparrow/common/components";
   import { TeamSkeleton } from "../../images";
   import { SparrowLogo } from "@sparrow/common/icons";
   import {
@@ -16,6 +16,7 @@
     ChevronLeftRegular,
     ChevronRightRegular,
   } from "@sparrow/library/icons";
+  import { WorkspaceType } from "@sparrow/common/enums";
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -47,6 +48,9 @@
   export let isGuestUser = false;
 
   export let isWorkspaceCreationInProgress = false;
+  export let onCopyLink;
+  export let selectedFilter;
+
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -78,9 +82,9 @@
   // This will split workspaces into pages
   $: paginatedWorkspaces = (() => {
     if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 5);
+      return filteredWorkspaces.slice(0, 6);
     } else {
-      const startIndex = 5 + (currPage - 2) * 6;
+      const startIndex = 6 + (currPage - 2) * 6;
       return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
     }
   })();
@@ -88,13 +92,13 @@
   // This will calculate the total number of pages
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
-    if (total <= 5) return 1;
-    return Math.ceil((total - 5) / 6) + 1;
+    if (total <= 6) return 1;
+    return Math.ceil((total - 6) / 6) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 5 + (currPage - 2) * 6 + 1;
+  $: startIndex = currPage === 1 ? 1 : 6 + (currPage - 2) * 6 + 1;
   $: endIndex = Math.min(
-    currPage === 1 ? 5 : startIndex + 5,
+    currPage === 1 ? 6 : startIndex + 5,
     filteredWorkspaces.length,
   );
 
@@ -124,8 +128,33 @@
           {:else if searchQuery !== "" && filteredWorkspaces.length === 0}
             <span class="not-found-text mx-auto ellipsis">No result found.</span
             >
+          {:else if workspaces.length === 0}
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              {#if selectedFilter === WorkspaceType.PUBLIC}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  Welcome to Sparrow! Explore your public workspaces here.
+                </p>
+              {:else if selectedFilter === WorkspaceType.PRIVATE}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  Welcome to Sparrow! Explore your private workspaces here.
+                </p>
+              {:else}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  Welcome to Sparrow! Explore your all workspaces here.
+                </p>
+              {/if}
+            </div>
           {/if}
-          {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
+          <!-- {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
               class="sparrow-fs-16 col-lg-3 col-md-10 flex-grow-1 py-0 add-new-workspace"
               style="min-height: 132px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
@@ -143,7 +172,8 @@
                 >
               {/if}
             </div>
-          {/if}
+          {/if} -->
+
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
               {onAddMember}
@@ -153,6 +183,7 @@
               {onDeleteWorkspace}
               {openInDesktop}
               {isWebEnvironment}
+              {onCopyLink}
             />
           {/each}
         </div>
@@ -218,7 +249,8 @@
     flex-direction: column;
     align-items: center;
     height: 100%;
-    padding: 150px 35px 24px;
+    padding: 5%;
+    gap: 16px;
   }
   .tab-head {
     padding: 8px;

@@ -106,7 +106,7 @@ export class TestflowRepository {
     _testflows: TFRxDocumentType[],
   ): Promise<void> => {
     if ((_testflows?.length || 0) > 0) {
-      await this.rxdb?.bulkUpsert(_testflows);
+      await RxDB.getInstance()?.rxdb?.testflow?.bulkUpsert(_testflows);
     }
     return;
   };
@@ -198,5 +198,23 @@ export class TestflowRepository {
       .exec();
 
     return testflows;
+  };
+
+  /* Remove testflows by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter testflows
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeTestflowsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb?.testflow.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
   };
 }

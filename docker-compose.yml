@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   # MongoDB
   mongo:
@@ -26,11 +28,12 @@ services:
 
   # Sparrow Api Server
   sparrow-api:
-    image: sparrowapi/sparrow-api:v1
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-      - "9002:9002"
+    image: sparrowapi/sparrow-api:7
+    # Don't expose ports directly, as they'll be proxied through nginx
+    # ports:
+    #   - "9000:9000"
+    #   - "9001:9001"
+    #   - "9002:9002"
     networks:
       - localnet
     depends_on:
@@ -41,9 +44,12 @@ services:
 
   # Sparrow Auth Server
   sparrow-auth:
-    image: sparrowapi/sparrow-auth:v1
-    ports:
-      - "1421:80"
+    build:
+      context: https://github.com/sparrowapp-dev/sparrow-app-auth.git
+      dockerfile: Dockerfile
+    # Don't expose port directly
+    # ports:
+    #   - "1421:80"
     networks:
       - localnet
     depends_on:
@@ -51,8 +57,8 @@ services:
       - mongo
       - kafka
     env_file:
-        - .env.docker-setup
-    command:  >-
+      - .env.docker-setup
+    command: >-
       sh -c "
         echo 'window.runtimeConfig = {
           VITE_API_URL: \"${VITE_API_URL}\",
@@ -68,10 +74,12 @@ services:
 
   # Sparrow Proxy Service
   sparrow-proxy:
-    image: sparrowapi/sparrow-proxy-service:v1
-    platform: linux/amd64
-    ports:
-      - "3000:3000"
+    build:
+      context: https://github.com/sparrowapp-dev/sparrow-proxy-service.git
+      dockerfile: Dockerfile
+    # Don't expose port directly
+    # ports:
+    #   - "3000:3000"
     networks:
       - localnet
 
@@ -82,24 +90,24 @@ services:
       dockerfile: Sparrow-Web.Dockerfile
       args:
         VITE_WEB_API_TIMEOUT: 5000
-        VITE_WEB_API_URL: http://localhost:9000
-        VITE_WEB_AUTH_URL: http://localhost:1421
-        VITE_WEB_SOCKET_IO_API_URL: http://localhost:9001
-        VITE_WEB_SPARROW_OAUTH: http://localhost:9000/api/auth/google/callback
+        VITE_WEB_API_URL: ${VITE_WEB_API_URL}
+        VITE_WEB_AUTH_URL: ${VITE_WEB_AUTH_URL}
+        VITE_WEB_SOCKET_IO_API_URL: ${VITE_WEB_SOCKET_IO_API_URL}
+        VITE_WEB_SPARROW_OAUTH: ${VITE_WEB_SPARROW_OAUTH}
         VITE_WEB_TERMS_OF_SERVICE: https://example.dev/termsandconditions
-        VITE_WEB_BASE_URL: http://localhost:9000
+        VITE_WEB_BASE_URL: ${VITE_WEB_BASE_URL}
         VITE_WEB_SPARROW_GITHUB: https://github.com/sparrowapp-dev
         VITE_WEB_SPARROW_LINKEDIN: https://www.linkedin.com/showcase/sparrow-app/
         VITE_WEB_SPARROW_DOWNLOAD_LINK: https://github.com/sparrowapp-dev/sparrow-app/releases
         VITE_WEB_RELEASE_NOTES_API: https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases
         VITE_WEB_SPARROW_DOCS: https://docs.sparrowapp.dev/docs/intro
-        VITE_WEB_PROXY_SERVICE: http://localhost:3000
+        VITE_WEB_PROXY_SERVICE: ${VITE_WEB_PROXY_SERVICE}
         VITE_WEB_ENABLE_MIX_PANEL: false
         VITE_WEB_MIX_PANEL_TOKEN:
-        VITE_WEB_SPARROW_AI_WEBSOCKET: "ws://localhost:9000/ai-assistant"
-
-    ports:
-      - "1422:80"
+        VITE_WEB_SPARROW_AI_WEBSOCKET: ${VITE_WEB_SPARROW_AI_WEBSOCKET}
+    # Don't expose port directly
+    # ports:
+    #   - "1422:80"
     networks:
       - localnet
     depends_on:
@@ -108,6 +116,25 @@ services:
       - sparrow-auth
       - mongo
       - kafka
+
+  # Nginx Reverse Proxy with SSL
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - localnet
+    depends_on:
+      - sparrow-api
+      - sparrow-auth
+      - sparrow-web
+    restart: always
 
 volumes:
   kafka_data:

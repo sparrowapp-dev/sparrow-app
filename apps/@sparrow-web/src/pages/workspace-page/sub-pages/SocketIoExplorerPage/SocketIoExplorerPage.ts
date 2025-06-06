@@ -65,7 +65,7 @@ import type {
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import constants from "src/constants/constants";
-
+import * as Sentry from "@sentry/svelte";
 class SocketIoExplorerPageViewModel {
   /**
    * Repository
@@ -322,7 +322,7 @@ class SocketIoExplorerPageViewModel {
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    } catch (error) {
+    } catch (error) { 
       notifications.error(
         "Failed to update the documentation. Please try again",
       );

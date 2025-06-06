@@ -5,6 +5,7 @@
   import { Button } from "../button";
   import { SparrowLogo } from "@sparrow/common/images";
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let description = "Could not Send Request";
   export let heading = "";
   export let icon;
@@ -12,6 +13,9 @@
   export let ctaShow = false;
   export let onClick = () => {};
   export let varient: "error" | "success" | "warning" | "info" = "error";
+  export let containerWidth = "543px";
+  export let closeIconRequired = false;
+  export let onClickClose = () => {};
 
   let componentClass;
   switch (varient) {
@@ -30,19 +34,27 @@
     default:
       componentClass = "errorClass";
   }
+
+  const handleAlert_try_response = ({ event_name }: { event_name: string }) => {
+    captureEvent("try_response", {
+      component: "Alert",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
 </script>
 
 <div>
   <div
-    class={componentClass}
-    style="width: 543px; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
+    class={`${componentClass} ${containerWidth ? "" : "w-100"}`}
+    style="max-width: {containerWidth}; min-height:56px; background-color:var(--bg-ds-surface-500); margin-bottom:10px; overflow:hidden;"
   >
     <div
       class="d-flex align-items-start flex-row"
-      style=" gap:16px; padding:16px;  "
+      style="gap:16px; padding:16px;"
     >
       <div
-        style="height: 100%; width: 32px; display:flex; align-items:center; justify-content:center; "
+        style="height: 100%; width: 32px; display:flex; align-items:center; justify-content:center;"
       >
         <div
           class="absolute inset-0 opacity-40 rounded-full"
@@ -63,7 +75,7 @@
           {/if}
         </div>
       </div>
-      <div style="display: flex; flex-direction: column; min-width: 322px; ">
+      <div style="display: flex; flex-direction: column; min-width: 322px;">
         {#if heading}
           <p
             class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
@@ -74,6 +86,7 @@
         {/if}
 
         <div class="d-flex flex-column">
+          <slot name="body-slot" />
           <p
             class="mb-0 pe-3 text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
             style=" color:var(--text-ds-neutral-50);"
@@ -89,7 +102,22 @@
             size="small"
             title={ctaTitle}
             onClick={() => {
+              handleAlert_try_response({
+                event_name: ctaTitle + "Clicked!",
+              });
               onClick();
+            }}
+          />
+        </div>
+      {/if}
+      {#if closeIconRequired}
+        <div style="margin-left: auto;">
+          <Button
+            size="small"
+            type="teritiary-regular"
+            startIcon={DismissRegular}
+            onClick={() => {
+              onClickClose();
             }}
           />
         </div>
@@ -175,7 +203,7 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(
       50% 50% at 50% 50%,
-      rgba(51, 204, 122, 0.25) 0%,
+      rgba(79, 172, 254, 0.25) 0%,
       rgba(29, 33, 43, 0) 100%
     );
   }

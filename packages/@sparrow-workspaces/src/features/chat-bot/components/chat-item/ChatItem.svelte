@@ -16,6 +16,7 @@
   import { SparrowAIIcon } from "@sparrow/common/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import { Events } from "@sparrow/common/enums";
   import {
     MessageTypeEnum,
@@ -30,6 +31,8 @@
     CopyRegular,
     ThumbDislikeRegular,
   } from "@sparrow/library/icons";
+  import * as Sentry from "@sentry/svelte";
+
   export let message: string;
   export let messageId: string;
   export let type;
@@ -52,7 +55,7 @@
    * Check if the metadata sent by AI is application user friendly (Matching with request data or not).
    *
    * @param target - The target value (Where to apply the change -> Req. Body or Headers or Parameters)
-   * @param language - The language value of the code suggested (Json, html, javascript etc) 
+   * @param language - The language value of the code suggested (Json, html, javascript etc)
    * @param type - The type value (Raw, url encoded, formdata)
    * @returns boolean indicating if all values are valid according to the enums
    */
@@ -233,8 +236,7 @@
           additionalButtons = `
         <button role="button" class="position-relative apply-change-${messageId} action-button codeBlock-action-btns-selector d-flex align-items-center justify-content-center border-radius-4" id="${index}" data-actionable='${actionableData}'>
           <img src="${ArrowTrendingSparkle}" id="${index}">
-          <div class="codeBlock-action-btns-tooltip">Insert
-            <div class="codeBlock-action-btns-tooltip-square"></div>
+          <div class="codeBlock-action-btns-tooltip">Insert Suggestions<div class="codeBlock-action-btns-tooltip-square"></div>
           </div>
         </button>
       `;
@@ -386,6 +388,20 @@
     }
   };
 
+  const handleEventClickOnPreview = () => {
+    captureEvent("copilot_suggestion_previewed", {
+      component: "ChatItem",
+      buttonText: "Preview",
+    });
+  };
+
+  const handleEventClickOnCopyCode = () => {
+    captureEvent("copilot_suggestion_copied", {
+      component: "ChatItem",
+      buttonText: "Copy",
+    });
+  };
+
   /**
    * Handles the click event to preview code from a specified wrapper to the modal popup.
    *
@@ -399,6 +415,7 @@
     if (!originalCodeBlock || !originalPreElement) return;
     const preClone = originalPreElement.cloneNode(true) as HTMLPreElement;
     onClickCodeBlockPreview(preClone);
+    handleEventClickOnPreview();
   };
 
   /**
@@ -429,6 +446,7 @@
    */
   const embedListenerToCopyCode = async () => {
     extractedMessage = decodeMessage(await marked(message));
+    handleEventClickOnCopyCode();
 
     setTimeout(() => {
       const copyCodeBtns = document.querySelectorAll(`.copy-code-${messageId}`);
@@ -630,7 +648,14 @@
     .message-wrapper .markdown span,
     .message-wrapper .markdown code
   ) {
-    font-size: 12px;
+    font-size: 12px !important;
+  }
+  :global(
+    .message-wrapper .markdown pre,
+    .message-wrapper .markdown code,
+    .message-wrapper .markdown code span
+  ) {
+    font-family: "JetBrains Mono", monospace !important;
   }
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;

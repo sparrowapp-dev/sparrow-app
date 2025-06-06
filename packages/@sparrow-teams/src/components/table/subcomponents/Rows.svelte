@@ -1,10 +1,18 @@
 <script lang="ts">
   import { ThreeDotIcon } from "@sparrow/library/assets";
   import { UserProfileList } from "@sparrow/teams/compopnents";
-  import { MenuView } from "@sparrow/teams/compopnents";
-  import { TeamRole, WorkspaceMemberRole } from "@sparrow/common/enums";
-  import { Button } from "@sparrow/library/ui";
-  import { MoreVerticalRegular } from "@sparrow/library/icons";
+  import { MenuView } from "@sparrow/common/components";
+  import {
+    TeamRole,
+    WorkspaceMemberRole,
+    WorkspaceType,
+  } from "@sparrow/common/enums";
+  import { Button, Tag } from "@sparrow/library/ui";
+  import {
+    GlobeRegular,
+    LockClosedRegular,
+    MoreVerticalRegular,
+  } from "@sparrow/library/icons";
 
   export let list;
   export let activeTeam;
@@ -166,7 +174,21 @@
   <td
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 position-relative"
   >
-    {#if isWebEnvironment}
+    {#if list?.workspaceType === WorkspaceType.PUBLIC}
+      <Tag text={WorkspaceType.PUBLIC} type="green" endIcon={GlobeRegular} />
+    {:else}
+      <Tag
+        text={WorkspaceType.PRIVATE}
+        type="cyan"
+        endIcon={LockClosedRegular}
+      />
+    {/if}
+  </td>
+
+  <td
+    class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 position-relative"
+  >
+    {#if isWebEnvironment && !list?.isShared}
       <button
         class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
         on:click|stopPropagation={() => {

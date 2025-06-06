@@ -5,6 +5,8 @@ import type {
   StreamPromptDto,
 } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
+import * as Sentry from "@sentry/svelte";
+import { AiModelProviderEnum, type AIModelVariant, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
 
 /**
  * Service for managing WebSocket connections and communication
@@ -88,7 +90,7 @@ export class AiAssistantWebSocketService {
       );
     }
     AiAssistantWebSocketService.instance = this;
-    
+
   }
 
   /**
@@ -124,9 +126,9 @@ export class AiAssistantWebSocketService {
 
       // If already connected or connecting, no need to create a new connection
       if (
-        this.webSocket && 
-        (this.webSocket.readyState === WebSocket.OPEN || 
-        this.webSocket.readyState === WebSocket.CONNECTING)
+        this.webSocket &&
+        (this.webSocket.readyState === WebSocket.OPEN ||
+          this.webSocket.readyState === WebSocket.CONNECTING)
       ) { return true; }
 
       // Clean up any existing connection
@@ -181,7 +183,7 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleClose = (event: CloseEvent) => {
-    
+
     this._isConnected = false;
     this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
 
@@ -237,8 +239,7 @@ export class AiAssistantWebSocketService {
       this.reconnectTimer = setTimeout(() => {
         // Adding this console info, to debug in deployed environments
         console.debug(
-          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
-            this.maxReconnectAttempts
+          `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts
           })...`,
         );
         this.reconnectAttempts++;
@@ -259,7 +260,7 @@ export class AiAssistantWebSocketService {
     this.cleanup();
     this._isConnected = false;
   }
-    
+
   /**
    * Cleans up all resources used by the service
    * @private
@@ -270,7 +271,7 @@ export class AiAssistantWebSocketService {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
-    
+
     // Close WebSocket if it exists
     if (this.webSocket) {
       // Remove event handlers to avoid memory leaks and redundant calls on disconnection
@@ -278,17 +279,17 @@ export class AiAssistantWebSocketService {
       this.webSocket.onmessage = null;
       this.webSocket.onerror = null;
       this.webSocket.onclose = null;
-      
+
       // Close the connection if it's not already closed
-      if (this.webSocket.readyState === WebSocket.OPEN || 
-          this.webSocket.readyState === WebSocket.CONNECTING) {
+      if (this.webSocket.readyState === WebSocket.OPEN ||
+        this.webSocket.readyState === WebSocket.CONNECTING) {
         this.webSocket.close(1000, "Closed by client");
       }
-      
+
       this.webSocket = null;
     }
   }
-  
+
 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,6 +330,9 @@ export class AiAssistantWebSocketService {
     userEmail: string,
     prompt: string,
     apiContext: string,
+    conversation,
+    model,
+    activity,
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -336,6 +340,10 @@ export class AiAssistantWebSocketService {
       emailId: userEmail,
       userInput: prompt,
       apiData: apiContext,
+      conversation,
+      model,
+      activity,
+      "feature": "sparrow-ai"
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
@@ -351,6 +359,119 @@ export class AiAssistantWebSocketService {
       return false;
     }
   };
+
+  public sendAiRequest = async (data: {
+    model: AiModelProviderEnum;
+    modelVersion: AIModelVariant;
+    authKey: string;
+    systemPrompt?: string;
+    userInput: { role: 'user' | 'assistant' | 'system'; content: string; }[] | string;
+    conversation?: "",
+    configs: modelsConfigType
+  }): Promise<boolean> => {
+
+    if (!this.webSocket || !this.isWsConnected()) {
+      console.error("WebSocket not connected, cannot send message");
+      return false;
+    }
+
+    const { configs, ...rest } = data;
+    const message = { ...rest, ...configs }; // spread configs at root level
+
+    try {
+      this.webSocket.send(JSON.stringify(message));
+      return true;
+    } catch (error) {
+      console.error("Error sending message:", error);
+      return false;
+    }
+  };
+
+  public prepareConversation = (
+    modelProvider: AiModelProviderEnum,
+    userPrompt: string,
+    systemPrompt: string,
+    isContextOn: boolean,
+    conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+
+    switch (modelProvider) {
+      case AiModelProviderEnum.OpenAI:
+        return this.prepareOpenAIConversation(isContextOn, userPrompt, systemPrompt, conversations);
+      case AiModelProviderEnum.DeepSeek:
+        return this.prepareDeepSeekConversation(isContextOn, userPrompt, systemPrompt, conversations);
+      case AiModelProviderEnum.Anthropic:
+        return this.prepareAnthropicConversation(isContextOn, userPrompt, systemPrompt, conversations);
+      case AiModelProviderEnum.Google:
+        return this.prepareGeminiConversation(isContextOn, userPrompt, systemPrompt, conversations);
+      default:
+        console.error("Unsupported model provider:", modelProvider);
+        // return conversations;
+        return;
+    }
+
+  }
+
+  private prepareOpenAIConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'system', content: systemPrompt };
+    if (isContextOn) {
+      return [systemPromptContext, ...conversations]; // If context is on, prepend the system prompt to the conversation
+    }
+    return [systemPromptContext, { "role": "user", "content": userPrompt }]; // If context is off, return the conversation as is
+  }
+
+  private prepareDeepSeekConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'system', content: systemPrompt };
+    if (isContextOn) {
+      // If context is on, prepend the system prompt to the conversation
+      return [systemPromptContext, ...conversations];
+    }
+    // If context is off, return the conversation as is
+    return [systemPromptContext, { "role": "user", "content": userPrompt }];
+  }
+
+  private prepareAnthropicConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    const systemPromptContext = { role: 'user', content: `${systemPrompt} + ${userPrompt}` };
+    if (isContextOn) {
+      // If context is on, prepend the system prompt to the conversation
+      return [systemPromptContext, ...conversations];
+    }
+    // If context is off, return the conversation as is
+    return [systemPromptContext];
+  }
+
+  private prepareGeminiConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]) => {
+    if (isContextOn && conversations.length > 0) {
+      // Convert conversations to Gemini format
+      const geminiConversations = conversations.map(conv => {
+        if (conv.role === 'user') {
+          return {
+            role: 'user',
+            parts: [{ text: conv.content }]
+          };
+        } else if (conv.role === 'assistant') {
+          return {
+            role: 'model',
+            parts: [{ text: conv.content }]
+          };
+        }
+        // Skip system messages as they're handled separately in Gemini
+        return null;
+      }).filter(conv => conv !== null);
+
+      // Add current user prompt to the conversation
+      geminiConversations.push({
+        role: 'user',
+        parts: [{ text: userPrompt }]
+      });
+
+      // Return as JSON string as expected by the API
+      return JSON.stringify(geminiConversations);
+    } else {
+      // For non-conversational or when context is off, return empty string
+      // The userInput will be sent separately
+      return "";
+    }
+  }
 
   /**
    * Adds an event listener for a specific event
@@ -388,7 +509,7 @@ export class AiAssistantWebSocketService {
   }
 
   public cleanupAllListeners(): void {
-    this.eventListeners.clear(); 
+    this.eventListeners.clear();
   }
 
   /**
@@ -403,10 +524,10 @@ export class AiAssistantWebSocketService {
     }
 
     try {
-      
+
       this.removeListener(`assistant-response_${tabId}`);
-      
-    // Server is not handling stop generation event, so disabling it now will add it later.
+
+      // Server is not handling stop generation event, so disabling it now will add it later.
       // this.webSocket.send(JSON.stringify({
       //   type: "stopGeneration",
       //   tabId,
@@ -418,10 +539,11 @@ export class AiAssistantWebSocketService {
 
       return true;
     } catch (error) {
+      Sentry.captureException(error);
       console.error("Error sending stop generation signal:", error);
       return false;
     }
   };
 
-    
+
 }

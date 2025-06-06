@@ -9,6 +9,8 @@ export enum ItemType {
   TESTFLOW = "TESTFLOW",
   SOCKET_IO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
+  MOCK_REQUEST = "MOCK_REQUEST",
+  AI_REQUEST = "AI_REQUEST",
 }
 
 export enum UntrackedItems {

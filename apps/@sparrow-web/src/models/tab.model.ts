@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 5,
+  version: 11,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1290,6 +1290,286 @@ export const tabSchemaLiteral = {
                 },
                 required: ["id", "source", "target"],
               },
+            },
+          },
+        },
+        aiRequest: {
+          type: "object",
+          properties: {
+            aiModelProvider: {
+              type: "string",
+            },
+            aiModelVariant: {
+              type: "string",
+            },
+            systemPrompt: {
+              type: "string",
+            },
+            configurations: {
+              type: "object",
+              properties: {
+                openai: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                  },
+                },
+                deepseek: {
+                  type: "object",
+                  properties: {
+                      streamResponse: {
+                        type: "boolean",
+                      },
+                      jsonResponseFormat: {
+                        type: "boolean",
+                      },
+                      temperature: {
+                        type: "number",
+                      },
+                      presencePenalty: {
+                        type: "number",
+                      },
+                      frequencyPenalty: {
+                        type: "number",
+                      },
+                      maxTokens: {
+                        type: "number",
+                      },
+                  },
+                },
+                anthropic: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    top_p: {
+                      type: "number",
+                    },
+                  },
+                },
+                google: {
+                  type: "object",
+                  properties: {
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    top_p: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
+                  },
+                },
+              },
+            },
+            state: {
+              type: "object",
+              properties: {
+                aiAuthNavigation: {
+                  type: "string",
+                },
+                aiNavigation: {
+                  type: "string",
+                },
+                aiLeftSplitterWidthPercentage: {
+                  type: "number",
+                },
+                aiRightSplitterWidthPercentage: {
+                  type: "number",
+                },
+                isAiSendRequestInProgress: {
+                  type: "boolean",
+                  default: false,
+                },
+                isSaveDescriptionInProgress: {
+                  type: "boolean",
+                  default: false,
+                },
+                isSaveRequestInProgress: {
+                  type: "boolean",
+                },
+                isChatbotActive: {
+                  type: "boolean",
+                },
+                isChatbotSuggestionsActive: {
+                  type: "boolean",
+                },
+                isChatbotGeneratingResponse: {
+                  type: "boolean",
+                },
+                isChatAutoClearActive: {
+                  type: "boolean",
+                },
+              },
+            },
+            auth: {
+              type: "object",
+              properties: {
+                bearerToken: {
+                  type: "string",
+                },
+                basicAuth: {
+                  type: "object",
+                  properties: {
+                    username: {
+                      type: "string",
+                    },
+                    password: {
+                      type: "string",
+                    },
+                  },
+                },
+                apiKey: {
+                  type: "object",
+                  properties: {
+                    authKey: {
+                      type: "string",
+                    },
+                    authValue: {
+                      type: "string",
+                    },
+                    addTo: {
+                      type: "string",
+                    },
+                  },
+                },
+              },
+            },
+            ai: {
+              type: "object",
+              properties: {
+                prompt: {
+                  type: "string",
+                },
+                threadId: {
+                  type: "string",
+                },
+                conversations: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      messageId: {
+                        type: "string",
+                      },
+                      message: {
+                        type: "string",
+                      },
+                      type: {
+                        type: "string",
+                      },
+                      isLiked: {
+                        type: "boolean",
+                      },
+                      isDisliked: {
+                        type: "boolean",
+                      },
+                      status: {
+                        type: "boolean",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        mockHistory: {
+          type: "string",
+        },
+        hub: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              maxLength: 100,
+            },
+            name: {
+              type: "string",
+            },
+            description: {
+              type: "string",
+            },
+            hubUrl: {
+              type: "string",
+            },
+            githubUrl: {
+              type: "string",
+            },
+            xUrl: {
+              type: "string",
+            },
+            linkedinUrl: {
+              type: "string",
+            },
+            logo: {
+              type: "object",
+            },
+            owner: {
+              type: "string",
+            },
+            users: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                  },
+                  email: {
+                    type: "string",
+                  },
+                  name: {
+                    type: "string",
+                  },
+                  role: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+            createdAt: {
+              type: "string",
+            },
+            createdBy: {
+              type: "string",
+            },
+            updatedAt: {
+              type: "string",
+            },
+            updatedBy: {
+              type: "string",
             },
           },
         },

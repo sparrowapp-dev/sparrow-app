@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
+    AddRegular,
     AttachmentIcon,
     CategoryIcon,
     CrossIcon,
@@ -102,10 +103,10 @@
         const res = onAddFeedback();
         isExposeFeedbackForm = res;
       }}
-      class="add-feedback w-100 outline-none border-0 border-radius-4 text-ds-font-size-14 text-ds-font-weight-regular"
+      class="add-feedback d-flex align-items-center justify-content-center gap-2 w-100 outline-none border-0 border-radius-6 text-ds-font-size-14"
     >
-      <PlusIcon height={"20"} width={"20"} />
-      <span class="px-2"> Add Feedback</span>
+      <AddRegular />
+      <span>Add Feedback</span>
     </button>
   </Tooltip>
 </div>
@@ -386,7 +387,7 @@
 
 <style>
   .add-feedback {
-    padding: 10px 16px 10px 12px;
+    padding: 8px 16px 8px 12px;
     background-color: var(--bg-primary-300);
   }
   .add-feedback:hover {

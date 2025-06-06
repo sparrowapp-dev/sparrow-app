@@ -67,6 +67,11 @@ import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/coll
 import { parse, GraphQLError } from "graphql";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 import constants from "src/constants/constants";
+import {
+  startLoading,
+  stopLoading,
+} from "@sparrow/common/store";
+
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -97,6 +102,7 @@ class GraphqlExplorerViewModel {
   });
 
   private _tab = new BehaviorSubject<Partial<Tab>>({});
+
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -1078,6 +1084,9 @@ class GraphqlExplorerViewModel {
     _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
     isFailedNotificationVisible: boolean = true,
   ) => {
+    const componentData = this._tab.getValue()
+    const tabId = componentData?.tabId;
+    startLoading(tabId + "fetchGraphqlSchema");
     const decodeData = this._decodeGraphql.init(
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
       _environmentVariables,
@@ -1172,6 +1181,7 @@ class GraphqlExplorerViewModel {
             progressiveTab,
           );
           notifications.success("Schema fetched successfully.");
+          stopLoading(tabId + "fetchGraphqlSchema");
         })
         .catch(async (error) => {
           console.error(error);
@@ -1188,6 +1198,7 @@ class GraphqlExplorerViewModel {
               "Failed to fetch schema. Please check the URL and try again.",
             );
           }
+          stopLoading(tabId + "fetchGraphqlSchema");
         });
     } catch (error) {
       console.error(error);
@@ -1203,6 +1214,7 @@ class GraphqlExplorerViewModel {
           "Failed to fetch schema. Please check the URL and try again.",
         );
       }
+      stopLoading(tabId + "fetchGraphqlSchema");
     }
   };
 
@@ -1986,8 +1998,10 @@ class GraphqlExplorerViewModel {
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
-
+    const tabId = graphqlTabData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -2041,6 +2055,7 @@ class GraphqlExplorerViewModel {
           guestGraphqlRequest,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -2095,11 +2110,13 @@ class GraphqlExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

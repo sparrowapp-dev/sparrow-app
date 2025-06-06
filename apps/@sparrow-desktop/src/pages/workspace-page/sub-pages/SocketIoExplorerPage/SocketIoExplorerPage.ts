@@ -67,6 +67,7 @@ import type {
   SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import constants from "@app/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 class SocketIoExplorerPageViewModel {
   /**

@@ -6,7 +6,11 @@ import type { WebSocketWrapper } from "./websocket-request-tab";
 import type { TFTabItemWrapperType } from "./testflow-tab";
 import type { SocketIoWrapper } from "./socket-io-request-tab";
 import type { GraphqlRequestWrapperTabInterface } from "./graphql-request-tab";
-import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-tab"; 
+import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-tab";
+import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab";
+import type { AiRequestWrapper } from "./ai-request-tab";
+import type { MockHistoryWrapper } from "./mock-history-tab";
+import type { HubWrapper } from "./hub-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -19,7 +23,11 @@ export enum TabTypeEnum {
   TESTFLOW = "TESTFLOW",
   SOCKET_IO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
-  SAVED_REQUEST = "SAVED_REQUEST"
+  SAVED_REQUEST = "SAVED_REQUEST",
+  AI_REQUEST = "AI_REQUEST",
+  MOCK_REQUEST = "MOCK_REQUEST",
+  MOCK_HISTORY = "MOCK_HISTORY",
+  HUB = "HUB",
 }
 
 export enum TabPersistenceTypeEnum {
@@ -38,10 +46,14 @@ export interface RequestIdWrapper {
 export interface FolderIdWrapper {
   folderId?: string;
 }
+export interface LLMRequestIdWrapper {
+  LLMRequestId?: string;
+}
 export interface Path
   extends WorkspaceIdWrapper,
     CollectionIdWrapper,
-    FolderIdWrapper, RequestIdWrapper {}
+    FolderIdWrapper,
+    RequestIdWrapper {}
 export interface DescriptionWrapper {
   description: string;
 }
@@ -89,13 +101,17 @@ export interface PathWrapper {
 export interface Property
   extends Partial<RequestWrapper>,
     Partial<FolderWrapper>,
+    Partial<MockHistoryWrapper>,
     Partial<CollectionWrapper>,
     Partial<WorkspaceWrapper>,
     Partial<WebSocketWrapper>,
     Partial<TFTabItemWrapperType>,
     Partial<SocketIoWrapper>,
     Partial<GraphqlRequestWrapperTabInterface>,
-    Partial<HttpRequestSavedWrapperTabInterface> {}
+    Partial<HttpRequestMockWrapperTabInterface>,
+    Partial<HttpRequestSavedWrapperTabInterface>,
+    Partial<AiRequestWrapper>,
+    Partial<HubWrapper> {}
 
 export interface PropertyWrapper {
   property: Property;

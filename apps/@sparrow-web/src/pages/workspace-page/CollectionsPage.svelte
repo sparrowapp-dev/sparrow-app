@@ -2,7 +2,7 @@
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { userValidationStore } from "@app/store/deviceSync.store";
-
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   // ---- Store
   import {
     leftPanelWidth,
@@ -22,6 +22,7 @@
     CollectionExplorerPage,
     FolderExplorerPage,
     WorkspaceExplorerPage,
+    AiRequestExplorerPage,
   } from "..";
   import {
     TabBar,
@@ -33,7 +34,7 @@
     WorkspaceTourGuide,
   } from "@sparrow/workspaces/features";
   import { WithModal } from "@sparrow/workspaces/hoc";
-  import { notifications } from "@sparrow/library/ui";
+  import { notifications, Tooltip } from "@sparrow/library/ui";
   import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
@@ -89,6 +90,12 @@
   import { writable } from "svelte/store";
 
   import { Checkbox } from "@sparrow/library/forms";
+  import * as Sentry from "@sentry/svelte";
+  import { Spinner } from "@sparrow/library/ui";
+  import { OpenRegular } from "@sparrow/library/icons";
+  import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
+  import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
+  import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -231,6 +238,10 @@
    * Handle close tab functionality in tab bar list
    */
   const closeTab = async (id: string, tab: Tab) => {
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      _viewModel.handleRemoveTab(id);
+      return;
+    }
     if (
       (tab?.type === TabTypeEnum.REQUEST ||
         tab?.type === TabTypeEnum.WEB_SOCKET ||
@@ -238,6 +249,7 @@
         tab?.type === TabTypeEnum.TESTFLOW ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
+        tab?.type === TabTypeEnum.MOCK_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.WORKSPACE ||
@@ -278,8 +290,11 @@
     }
 
     const wsId = currentWOrkspaceValue._id;
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
     _viewModel.deleteTabsWithTabIdInAWorkspace(wsId, savedTabs);
-
     for (let tab of unSavedTabs) {
       // Wait for user confirmation before moving to the next tab
       await closeTab(tab.id, tab);
@@ -287,6 +302,12 @@
   };
   // Methods for Tab Controls - start
   const tabsForceCloseInitiator = (currentTabId: string) => {
+    // For viewer role, directly force close without popup
+    if (userRole === WorkspaceRole.WORKSPACE_VIEWER) {
+      forceCloseTabs(currentTabId);
+      return;
+    }
+
     tabsToForceClose = $tabList;
     tabIdWhoRecivedForceClose = currentTabId;
 
@@ -339,6 +360,19 @@
   /**
    * Handle save functionality on close confirmation popup
    */
+
+  const handlecollection_document_response = ({
+    event_name,
+  }: {
+    event_name: string;
+  }) => {
+    captureEvent("document_response", {
+      component: "CollectionsPage",
+      button_text: event_name,
+      destination: event_name,
+    });
+  };
+
   const handlePopupSave = async () => {
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
@@ -385,6 +419,7 @@
       removeTab.type === TabTypeEnum.WEB_SOCKET ||
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
+      removeTab.type === TabTypeEnum.MOCK_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL ||
       removeTab.type === TabTypeEnum.FOLDER
     ) {
@@ -399,6 +434,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("API request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.MOCK_REQUEST) {
+          const res = await _viewModel.saveMockAPIRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("Mock Request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);
@@ -533,11 +576,14 @@
     }
   };
 
+  let isInitialDataLoading = true;
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
+        isInitialDataLoading = true;
         activeTab = undefined;
-        await handleRefreshApicalls(value?._id);
+        handleRefreshApicalls(value?._id);
 
         userValidationStore.subscribe((validation) => {
           if (!validation.isValid) {
@@ -548,6 +594,8 @@
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
         totalTeamCount = value._data?.users?.length || 0;
+
+        isInitialDataLoading = false;
       }
       prevWorkspaceId = value._id;
       if (count == 0) {
@@ -721,6 +769,26 @@
       });
     }
   };
+
+  let mockCollectionUrl: string;
+  let isMockURLModelOpen: boolean;
+  const handleMockCollectionModel = (url: string) => {
+    mockCollectionUrl = url;
+    isMockURLModelOpen = true;
+  };
+
+  let createMockCollection = false;
+  let currentCollectionId: string;
+  let currentWorkspaceId: string;
+  let isCreateMockCollectionPopup: boolean;
+  const handleCreateMockCollectionModel = (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    currentCollectionId = collectionId;
+    currentWorkspaceId = workspaceId;
+    isCreateMockCollectionPopup = true;
+  };
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -787,6 +855,9 @@
           isWebApp={true}
           onCompareCollection={_viewModel.handleCompareCollection}
           onSyncCollection={handleSyncCollection}
+          onUpdateRunningState={_viewModel.handleMockCollectionState}
+          onOpenWorkspace={_viewModel.handleOpenWorkspace}
+          onCreateMockCollection={handleCreateMockCollectionModel}
         />
       </Pane>
       <Pane
@@ -798,115 +869,153 @@
           class="d-flex flex-column h-100"
           style="background-color:var(--bg-ds-surface-900)"
         >
-          <TabBar
-            tabList={$tabList}
-            {isGuestUser}
-            onNewTabRequested={_viewModel.createNewTab}
-            onTabClosed={closeTab}
-            onDropEvent={_viewModel.onDropEvent}
-            onDragStart={_viewModel.handleDropOnStart}
-            onDropOver={_viewModel.handleDropOnEnd}
-            onTabSelected={_viewModel.handleActiveTab}
-            onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
-            onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
-            onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
-            onDoubleClick={_viewModel.handleTabTypeChange}
-            onClickCloseOtherTabs={softCloseTabs}
-            onClickForceCloseTabs={tabsForceCloseInitiator}
-            onClickDuplicateTab={handleTabDuplication}
-          />
-          <div style="flex:1; overflow: hidden;">
-            <Route>
-              {#if true}
-                {#if $activeTab?.type === ItemType.REQUEST}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <RestExplorerPage bind:isTourGuideOpen tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.COLLECTION}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <CollectionExplorerPage
-                        tab={$activeTab}
-                        onSyncCollection={handleSyncCollection}
-                      />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.FOLDER}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <FolderExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.ENVIRONMENT}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <EnvironmentExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.WORKSPACE}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <WorkspaceExplorerPage
-                        {collectionList}
-                        tab={$activeTab}
-                      />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.WEB_SOCKET}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <WebSocketExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.TESTFLOW}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <TestFlowExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.SOCKET_IO}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <SocketIoExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <RestExplorerSavedPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if $activeTab?.type === ItemType.GRAPHQL}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <GraphqlExplorerPage tab={$activeTab} />
-                    </div>
-                  </Motion>
-                {:else if !$tabList?.length}
-                  <Motion {...scaleMotionProps} let:motion>
-                    <div class="h-100" use:motion>
-                      <WorkspaceDefault
-                        {currentWorkspace}
-                        {handleCreateEnvironment}
-                        onCreateTestflow={() => {
-                          _viewModel3.handleCreateTestflow();
-                          isExpandTestflow.set(true);
-                        }}
-                        showImportCollectionPopup={() =>
-                          (isImportCollectionPopup = true)}
-                        onItemCreated={_viewModel.handleCreateItem}
-                        {isGuestUser}
-                        {userRole}
-                        isWebApp={true}
-                      />
-                    </div>
-                  </Motion>
+          {#if isInitialDataLoading}
+            <div class="h-100 d-flex align-items-center justify-content-center">
+              <Spinner size={"32px"} />
+            </div>
+          {:else}
+            <TabBar
+              tabList={$tabList}
+              {isGuestUser}
+              onNewTabRequested={_viewModel.createNewTab}
+              onTabClosed={closeTab}
+              onDropEvent={_viewModel.onDropEvent}
+              onDragStart={_viewModel.handleDropOnStart}
+              onDropOver={_viewModel.handleDropOnEnd}
+              onTabSelected={_viewModel.handleActiveTab}
+              onChangeViewInRequest={_viewModel.handleOnChangeViewInRequest}
+              onFetchCollectionGuide={_viewModel.fetchCollectionGuide}
+              onUpdateCollectionGuide={_viewModel.updateCollectionGuide}
+              onDoubleClick={_viewModel.handleTabTypeChange}
+              onClickCloseOtherTabs={softCloseTabs}
+              onClickForceCloseTabs={tabsForceCloseInitiator}
+              onClickDuplicateTab={handleTabDuplication}
+              {userRole}
+            />
+            <div style="flex:1; overflow: hidden;">
+              <Route>
+                {#if true}
+                  {#if $activeTab?.type === ItemType.REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <RestExplorerPage
+                          bind:isTourGuideOpen
+                          tab={$activeTab}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.AI_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <AiRequestExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.COLLECTION}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <CollectionExplorerPage
+                          tab={$activeTab}
+                          onSyncCollection={handleSyncCollection}
+                          onMockCollectionModelOpen={handleMockCollectionModel}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.FOLDER}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <FolderExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.ENVIRONMENT}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <EnvironmentExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.WORKSPACE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <WorkspaceExplorerPage
+                          {collectionList}
+                          tab={$activeTab}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.WEB_SOCKET}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <WebSocketExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.TESTFLOW}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <TestFlowExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.SOCKET_IO}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <SocketIoExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <RestExplorerSavedPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === ItemType.GRAPHQL}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <GraphqlExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_REQUEST}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <RestExplorerMockPage
+                          bind:isTourGuideOpen
+                          tab={$activeTab}
+                        />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.HUB}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <HubExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if !$tabList?.length}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100" use:motion>
+                        <WorkspaceDefault
+                          {currentWorkspace}
+                          {handleCreateEnvironment}
+                          onCreateTestflow={() => {
+                            _viewModel3.handleCreateTestflow();
+                            isExpandTestflow.set(true);
+                          }}
+                          showImportCollectionPopup={() =>
+                            (isImportCollectionPopup = true)}
+                          onItemCreated={_viewModel.handleCreateItem}
+                          {isGuestUser}
+                          {userRole}
+                          isWebApp={true}
+                        />
+                      </div>
+                    </Motion>
+                  {/if}
                 {/if}
-              {/if}
-            </Route>
-          </div>
+              </Route>
+            </div>
+          {/if}
         </section>
       </Pane>
     </Splitpanes>
@@ -942,7 +1051,7 @@
       }}
       disabled={false}
     />
-    <p class="m-0">I understand, don't show this agian.</p>
+    <p class="m-0">I understand, don't show this again.</p>
   </div>
 
   <div
@@ -982,7 +1091,7 @@
   handleModalState={() => handleClosePopupBackdrop(false)}
 >
   <div class="mt-2 mb-4">
-    <p class="lightGray" style="color: lightGray;">
+    <p class="lightGray text-fs-14" style="color: lightGray;">
       Do you want to save changes in this tab “<span
         class="text-whiteColor fw-bold"
       >
@@ -1010,6 +1119,9 @@
       customWidth={"95px"}
       disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
       onClick={() => {
+        handlecollection_document_response({
+          event_name: "Response Doc Saved!",
+        });
         handlePopupSave();
       }}
     ></Button>
@@ -1286,13 +1398,13 @@
 >
   <DownloadApp
     onInstallRedirect={() => {
-      window.open(constants.WEB_MARKETING_URL, "_blank");
+      window.open(constants.MARKETING_URL, "_blank");
     }}
     onGithubRedirect={() => {
       window.open(constants.SPARROW_GITHUB, "_blank");
     }}
     onDocsRedirect={() => {
-      window.open(constants.DOCS_URL, "_blank");
+      window.open(constants.INTRO_DOCS_URL, "_blank");
     }}
   />
 </Modal>
@@ -1546,6 +1658,131 @@
         isReplaceCollectionModalOpen = false;
       }}
     ></Button>
+  </div>
+</Modal>
+
+<Modal
+  title={"How to use Mock URL?"}
+  zIndex={1000}
+  isOpen={isMockURLModelOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isMockURLModelOpen = false;
+  }}
+>
+  <div class="d-flex flex-column gap-3 mt-3 mb-2">
+    <div class="d-flex gap-1" style="width: 100%;">
+      <p class="text-ds-font-size-14" style="margin-bottom: 0px;">1.</p>
+      <div>
+        <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
+          Copy the Mock URL
+        </p>
+        <p
+          class="text-ds-font-size-12 mt-1"
+          style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
+        >
+          Click "Copy" to copy your unique mock base URL.
+        </p>
+      </div>
+    </div>
+    <div class="d-flex gap-1">
+      <p class="text-ds-font-size-14" style="margin-bottom: 0px;">2.</p>
+      <div>
+        <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
+          Use it in Request
+        </p>
+        <p
+          class="text-ds-font-size-12 mt-1"
+          style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
+        >
+          Open request in this collection, paste the base URL in the request
+          field, followed by the endpoints (if any). For example,
+        </p>
+        <div
+          class="d-flex justify-content-start align-items-start px-2 py-1 text-ds-font-size-12 mt-1"
+          style="
+    background-color: var(--bg-ds-surface-400);
+    border-radius: 4px;
+    gap: 16px;
+    width: fit-content;
+  "
+        >
+          <span class="d-inline-block text-truncate" style="max-width: 380px;">
+            GET {mockCollectionUrl}/users
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex gap-1" style="width: 100%;">
+      <p class="text-ds-font-size-14" style="margin-bottom: 0px;">3.</p>
+      <div>
+        <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
+          Need more details?
+        </p>
+        <Tooltip title={"Coming Soon"} placement={"top-center"}>
+          <Button
+            size="small"
+            customWidth={"220px"}
+            type={"link-primary"}
+            title="Learn how mock collection works"
+            disable={true}
+            onClick={() => {}}
+            endIcon={OpenRegular}
+          />
+        </Tooltip>
+      </div>
+    </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Create Mock Collection"}
+  width={"36%"}
+  zIndex={1000}
+  isOpen={isCreateMockCollectionPopup}
+  handleModalState={() => (isCreateMockCollectionPopup = false)}
+>
+  <div class="text-lightGray mb-4 mt-2">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+    >
+      The mock collection only supports REST API requests. Requests using
+      GraphQL, WebSocket, or other request types will be excluded.
+      <br />
+      Do you want to continue?
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      disable={createMockCollection}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isCreateMockCollectionPopup = false;
+      }}
+    />
+
+    <Button
+      disable={createMockCollection}
+      title={"Yes, Continue"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"primary"}
+      loader={createMockCollection}
+      onClick={async () => {
+        createMockCollection = true;
+        await _viewModel.handleCreateMockCollectionFromExisting(
+          currentCollectionId,
+          currentWorkspaceId,
+        );
+        createMockCollection = false;
+        isCreateMockCollectionPopup = false;
+      }}
+    />
   </div>
 </Modal>
 

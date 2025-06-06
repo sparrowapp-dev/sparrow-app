@@ -2,15 +2,19 @@
   // ---- document models
   import type { WorkspaceDocument } from "@app/database/database";
   // ---- library
-  import { Input, LabelField } from "@sparrow/library/forms";
+  import { Input, LabelField, Checkbox } from "@sparrow/library/forms";
   import { Button, Avatar } from "@sparrow/library/ui";
   export let isWorkspacePublicModalOpen = false;
   export let workspace: WorkspaceDocument;
   export let onMakePublicWorkspace;
+  export let onRedirectTermsService;
+  export let onRedirectPrivacyPolicy;
+  export let onRedirectDocs;
   const inputId: string = "workspace-delete-input";
   let inputName = "";
   let inputNameError = "";
   let loader: boolean = false;
+  let isCheckboxChecked: boolean = false;
 </script>
 
 <div class="workspace-delete-confirmation">
@@ -24,34 +28,64 @@
     errorMessage={inputNameError}
   >
     <p
-      style="color: var(--text-ds-neutral-200); margin-bottom:0px; margin-top:18px;"
+      style="color: var(--text-ds-neutral-200); margin-bottom:7px; margin-top:18px;"
       class="text-ds-font-size-14 text-ds-line-height-143"
     >
-      Publish this workspace publicly?
+      Publish "{workspace?.name}" Workspace
     </p>
-    <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
+    <p
+      class="text-ds-font-size-12"
+      style="color: var(--text-ds-neutral-400); margin-bottom: 0px;"
+    >
       Anyone with the link can view this workspace, but only collaborators
       you've added can make changes. Active sync collections will remain private
-      and will not be made public. You can unpublish the workspace at any time
-      to make it private again. By publishing, you agree to our <span
-        style="color: var(--text-ds-neutral-50); text-decoration: underline;"
+      and will not be made public.<br/>By publishing, you agree to our
+    </p>
+    <div class="d-flex" style="align-items:center;">
+      <Button
+        title="Terms of Service"
+        type={"link-primary"}
+        onClick={async () => {
+          "click dont save";
+          await onRedirectTermsService();
+        }}
+        size="small"
+        buttonClassProp="ps-0 pe-1"
+      />
+      <!-- <span
+        style="color: var(--text-ds-neutral-200); text-decoration: underline;"
         >Terms of Service</span
+      > -->
+      <p
+        class="text-ds-font-size-12"
+        style="margin-top: 4px; margin-bottom:4px; color: var(--text-ds-neutral-400); "
       >
-      and
-      <span
-        style="color: var(--text-ds-neutral-50); text-decoration: underline;"
+        and
+      </p>
+      <Button
+        title="Privacy Policy"
+        type={"link-primary"}
+        onClick={async () => {
+          "click dont save";
+          await onRedirectPrivacyPolicy();
+        }}
+        size="small"
+        buttonClassProp="ps-1 pe-1"
+      />
+    </div>
+    <!-- <span
+        style="color: var(--text-ds-neutral-200); text-decoration: underline;"
         >Privacy Policy</span
-      >.
-    </p>
-    <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
-      To proceed, type <span style="color: var(--text-ds-neutral-50);"
-        >{workspace?.name}</span
-      > below.
-    </p>
+      > -->
 
-    <Input
+    <!-- <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
+      To proceed, type <span style="color: var(--text-ds-neutral-200);"
+        >workspace name</span
+      > below.
+    </p> -->
+
+    <!-- <Input
       bind:value={inputName}
-      height={"36px"}
       id={inputId}
       placeholder={"Type workspace name to proceed"}
       class="text-ds-font-size-14 bg-tertiary-300 text-ds-font-weight-medium px-2 border-radius-4"
@@ -60,14 +94,44 @@
       isEditIconRequired={false}
       type={"text"}
       placeholderColor={"var(--text-secondary-200)"}
-    />
-    <p class="text-ds-font-size-12" style="color: var(--text-ds-neutral-400);">
+    /> -->
+    <div class="checkbox-container">
+      <Checkbox
+        size={"small"}
+        bind:checked={isCheckboxChecked}
+        on:input={() => {
+          isCheckboxChecked = !isCheckboxChecked;
+        }}
+      />
       <span
-        style="color: var(--text-ds-neutral-50); text-decoration: underline;"
-        >Learn More</span
-      > how public workspaces work.
-    </p>
+        class="text-ds-font-size-12 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-200);"
+        >I accept and agree to make this workspace public.</span
+      >
+    </div>
   </LabelField>
+
+  <div class="d-flex" style="align-items:center;">
+    <Button
+      title="Learn More"
+      type={"link-primary"}
+      onClick={async () => {
+        "click dont save";
+        await onRedirectDocs();
+      }}
+      size="small"
+      buttonClassProp="ps-0 pe-1"
+    />
+    <p
+      class="text-ds-font-size-12"
+      style="color: var(--text-ds-neutral-400); margin-bottom: 0px;"
+    >
+      <!-- <span style="color: var(--text-ds-neutral-200); text-decoration: underline;"
+      >Learn More</span
+    >  -->
+      how public workspaces work.
+    </p>
+  </div>
   <br />
 
   <div
@@ -95,25 +159,24 @@
         {loader}
         onClick={async () => {
           loader = true;
-          inputName = inputName.replace(/’/g, "'");
-          if (inputName === "") {
-            inputNameError = `Workspace name cannot be empty. Please enter the workspace name.`;
-          } else if (inputName !== workspace?.name) {
-            inputNameError = `Workspace name doesn’t match.`;
-          } else {
-            inputNameError = "";
-            await onMakePublicWorkspace();
-            isWorkspacePublicModalOpen = false;
-          }
+          await onMakePublicWorkspace();
+          isWorkspacePublicModalOpen = false;
           loader = false;
         }}
-        disable={loader}
+        disable={!isCheckboxChecked || loader}
       />
     </div>
   </div>
 </div>
 
 <style lang="scss">
+  .checkbox-container {
+    margin-left: -5px;
+    display: flex;
+    align-items: center;
+    padding-left: 0;
+  }
+
   .workspace-delete-confirmation {
     .team-icon {
       height: 24px;

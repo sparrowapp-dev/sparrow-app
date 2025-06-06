@@ -1,4 +1,5 @@
 import yaml from "js-yaml";
+import * as Sentry from "@sentry/svelte";
 export function isUrlValid(str: string) {
   const pattern = new RegExp(
     "^(https?:\\/\\/)?" + // protocol
@@ -77,7 +78,7 @@ export const validateImportBody = (data: string) => {
   try {
     JSON.parse(data);
     return (contentType = ContentTypeEnum["application/json"]);
-  } catch (jsonError) {
+  } catch (jsonError) { 
     if (jsonError instanceof SyntaxError) {
       try {
         yaml.load(data);

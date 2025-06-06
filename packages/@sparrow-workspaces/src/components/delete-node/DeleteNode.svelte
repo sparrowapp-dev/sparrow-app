@@ -20,15 +20,18 @@
 <section>
   <div>
     <!-- Prompt message for the user to confirm leaving the team -->
-    <p class="text-fs-14 text-ds-font-weight-medium" style="color: var(--text-secondary-1000);">
-      Are you sure you want to delete this block?
-
-      {#if deleteCount > 0}
-        Deleting
-        <span style="font-weight: 700;">
-          {deleteNodeName ? `"${deleteNodeName}"` : "this"}
-        </span>
-        will also remove its {deleteCount} connected blocks.
+    <p
+      class="text-fs-14 text-ds-font-weight-medium"
+      style="color: var(--text-secondary-1000);"
+    >
+      {#if deleteCount >= 1}
+        Deleting this block will break <span
+          class=""
+          style="color: var(--text-ds-neutral-50)"
+          >{deleteCount} downstream blocks</span
+        > that rely on its dynamic expressions. Are you sure you want to proceed?
+      {:else}
+        Are you sure you want to delete this Block?
       {/if}
     </p>
   </div>

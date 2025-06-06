@@ -22,6 +22,7 @@ import { getClientUser } from "../../utils/jwt";
 import { WorkspaceTabAdapter } from "src/adapter";
 import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
+import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -34,6 +35,7 @@ export class TeamExplorerPageViewModel {
   private teamService = new TeamService();
   private guestUserRepository = new GuestUserRepository();
   private userService = new UserService();
+  private recentWorkspaceRepository = new RecentWorkspaceRepository();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -169,6 +171,9 @@ export class TeamExplorerPageViewModel {
           name,
           users,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           description,
           logo,
           workspaces,
@@ -191,6 +196,9 @@ export class TeamExplorerPageViewModel {
           name,
           users,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           description,
           logo,
           workspaces: updatedWorkspaces,
@@ -390,6 +398,71 @@ export class TeamExplorerPageViewModel {
     }
     // Disabling the switching of workspace in web
     navigate("collections");
+    // Update the recent workspace repository
+    const existingRecentWorkspace =
+      await this.recentWorkspaceRepository.readWorkspace(id);
+    if (!existingRecentWorkspace) {
+      const {
+        _id,
+        name,
+        description,
+        workspaceType,
+        team,
+        createdAt,
+        createdBy,
+        updatedAt,
+        updatedBy,
+      } = res;
+      const recentWorkspaceItem = {
+        _id,
+        name,
+        description,
+        workspaceType,
+        isShared: false,
+        team: {
+          teamId: team?.teamId,
+          teamName: team?.teamName || "",
+          hubUrl: team?.hubUrl || "",
+        },
+        lastVisited: new Date().toISOString(),
+        createdAt,
+        createdBy,
+        updatedAt,
+        updatedBy,
+      };
+      await this.recentWorkspaceRepository.addRecentWorkspace(
+        recentWorkspaceItem,
+      );
+      // Limit public workspaces to 6 most recently visited
+      await this.limitPrivateWorkspaces(6);
+    }
+  };
+
+  private limitPrivateWorkspaces = async (maxCount: number): Promise<void> => {
+    // Get all public workspaces sorted by lastVisited
+    const allPublicWorkspaces =
+      await this.recentWorkspaceRepository.getRecentWorkspacesDocs();
+    const publicWorkspaces = allPublicWorkspaces.filter(
+      (workspace) => workspace.workspaceType === "PRIVATE",
+    );
+
+    // If we have more than the max count, remove the oldest ones
+    if (publicWorkspaces.length > maxCount) {
+      // Sort by lastVisited (most recent first)
+      const sortedWorkspaces = publicWorkspaces.sort((a, b) => {
+        const dateA = a.lastVisited ? new Date(a.lastVisited).getTime() : 0;
+        const dateB = b.lastVisited ? new Date(b.lastVisited).getTime() : 0;
+        return dateB - dateA;
+      });
+
+      // Get the workspaces to remove (oldest ones)
+      const workspacesToRemove = sortedWorkspaces.slice(maxCount);
+
+      // Delete each workspace that exceeds our limit
+      for (const workspace of workspacesToRemove) {
+        await this.recentWorkspaceRepository.deleteWorkspace(workspace._id);
+      }
+    }
   };
 
   /**
@@ -415,7 +488,7 @@ export class TeamExplorerPageViewModel {
       await this.refreshWorkspaces(_userId);
       await this.teamRepository.modifyTeam(_teamId, responseData);
       notifications.success(
-        `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
+        `Invite sent to ${_inviteBody.users.length} person for ${_teamName}.`,
       );
     } else {
       notifications.error(
@@ -865,7 +938,7 @@ export class TeamExplorerPageViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} person for ${_workspaceName}.`,
       );
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);
@@ -899,7 +972,7 @@ export class TeamExplorerPageViewModel {
     );
     if (response.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite resent successfully!`);
+      notifications.success(`Invite resent successfully.`);
       return response;
     } else {
       notifications.error("Failed to resend invite. Please try again.");
@@ -915,7 +988,7 @@ export class TeamExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite withdrawn successfully!`);
+      notifications.success(`Invite withdrawn successfully.`);
       return response;
     } else {
       notifications.error("Failed to withdraw invite. Please try again.");

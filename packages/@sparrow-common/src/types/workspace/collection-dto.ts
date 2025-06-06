@@ -1,5 +1,6 @@
 import type { GraphqlRequestMetaDataDtoInterface } from "./graphql-request-dto";
 import type { HttpRequestMetaDataDtoInterface } from "./http-request-dto";
+import type { HttpRequestMockMetaDataDtoInterface } from "./http-request-mock-dto";
 import type { SocketIORequestMetaDataDtoInterface } from "./socket-io-request-dto";
 import type { WebSocketRequestMetaDataDtoInterface } from "./websocket-request-dto";
 
@@ -10,6 +11,7 @@ export enum CollectionItemTypeDtoEnum {
   WEBSOCKET = "WEBSOCKET",
   SOCKETIO = "SOCKETIO",
   GRAPHQL = "GRAPHQL",
+  MOCK_REQUEST = "MOCK_REQUEST",
 }
 
 export enum CollectionSourceTypeDtoEnum {
@@ -28,6 +30,7 @@ export interface CollectionItemDtoInterface {
   websocket?: WebSocketRequestMetaDataDtoInterface;
   socketio?: SocketIORequestMetaDataDtoInterface;
   graphql?: GraphqlRequestMetaDataDtoInterface;
+  mockRequest?: HttpRequestMockMetaDataDtoInterface;
   isDeleted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -45,6 +48,22 @@ export interface CollectionUpdaterDetailsDtoInterface {
   id?: string;
 }
 
+export interface MockRequestHistoryDtoInterface {
+  id?: string;
+  timestamp: Date;
+  name: string;
+  url: string;
+  method: string;
+  responseStatus?: string;
+  duration: number;
+  requestHeaders?: { key: string; value: string; checked: boolean }[];
+  requestBody?: any[];
+  selectedRequestBodyType?: string;
+  selectedResponseBodyType?: string;
+  responseHeaders?: { key: string; value: string; checked: boolean }[];
+  responseBody?: string;
+}
+
 export interface CollectionDtoInterface {
   name: string;
   description?: string;
@@ -60,4 +79,5 @@ export interface CollectionDtoInterface {
   updatedAt?: Date;
   createdBy?: string;
   updatedBy?: CollectionUpdaterDetailsDtoInterface;
+  mockRequestHistory?: MockRequestHistoryDtoInterface[];
 }

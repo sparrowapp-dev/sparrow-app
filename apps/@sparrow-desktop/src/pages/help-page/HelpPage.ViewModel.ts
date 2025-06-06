@@ -10,7 +10,7 @@ import { DiscordIDs } from "@sparrow/support/constants/discord.constants";
 import { LearnMoreURL } from "@sparrow/support/constants/learnMore.constant";
 // import type { CannyUserType } from "@common/types/canny/canny";
 import { open } from "@tauri-apps/plugin-shell";
-
+import * as Sentry from "@sentry/svelte";
 class HelpPageViewModel {
   // Private Services
   private cannyService = new CannyIoService();

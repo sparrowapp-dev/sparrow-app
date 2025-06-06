@@ -9,9 +9,13 @@
     QuestionCirlceReqular,
     DocumentRegular,
     GiftReqular,
+    HomeRegular,
+    CartRegular,
+    GlobeRegular,
+    LockClosedRegular,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
-  import { environmentType } from "@sparrow/common/enums";
+  import { environmentType, WorkspaceType } from "@sparrow/common/enums";
   import { SparrowIcon } from "@sparrow/library/icons";
   import { ArrowRightIcon } from "@sparrow/library/icons";
   import type { WorkspaceDocument } from "@app/database/database";
@@ -21,8 +25,10 @@
   import UserProfileModal, {
     type UserProfileObj,
   } from "./sub-component/UserProfileModal.svelte";
-  import { Button, Dropdown, Tooltip } from "@sparrow/library/ui";
+  import { Button, Dropdown, Tag, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
+  import { policyConfig } from "@sparrow/common/store";
+
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -53,6 +59,8 @@
 
   export let currentTeamId;
 
+  export let currentWorkspaceType;
+
   export let workspaceDocuments: WorkspaceDocument[] = [];
   export let teamDocuments = [];
 
@@ -69,6 +77,7 @@
   export let onSearchClick;
   export let handleDocsRedirect;
   export let handleFeaturesRedirect;
+  export let recentVisitedWorkspaces;
 
   let helpOptionsOpen = false;
 
@@ -112,6 +121,7 @@
       id: currentWorkspaceId,
       name: currentWorkspaceName,
       description: currentTeamName,
+      icon: WorkspaceRegular,
     },
   ];
 
@@ -146,28 +156,61 @@
     });
   };
 
-  const calculateLimitedWorkspace = () => {
-    let workspaces = workspaceDocuments
-      .filter((elem) => {
-        if (currentTeamId === elem?.team?.teamId) return true;
-        return false;
-      })
-      .reverse()
-      .slice(0, 5)
-      .map((workspace) => {
-        const workspaceObj = {
-          id: workspace._id,
-          name: workspace.name,
-          description: workspace.team?.teamName,
-        };
-        return workspaceObj;
-      });
-    workspaces.push({
+  // const calculateLimitedWorkspace = () => {
+  //   let workspaces = workspaceDocuments
+  //     .filter((elem) => {
+  //       if (currentTeamId === elem?.team?.teamId) return true;
+  //       return false;
+  //     })
+  //     .reverse()
+  //     .slice(0, 5)
+  //     .map((workspace) => {
+  //       const workspaceObj = {
+  //         id: workspace._id,
+  //         name: workspace.name,
+  //         description: workspace.team?.teamName,
+  //         icon: WorkspaceRegular,
+  //       };
+  //       return workspaceObj;
+  //     });
+  //   workspaces.push({
+  //     id: currentWorkspaceId,
+  //     name: currentWorkspaceName,
+  //     description: currentTeamName,
+  //     icon: WorkspaceRegular,
+  //   });
+  //   const res = createSetFromArray(workspaces, "id");
+  //   if (res.length > 5) {
+  //     res.shift();
+  //   }
+  //   workspaceData = res;
+  //   return;
+  // };
+
+  const calculateLimitedVisitedWorkspace = () => {
+    // debugger;
+    let workspaces = recentVisitedWorkspaces?.slice(0, 5)?.map((workspace) => {
+      const workspaceObj = {
+        id: workspace?._id,
+        name: workspace?.name,
+        description: workspace?.team?.teamName,
+        icon:
+          workspace?.workspaceType === "PUBLIC"
+            ? GlobeRegular
+            : LockClosedRegular,
+      };
+      return workspaceObj;
+    });
+    workspaces?.push({
       id: currentWorkspaceId,
       name: currentWorkspaceName,
       description: currentTeamName,
+      icon:
+        currentWorkspaceType === WorkspaceType.PUBLIC
+          ? GlobeRegular
+          : LockClosedRegular,
     });
-    const res = createSetFromArray(workspaces, "id");
+    const res = createSetFromArray(workspaces || [], "id");
     if (res.length > 5) {
       res.shift();
     }
@@ -181,11 +224,13 @@
       currentTeamId ||
       currentWorkspaceName ||
       currentWorkspaceId ||
-      workspaceDocuments
+      workspaceDocuments ||
+      recentVisitedWorkspaces
     ) {
-      calculateLimitedWorkspace();
+      calculateLimitedVisitedWorkspace();
     }
   }
+
   const handleViewWorkspaces = () => {
     navigate("/app/home");
   };
@@ -341,14 +386,15 @@
                   </div>
                 </div>
               </div>
-
-              <Button
-                type="primary"
-                title="Create an Account or Sign In"
-                size="small"
-                onClick={onLoginUser}
-                customWidth={"100%"}
-              />
+              {#if $policyConfig.enableLogin}
+                <Button
+                  type="primary"
+                  title="Create an Account or Sign In"
+                  size="small"
+                  onClick={onLoginUser}
+                  customWidth={"100%"}
+                />
+              {/if}
             </div>
           </Select>
         </div>
@@ -378,11 +424,15 @@
           icon={WorkspaceRegular}
           iconColor={"var(--icon-ds-neutral-100)"}
           headerFontWeight={600}
-          showDescription={false}
+          showDescription={true}
           headerHeight={"28px"}
         >
           <div slot="pre-select" class="mb-1">
-            <div class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150">{currentTeamName}</div>
+            <div
+              class="workspacename text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150"
+            >
+              Recent workspaces
+            </div>
           </div>
           <div
             slot="post-select"
@@ -390,21 +440,31 @@
             style="justify-content: center; align-items:center;"
           >
             <div class="lower-underline"></div>
-            <div class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={handleViewWorkspaces}>
-              <span>View all Workspaces</span>
+            <div
+              class="view-all-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+              on:click={() => {
+                navigate("/app/marketplace");
+              }}
+            >
+              <span>Marketplace</span>
               <Button
                 type="teritiary-regular"
-                startIcon={ArrowRightRegular}
+                startIcon={CartRegular}
                 size="small"
               />
             </div>
             <div class="lower-underline"></div>
-            <div class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium" on:click={onCreateWorkspace}>
-              <span>Create New Workspace</span>
+            <div
+              class="create-new-workspace text-ds-font-size-12 text-ds-font-weight-medium"
+              on:click={() => {
+                navigate("/app/home");
+              }}
+            >
+              <span>Home</span>
               <div style="align-content: flex-end;">
                 <Button
                   type="teritiary-regular"
-                  startIcon={AddRegular}
+                  startIcon={HomeRegular}
                   size="small"
                 />
               </div>
@@ -413,13 +473,19 @@
         </Select>
       {/if}
     </div>
+    {#if currentWorkspaceType === WorkspaceType.PUBLIC}
+      <Tag type="green" text="Public" endIcon={GlobeRegular} />
+    {/if}
   </div>
 
   <div
     class="d-flex align-items-center no-drag"
-    style="position: relative; display:flex; gap: 16px;"
+    style="position: relative; display:flex; gap: 16px; margin-right: {isWebApp ||
+    !isWindows
+      ? '16px'
+      : '0px'}"
   >
-    {#if isGuestUser && isLoginBannerActive === false}
+    {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
       <Tooltip
         placement="bottom-center"
         title={"You are using Sparrow Edge"}
@@ -600,7 +666,7 @@
     {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-1"}>
+      <div>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}

@@ -19,6 +19,8 @@ import { createDeepCopy } from "@sparrow/common/utils";
 import { EnvironmentService } from "src/services/environment.service";
 import { TestflowRepository } from "src/repositories/testflow.repository";
 import { TestflowService } from "src/services/testflow.service";
+import { TabRepository } from "src/repositories/tab.repository";
+import { identifyUser } from "src/utils/posthog/posthogConfig";
 const _guideRepository = new GuideRepository();
 const guestUserRepository = new GuestUserRepository();
 const teamRepository = new TeamRepository();
@@ -30,6 +32,7 @@ const collectionRepository = new CollectionRepository();
 const environmentService = new EnvironmentService();
 const testflowRepository = new TestflowRepository();
 const testflowService = new TestflowService();
+const tabRepository = new TabRepository();
 
 export const sendUserDataToMixpanel = (userDetails: {
   _id: string;
@@ -206,7 +209,7 @@ const createPublicTeamWorkspace = async (user: any, workspaceData: any) => {
   const existingWorkspace = await workspaceRepository.readWorkspace(
     workspaceData._id,
   );
-  if (existingWorkspace) {
+  if (existingWorkspace && existingWorkspace.team?.teamId !== teamId) {
     await workspaceRepository.setActiveWorkspace(workspaceData._id);
     return;
   }
@@ -217,9 +220,31 @@ const createPublicTeamWorkspace = async (user: any, workspaceData: any) => {
   }
   await teamRepository.createTeam(dummyTeam);
   await workspaceRepository.addWorkspace(item);
-  await fetchCollections(workspaceData._id);
-  await refreshEnvironment(workspaceData._id);
-  await refreshTestflow(workspaceData._id);
+  const [
+    fetchCollectionsResult,
+    refreshEnvironmentResult,
+    refreshTestflowResult,
+  ] = await Promise.all([
+    fetchCollections(workspaceData._id),
+    refreshEnvironment(workspaceData._id),
+    refreshTestflow(workspaceData._id),
+  ]);
+  const collectionTabsToBeDeleted =
+    fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
+  const environmentTabsToBeDeleted =
+    refreshEnvironmentResult?.environmentTabsToBeDeleted || [];
+  const testflowTabsToBeDeleted =
+    refreshTestflowResult?.testflowTabsToBeDeleted || [];
+
+  const totalTabsToBeDeleted = [
+    ...collectionTabsToBeDeleted,
+    ...environmentTabsToBeDeleted,
+    ...testflowTabsToBeDeleted,
+  ];
+  await tabRepository.deleteTabsWithTabIdInAWorkspace(
+    workspaceData._id,
+    totalTabsToBeDeleted,
+  );
 };
 
 /**
@@ -233,6 +258,30 @@ const fetchCollections = async (
     workspaceId,
     constants.API_URL,
   );
+  /**
+   * Iterates throught the Collection and return all the Collection item Ids - COllection, Folder, Http Request, WebSocket Request.
+   * @param _collectionItem - Collection or Collection item (Folder, Http Request, WebSocket Request).
+   * @param _collectionItemIds - Blank list that should be manipulated by this function as a result.
+   * @returns List of COllection item Ids.
+   */
+  const getCollectionItemIds = (
+    _collectionItem: any,
+    _collectionItemIds: string[],
+  ): void => {
+    if (!_collectionItem?.type) {
+      // Collection - object do not have type and holds _id.
+      _collectionItemIds.push(_collectionItem._id);
+    } else {
+      // Folder, Http Request, WebSocket Request - object that holds id.
+      _collectionItemIds.push(_collectionItem.id);
+    }
+
+    // Recursively search through the Collection item structure
+    for (let j = 0; j < _collectionItem?.items?.length; j++) {
+      getCollectionItemIds(_collectionItem.items[j], _collectionItemIds);
+    }
+    return;
+  };
   if (res?.isSuccessful && res?.data?.data) {
     const collections = res.data.data;
     await collectionRepository.bulkInsertData(
@@ -246,6 +295,26 @@ const fetchCollections = async (
         return collection;
       }),
     );
+    await collectionRepository.deleteOrphanCollections(
+      workspaceId,
+      collections?.map((_collection: any) => {
+        return _collection._id;
+      }),
+    );
+    const collectionItemIds: string[] = [];
+    for (let i = 0; i < collections.length; i++) {
+      getCollectionItemIds(collections[i], collectionItemIds);
+    }
+
+    const collectionItemTabsToBeDeleted =
+      await tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+        workspaceId,
+        collectionItemIds as string[],
+      );
+
+    return {
+      collectionItemTabsToBeDeleted,
+    };
   }
 
   return {};
@@ -276,6 +345,22 @@ const refreshEnvironment = async (
         return environment;
       }),
     );
+    await environmentRepository.deleteOrphanEnvironments(
+      workspaceId,
+      environments?.map((_environment: any) => {
+        return _environment._id;
+      }),
+    );
+    const environmentTabsToBeDeleted =
+      await tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
+        workspaceId,
+        environments?.map((_environment: any) => {
+          return _environment._id;
+        }),
+      );
+    return {
+      environmentTabsToBeDeleted,
+    };
   }
   return {};
 };
@@ -303,7 +388,24 @@ const refreshTestflow = async (
         return testflow;
       }),
     );
+    await testflowRepository.deleteOrphanTestflows(
+      workspaceId,
+      testflows?.map((_testflow: any) => {
+        return _testflow._id;
+      }),
+    );
+    const testflowTabsToBeDeleted =
+      await tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
+        workspaceId,
+        testflows?.map((_testflow: any) => {
+          return _testflow._id;
+        }),
+      );
+    return {
+      testflowTabsToBeDeleted,
+    };
   }
+  // debugger;
   return {};
 };
 
@@ -311,6 +413,8 @@ export async function handleLogin(url: string) {
   const tokens = getAuthJwt();
   const urlParams = new URLSearchParams(url.split("?")[1]);
   const workspaceId = urlParams.get("workspaceId");
+  const adminRedirectWorkspaceId = urlParams.get("adminRedirectWorkspaceId");
+  const adminRedirectHubId = urlParams.get("adminRedirectHubId");
   const clientUser = getClientUser();
 
   if ((!tokens[0] || !tokens[1]) && !url) {
@@ -346,6 +450,18 @@ export async function handleLogin(url: string) {
         }, 1000);
       }
     }
+    // this will open the workspace in the app
+    if (adminRedirectWorkspaceId) {
+      setTimeout(async () => {
+        await workspaceRepository.setActiveWorkspace(adminRedirectWorkspaceId);
+      }, 1000);
+    }
+    // this will open the hub in the app
+    if (adminRedirectHubId) {
+      setTimeout(async () => {
+        await teamRepository.setOpenTeam(adminRedirectHubId);
+      }, 1000);
+    }
     return;
   }
   const params = new URLSearchParams(url.split("?")[1]);
@@ -359,6 +475,7 @@ export async function handleLogin(url: string) {
   }
   // handles case if token exist in url
   const userDetails = jwtDecode(accessToken);
+  identifyUser(userDetails.email);
   setAuthJwt(constants.AUTH_TOKEN, accessToken);
   setAuthJwt(constants.REF_TOKEN, refreshToken);
   setUser(jwtDecode(accessToken));

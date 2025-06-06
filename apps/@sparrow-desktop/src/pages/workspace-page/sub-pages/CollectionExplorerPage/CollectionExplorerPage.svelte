@@ -27,6 +27,7 @@
   export let tab: TabDocument;
 
   export let onSyncCollection: (collectionId: string) => void;
+  export let onMockCollectionModelOpen;
 
   // ViewModel initialization
   const _viewModel = new CollectionExplorerPage(tab);
@@ -38,6 +39,7 @@
   let collection: CollectionDocument;
 
   let prevTabName = "";
+  let isSharedWorkspace = false;
 
   /**
    * produces delay to update name of a collection.
@@ -103,6 +105,7 @@
       if (activeWorkspaceRxDoc) {
         currentWorkspace = activeWorkspaceRxDoc;
         currentWorkspaceId = activeWorkspaceRxDoc._id;
+        isSharedWorkspace = activeWorkspaceRxDoc.isShared;
         environmentId = activeWorkspaceRxDoc.environmentId as string;
         const clientUserId = getClientUser().id;
         if (clientUserId) {
@@ -122,6 +125,7 @@
         } else {
           isCollectionEditable = true;
         }
+        findUserRole();
       }
     },
   );
@@ -187,6 +191,8 @@
 </script>
 
 <CollectionExplorer
+  bind:userRole
+  {onMockCollectionModelOpen}
   {isCollectionEditable}
   onUpdateEnvironment={_viewModel.updateEnvironment}
   isWebApp={false}
@@ -205,4 +211,7 @@
   getLastUpdatedAndCount={_viewModel.getLastUpdatedAndCount}
   onUpdateCollectionState={_viewModel.updateCollectionState}
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
+  onUpdateRunningState={_viewModel.handleMockCollectionState}
+  currentWorkspace={currentWorkspace}
+  {isSharedWorkspace}
 />

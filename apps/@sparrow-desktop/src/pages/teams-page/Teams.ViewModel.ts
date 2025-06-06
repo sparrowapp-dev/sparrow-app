@@ -19,6 +19,8 @@ import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TestflowRepository } from "@app/repositories/testflow.repository";
 
 export class TeamsViewModel {
   constructor() {}
@@ -33,6 +35,8 @@ export class TeamsViewModel {
 
   private collectionRepository = new CollectionRepository();
   private userService = new UserService();
+  private environmentRepository = new EnvironmentRepository();
+  private testflowRepository = new TestflowRepository();
 
   /**
    * @description - get environment list from local db
@@ -73,6 +77,9 @@ export class TeamsViewModel {
           name,
           users,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           description,
           logo,
           workspaces,
@@ -95,6 +102,9 @@ export class TeamsViewModel {
           teamId: _id,
           name,
           hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
           users,
           description,
           logo,
@@ -347,12 +357,26 @@ export class TeamsViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
-      await this.workspaceRepository.deleteOrphanWorkspaces(
-        data.map((_workspace) => {
-          return _workspace._id;
-        }),
-      );
-      if (!isAnyWorkspaceActive) {
+      const selectedWorkspacesToBeDeleted =
+        await this.workspaceRepository.deleteOrphanWorkspaces(
+          data.map((_workspace) => {
+            return _workspace._id;
+          }),
+        );
+      if (selectedWorkspacesToBeDeleted?.length > 0) {
+        await this.collectionRepository.removeCollectionsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+        await this.environmentRepository.removeEnvironmentsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+        await this.testflowRepository.removeTestflowsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+      }
+      const isSharedWorkspaceActive =
+        await this.workspaceRepository.getSharedPublicActiveWorkspace();
+      if (!isAnyWorkspaceActive && !isSharedWorkspaceActive) {
         this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
       }

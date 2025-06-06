@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Events } from "@sparrow/common/enums";
+  import { Events, WorkspaceRole } from "@sparrow/common/enums";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { generatingImage } from "@sparrow/common/images";
   import { TextEditor } from "@sparrow/library/forms";
   import { AISuggestionBox } from "../../../../features/chat-bot/components";
+  import { policyConfig } from "@sparrow/common/store";
 
   export let onUpdateRequestDescription;
   export let isDocGenerating = false;
@@ -11,6 +12,7 @@
   export let onGenerateDocumentation;
   export let isGuestUser;
   export let requestDoc: string;
+  export let userRole;
 
   const sendPrompt = async (text: string) => {
     if (text) {
@@ -20,7 +22,10 @@
 </script>
 
 <div class=" text-fs-14">
-  <div style="height: 100%; min-height:160px;background-color: var(--bg-ds-surface-600);border-radius:4px;padding:8px;display:flex;flex-direction:column;gap:4px;" class="area">
+  <div
+    style="height: 100%; min-height:160px;background-color: var(--bg-ds-surface-600);border-radius:4px;padding:8px;display:flex;flex-direction:column;gap:4px;"
+    class="area"
+  >
     <div on:keydown|stopPropagation on:keyup|stopPropagation>
       <div
         id="editor2"
@@ -31,16 +36,16 @@
           id={"editor2"}
           onInput={onUpdateRequestDescription}
           value={requestDoc}
-          isReadOnly={isDocGenerating ? true : false}
+          isReadOnly={isDocGenerating ||
+          userRole === WorkspaceRole.WORKSPACE_VIEWER
+            ? true
+            : false}
         />
       </div>
     </div>
-    {#if !isGuestUser}
-      <div
-        class=""
-        style=" width: 100%;"
-      >
-        <div style="width:fit-content;] ">
+    {#if !isGuestUser && $policyConfig.enableAIAssistance && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <div class="" style=" width: 100%;">
+        <div style="width:fit-content; ">
           {#if isDocGenerating == true}
             <div
               class="text-primary-300 mt-1"
@@ -75,7 +80,6 @@
         </div>
       </div>
     {/if}
-    
   </div>
 </div>
 

@@ -57,11 +57,14 @@ import {
 import { isGuestUserActive } from "src/store/auth.store";
 import { EnvironmentService } from "@app/services/environment.service";
 import type { EnvironmentDocType } from "src/models/environment.model";
+import { DecodeTestflow } from "@sparrow/workspaces/features/testflow-explorer/utils";
 import constants from "src/constants/constants";
+import * as Sentry from "@sentry/svelte";
 
 export class TestflowExplorerPageViewModel {
-  private _tab = new BehaviorSubject<Partial<Tab>>({});
+   private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
+  
   private collectionRepository = new CollectionRepository();
   private environmentRepository = new EnvironmentRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -74,7 +77,7 @@ export class TestflowExplorerPageViewModel {
   /**
    * Utils
    */
-  private _decodeRequest = new DecodeRequest();
+  private _decodeRequest = new DecodeTestflow();
 
   /**
    * Constructor to initialize the TestflowExplorerPageViewModel class
@@ -204,7 +207,7 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.id,
     );
     testflowServer = testflowServer?.toMutableJSON();
-    // console.log(progressiveTab, testflowServer); will be used for debugging in some time
+    const tabServer = new TestflowTabAdapter().unadapt(progressiveTab);
 
     if (!testflowServer) {
       result = false;
@@ -219,13 +222,13 @@ export class TestflowExplorerPageViewModel {
     else if (
       !this.compareArray.init(
         testflowServer.nodes,
-        progressiveTab.property.testflow.nodes,
+        tabServer.nodes,
       )
     ) {
       result = false;
     }
 
-    // nodes
+    // edges
     else if (
       !this.compareArray.init(
         testflowServer.edges,
@@ -384,6 +387,23 @@ export class TestflowExplorerPageViewModel {
     return collectionAuth;
   };
 
+  private findConnectedNodes  = (adj: any[], start: number,nodes, result, visited = new Set(), ) => {
+    if (visited.has(start)) return;
+
+    
+      for (let i = 0; i < nodes.length; i++) {
+        if (Number(nodes[i].id) === start) {
+          result.push(nodes[i]);
+        }
+      }
+      
+    visited.add(start);
+
+    for (const neighbor of adj[start]) {
+      this.findConnectedNodes(adj, neighbor, nodes, result, visited,);
+    }
+  };
+
   /**
    * Handles running the test flow by processing each node sequentially and recording the results
    */
@@ -396,25 +416,66 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     );
     const nodes = progressiveTab?.property?.testflow?.nodes;
+    const edges = progressiveTab?.property?.testflow?.edges;
     const abortController = new AbortController();
     const { signal } = abortController;
 
     let runningNodes: any[] = [];
 
     if (_event === "run-from-here") {
-      nodes.forEach((node: any) => {
-        if (node.id >= _id) {
-          runningNodes.push(node);
-        }
-      });
+      let maxNodeId = 1;
+      for (let i = 0; i < nodes.length; i++) {
+           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+         }
+         
+       // Initialize adjacency list
+       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+       // Populate adjacency list
+  
+     
+      for (let i = 0; i < edges.length; i++) {
+        graph[Number(edges[i].source)].push(Number(edges[i].target));
+      }
+      
+      let result = [];
+      this.findConnectedNodes(graph, Number(_id), nodes,result );
+      runningNodes = [...result];
     } else if (_event === "run-till-here") {
-      nodes.forEach((node: any) => {
-        if (node.id <= _id) {
-          runningNodes.push(node);
-        }
-      });
+      let maxNodeId = 1;
+      for (let i = 0; i < nodes.length; i++) {
+           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+         }
+         
+       // Initialize adjacency list
+       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+       // Populate adjacency list
+  
+     
+      for (let i = 0; i < edges.length; i++) {
+        graph[Number(edges[i].target)].push(Number(edges[i].source));
+      }
+      
+      let result = [];
+      this.findConnectedNodes(graph, Number(_id), nodes,result );
+      runningNodes = [...(result.reverse())];
     } else {
-      runningNodes = [...nodes];
+      let maxNodeId = 1;
+      for (let i = 0; i < nodes.length; i++) {
+           maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+         }
+         
+       // Initialize adjacency list
+       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+       // Populate adjacency list
+  
+     
+      for (let i = 0; i < edges.length; i++) {
+        graph[Number(edges[i].source)].push(Number(edges[i].target));
+      }
+      
+      let result = [];
+      this.findConnectedNodes(graph, Number("1"), nodes,result );
+      runningNodes = [...result];
     }
 
     testFlowDataStore.update((testFlowDataMap) => {
@@ -428,6 +489,7 @@ export class TestflowExplorerPageViewModel {
           abortController: abortController,
           nodes: [],
           history: [],
+          runner:{},
           isRunHistoryEnable: false,
           isTestFlowRunning: true,
           isTestFlowSaveInProgress: false,
@@ -450,6 +512,8 @@ export class TestflowExplorerPageViewModel {
       expand: false,
     };
 
+    let requestChainResponse = {};
+
     // Sequential execution
     for (const element of runningNodes) {
       if (element?.type === "requestBlock" && element?.data?.requestId) {
@@ -469,13 +533,13 @@ export class TestflowExplorerPageViewModel {
           request,
         );
 
-        // Extract the auth data from the API request
-        const collectionAuth = extractAuthData(request);
+        
 
         const decodeData = this._decodeRequest.init(
           adaptedRequest.property.request,
           environments?.filtered || [],
-          collectionAuth,
+          requestChainResponse
+          
         );
         const start = Date.now();
 
@@ -498,7 +562,7 @@ export class TestflowExplorerPageViewModel {
             );
             if (existingTestFlowData) {
               let resData: TFHistoryAPIResponseStoreType;
-              if (response.isSuccessful) {
+              // if (response.isSuccessful) {
                 const byteLength = new TextEncoder().encode(
                   JSON.stringify(response),
                 ).length;
@@ -540,35 +604,94 @@ export class TestflowExplorerPageViewModel {
                   time: new ParseTime().convertMilliseconds(duration),
                 };
                 history.requests.push(req);
-              } else {
-                resData = {
-                  body: "",
-                  headers: [],
-                  status: ResponseStatusCode.ERROR,
-                  time: duration,
-                  size: 0,
-                };
-                failedRequests++;
-                totalTime += duration;
-                const req = {
-                  method: request?.request?.method as string,
-                  name: request?.name as string,
-                  status: ResponseStatusCode.ERROR,
-                  time: new ParseTime().convertMilliseconds(duration),
-                };
-                history.requests.push(req);
-              }
+              // } else {
+              //   resData = {
+              //     body: "",
+              //     headers: [],
+              //     status: ResponseStatusCode.ERROR,
+              //     time: duration,
+              //     size: 0,
+              //   };
+              //   failedRequests++;
+              //   totalTime += duration;
+              //   const req = {
+              //     method: request?.request?.method as string,
+              //     name: request?.name as string,
+              //     status: ResponseStatusCode.ERROR,
+              //     time: new ParseTime().convertMilliseconds(duration),
+              //   };
+              //   history.requests.push(req);
+              // }
               existingTestFlowData.nodes.push({
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
               });
 
+              const responseHeader = this._decodeRequest.setResponseContentType(
+                formattedHeaders,
+              );
+
+              const reqParam = {};
+              const params = new URL(decodeData[0]).searchParams;
+
+
+              for (const [key, value] of params.entries()) {
+                reqParam[key] = value;
+              }
+
+                const headersObject = Object.fromEntries(
+                  JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
+                );
+
+
+                let reqBody;
+                if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
+                  try{
+                    reqBody = JSON.parse(decodeData[3]);
+                  }
+                  catch(e){
+                    reqBody = {};
+                  }
+                }
+                else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
+                  const formDataObject = Object.fromEntries(
+                    JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
+                  );
+                  reqBody = formDataObject || {}
+                }
+                else{
+                  reqBody = decodeData[3];
+                }
+                requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+                requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+
+
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
           });
-        } catch (error) {
+        } catch (error) { 
           if (error?.name === "AbortError") {
             break;
           }
@@ -590,6 +713,31 @@ export class TestflowExplorerPageViewModel {
                 response: resData,
                 request: adaptedRequest,
               });
+
+              requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                response: {
+                  body: {},
+                  headers:{}
+                },
+                request: {
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
+
+              requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                response: {
+                  body: {},
+                  headers:{}
+                },
+                request: {
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
+
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -624,6 +772,7 @@ export class TestflowExplorerPageViewModel {
           wsData.history = hs;
         }
         wsData.isTestFlowRunning = false;
+        wsData.runner = requestChainResponse;
         testFlowDataMap.set(progressiveTab.tabId, wsData);
       }
       return testFlowDataMap;
@@ -634,6 +783,82 @@ export class TestflowExplorerPageViewModel {
       );
     }
   };
+
+
+  private setEnvironmentVariables = (
+    text: string,
+    environmentVariables,
+  ): string => {
+    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, squareContent) => {
+      const updated = squareContent
+      .replace(/\\/g, '').replace(/"/g, `'`)
+      .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
+        return `'{{${inner.trim()}}}'`;
+      });
+      return `[*$[${updated}]$*]`;
+    });
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+    return updatedText;
+  };
+
+  private setDynamicExpression2 = (
+    text: string,
+    response,
+  ): any => {
+    let status = "fail";
+    let contentType = "Text";
+    const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, expr) => {
+      try {
+        const de = expr.replace(/'\{\{(.*?)\}\}'/g,"undefined"); // convert missing environments to undefined 
+        // Use Function constructor to evaluate with access to `response`
+        const fn = new Function("response", `
+          with (response) {
+            return (${de});
+          }
+        `);
+        const s = fn(response);
+        if(typeof s === "string"){
+          status = "pass";
+          contentType = "Text";
+          return s;
+        }
+        if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
+          status = "pass";
+          contentType = "JSON"
+          return `${JSON.stringify(s)}`; // serialize object
+        }
+        contentType = "JavaScript"
+        status = "pass";
+        return s;
+      } catch (e) {
+        status = "fail";
+        console.error("Eval error:", e.message);
+        return e.message;
+      }
+    });
+    return {result, status, contentType};
+  };
+
+ public handlePreviewExpression = async(expression) => {
+
+  const progressiveTab = createDeepCopy(this._tab.getValue());
+  const environments = await this.getActiveEnvironments(
+    progressiveTab.path.workspaceId,
+  );
+
+  let runner = {};
+  testFlowDataStore.update((testFlowDataMap) => {
+    let wsData = testFlowDataMap.get(progressiveTab.tabId);
+    if (wsData) {
+      runner = wsData.runner;
+    } 
+    return testFlowDataMap;
+  });
+  return this.setDynamicExpression2(this.setEnvironmentVariables("[*$[" + expression + "]$*]", environments?.filtered || []), runner);
+ }
 
   /**
    * Runs a single test flow node and updates the testFlowDataStore
@@ -688,11 +913,9 @@ export class TestflowExplorerPageViewModel {
       request,
     );
 
-    const collectionAuth = extractAuthData(request);
     const decodeData = this._decodeRequest.init(
       adaptedRequest.property.request,
       environments?.filtered || [],
-      collectionAuth,
     );
 
     const start = Date.now();
@@ -852,14 +1075,15 @@ export class TestflowExplorerPageViewModel {
    * @returns Resolves when the redirection process is completed.
    */
   public redirectRequest = async (
-    _workspaceId: string,
     _collectionId: string,
     _folderId: string,
     _requestId: string,
   ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const workspaceId = progressiveTab.path.workspaceId; 
     const errorMessage = "id can't be empty while redirecting request!";
     // base conditions
-    if (!_workspaceId) {
+    if (!workspaceId) {
       console.error("Workspace " + errorMessage);
       return;
     }
@@ -894,7 +1118,7 @@ export class TestflowExplorerPageViewModel {
     // creating a tab for the request
     const requestTabAdapter = new RequestTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
-      _workspaceId || "",
+      workspaceId || "",
       _collectionId || "",
       _folderId || "",
       request,
@@ -1415,5 +1639,13 @@ export class TestflowExplorerPageViewModel {
       }
       return response;
     }
+  };
+
+  /**
+   * @description - This function will redirect to the sparrow docs of testflow.
+   */
+  public redirectDocsTestflow = async () => {
+    window.open(constants.TESTFLOW_DOCS_URL, "_blank");
+    return;
   };
 }

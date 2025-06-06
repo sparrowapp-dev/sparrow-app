@@ -67,6 +67,47 @@ const requestItems = {
   },
 };
 
+const mockRequestItems = {
+  method: {
+    type: "string",
+  },
+  operationId: {
+    type: "string",
+  },
+  url: {
+    type: "string",
+  },
+  body: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedRequestBodyType: {
+    type: "string",
+  },
+  queryParams: {
+    type: "array",
+    properties: params,
+  },
+  headers: {
+    type: "array",
+    properties: params,
+  },
+  responseBody: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedResponseBodyType: {
+    type: "string",
+  },
+  responseHeaders: {
+    type: "array",
+    properties: params,
+  },
+  responseStatus: {
+    type: "string",
+  },
+};
+
 const websocketItems = {
   url: {
     type: "string",
@@ -109,6 +150,10 @@ const itemsProperties = {
     type: "object",
     properties: requestItems,
   },
+  mockRequest: {
+    type: "object",
+    properties: mockRequestItems,
+  },
   websocket: {
     type: "object",
     properties: websocketItems,
@@ -142,7 +187,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 2,
+  version: 5,
   properties: {
     collectionId: {
       type: "string",
@@ -150,6 +195,15 @@ export const collectionSchemaLiteral = {
     },
     description: {
       type: "string",
+    },
+    collectionType: {
+      type: "string",
+    },
+    mockCollectionUrl: {
+      type: "string",
+    },
+    isMockCollectionRunning: {
+      type: "boolean",
     },
     id: {
       type: "string",
@@ -222,6 +276,37 @@ export const collectionSchemaLiteral = {
               type: "string",
             },
           },
+        },
+      },
+    },
+    mockRequestHistory: {
+      type: "array",
+      default: [],
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          timestamp: { type: "date-time" },
+          name: { type: "string" },
+          url: { type: "string" },
+          method: { type: "string" },
+          responseStatus: { type: "string" },
+          duration: { type: "number" },
+          requestHeaders: {
+            type: "array",
+            properties: params,
+          },
+          requestBody: {
+            type: "array",
+            properties: requestBody,
+          },
+          selectedRequestBodyType: { type: "string" },
+          selectedResponseBodyType: { type: "string" },
+          responseHeaders: {
+            type: "array",
+            properties: params,
+          },
+          responseBody: { type: "string" },
         },
       },
     },

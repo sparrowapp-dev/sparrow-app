@@ -15,6 +15,9 @@
     help,
     hoveredHelp,
     selectedHelp,
+    hoveredMarketplace,
+    Marketplace,
+    selectedMarketplace,
   } from "../images";
   import SidebarItem from "../components/SidebarItem.svelte";
 
@@ -67,6 +70,12 @@
         sidebarItemWithIcons.defaultLogo = collections;
         sidebarItemWithIcons.hoveredLogo = hoveredCollections;
         sidebarItemWithIcons.selectedLogo = selectedCollections;
+        break;
+
+      case SidebarItemImgEnum.MARKETPLACE:
+        sidebarItemWithIcons.defaultLogo = Marketplace;
+        sidebarItemWithIcons.hoveredLogo = hoveredMarketplace;
+        sidebarItemWithIcons.selectedLogo = selectedMarketplace;
         break;
 
       case SidebarItemImgEnum.COMMUNITY:
@@ -129,7 +138,6 @@
           {item}
           {slidebarPlace}
           on:click={(event) => handleCompo(event.detail)}
-          
         />
       </div>
     {/each}

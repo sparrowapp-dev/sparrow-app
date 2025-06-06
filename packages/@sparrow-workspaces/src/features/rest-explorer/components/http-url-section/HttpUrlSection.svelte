@@ -62,6 +62,14 @@
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
     } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      if (requestUrl === "") {
+        const codeMirrorElement = document.querySelector(
+          ".input-url .cm-editor",
+        );
+        if (codeMirrorElement) {
+          codeMirrorElement.classList.add("url-red-border");
+        }
+      }
       onSendButtonClicked(environmentVariables);
     }
   };
@@ -121,7 +129,7 @@
     menuItem={"v2"}
     highlightTickedItem={false}
   />
-  <div class="w-100 d-flex align-items-center position-relative ">
+  <div class="w-100 d-flex align-items-center position-relative">
     <div class="position-absolute top-0" style="width: calc(100% );">
       <CodeMirrorInput
         value={requestUrl}
@@ -134,7 +142,6 @@
         class={"input-url"}
         {userRole}
         isFocusedOnMount={false}
-
       />
     </div>
   </div>
@@ -188,18 +195,25 @@
       onUpdateRequestState({ requestSplitterDirection: e.detail });
     }}
   /> -->
-  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
-    <Button
-      type="secondary"
-      size="medium"
-      loader={isSaveLoad}
-      startIcon={isSaveLoad ? "" : SaveRegular}
-      onClick={handleSaveRequest}
-      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
-        ? true
-        : false}
-    />
-  </Tooltip>
+  {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+    <Tooltip
+      title={"Save"}
+      placement={"bottom-center"}
+      distance={12}
+      zIndex={10}
+    >
+      <Button
+        type="secondary"
+        size="medium"
+        loader={isSaveLoad}
+        startIcon={isSaveLoad ? "" : SaveRegular}
+        onClick={handleSaveRequest}
+        disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+          ? true
+          : false}
+      />
+    </Tooltip>
+  {/if}
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

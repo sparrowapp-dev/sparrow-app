@@ -21,6 +21,7 @@ import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explore
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { version } from "../../../src-tauri/tauri.conf.json";
+
 const apiTimeOut = constants.API_SEND_TIMEOUT;
 
 const tabRepository = new TabRepository();
@@ -849,6 +850,23 @@ const connectSocketIo = async (
 };
 
 /**
+ * 
+ * @param signal - AbortSignal to listen for abort events
+ * @returns 
+ */
+const waitForAbort = (signal: AbortSignal): Promise<never> => {
+  return new Promise((_, reject) => {
+    if (signal?.aborted) {
+      return reject(new Error("Aborted before starting"));
+    }
+
+    signal?.addEventListener("abort", () => {
+      reject(new Error("Aborted during request"));
+    }, { once: true });
+  });
+}
+
+/**
  * Invoke RPC Communication
  * @param url - Request URL
  * @param method - Request Method
@@ -870,14 +888,13 @@ const makeHttpRequestV2 = async (
   const startTime = performance.now();
 
   try {
-    const data = await invoke("make_http_request_v2", {
+    const data = await Promise.race([invoke("make_http_request_v2", {
       url,
       method,
       headers,
       body,
       request,
-    });
-
+    }), waitForAbort(signal)])
     // Handle the response and update UI accordingly
     if (signal?.aborted) {
       throw new Error(); // Ignore response if request was cancelled
@@ -889,7 +906,6 @@ const makeHttpRequestV2 = async (
     try {
       const responseBody = JSON.parse(data);
       const apiResponse: Response = JSON.parse(responseBody.body) as Response;
-      console.table(apiResponse);
 
       const appInsightData = {
         id: uuidv4(),

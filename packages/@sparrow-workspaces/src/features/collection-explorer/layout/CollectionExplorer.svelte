@@ -50,6 +50,8 @@
   export let onSyncCollection;
   export let isSharedWorkspace = false;
 
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
   /**
    * Icons and images
    */
@@ -72,16 +74,29 @@
   // import { WorkspaceRole } from "@sparrow/common/enums";
   import { CollectionAuth, CollectionNavigator } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
-  import { Button, Dropdown, Options } from "@sparrow/library/ui";
+  import {
+    Button,
+    Dropdown,
+    notifications,
+    Options,
+    Tag,
+    Tooltip,
+  } from "@sparrow/library/ui";
   import {
     AddRegular,
+    ArrowRightRegular,
     ArrowSwapRegular,
     ArrowSyncRegular,
     CaretDownFilled,
     CaretUpFilled,
+    CopyRegular,
     FolderAddRegular,
     FolderIcon,
     GraphIcon,
+    HistoryRegular,
+    OpenRegular,
+    PlayCircleRegular,
+    RecordStopRegular,
     SaveRegular,
     SocketIcon,
     SocketIoIcon,
@@ -91,6 +106,9 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
   import { onDestroy, onMount } from "svelte";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import { getMethodStyle } from "@sparrow/common/utils";
+  import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
 
   /**
    * Role of user in active workspace
@@ -99,6 +117,8 @@
   export let environmentVariables;
   export let onSaveCollection;
   export let onItemCreated;
+  export let onUpdateRunningState;
+  export let userRole;
 
   /**
    * Local variables
@@ -114,6 +134,7 @@
   let totalWebSocket: number = 0;
   let totalSocketIo: number = 0;
   let totalGraphQl: number = 0;
+  let totalMockRequests: number = 0;
   let showAddItemMenu = false;
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
@@ -133,6 +154,7 @@
       totalWebSocket = res.totalWebSocket;
       totalSocketIo = res.totalSocketIo;
       totalGraphQl = res.totalGraphQl;
+      totalMockRequests = res.totalMockRequests;
     }
   };
 
@@ -144,6 +166,14 @@
       updateLastUpdateAndCount();
     }
   }
+
+  const handlecollection_collection_saved = ({ name }: { name: string }) => {
+    captureEvent("collection_saved", {
+      component: "CollectionExplorer",
+      button_text: name,
+      destination: name,
+    });
+  };
 
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -226,6 +256,31 @@
     },
   ];
 
+  const addButtonDataMock = [
+    {
+      onclick: () => {
+        onItemCreated("folder", {
+          collection: collection,
+        });
+      },
+      name: "Add Folder",
+      icon: FolderAddRegular,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+    {
+      onclick: () => {
+        onItemCreated("requestMockCollection", {
+          collection: collection,
+        });
+      },
+      name: `Add Mock ${HttpRequestDefaultNameBaseEnum.NAME}`,
+      icon: ArrowSwapRegular,
+      iconColor: "var(--icon-ds-neutral-50)",
+      iconSize: "14px",
+    },
+  ];
+
   let isBackgroundClickable = true;
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -269,6 +324,16 @@
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeyDown);
   });
+
+  export let onMockCollectionModelOpen;
+  let isMockRunning = false;
+  const mockRunningStatus = () => {
+    onUpdateRunningState(collection.id, collection.workspaceId, {
+      isMockCollectionRunning: !collection.isMockCollectionRunning,
+    });
+    isMockRunning = !isMockRunning;
+  };
+  export let currentWorkspace;
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -446,8 +511,9 @@
           </div>
         {/if} -->
       </div>
-      <div class="d-flex flex-row">
-        <!-- {#if collection?.activeSync}
+      {#if !(isSharedWorkspace && currentWorkspace?.workspaceType === WorkspaceType.PUBLIC)}
+        <div class="d-flex flex-row">
+          <!-- {#if collection?.activeSync}
           <div class="d-flex flex-column justify-content-center">
             <Button
               disable={!isCollectionEditable || refreshCollectionLoader}
@@ -467,64 +533,69 @@
             />
           </div>
         {/if} -->
-        {#if collection?.activeSync}
-          <div class="me-2">
-            <Button
-              id={`sync-collection`}
-              disable={!isCollectionEditable || isCollectionSyncing}
-              loader={isCollectionSyncing}
-              title={"Sync Collection"}
-              type={"secondary"}
-              onClick={async () => {
-                isCollectionSyncing = true;
-                await onSyncCollection(collection.id);
-                isCollectionSyncing = false;
-              }}
-              size="medium"
-              startIcon={ArrowSyncRegular}
-            />
-          </div>
-        {/if}
+          {#if collection?.activeSync}
+            <div class="me-2">
+              <Button
+                id={`sync-collection`}
+                disable={!isCollectionEditable || isCollectionSyncing}
+                loader={isCollectionSyncing}
+                title={"Sync Collection"}
+                type={"secondary"}
+                onClick={async () => {
+                  isCollectionSyncing = true;
+                  await onSyncCollection(collection.id);
+                  isCollectionSyncing = false;
+                }}
+                size="medium"
+                startIcon={ArrowSyncRegular}
+              />
+            </div>
+          {/if}
 
-        <div
-          class="d-flex me-2 flex-column justify-content-center"
-          bind:this={collectionTabButtonWrapper}
-        >
-          <Dropdown
-            zIndex={600}
-            buttonId={`add-item-collection`}
-            bind:isMenuOpen={showAddItemMenu}
-            bind:isBackgroundClickable
-            options={addButtonData}
-            horizontalPosition="left"
+          <div
+            class="d-flex me-2 flex-column justify-content-center"
+            bind:this={collectionTabButtonWrapper}
           >
-            <Button
-              id={`add-item-collection`}
-              disable={!isCollectionEditable ||
-                collection?.activeSync ||
-                isSharedWorkspace}
-              title={"New"}
-              type={"primary"}
-              onClick={() => {
-                showAddItemMenu = !showAddItemMenu;
-              }}
-              size="medium"
-              startIcon={AddRegular}
-              endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
-            />
-          </Dropdown>
+            <Dropdown
+              zIndex={600}
+              buttonId={`add-item-collection`}
+              bind:isMenuOpen={showAddItemMenu}
+              bind:isBackgroundClickable
+              options={collection?.collectionType ===
+              CollectionTypeBaseEnum.MOCK
+                ? addButtonDataMock
+                : addButtonData}
+              horizontalPosition="left"
+            >
+              <Button
+                id={`add-item-collection`}
+                disable={!isCollectionEditable ||
+                  collection?.activeSync ||
+                  isSharedWorkspace}
+                title={"New"}
+                type={"primary"}
+                onClick={() => {
+                  showAddItemMenu = !showAddItemMenu;
+                }}
+                size="medium"
+                startIcon={AddRegular}
+                endIcon={showAddItemMenu ? CaretUpFilled : CaretDownFilled}
+              />
+            </Dropdown>
+          </div>
+          <Button
+            disable={$tab?.isSaved || !isCollectionEditable
+              ? true
+              : false || isSharedWorkspace}
+            startIcon={SaveRegular}
+            type={"secondary"}
+            onClick={() => {
+              onSaveCollection();
+              handlecollection_collection_saved({ name: "Collection Saved" });
+            }}
+          />
         </div>
-        <Button
-          disable={$tab?.isSaved || !isCollectionEditable
-            ? true
-            : false || isSharedWorkspace}
-          startIcon={SaveRegular}
-          type={"secondary"}
-          onClick={() => {
-            onSaveCollection();
-          }}
-        />
-      </div>
+      {/if}
     </div>
     <!-- {#if collection?.activeSync && !isSynced}
       <div
@@ -567,77 +638,329 @@
         </div>
       </div>
     {/if} -->
-    <div class="d-flex pb-3" style="justify-content: space-between;">
-      <CollectionNavigator
-        collectionNavigation={$tab?.property?.collection?.state
-          ?.collectionNavigation}
-        {onUpdateCollectionState}
-      />
-      {#if collection?.activeSync}
-        <div class="d-flex" style="align-items: center;">
-          <ArrowSyncRegular size="12px" />
-          <p
-            style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
-            class="text-ds-font-size-12"
+    {#if collection?.collectionType === CollectionTypeBaseEnum.MOCK}
+      <div class="d-flex flex-column gap-3" style="height: 100%;">
+        <div class="mock-url-section d-flex flex-column">
+          <div
+            class="d-flex align-items-center justify-content-between"
+            style="width: 100%;"
           >
-            Synced {syncedTimeAgo(collection?.syncedAt)}
-          </p>
-        </div>
-      {/if}
-    </div>
-    {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
-      <div
-        class={`d-block
-        align-items-center`}
-      >
-        <div class="d-flex gap-4 ps-2">
-          <div class="d-flex align-items-center gap-2">
-            <span class="fs-4 highlighted-number">{totalFolders}</span>
-            <p style="font-size: 12px;" class="mb-0">Folders</p>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <span class="fs-4 highlighted-number">{totalRequests}</span>
-            <p style="font-size: 12px;" class="mb-0">
-              {HttpRequestDefaultNameBaseEnum.NAME}
-            </p>
-          </div>
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <span class="fs-4 highlighted-number">{totalGraphQl}</span>
-              <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+            <div class="">
+              <p class="text-ds-font-size-16" style="margin-bottom: 0px;">
+                Mock URL
+              </p>
+              <p
+                class="text-ds-font-size-12"
+                style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
+              >
+                Use this mock URL to test your requests without hitting the real
+                API.
+              </p>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <div class="d-flex justify-content-center">
+                <Tag
+                  size="medium"
+                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                  text={collection?.isMockCollectionRunning
+                    ? "Running"
+                    : "Inactive"}
+                />
+              </div>
+              <Button
+                size="small"
+                type={collection?.isMockCollectionRunning
+                  ? "danger"
+                  : "primary"}
+                title={collection?.isMockCollectionRunning
+                  ? "Stop Mock"
+                  : "Run Mock"}
+                onClick={() => {
+                  mockRunningStatus();
+                }}
+                startIcon={collection?.isMockCollectionRunning
+                  ? RecordStopRegular
+                  : PlayCircleRegular}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                  isSharedWorkspace}
+              />
             </div>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <span class="fs-4 highlighted-number">{totalWebSocket}</span>
-            <p style="font-size: 12px;" class="mb-0">WebSocket</p>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <span class="fs-4 highlighted-number">{totalSocketIo}</span>
-            <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
+          <div class="d-flex">
+            <div
+              class="d-flex justify-content-center align-items-center px-2 py-1 text-ds-font-size-14"
+              style="
+    background-color: var(--bg-ds-surface-600);
+    border-radius: 4px;
+    gap: 16px;
+    margin-right: 8px;
+
+  "
+            >
+              <span
+                class="d-inline-block text-truncate"
+                style="max-width: 400px;"
+              >
+                {collection?.mockCollectionUrl}
+              </span>
+            </div>
+            <Button
+              size="small"
+              type={"outline-secondary"}
+              title="Copy"
+              onClick={() => {
+                navigator.clipboard.writeText(collection?.mockCollectionUrl);
+                notifications.success("Link copied to clipboard.");
+              }}
+              startIcon={CopyRegular}
+            />
+            <Button
+              size="small"
+              type={"link-primary"}
+              title="Learn how to use mock URL"
+              onClick={() => {
+                onMockCollectionModelOpen(collection?.mockCollectionUrl);
+              }}
+              endIcon={OpenRegular}
+            />
           </div>
         </div>
-        <hr />
-        <div class="d-flex align-items-start ps-0 h-100 z-0">
-          <textarea
-            disabled={!isCollectionEditable}
-            id="updateCollectionDescField"
-            value={$tab?.description || ""}
-            class=" border-0 text-fs-12 collection-area input-outline w-100 p-2"
-            placeholder="Describe this collection and share code examples or usage tips for the APIs."
-            on:input={handleInputDescription}
-          />
+        <div class="mock-url-section d-flex flex-column">
+          <div class="d-flex align-items-center justify-content-between">
+            <p class="text-ds-font-size-16" style="margin-bottom: 0px;">
+              Overview
+            </p>
+          </div>
+          <div
+            class={`d-block
+        align-items-center`}
+            style="width: 100%;"
+          >
+            <div class="d-flex gap-4">
+              <div class="d-flex align-items-center gap-2">
+                <span class="fs-4 highlighted-number">{totalFolders}</span>
+                <p style="font-size: 12px;" class="mb-0">Folders</p>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fs-4 highlighted-number">{totalMockRequests}</span>
+                <p style="font-size: 12px;" class="mb-0">
+                  {HttpRequestDefaultNameBaseEnum.NAME}
+                </p>
+              </div>
+            </div>
+            <hr style="margin: 0.5rem 0;" />
+            <div class="d-flex align-items-start ps-0 h-100 z-0">
+              <textarea
+                disabled={!isCollectionEditable}
+                id="updateCollectionDescField"
+                value={$tab?.description || ""}
+                class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
+                  ? 'input-outline'
+                  : ''} w-100 p-2"
+                placeholder={isSharedWorkspace
+                ? "No description added."
+                : "Add Description"}
+                on:input={handleInputDescription}
+                style="background-color: {isSharedWorkspace
+                  ? 'var(--bg-ds-surface-900)'
+                  : 'var(--bg-ds-surface-600)'};"
+              />
+            </div>
+          </div>
         </div>
+        {#if !(isSharedWorkspace && currentWorkspace?.workspaceType === WorkspaceType.PUBLIC)}
+          <div class="d-flex gap-3" style="width: 100%; height: 100%;">
+            <div class="mock-url-section d-flex flex-column" style="flex: 1;">
+              <div
+                class="d-flex align-items-center justify-content-between"
+                style="width: 100%;"
+              >
+                <div class="text-ds-font-size-16" style="margin-bottom: 0px;">
+                  Details
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <Tooltip title={"Coming Soon"} placement={"top-center"}>
+                    <Button
+                      size="small"
+                      type={"link-primary"}
+                      title="Edit Configuration"
+                      disable={true}
+                      onClick={() => {}}
+                      endIcon={ArrowRightRegular}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
+              <div
+                class="d-flex align-items-center justify-content-center text-ds-font-size-12"
+                style="color: var(--text-ds-neutral-300); margin:auto;"
+              >
+                Coming Soon
+              </div>
+            </div>
+            <div
+              class="mock-url-section d-flex flex-column"
+              style="flex: 1; height: 100%; display: flex; flex-direction: column;"
+            >
+              <div
+                class="d-flex align-items-center justify-content-between"
+                style="width: 100%;"
+              >
+                <div class="text-ds-font-size-16" style="margin-bottom: 0px;">
+                  Recent Requests
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <Button
+                    size="small"
+                    type={"link-primary"}
+                    title="View All"
+                    disable={false}
+                    onClick={() => {
+                      onItemCreated("mockHistory", {
+                        collection: collection,
+                      });
+                    }}
+                    endIcon={ArrowRightRegular}
+                  />
+                </div>
+              </div>
+              <div
+                class="d-flex flex-column"
+                style="height: 100%; margin:auto; width: 100%;"
+              >
+                <div class="recent-requests-list custom-scrollbar">
+                  {#if collection?.mockRequestHistory && collection.mockRequestHistory.length > 0}
+                    {#each collection.mockRequestHistory
+                      .slice()
+                      .reverse()
+                      .slice(0, 5) as request}
+                      <div
+                        class="request-item d-flex justify-content-between align-items-center py-2 mb-2"
+                      >
+                        <div class="d-flex align-items-center overflow-hidden">
+                          <span
+                            class="method-label text-{getMethodStyle(
+                              request?.method,
+                            )} me-2"
+                            >{request?.method?.toUpperCase() === "DELETE"
+                              ? "DEL"
+                              : request?.method?.toUpperCase()}</span
+                          >
+                          <span class="request-title">{request.name}</span>
+                          <span
+                            class="request-url text-ds-font-size-12 ms-2"
+                            style="color: var(--text-ds-neutral-300);"
+                            >{request.url}</span
+                          >
+                        </div>
+                        <span
+                          class="request-time text-ds-font-size-12"
+                          style="color: var(--text-ds-neutral-100);"
+                          >{syncedTimeAgo(request.timestamp)}</span
+                        >
+                      </div>
+                    {/each}
+                  {:else}
+                    <div
+                      class="d-flex flex-column align-items-center justify-content-center text-ds-font-size-12 py-3"
+                      style="color: var(--text-ds-neutral-300); height: 100%; width: 100%;"
+                    >
+                      <HistoryRegular
+                        size={"32px"}
+                        color={"var(--text-ds-neutral-500)"}
+                      />
+                      <div class="text-center">
+                        No recent requests yet. Run a request in this collection
+                        to see it here.
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
       </div>
     {:else}
-      <CollectionAuth
-        auth={$tab?.property?.collection?.auth}
-        requestStateAuth={$tab?.property?.collection?.state
-          ?.collectionAuthNavigation}
-        onUpdateRequestAuth={onUpdateCollectionAuth}
-        onUpdateRequestState={onUpdateCollectionState}
-        {onUpdateEnvironment}
-        {environmentVariables}
-      />
+      <div class="d-flex pb-3" style="justify-content: space-between;">
+        <CollectionNavigator
+          collectionNavigation={$tab?.property?.collection?.state
+            ?.collectionNavigation}
+          {onUpdateCollectionState}
+        />
+        {#if collection?.activeSync}
+          <div class="d-flex" style="align-items: center;">
+            <ArrowSyncRegular size="12px" />
+            <p
+              style="margin-bottom: 0px; margin-left:4px; color:var(--text-ds-neutral-200)"
+              class="text-ds-font-size-12"
+            >
+              Synced {syncedTimeAgo(collection?.syncedAt)}
+            </p>
+          </div>
+        {/if}
+      </div>
+      {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
+        <div
+          class={`d-block
+        align-items-center`}
+        >
+          <div class="d-flex gap-4 ps-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4 highlighted-number">{totalFolders}</span>
+              <p style="font-size: 12px;" class="mb-0">Folders</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4 highlighted-number">{totalRequests}</span>
+              <p style="font-size: 12px;" class="mb-0">
+                {HttpRequestDefaultNameBaseEnum.NAME}
+              </p>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fs-4 highlighted-number">{totalGraphQl}</span>
+                <p style="font-size: 12px;" class="mb-0">GraphQL</p>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4 highlighted-number">{totalWebSocket}</span>
+              <p style="font-size: 12px;" class="mb-0">WebSocket</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4 highlighted-number">{totalSocketIo}</span>
+              <p style="font-size: 12px;" class="mb-0">Socket.IO</p>
+            </div>
+          </div>
+          <hr style="margin-bottom: 12px;" />
+          <div class="d-flex align-items-start ps-0 h-100 z-0">
+            <textarea
+              disabled={!isCollectionEditable}
+              id="updateCollectionDescField"
+              value={$tab?.description || ""}
+              class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
+                ? 'input-outline'
+                : ''} w-100 p-2"
+              placeholder={isSharedWorkspace
+                ? "No description added."
+                : "Describe this collection and share code examples or usage tips for the APIs."}
+              on:input={handleInputDescription}
+              style="background-color: {isSharedWorkspace
+                ? 'var(--bg-ds-surface-900)'
+                : 'var(--bg-ds-surface-600)'};"
+            />
+          </div>
+        </div>
+      {:else}
+        <CollectionAuth
+          auth={$tab?.property?.collection?.auth}
+          requestStateAuth={$tab?.property?.collection?.state
+            ?.collectionAuthNavigation}
+          onUpdateRequestAuth={onUpdateCollectionAuth}
+          onUpdateRequestState={onUpdateCollectionState}
+          {onUpdateEnvironment}
+          {environmentVariables}
+        />
+      {/if}
     {/if}
   </div>
   <!-- <div
@@ -669,7 +992,6 @@
     border: none;
     border-radius: 4px !important;
     color: var(--text-secondary-1000);
-    background-color: var(--bg-ds-surface-600);
     height: 168px;
   }
   textarea::placeholder {
@@ -694,5 +1016,50 @@
   }
   .text-plusButton {
     color: var(--text-primary-600) !important;
+  }
+
+  .mock-url-section {
+    align-items: flex-start;
+    padding: 12px;
+    gap: 12px;
+    border: 1px solid var(--border-ds-surface-100);
+    border-radius: 8px;
+  }
+  .recent-requests-list {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 4px;
+    height: 100%;
+  }
+
+  .request-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--bg-ds-surface-600);
+  }
+  .method-label {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 45px;
+    text-align: center;
+  }
+
+  .request-title {
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--text-ds-neutral-50);
+    text-overflow: ellipsis;
+    max-width: 170px;
+    overflow: hidden;
+  }
+
+  .request-url {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
   }
 </style>

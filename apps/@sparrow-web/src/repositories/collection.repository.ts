@@ -5,6 +5,7 @@ import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
+import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
   constructor() {}
 
@@ -45,10 +46,17 @@ export class CollectionRepository {
       if (data.selectedAuthType) value.selectedAuthType = data.selectedAuthType;
       if (data.auth) value.auth = data.auth;
       if (data.branches) value.branches = data.branches;
+      if (
+        data?.isMockCollectionRunning === true ||
+        data?.isMockCollectionRunning === false
+      )
+        value.isMockCollectionRunning = data.isMockCollectionRunning;
       if (data.primaryBranch) value.primaryBranch = data.primaryBranch;
       if (data.currentBranch) value.currentBranch = data.currentBranch;
       if (data.localRepositoryPath)
         value.localRepositoryPath = data.localRepositoryPath;
+      if (data.mockRequestHistory)
+        value.mockRequestHistory = data.mockRequestHistory;
       return value;
     });
 
@@ -928,5 +936,23 @@ export class CollectionRepository {
       );
 
     return node ?? null;
+  };
+
+  /* Remove collections by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter collections
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeCollectionsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb?.collection.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
   };
 }

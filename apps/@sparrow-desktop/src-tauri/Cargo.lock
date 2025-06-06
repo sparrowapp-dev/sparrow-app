@@ -4280,6 +4280,7 @@ dependencies = [
  "tokio-util 0.6.10",
  "tungstenite 0.20.1",
  "url",
+ "winreg 0.11.0",
 ]
 
 [[package]]
@@ -6192,6 +6193,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36c1fec1a2bb5866f07c25f68c26e565c4c200aebb96d7e55710c19d3e8ac49b"
 dependencies = [
  "memchr",
+]
+
+[[package]]
+name = "winreg"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76a1a57ff50e9b408431e8f97d5456f2807f8eb2a2cd79b06068fc87f8ecf189"
+dependencies = [
+ "cfg-if",
+ "winapi",
 ]
 
 [[package]]

@@ -19,6 +19,7 @@ import {
   createDeepCopy,
   Debounce,
   InitFolderTab,
+  InitMockRequestTab,
   InitWebSocketTab,
   moveNavigation,
 } from "@sparrow/common/utils";
@@ -37,6 +38,7 @@ import { isGuestUserActive } from "@app/store/auth.store";
 
 import {
   CollectionItemTypeBaseEnum,
+  CollectionTypeBaseEnum,
   type CollectionArgsBaseInterface,
   type CollectionBaseInterface as CollectionDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
@@ -60,6 +62,8 @@ import { InitTab } from "@sparrow/common/factory";
 import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/http-request-base";
 import constants from "src/constants/constants";
+import * as Sentry from "@sentry/svelte";
+import { MockHistoryTabAdapter } from "src/adapter/mock-history-tab";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -547,19 +551,26 @@ class CollectionExplorerPage {
       },
       baseUrl,
     );
+    const isMockCollection =
+      response.data.data?.collectionType === CollectionTypeBaseEnum.MOCK;
     if (response.isSuccessful) {
       this.collectionRepository.updateCollection(
         progressiveTab.id as string,
         response.data.data,
       );
-      notifications.success(
-        `The ‘${progressiveTab.name}’ collection saved successfully.`,
-      );
+      const successMessage = isMockCollection
+        ? `'${progressiveTab.name}' mock collection saved successfully.`
+        : `The '${progressiveTab.name}' collection saved successfully.`;
+
+      notifications.success(successMessage);
       progressiveTab.isSaved = true;
       this.tab = progressiveTab;
       this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } else {
-      notifications.error("Failed to save collection. Please try again.");
+      const errorMessage = isMockCollection
+        ? `Failed to save mock collection. Please try again.`
+        : `Failed to update description. Please try again.`;
+      notifications.error(errorMessage);
     }
   };
 
@@ -783,6 +794,7 @@ class CollectionExplorerPage {
     let totalWebSocket = 0;
     let totalSocketIo = 0;
     let totalGraphQl = 0;
+    let totalMockRequests = 0;
 
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
@@ -794,6 +806,8 @@ class CollectionExplorerPage {
           totalSocketIo++;
         } else if (collectionItem.type === ItemType.GRAPHQL) {
           totalGraphQl++;
+        } else if (collectionItem.type === ItemType.MOCK_REQUEST) {
+          totalMockRequests++;
         } else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
           if (collectionItem?.items)
@@ -806,6 +820,8 @@ class CollectionExplorerPage {
                 totalSocketIo++;
               } else if (item.type === ItemType.GRAPHQL) {
                 totalGraphQl++;
+              } else if (item.type === ItemType.MOCK_REQUEST) {
+                totalMockRequests++;
               }
             });
         }
@@ -843,6 +859,7 @@ class CollectionExplorerPage {
       totalGraphQl,
       totalFolders,
       lastUpdated,
+      totalMockRequests,
     };
   };
 
@@ -1097,6 +1114,115 @@ class CollectionExplorerPage {
         folderId: "",
       });
       request.updateIsSave(true);
+      this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
+   * Handle creating a new mock request in a collection
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateMockRequestInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const request = new InitMockRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const requestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: request.getValue().name,
+        type: request.getValue().type,
+        description: "",
+        mockRequest: {
+          method: request?.getValue().property?.mockRequest?.method,
+          url: collection?.mockCollectionUrl,
+        } as HttpRequestBaseInterface,
+      },
+    };
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...requestObj.items,
+        id: request.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          requestObj.collectionId,
+          request.getValue().id,
+        );
+      if (res) {
+        res.id = uuidv4();
+      }
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+
+      request.updateId(res?.id as string);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      request.updateIsSave(true);
+      await this.tabRepository.createTab(request.getValue());
+      moveNavigation("right");
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addMockRequestInCollection(
+      requestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        request.getValue().id,
+        res,
+      );
+      request.updateId(res.id);
+      request.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      request.updateIsSave(true);
+      request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
       return;
@@ -1514,6 +1640,18 @@ class CollectionExplorerPage {
     }
   };
 
+  public handleOpenMockHistory = (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const mockHistroyTab = new MockHistoryTabAdapter().adapt(
+      workspaceId,
+      collection.id,
+    );
+    this.tabRepository.createTab(mockHistroyTab);
+    moveNavigation("right");
+  };
+
   /**
    * Handle control of creating items
    * @param entityType :string - type of entity, collection, folder or request
@@ -1537,6 +1675,12 @@ class CollectionExplorerPage {
           args.collection as CollectionDto,
         );
         break;
+      case "requestMockCollection":
+        await this.handleCreateMockRequestInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
       case "websocketCollection":
         await this.handleCreateWebSocketInCollection(
           args.collection.workspaceId,
@@ -1555,6 +1699,12 @@ class CollectionExplorerPage {
           args.collection as CollectionDto,
         );
         break;
+      case "mockHistory":
+        this.handleOpenMockHistory(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
     }
     return response;
   };
@@ -1566,6 +1716,32 @@ class CollectionExplorerPage {
    */
   public getWorkspaceById = async (workspaceId: string) => {
     return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  public handleMockCollectionState = async (
+    collectionId: string,
+    workspaceId: string,
+    request: any,
+  ) => {
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response =
+      await this.collectionService.updateMockCollectionRunningStatus(
+        collectionId,
+        workspaceId,
+
+        request,
+        baseUrl,
+      );
+    if (response.isSuccessful) {
+      await this.collectionRepository.updateCollection(
+        collectionId,
+        response.data.data,
+      );
+    } else if (response.message === "Network Error") {
+      notifications.error(response.message);
+    } else {
+      notifications.error("Failed to update running state. Please try again.");
+    }
   };
 }
 

@@ -11,6 +11,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
+  import { WorkspaceType } from "@sparrow/common/enums";
   import {
     AddRegular,
     GlobeRegular,
@@ -120,6 +121,7 @@
   export let isGuestUser = false;
   export let onAddMember;
   export let openInDesktop;
+  export let onCopyLink;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -130,11 +132,13 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+
   let selectedFilter = "All";
+
   const addButtonData = [
     {
       name: "Leave Hub",
-      color: "var(--dangerColor)",
+      color: "var(--text-ds-danger-300)",
       onclick: () => handleLeaveTeam(),
     },
   ];
@@ -174,7 +178,7 @@
         name: "Members",
         id: TeamTabsEnum.MEMBERS,
         count: openTeam?.users?.length || 1,
-        visible: true,
+        visible: openTeam?.teamId !== "sharedWorkspaceTeam",
         disabled: isGuestUser === true ? true : false,
       },
       {
@@ -187,10 +191,13 @@
         disabled: isGuestUser === true ? true : false,
       },
       {
-        name: "Settings",
+        name: "Hub Information",
         id: TeamTabsEnum.SETTINGS,
         count: 0,
-        visible: openTeam?.owner === userId || isGuestUser === true,
+        visible:
+          (openTeam?.owner === userId &&
+            openTeam.teamId !== "sharedWorkspaceTeam") ||
+          isGuestUser === true,
         disabled: isGuestUser === true ? true : false,
       },
     ];
@@ -273,7 +280,7 @@
     if (selectedFilter !== "All") {
       filteredWorkspaces = workspaces.filter(
         (workspace) =>
-          workspace.workspaceType.toLowerCase() ===
+          workspace?.workspaceType?.toLowerCase() ===
           selectedFilter.toLowerCase(),
       );
     } else {
@@ -361,7 +368,7 @@
                 </p>
               {/if}
               <Button
-                title={`Invite`}
+                title={`Invite collaborators`}
                 type={"secondary"}
                 startIcon={PeopleRegular}
                 onClick={() => {
@@ -430,7 +437,7 @@
         <div style="flex:1; overflow:auto;">
           {#if activeTeamTab === TeamTabsEnum.WORKSPACES}
             <div class="h-100 d-flex flex-column">
-              {#if openTeam && openTeam?.workspaces?.length > 0 && !isGuestUser}
+              {#if openTeam && !isGuestUser}
                 <div
                   class="d-flex align-items-center"
                   style="gap: 20px; justify-content:space-between; align-items:center;"
@@ -441,7 +448,7 @@
                   >
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center ${
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center filter-button ${
                         selectedFilter === "All"
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
@@ -453,24 +460,24 @@
 
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
-                        selectedFilter === "Private"
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
+                        selectedFilter === WorkspaceType.PRIVATE
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
                       }`}
-                      on:click={() => (selectedFilter = "Private")}
+                      on:click={() => (selectedFilter = WorkspaceType.PRIVATE)}
                     >
                       <LockClosedRegular size="16px" />
                       Private
                     </span>
                     <span
                       role="button"
-                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 ${
-                        selectedFilter === "Public"
+                      class={`d-flex rounded px-2 text-fs-12 py-1 btn-formatter align-items-center gap-1 filter-button ${
+                        selectedFilter === WorkspaceType.PUBLIC
                           ? "bg-tertiary-500 text-secondary-100"
                           : ""
                       }`}
-                      on:click={() => (selectedFilter = "Public")}
+                      on:click={() => (selectedFilter = WorkspaceType.PUBLIC)}
                     >
                       <GlobeRegular size="16px" />
                       Public
@@ -480,11 +487,11 @@
                     <Search
                       variant={"primary"}
                       id="search-input"
-                      size="medium"
+                      size="small"
                       placeholder="Search workspaces in {openTeam?.name}"
                       on:input={handleSearchInput}
                       bind:value={searchQuery}
-                      customWidth={"450px"}
+                      customWidth={"320px"}
                     />
                   </div>
                 </div>
@@ -517,6 +524,7 @@
                     {openInDesktop}
                     {isWebEnvironment}
                     {searchQuery}
+                    {onCopyLink}
                     workspaces={filteredWorkspaces.filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
@@ -528,6 +536,7 @@
                     bind:isWorkspaceCreationInProgress
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
+                    {selectedFilter}
                   />
                   <!--Enabled in next phase-->
                 {/if}
@@ -649,6 +658,11 @@
 {/if}
 
 <style>
+  .filter-button:hover {
+    background-color: var(--bg-ds-surface-400);
+    color: var(--text-ds-neutral-50);
+  }
+
   .custom-tooltip {
     --bs-tooltip-bg: var(--bs-primary);
   }

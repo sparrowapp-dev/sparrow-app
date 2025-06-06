@@ -1,19 +1,17 @@
 <script lang="ts">
-  import { trashIcon as trashIcon } from "@sparrow/library/assets";
-  import {
-    AttachRegular,
-    DeleteRegular,
-    ReOrderDotsRegular,
-  } from "@sparrow/library/icons";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { invoke } from "@tauri-apps/api/core";
-  import { crossIcon as close } from "@sparrow/library/assets";
   import { TabularInputTheme } from "../../utils";
   import { CodeMirrorInput } from "..";
   import { Button, notifications, Tooltip } from "@sparrow/library/ui";
-  import { onMount } from "svelte";
+  import { afterUpdate, onMount } from "svelte";
   import { Base64Converter } from "@sparrow/common/utils";
   import { Checkbox } from "@sparrow/library/forms";
+  import LazyElementFormData from "./LazyElementFormData.svelte";
+  import {
+    handleEventOnClickApplyUndoAI,
+    handleEventonClickApplyChangesAI,
+  } from "@sparrow/common/utils";
   export let keyValue: {
     key: string;
     value: string;
@@ -22,16 +20,17 @@
     base: string;
   }[];
   export let callback: (pairs: KeyValuePair[]) => void;
-  export let readable: { key: string; value: string } = {
-    key: "",
-    value: "",
-  };
+
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isCheckBoxEditable = true;
   export let isTopHeaderRequired = true;
   export let isBulkEditRequired = false;
   export let isInputBoxEditable = true;
+
+  export let handleOpenCurrentDynamicExpression;
+  export let dynamicExpression;
+
   export let isWebApp = false;
 
   // New props for merge/diff view
@@ -49,6 +48,20 @@
   let pairs = keyValue;
   let controller: boolean = false;
   let pairsContainer: HTMLElement;
+
+  // This is a flag to determine if we should scroll to the bottom
+  let shouldScrollToBottom = false;
+
+  // This is for scrolling into view when a new row is added and the component updates
+  afterUpdate(() => {
+    if (shouldScrollToBottom && pairsContainer) {
+      const lastRow = pairsContainer.lastElementChild;
+      if (lastRow) {
+        lastRow.scrollIntoView({ behavior: "auto", block: "end" });
+      }
+      shouldScrollToBottom = false;
+    }
+  });
 
   const theme = new TabularInputTheme().build();
 
@@ -207,13 +220,6 @@
       currentIndex: result.length - 1,
     };
 
-    isMergeViewLoading = false;
-
-    // Check for changes after calculating diff
-    setTimeout(() => {
-      checkForChanges();
-    }, 0);
-
     return [...result, lastEmptyRow];
   }
 
@@ -247,6 +253,7 @@
     await sleep(2000);
     diffPairs = calculateDiff();
     checkForChanges();
+    isMergeViewLoading = false;
   };
   $: if (showMergeView) updateDiffPairsWithLoading();
 
@@ -272,8 +279,8 @@
         key: pair.key,
         value: pair.value,
         checked: pair.checked || false,
-        type: pair.type,
-        base: pair.base,
+        type: pair.type || "text",
+        base: pair.base || "",
       }));
 
     // Add an empty row at the end if needed
@@ -299,6 +306,7 @@
 
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventonClickApplyChangesAI("TabularInputFormData", "Body-FormData");
   };
 
   // Function to undo all changes and revert to original state
@@ -313,6 +321,7 @@
     isMergeViewLoading = true;
     await sleep(2000);
     isMergeViewLoading = false; // Reset loading state
+    handleEventOnClickApplyUndoAI("TabularInputFormData", "Body-FormData");
   };
 
   // Utility function to create a delay
@@ -345,20 +354,6 @@
     }
   };
 
-  /**
-   * Scrolls the container to bring the newly added row into view
-   */
-  const scrollToNewRow = async () => {
-    setTimeout(() => {
-      if (pairsContainer) {
-        const lastRow = pairsContainer.lastElementChild;
-        if (lastRow) {
-          lastRow.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-      }
-    }, 0);
-  };
-
   const updateParam = async (index: number): Promise<void> => {
     pairs = pairs;
     if (
@@ -374,6 +369,7 @@
         type: "text",
         base: "",
       });
+      shouldScrollToBottom = true;
       pairs = pairs;
       callback(pairs);
 
@@ -382,8 +378,6 @@
         diffPairs = calculateDiff();
         checkForChanges();
       }
-
-      await scrollToNewRow();
     } else {
       callback(pairs);
     }
@@ -575,262 +569,69 @@
     <!-- Showing Duplicate Fake Rows For Diff/Merge View -->
     {#if !isMergeViewLoading && showMergeView && hasChanges}
       {#each diffPairs as element, index (index)}
-        <div
-          class="pair-data-row w-100 d-flex align-items-center px-1 diff-row diff-{element.diffType}"
-          style="position:relative"
-        >
-          <div style=" width:24px;" class="me-2">
-            {#if diffPairs.length - 1 != index || !isInputBoxEditable}
-              <Checkbox
-                checked={element.checked}
-                on:input={() => {
-                  updateCheck(index);
-                }}
-                disabled={!isCheckBoxEditable}
-              />
-            {/if}
-          </div>
-
-          <div class="d-flex gap-0" style="width: calc(100% - 86px);">
-            <div class="w-50 d-flex align-items-center">
-              <div
-                class="position-absolute top-0"
-                style="width: calc(50% - 48px);"
-              >
-                <CodeMirrorInput
-                  bind:value={element.key}
-                  onUpdateInput={() => {
-                    updateParam(index);
-                  }}
-                  disabled={true}
-                  placeholder={"Add Key"}
-                  {theme}
-                  {environmentVariables}
-                  {onUpdateEnvironment}
-                />
-              </div>
-            </div>
-            {#if element.type === "file"}
-              <div class="w-50 position-relative d-flex align-items-center">
-                <div
-                  class="position-relative rounded p-1 d-flex backgroundColor"
-                >
-                  <div
-                    class="bg-keyValuePairColor d-flex h-fit rounded"
-                    style="padding: 1px 4px;"
-                  >
-                    <p style="font-size:10px;" class="mb-0 me-1">
-                      {element.value ? element.value : "corrupted-file"}
-                    </p>
-                    <img
-                      src={close}
-                      alt=""
-                      class="my-auto"
-                      style="cursor:pointer; height: 10px; width: 10px; {element.diffType ===
-                      'deleted'
-                        ? 'visibility: hidden;'
-                        : ''}"
-                      on:click={() => {
-                        if (
-                          isInputBoxEditable &&
-                          element.diffType !== "deleted"
-                        ) {
-                          removeFormFile(index);
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            {:else}
-              <div class="w-50 d-flex align-items-center">
-                <div
-                  class="position-absolute top-0 left-6"
-                  style="width: calc(50% - 48px);"
-                >
-                  <CodeMirrorInput
-                    bind:value={element.value}
-                    onUpdateInput={() => {
-                      updateParam(index);
-                    }}
-                    placeholder={"Add Value"}
-                    disabled={true}
-                    {theme}
-                    {environmentVariables}
-                    {onUpdateEnvironment}
-                  />
-                </div>
-              </div>
-            {/if}
-          </div>
-          <div
-            class="ms-1 d-flex align-items-center justify-content-between gap-1"
-            style="width:40px;"
-          >
-            {#if diffPairs.length - 1 != index}
-              {#if element.diffType !== "deleted"}
-                <!-- Hidden buttons in diff view, but kept for layout consistency -->
-                <div style="width:45px;" class="opacity-0"></div>
-              {:else}
-                <div style="width:45px;" class="opacity-0"></div>
-              {/if}
-            {/if}
-          </div>
-        </div>
+        <LazyElementFormData
+          element={{
+            key: element.key,
+            value: element.value,
+            checked: element.checked,
+            type: element.type,
+            base: element.base,
+            diffType: element.diffType,
+          }}
+          {index}
+          pairs={diffPairs}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          {updateParam}
+          {updateCheck}
+          {deleteParam}
+          isInputBoxEditable={false}
+          isCheckBoxEditable={true}
+          customClass={`diff-row diff-${element.diffType}`}
+          {uploadFormFile}
+          {removeFormFile}
+          {handleOpenCurrentDynamicExpression}
+          {dynamicExpression}
+        />
       {/each}
 
       <!-- Diff view action buttons -->
-      <div class="d-flex justify-content-end mt-3 me-0 gap-2">
-        <Button title="Keep the Changes!!" type="primary" onClick={applyChanges}
+      <div
+        class="d-flex justify-content-end mt-3 me-1 gap-2 merge-view-act-btns"
+      >
+        <Button
+          title="Keep the Changes"
+          size={"small"}
+          type="primary"
+          onClick={applyChanges}
         ></Button>
-        <Button title="Undo" type="secondary" onClick={undoChanges}></Button>
+        <Button
+          title="Undo"
+          size={"small"}
+          type="secondary"
+          onClick={undoChanges}
+        ></Button>
       </div>
     {:else}
       {#each pairs as element, index}
-        <div
-          class="pair-data-row w-100 d-flex align-items-center px-1"
-          style="position:relative"
-        >
-          <!-- <div class="button-container">
-            <Button
-              size="extra-small"
-              type="teritiary-regular"
-              startIcon={ReOrderDotsRegular}
-            />
-          </div> -->
-          <div style=" width:24px;" class="me-2">
-            {#if pairs.length - 1 != index || !isInputBoxEditable}
-              <Checkbox
-                checked={element.checked}
-                on:input={() => {
-                  updateCheck(index);
-                }}
-                disabled={!isCheckBoxEditable}
-              />
-            {/if}
-          </div>
-
-          <div class="d-flex gap-0" style="width: calc(100% - 86px);">
-            <div class="w-50 d-flex align-items-center">
-              <div
-                class="position-absolute top-0"
-                style="width: calc(50% - 48px);"
-              >
-                <CodeMirrorInput
-                  bind:value={element.key}
-                  onUpdateInput={() => {
-                    updateParam(index);
-                  }}
-                  disabled={!isInputBoxEditable ? true : false}
-                  placeholder={"Add Key"}
-                  {theme}
-                  {environmentVariables}
-                  {onUpdateEnvironment}
-                />
-              </div>
-            </div>
-            {#if element.type === "file"}
-              <div class="w-50 position-relative d-flex align-items-center">
-                <div
-                  class="position-relative rounded p-1 d-flex backgroundColor"
-                >
-                  <div
-                    class="bg-keyValuePairColor d-flex h-fit rounded"
-                    style="padding: 1px 4px;"
-                  >
-                    <p style="font-size:10px;" class="mb-0 me-1">
-                      {element.value ? element.value : "corrupted-file"}
-                    </p>
-                    <img
-                      src={close}
-                      alt=""
-                      class="my-auto"
-                      style="cursor:pointer; height: 10px; width: 10px;"
-                      on:click={() => {
-                        if (isInputBoxEditable) {
-                          removeFormFile(index);
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            {:else}
-              <div class="w-50 d-flex align-items-center">
-                <div
-                  class="position-absolute top-0 left-6"
-                  style="width: calc(50% - 48px);"
-                >
-                  <CodeMirrorInput
-                    bind:value={element.value}
-                    onUpdateInput={() => {
-                      updateParam(index);
-                    }}
-                    placeholder={"Add Value"}
-                    disabled={!isInputBoxEditable ? true : false}
-                    {theme}
-                    {environmentVariables}
-                    {onUpdateEnvironment}
-                  />
-                </div>
-              </div>
-            {/if}
-          </div>
-          <div
-            class="ms-1 d-flex align-items-center justify-content-between gap-1"
-            style="width:40px;"
-          >
-            {#if pairs.length - 1 != index}
-              {#if isInputBoxEditable}
-                <!-- {#if !isWebApp} -->
-                <Tooltip
-                  title="Attach"
-                  show={isInputBoxEditable &&
-                    element.type == "text" &&
-                    element.value == ""}
-                  placement="bottom-center"
-                >
-                  <button
-                    class="button-container d-flex align-items-center justify-content-center border-0 {isInputBoxEditable &&
-                    element.type == 'text' &&
-                    element.value == ''
-                      ? 'opacity-1'
-                      : 'opacity-0 pe-none'}"
-                    style="width:16px; height:16px; padding:2px; background:transparent;"
-                    on:click={() => {
-                      uploadFormFile(index);
-                    }}
-                  >
-                    <AttachRegular
-                      size={"16px"}
-                      color={"var(--icon-ds-neutral-100)"}
-                    />
-                  </button>
-                </Tooltip>
-                <!-- {/if} -->
-                <Tooltip
-                  title={"Delete"}
-                  placement={"bottom-center"}
-                  distance={10}
-                >
-                  <div class="button-container">
-                    <Button
-                      buttonClassProp=""
-                      size="extra-small"
-                      type="teritiary-regular"
-                      startIcon={DeleteRegular}
-                      onClick={() => {
-                        deleteParam(index);
-                      }}
-                    />
-                  </div>
-                </Tooltip>
-              {:else}
-                <div style="width:45px;" class="opacity:0;"></div>
-              {/if}
-            {/if}
-          </div>
-        </div>
+        <LazyElementFormData
+          {element}
+          {index}
+          {pairs}
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          {isInputBoxEditable}
+          {isCheckBoxEditable}
+          {updateParam}
+          {updateCheck}
+          {deleteParam}
+          {uploadFormFile}
+          {removeFormFile}
+          {handleOpenCurrentDynamicExpression}
+          {dynamicExpression}
+        />
       {/each}
     {/if}
   </div>
@@ -844,31 +645,6 @@
     height: 28px;
     padding-left: 4px;
     padding-right: 1rem;
-  }
-  .pair-data-row:first-child {
-    border-top: none !important;
-    height: 28px !important;
-  }
-  .pair-data-row {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    padding-right: 20px;
-    padding-left: 2px;
-    height: calc(28px);
-    background-color: var(--bg-ds-surface-600);
-    border-top: 1px solid var(--bg-ds-surface-400);
-  }
-  .pair-data-row:hover {
-    background-color: var(--bg-ds-surface-500);
-  }
-  .trash-icon {
-    background: transparent;
-  }
-  .trash-icon:hover {
-    background-color: var(--bg-ds-surface-300);
-  }
-  .trash-icon:focus-visible {
-    border: 2px solid var(--bg-ds-primary-300);
   }
   .header-text {
     color: var(--text-ds-neutral-200);
@@ -888,23 +664,8 @@
       visibility 0.1s;
   }
 
-  /* Diff view styling */
-
-  /* Diff/Merge View: Style for new row added */
-  .diff-row.diff-added {
-    /* background-color: #113b21 !important; */
-    background-color: var(--bg-ds-success-800) !important ;
-  }
-
-  /* Diff/Merge View: Style for row modified */
-  .diff-row.diff-modified {
-    /* background-color: #113b21 !important; */
-    background-color: var(--bg-ds-success-800) !important ;
-  }
-
-  /* Diff/Merge View: Style for new row deleted */
-  .diff-row.diff-deleted {
-    /* background-color: #3d1514 !important; */
-    background-color: var(--bg-ds-danger-800) !important;
+  .merge-view-act-btns {
+    position: sticky;
+    bottom: 4px;
   }
 </style>
