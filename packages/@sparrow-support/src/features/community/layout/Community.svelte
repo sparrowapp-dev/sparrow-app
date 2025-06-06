@@ -29,7 +29,7 @@
       </p>
     </div>
 
-    <div class="content-section px-2">
+    <div class="content-section">
       <h2
         class="text-ds-font-size-12"
         style="display:flex; align-items:center; padding: 16px, 10px, 10px, 10px;"
@@ -53,7 +53,7 @@
       </p>
     </div>
 
-    <div class="discord-section px-2">
+    <div class="discord-section">
       <h3
         class="text-ds-font-size-16 text-ds-font-weight-semi-bold"
         style="color: var(--text-secondary-100); margin-bottom: 4px;"
@@ -137,6 +137,9 @@
           }}
         ></p>
       </div> -->
+      <div class="pt-3">
+        <DiscordPost />
+      </div>
     </div>
   </div>
 </div>
