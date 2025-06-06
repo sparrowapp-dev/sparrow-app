@@ -11,7 +11,6 @@
     CrossIcon,
     DiversityRegular,
     LikeIcon,
-    LinkRegular,
     MessageIcon,
     PostIcon,
     SortIcon,
@@ -424,21 +423,16 @@
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
                       >
                         <div style="flex: 1;">
-                          <div class="d-flex gap-3 align-items-center">
-                            <div
-                              class="title"
-                              on:click={() => {
-                                (postId = post?.id),
-                                  (isPostopen = true),
-                                  setPostId("feedback", postId);
-                                MixpanelEvent(Events.Activity_Post);
-                              }}
-                            >
-                              {post?.title}
-                            </div>
-                            <div class="mb-2">
-                              <LinkRegular />
-                            </div>
+                          <div
+                            class="title"
+                            on:click={() => {
+                              (postId = post?.id),
+                                (isPostopen = true),
+                                setPostId("feedback", postId);
+                              MixpanelEvent(Events.Activity_Post);
+                            }}
+                          >
+                            {post?.title}
                           </div>
 
                           <div
@@ -653,20 +647,15 @@
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
                       >
                         <div style="flex: 1;">
-                          <div class="d-flex gap-3 align-items-center">
-                            <div
-                              class="title"
-                              on:click={() => (
-                                (postId = post?.id),
-                                (isPostopen = true),
-                                setPostId("feedback", postId)
-                              )}
-                            >
-                              {post?.title}
-                            </div>
-                            <div class="mb-2">
-                              <LinkRegular />
-                            </div>
+                          <div
+                            class="title"
+                            on:click={() => (
+                              (postId = post?.id),
+                              (isPostopen = true),
+                              setPostId("feedback", postId)
+                            )}
+                          >
+                            {post?.title}
                           </div>
                           <div
                             style="height: 16px; display: flex; align-items: center;"

@@ -272,7 +272,6 @@
               />
             {:else if activeTab === "community"}
               <Community />
-              <DiscordPost />
             {:else if activeTab === "myActivity"}
               <ActivitySection
                 onInputFeedback={_viewModel.createPost}
