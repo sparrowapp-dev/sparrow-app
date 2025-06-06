@@ -2407,8 +2407,21 @@ class RestExplorerViewModel {
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (prompt = "") => {
+    console.log("Testing lllllllllllllllllllllllllllllllllllllllllllllllll");
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
+
+    console.log("This is component data ", componentData);
+
+    let workspaceId = componentData.path.workspaceId;
+
+    let workspaceVal = await this.readWorkspace(workspaceId);
+
+    let teamId = workspaceVal.team?.teamId;
+
+    console.log("this is team id ", teamId);
+
+    // debugger;
 
     // extraction of request API data for setting AI Context
     const apiData = {
@@ -2420,11 +2433,14 @@ class RestExplorerViewModel {
       auth: componentData.property.request.auth,
     };
 
-    const rawConversations = componentData?.property?.request?.ai?.conversations || [];
-    const formattedConversations = rawConversations.map(({ type, message }) => ({
-      role: type === 'Sender' ? 'user' : 'assistant',
-      content: message
-    }));
+    const rawConversations =
+      componentData?.property?.request?.ai?.conversations || [];
+    const formattedConversations = rawConversations.map(
+      ({ type, message }) => ({
+        role: type === "Sender" ? "user" : "assistant",
+        content: message,
+      }),
+    );
 
     try {
       const userEmail = getClientUser().email;
@@ -2440,7 +2456,8 @@ class RestExplorerViewModel {
         JSON.stringify(apiData),
         formattedConversations,
         "deepseek",
-        "chat"
+        "chat",
+        teamId,
       );
 
       if (!socketResponse) {

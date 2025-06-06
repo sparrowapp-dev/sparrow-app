@@ -333,6 +333,7 @@ export class AiAssistantWebSocketService {
     conversation,
     model,
     activity,
+    teamId
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -343,6 +344,7 @@ export class AiAssistantWebSocketService {
       conversation,
       model,
       activity,
+      teamId,
       "feature": "sparrow-ai"
     };
 
