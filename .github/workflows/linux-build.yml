@@ -118,10 +118,10 @@ jobs:
         run: yarn
 
       - name: Build Tauri app
-        run: yarn workspace @sparrow/desktop tauri build --debug
+        run: yarn workspace @sparrow/desktop tauri build
 
       - name: Generate DEB metadata
-        working-directory: apps/@sparrow-desktop/src-tauri/target/debug/bundle
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
         run: |
           mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
           cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
