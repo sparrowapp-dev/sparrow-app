@@ -19,6 +19,7 @@
     RestExtensionPanel,
     RequestParameters,
     ResponseStatus,
+    MultipleMockResponse,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -84,6 +85,7 @@
     CheckmarkCircleFilled,
     ErrorCircleFilled,
     CaretDownFilled,
+    AddRegular,
   } from "@sparrow/library/icons";
 
   import { SparrowSecondaryIcon, SparkleFilled } from "@sparrow/common/icons";
@@ -94,6 +96,7 @@
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { Select } from "@sparrow/library/forms";
   import { HttpStatusCodes } from "../utils";
+  import { SparrowLogo } from "@sparrow/common/images";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -175,6 +178,63 @@
   let minSizePct = 0;
   let maxSizePct = 0;
   let defaultSizePct = 0;
+
+  //Multiple Mockresponses
+  let mockResponses = [
+    // {
+    //   id: "1",
+    //   name: "Mock Response 1",
+    //   isActive: true,
+    // },
+    // {
+    //   id: "2",
+    //   name: "Mock Response 2",
+    //   statusCode: 404,
+    //   isActive: false,
+    // },
+    // {
+    //   id: "3",
+    //   name: "Mock Response 3",
+    //   statusCode: 500,
+    //   isActive: false,
+    // },
+    // {
+    //   id: "4",
+    //   name: "Mock Response 4",
+    //   statusCode: 200,
+    //   isActive: true,
+    // },
+    // {
+    //   id: "5",
+    //   name: "Mock Response 5",
+    //   statusCode: 404,
+    //   isActive: false,
+    // },
+    // {
+    //   id: "6",
+    //   name: "Mock Response 6",
+    //   statusCode: 500,
+    //   isActive: false,
+    // },
+    // {
+    //   id: "7",
+    //   name: "Mock Response 7",
+    //   statusCode: 200,
+    //   isActive: true,
+    // },
+    // {
+    //   id: "8",
+    //   name: "Mock Response 8",
+    //   statusCode: 404,
+    //   isActive: false,
+    // },
+    // {
+    //   id: "9",
+    //   name: "Mock Response 9",
+    //   statusCode: 500,
+    //   isActive: false,
+    // },
+  ];
 
   /**
    * Converts the pixel-based min, max, and default sizes
@@ -716,15 +776,45 @@
                   class="bg-transparent position-relative"
                 >
                   <!-- Response Pane -->
-                  <div
-                    class="d-flex flex-column h-100 {$tabsSplitterDirection ===
-                    'horizontal'
-                      ? 'pt-1'
-                      : 'ps-2'}"
-                  >
-                    <div class="h-100 d-flex flex-column">
-                      <div style="flex:1; overflow:auto;">
-                        <!-- {#if storeData?.isSendRequestInProgress}
+                  <div class="d-flex h-100" style="gap: 8px;">
+                    <div>
+                      <MultipleMockResponse {tab} {userRole} {mockResponses} />
+                    </div>
+                    <div
+                      style="width:1px; background:var(--border-ds-surface-100); height:100%; margin-left: 8px;"
+                    ></div>
+                    <div
+                      class="d-flex flex-column h-100 {$tabsSplitterDirection ===
+                      'horizontal'
+                        ? 'pt-1'
+                        : 'ps-2'}"
+                      style="flex:1;"
+                    >
+                      {#if mockResponses.length === 0}
+                        <div
+                          class="d-flex flex-column justify-content-center align-items-center w-100"
+                        >
+                          <div class="container">
+                            <SparrowLogo width={"120px"} height={"120px"} />
+                          </div>
+                          <p
+                            style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;text-align:center"
+                          >
+                            This mock request has no responses. Add a mock
+                            response to begin testing.
+                          </p>
+                          <Button
+                            title="Add Mock Response"
+                            size="small"
+                            type="outline-secondary"
+                            onClick={() => {}}
+                            startIcon={AddRegular}
+                          />
+                        </div>
+                      {:else}
+                        <div class="h-100 d-flex flex-column">
+                          <div style="flex:1; overflow:auto;">
+                            <!-- {#if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
                             style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
@@ -740,92 +830,99 @@
                             {environmentVariables}
                           />
                         {:else if storeData?.response.status} -->
-                        <div class="h-100 d-flex flex-column" style="gap:12px">
-                          <!-- <div
+                            <div
+                              class="h-100 d-flex flex-column"
+                              style="gap:12px"
+                            >
+                              <!-- <div
                             class="d-flex justify-content-between"
                             style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                           > -->
-                          <div class="d-flex justify-content-between">
-                            <ResponseNavigator
-                              requestStateSection={$tab.property.mockRequest
-                                ?.state?.responseNavigation}
-                              {onUpdateRequestState}
-                              responseHeadersLength={$tab.property.mockRequest
-                                ?.responseHeaders?.length || 0}
-                            />
-                            <Select
-                              data={HttpStatusCodes}
-                              onclick={(selectedItem) => {
-                                selectedStatusCode = selectedItem;
-                                onUpdateResponseStatus(selectedItem);
-                              }}
-                              titleId={$tab.property.mockRequest
-                                ?.responseStatus}
-                              placeholderText={"Status Code"}
-                              id={"httpStatusCode"}
-                              zIndex={701}
-                              disabled={false}
-                              minBodyWidth={"180px"}
-                              minHeaderWidth={"180px"}
-                              maxHeaderWidth={"180px"}
-                              bodyTheme={"violet"}
-                              menuItem={"v2"}
-                              headerFontSize={"12px"}
-                              isDropIconFilled={true}
-                              maxBodyHeight={"196px"}
-                              variant={"secondary"}
-                              borderType={"none"}
-                              borderActiveType={"none"}
-                              borderHighlight={"hover-active"}
-                              headerHighlight={"hover-active"}
-                              headerHeight={"26px"}
-                              borderRounded={"4px"}
-                              headerSearchable={true}
-                            />
-                          </div>
-                          <!-- </div> -->
-                          <div
-                            class="flex-grow-1 d-flex flex-column"
-                            style="overflow:auto; min-height:0;"
-                          >
-                            {#if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
-                              {#if $tab.property.mockRequest?.state?.responseBodyLanguage !== "Image"}
-                                <ResponseBodyNavigator
-                                  response={$tab.property.mockRequest
-                                    ?.headers || []}
-                                  apiState={$tab.property.mockRequest?.state}
-                                  path={$tab.path}
-                                  {onUpdateResponseState}
+                              <div class="d-flex justify-content-between">
+                                <ResponseNavigator
+                                  requestStateSection={$tab.property.mockRequest
+                                    ?.state?.responseNavigation}
                                   {onUpdateRequestState}
-                                  {onClearResponse}
-                                  {onSaveResponse}
-                                  {isWebApp}
-                                  {isGuestUser}
-                                  {userRole}
+                                  responseHeadersLength={$tab.property
+                                    .mockRequest?.responseHeaders?.length || 0}
                                 />
-                              {/if}
+                                <Select
+                                  data={HttpStatusCodes}
+                                  onclick={(selectedItem) => {
+                                    selectedStatusCode = selectedItem;
+                                    onUpdateResponseStatus(selectedItem);
+                                  }}
+                                  titleId={$tab.property.mockRequest
+                                    ?.responseStatus}
+                                  placeholderText={"Status Code"}
+                                  id={"httpStatusCode"}
+                                  zIndex={701}
+                                  disabled={false}
+                                  minBodyWidth={"180px"}
+                                  minHeaderWidth={"180px"}
+                                  maxHeaderWidth={"180px"}
+                                  bodyTheme={"violet"}
+                                  menuItem={"v2"}
+                                  headerFontSize={"12px"}
+                                  isDropIconFilled={true}
+                                  maxBodyHeight={"196px"}
+                                  variant={"secondary"}
+                                  borderType={"none"}
+                                  borderActiveType={"none"}
+                                  borderHighlight={"hover-active"}
+                                  headerHighlight={"hover-active"}
+                                  headerHeight={"26px"}
+                                  borderRounded={"4px"}
+                                  headerSearchable={true}
+                                />
+                              </div>
+                              <!-- </div> -->
                               <div
-                                style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                                class="flex-grow-1 d-flex flex-column"
+                                style="overflow:auto; min-height:0;"
                               >
-                                <ResponseBody
-                                  response={$tab.property.mockRequest
-                                    ?.responseBody}
-                                  apiState={$tab.property.mockRequest?.state}
-                                  {onUpdateResponseBody}
-                                />
+                                {#if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
+                                  {#if $tab.property.mockRequest?.state?.responseBodyLanguage !== "Image"}
+                                    <ResponseBodyNavigator
+                                      response={$tab.property.mockRequest
+                                        ?.headers || []}
+                                      apiState={$tab.property.mockRequest
+                                        ?.state}
+                                      path={$tab.path}
+                                      {onUpdateResponseState}
+                                      {onUpdateRequestState}
+                                      {onClearResponse}
+                                      {onSaveResponse}
+                                      {isWebApp}
+                                      {isGuestUser}
+                                      {userRole}
+                                    />
+                                  {/if}
+                                  <div
+                                    style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                                  >
+                                    <ResponseBody
+                                      response={$tab.property.mockRequest
+                                        ?.responseBody}
+                                      apiState={$tab.property.mockRequest
+                                        ?.state}
+                                      {onUpdateResponseBody}
+                                    />
+                                  </div>
+                                {:else if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
+                                  <div style="overflow:auto;">
+                                    <ResponseHeaders
+                                      responseHeader={$tab.property.mockRequest
+                                        ?.responseHeaders || []}
+                                    />
+                                  </div>
+                                {/if}
                               </div>
-                            {:else if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
-                              <div style="overflow:auto;">
-                                <ResponseHeaders
-                                  responseHeader={$tab.property.mockRequest
-                                    ?.responseHeaders || []}
-                                />
-                              </div>
-                            {/if}
+                            </div>
+                            <!-- {/if} -->
                           </div>
                         </div>
-                        <!-- {/if} -->
-                      </div>
+                      {/if}
                     </div>
                   </div>
                 </Pane>
@@ -995,6 +1092,12 @@
 {/if}
 
 <style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 78px 24px;
+  }
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
     height: 40px;
