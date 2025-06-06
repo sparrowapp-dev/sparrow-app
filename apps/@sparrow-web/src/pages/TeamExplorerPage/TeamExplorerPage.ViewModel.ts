@@ -488,7 +488,7 @@ export class TeamExplorerPageViewModel {
       await this.refreshWorkspaces(_userId);
       await this.teamRepository.modifyTeam(_teamId, responseData);
       notifications.success(
-        `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
+        `Invite sent to ${_inviteBody.users.length} person for ${_teamName}.`,
       );
     } else {
       notifications.error(
@@ -938,7 +938,7 @@ export class TeamExplorerPageViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} person for ${_workspaceName}.`,
       );
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);
