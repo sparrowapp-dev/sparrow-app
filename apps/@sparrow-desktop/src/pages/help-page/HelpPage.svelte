@@ -94,8 +94,11 @@
     if (status === "new" || status === "open") {
       return "cyan";
     }
-    if (status === "fixed" || status === "in progress") {
+    if (status === "fixed") {
       return "purple";
+    }
+    if (status === "in progress") {
+      return "pink";
     }
     if (status === "improved" || status === "complete") {
       return "green";

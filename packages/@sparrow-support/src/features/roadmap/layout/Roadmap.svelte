@@ -119,9 +119,7 @@
 
 <div class="container-data" style="padding: 20px; height: calc(100% - 136px)">
   <div class="headerq">
-    <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold mb-2">
-      Roadmap
-    </p>
+    <p class="text-ds-font-size-20 fw-semibold mb-2">Roadmap</p>
     <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
       Stay updated with all feedback, from planning to progress, on a single
       roadmap.
@@ -159,7 +157,7 @@
         }}
         titleId={type}
         minHeaderWidth={"185px"}
-        headerHeight={"26px"}
+        headerHeight={"28px"}
         iconRequired={true}
         icon={DiversityRegular}
         iconColor={"var(--icon-primary-300)"}
