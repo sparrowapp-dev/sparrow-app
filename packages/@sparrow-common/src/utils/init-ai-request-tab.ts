@@ -79,7 +79,7 @@ class InitAiRequestTab {
                             streamResponse: true,
                             jsonResponseFormat: false,
                             temperature: 0.5,
-                            maxTokens: 1024,
+                            maxTokens: -1,
                             top_p: 0.95,
                         },
                     },
