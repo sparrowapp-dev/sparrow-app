@@ -774,9 +774,13 @@
     color: var(--text-secondary-100);
   }
   .title:hover {
-    text-decoration: underline;
     cursor: pointer;
+    color: var(--text-ds-primary-300);
+  }
+
+  .title:active {
     color: var(--text-primary-300);
+    text-decoration: underline;
   }
 
   #search-input {
