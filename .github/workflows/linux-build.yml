@@ -1,0 +1,175 @@
+name: Linux Build and Release
+
+on:
+  push:
+    branches:
+      - build/linux-debian
+  workflow_dispatch:
+
+jobs:
+  release_linux:
+    runs-on: ubuntu-latest
+    environment: linux build
+
+
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      AWS_REGION: 'us-east-1'
+      AWS_S3_BUCKET: sparrow-assest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Rust 1.82.0
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.82.0
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config libssl-dev libcairo2-dev \
+            libwebkit2gtk-4.1-dev build-essential \
+            curl wget file libxdo-dev \
+            libayatana-appindicator3-dev librsvg2-dev \
+            gnupg software-properties-common tree
+
+      - name: Setup Node.js 22
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+
+      - name: Install Yarn (Ubuntu 24.04 compatible)
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/yarn.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install -y yarn
+
+      # - name: Inject .env for Desktop
+      #   run: |
+      #     ls
+      #     echo "${{ secrets.DESKTOP_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env
+
+      - name: Inject .env for Desktop
+        run: |
+          pwd
+          ls
+          cat > apps/@sparrow-desktop/.env << 'EOF'
+          ${{ secrets.DESKTOP_ENV_FILE_DEV }}
+          EOF
+
+      - name: cat .env for Desktop
+        run: |
+          cat /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/.env  
+
+      - name: Inject .env for WEB
+        run: |
+          pwd
+          ls
+          cat > apps/@sparrow-web/.env << 'EOF'
+          ${{ secrets.WEB_ENV_FILE_DEV }}
+          EOF
+
+      # - name: Inject .env for WEB
+      #   run: |
+      #     ls
+      #     echo "${{ secrets.WEB_ENV_FILE_DEV }}" | base64 --decode > /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env
+
+      - name: cat .env for WEB
+        run: |
+          cat /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env    
+
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Build Tauri app
+        run: yarn workspace @sparrow/desktop tauri build
+
+      - name: Generate DEB metadata
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        run: |
+          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
+          cd ../../../../../../publishDir
+          mkdir -p dists/stable/main/binary-amd64/
+          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
+      - name: Prepare publish directory
+        run: |
+          cd publishDir
+          cat > apt-release.conf <<EOF
+          APT::FTPArchive::Release {
+            Origin "Sparrow";
+            Label "Sparrow";
+            Suite "stable";
+            Codename "stable";
+            Architectures "amd64";
+            Components "main";
+            Description "Sparrow Debian Repository";
+          };
+          EOF
+
+          cd dists/stable
+          apt-ftparchive -c ../../apt-release.conf release . > Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
+
+          cd ../../
+          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
+
+          cd ..
+          mv publishDir gh-pages
+
+      - name: Upload gh-pages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh-pages
+          path: gh-pages
+  upload_to_s3:
+    runs-on: ubuntu-latest
+    needs: release_linux
+    environment: development
+    steps:
+      
+      - name: Download gh-pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gh-pages
+          path: gh-pages      
+
+      - name: Upload to S3 bucket
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          SOURCE_DIR: gh-pages
+
+      # - name: Notify Teams Channel
+      #   run: |
+      #     curl -H 'Content-Type: application/json' \
+      #       -d '{
+      #         "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+      #       }' \
+      #       ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
