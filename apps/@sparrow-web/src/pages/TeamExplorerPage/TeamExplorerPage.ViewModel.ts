@@ -972,7 +972,7 @@ export class TeamExplorerPageViewModel {
     );
     if (response.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite resent successfully!`);
+      notifications.success(`Invite resent successfully.`);
       return response;
     } else {
       notifications.error("Failed to resend invite. Please try again.");
@@ -988,7 +988,7 @@ export class TeamExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite withdrawn successfully!`);
+      notifications.success(`Invite withdrawn successfully.`);
       return response;
     } else {
       notifications.error("Failed to withdraw invite. Please try again.");
