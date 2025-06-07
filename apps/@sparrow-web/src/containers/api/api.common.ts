@@ -1299,6 +1299,7 @@ const makeGraphQLRequest = async (
   const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
   const startTime = performance.now();
   try {
+    debugger;
     if (_selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/graphql-request";
       const axiosResponse = await axios({
