@@ -431,43 +431,38 @@
                   />
                 </div> -->
                 <div style="flex:1; overflow: auto;">
-                  {#if $isSchemaFetching}
+                  {#if $isSchemaFetching && !$tab.property.graphql.schema.length}
                     <div
                       style="display: flex; align-items: center; justify-content: center; height: 100%;"
                     >
                       <Loader loaderSize="20px" />
                     </div>
                   {:else if $tab.property.graphql.state.isRequestSchemaFetched}
-                  {#if $tab.property.graphql.schema.length > 0}
-                    <GenerateQuery
-                      schema={$tab.property.graphql.schema}
-                      updateSchema={handleUpdateSchema}
-                      requestOperationSection={$tab.property.graphql?.state
-                        ?.operationNavigation}
-                      onUpdateRequestState={handleUpdateRequestState}
-                      operationSearch={$tab.property.graphql?.operationSearch}
-                      {updateOperationSearch}
-                      onRefreshSchema={handleFetchSchema}
-                      isSchemaFetching={$isSchemaFetching}
-                    />
-                  {:else}
-                    <div style="flex: 1;">
-                      <div class="error-message">
-                        <div class="error-icon">
-                         <Alert
+                    {#if $tab.property.graphql.schema.length > 0}
+                      <GenerateQuery
+                        schema={$tab.property.graphql.schema}
+                        updateSchema={handleUpdateSchema}
+                        requestOperationSection={$tab.property.graphql?.state
+                          ?.operationNavigation}
+                        onUpdateRequestState={handleUpdateRequestState}
+                        operationSearch={$tab.property.graphql?.operationSearch}
+                        {updateOperationSearch}
+                        onRefreshSchema={handleFetchSchema}
+                        isSchemaFetching={$isSchemaFetching}
+                      />
+                    {:else}
+                      <div
+                        class="d-flex justify-content-center align-items-center"
+                        style="margin-top: 44px;"
+                      >
+                        <Alert
                           varient="error"
                           description={"Unable to load schema. Please check the URL and try again."}
                           heading={"Error"}
                           ctaShow={true}
                           onClick={handleFetchSchema}
                         />
-                        </div>
-                        <span class="error-text"
-                          >"Unable to load schema. Please check the URL and try
-                          again."</span
-                        >
                       </div>
-                    </div>
                     {/if}
                   {/if}
                 </div>

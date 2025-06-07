@@ -536,7 +536,8 @@ class GraphqlExplorerViewModel {
   };
 
   private transformSchema = async (schemaData) => {
-    const types = schemaData.__schema.types;
+    if (!schemaData) throw new Error("Invalid Schema Data");
+    const types = schemaData?.__schema.types;
     const processedTypes = new Set();
     const maxItemLength = 15;
     const maxDepthLength = 8;
@@ -1202,7 +1203,7 @@ class GraphqlExplorerViewModel {
     } catch (error) {
       console.error(error);
       const newProgressiveTab = createDeepCopy(this._tab.getValue());
-      newProgressiveTab.property.graphql.state.isRequestSchemaFetched = false;
+      newProgressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = newProgressiveTab;
       await this.tabRepository.updateTab(
         newProgressiveTab.tabId,
