@@ -1352,11 +1352,15 @@ class GraphqlExplorerViewModel {
     return mergeItems(realJson, schemaJson);
   };
 
-  public updateQueryAsPerSchema = async () => {
+  public updateQueryAsPerSchema = async (isCheckBoxChecked: boolean) => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
       let _query;
+      // Dont add default query in case checkbox is not ticked
+      if (!isCheckBoxChecked) {
+        return;
+      }
       if (
         progressiveTab.property.graphql.state.operationNavigation ===
         GraphqlRequestOperationTabEnum.QUERY
@@ -1414,11 +1418,12 @@ class GraphqlExplorerViewModel {
    * @param _headers - request headers
    */
   public updateSchema = async (_schema: string) => {
+    const isCheckBoxChecked = JSON.parse(_schema)?.isCheckBoxChecked;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    await this.updateQueryAsPerSchema();
+    await this.updateQueryAsPerSchema(isCheckBoxChecked);
     this.compareRequestWithServer();
   };
 
