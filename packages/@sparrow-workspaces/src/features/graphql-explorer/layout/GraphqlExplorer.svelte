@@ -19,7 +19,7 @@
     RequestSchema,
     GenerateQuery,
   } from "../components";
-  import { Loader } from "@sparrow/library/ui";
+  import { Alert, Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
@@ -438,6 +438,7 @@
                       <Loader loaderSize="20px" />
                     </div>
                   {:else if $tab.property.graphql.state.isRequestSchemaFetched}
+                  {#if $tab.property.graphql.schema.length > 0}
                     <GenerateQuery
                       schema={$tab.property.graphql.schema}
                       updateSchema={handleUpdateSchema}
@@ -453,11 +454,13 @@
                     <div style="flex: 1;">
                       <div class="error-message">
                         <div class="error-icon">
-                          <WarningIcon
-                            height="16"
-                            width="16"
-                            color="var(--icon-danger-200)"
-                          />
+                         <Alert
+                          varient="error"
+                          description={"Unable to load schema. Please check the URL and try again."}
+                          heading={"Error"}
+                          ctaShow={true}
+                          onClick={handleFetchSchema}
+                        />
                         </div>
                         <span class="error-text"
                           >"Unable to load schema. Please check the URL and try
@@ -465,6 +468,7 @@
                         >
                       </div>
                     </div>
+                    {/if}
                   {/if}
                 </div>
               </div>

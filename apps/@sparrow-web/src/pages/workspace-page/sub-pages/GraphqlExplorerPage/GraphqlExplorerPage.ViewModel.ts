@@ -1186,7 +1186,7 @@ class GraphqlExplorerViewModel {
           console.error(error);
           const newProgressiveTab = createDeepCopy(this._tab.getValue());
           newProgressiveTab.property.graphql.state.isRequestSchemaFetched =
-            false;
+            true;
           this.tab = newProgressiveTab;
           await this.tabRepository.updateTab(
             newProgressiveTab.tabId,
