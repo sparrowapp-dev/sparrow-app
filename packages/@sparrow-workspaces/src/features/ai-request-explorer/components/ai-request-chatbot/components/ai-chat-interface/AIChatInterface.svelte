@@ -141,7 +141,7 @@
       class="conversation-history-panel d-flex flex-column h-100 px-2 py-2 gap-2"
     >
       <div
-        class="conversation-history-header d-flex align-items-center justify-content-between"
+        class="conversation-history-header d-flex align-items-center justify-content-between mt-1"
       >
         <span
           class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold"
@@ -159,7 +159,10 @@
       </div>
 
       <div
-        class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-center"
+        class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-center {!conversationsHistory
+          ?._data?.conversations?.length
+          ? 'flex-grow-1'
+          : ''}"
       >
         {#if conversationsHistory && conversationsHistory._data.conversations.length > 0}
           {#each conversationsHistory._data.conversations as conversation (conversation.id)}
@@ -173,11 +176,25 @@
           <div
             class="empty-state d-flex flex-column align-items-center justify-content-center h-100"
           >
-            <div class="mb-3">
-              <BotRegular size={"32px"} color={"var(--icon-ds-neutral-500)"} />
-            </div>
+            <div
+              style="width: 200px;"
+              class="d-flex flex-column align-items-center justify-content-center gap-2"
+            >
+              <div class="">
+                <BotRegular
+                  width={"20px"}
+                  height={"30px"}
+                  color={"var(--icon-ds-neutral-500)"}
+                />
+              </div>
 
-            <p class="empty-text">No conversations yet</p>
+              <p
+                class="empty-text text-ds-font-size-14"
+                style="font-family: Inter,sans-serif; color: grey"
+              >
+                No conversations yet
+              </p>
+            </div>
           </div>
         {/if}
       </div>
@@ -185,7 +202,11 @@
   {/if}
 
   <!-- ChatBot Panel -->
-  <div class="ai-chat-panel h-100">
+  <div
+    class="ai-chat-panel h-100 {isConversationHistoryPanelOpen
+      ? 'with-history'
+      : 'full-width'}"
+  >
     <div
       class="d-flex flex-column h-100 chat-box"
       in:fly={{ y: 50, duration: 300, easing: cubicOut }}
@@ -215,12 +236,12 @@
                   <ChatHistoryRegular size={"20px"} />
                 </button> -->
 
-                <Tooltip title={"Open Chat History"} placement={"top-center"}>
-                  <span
-                    style={isConversationHistoryPanelOpen
-                      ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px;"
-                      : ""}
-                  >
+                <span
+                  style={isConversationHistoryPanelOpen
+                    ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px;"
+                    : ""}
+                >
+                  <Tooltip title={"Open Chat History"} placement={"top-center"}>
                     <Button
                       size="small"
                       startIcon={ChatHistoryRegular}
@@ -235,8 +256,8 @@
                         }
                       }}
                     />
-                  </span>
-                </Tooltip>
+                  </Tooltip>
+                </span>
                 <span class="text-ds-font-size-12 fw-medium text-white"
                   >Conversation</span
                 >
@@ -525,17 +546,35 @@
     border-radius: 6px;
     border: 1px solid var(--bg-ds-surface-100);
     padding: 10px;
-    max-width: 100%;
-    min-width: 60%;
+    transition: all 0.3s ease;
   }
 
   /* new - st*/
+
+  /* Full width when history panel is closed */
+  .ai-chat-panel.full-width {
+    width: 100%;
+    flex: 1;
+    min-width: 400px;
+  }
+
+  /* Adjusted width when history panel is open */
+
+  .ai-chat-panel.with-history {
+    width: 60%;
+    flex: 0 0 60%;
+    /* min-width: 200px; */
+  }
+
+  /* Conversation History Panel Styles */
   .conversation-history-panel {
-    /* max-width: 40%; */
-    width: 45%;
+    width: 40%;
+    flex: 0 0 40%;
+    /* min-width: 100px;
+    max-width: 250px; */
+    transition: all 0.3s ease;
     background-color: var(--bg-ds-surface-600);
     border-right: 1px solid var(--border-ds-surface-200);
-    /* flex: 1; */
     border-radius: 8px;
   }
 

@@ -17,7 +17,8 @@ export class AiRequestRepository {
   */
   public addConversation = async (provider: AiModelProviderEnum, providerkey: string, conversations: any) => {
     const doc = {
-      id: provider === "openai" ? "openai-123" : provider === "anthropic" ? "anthropic-123" : provider === "deepseek" ? "deepseek-123" : "gemini-123",
+      // id: provider === "openai" ? "openai" : provider === "anthropic" ? "anthropic" : provider === "deepseek" ? "deepseek" : "gemini",
+      id: `${provider}-${providerkey}`,
       provider,
       apiKey: providerkey,
       conversations: [],

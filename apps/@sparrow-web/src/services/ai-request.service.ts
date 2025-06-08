@@ -28,7 +28,71 @@ export class AiRequestService {
     return response;
   };
 
-  public addOrUpdateConversation = async (aiProvider: AiModelProviderEnum, providerKey: string, conversationId: string, conversations: string) => {
+  // public addOrUpdateConversation = async (aiProvider: AiModelProviderEnum, providerKey: string, conversationId: string, conversations: string) => {
+  //   const payload = {
+  //     id: conversationId,
+  //     provider: aiProvider,
+  //     apiKey: providerKey,
+  //     data: [
+  //       {
+  //         title: "New Conversation 01",
+  //         inputTokens: 12,
+  //         outputTokens: 14,
+  //         date: "2025-06-08",
+  //         time: "10:51",
+  //         authoredBy: "Anish Kmr",
+  //         conversation: conversations,
+  //       }
+  //     ]
+  //   }
+  //   const response = await makeRequest(
+  //     "POST",
+  //     `${this.apiUrl}/api/assistant/update-conversation`,
+  //     {
+  //       headers: getAuthHeaders(),
+  //       body: payload,
+  //     },
+  //   );
+
+  //   return response;
+  // }
+
+  public addNewConversation = async (
+    aiProvider: AiModelProviderEnum,
+    providerKey: string,
+    conversations: string
+  ) => {
+    const payload = {
+      provider: aiProvider,
+      apiKey: providerKey,
+      data: [
+        {
+          title: "New Conversation 01",
+          inputTokens: 12,
+          outputTokens: 14,
+          date: "2025-06-08",
+          time: "10:51",
+          authoredBy: "Anish Kmr",
+          conversation: conversations,
+        }
+      ]
+    };
+
+    const response = await makeRequest("POST", `${this.apiUrl}/api/assistant/insert-conversation`, {
+      headers: getAuthHeaders(),
+      body: payload,
+    });
+
+    return response;
+  };
+
+
+  public updateConversation = async (
+    aiProvider: AiModelProviderEnum,
+    providerKey: string,
+    conversationId: string,
+    conversations: string
+  ) => {
     const payload = {
       id: conversationId,
       provider: aiProvider,
@@ -44,18 +108,16 @@ export class AiRequestService {
           conversation: conversations,
         }
       ]
-    }
-    const response = await makeRequest(
-      "POST",
-      `${this.apiUrl}/api/assistant/update-conversation`,
-      {
-        headers: getAuthHeaders(),
-        body: payload,
-      },
-    );
+    };
+
+    const response = await makeRequest("POST", `${this.apiUrl}/api/assistant/update-conversation`, {
+      headers: getAuthHeaders(),
+      body: payload,
+    });
 
     return response;
-  }
+  };
+
 
 
 }

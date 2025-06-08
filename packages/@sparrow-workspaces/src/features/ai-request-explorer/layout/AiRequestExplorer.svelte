@@ -54,6 +54,10 @@
   export let conversationsHistory: AiRequestConversationsDocument[];
   export let onSelectConversation: (id: string) => void;
   export let onDeleteConversation: (id: string) => void;
+  export let fetchConversations: () => Promise<void>;
+  export let getConversationsList: () => Observable<
+    AiRequestConversationsDocument[]
+  >;
 
   // Role of user in active workspace
   export let userRole;
@@ -111,11 +115,14 @@
   });
   onDestroy(() => {});
 
-  const onOpenConversationHistoryPanel = () => {
+  const onOpenConversationHistoryPanel = async () => {
     maxPx += 200;
     defaultPx += 130;
     minPx += 250;
     updateSplitpaneContSizes();
+    const res = await fetchConversations();
+    getConversationsList();
+    console.log("Conversations fetched: ", res);
   };
   const onCloseConversationHistoryPanel = () => {
     maxPx -= 200;
@@ -127,10 +134,10 @@
   $: {
     if ($tab) console.log("tab :>> ", $tab?.property?.aiRequest);
   }
-  // $: {
-  //   if (conversationsHistory)
-  //     console.log("convo List :>> ", conversationsHistory);
-  // }
+  $: {
+    if (conversationsHistory)
+      console.log("convo List :>> ", conversationsHistory);
+  }
 </script>
 
 {#if $tab.tabId}

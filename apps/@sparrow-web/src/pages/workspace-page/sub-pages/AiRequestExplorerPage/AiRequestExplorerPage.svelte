@@ -11,7 +11,7 @@
   import { AiRequestExplorer } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, afterUpdate } from "svelte";
   import {
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
@@ -34,8 +34,7 @@
     },
   );
 
-  let conversationsHistory: Observable<AiRequestConversationsDocument[]> =
-    _viewModel.getConversationsList();
+  let conversationsHistory: Observable<AiRequestConversationsDocument[]>;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -164,6 +163,10 @@
     collectionSubscriber.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
   });
+
+  const getConvoList = async () => {
+    conversationsHistory = _viewModel.getConversationsList();
+  };
 </script>
 
 <AiRequestExplorer
@@ -189,7 +192,9 @@
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
-  conversationsHistory={$conversationsHistory}
+  fetchConversations={_viewModel.fetchConversations}
   onSelectConversation={(id) => console.log("Selected:", id)}
   onDeleteConversation={(id) => console.log("Deleted:", id)}
+  conversationsHistory={$conversationsHistory}
+  getConversationsList={getConvoList}
 />

@@ -101,23 +101,22 @@ class AiRequestExplorerViewModel {
   public fetchConversations = async () => {
     const componentData = this._tab.getValue();
     const tabId = componentData.tabId;
-    // const modelProvider = componentData.property.aiRequest.aiModelProvider;
-    // const modelVariant = componentData.property.aiRequest.aiModelVariant;
-    // const authKey = componentData.property.aiRequest.auth.apiKey;
+    const provider = componentData.property.aiRequest.aiModelProvider;
+    const providerAuthKey = componentData.property.aiRequest.auth.apiKey.authValue;
 
-    // if (!authKey || !modelProvider || !modelVariant) {
-    //   console.error("No AI model and API key is provided before fetching conversations.");
-    //   return;
-    // }
+    if (!providerAuthKey || !provider) {
+      console.error("No provider and authKey is provided before fetching conversations.");
+      return;
+    }
 
     try {
       const conversationsRes = await this.aiRequestService.fetchConversationsByApiKey(
-        "openai",
-        "sk-openai-abc-123", // Replace with actual API key
+        provider,
+        providerAuthKey,
       );
       if (conversationsRes.isSuccessful) {
         // Store the fetched conversations in the repository
-        const repoData = await this.aiRequestRepository.addConversation("openai", "sk-openai-abc-123", conversationsRes.data.data);
+        const repoData = await this.aiRequestRepository.addConversation(provider, providerAuthKey, conversationsRes.data.data);
         // console.log("Conversations local repo:", repoData);
       } else {
         console.error("Conversation fetch failed:");
@@ -135,14 +134,14 @@ class AiRequestExplorerViewModel {
    */
   public getConversationsList = () => {
     const componentData = this._tab.getValue();
-    const tabId = componentData.tabId;
-    const provider = componentData?.property?.aiRequest?.aiModelProvider || "openai";
-    const providerKey = componentData?.property?.aiRequest?.auth?.apiKey || "sk-openai-abc-123";
-    if (!provider || !providerKey) {
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    // console.log("Fetching conversations for provider:", provider, "with key:", providerAuthKey);
+    if (!provider || !providerAuthKey) {
       console.error("No provider and providerKey is provided before fetching conversations.");
       return;
     }
-    const response = this.aiRequestRepository.getConversationsByApiKeyAndProvider(provider, providerKey);
+    const response = this.aiRequestRepository.getConversationsByApiKeyAndProvider(provider, providerAuthKey);
     return response;
   };
 
@@ -152,25 +151,40 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const conversations = componentData?.property?.aiRequest?.ai?.conversations || [];
     const conversaionId = componentData?.property?.aiRequest?.ai?.conversaionId;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
-    // if (!conversaionId) {
-    //   notifications.error("No conversaion ID found to save the conversation.");
-    //   return;
-    // }
-    // if (!conversations.length) {
-    //   notifications.error("No conversaion ID found to save the conversation.");
-    //   return;
-    // }
-    // console.log("saving conversation :>> ", conversations);
+
+    if (!conversations.length && !provider && !providerAuthKey) {
+      notifications.error("No provider, key found to save the conversation.");
+      return;
+    }
+
+    console.log("saving conversation :>> ", providerAuthKey);
     // return;
 
     try {
-      const response = await this.aiRequestService.addOrUpdateConversation(
-        "openai",
-        "sk-openai-abc-123",
-        "openai-conv-972fa5ed-a7b5-4f21-928e-9c12bfd49dc4",
-        conversations,
-      );
+
+      let response = null;
+      if (!conversaionId) {
+        // If conversationId is not provided, create a new conversation
+        response = await this.aiRequestService.addNewConversation(
+          provider,
+          providerAuthKey,
+          conversations,
+        );
+        const newConversationId = response.data.data;
+        console.log("New Conversation Response:", response, newConversationId);
+        this.updateAiRequestConversationId(newConversationId);
+      }
+      else {
+        response = await this.aiRequestService.updateConversation(
+          provider,
+          providerAuthKey,
+          conversaionId, // "openai-conv-972fa5ed-a7b5-4f21-928e-9c12bfd49dc4",
+          conversations,
+        );
+        console.log("Update Conversation Response:", response);
+      }
 
       if (response.isSuccessful) {
         // Update the conversations in the repository
@@ -575,6 +589,13 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
+  public updateAiRequestConversationId = async (_conversationId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.ai.conversaionId = _conversationId;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
   /**
    * Updates the AI conversations in the request property of the current tab.
    *
@@ -588,6 +609,10 @@ class AiRequestExplorerViewModel {
     progressiveTab.property.aiRequest.ai.conversations = _conversations;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    console.log("AI conversations updated:", _conversations);
+
+    if (_conversations.length) {
+    }
   };
 
   /**
@@ -642,6 +667,7 @@ class AiRequestExplorerViewModel {
       },
     ]);
     await this.updateRequestState({ isChatbotGeneratingResponse: false });
+    this.saveConversation();
   }
 
   /**
@@ -827,6 +853,8 @@ class AiRequestExplorerViewModel {
                 isChatbotGeneratingResponse: false,
               });
 
+              this.saveConversation(); // save in db
+
               const newData: AiRequestExplorerData = {
                 response: {
                   messageId: "",
@@ -973,6 +1001,7 @@ class AiRequestExplorerViewModel {
                 await this.updateRequestState({
                   isChatbotGeneratingResponse: false,
                 });
+                this.saveConversation();
               }
             }
             break;

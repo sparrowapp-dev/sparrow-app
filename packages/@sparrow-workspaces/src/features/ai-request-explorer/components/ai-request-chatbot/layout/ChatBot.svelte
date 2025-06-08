@@ -96,6 +96,7 @@
       MixpanelEvent(Events.AI_Regenerate_Response),
     );
   };
+
 </script>
 
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
