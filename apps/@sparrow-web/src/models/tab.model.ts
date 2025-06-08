@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 11,
+  version: 12,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1334,24 +1334,24 @@ export const tabSchemaLiteral = {
                 deepseek: {
                   type: "object",
                   properties: {
-                      streamResponse: {
-                        type: "boolean",
-                      },
-                      jsonResponseFormat: {
-                        type: "boolean",
-                      },
-                      temperature: {
-                        type: "number",
-                      },
-                      presencePenalty: {
-                        type: "number",
-                      },
-                      frequencyPenalty: {
-                        type: "number",
-                      },
-                      maxTokens: {
-                        type: "number",
-                      },
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
                   },
                 },
                 anthropic: {
@@ -1472,7 +1472,7 @@ export const tabSchemaLiteral = {
                 prompt: {
                   type: "string",
                 },
-                threadId: {
+                conversationId: {
                   type: "string",
                 },
                 conversations: {

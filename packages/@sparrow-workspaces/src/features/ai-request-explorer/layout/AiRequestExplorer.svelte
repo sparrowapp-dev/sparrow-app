@@ -11,7 +11,10 @@
     ConversationHistoryItem,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import type { CollectionDocument } from "@app/database/database";
+  import type {
+    CollectionDocument,
+    AiRequestConversationsDocument,
+  } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
@@ -47,6 +50,11 @@
   export let onToggleLike;
   export let onUpdateAiConfigurations;
 
+  // Conversations History Props
+  export let conversationsHistory: AiRequestConversationsDocument[];
+  export let onSelectConversation: (id: string) => void;
+  export let onDeleteConversation: (id: string) => void;
+
   // Role of user in active workspace
   export let userRole;
   export let storeData: AiRequestExplorerData | undefined;
@@ -63,9 +71,9 @@
   // Chatbot pane size constraints in pixels (based on Figma design)
   // const minPx = 343;
   // const maxPx = 525;
-  const minPx = 343;
-  const maxPx = 800;
-  const defaultPx = 452;
+  let minPx = 343;
+  let maxPx = 525;
+  let defaultPx = 452;
 
   // Chatbot pane size constraints in percentage (calculated at runtime)
   let minSizePct = 0;
@@ -103,24 +111,26 @@
   });
   onDestroy(() => {});
 
-  // $: {
-  //   if ($tab)
-  //     console.log("tab :>> ", $tab?.property?.aiRequest?.configurations);
-  // }
+  const onOpenConversationHistoryPanel = () => {
+    maxPx += 200;
+    defaultPx += 130;
+    minPx += 250;
+    updateSplitpaneContSizes();
+  };
+  const onCloseConversationHistoryPanel = () => {
+    maxPx -= 200;
+    defaultPx -= 130;
+    minPx -= 250;
+    updateSplitpaneContSizes();
+  };
 
-  // Conversation history props
-  export let conversations: Array<{
-    id: string;
-    title: string;
-    timestamp: string;
-    time: string;
-    inputTokens: number;
-    outputTokens: number;
-    updatedBy: string;
-    isActive?: boolean;
-  }>;
-  export let onSelectConversation: (id: string) => void;
-  export let onDeleteConversation: (id: string) => void;
+  $: {
+    if ($tab) console.log("tab :>> ", $tab?.property?.aiRequest);
+  }
+  // $: {
+  //   if (conversationsHistory)
+  //     console.log("convo List :>> ", conversationsHistory);
+  // }
 </script>
 
 {#if $tab.tabId}
@@ -271,69 +281,21 @@
             size={defaultSizePct}
             maxSize={maxSizePct}
           >
-            <div class="ai-panel d-flex gap-2 h-100">
-              <!-- Conversation History Panel -->
-              <div
-                class="conversation-history-panel d-flex flex-column h-100 px-2 py-2 gap-2"
-              >
-                <div
-                  class="conversation-history-header d-flex align-items-center justify-content-between"
-                >
-                  <span
-                    class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold"
-                    >Conversation History</span
-                  >
-
-                  <Button
-                    size="extra-small"
-                    startIcon={DismissRegular}
-                    type="teritiary-regular"
-                    onClick={() => {}}
-                  />
-                </div>
-
-                <div
-                  class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-center"
-                >
-                  {#if conversations.length > 0}
-                    {#each conversations as conversation (conversation.id)}
-                      <ConversationHistoryItem
-                        {conversation}
-                        onSelect={onSelectConversation}
-                        onDelete={onDeleteConversation}
-                      />
-                    {/each}
-                  {:else}
-                    <div
-                      class="empty-state d-flex flex-column align-items-center justify-content-center h-100"
-                    >
-                      <div class="mb-3">
-                        <BotRegular
-                          size={"32px"}
-                          color={"var(--icon-ds-neutral-500)"}
-                        />
-                      </div>
-                      <p class="empty-text">No conversations yet</p>
-                    </div>
-                  {/if}
-                </div>
-              </div>
-
-              <!-- Chatbot Panel -->
-              <div class="chatbot-panel h-100">
-                <ChatBot
-                  {tab}
-                  disabled={!$tab.property.aiRequest?.aiModelProvider}
-                  responseData={storeData}
-                  {onUpdateAiPrompt}
-                  {onUpdateAiConversation}
-                  {onUpdateRequestState}
-                  {onGenerateAiResponse}
-                  {onStopGeneratingAIResponse}
-                  {onToggleLike}
-                />
-              </div>
-            </div>
+            <!-- Conversation History Panel -->
+            <ChatBot
+              {tab}
+              disabled={!$tab.property.aiRequest?.aiModelProvider}
+              responseData={storeData}
+              {onUpdateAiPrompt}
+              {onUpdateAiConversation}
+              {onUpdateRequestState}
+              {onGenerateAiResponse}
+              {onStopGeneratingAIResponse}
+              {onToggleLike}
+              {conversationsHistory}
+              {onOpenConversationHistoryPanel}
+              {onCloseConversationHistoryPanel}
+            />
           </Pane>
         </Splitpanes>
       </div>
@@ -389,24 +351,5 @@
     border: none !important;
     border-right: 2px solid var(--border-ds-primary-300) !important;
     background: transparent !important;
-  }
-
-  .conversation-history-panel {
-    width: 40%;
-    background-color: var(--bg-ds-surface-600);
-    border-right: 1px solid var(--border-ds-surface-200);
-    flex: 1;
-    min-width: 200px;
-    border-radius: 8px;
-  }
-
-  .chatbot-panel {
-    min-width: 300px;
-    width: 60%;
-  }
-
-  .history-title {
-    font-family: Inter, sans-serif;
-    color: var(--text-ds-neutral-100);
   }
 </style>

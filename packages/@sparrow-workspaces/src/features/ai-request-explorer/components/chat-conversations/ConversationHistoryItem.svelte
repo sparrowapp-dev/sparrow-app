@@ -147,9 +147,11 @@
     onDelete(conversation.id);
   };
 
-  $: {
-    console.log(`Conversation Item: ${conversation},`);
-  }
+  // setTimeout(() => {
+  //   if (conversation) {
+  //     // console.log(`Conversation Item:`, conversation.title);
+  //   }
+  // }, 5000);
 </script>
 
 <div
@@ -190,7 +192,7 @@
       <div class="d-flex align-items-center gap-2">
         <!-- Timestamp -->
         <span class="conversation-timestamp">
-          {conversation.timestamp}
+          {conversation.date}
         </span>
 
         <!-- Time if available -->
@@ -202,9 +204,9 @@
       </div>
 
       <!-- Updated by -->
-      {#if conversation.updatedBy}
+      {#if conversation.authoredBy}
         <span class="updated-by">
-          {conversation.updatedBy}
+          {`By ${conversation.authoredBy}`}
         </span>
       {/if}
     </div>
@@ -224,7 +226,7 @@
   .conversation-item {
     transition: background-color 0.15s ease;
     cursor: pointer;
-    margin: 0 4px 2px 4px;
+    /* margin: 0 4px 2px 0px; */
     background-color: var(--bg-ds-surface-500) !important;
   }
 

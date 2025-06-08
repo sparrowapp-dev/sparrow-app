@@ -8,6 +8,8 @@
     EditRegular,
     BroomRegular,
     FormNewRegular,
+    DismissRegular,
+    BotRegular,
   } from "@sparrow/library/icons";
   import { SparkleFilled } from "@sparrow/common/icons";
   import { cubicOut } from "svelte/easing";
@@ -26,6 +28,7 @@
   import { tick } from "svelte";
   import { type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import { Sleep } from "@sparrow/common/utils";
+  import { ConversationHistoryItem } from "../../..";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -41,7 +44,12 @@
   export let responseData: AiRequestExplorerData;
   export let onChatClear;
   export let isChatAutoClearActive = false;
+  export let conversationsHistory;
+  export let onOpenConversationHistoryPanel;
+  export let onCloseConversationHistoryPanel;
+
   let isChatLoadingActive = false;
+  let isConversationHistoryPanelOpen = false;
 
   let chatContainer: HTMLElement;
   /**
@@ -100,6 +108,15 @@
   const handleClosePopupBackdrop = (flag: boolean) => {
     isChatClearPopupOpened = flag;
   };
+
+  const handleOpenConversationHistoryPanel = () => {
+    isConversationHistoryPanelOpen = true;
+    onOpenConversationHistoryPanel();
+  };
+  const handleCloseConversationHistoryPanel = () => {
+    isConversationHistoryPanelOpen = false;
+    onCloseConversationHistoryPanel();
+  };
 </script>
 
 <!-- Code Block Preview Modal -->
@@ -117,240 +134,333 @@
   ></div>
 </Modal>
 
-<div class="ai-chat-panel h-100">
-  <div
-    class="d-flex flex-column h-100 chat-box"
-    in:fly={{ y: 50, duration: 300, easing: cubicOut }}
-    out:fly={{ y: 50, duration: 300, easing: cubicOut }}
-  >
-    <div style="flex:1; overflow:auto;">
-      <div class="d-flex h-100 flex-column">
-        <div class="chatbox-heading">
-          <div
-            class="d-flex justify-content-between align-items-center w-100"
-            in:fade={{ duration: 200 }}
-          >
-            <div class="d-flex align-items-center gap-2">
-              <button
-                class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2"
-                style="background-color: var(--bg-ds-surface-300); pointer-events: none;"
-              >
-                <ChatHistoryRegular size={"20px"} />
-              </button>
-              <span class="text-ds-font-size-12 fw-medium text-white"
-                >Conversation</span
-              >
-              <!-- <button
-                class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent"
-              >
-                <EditRegular size={"12px"} color={"white"} />
-              </button> -->
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              <Tooltip
-                title={"Clears chat context after each message."}
-                placement={"top-center"}
-                zIndex={701}
-                show={true}
-              >
-                <div class="d-flex align-items-center gap-2">
-                  <Toggle
-                    label={"Auto Clear"}
-                    textColor={"var(--text-ds-neutral-100)"}
-                    isActive={isChatAutoClearActive}
-                    disabled={false}
-                    onChange={async (event) => {
-                      if (conversations?.length) {
-                        onUpdateRequestState({
-                          isChatAutoClearActive: event?.target.checked,
-                        });
-                        chatContainer.scrollTo({
-                          top: 0,
-                          behavior: "auto",
-                        });
-                        // handleClosePopupBackdrop(false);
-                        isChatLoadingActive = true;
-                        await new Sleep().setTime(1500).exec();
-                        onChatClear();
-                        isChatLoadingActive = false;
-                      }
-
-                      notifications.success(
-                        event?.target.checked
-                          ? "New prompts will now run in zero-shot mode with no chat history."
-                          : "Chat history will now persist across prompts.",
-                      );
-                    }}
-                  />
-                </div>
-              </Tooltip>
-
-              <Tooltip title={"Clear chat"} placement={"top-center"}>
-                <span class="add-icon-container">
-                  <Button
-                    id={`clear-chat-history`}
-                    size="extra-small"
-                    customWidth={"24px"}
-                    type="teritiary-regular"
-                    startIcon={BroomRegular}
-                    disable={!conversations?.length}
-                    onClick={async (e) => {
-                      isChatClearPopupOpened = true;
-                    }}
-                  />
-                </span>
-              </Tooltip>
-
-              <!-- <Tooltip
-                title={"New Conversation"}
-                placement={"left-center"}
-                zIndex={701}
-                show={true}
-              >
-                <span class="add-icon-container">
-                  <Button
-                    id={`start-new-conversation`}
-                    size="extra-small"
-                    customWidth={"24px"}
-                    type="teritiary-regular"
-                    startIcon={FormNewRegular}
-                    onClick={async (e) => {}}
-                  />
-                </span>
-              </Tooltip> -->
-            </div>
-          </div>
-          <!-- <div
-            class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
-            style="font-size: 10px;"
-          >
-            <span style="color: var(--text-ds-success-300);"
-              >{isResponseGenerating
-                ? 0
-                : conversations[conversations.length - 1]?.inputTokens || 0}
-              input tokens</span
-            >
-            <span style="color: var(--text-ds-danger-300);"
-              >{isResponseGenerating
-                ? 0
-                : conversations[conversations.length - 1]?.outputTokens || 0} output
-              tokens</span
-            >
-          </div> -->
-
-          <div
-            class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
-            style="font-size: 10px;"
-          >
-            <span style="color: var(--text-ds-success-300);">
-              {isResponseGenerating
-                ? 0
-                : conversations
-                    .filter((c) => c.type === "Sender")
-                    .reduce((sum, c) => sum + (c.inputTokens || 0), 0)} input tokens
-            </span>
-            <span style="color: var(--text-ds-danger-300);">
-              {isResponseGenerating
-                ? 0
-                : conversations
-                    .filter((c) => c.type === "Receiver")
-                    .reduce((sum, c) => sum + (c.outputTokens || 0), 0)} output tokens
-            </span>
-          </div>
-        </div>
-
-        <div
-          bind:this={chatContainer}
-          class="my-2 position-relative"
-          style="flex:1; overflow-x:hidden; overflow-y:auto;"
+<div class="ai-chatbot-panel d-flex flex-row h-100 gap-2">
+  <!-- Conversation History Panel -->
+  {#if isConversationHistoryPanelOpen}
+    <div
+      class="conversation-history-panel d-flex flex-column h-100 px-2 py-2 gap-2"
+    >
+      <div
+        class="conversation-history-header d-flex align-items-center justify-content-between"
+      >
+        <span
+          class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold"
+          >Conversation History</span
         >
-          {#if isChatLoadingActive}
-            <div
-              class="d-flex align-items-center justify-content-center w-100 h-100"
-              style="z-index:3; position:absolute;"
-            >
-              <Loader loaderSize={"20px"} />
-            </div>
-          {/if}
 
+        <Button
+          size="extra-small"
+          startIcon={DismissRegular}
+          type="teritiary-regular"
+          onClick={() => {
+            handleCloseConversationHistoryPanel();
+          }}
+        />
+      </div>
+
+      <div
+        class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-center"
+      >
+        {#if conversationsHistory && conversationsHistory._data.conversations.length > 0}
+          {#each conversationsHistory._data.conversations as conversation (conversation.id)}
+            <ConversationHistoryItem
+              {conversation}
+              onSelect={() => {}}
+              onDelete={() => {}}
+            />
+          {/each}
+        {:else}
           <div
-            class="d-flex flex-column h-100 align-items-center justify-content-center"
+            class="empty-state d-flex flex-column align-items-center justify-content-center h-100"
           >
-            {#if !conversations?.length}
-              <div
-                class="h-100 w-100 d-flex flex-column justify-content-center"
-                in:fade={{ duration: 300 }}
-              >
-                <div class="d-flex flex-column align-items-center">
-                  <span class="pb-3">
-                    <!-- <SparkleFilled height={"28px"} width={"28px"} /> -->
-                    <SparrowLogo width={"116"} height={"120px"} />
-                  </span>
-                  <p
-                    class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-medium text-secondary-250 mb-0"
-                    style="letter-spacing: 0; color: var(--text-ds-neutral-500);"
+            <div class="mb-3">
+              <BotRegular size={"32px"} color={"var(--icon-ds-neutral-500)"} />
+            </div>
+
+            <p class="empty-text">No conversations yet</p>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
+  <!-- ChatBot Panel -->
+  <div class="ai-chat-panel h-100">
+    <div
+      class="d-flex flex-column h-100 chat-box"
+      in:fly={{ y: 50, duration: 300, easing: cubicOut }}
+      out:fly={{ y: 50, duration: 300, easing: cubicOut }}
+    >
+      <div style="flex:1; overflow:auto;">
+        <div class="d-flex h-100 flex-column">
+          <div class="chatbox-heading">
+            <div
+              class="d-flex justify-content-between align-items-center w-100"
+              in:fade={{ duration: 200 }}
+            >
+              <div class="d-flex align-items-center gap-2">
+                <!-- <button
+                  on:click={() => {
+                    isConversationHistoryPanelOpen =
+                      !isConversationHistoryPanelOpen;
+                    if (isConversationHistoryPanelOpen) {
+                      handleOpenConversationHistoryPanel();
+                    } else {
+                      handleCloseConversationHistoryPanel();
+                    }
+                  }}
+                  class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2"
+                  style="background-color: var(--bg-ds-surface-300);"
+                >
+                  <ChatHistoryRegular size={"20px"} />
+                </button> -->
+
+                <Tooltip title={"Open Chat History"} placement={"top-center"}>
+                  <span
+                    style={isConversationHistoryPanelOpen
+                      ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px;"
+                      : ""}
                   >
-                    Enter a prompt to start the conversation.
-                  </p>
-                </div>
-              </div>
-            {:else}
-              <div class="h-100 w-100">
-                {#each conversations as chat, index}
-                  <div in:fade={{ duration: 200, delay: index * 50 }}>
-                    <ChatItem
-                      message={chat.message}
-                      aiResponseMetrices={{
-                        response: {
-                          messageId: chat.messageId,
-                          inputTokens: chat.inputTokens,
-                          outputTokens: chat.outputTokens,
-                          totalTokens: chat.totalTokens,
-                          statusCode: chat.statusCode,
-                          time: chat.time,
-                          modelProvider: chat.modelProvider,
-                          modelVariant: chat.modelVariant,
-                        },
+                    <Button
+                      size="small"
+                      startIcon={ChatHistoryRegular}
+                      type="secondary"
+                      onClick={() => {
+                        isConversationHistoryPanelOpen =
+                          !isConversationHistoryPanelOpen;
+                        if (isConversationHistoryPanelOpen) {
+                          handleOpenConversationHistoryPanel();
+                        } else {
+                          handleCloseConversationHistoryPanel();
+                        }
                       }}
-                      messageId={chat.messageId}
-                      type={chat.type}
-                      status={chat.status}
-                      isLiked={chat.isLiked}
-                      isDisliked={chat.isDisliked}
-                      onClickCodeBlockPreview={handleCodePreview}
-                      {onToggleLike}
-                      {regenerateAiResponse}
-                      isLastRecieverMessage={conversations.length - 1 === index
-                        ? true
-                        : false}
-                      {isResponseGenerating}
-                      {handleApplyChangeOnAISuggestion}
+                    />
+                  </span>
+                </Tooltip>
+                <span class="text-ds-font-size-12 fw-medium text-white"
+                  >Conversation</span
+                >
+                <button
+                  class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent"
+                >
+                  <EditRegular size={"14px"} color={"white"} />
+                </button>
+                <!-- <Button
+                  size="extra-small"
+                  startIcon={EditRegular}
+                  type={"teritiary-regular"}
+                  customWidth={"10px"}
+                  onClick={() => {}}
+                /> -->
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <Tooltip
+                  title={"Clears chat context after each message."}
+                  placement={"top-center"}
+                  zIndex={701}
+                  show={true}
+                >
+                  <div class="d-flex align-items-center gap-2">
+                    <Toggle
+                      label={"Auto Clear"}
+                      textColor={"var(--text-ds-neutral-100)"}
+                      isActive={isChatAutoClearActive}
+                      disabled={false}
+                      onChange={async (event) => {
+                        if (conversations?.length) {
+                          onUpdateRequestState({
+                            isChatAutoClearActive: event?.target.checked,
+                          });
+                          chatContainer.scrollTo({
+                            top: 0,
+                            behavior: "auto",
+                          });
+                          // handleClosePopupBackdrop(false);
+                          isChatLoadingActive = true;
+                          await new Sleep().setTime(1500).exec();
+                          onChatClear();
+                          isChatLoadingActive = false;
+                        }
+
+                        notifications.success(
+                          event?.target.checked
+                            ? "New prompts will now run in zero-shot mode with no chat history."
+                            : "Chat history will now persist across prompts.",
+                        );
+                      }}
                     />
                   </div>
-                {/each}
+                </Tooltip>
+
+                <Tooltip title={"Clear chat"} placement={"top-center"}>
+                  <span class="add-icon-container">
+                    <Button
+                      id={`clear-chat-history`}
+                      size="extra-small"
+                      customWidth={"24px"}
+                      type="teritiary-regular"
+                      startIcon={BroomRegular}
+                      disable={!conversations?.length}
+                      onClick={async (e) => {
+                        isChatClearPopupOpened = true;
+                      }}
+                    />
+                  </span>
+                </Tooltip>
+
+                <!-- <Tooltip
+                  title={"New Conversation"}
+                  placement={"left-center"}
+                  zIndex={701}
+                  show={true}
+                >
+                  <span class="add-icon-container">
+                    <Button
+                      id={`start-new-conversation`}
+                      size="extra-small"
+                      customWidth={"24px"}
+                      type="teritiary-regular"
+                      startIcon={FormNewRegular}
+                      onClick={async (e) => {}}
+                    />
+                  </span>
+                </Tooltip> -->
+              </div>
+            </div>
+            <!-- <div
+              class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
+              style="font-size: 10px;"
+            >
+              <span style="color: var(--text-ds-success-300);"
+                >{isResponseGenerating
+                  ? 0
+                  : conversations[conversations.length - 1]?.inputTokens || 0}
+                input tokens</span
+              >
+              <span style="color: var(--text-ds-danger-300);"
+                >{isResponseGenerating
+                  ? 0
+                  : conversations[conversations.length - 1]?.outputTokens || 0} output
+                tokens</span
+              >
+            </div> -->
+
+            <div
+              class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
+              style="font-size: 10px;"
+            >
+              <span style="color: var(--text-ds-success-300);">
+                {isResponseGenerating
+                  ? 0
+                  : conversations
+                      .filter((c) => c.type === "Sender")
+                      .reduce((sum, c) => sum + (c.inputTokens || 0), 0)} input tokens
+              </span>
+              <span style="color: var(--text-ds-danger-300);">
+                {isResponseGenerating
+                  ? 0
+                  : conversations
+                      .filter((c) => c.type === "Receiver")
+                      .reduce((sum, c) => sum + (c.outputTokens || 0), 0)} output
+                tokens
+              </span>
+            </div>
+          </div>
+
+          <div
+            bind:this={chatContainer}
+            class="my-2 position-relative"
+            style="flex:1; overflow-x:hidden; overflow-y:auto;"
+          >
+            {#if isChatLoadingActive}
+              <div
+                class="d-flex align-items-center justify-content-center w-100 h-100"
+                style="z-index:3; position:absolute;"
+              >
+                <Loader loaderSize={"20px"} />
               </div>
             {/if}
+
+            <div
+              class="d-flex flex-column h-100 align-items-center justify-content-center"
+            >
+              {#if !conversations?.length}
+                <div
+                  class="h-100 w-100 d-flex flex-column justify-content-center"
+                  in:fade={{ duration: 300 }}
+                >
+                  <div class="d-flex flex-column align-items-center">
+                    <span class="pb-3">
+                      <!-- <SparkleFilled height={"28px"} width={"28px"} /> -->
+                      <SparrowLogo width={"116"} height={"120px"} />
+                    </span>
+                    <p
+                      class="text-ds-font-size-14 text-ds-line-height-150 text-ds-font-weight-medium text-secondary-250 mb-0"
+                      style="letter-spacing: 0; color: var(--text-ds-neutral-500);"
+                    >
+                      Enter a prompt to start the conversation.
+                    </p>
+                  </div>
+                </div>
+              {:else}
+                <div class="h-100 w-100">
+                  {#each conversations as chat, index}
+                    <div in:fade={{ duration: 200, delay: index * 50 }}>
+                      <ChatItem
+                        message={chat.message}
+                        aiResponseMetrices={{
+                          response: {
+                            messageId: chat.messageId,
+                            inputTokens: chat.inputTokens,
+                            outputTokens: chat.outputTokens,
+                            totalTokens: chat.totalTokens,
+                            statusCode: chat.statusCode,
+                            time: chat.time,
+                            modelProvider: chat.modelProvider,
+                            modelVariant: chat.modelVariant,
+                          },
+                        }}
+                        messageId={chat.messageId}
+                        type={chat.type}
+                        status={chat.status}
+                        isLiked={chat.isLiked}
+                        isDisliked={chat.isDisliked}
+                        onClickCodeBlockPreview={handleCodePreview}
+                        {onToggleLike}
+                        {regenerateAiResponse}
+                        isLastRecieverMessage={conversations.length - 1 ===
+                        index
+                          ? true
+                          : false}
+                        {isResponseGenerating}
+                        {handleApplyChangeOnAISuggestion}
+                      />
+                    </div>
+                  {/each}
+                </div>
+              {/if}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="input-parent">
-      {#if conversations?.length && isResponseGenerating}
-        <p
-          class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
-          in:fade={{ duration: 200 }}
-        >
-          <img src={generatingImage} style="width: 118px;" alt="" />
-        </p>
-      {/if}
-      <PromptInput
-        {prompt}
-        {onUpdateAiPrompt}
-        {isResponseGenerating}
-        {onStopGeneratingAIResponse}
-        placeholder={"Write a prompt or generate one from generate prompt."}
-        {sendPrompt}
-      />
+      <div class="input-parent">
+        {#if conversations?.length && isResponseGenerating}
+          <p
+            class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
+            in:fade={{ duration: 200 }}
+          >
+            <img src={generatingImage} style="width: 118px;" alt="" />
+          </p>
+        {/if}
+        <PromptInput
+          {prompt}
+          {onUpdateAiPrompt}
+          {isResponseGenerating}
+          {onStopGeneratingAIResponse}
+          placeholder={"Write a prompt or generate one from generate prompt."}
+          {sendPrompt}
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -407,12 +517,34 @@
 </Modal>
 
 <style>
+  .ai-chatbot-panel {
+    /* overflow-x: auto; */
+  }
   .ai-chat-panel {
     background-color: var(--bg-ds-surface-700);
     border-radius: 6px;
     border: 1px solid var(--bg-ds-surface-100);
     padding: 10px;
+    max-width: 100%;
+    min-width: 60%;
   }
+
+  /* new - st*/
+  .conversation-history-panel {
+    /* max-width: 40%; */
+    width: 45%;
+    background-color: var(--bg-ds-surface-600);
+    border-right: 1px solid var(--border-ds-surface-200);
+    /* flex: 1; */
+    border-radius: 8px;
+  }
+
+  .history-title {
+    font-family: Inter, sans-serif;
+    color: var(--text-ds-neutral-100);
+  }
+  /* new - ed */
+
   .chat-box {
     background-color: var(--bg-ds-surface-700);
   }

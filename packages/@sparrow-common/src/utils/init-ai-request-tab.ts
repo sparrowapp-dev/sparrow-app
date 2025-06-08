@@ -34,9 +34,6 @@ class InitAiRequestTab {
             activeSync: false,
             property: {
                 aiRequest: {
-                    // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    // aiModelProvider: AiModelProviderEnum.OpenAI,
-                    // aiModelVariant: OpenAIModelEnum.GPT_4o,
                     aiModelProvider: "",
                     aiModelVariant: "",
                     systemPrompt: "",
@@ -86,7 +83,7 @@ class InitAiRequestTab {
                     ai: {
                         prompt: "",
                         conversations: [],
-                        threadId: "",
+                        conversationId: "",
                     },
                     state: {
                         aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,

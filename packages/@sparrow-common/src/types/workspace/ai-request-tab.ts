@@ -162,14 +162,14 @@ export interface Conversation
 export interface ConversationsWrapper {
     conversations: Conversation[];
 }
-export interface ThreadIdWrapper {
-    threadId: string;
+export interface ConversationIdWrapper {
+    conversationId: string;
 }
 
 export interface Ai
     extends PromptWrapper,
     ConversationsWrapper,
-    ThreadIdWrapper { }
+    ConversationIdWrapper { }
 export interface AiWrapper {
     ai: Ai;
 }

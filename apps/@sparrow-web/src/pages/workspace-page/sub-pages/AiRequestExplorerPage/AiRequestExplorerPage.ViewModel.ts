@@ -14,6 +14,7 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
 import { EnvironmentService } from "../../../../services/environment.service";
+import { AiRequestService } from "src/services/ai-request.service";
 
 // ---- Events
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -37,8 +38,9 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum, type modelsConfigType , type AIModelVariant, OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
+import { AiModelProviderEnum, type modelsConfigType, type AIModelVariant, OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
+import { AiRequestRepository } from "src/repositories/ai-request.repository";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -47,10 +49,12 @@ class AiRequestExplorerViewModel {
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
   private guestUserRepository = new GuestUserRepository();
+  private aiRequestRepository = new AiRequestRepository();
 
   // Services
   private environmentService = new EnvironmentService();
   private aiAssistentService = new AiAssistantService();
+  private aiRequestService = new AiRequestService();
   private aiAssistentWebSocketService =
     AiAssistantWebSocketService.getInstance();
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
@@ -69,6 +73,13 @@ class AiRequestExplorerViewModel {
         this.tab = t;
       }, 0);
     }
+
+
+    setTimeout(async () => {
+      // const res = await this.fetchConversations();
+      // const res = await this.saveConversation();
+      // console.log("calling saveConversation :>> ", res);
+    }, 15000);
   }
 
   public get activeWorkspace() {
@@ -85,6 +96,99 @@ class AiRequestExplorerViewModel {
 
   private set tab(value: RequestTab) {
     this._tab.next(value);
+  }
+
+  public fetchConversations = async () => {
+    const componentData = this._tab.getValue();
+    const tabId = componentData.tabId;
+    // const modelProvider = componentData.property.aiRequest.aiModelProvider;
+    // const modelVariant = componentData.property.aiRequest.aiModelVariant;
+    // const authKey = componentData.property.aiRequest.auth.apiKey;
+
+    // if (!authKey || !modelProvider || !modelVariant) {
+    //   console.error("No AI model and API key is provided before fetching conversations.");
+    //   return;
+    // }
+
+    try {
+      const conversationsRes = await this.aiRequestService.fetchConversationsByApiKey(
+        "openai",
+        "sk-openai-abc-123", // Replace with actual API key
+      );
+      if (conversationsRes.isSuccessful) {
+        // Store the fetched conversations in the repository
+        const repoData = await this.aiRequestRepository.addConversation("openai", "sk-openai-abc-123", conversationsRes.data.data);
+        // console.log("Conversations local repo:", repoData);
+      } else {
+        console.error("Conversation fetch failed:");
+      }
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      // Sentry.captureException(error);
+      // notifications.error("An error occurred while fetching conversations.");
+    }
+  }
+
+  /**
+   * Get list of conversations based on specific apikey 
+   * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
+   */
+  public getConversationsList = () => {
+    const componentData = this._tab.getValue();
+    const tabId = componentData.tabId;
+    const provider = componentData?.property?.aiRequest?.aiModelProvider || "openai";
+    const providerKey = componentData?.property?.aiRequest?.auth?.apiKey || "sk-openai-abc-123";
+    if (!provider || !providerKey) {
+      console.error("No provider and providerKey is provided before fetching conversations.");
+      return;
+    }
+    const response = this.aiRequestRepository.getConversationsByApiKeyAndProvider(provider, providerKey);
+    return response;
+  };
+
+
+  public saveConversation = async () => {
+    const componentData = this._tab.getValue();
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const conversations = componentData?.property?.aiRequest?.ai?.conversations || [];
+    const conversaionId = componentData?.property?.aiRequest?.ai?.conversaionId;
+
+    // if (!conversaionId) {
+    //   notifications.error("No conversaion ID found to save the conversation.");
+    //   return;
+    // }
+    // if (!conversations.length) {
+    //   notifications.error("No conversaion ID found to save the conversation.");
+    //   return;
+    // }
+    // console.log("saving conversation :>> ", conversations);
+    // return;
+
+    try {
+      const response = await this.aiRequestService.addOrUpdateConversation(
+        "openai",
+        "sk-openai-abc-123",
+        "openai-conv-972fa5ed-a7b5-4f21-928e-9c12bfd49dc4",
+        conversations,
+      );
+
+      if (response.isSuccessful) {
+        // Update the conversations in the repository
+        // const repoData = await this.aiRequestRepository.addConversation("openai", "sk-openai-abc-123", conversationsRes.data.data);
+        // console.log("Conversations local repo:", repoData);
+        const fetchRes = await this.fetchConversations();
+
+        // const list = this.getConversationsList();
+        // console.log("Conversations list:", list);
+        notifications.success("Conversation saved successfully.");
+      } else {
+        notifications.error("Failed to save conversation. Please try again.");
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      console.error("Error saving conversation:", error);
+      notifications.error("An error occurred while saving the conversation.");
+    }
   }
 
   /**
@@ -588,25 +692,25 @@ class AiRequestExplorerViewModel {
     const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
     const isJsonFormatConfigAvailable = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
     const isJsonFormatEnabed = isJsonFormatConfigAvailable ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
-   
-    
+
+
     let finalSP = null;
     if (systemPrompt.length) {
       const SPDatas = JSON.parse(systemPrompt);
       if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
     }
 
-    if(isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
-    
+    if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
+
     let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
     if (!isChatAutoClearActive) {
       const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
- 
+
       formattedConversations = rawConversations
         .filter(({ status }) => status !== false) // Exclude items with status === false
         .map(({ type, message }) => ({
           role: type === 'Sender' ? 'user' : 'assistant',
-          content: isJsonFormatEnabed ?  `${message} (Give Response In JSON Format)` : message,
+          content: isJsonFormatEnabed ? `${message} (Give Response In JSON Format)` : message,
         }));
     }
 
@@ -715,7 +819,7 @@ class AiRequestExplorerViewModel {
                   totalTokens: 0,
                   statusCode: response.statusCode,
                   time: response.timeTaken.replace("ms", ""),
-                  modelProvider, 
+                  modelProvider,
                   modelVariant
                 },
               ]);
@@ -731,7 +835,7 @@ class AiRequestExplorerViewModel {
                   outputTokens: 0,
                   totalTokens: 0,
                   time: response.timeTaken.replace("ms", ""),
-                  modelProvider, 
+                  modelProvider,
                   modelVariant
                 },
               };
@@ -770,7 +874,7 @@ class AiRequestExplorerViewModel {
                       isLiked: false,
                       isDisliked: false,
                       status: true,
-                      modelProvider, 
+                      modelProvider,
                       modelVariant
                     },
                   ]);

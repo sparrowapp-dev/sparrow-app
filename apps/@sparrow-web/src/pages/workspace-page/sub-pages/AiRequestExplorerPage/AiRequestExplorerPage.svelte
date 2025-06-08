@@ -1,5 +1,6 @@
 <script lang="ts">
   import type {
+    AiRequestConversationsDocument,
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
@@ -17,6 +18,8 @@
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
+  import type { AiRequestConversationsDocType } from "src/models/ai-request-conversations.model";
+  import type { Observable } from "rxjs";
 
   export let tab;
   // export let isTourGuideOpen = false;
@@ -30,6 +33,9 @@
       collection = data?.toMutableJSON();
     },
   );
+
+  let conversationsHistory: Observable<AiRequestConversationsDocument[]> =
+    _viewModel.getConversationsList();
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -183,27 +189,7 @@
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
-  conversations={[
-    {
-      id: "1",
-      title: "Design Research Chat",
-      timestamp: "13/05/2025",
-      time: "12:45 AM",
-      inputTokens: 23,
-      outputTokens: 1489,
-      updatedBy: "Anish Kumar Singh",
-      isActive: true,
-    },
-    {
-      id: "2",
-      title: "UX Strategy Discussion",
-      timestamp: "13/05/2025",
-      time: "12:45 AM",
-      inputTokens: 23,
-      outputTokens: 1489,
-      updatedBy: "Raman",
-    },
-  ]}
+  conversationsHistory={$conversationsHistory}
   onSelectConversation={(id) => console.log("Selected:", id)}
   onDeleteConversation={(id) => console.log("Deleted:", id)}
 />

@@ -24,6 +24,9 @@
   export let handleApplyChangeOnAISuggestion;
   export let responseData: AiRequestExplorerData;
   export let disabled = false;
+  export let conversationsHistory;
+  export let onOpenConversationHistoryPanel;
+  export let onCloseConversationHistoryPanel;
 
   let scrollList: ScrollList;
 
@@ -114,6 +117,9 @@
       isChatAutoClearActive={$tab?.property?.aiRequest?.state
         ?.isChatAutoClearActive}
       bind:scrollList
+      {conversationsHistory}
+      {onOpenConversationHistoryPanel}
+      {onCloseConversationHistoryPanel}
     />
   </div>
 {/if}
