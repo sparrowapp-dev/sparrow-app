@@ -11,6 +11,7 @@ export enum ItemType {
   GRAPHQL = "GRAPHQL",
   MOCK_REQUEST = "MOCK_REQUEST",
   AI_REQUEST = "AI_REQUEST",
+  MOCK_REQUEST_RESPONSE = "MOCK_REQUEST_RESPONSE",
 }
 
 export enum UntrackedItems {
