@@ -11,6 +11,7 @@
   import { Toggle } from "@sparrow/library/ui";
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { Modal } from "@sparrow/library/ui";
 
   export let tab;
   export let userRole;
@@ -25,6 +26,9 @@
   let newResponseName: string = "";
   let noOfColumns = 180;
   let isRenaming = false;
+  let deleteLoader: boolean = false;
+  let isDeletePopup: boolean = false;
+  let responseToDelete = null;
 
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -93,7 +97,11 @@
         disabled: false,
       },
       {
-        onClick: () => {},
+        onClick: () => {
+          responseToDelete = mockResponses[activeResponseIdx];
+          isDeletePopup = true;
+          showMenu = false;
+        },
         displayText: "Delete",
         disabled: false,
       },
@@ -269,6 +277,61 @@
     {/each}
   </div>
 {/if}
+
+<Modal
+  title={"Delete Mock Response?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeletePopup}
+  handleModalState={() => (isDeletePopup = false)}
+>
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
+    <p>
+      Are you sure you want to delete this Mock Response?
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        "{responseToDelete?.name}"
+      </span>
+      will be removed and cannot be restored.
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+  >
+    <Button
+      disable={deleteLoader}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isDeletePopup = false;
+        responseToDelete = null;
+      }}
+    />
+
+    <Button
+      disable={deleteLoader}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={() => {
+        deleteLoader = true;
+        //on delete mock response functioncall
+        deleteLoader = false;
+        isDeletePopup = false;
+      }}
+    />
+  </div>
+</Modal>
 
 <style>
   .add-icon-container {
