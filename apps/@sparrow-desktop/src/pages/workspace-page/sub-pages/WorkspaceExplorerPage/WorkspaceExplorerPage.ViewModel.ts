@@ -323,10 +323,11 @@ export default class WorkspaceExplorerViewModel {
         `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
       );
     } else {
-      if(response?.message === "Plan limit reached"){
-        notifications.error("Failed to send invite. please upgrade your plan.");
-      }
-      else{
+      if (response?.message === "Plan limit reached") {
+        notifications.error(
+          "You’ve reached the collaborator limit for your current plan. Upgrade to add more collaborators.",
+        );
+      } else {
         notifications.error(`Failed to send invite. Please try again.`);
       }
     }
@@ -577,7 +578,7 @@ export default class WorkspaceExplorerViewModel {
         progressiveTab.id,
         updatedata,
       );
-    } 
+    }
     return response;
   };
 
