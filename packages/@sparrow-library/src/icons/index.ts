@@ -275,3 +275,4 @@ export { default as PeopleTeamRegular } from "./PeopleTeamRegular.svelte";
 export { default as ChatMultipleRegular } from "./ChatMultipleRegular.svelte";
 export { default as CommentRegular } from "./CommentRegular.svelte";
 export { default as FilterRegular } from "./FilterRegular.svelte";
+export { default as CircleSmallRegular } from "./CircleSmallRegular.svelte";
