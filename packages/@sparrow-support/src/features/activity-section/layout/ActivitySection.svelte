@@ -205,7 +205,7 @@
 <div style="padding: 20px; height: 100%;">
   <div class="mt-0">
     <p class="text-ds-font-size-20 fw-semibold mb-2">My Activity</p>
-    <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
+    <p class="text-ds-font-size-14" style="color: var(--text-ds-neutral-400); ">
       Find all your posts, comments, and likes in one place and easily keep
       track of them.
     </p>
