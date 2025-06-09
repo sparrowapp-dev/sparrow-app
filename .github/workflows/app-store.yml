@@ -68,30 +68,30 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      - name: Import Apple Developer Certificate
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: '' #Blank
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      # - name: Import Apple Developer Certificate
+      #   env:
+      #     APPLE_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
+      #     APPLE_CERTIFICATE_PASSWORD: '' #Blank
+      #     KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
-        run: |
-          echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
-          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-          security find-identity -v -p codesigning build.keychain
+      #   run: |
+      #     echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
+      #     security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+      #     security default-keychain -s build.keychain
+      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+      #     security set-keychain-settings -t 3600 -u build.keychain
+      #     security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+      #     security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+      #     security find-identity -v -p codesigning build.keychain
 
-      - name: Verify Certificate
-        run: |
-          security find-identity -v -p codesigning build.keychain
-          security list-keychains
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution")
-          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
-          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-          echo "Certificate imported."
+      # - name: Verify Certificate
+      #   run: |
+      #     security find-identity -v -p codesigning build.keychain
+      #     security list-keychains
+      #     CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution")
+      #     CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+      #     echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+      #     echo "Certificate imported."
 
       - name: Build Tauri App
         run: |
@@ -118,7 +118,7 @@ jobs:
 
       - name: Install AWS CLI
         run: |
-          curl "https://awscli.amazonaws.com
+          curl "https://awscli.amazonaws.com"
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
 
