@@ -2,6 +2,7 @@ export interface PromptDto {
   text: string;
   threadId?: string;
   instructions: string;
+  model: string;
 }
 
 export interface StreamPromptDto {
