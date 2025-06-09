@@ -561,7 +561,6 @@ export class CollectionService {
       HttpClientBackendResponseInterface<CollectionItemDtoInterface>
     >
   > => {
-    console.log("************* ANISH *************** :>> ", _aiRequest);
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/collection/ai-request`,

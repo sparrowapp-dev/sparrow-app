@@ -485,7 +485,6 @@ export default class CollectionsViewModel {
       newRequestTab.updatePath(filteredPath as TabPath);
       newRequestTab.updateIsSave(false);
 
-      // console.log("new req :>> ", newRequestTab)
       this.tabRepository.createTab(newRequestTab.getValue());
       moveNavigation("right");
     }
@@ -1848,7 +1847,6 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
   ) => {
-    console.log("came here 1 :>> ")
     const aiRequest = new InitAiRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
@@ -1877,7 +1875,6 @@ export default class CollectionsViewModel {
         } as AiRequestBaseInterface,
       },
     };
-    console.log("came here 2 :>> ")
 
     await this.collectionRepository.addRequestOrFolderInCollection(
       collection.id,
@@ -3371,7 +3368,6 @@ export default class CollectionsViewModel {
     folder: CollectionItemsDto,
     aiRequest: CollectionItemsDto,
   ) => {
-    console.log("In handleOpenItem :>> ", aiRequest)
     const aiRequestTabAdapter = new AiRequestTabAdapter();
     const adaptedAiRequest = aiRequestTabAdapter.adapt(
       workspaceId || "",

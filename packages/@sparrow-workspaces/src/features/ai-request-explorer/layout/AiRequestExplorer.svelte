@@ -20,10 +20,7 @@
   import { writable } from "svelte/store";
   import { disabledModelFeatures } from "../constants";
 
-  import {
-    SettingsRegular,
-    BotSparkleRegular,
-  } from "@sparrow/library/icons";
+  import { SettingsRegular, BotSparkleRegular } from "@sparrow/library/icons";
   import { Modal } from "@sparrow/library/ui";
   import { SaveAsCollectionItem } from "../../save-as-request";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
@@ -110,11 +107,6 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
-  $: {
-    if ($tab) {
-      console.log("tab :>> ", $tab);
-    }
-  }
 </script>
 
 {#if $tab.tabId}

@@ -1374,10 +1374,6 @@ class AiRequestExplorerViewModel {
       updatedText = updatedText.replace(regex, element.value);
     });
 
-    console.log("in SetEnv text :>> ", text)
-    console.log("in SetEnv environmentVariables :>> ", environmentVariables), 
-    console.log("in SetEnv updatedText :>> ", updatedText)
-    
     return updatedText;
   };
 
@@ -1801,7 +1797,6 @@ class AiRequestExplorerViewModel {
 
               // Handle thread ID on stream start if not already set
               if (stream_status === STREAMING_STATES.START) {
-                // console.log("** stream started ** ");
                 const thisTabThreadId =
                   componentData?.property?.aiRequest?.ai?.threadId;
                 if (!thisTabThreadId && thread_id) {

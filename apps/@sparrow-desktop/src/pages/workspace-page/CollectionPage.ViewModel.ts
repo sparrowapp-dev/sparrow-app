@@ -1833,7 +1833,6 @@ export default class CollectionsViewModel {
     workspaceId: string,
     collection: CollectionDto,
   ) => {
-    console.log("came here 1 :>> ")
     const aiRequest = new InitAiRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
@@ -1862,7 +1861,6 @@ export default class CollectionsViewModel {
         } as AiRequestBaseInterface,
       },
     };
-    console.log("came here 2 :>> ")
 
     await this.collectionRepository.addRequestOrFolderInCollection(
       collection.id,
@@ -2497,7 +2495,6 @@ export default class CollectionsViewModel {
     collection: CollectionDto,
     explorer: CollectionItemsDto,
   ) => {
-    console.log("Anish :>> 1")
     const aiRequest = new InitAiRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
@@ -2532,7 +2529,6 @@ export default class CollectionsViewModel {
         },
       },
     };
-    console.log("Anish :>> 2 ", aiRequestObj)
 
     await this.collectionRepository.addRequestInFolder(
       aiRequestObj.collectionId,
@@ -3358,7 +3354,6 @@ export default class CollectionsViewModel {
     folder: CollectionItemsDto,
     aiRequest: CollectionItemsDto,
   ) => {
-    console.log("In handleOpenItem :>> ", aiRequest)
     const aiRequestTabAdapter = new AiRequestTabAdapter();
     const adaptedAiRequest = aiRequestTabAdapter.adapt(
       workspaceId || "",
