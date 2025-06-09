@@ -14,6 +14,10 @@
 
   export let tab;
   export let userRole;
+  export let isWebApp;
+  $: {
+    console.log("hh,", isWebApp);
+  }
   export let mockResponses;
 
   let inputField: HTMLInputElement;
@@ -22,6 +26,7 @@
   let showMenu: boolean = false;
   let newResponseName: string = "";
   let noOfColumns = 180;
+  let isRenaming = false;
 
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -62,8 +67,6 @@
       activeResponseIdx = idx;
     }, 100);
   }
-  const isRenaming = false;
-  const isSharedWorkspace = false;
 </script>
 
 <svelte:window
@@ -71,7 +74,7 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+{#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
   <Options
     xAxis={responseTabElements[activeResponseIdx].getBoundingClientRect()
       .right - 30}
@@ -161,7 +164,9 @@
   </div>
   <div
     class="sparrow-thin-scrollbar"
-    style="max-height: 75%; overflow-y: auto; overflow-x: hidden;"
+    style=" {isWebApp
+      ? 'max-height: 70%;'
+      : 'max-height: 75%;'} overflow-y: auto; overflow-x: hidden;"
   >
     {#each mockResponses as response, idx (response.id)}
       <div
@@ -228,7 +233,7 @@
             </div>
           {/if}
         </button>
-        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Toggle
             bind:isActive={response.isActive}
             label=""
@@ -239,7 +244,7 @@
           />
         {/if}
 
-        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <div style="position: relative; display: flex; align-items: center;">
             <Tooltip
               title={"More"}

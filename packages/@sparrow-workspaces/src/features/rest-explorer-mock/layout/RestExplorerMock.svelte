@@ -236,6 +236,9 @@
     //   isActive: false,
     // },
   ];
+  $: {
+    console.log("hh,", isWebApp);
+  }
 
   /**
    * Converts the pixel-based min, max, and default sizes
@@ -779,7 +782,12 @@
                   <!-- Response Pane -->
                   <div class="d-flex h-100" style="gap: 8px;">
                     <div>
-                      <MultipleMockResponse {tab} {userRole} {mockResponses} />
+                      <MultipleMockResponse
+                        {tab}
+                        {userRole}
+                        {mockResponses}
+                        {isWebApp}
+                      />
                     </div>
                     <div
                       style="width:1px; background:var(--border-ds-surface-100); height:100%; margin-left: 8px;"
