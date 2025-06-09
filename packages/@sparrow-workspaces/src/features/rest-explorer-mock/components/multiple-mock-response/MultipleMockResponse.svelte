@@ -15,9 +15,7 @@
   export let tab;
   export let userRole;
   export let isWebApp;
-  $: {
-    console.log("hh,", isWebApp);
-  }
+
   export let mockResponses;
 
   let inputField: HTMLInputElement;
