@@ -125,7 +125,7 @@ jobs:
 
       - name: Upload & download File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-assest/macos/ --recursive --exclude "*" --include "*.app"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-assest/macos/ --recursive
    #       aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
