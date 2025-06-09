@@ -68,36 +68,36 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      # - name: Import Apple Developer Certificate
-      #   env:
-      #     APPLE_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
-      #     APPLE_CERTIFICATE_PASSWORD: '' #Blank
-      #     KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      - name: Import Apple Developer Certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: '' #Blank
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
-      #   run: |
-      #     echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
-      #     security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-      #     security default-keychain -s build.keychain
-      #     security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-      #     security set-keychain-settings -t 3600 -u build.keychain
-      #     security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-      #     security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-      #     security find-identity -v -p codesigning build.keychain
+        run: |
+          echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          security find-identity -v -p codesigning build.keychain
 
-      # - name: Verify Certificate
-      #   run: |
-      #     security find-identity -v -p codesigning build.keychain
-      #     security list-keychains
-      #     CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution")
-      #     CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
-      #     echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-      #     echo "Certificate imported."
+      - name: Verify Certificate
+        run: |
+          security find-identity -v -p codesigning build.keychain
+          security list-keychains
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution")
+          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+          echo "Certificate imported."
 
       - name: Build Tauri App
         run: |
           yarn cache clean
           yarn install
-          yarn desktop-build
+          yarn workspace @sparrow/desktop tauri build
           
 
         env:
@@ -113,13 +113,13 @@ jobs:
           # KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
           CI: false
 
-      - name: file content
-        run: |
-          cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+      # - name: file content
+      #   run: |
+      #     cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
         
       - name: Compress entire macos/ folder
         run: |
-          cd /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle
+          cd /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/release/bundle
           ditto -c -k --sequesterRsrc --keepParent macos macos_bundle.zip
 
 
@@ -131,7 +131,7 @@ jobs:
 
       - name: Upload zipped macos bundle to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos_bundle.zip s3://sparrow-assest/macos/
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/release/bundle/macos_bundle.zip s3://sparrow-assest/macos/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
