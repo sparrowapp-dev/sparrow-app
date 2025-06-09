@@ -153,7 +153,7 @@ export class TeamsViewModel {
       const planResponse =  await this.planService.getPlansByIds(
         userPlans,
       );
-      
+
       const parsedPlans =  []; 
       if(response.isSuccessful && planResponse.data.data) {
         for (const planData of planResponse.data.data) {
@@ -188,7 +188,7 @@ export class TeamsViewModel {
             updatedBy: rawData.updatedBy,
           };
           parsedPlans.push(planDetails);
-        } 
+        }
         await this.planRepository.upsertMany(parsedPlans);
 
       }
@@ -308,9 +308,11 @@ export class TeamsViewModel {
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New hub ${team.name} is created.`);
     } else {
-      if(response?.message === "Plan limit reached"){
-        notifications.error("Failed to create hub. please upgrade your plan.");
-      }else{
+      if (response?.message === "Plan limit reached") {
+        notifications.error(
+          "You’ve reached the limit of private hub on your current plan. Upgrade to create more private hubs",
+        );
+      } else {
         notifications.error("Failed to create hub. Please try again.");
       }
     }
