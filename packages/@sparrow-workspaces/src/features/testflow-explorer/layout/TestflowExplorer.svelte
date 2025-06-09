@@ -1251,17 +1251,17 @@
    * This Function will the pass the value of first Node is Connected Target value.
    */
   const handleSelectFirstNode = () => {
-    let fisrtNode = "2";
+    let defaultNode = "2";
     edges.update((_edges) => {
       for (let item = 0; item < _edges.length; item++) {
         if (_edges[item]?.source === "1") {
-          fisrtNode = _edges[item]?.target;
+          defaultNode = _edges[item]?.target;
           break;
         }
       }
       return _edges;
     });
-    selectNode(fisrtNode);
+    return defaultNode;
   };
 
   /**
@@ -1449,7 +1449,10 @@
                 onClick={async () => {
                   unselectNodes();
                   await onClickRun();
-                  handleSelectFirstNode();
+                  const startingNode = handleSelectFirstNode();
+                  if (startingNode) {
+                    selectNode(startingNode);
+                  }
                   MixpanelEvent(Events.Run_TestFlows);
                   handleEventOnRunBlocks();
                 }}
