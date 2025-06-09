@@ -2916,6 +2916,47 @@ class RestExplorerMockViewModel {
       }
     }
   };
+    /**
+ * Handle create mock response in a collection
+ */
+  public handleCreateMockResponse = async (
+  ) => {
+  const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+  try {
+    const mockResponseObj = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      mockRequestId: progressiveTab.id,
+      folderId: progressiveTab.path.folderId || "",
+    items: {
+      name: "New Mock REST API - Response",
+      description: "",
+      type: ItemType.MOCK_REQUEST_RESPONSE,
+      mockRequestResponse: {
+        responseBody: "",
+        responseHeaders: [],
+        responseStatus: "",
+        responseDate: "",
+        selectedResponseBodyType: "",
+        isMockResponseActive: false,
+      },
+    },
+  };
+    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+    const response = await this.collectionService.createMockResponseInCollection(mockResponseObj, baseUrl);
+    if (response?.isSuccessful && response.data?.data) {
+      notifications.success("Mock response created successfully.");
+      return response.data.data;
+    } else {
+      notifications.error(response?.message || "Failed to create mock response.");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error creating mock response:", error);
+    notifications.error("An error occurred while creating mock response.");
+    return "";
+  }
+};
 }
 
 export default RestExplorerMockViewModel;
