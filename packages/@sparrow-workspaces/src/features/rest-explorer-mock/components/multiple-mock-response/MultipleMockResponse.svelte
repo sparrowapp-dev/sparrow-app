@@ -268,17 +268,6 @@
 {/if}
 
 <style>
-  .delete-ticker {
-    color: var(--error--color);
-    font-weight: 500;
-  }
-  .sparrow-thin-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--bg-secondary-330);
-  }
-
-  .sparrow-thin-scrollbar::-webkit-scrollbar-button {
-    color: var(--bg-secondary-330);
-  }
   .add-icon-container {
     background-color: var(--bg-ds-surface-400);
     border-radius: 4px;
@@ -356,12 +345,6 @@
   .btn-primary:focus-visible .threedot-icon-container {
     visibility: visible;
   }
-  .btn-primary:hover {
-    /* .delete-ticker {
-      background-color: var(--border-color) !important;
-    } */
-  }
-
   .navbar {
     width: 180px;
     height: auto;

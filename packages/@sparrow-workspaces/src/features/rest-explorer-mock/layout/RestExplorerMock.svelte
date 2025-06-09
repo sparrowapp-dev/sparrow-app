@@ -20,6 +20,7 @@
     RequestParameters,
     ResponseStatus,
     MultipleMockResponse,
+    NoMockResponseDetailsSection,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -791,26 +792,7 @@
                       style="flex:1;"
                     >
                       {#if mockResponses.length === 0}
-                        <div
-                          class="d-flex flex-column justify-content-center align-items-center w-100"
-                        >
-                          <div class="container">
-                            <SparrowLogo width={"120px"} height={"120px"} />
-                          </div>
-                          <p
-                            style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;text-align:center"
-                          >
-                            This mock request has no responses. Add a mock
-                            response to begin testing.
-                          </p>
-                          <Button
-                            title="Add Mock Response"
-                            size="small"
-                            type="outline-secondary"
-                            onClick={() => {}}
-                            startIcon={AddRegular}
-                          />
-                        </div>
+                        <NoMockResponseDetailsSection />
                       {:else}
                         <div class="h-100 d-flex flex-column">
                           <div style="flex:1; overflow:auto;">
@@ -1092,12 +1074,6 @@
 {/if}
 
 <style>
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 78px 24px;
-  }
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
     height: 40px;
