@@ -236,9 +236,6 @@
     //   isActive: false,
     // },
   ];
-  $: {
-    console.log("hh,", isWebApp);
-  }
 
   /**
    * Converts the pixel-based min, max, and default sizes
