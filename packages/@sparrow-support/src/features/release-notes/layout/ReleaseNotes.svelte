@@ -3,21 +3,26 @@
   import { Select } from "@sparrow/library/forms";
   import {
     ArrowUnfilledIcon,
+    ChevronLeftRegular,
     CrossIcon,
     FilterIcon,
+    FilterRegular,
     LinkedinIcon,
+    LinkedinOrgIcon,
     LinkIcon,
+    LinkRegular,
     ThumbIcon,
   } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   import { marked } from "marked";
-  import { Loader, Tag, Tooltip } from "@sparrow/library/ui";
+  import { Button, Loader, Tag, Tooltip } from "@sparrow/library/ui";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { notifications } from "@sparrow/library/ui";
   import { UpdatesTagType } from "../../../types/feedback";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { Search } from "@sparrow/library/forms";
+  import { SparrowLogo } from "@sparrow/common/images";
   export let listChangeLog;
 
   export let onReleaseNoteRedirect;
@@ -205,8 +210,11 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Updates</p>
-      <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
+      <p class="text-ds-font-size-20 fw-semibold mb-2">Updates</p>
+      <p
+        class="text-ds-font-size-14"
+        style="color: var(--text-ds-neutral-400); "
+      >
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>
@@ -215,10 +223,9 @@
     {#if showTimeline}
       <div class="d-flex justify-content-between page-funationality">
         <div class="" style="cursor:pointer">
-          <div class={`d-flex  rounded py-1 px-2 mb-4`}>
+          <div class={`d-flex  rounded py-1 mb-4`}>
             <Search
               variant="primary"
-              customWidth={"300px"}
               id="search-input"
               placeholder="Search updates"
               on:input={handleInput}
@@ -227,7 +234,7 @@
           </div>
         </div>
 
-        <div class="filter">
+        <div class="filter py-1">
           <Select
             id={"feeds"}
             data={[
@@ -245,13 +252,13 @@
             zIndex={499}
             disabled={false}
             iconRequired={true}
-            icon={FilterIcon}
-            iconColor={"var(--text-secondary-100)"}
+            icon={FilterRegular}
+            iconColor={"var(--icon-primary-300)"}
             borderType={"none"}
             borderActiveType={"none"}
             borderHighlight={"hover-active"}
             headerHighlight={"hover-active"}
-            headerHeight={"26px"}
+            headerHeight={"28px"}
             minBodyWidth={"150px"}
             minHeaderWidth={"150px"}
             maxHeaderWidth={"200px"}
@@ -262,13 +269,14 @@
             headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
+            variant={"secondary"}
           />
         </div>
       </div>
     {/if}
     {#if isLoading}
       <div class="mt-5">
-        <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+        <Loader loaderSize={"20px"} loaderMessage="Loading..." />
       </div>
     {:else}
       <div>
@@ -304,24 +312,22 @@
                         show={true}
                         zIndex={701}
                       >
-                        <div
-                          class="link-div d-flex align-items-center justify-content-cetner"
-                          style="height:24px; width:24px; cursor:pointer"
-                          on:click={async () => {
+                        <Button
+                          size="extra-small"
+                          type="teritiary-regular"
+                          startIcon={LinkRegular}
+                          onClick={async () => {
                             await copyToClipBoard(event.url);
                             notifications.success("Link copied to clipboard.");
                             MixpanelEvent(Events.Copy_Link);
                           }}
-                        >
-                          <LinkIcon
-                            height={"18px"}
-                            width={"18px"}
-                            color={"var(--text-secondary-100)"}
-                          />
-                        </div>
+                        />
                       </Tooltip>
                     </div>
-                    <div class="tags" style="margin-top: 5px;">
+                    <div
+                      class="tags d-flex"
+                      style="margin-top: 8px; gap: 12px;"
+                    >
                       {#each event.types as tag}
                         <span class="mt-[6px]">
                           <Tag type={getTagType(tag)} text={tag || ""} />
@@ -330,18 +336,17 @@
                     </div>
                     {#if event.plaintextDetails.split(" ").length > 20}
                       <p
-                        style=" line-height:24px; "
+                        style=" line-height:24px; color:var(--text-ds-neutral-200);"
                         class="text-ds-font-size-14 text-ds-font-weight-regular"
                       >
                         {truncateDescription(event.plaintextDetails)}
                         <span
-                          style="text-decoration: underline; color:#3670F7; border:none; background-color:transparent; cursor:pointer "
-                          class="ms-0"
+                          class="see-more-link ms-0"
                           on:click={() => {
                             handleSeeMore(event);
                             MixpanelEvent(Events.See_More_Updates);
                           }}
-                          >see more
+                          >See More
                         </span>
                       </p>
                     {:else}
@@ -355,60 +360,67 @@
                     <div
                       class="d-flex align-items-center justify-content-between"
                     >
-                      <p
-                        style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
-                        class="mb-0"
-                        on:click={async () => {
+                      <Button
+                        title={"GitHub"}
+                        size="small"
+                        type="link-primary"
+                        onClick={async () => {
                           onReleaseNoteRedirect(event?.title);
                         }}
-                      >
-                        Github
-                      </p>
+                        buttonClassProp={"ps-1"}
+                      />
 
-                      <div class="d-flex align-items-center gap-2">
-                        <!-- <ThumbIcon height={"18px"} width={"18px"} />
+                      <!-- <ThumbIcon height={"18px"} width={"18px"} />
                     <div style="color: var(--text-secondary-100);">
                       {event.reactions?.like || ""}
                     </div> -->
-                        <div
-                          style="cursor:pointer;"
-                          class="ps-2"
-                          on:click={onLinkedInRedirect}
-                        >
-                          <LinkedinIcon
-                            height={"18px"}
-                            width={"18px"}
-                            color={"var(--icon-secondary-950)"}
-                          />
-                        </div>
-                      </div>
+                      <Button
+                        size="small"
+                        startIcon={LinkedinOrgIcon}
+                        type={"teritiary-regular"}
+                        onClick={onLinkedInRedirect}
+                      />
                     </div>
                   </div>
                 </div>
               {/each}
             </div>
-          {:else}
+          {:else if searchQuery && filteredEvents.length === 0}
             <div
               class="no-results mt-5 d-flex justify-content-center align-items-center mx-1 mb-0 text-center text-ds-font-size-14 text-ds-font-weight-medium"
-              style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              style="color: var(--text-ds-neutral-400); letter-spacing: 0.5px;"
             >
               <p>No result found.</p>
+            </div>
+          {:else}
+            <div
+              class="h-100 w-100 d-flex justify-content-center align-items-center"
+              style="flex: 1; min-height: calc(100vh - 350px);"
+            >
+              <div
+                class="d-flex"
+                style="flex-direction:column; align-items: center;"
+              >
+                <SparrowLogo />
+                <p
+                  class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-4"
+                  style="color: var(--text-ds-neutral-400);"
+                >
+                  Currently, there are no updates available.
+                </p>
+              </div>
             </div>
           {/if}
         {:else}
           <div class="d-flex selected-event-detail">
-            <div style="width:23.5%; " class="d-flex mt-2">
-              <div>
-                <div
-                  on:click={handleBack}
-                  style="cursor:pointer; transform: rotate(90deg);"
-                >
-                  <ArrowUnfilledIcon
-                    height={"16px"}
-                    width={"16px"}
-                    color={"var(--text-secondary-100)"}
-                  />
-                </div>
+            <div style="width:18%; " class="d-flex mt-2">
+              <div style="margin-top: -6px;">
+                <Button
+                  type="teritiary-regular"
+                  size="medium"
+                  startIcon={ChevronLeftRegular}
+                  onClick={handleBack}
+                />
               </div>
               <div
                 class="ms-2 text-ds-font-size-14 text-ds-font-weight-medium"
@@ -437,24 +449,19 @@
                   show={true}
                   zIndex={701}
                 >
-                  <div
-                    class="link-div"
-                    style="  height: 24px; width:24px; cursor:pointer"
-                    on:click={async () => {
+                  <Button
+                    size="extra-small"
+                    type="teritiary-regular"
+                    startIcon={LinkRegular}
+                    onClick={async () => {
                       await copyToClipBoard(selectedEvent.url);
                       notifications.success("Link copied to clipboard.");
                       MixpanelEvent(Events.Copy_Link);
                     }}
-                  >
-                    <LinkIcon
-                      height={"18px"}
-                      width={"18px"}
-                      color={"var(--text-secondary-100)"}
-                    />
-                  </div>
+                  />
                 </Tooltip>
               </div>
-              <div class="tags">
+              <div class="tags d-flex" style="margin-top: 8px; gap: 12px;">
                 {#each selectedEvent.types as tag}
                   <span class="mt-[6px]">
                     <Tag type={getTagType(tag)} text={tag || ""} />
@@ -462,39 +469,30 @@
                 {/each}
               </div>
 
-              <p class="mt-3 text-ds-font-size-14 text-ds-font-weight-regular">
+              <p
+                class="mt-3 text-ds-font-size-14 text-ds-font-weight-regular"
+                style="color: var(--text-ds-neutral-200);"
+              >
                 {@html marked(selectedEvent.markdownDetails)}
               </p>
 
-              <div
-                class="d-flex align-items-center justify-content-between p-1"
-              >
-                <p
-                  style=" cursor:pointer; margin-bottom: 0px; text-decoration:underline; color:var(--text-primary-300); "
-                  class="mb-0"
-                  on:click={() => {
+              <div class="d-flex align-items-center justify-content-between">
+                <Button
+                  title={"GitHub"}
+                  size="small"
+                  type="link-primary"
+                  onClick={async () => {
                     onReleaseNoteRedirect(selectedEvent?.title);
                   }}
-                >
-                  Github
-                </p>
-                <div class="d-flex align-items-center gap-2">
-                  <!-- <ThumbIcon height={"18px"} width={"18px"} />
-              <div style="color: var(--text-secondary-100);">
-                {selectedEvent.reactions?.like || ""}
-              </div> -->
-                  <div
-                    style="cursor:pointer;"
-                    class="ps-2"
-                    on:click={onLinkedInRedirect}
-                  >
-                    <LinkedinIcon
-                      height={"18px"}
-                      width={"18px"}
-                      color={"var(--icon-secondary-950)"}
-                    />
-                  </div>
-                </div>
+                  buttonClassProp={"ps-1"}
+                />
+
+                <Button
+                  size="small"
+                  startIcon={LinkedinOrgIcon}
+                  type={"teritiary-regular"}
+                  onClick={onLinkedInRedirect}
+                />
               </div>
             </div>
           </div>
@@ -555,7 +553,7 @@
 
   .timeline {
     position: relative;
-    margin-left: 130px;
+    margin-left: 120px;
   }
 
   .timeline::before {
@@ -585,12 +583,12 @@
   .timeline-date {
     padding: 0;
     position: absolute;
-    left: -140px;
+    left: -120px;
     top: 10px;
     font-weight: bold;
     color: var(--text-secondary-100);
     width: 120px;
-    text-align: right;
+    text-align: left;
     font-weight: 500;
     font-size: 14px;
   }
@@ -608,20 +606,26 @@
 
   .timeline-content {
     margin-left: 40px;
-    padding: 10px 20px;
-    background-color: var(--bg-secondary-800);
-    border-radius: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    background-color: var(--bg-ds-surface-700);
+    border-radius: 6px;
     width: 100%;
   }
 
   .timeline-content h3 {
     line-height: 27px;
     color: var(--text-secondary-100);
+    transition: color 0.2s ease;
   }
 
   .timeline-content h3:hover {
+    color: var(--text-ds-primary-300);
+  }
+
+  .timeline-content h3:active {
     color: var(--text-primary-300);
+
+    text-decoration: underline;
   }
 
   .timeline-reactions {
@@ -661,5 +665,17 @@
   .tag-improved {
     color: var(--text-success-200);
     border-color: var(--border-success-200);
+  }
+
+  .see-more-link {
+    color: var(--text-ds-primary-300);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  .see-more-link:active {
+    color: var(--text-primary-300);
+    text-decoration: underline;
   }
 </style>
