@@ -86,6 +86,8 @@ jobs:
 
       - name: Verify Certificate
         run: |
+          security find-identity -v -p codesigning build.keychain
+          security list-keychains
           CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution")
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
