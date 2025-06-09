@@ -387,7 +387,7 @@
         <div
           style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50vh;"
         >
-          <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+          <Loader loaderSize={"20px"} loaderMessage="Loading..." />
         </div>
       {:else if searchTerm && filteredPosts.length === 0 && filteredComments.length === 0 && filteredLikedPosts.length === 0}
         <div
