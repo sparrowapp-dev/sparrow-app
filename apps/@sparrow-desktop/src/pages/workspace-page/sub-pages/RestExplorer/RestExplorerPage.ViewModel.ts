@@ -2816,6 +2816,13 @@ class RestExplorerViewModel {
   public generateDocumentation = async (prompt = "") => {
     await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
+
+    let workspaceId = componentData.path.workspaceId;
+
+    let workspaceVal = await this.readWorkspace(workspaceId);
+    
+    let teamId = workspaceVal.team?.teamId;
+   
     const apiData = {
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
@@ -2828,6 +2835,7 @@ class RestExplorerViewModel {
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
+      teamId:teamId
     });
     if (response.isSuccessful) {
       const formatter = new MarkdownFormatter();
