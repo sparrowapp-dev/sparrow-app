@@ -47,6 +47,8 @@
   export let conversationsHistory;
   export let onOpenConversationHistoryPanel;
   export let onCloseConversationHistoryPanel;
+  export let chatPanelTitle: string;
+  export let onSwitchConversation;
 
   let isChatLoadingActive = false;
   let isConversationHistoryPanelOpen = false;
@@ -117,6 +119,43 @@
     isConversationHistoryPanelOpen = false;
     onCloseConversationHistoryPanel();
   };
+
+  const onSelectChatHistoryItem = (
+    conversationId: string,
+    conversations: Conversation[],
+  ) => {
+    console.log(
+      "In onSelectChatHistoryItem() :>> ",
+      conversationId,
+      conversations,
+    );
+    onSwitchConversation(conversationId, conversations);
+  };
+
+  let isRenaming = false;
+  let newRequestName: string = "";
+  let inputField: HTMLInputElement;
+
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newRequestName = target.value.trim();
+  };
+
+  const onRenameBlur = async () => {
+    if (newRequestName) {
+    }
+    isRenaming = false;
+    newRequestName = "";
+  };
+
+  const onRenameInputKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldFile",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
 
 <!-- Code Block Preview Modal -->
@@ -168,7 +207,7 @@
           {#each conversationsHistory._data.conversations as conversation (conversation.id)}
             <ConversationHistoryItem
               {conversation}
-              onSelect={() => {}}
+              onSelect={onSelectChatHistoryItem}
               onDelete={() => {}}
             />
           {/each}
@@ -219,23 +258,7 @@
               class="d-flex justify-content-between align-items-center w-100"
               in:fade={{ duration: 200 }}
             >
-              <div class="d-flex align-items-center gap-2">
-                <!-- <button
-                  on:click={() => {
-                    isConversationHistoryPanelOpen =
-                      !isConversationHistoryPanelOpen;
-                    if (isConversationHistoryPanelOpen) {
-                      handleOpenConversationHistoryPanel();
-                    } else {
-                      handleCloseConversationHistoryPanel();
-                    }
-                  }}
-                  class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2"
-                  style="background-color: var(--bg-ds-surface-300);"
-                >
-                  <ChatHistoryRegular size={"20px"} />
-                </button> -->
-
+              <div class="d-flex align-items-center gap-1">
                 <span
                   style={isConversationHistoryPanelOpen
                     ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px;"
@@ -258,23 +281,68 @@
                     />
                   </Tooltip>
                 </span>
-                <span class="text-ds-font-size-12 fw-medium text-white"
-                  >Conversation</span
-                >
-                <button
+
+                <!-- <span class="text-ds-font-size-12 fw-medium text-white"
+                  >{chatPanelTitle}</span
+                > -->
+                <!-- Chat Title - st -->
+                {#if isRenaming}
+                  <input
+                    class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                    style="width: 60%"
+                    id="renameInputFieldFile"
+                    type="text"
+                    maxlength={100}
+                    value={chatPanelTitle}
+                    on:click|stopPropagation={() => {}}
+                    bind:this={inputField}
+                    on:input={handleRenameInput}
+                    on:blur={onRenameBlur}
+                    on:keydown={onRenameInputKeyPress}
+                  />
+                {:else}
+                  <div
+                    class="chat-panel-title ellipsis"
+                    style="color: var(--bg-ds-neutral-50); width: 105px;"
+                    on:click={() => {
+                      // isRenaming = true;
+                      // setTimeout(() => inputField.focus(), 100);
+                    }}
+                  >
+                    <p
+                      class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                    >
+                      {chatPanelTitle}
+                    </p>
+                  </div>
+                {/if}
+                <!-- Chat Title - ed -->
+
+                <!-- <button
                   class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent"
                 >
                   <EditRegular size={"14px"} color={"white"} />
-                </button>
-                <!-- <Button
-                  size="extra-small"
-                  startIcon={EditRegular}
-                  type={"teritiary-regular"}
-                  customWidth={"10px"}
-                  onClick={() => {}}
-                /> -->
+                </button> -->
+                <Tooltip title={"Edit Title"} placement={"top-center"}>
+                  <div
+                    style="display: flex; justify-content: center; align-items: center;"
+                  >
+                    <div style="transform: scale(0.85);">
+                      <Button
+                        size="extra-small"
+                        startIcon={EditRegular}
+                        type="teritiary-regular"
+                        disable={isRenaming}
+                        onClick={() => {
+                          isRenaming = true;
+                          setTimeout(() => inputField.focus(), 100);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Tooltip>
               </div>
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex align-items-center gap-1 justify-content-end">
                 <Tooltip
                   title={"Clears chat context after each message."}
                   placement={"top-center"}
@@ -329,43 +397,21 @@
                   </span>
                 </Tooltip>
 
-                <!-- <Tooltip
-                  title={"New Conversation"}
-                  placement={"left-center"}
-                  zIndex={701}
-                  show={true}
-                >
-                  <span class="add-icon-container">
-                    <Button
-                      id={`start-new-conversation`}
-                      size="extra-small"
-                      customWidth={"24px"}
-                      type="teritiary-regular"
-                      startIcon={FormNewRegular}
-                      onClick={async (e) => {}}
-                    />
-                  </span>
-                </Tooltip> -->
+                <Tooltip title={"New Conversation"} placement={"top-center"}>
+                  <Button
+                    id={`start-new-conversation`}
+                    title={"New"}
+                    size="extra-small"
+                    customWidth={"60px"}
+                    type={"teritiary-regular"}
+                    startIcon={FormNewRegular}
+                    onClick={async () => {
+                      onSwitchConversation("", []); // For new conversation id and conversation array is empty
+                    }}
+                  />
+                </Tooltip>
               </div>
             </div>
-            <!-- <div
-              class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
-              style="font-size: 10px;"
-            >
-              <span style="color: var(--text-ds-success-300);"
-                >{isResponseGenerating
-                  ? 0
-                  : conversations[conversations.length - 1]?.inputTokens || 0}
-                input tokens</span
-              >
-              <span style="color: var(--text-ds-danger-300);"
-                >{isResponseGenerating
-                  ? 0
-                  : conversations[conversations.length - 1]?.outputTokens || 0} output
-                tokens</span
-              >
-            </div> -->
-
             <div
               class="d-flex flex-row gap-2 fw-medium justify-content-end p-1"
               style="font-size: 10px;"
@@ -632,4 +678,38 @@
     background-color: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.9);
   }
+
+  .renameInputFieldFile {
+    height: 24px;
+    background-color: transparent;
+    color: var(--bg-ds-neutral-50);
+    padding: 4px 2px;
+    outline: none;
+    border-radius: 4px !important;
+    border: 1px solid var(--bg-ds-primary-300);
+    caret-color: var(--bg-ds-primary-300);
+  }
+  .renameInputFieldFile:focus {
+    border: 1px solid var(--border-ds-primary-300) !important;
+  }
+
+  .chat-panel-title {
+    height: 24px;
+    line-height: 18px;
+    font-weight: 500;
+    width: calc(100% - 58px);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    caret-color: var(--bg-ds-primary-300);
+  }
+  .chat-panel-title:focus {
+    border: 1px solid var(--bg-ds-primary-300) !important;
+  }
+  /* .chat-panel-title:hover {
+    border: 1px solid var(--bg-ds-primary-300) !important;
+    border-radius: 4px;
+    cursor: text;
+  } */
 </style>

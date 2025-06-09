@@ -64,6 +64,17 @@ export interface IsChatAutoClearActive {
     isChatAutoClearActive: boolean;
 }
 
+export interface IsChatbotConversationLoading {
+    isChatbotConversationLoading: boolean;
+}
+export interface IsConversationHistoryPanelOpen {
+    isConversationHistoryPanelOpen: boolean;
+}
+
+export interface IsConversationHistoryLoading {
+    isConversationHistoryLoading: boolean;
+}
+
 export interface IsChatbotSuggestionsActive {
     isChatbotSuggestionsActive: boolean;
 }
@@ -162,14 +173,28 @@ export interface Conversation
 export interface ConversationsWrapper {
     conversations: Conversation[];
 }
+export interface LastActiveConversationBackupWrapper {
+    lastActiveChatBackup: Conversation[];
+}
 export interface ConversationIdWrapper {
     conversationId: string;
+}
+
+export interface ConversationTitleWrapper {
+    conversationTitle: string;
+}
+
+export interface IsoldChatPreviewActiveWrapper {
+    isoldChatPreviewActive: boolean
 }
 
 export interface Ai
     extends PromptWrapper,
     ConversationsWrapper,
-    ConversationIdWrapper { }
+    ConversationIdWrapper,
+    LastActiveConversationBackupWrapper,
+    IsoldChatPreviewActiveWrapper,
+    ConversationTitleWrapper { }
 export interface AiWrapper {
     ai: Ai;
 }
@@ -220,7 +245,10 @@ export interface State
     IsChatbotActive,
     IsChatAutoClearActive,
     IsChatbotSuggestionsActive,
-    IsChatbotGeneratingResponse { }
+    IsChatbotGeneratingResponse,
+    IsChatbotConversationLoading,
+    IsConversationHistoryPanelOpen,
+    IsConversationHistoryLoading { }
 
 export interface StatePartial
     extends
@@ -234,4 +262,7 @@ export interface StatePartial
     Partial<IsChatbotActive>,
     Partial<IsChatAutoClearActive>,
     Partial<IsChatbotSuggestionsActive>,
-    Partial<IsChatbotGeneratingResponse> { }
+    Partial<IsChatbotGeneratingResponse>,
+    Partial<IsChatbotConversationLoading>,
+    Partial<IsConversationHistoryPanelOpen>,
+    Partial<IsConversationHistoryLoading> { }

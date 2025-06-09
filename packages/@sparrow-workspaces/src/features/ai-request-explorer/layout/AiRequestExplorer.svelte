@@ -16,7 +16,10 @@
     AiRequestConversationsDocument,
   } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
+  import {
+    AiRequestSectionEnum,
+    type Conversation,
+  } from "@sparrow/common/types/workspace/ai-request-tab";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
@@ -54,6 +57,10 @@
   export let conversationsHistory: AiRequestConversationsDocument[];
   export let onSelectConversation: (id: string) => void;
   export let onDeleteConversation: (id: string) => void;
+  export let onSwitchConversation: (
+    conversationId: string,
+    conversation: Conversation[],
+  ) => void;
   export let fetchConversations: () => Promise<void>;
   export let getConversationsList: () => Observable<
     AiRequestConversationsDocument[]
@@ -302,6 +309,7 @@
               {conversationsHistory}
               {onOpenConversationHistoryPanel}
               {onCloseConversationHistoryPanel}
+              {onSwitchConversation}
             />
           </Pane>
         </Splitpanes>

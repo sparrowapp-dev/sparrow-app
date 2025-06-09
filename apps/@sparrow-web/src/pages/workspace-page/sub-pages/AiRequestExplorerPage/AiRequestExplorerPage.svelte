@@ -197,4 +197,5 @@
   onDeleteConversation={(id) => console.log("Deleted:", id)}
   conversationsHistory={$conversationsHistory}
   getConversationsList={getConvoList}
+  onSwitchConversation={_viewModel.switchConversation}
 />

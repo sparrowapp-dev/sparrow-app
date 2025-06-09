@@ -41,6 +41,7 @@ import * as Sentry from "@sentry/svelte";
 import { AiModelProviderEnum, type modelsConfigType, type AIModelVariant, OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
 import { AiRequestRepository } from "src/repositories/ai-request.repository";
+import { type StatePartial as AiStateParital } from "@sparrow/common/types/workspace/ai-request-tab";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -100,31 +101,26 @@ class AiRequestExplorerViewModel {
 
   public fetchConversations = async () => {
     const componentData = this._tab.getValue();
-    const tabId = componentData.tabId;
     const provider = componentData.property.aiRequest.aiModelProvider;
     const providerAuthKey = componentData.property.aiRequest.auth.apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
-      console.error("No provider and authKey is provided before fetching conversations.");
+      console.error("Failed due to missing provider and authKey before fetching conversations.");
       return;
     }
 
     try {
-      const conversationsRes = await this.aiRequestService.fetchConversationsByApiKey(
+      const convoFetchRes = await this.aiRequestService.fetchConversationsByApiKey(
         provider,
         providerAuthKey,
       );
-      if (conversationsRes.isSuccessful) {
+      if (convoFetchRes.isSuccessful) {
         // Store the fetched conversations in the repository
-        const repoData = await this.aiRequestRepository.addConversation(provider, providerAuthKey, conversationsRes.data.data);
-        // console.log("Conversations local repo:", repoData);
-      } else {
-        console.error("Conversation fetch failed:");
-      }
+        const repoData = await this.aiRequestRepository.addConversation(provider, providerAuthKey, convoFetchRes.data.data);
+        console.log("Conversations fetched successfully. :>> ", repoData);
+      } else { console.error("Conversation fetch failed:"); }
     } catch (error) {
-      console.error("Error fetching conversations:", error);
-      // Sentry.captureException(error);
-      // notifications.error("An error occurred while fetching conversations.");
+      console.error("Error while fetching conversations :>> ", error);
     }
   }
 
@@ -136,74 +132,136 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
-    // console.log("Fetching conversations for provider:", provider, "with key:", providerAuthKey);
+
     if (!provider || !providerAuthKey) {
-      console.error("No provider and providerKey is provided before fetching conversations.");
+      console.error("Failed fetching conversations due to missing provider and authKey detials.");
       return;
     }
     const response = this.aiRequestRepository.getConversationsByApiKeyAndProvider(provider, providerAuthKey);
     return response;
   };
 
+  // public getFormattedTime = (): string => {
+  //   const date = new Date();
+  //   const hours = date.getHours();
+  //   const minutes = date.getMinutes();
+  //   const ampm = hours >= 12 ? 'PM' : 'AM';
+  //   const formattedHours = hours % 12 || 12;
+  //   return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+  // }
+
+  public getFormattedTime = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = (hours % 12 || 12).toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+  };
+
+
+  public getLocalDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;  // e.g. "2025-06-10"
+  };
 
   public saveConversation = async () => {
     const componentData = this._tab.getValue();
+    const user = getClientUser();
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const conversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-    const conversaionId = componentData?.property?.aiRequest?.ai?.conversaionId;
+    const conversationId = componentData?.property?.aiRequest?.ai?.conversationId;
+    const conversationTitle = componentData?.property?.aiRequest?.ai?.conversationTitle;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
-
-    if (!conversations.length && !provider && !providerAuthKey) {
-      notifications.error("No provider, key found to save the conversation.");
+    if (!conversations.length || !provider || !providerAuthKey) {
+      console.error("Missing provider, conversations, or authKey.");
       return;
     }
 
-    console.log("saving conversation :>> ", providerAuthKey);
-    // return;
-
     try {
+      const { inputTokens, outputTokens } = conversations.reduce((acc, item) => {
+        if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
+        if (item.type === "Receiver") acc.outputTokens += item.outputTokens || 0;
+        return acc;
+      }, { inputTokens: 0, outputTokens: 0 });
 
-      let response = null;
-      if (!conversaionId) {
-        // If conversationId is not provided, create a new conversation
-        response = await this.aiRequestService.addNewConversation(
+      const commonFields = {
+        title: conversationTitle,
+        inputTokens,
+        outputTokens,
+        // date: new Date().toISOString().slice(0, 10),
+        date: this.getLocalDate(),
+        time: this.getFormattedTime(),
+        conversation: conversations,
+        authoredBy: isGuestUser ? "Guest User" : user.name,
+        updatedBy: isGuestUser ? "Guest User" : {
+          name: user.name,
+          email: user.email,
+          id: user.id,
+        }
+      };
+
+      if (!conversationId) {
+        const payload = {
           provider,
-          providerAuthKey,
-          conversations,
-        );
+          apiKey: providerAuthKey,
+          data: [{
+            ...commonFields,
+            createdBy: isGuestUser ? "Guest User" : {
+              name: user.name,
+              email: user.email,
+              id: user.id,
+            }
+          }]
+        };
+
+        const response = await this.aiRequestService.addNewConversation(payload);
         const newConversationId = response.data.data;
-        console.log("New Conversation Response:", response, newConversationId);
+        console.log("Added New Conversation Successfully :>> ", response);
         this.updateAiRequestConversationId(newConversationId);
-      }
-      else {
-        response = await this.aiRequestService.updateConversation(
-          provider,
-          providerAuthKey,
-          conversaionId, // "openai-conv-972fa5ed-a7b5-4f21-928e-9c12bfd49dc4",
-          conversations,
-        );
-        console.log("Update Conversation Response:", response);
-      }
 
-      if (response.isSuccessful) {
-        // Update the conversations in the repository
-        // const repoData = await this.aiRequestRepository.addConversation("openai", "sk-openai-abc-123", conversationsRes.data.data);
-        // console.log("Conversations local repo:", repoData);
-        const fetchRes = await this.fetchConversations();
+        if (response.isSuccessful) {
+          await this.fetchConversations();
+          notifications.success("New Conversation saved successfully.");
+        } else {
+          notifications.error("Failed to save conversation. Please try again.");
+        }
 
-        // const list = this.getConversationsList();
-        // console.log("Conversations list:", list);
-        notifications.success("Conversation saved successfully.");
       } else {
-        notifications.error("Failed to save conversation. Please try again.");
+        const payload = {
+          provider,
+          apiKey: providerAuthKey,
+          id: conversationId,
+          data: [{
+            ...commonFields,
+          }]
+        };
+        const response = await this.aiRequestService.updateConversation(payload);
+        console.log("Conversation Updated Successfully :>> ", response);
+
+        if (response.isSuccessful) {
+          await this.fetchConversations();
+          notifications.success("Conversation Updated successfully.");
+        } else {
+          notifications.error("Failed to save conversation. Please try again.");
+        }
       }
     } catch (error) {
-      Sentry.captureException(error);
-      console.error("Error saving conversation:", error);
+      console.error("Error while saving conversation history :>> ", error);
       notifications.error("An error occurred while saving the conversation.");
     }
   }
+
 
   /**
    *
@@ -591,7 +649,7 @@ class AiRequestExplorerViewModel {
 
   public updateAiRequestConversationId = async (_conversationId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.aiRequest.ai.conversaionId = _conversationId;
+    progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -609,17 +667,25 @@ class AiRequestExplorerViewModel {
     progressiveTab.property.aiRequest.ai.conversations = _conversations;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    console.log("AI conversations updated:", _conversations);
-
-    if (_conversations.length) {
-    }
   };
+
+  public switchConversation = async (conversationId: string, _conversation: Conversation[]) => {
+    console.log("In switchConversation() :>> ");
+    this.updateRequestState({ isChatbotConversationLoading: true });
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.ai.conversationId = conversationId;
+    progressiveTab.property.aiRequest.ai.conversations = _conversation;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.updateRequestState({ isChatbotConversationLoading: false });
+    notifications.success("Switched to new chat!");
+  }
 
   /**
    *
    * @param _state - request state
    */
-  public updateRequestState = async (_state: StatePartial) => {
+  public updateRequestState = async (_state: AiStateParital) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.state = {
       ...progressiveTab.property.aiRequest.state,
@@ -853,7 +919,7 @@ class AiRequestExplorerViewModel {
                 isChatbotGeneratingResponse: false,
               });
 
-              this.saveConversation(); // save in db
+              await this.saveConversation(); // save in db
 
               const newData: AiRequestExplorerData = {
                 response: {
@@ -872,8 +938,6 @@ class AiRequestExplorerViewModel {
                 map.set(tabId, newData);
                 return new Map(map); // Return a new Map to trigger reactivity
               });
-
-
               return;
             }
 
@@ -989,6 +1053,7 @@ class AiRequestExplorerViewModel {
 
                   // Update the conversation data
                   await this.updateRequestAIConversation(updatedConversations);
+                  this.saveConversation();
                 }
 
 
@@ -1001,7 +1066,6 @@ class AiRequestExplorerViewModel {
                 await this.updateRequestState({
                   isChatbotGeneratingResponse: false,
                 });
-                this.saveConversation();
               }
             }
             break;

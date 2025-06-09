@@ -13,11 +13,10 @@ export class AiRequestRepository {
 
   /**
   * @description
-  * Adds a new environment to workspace.
+  * Adds a new conversaiton to local db.
   */
   public addConversation = async (provider: AiModelProviderEnum, providerkey: string, conversations: any) => {
     const doc = {
-      // id: provider === "openai" ? "openai" : provider === "anthropic" ? "anthropic" : provider === "deepseek" ? "deepseek" : "gemini",
       id: `${provider}-${providerkey}`,
       provider,
       apiKey: providerkey,

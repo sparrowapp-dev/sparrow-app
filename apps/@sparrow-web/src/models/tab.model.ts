@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 12,
+  version: 14,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1431,6 +1431,15 @@ export const tabSchemaLiteral = {
                 isChatAutoClearActive: {
                   type: "boolean",
                 },
+                isChatbotConversationLoading: {
+                  type: "boolean",
+                },
+                isConversationHistoryPanelOpen: {
+                  type: "boolean",
+                },
+                isConversationHistoryLoading: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
@@ -1475,6 +1484,9 @@ export const tabSchemaLiteral = {
                 conversationId: {
                   type: "string",
                 },
+                isoldChatPreviewActive: {
+                  type: "boolean",
+                },
                 conversations: {
                   type: "array",
                   items: {
@@ -1500,6 +1512,35 @@ export const tabSchemaLiteral = {
                       },
                     },
                   },
+                },
+                lastActiveChatBackup: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      messageId: {
+                        type: "string",
+                      },
+                      message: {
+                        type: "string",
+                      },
+                      type: {
+                        type: "string",
+                      },
+                      isLiked: {
+                        type: "boolean",
+                      },
+                      isDisliked: {
+                        type: "boolean",
+                      },
+                      status: {
+                        type: "boolean",
+                      },
+                    },
+                  },
+                },
+                conversationTitle: {
+                  type: "string",
                 },
               },
             },

@@ -1,128 +1,8 @@
-<!-- <script lang="ts">
-  import { DismissRegular } from "@sparrow/library/icons";
-
-  export let conversation: {
-    id: string;
-    title: string;
-    timestamp: string;
-    isActive?: boolean;
-  };
-  export let onSelect: (id: string) => void;
-  export let onDelete: (id: string) => void;
-
-  const handleSelect = () => {
-    onSelect(conversation.id);
-  };
-
-  const handleDelete = (e: Event) => {
-    e.stopPropagation();
-    onDelete(conversation.id);
-  };
-
-  $: {
-    console.log(`Conversation Item: ${conversation},`);
-  }
-</script>
-
-<div
-  class="conversation-item"
-  class:active={conversation.isActive}
-  on:click={handleSelect}
-  on:keydown={(e) => e.key === "Enter" && handleSelect()}
-  role="button"
-  tabindex="0"
->
-  <div class="conversation-content">
-    <div class="conversation-title">{conversation.title}</div>
-    <div class="conversation-timestamp">{conversation.timestamp}</div>
-  </div>
-  <button
-    class="delete-btn"
-    on:click={handleDelete}
-    title="Delete conversation"
-  >
-    <DismissRegular size="12px" color="var(--icon-ds-neutral-400)" />
-  </button>
-</div>
-
-<style>
-  .conversation-item {
-    width: 100%;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 8px 12px;
-    /* margin: 0 4px 2px 4px; */
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-    border: 1px solid transparent;
-    position: relative;
-  }
-
-  .conversation-item:hover {
-    background-color: var(--bg-ds-surface-800);
-  }
-
-  .conversation-item.active {
-    background-color: var(--bg-ds-surface-700);
-    border-color: var(--border-ds-primary-300);
-  }
-
-  .conversation-content {
-    flex: 1;
-    min-width: 0;
-    padding-right: 8px;
-  }
-
-  .conversation-title {
-    font-family: Inter, sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-ds-neutral-100);
-    margin-bottom: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 1.2;
-  }
-
-  .conversation-timestamp {
-    font-family: Inter, sans-serif;
-    font-size: 10px;
-    color: var(--text-ds-neutral-500);
-    line-height: 1;
-  }
-
-  .delete-btn {
-    background: none;
-    border: none;
-    padding: 2px;
-    border-radius: 3px;
-    cursor: pointer;
-    opacity: 0;
-    transition:
-      opacity 0.15s ease,
-      background-color 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 6px;
-    right: 8px;
-  }
-
-  .conversation-item:hover .delete-btn {
-    opacity: 1;
-  }
-
-  .delete-btn:hover {
-    background-color: var(--bg-ds-surface-600);
-  }
-</style> -->
-
-<!-- ************************************************ -->
 <script lang="ts">
+  import type {
+    ConversationsWrapper,
+    Conversation,
+  } from "@sparrow/common/types/workspace/ai-request-tab";
   import { DismissRegular } from "@sparrow/library/icons";
 
   export let conversation: {
@@ -135,11 +15,12 @@
     updatedBy?: string; // e.g., "GPT-4.0"
     isActive?: boolean;
   };
-  export let onSelect: (id: string) => void;
+  export let onSelect: (id: string, conversations: Conversation) => void;
   export let onDelete: (id: string) => void;
 
   const handleSelect = () => {
-    onSelect(conversation.id);
+    console.log("slect clicked :>> ", conversation);
+    onSelect(conversation.id, conversation.conversation);
   };
 
   const handleDelete = (e: Event) => {
@@ -157,7 +38,9 @@
 <div
   class="conversation-item position-relative w-100 d-flex align-items-start justify-content-between p-2 rounded-2 cursor-pointer"
   class:active={conversation.isActive}
-  on:click={handleSelect}
+  on:click={() => {
+    handleSelect();
+  }}
   on:keydown={(e) => e.key === "Enter" && handleSelect()}
   role="button"
   tabindex="0"

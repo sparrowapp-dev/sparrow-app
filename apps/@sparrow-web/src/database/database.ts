@@ -288,6 +288,12 @@ export class RxDB {
           12: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          13: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          14: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {

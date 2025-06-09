@@ -27,6 +27,7 @@
   export let conversationsHistory;
   export let onOpenConversationHistoryPanel;
   export let onCloseConversationHistoryPanel;
+  export let onSwitchConversation;
 
   let scrollList: ScrollList;
 
@@ -97,6 +98,10 @@
     );
   };
 
+  const onSelectChatHistoryItem = async (_oldConversation) => {
+    console.log("old Convo:>> ", _oldConversation);
+    onUpdateAiConversation(_oldConversation);
+  };
 </script>
 
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
@@ -105,6 +110,7 @@
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       {responseData}
       prompt={$tab?.property?.aiRequest?.ai?.prompt}
+      chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
       {onUpdateAiPrompt}
       {sendPrompt}
       isResponseGenerating={$tab?.property?.aiRequest?.state
@@ -121,6 +127,7 @@
       {conversationsHistory}
       {onOpenConversationHistoryPanel}
       {onCloseConversationHistoryPanel}
+      {onSwitchConversation}
     />
   </div>
 {/if}

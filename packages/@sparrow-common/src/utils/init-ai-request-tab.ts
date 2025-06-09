@@ -84,6 +84,9 @@ class InitAiRequestTab {
                         prompt: "",
                         conversations: [],
                         conversationId: "",
+                        lastActiveChatBackup: [],
+                        isoldChatPreviewActive: false,
+                        conversationTitle: "Conversation 1",
                     },
                     state: {
                         aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,
@@ -97,6 +100,9 @@ class InitAiRequestTab {
                         isChatAutoClearActive: false,
                         isChatbotSuggestionsActive: true,
                         isChatbotGeneratingResponse: false,
+                        isChatbotConversationLoading: false,
+                        isConversationHistoryPanelOpen: false,
+                        isConversationHistoryLoading: false
                     },
                 },
             },
