@@ -358,35 +358,28 @@
                       </p>
                     {/if}
                     <div
-                      class="d-flex align-items-center justify-content-between px-1"
+                      class="d-flex align-items-center justify-content-between"
                     >
-                      <p
-                        style=" cursor:pointer; margin-bottom: 0px; "
-                        class="mb-0 text-ds-font-size-14 see-more-link"
-                        on:click={async () => {
+                      <Button
+                        title={"GitHub"}
+                        size="small"
+                        type="link-primary"
+                        onClick={async () => {
                           onReleaseNoteRedirect(event?.title);
                         }}
-                      >
-                        GitHub
-                      </p>
+                        buttonClassProp={"ps-1"}
+                      />
 
-                      <div class="d-flex align-items-center gap-2">
-                        <!-- <ThumbIcon height={"18px"} width={"18px"} />
+                      <!-- <ThumbIcon height={"18px"} width={"18px"} />
                     <div style="color: var(--text-secondary-100);">
                       {event.reactions?.like || ""}
                     </div> -->
-                        <div
-                          style="cursor:pointer;"
-                          class="ps-2"
-                          on:click={onLinkedInRedirect}
-                        >
-                          <LinkedinOrgIcon
-                            height={"18px"}
-                            width={"18px"}
-                            color={"var(--icon-ds-neutral-50)"}
-                          />
-                        </div>
-                      </div>
+                      <Button
+                        size="small"
+                        startIcon={LinkedinOrgIcon}
+                        type={"teritiary-regular"}
+                        onClick={onLinkedInRedirect}
+                      />
                     </div>
                   </div>
                 </div>
@@ -483,35 +476,23 @@
                 {@html marked(selectedEvent.markdownDetails)}
               </p>
 
-              <div
-                class="d-flex align-items-center justify-content-between p-1"
-              >
-                <p
-                  style=" cursor:pointer; margin-bottom: 0px; "
-                  class="mb-0 text-ds-font-size-14 see-more-link"
-                  on:click={() => {
+              <div class="d-flex align-items-center justify-content-between">
+                <Button
+                  title={"GitHub"}
+                  size="small"
+                  type="link-primary"
+                  onClick={async () => {
                     onReleaseNoteRedirect(selectedEvent?.title);
                   }}
-                >
-                  GitHub
-                </p>
-                <div class="d-flex align-items-center gap-2">
-                  <!-- <ThumbIcon height={"18px"} width={"18px"} />
-              <div style="color: var(--text-secondary-100);">
-                {selectedEvent.reactions?.like || ""}
-              </div> -->
-                  <div
-                    style="cursor:pointer;"
-                    class="ps-2"
-                    on:click={onLinkedInRedirect}
-                  >
-                    <LinkedinOrgIcon
-                      height={"18px"}
-                      width={"18px"}
-                      color={"var(--icon-ds-neutral-50)"}
-                    />
-                  </div>
-                </div>
+                  buttonClassProp={"ps-1"}
+                />
+
+                <Button
+                  size="small"
+                  startIcon={LinkedinOrgIcon}
+                  type={"teritiary-regular"}
+                  onClick={onLinkedInRedirect}
+                />
               </div>
             </div>
           </div>
