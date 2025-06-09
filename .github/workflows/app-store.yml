@@ -101,7 +101,7 @@ jobs:
           
 
         env:
-          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_SIGNING_IDENTITY: "${{ env.CERT_ID }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}" # this is the apple distribution certificate
           APPLE_CERTIFICATE_PASSWORD: "" # password is blank
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
