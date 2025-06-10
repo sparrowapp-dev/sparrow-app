@@ -90,11 +90,16 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-
-      - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
+      - name: Extract and Store Tauri Signatures
+        uses: punitkashyup/tauri-signature-to-k8s-secret.git@v1
+        with:
+          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+          kubernetes-namespace: 'sparrow-dev'
+          secret-name: 'sparrow-api-secret'
+          secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
+          platforms: 'windows'
+          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
 
       - name: sign msi
         run: |
@@ -215,9 +220,27 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CI: false
 
-      - name: file content
-        run: |
-          cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+      - name: Extract and Store Tauri Signatures
+        uses: punitkashyup/tauri-signature-to-k8s-secret.git@v1
+        with:
+          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+          kubernetes-namespace: 'sparrow-dev'
+          secret-name: 'sparrow-api-secret'
+          secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
+          platforms: 'macos'
+          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
+
+      - name: Extract and Store Tauri Signatures
+        uses: punitkashyup/tauri-signature-to-k8s-secret.git@v1
+        with:
+          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+          kubernetes-namespace: 'sparrow-dev'
+          secret-name: 'sparrow-api-secret'
+          secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
+          platforms: 'macos'
+          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
 
       - name: Install AWS CLI
         run: |
