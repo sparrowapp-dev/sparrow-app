@@ -1484,7 +1484,7 @@ class RestExplorerMockViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) {}
+  set collection(e) { }
 
   /**
    *
@@ -2805,7 +2805,7 @@ class RestExplorerMockViewModel {
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
-      model: "deepseek",
+      model: "deepseek"
     });
     if (response.isSuccessful) {
       const formatter = new MarkdownFormatter();
@@ -2918,9 +2918,10 @@ class RestExplorerMockViewModel {
     }
   };
 
+
   /**
-   * Handle create mock response in a collection
-   */
+  * Handle create mock response in a collection
+  */
   public handleCreateMockResponse = async () => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
     try {
@@ -3002,6 +3003,78 @@ class RestExplorerMockViewModel {
       console.error("Error creating mock response:", error);
       notifications.error("An error occurred while creating mock response.");
       return "";
+    }
+  };
+  
+  /**
+   * Handle state of mock response in a collection
+  */
+  public handleMockResponseState = async (
+    mockResponseId: string,
+    isMockResponseActive: boolean
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+
+    // Prepare the update payload matching your backend DTO
+    const updatePayload = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      folderId: progressiveTab.path.folderId || "",
+      mockRequestId: progressiveTab.id,
+      mockResponseId: mockResponseId,
+      isMockResponseActive: isMockResponseActive,
+    };
+
+    try {
+      const response = await this.collectionService.updateMockResponseInCollection(
+        mockResponseId,
+        updatePayload,
+        baseUrl
+      );
+      if (response?.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating mock response state:", error);
+      return false;
+    }
+  };
+  /**
+  * Handle renaming of mock response in a collection
+ */
+  public handleRenameMockResponse = async (
+    mockResponseId: string,
+    name: string
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+
+    const updatePayload = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      folderId: progressiveTab.path.folderId || "",
+      mockRequestId: progressiveTab.id,
+      mockResponseId: mockResponseId,
+      name: name,
+    };
+
+    try {
+      const response = await this.collectionService.updateMockResponseInCollection(
+        mockResponseId,
+        updatePayload,
+        baseUrl
+      );
+      if (response?.isSuccessful) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error renaming mock response:", error);
+      return false;
     }
   };
 }

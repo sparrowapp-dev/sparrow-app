@@ -29,6 +29,17 @@ export interface HttpResponseMockCreateUpdatePayloadDtoInterface {
   items: MockResponseItemsDto;
 }
 
+export interface HttpResponseMockUpdatePayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  mockRequestId: string;
+  mockResponseId?: string;
+  name?: string;
+  description?: string;
+  isMockResponseActive?: boolean;
+}
+
 export interface HttpResponseMockDeletePayloadDtoInterface {
   collectionId: string;
   workspaceId: string;

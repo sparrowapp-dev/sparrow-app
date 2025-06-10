@@ -59,7 +59,8 @@ import type {
 
 import type {
   HttpResponseMockCreateUpdatePayloadDtoInterface,
-  HttpResponseMockDeletePayloadDtoInterface
+  HttpResponseMockDeletePayloadDtoInterface,
+  HttpResponseMockUpdatePayloadDtoInterface
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 
 export class CollectionService {
@@ -884,14 +885,14 @@ export class CollectionService {
 
   public updateMockResponseInCollection = async (
     responseId: string,
-    mockResponse: HttpResponseMockCreateUpdatePayloadDtoInterface,
+    updateMockResponse: HttpResponseMockUpdatePayloadDtoInterface,
     baseUrl: string,
   ) => {
     const response = await makeRequest(
-      "PUT",
+      "PATCH",
       `${baseUrl}/api/collection/mock-response/${responseId}`,
       {
-        body: mockResponse,
+        body: updateMockResponse,
         headers: getAuthHeaders(),
       },
     );

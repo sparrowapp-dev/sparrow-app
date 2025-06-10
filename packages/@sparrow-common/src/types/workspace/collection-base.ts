@@ -23,6 +23,7 @@ export enum CollectionItemTypeBaseEnum {
   SAVED_REQUEST = "REQUEST_RESPONSE",
   MOCK_REQUEST = "MOCK_REQUEST",
   AI_REQUEST = "AI_REQUEST",
+  MOCK_REQUEST_RESPONSE = "MOCK_REQUEST_RESPONSE",
 }
 
 export interface CollectionItemBaseInterface {

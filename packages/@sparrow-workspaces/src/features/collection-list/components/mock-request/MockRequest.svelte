@@ -354,7 +354,7 @@
     {/if} -->
 
     <span style="  display: flex; margin-right:4px; ">
-      {#if api?.items && api?.items?.length > 0}
+      <!-- {#if api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
@@ -370,7 +370,7 @@
           class="api-method"
           style="width: 24px !important; height:24px !important; padding:0;"
         ></div>
-      {/if}
+      {/if} -->
     </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
@@ -464,21 +464,21 @@
       style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
     ></div>
     <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
+    <!-- {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+    {/each} -->
   </div>
 </div>
 
