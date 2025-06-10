@@ -154,6 +154,8 @@
               }}
             >
               <RoadmapIcon
+                height={"16px"}
+                width={"16px"}
                 color={activeTab === "roadmap"
                   ? "var(--text-secondary-100)"
                   : "var(--text-primary-250)"}
@@ -171,6 +173,7 @@
               }}
             >
               <DocumentTextRegular
+                size={"16px"}
                 color={activeTab === "feedback"
                   ? "var(--text-secondary-100)"
                   : ""}
@@ -188,6 +191,7 @@
               }}
             >
               <MailInboxArrowDownRegular
+                size={"16px"}
                 color={activeTab === "updates"
                   ? "var(--text-secondary-100)"
                   : ""}
@@ -205,6 +209,7 @@
               }}
             >
               <PeopleTeamRegular
+                size={"16px"}
                 color={activeTab === "community"
                   ? "var(--text-secondary-100)"
                   : ""}
@@ -223,6 +228,7 @@
               }}
             >
               <BroadActivityFeedRegular
+                size={"16px"}
                 color={activeTab === "myActivity"
                   ? "var(--text-secondary-100)"
                   : ""}
@@ -323,6 +329,8 @@
     color: var(--text-primary-250);
     position: relative;
     justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
   }
 
   .tab.active {
@@ -336,6 +344,6 @@
     bottom: -2px;
     width: 100%;
     height: 2px;
-    border-bottom: 4px solid var(--border-primary-300);
+    border-bottom: 2px solid var(--border-primary-300);
   }
 </style>

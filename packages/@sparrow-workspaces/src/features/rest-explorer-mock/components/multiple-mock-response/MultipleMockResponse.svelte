@@ -18,6 +18,7 @@
   export let isWebApp;
 
   export let mockResponses;
+  export let onCreateMockResponse;
 
   let inputField: HTMLInputElement;
   let responseTabElements: HTMLElement[] = [];
@@ -148,7 +149,7 @@
         size="extra-small"
         customWidth={"24px"}
         type="teritiary-regular"
-        onClick={() => {}}
+        onClick={onCreateMockResponse}
         startIcon={AddRegular}
       />
     </span>

@@ -130,6 +130,7 @@
   export let onOpenCollection;
   export let onUpdateResponseBody;
   export let onUpdateResponseStatus;
+  export let onCreateMockResponse;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -784,6 +785,7 @@
                         {userRole}
                         {mockResponses}
                         {isWebApp}
+                        {onCreateMockResponse}
                       />
                     </div>
                     <div
@@ -797,7 +799,7 @@
                       style="flex:1;"
                     >
                       {#if mockResponses.length === 0}
-                        <NoMockResponseDetailsSection />
+                        <NoMockResponseDetailsSection {onCreateMockResponse} />
                       {:else}
                         <div class="h-100 d-flex flex-column">
                           <div style="flex:1; overflow:auto;">

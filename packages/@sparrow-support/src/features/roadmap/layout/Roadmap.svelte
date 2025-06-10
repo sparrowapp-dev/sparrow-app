@@ -120,7 +120,7 @@
 <div class="container-data" style="padding: 20px; height: calc(100% - 136px)">
   <div class="headerq">
     <p class="text-ds-font-size-20 fw-semibold mb-2">Roadmap</p>
-    <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
+    <p class="text-ds-font-size-14" style="color: var(--text-ds-neutral-400);">
       Stay updated with all feedback, from planning to progress, on a single
       roadmap.
     </p>
@@ -181,7 +181,7 @@
 
   {#if isLoading}
     <div class="mt-5">
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      <Loader loaderSize={"20px"} loaderMessage="Loading..." />
     </div>
   {:else}
     <div
