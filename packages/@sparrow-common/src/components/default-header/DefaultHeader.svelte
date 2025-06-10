@@ -42,8 +42,8 @@
   on:mousedown={handleMouseDown}
 >
   <div class="d-flex ms-3 justify-content-cdenter align-items-center no-drag">
-    {#if !isWindows}
-      <WindowAction isWindows={false} />
+    {#if os === "macos"}
+      <WindowAction platform={"macos"} />
     {/if}
 
     <div>
@@ -56,9 +56,9 @@
   </div>
 
   <div class="d-flex align-items-center no-drag" style="position: relative;">
-    {#if isWindows}
+    {#if os === "linux" || os === "windows"}
       <div class="d-flex gap-3 ms-4 no-drag">
-        <WindowAction isWindows={true} />
+        <WindowAction platform={"windows"} />
       </div>
     {/if}
   </div>
