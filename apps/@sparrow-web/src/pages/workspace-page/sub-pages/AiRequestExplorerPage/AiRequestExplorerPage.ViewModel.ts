@@ -74,13 +74,6 @@ class AiRequestExplorerViewModel {
         this.tab = t;
       }, 0);
     }
-
-
-    setTimeout(async () => {
-      // const res = await this.fetchConversations();
-      // const res = await this.saveConversation();
-      // console.log("calling saveConversation :>> ", res);
-    }, 15000);
   }
 
   public get activeWorkspace() {
@@ -110,15 +103,12 @@ class AiRequestExplorerViewModel {
     }
 
     try {
-      const convoFetchRes = await this.aiRequestService.fetchConversationsByApiKey(
-        provider,
-        providerAuthKey,
-      );
-      if (convoFetchRes.isSuccessful) {
+      const conversationFetchResult = await this.aiRequestService.fetchConversationsByApiKey(provider, providerAuthKey);
+      if (conversationFetchResult.isSuccessful) {
         // Store the fetched conversations in the repository
-        const repoData = await this.aiRequestRepository.addConversation(provider, providerAuthKey, convoFetchRes.data.data);
-        console.log("Conversations fetched successfully. :>> ", repoData);
-      } else { console.error("Conversation fetch failed:"); }
+        const res = await this.aiRequestRepository.addConversation(provider, providerAuthKey, conversationFetchResult.data.data);
+        return res;
+      } else { console.error("Conversation fetch failed:"); return; }
     } catch (error) {
       console.error("Error while fetching conversations :>> ", error);
     }
@@ -159,7 +149,7 @@ class AiRequestExplorerViewModel {
     return `${year}-${month}-${day}`;  // e.g. "2025-06-10"
   };
 
-  public saveConversation = async () => {
+  public saveConversationHistory = async () => {
     const componentData = this._tab.getValue();
     const user = getClientUser();
     let isGuestUser;
@@ -173,7 +163,8 @@ class AiRequestExplorerViewModel {
     const conversationTitle = componentData?.property?.aiRequest?.ai?.conversationTitle;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
-    if (!conversations.length || !provider || !providerAuthKey) {
+    // if (!conversations.length || !provider || !providerAuthKey) {
+    if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
       return;
     }
@@ -189,7 +180,6 @@ class AiRequestExplorerViewModel {
         title: conversationTitle,
         inputTokens,
         outputTokens,
-        // date: new Date().toISOString().slice(0, 10),
         date: this.getLocalDate(),
         time: this.getFormattedTime(),
         conversation: conversations,
@@ -217,16 +207,10 @@ class AiRequestExplorerViewModel {
 
         const response = await this.aiRequestService.addNewConversation(payload);
         const newConversationId = response.data.data;
-        console.log("Added New Conversation Successfully :>> ", response);
         this.updateAiRequestConversationId(newConversationId);
 
-        if (response.isSuccessful) {
-          await this.fetchConversations();
-          notifications.success("New Conversation saved successfully.");
-        } else {
-          notifications.error("Failed to save conversation. Please try again.");
-        }
-
+        if (response.isSuccessful) { await this.fetchConversations(); }
+        else { console.error("Failed to save conversation. Please try again. ", response); }
       } else {
         const payload = {
           provider,
@@ -236,20 +220,12 @@ class AiRequestExplorerViewModel {
             ...commonFields,
           }
         };
-        const response = await this.aiRequestService.updateConversation(payload);
-        console.log("Conversation Updated Successfully :>> ", response);
 
-        if (response.isSuccessful) {
-          await this.fetchConversations();
-          notifications.success("Conversation Updated successfully.");
-        } else {
-          notifications.error("Failed to save conversation. Please try again.");
-        }
+        const response = await this.aiRequestService.updateConversation(payload);
+        if (response.isSuccessful) { await this.fetchConversations(); }
+        else { console.error("Something went wrong while updating conversation. ", response); }
       }
-    } catch (error) {
-      console.error("Error while saving conversation history :>> ", error);
-      notifications.error("An error occurred while saving the conversation.");
-    }
+    } catch (error) { console.error("Error while saving conversation history :>> ", error); }
   }
 
   public handleRenameConversationTitle = async (conversationId: string, newConversationTitle: string) => {
@@ -294,16 +270,14 @@ class AiRequestExplorerViewModel {
         }
       };
 
-      console.log("rename data :>> ", payload)
       const response = await this.aiRequestService.updateConversation(payload);
-      console.log("Conversation Title Update Response :>> ", response);
 
       if (response.isSuccessful) {
         if (conversationId === currTabConversationId) {
           this.updateAiRequestConversationTitle(newConversationTitle);
         }
         await this.fetchConversations(); // Fetch to udpate the states in local db
-        notifications.success("Conversation Title Updated successfully.");
+        notifications.success("Conversation title updated successfully.");
       } else {
         notifications.error("Failed to update conversation title. Please try again.");
       }
@@ -343,9 +317,10 @@ class AiRequestExplorerViewModel {
 
       if (response.isSuccessful) {
         if (conversationId === currTabConversationId) {
-          this.updateAiRequestConversationTitle("New Conversation");
-          this.updateAiRequestConversationId("");
-          this.updateRequestAIConversation([]);
+          // this.updateAiRequestConversationTitle("New Conversation");
+          // this.updateAiRequestConversationId("");
+          // this.updateRequestAIConversation([]);
+          this.handleStartNewConversation();
         }
         await this.fetchConversations(); // Fetch to udpate the states in local db
         notifications.success(`Conversation ${conversationTitle} deleted successfully.`);
@@ -776,7 +751,7 @@ class AiRequestExplorerViewModel {
   public handleClearConversation = async () => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     await this.updateRequestAIConversation([]);
-    await this.saveConversation(); // save conversation in db
+    await this.saveConversationHistory(); // save conversation in db
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
     // notifications.success("Chat cleared successfully.")
@@ -787,7 +762,7 @@ class AiRequestExplorerViewModel {
     await this.switchConversation("", "New Conversation", []);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success("Created new conversation.");
+    // notifications.success("Created new conversation.");
   }
 
   public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversations: Conversation[]) => {
@@ -805,7 +780,7 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success(`Switched to "${_conversationTitle}" conversation!`);
+    notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
   }
 
   /**
@@ -857,7 +832,7 @@ class AiRequestExplorerViewModel {
       },
     ]);
     await this.updateRequestState({ isChatbotGeneratingResponse: false });
-    this.saveConversation();
+    this.saveConversationHistory();
   }
 
   /**
@@ -1042,8 +1017,7 @@ class AiRequestExplorerViewModel {
               await this.updateRequestState({
                 isChatbotGeneratingResponse: false,
               });
-
-              await this.saveConversation(); // save in db
+              await this.saveConversationHistory();
 
               const newData: AiRequestExplorerData = {
                 response: {
@@ -1177,9 +1151,8 @@ class AiRequestExplorerViewModel {
 
                   // Update the conversation data
                   await this.updateRequestAIConversation(updatedConversations);
-                  this.saveConversation();
+                  this.saveConversationHistory();
                 }
-
 
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>

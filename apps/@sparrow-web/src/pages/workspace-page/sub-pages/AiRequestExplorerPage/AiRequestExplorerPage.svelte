@@ -193,8 +193,8 @@
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   fetchConversations={_viewModel.fetchConversations}
-  conversationsHistory={$conversationsHistory}
   getConversationsList={getConvoList}
+  conversationsHistory={$conversationsHistory}
   onSwitchConversation={_viewModel.switchConversation}
   onRenameConversation={_viewModel.handleRenameConversationTitle}
   onDeleteConversation={_viewModel.handleDeleteConversation}

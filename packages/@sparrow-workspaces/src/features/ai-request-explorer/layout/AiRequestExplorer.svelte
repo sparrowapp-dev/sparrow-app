@@ -137,8 +137,8 @@
     minPx += 250;
     updateSplitpaneContSizes();
     const res = await fetchConversations();
-    getConversationsList();
-    console.log("Conversations fetched: ", res);
+    const result = getConversationsList();
+    return result;
   };
   const onCloseConversationHistoryPanel = () => {
     maxPx -= 200;
@@ -148,11 +148,8 @@
   };
 
   $: {
-    if ($tab) console.log("tab :>> ", $tab?.property?.aiRequest);
-  }
-  $: {
-    if (conversationsHistory)
-      console.log("convo List :>> ", conversationsHistory);
+    if ($tab?.property?.aiRequest)
+      console.log("tab :>> ", $tab?.property?.aiRequest);
   }
 </script>
 
@@ -161,11 +158,9 @@
     <div class="w-100 d-flex flex-column h-100 p-3">
       <div class="d-flex justify-content-between w-100 p-3 d-none">
         <RequestName name={$tab.name} {onUpdateRequestName} />
-
         <div class="d-flex justify-content-between"></div>
       </div>
 
-      <!-- HTTP URL Section -->
       <ModelSector
         class=""
         isSaveLoad={$loading}
@@ -304,7 +299,6 @@
             size={defaultSizePct}
             maxSize={maxSizePct}
           >
-            <!-- Conversation History Panel -->
             <ChatBot
               {tab}
               disabled={!$tab.property.aiRequest?.aiModelProvider}

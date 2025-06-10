@@ -45,7 +45,7 @@ export class AiRequestRepository {
           apiKey: apiKey,
           provider: provider
         },
-        sort: [{ updatedAt: 'desc' }] // Latest first
+        sort: [{ updatedAt: 'desc' }] // Latest first 
       }).$;
   };
 

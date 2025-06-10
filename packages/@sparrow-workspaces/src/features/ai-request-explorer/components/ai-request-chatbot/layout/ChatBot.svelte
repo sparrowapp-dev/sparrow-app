@@ -75,12 +75,6 @@
     }
   };
 
-  const clearChat = async () => {
-    if ($tab?.property?.aiRequest?.ai?.conversations.length) {
-      onUpdateAiConversation([]);
-    }
-  };
-
   onMount(() => {
     setTimeout(() => {
       if (scrollList) scrollList("bottom", -1, "auto");
@@ -100,39 +94,34 @@
       MixpanelEvent(Events.AI_Regenerate_Response),
     );
   };
-
-  const onSelectChatHistoryItem = async (_oldConversation) => {
-    console.log("old Convo:>> ", _oldConversation);
-    onUpdateAiConversation(_oldConversation);
-  };
 </script>
 
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
   <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
-      conversations={$tab?.property?.aiRequest?.ai?.conversations}
       {responseData}
-      prompt={$tab?.property?.aiRequest?.ai?.prompt}
-      chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
+      bind:scrollList
       {onUpdateAiPrompt}
       {sendPrompt}
-      isResponseGenerating={$tab?.property?.aiRequest?.state
-        ?.isChatbotGeneratingResponse}
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      {onClearConversation}
-      isChatAutoClearActive={$tab?.property?.aiRequest?.state
-        ?.isChatAutoClearActive}
-      bind:scrollList
       {conversationsHistory}
       {onOpenConversationHistoryPanel}
       {onCloseConversationHistoryPanel}
       {onSwitchConversation}
       {onRenameConversation}
       {onDeleteConversation}
+      {onClearConversation}
+      conversations={$tab?.property?.aiRequest?.ai?.conversations}
+      prompt={$tab?.property?.aiRequest?.ai?.prompt}
+      chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
+      isResponseGenerating={$tab?.property?.aiRequest?.state
+        ?.isChatbotGeneratingResponse}
+      isChatAutoClearActive={$tab?.property?.aiRequest?.state
+        ?.isChatAutoClearActive}
       isChatPanelLoadingActive={$tab?.property?.aiRequest?.state
         ?.isChatbotConversationLoading}
       currTabAiInfo={$tab.property?.aiRequest?.ai}

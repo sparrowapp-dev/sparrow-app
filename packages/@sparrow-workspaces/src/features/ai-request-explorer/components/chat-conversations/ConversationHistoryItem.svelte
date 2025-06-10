@@ -34,6 +34,7 @@
   ) => void;
 
   const handleSelect = () => {
+    if (currOpenedConversationId === conversation.id) return;
     onSelectConversation(
       conversation.id,
       conversation.title,
@@ -234,8 +235,10 @@
       class="text-fs-14 text-ds-font-weight-medium text-ds-line-height-143"
       style="color: lightgray; letter-spacing: 0;"
     >
-      This will permanently delete the conversation titled "{conversation.title}".
-      This action cannot be undone, and you will no longer be able to access
+      This will permanently delete the conversation titled "<span
+        style="color: var(--text-ds-neutral-50)"
+        class="text-ds-font-weight-semi-bold">{conversation.title}</span
+      >". This action cannot be undone, and you will no longer be able to access
       this conversation once it is deleted.
       <br /><br />
       Are you sure you want to proceed?
@@ -273,13 +276,17 @@
     background-color: var(--bg-ds-surface-500) !important;
   }
 
-  .conversation-item:hover {
+  /* .conversation-item:hover {
+    background-color: var(--bg-ds-surface-800) !important;
+  } */
+
+  .conversation-item:not(.active):hover {
     background-color: var(--bg-ds-surface-800) !important;
   }
 
   .conversation-item.active {
-    /* background-color: var(--bg-ds-surface-100) !important; */
     border: 0.5px solid var(--border-ds-primary-300) !important;
+    cursor: default;
   }
 
   .conversation-title {

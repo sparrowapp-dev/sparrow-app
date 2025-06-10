@@ -59,7 +59,7 @@
   export let isChatPanelLoadingActive;
   export let currTabAiInfo: Ai;
 
-  let isChatLoadingActive = false;
+  let conversationHistoryPanelLoader = false;
   let isConversationHistoryPanelOpen = false;
 
   let chatContainer: HTMLElement;
@@ -120,27 +120,22 @@
     isChatClearPopupOpened = flag;
   };
 
-  const handleOpenConversationHistoryPanel = () => {
+  const handleOpenConversationHistoryPanel = async () => {
+    await onOpenConversationHistoryPanel();
     isConversationHistoryPanelOpen = true;
-    onOpenConversationHistoryPanel();
   };
-  const handleCloseConversationHistoryPanel = () => {
+  const handleCloseConversationHistoryPanel = async () => {
+    await onCloseConversationHistoryPanel();
     isConversationHistoryPanelOpen = false;
-    onCloseConversationHistoryPanel();
   };
 
-  const onSelectChatHistoryItem = (
-    conversationId: string,
-    conversationTitle: string,
-    conversations: Conversation[],
-  ) => {
-    console.log(
-      "In onSelectChatHistoryItem() :>> ",
-      conversationId,
-      conversations,
-    );
-    onSwitchConversation(conversationId, conversationTitle, conversations);
-  };
+  // const onSelectChatHistoryItem = (
+  //   conversationId: string,
+  //   conversationTitle: string,
+  //   conversations: Conversation[],
+  // ) => {
+  //   onSwitchConversation(conversationId, conversationTitle, conversations);
+  // };
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -194,7 +189,7 @@
         class="conversation-history-header d-flex align-items-center justify-content-between mt-1"
       >
         <span
-          class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold"
+          class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold ms-2"
           >Conversation History</span
         >
 
@@ -209,17 +204,14 @@
       </div>
 
       <div
-        class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-center {!conversationsHistory
-          ?._data?.conversations?.length
-          ? 'flex-grow-1'
-          : ''}"
+        class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-start flex-grow-1"
       >
-        {#if conversationsHistory && conversationsHistory._data.conversations.length > 0}
+        {#if conversationsHistory && conversationsHistory._data.conversations.length}
           {#each conversationsHistory._data.conversations as conversation (conversation.id)}
             <ConversationHistoryItem
               currOpenedConversationId={currTabAiInfo.conversationId}
               {conversation}
-              onSelectConversation={onSelectChatHistoryItem}
+              onSelectConversation={onSwitchConversation}
               {onRenameConversation}
               {onDeleteConversation}
             />
@@ -234,7 +226,7 @@
             >
               <div class="">
                 <BotRegular
-                  width={"20px"}
+                  width={"24px"}
                   height={"30px"}
                   color={"var(--icon-ds-neutral-500)"}
                 />
@@ -277,18 +269,27 @@
                     ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px;"
                     : ""}
                 >
-                  <Tooltip title={"Open Chat History"} placement={"top-center"}>
+                  <Tooltip
+                    title={isConversationHistoryPanelOpen
+                      ? "Close chat history"
+                      : " Open chat history"}
+                    placement={"top-center"}
+                  >
                     <Button
                       size="small"
                       startIcon={ChatHistoryRegular}
-                      type="secondary"
-                      onClick={() => {
+                      type={"secondary"}
+                      loader={conversationHistoryPanelLoader}
+                      onClick={async () => {
+                        conversationHistoryPanelLoader = true;
                         isConversationHistoryPanelOpen =
                           !isConversationHistoryPanelOpen;
                         if (isConversationHistoryPanelOpen) {
-                          handleOpenConversationHistoryPanel();
+                          await handleOpenConversationHistoryPanel();
+                          conversationHistoryPanelLoader = false;
                         } else {
-                          handleCloseConversationHistoryPanel();
+                          await handleCloseConversationHistoryPanel();
+                          conversationHistoryPanelLoader = false;
                         }
                       }}
                     />
@@ -391,31 +392,31 @@
                 </Tooltip>
 
                 <Tooltip title={"Clear chat"} placement={"top-center"}>
-                  <span class="add-icon-container">
-                    <Button
-                      id={`clear-chat-history`}
-                      size="extra-small"
-                      customWidth={"24px"}
-                      type="teritiary-regular"
-                      startIcon={BroomRegular}
-                      disable={!conversations?.length}
-                      onClick={async (e) => {
-                        isChatClearPopupOpened = true;
-                      }}
-                    />
-                  </span>
+                  <Button
+                    id={`clear-chat-history`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={BroomRegular}
+                    disable={!conversations?.length}
+                    onClick={async (e) => {
+                      isChatClearPopupOpened = true;
+                    }}
+                  />
                 </Tooltip>
 
                 <Tooltip title={"New Conversation"} placement={"top-center"}>
                   <Button
-                    id={`start-new-conversation`}
+                    id={`start-new-conversation-btn`}
                     title={"New"}
                     size="extra-small"
                     customWidth={"60px"}
+                    buttonClassProp={""}
                     type={"teritiary-regular"}
                     startIcon={FormNewRegular}
                     onClick={async () => {
-                      onSwitchConversation("", "New Conversation", []); // For new conversation id and conversation array is empty
+                      // Create new conversation with empty id and conversation array
+                      onSwitchConversation("", "New Conversation", []);
                     }}
                   />
                 </Tooltip>
@@ -629,12 +630,48 @@
     background-color: var(--bg-ds-surface-600);
     border-right: 1px solid var(--border-ds-surface-200);
     border-radius: 8px;
+    overflow: hidden;
   }
 
   .history-title {
     font-family: Inter, sans-serif;
     color: var(--text-ds-neutral-100);
   }
+
+  .conversation-list {
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    width: 100%;
+  }
+
+  /* Hide scrollbar completely while keeping scroll functionality */
+  .conversation-list::-webkit-scrollbar {
+    display: none;
+  }
+  .conversation-list {
+    scrollbar-width: none;
+  }
+
+  /* Custom scrollbar styling */
+  /* .conversation-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .conversation-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .conversation-list::-webkit-scrollbar-thumb {
+    background: var(--border-ds-surface-300);
+    border-radius: 2px;
+  }
+  .conversation-list::-webkit-scrollbar-thumb:hover {
+    background: var(--border-ds-surface-400);
+  }
+  .conversation-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-ds-surface-300) transparent;
+  } */
+
   /* new - ed */
 
   .chat-box {
