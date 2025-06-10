@@ -729,9 +729,10 @@
                   <div class="d-flex h-100" style="gap: 8px;">
                     <div>
                       <MultipleMockResponse
-                        {tab}
+                        requestName={$tab.name}
+                        requestMethod={$tab.property.mockRequest?.method}
+                        mockResponses={$tab.property.mockRequest?.items || []}
                         {userRole}
-                        {mockResponses}
                         {isWebApp}
                         {onCreateMockResponse}
                         {onHandleMockResponseState}
@@ -748,7 +749,7 @@
                         : 'ps-2'}"
                       style="flex:1;"
                     >
-                      {#if mockResponses.length === 0}
+                      {#if $tab.property.mockRequest?.items?.length === 0}
                         <NoMockResponseDetailsSection {onCreateMockResponse} />
                       {:else}
                         <div class="h-100 d-flex flex-column">
