@@ -95,7 +95,7 @@ jobs:
           version: 'latest'    
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.6
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.7
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -122,7 +122,7 @@ jobs:
 
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -230,7 +230,7 @@ jobs:
           version: 'latest'
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.6
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.7
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -240,7 +240,7 @@ jobs:
           platforms: 'macos'
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.6
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.7
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
