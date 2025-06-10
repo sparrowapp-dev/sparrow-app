@@ -190,6 +190,10 @@ jobs:
           name: gh-pages
           path: gh-pages      
 
+      - name: list the gh pages path
+        run: |
+           pwd 
+
       - name: Upload to S3 bucket
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -200,6 +204,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           SOURCE_DIR: gh-pages
+          DEST_DIR: linux 
 
       # - name: Notify Teams Channel
       #   run: |
