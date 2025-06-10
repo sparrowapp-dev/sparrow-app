@@ -20,7 +20,6 @@
     CollectionBaseInterface,
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
-  import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import {
     openedComponent,
@@ -355,7 +354,7 @@
     {/if} -->
 
     <span style="  display: flex; margin-right:4px; ">
-      {#if api?.items && api?.items?.length > 0 && api?.type !== CollectionItemTypeBaseEnum.MOCK_REQUEST}
+      <!-- {#if api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
@@ -371,7 +370,7 @@
           class="api-method"
           style="width: 24px !important; height:24px !important; padding:0;"
         ></div>
-      {/if}
+      {/if} -->
     </span>
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
@@ -465,8 +464,7 @@
       style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
     ></div>
     <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      {#if exp.type !== CollectionItemTypeBaseEnum.MOCK_REQUEST_RESPONSE}
+    <!-- {#each api?.items || [] as exp}
         <div>
           <SavedRequest
             {userRole}
@@ -480,8 +478,7 @@
             {activeTabId}
           />
         </div>
-      {/if}
-    {/each}
+    {/each} -->
   </div>
 </div>
 

@@ -2920,10 +2920,9 @@ class RestExplorerMockViewModel {
 
 
   /**
-   * Handle create mock response in a collection
+  * Handle create mock response in a collection
   */
-  public handleCreateMockResponse = async (
-  ) => {
+  public handleCreateMockResponse = async () => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
     try {
       const mockResponseObj = {
@@ -2945,13 +2944,59 @@ class RestExplorerMockViewModel {
           },
         },
       };
-      const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
-      const response = await this.collectionService.createMockResponseInCollection(mockResponseObj, baseUrl);
+      const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+      const response =
+        await this.collectionService.createMockResponseInCollection(
+          mockResponseObj,
+          baseUrl,
+        );
       if (response?.isSuccessful && response.data?.data) {
         notifications.success("Mock response created successfully.");
+        if (progressiveTab.path?.folderId) {
+          this.collectionRepository.addSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            response.data.data,
+          );
+        } else {
+          this.collectionRepository.addSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            response.data.data,
+          );
+        }
+        const mockResponse = {
+          id: response.data.data.id,
+          name: response.data.data.name,
+          description: response.data.data.description,
+          type: ItemType.MOCK_REQUEST_RESPONSE,
+          mockRequestResponse: {
+            responseBody: response.data.data.mockRequestResponse.responseBody,
+            responseHeaders:
+              response.data.data.mockRequestResponse.responseHeaders,
+            responseStatus:
+              response.data.data.mockRequestResponse.responseStatus,
+            responseDate: response.data.data.mockRequestResponse.responseDate,
+            isMockResponseActive:
+              response.data.data.mockRequestResponse.isMockResponseActive,
+            selectedResponseBodyType:
+              response.data.data.mockRequestResponse.selectedResponseBodyType,
+          },
+        };
+        progressiveTab.property?.mockRequest?.items?.push(mockResponse);
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
         return response.data.data;
       } else {
-        notifications.error(response?.message || "Failed to create mock response.");
+        notifications.error(
+          response?.message || "Failed to create mock response.",
+        );
         return "";
       }
     } catch (error) {
@@ -2960,6 +3005,7 @@ class RestExplorerMockViewModel {
       return "";
     }
   };
+  
   /**
    * Handle state of mock response in a collection
   */
