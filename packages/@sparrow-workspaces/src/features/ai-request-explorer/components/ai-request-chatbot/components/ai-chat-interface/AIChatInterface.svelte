@@ -15,7 +15,7 @@
   import { cubicOut } from "svelte/easing";
   import { generatingImage, SparrowLogo } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  import type { Conversation } from "@sparrow/common/types/workspace";
+  // import type { Ai, Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
   import {
     Button,
@@ -29,6 +29,11 @@
   import { type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import { Sleep } from "@sparrow/common/utils";
   import { ConversationHistoryItem } from "../../..";
+  import type {
+    AiWrapper,
+    Ai,
+    Conversation,
+  } from "@sparrow/common/types/workspace/ai-request-tab";
 
   export let conversations: Conversation[] = [];
   export let prompt = "";
@@ -42,7 +47,7 @@
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
   export let responseData: AiRequestExplorerData;
-  export let onChatClear;
+  export let onClearConversation;
   export let isChatAutoClearActive = false;
   export let conversationsHistory;
   export let onOpenConversationHistoryPanel;
@@ -51,6 +56,8 @@
   export let onSwitchConversation;
   export let onRenameConversation;
   export let onDeleteConversation;
+  export let isChatPanelLoadingActive;
+  export let currTabAiInfo: Ai;
 
   let isChatLoadingActive = false;
   let isConversationHistoryPanelOpen = false;
@@ -210,6 +217,7 @@
         {#if conversationsHistory && conversationsHistory._data.conversations.length > 0}
           {#each conversationsHistory._data.conversations as conversation (conversation.id)}
             <ConversationHistoryItem
+              currOpenedConversationId={currTabAiInfo.conversationId}
               {conversation}
               onSelectConversation={onSelectChatHistoryItem}
               {onRenameConversation}
@@ -369,11 +377,7 @@
                             top: 0,
                             behavior: "auto",
                           });
-                          // handleClosePopupBackdrop(false);
-                          isChatLoadingActive = true;
-                          await new Sleep().setTime(1500).exec();
-                          onChatClear();
-                          isChatLoadingActive = false;
+                          await onClearConversation();
                         }
 
                         notifications.success(
@@ -444,7 +448,8 @@
             class="my-2 position-relative"
             style="flex:1; overflow-x:hidden; overflow-y:auto;"
           >
-            {#if isChatLoadingActive}
+            <!-- {#if isChatLoadingActive} -->
+            {#if isChatPanelLoadingActive}
               <div
                 class="d-flex align-items-center justify-content-center w-100 h-100"
                 style="z-index:3; position:absolute;"
@@ -578,11 +583,8 @@
           behavior: "auto",
         });
         handleClosePopupBackdrop(false);
-        isChatLoadingActive = true;
-        await new Sleep().setTime(1500).exec();
-        onChatClear();
+        await onClearConversation();
         notifications.success("Chat history cleared successfully.");
-        isChatLoadingActive = false;
       }}
     ></Button>
   </div>

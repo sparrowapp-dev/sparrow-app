@@ -40,6 +40,7 @@
       conversation.conversation,
     );
   };
+  export let currOpenedConversationId: string;
 
   let isDeleteConversationPopupOpen = false;
   const handleDelete = async (e: Event) => {
@@ -97,7 +98,7 @@
 
 <div
   class="conversation-item position-relative w-100 d-flex align-items-start justify-content-between p-2 rounded-2 cursor-pointer"
-  class:active={conversation.isActive}
+  class:active={currOpenedConversationId === conversation.id ? true : false}
   on:click={() => {
     handleSelect();
   }}
@@ -277,8 +278,8 @@
   }
 
   .conversation-item.active {
-    /* background-color: var(--bg-ds-surface-500) !important; */
-    /* border-color: var(--border-ds-primary-300) !important; */
+    /* background-color: var(--bg-ds-surface-100) !important; */
+    border: 0.5px solid var(--border-ds-primary-300) !important;
   }
 
   .conversation-title {

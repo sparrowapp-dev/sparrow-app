@@ -198,4 +198,5 @@
   onSwitchConversation={_viewModel.switchConversation}
   onRenameConversation={_viewModel.handleRenameConversationTitle}
   onDeleteConversation={_viewModel.handleDeleteConversation}
+  onClearConversation={_viewModel.handleClearConversation}
 />

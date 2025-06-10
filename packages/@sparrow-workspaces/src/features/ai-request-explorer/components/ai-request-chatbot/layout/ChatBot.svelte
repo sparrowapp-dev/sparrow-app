@@ -30,6 +30,7 @@
   export let onSwitchConversation;
   export let onRenameConversation;
   export let onDeleteConversation;
+  export let onClearConversation;
 
   let scrollList: ScrollList;
 
@@ -122,7 +123,7 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      onChatClear={clearChat}
+      {onClearConversation}
       isChatAutoClearActive={$tab?.property?.aiRequest?.state
         ?.isChatAutoClearActive}
       bind:scrollList
@@ -132,6 +133,9 @@
       {onSwitchConversation}
       {onRenameConversation}
       {onDeleteConversation}
+      isChatPanelLoadingActive={$tab?.property?.aiRequest?.state
+        ?.isChatbotConversationLoading}
+      currTabAiInfo={$tab.property?.aiRequest?.ai}
     />
   </div>
 {/if}

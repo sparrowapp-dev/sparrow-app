@@ -1,5 +1,5 @@
 // ---- Utils
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, moveNavigation, Sleep } from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -776,27 +776,36 @@ class AiRequestExplorerViewModel {
   public handleClearConversation = async () => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     await this.updateRequestAIConversation([]);
+    await this.saveConversation(); // save conversation in db
+    await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success("Chat cleared successfully.")
+    // notifications.success("Chat cleared successfully.")
   }
 
   public handleStartNewConversation = async () => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     await this.switchConversation("", "New Conversation", []);
+    await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success("Chat cleared successfully.")
+    notifications.success("Created new conversation.");
   }
 
-  public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversation: Conversation[]) => {
+  public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversations: Conversation[]) => {
+    // const componentData = this._tab.getValue();
+    // const currTabConversationId = componentData?.property?.aiRequest.ai?.conversationId;
+    // if (currTabConversationId === _conversationId) {
+    //   return;
+    // }
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
     progressiveTab.property.aiRequest.ai.conversationTitle = _conversationTitle;
-    progressiveTab.property.aiRequest.ai.conversations = _conversation;
+    progressiveTab.property.aiRequest.ai.conversations = _conversations;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success(`Switched to ${_conversationTitle} conversation!`);
+    notifications.success(`Switched to "${_conversationTitle}" conversation!`);
   }
 
   /**
