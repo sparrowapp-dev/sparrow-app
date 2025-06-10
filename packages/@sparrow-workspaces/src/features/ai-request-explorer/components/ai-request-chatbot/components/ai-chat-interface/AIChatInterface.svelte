@@ -49,6 +49,7 @@
   export let onCloseConversationHistoryPanel;
   export let chatPanelTitle: string;
   export let onSwitchConversation;
+  export let onRenameConversation;
 
   let isChatLoadingActive = false;
   let isConversationHistoryPanelOpen = false;
@@ -122,6 +123,7 @@
 
   const onSelectChatHistoryItem = (
     conversationId: string,
+    conversationTitle: string,
     conversations: Conversation[],
   ) => {
     console.log(
@@ -129,7 +131,7 @@
       conversationId,
       conversations,
     );
-    onSwitchConversation(conversationId, conversations);
+    onSwitchConversation(conversationId, conversationTitle, conversations);
   };
 
   let isRenaming = false;
@@ -143,6 +145,7 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
+      onRenameConversation("", newRequestName);
     }
     isRenaming = false;
     newRequestName = "";
@@ -207,8 +210,9 @@
           {#each conversationsHistory._data.conversations as conversation (conversation.id)}
             <ConversationHistoryItem
               {conversation}
-              onSelect={onSelectChatHistoryItem}
-              onDelete={() => {}}
+              onSelectConversation={onSelectChatHistoryItem}
+              {onRenameConversation}
+              onDeleteConversation={() => {}}
             />
           {/each}
         {:else}
@@ -406,7 +410,7 @@
                     type={"teritiary-regular"}
                     startIcon={FormNewRegular}
                     onClick={async () => {
-                      onSwitchConversation("", []); // For new conversation id and conversation array is empty
+                      onSwitchConversation("", "New Conversation", []); // For new conversation id and conversation array is empty
                     }}
                   />
                 </Tooltip>

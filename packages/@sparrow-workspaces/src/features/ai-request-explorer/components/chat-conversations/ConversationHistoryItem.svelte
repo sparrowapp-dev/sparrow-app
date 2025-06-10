@@ -3,7 +3,12 @@
     ConversationsWrapper,
     Conversation,
   } from "@sparrow/common/types/workspace/ai-request-tab";
-  import { DismissRegular } from "@sparrow/library/icons";
+  import {
+    DeleteRegular,
+    EditRegular,
+    MoreHorizontalRegular,
+  } from "@sparrow/library/icons";
+  import { Options } from "@sparrow/library/ui";
 
   export let conversation: {
     id: string;
@@ -15,25 +20,76 @@
     updatedBy?: string; // e.g., "GPT-4.0"
     isActive?: boolean;
   };
-  export let onSelect: (id: string, conversations: Conversation) => void;
-  export let onDelete: (id: string) => void;
+  export let onSelectConversation: (
+    id: string,
+    conversations: Conversation,
+  ) => void;
+  export let onDeleteConversation: (id: string) => void;
+  export let onRenameConversation: (
+    id: string,
+    conversationTitle: string,
+  ) => void;
 
   const handleSelect = () => {
-    console.log("slect clicked :>> ", conversation);
-    onSelect(conversation.id, conversation.conversation);
+    onSelectConversation(
+      conversation.id,
+      conversation.title,
+      conversation.conversation,
+    );
   };
 
   const handleDelete = (e: Event) => {
     e.stopPropagation();
-    onDelete(conversation.id);
+    onDeleteConversation(conversation.id);
   };
 
-  // setTimeout(() => {
-  //   if (conversation) {
-  //     // console.log(`Conversation Item:`, conversation.title);
-  //   }
-  // }, 5000);
+  let showMenu = false;
+  let chatItemTabWrapper: HTMLElement;
+  let noOfColumns = 140;
+  let isRenaming = false;
+  let newRequestName: string = "";
+  let inputField: HTMLInputElement;
+
+  function rightClickContextMenu(event) {
+    event.stopPropagation();
+    setTimeout(() => {
+      showMenu = !showMenu;
+    }, 100);
+  }
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(`conversation-item-menu`);
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+
+  const handleRenameInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    newRequestName = target.value.trim();
+  };
+
+  const onRenameBlur = async () => {
+    if (newRequestName) {
+      onRenameConversation(conversation.id, newRequestName);
+    }
+    isRenaming = false;
+    newRequestName = "";
+  };
+
+  const onRenameInputKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      const inputField = document.getElementById(
+        "renameInputFieldFile",
+      ) as HTMLInputElement;
+      inputField.blur();
+    }
+  };
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
 
 <div
   class="conversation-item position-relative w-100 d-flex align-items-start justify-content-between p-2 rounded-2 cursor-pointer"
@@ -41,15 +97,33 @@
   on:click={() => {
     handleSelect();
   }}
-  on:keydown={(e) => e.key === "Enter" && handleSelect()}
   role="button"
   tabindex="0"
 >
   <div class="conversation-content flex-fill pe-2">
     <!-- Title -->
-    <div class="conversation-title text-truncate mb-1">
+    {#if isRenaming}
+      <input
+        class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+        style="width: 70%"
+        id="renameInputFieldFile"
+        type="text"
+        maxlength={100}
+        value={conversation.title}
+        on:click|stopPropagation={() => {}}
+        bind:this={inputField}
+        on:input={handleRenameInput}
+        on:blur={onRenameBlur}
+        on:keydown={onRenameInputKeyPress}
+      />
+    {:else}
+      <div class="conversation-title text-truncate mb-1">
+        {conversation.title}
+      </div>
+    {/if}
+    <!-- <div class="conversation-title text-truncate mb-1">
       {conversation.title}
-    </div>
+    </div> -->
 
     <!-- Metadata row -->
     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -95,15 +169,48 @@
     </div>
   </div>
 
-  <!-- Delete button -->
   <button
-    class="delete-btn position-absolute btn p-1 rounded-1 d-flex align-items-center justify-content-center"
-    on:click={handleDelete}
-    title="Delete conversation"
+    id={"conversation-item-menu"}
+    bind:this={chatItemTabWrapper}
+    class="delete-btn position-absolute btn p-0 rounded-1 d-flex align-items-center justify-content-center"
+    on:click|stopPropagation={rightClickContextMenu}
   >
-    <DismissRegular size="12px" color="var(--icon-ds-neutral-400)" />
+    <MoreHorizontalRegular size="12px" color="var(--icon-ds-neutral-100)" />
   </button>
 </div>
+
+{#if showMenu}
+  <Options
+    xAxis={chatItemTabWrapper.getBoundingClientRect().right - 10}
+    yAxis={[
+      chatItemTabWrapper.getBoundingClientRect().top - 0,
+      chatItemTabWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    zIndex={500}
+    menuItems={[
+      {
+        onClick: () => {
+          isRenaming = true;
+          setTimeout(() => inputField.focus(), 100);
+        },
+        displayText: "Rename",
+        disabled: false,
+        hidden: false,
+        icon: EditRegular,
+        iconColor: "var(--sparrow-white)",
+      },
+      {
+        onClick: () => {},
+        displayText: "Delete",
+        disabled: false,
+        hidden: false,
+        icon: DeleteRegular,
+        iconColor: "var(--icon-ds-danger-300)",
+      },
+    ]}
+    {noOfColumns}
+  />
+{/if}
 
 <style>
   .conversation-item {
@@ -128,6 +235,17 @@
     font-weight: 500;
     color: var(--text-ds-neutral-100);
     line-height: 1.2;
+
+    /* height: 24px; */
+    /* width: calc(100% - 58px);
+    text-align: left;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    caret-color: var(--bg-ds-primary-300); */
+  }
+  .conversation-title:focus {
+    outline: 0.5px solid var(--bg-ds-primary-300) !important;
   }
 
   .token-count {
@@ -198,5 +316,19 @@
 
   .cursor-pointer {
     cursor: pointer;
+  }
+
+  .renameInputFieldFile {
+    height: 20px;
+    background-color: transparent;
+    color: var(--bg-ds-neutral-50);
+    padding: 4px 2px;
+    outline: none;
+    border-radius: 4px !important;
+    border: 1px solid var(--bg-ds-primary-300);
+    caret-color: var(--bg-ds-primary-300);
+  }
+  .renameInputFieldFile:focus {
+    outline: 0px solid var(--border-ds-primary-300) !important;
   }
 </style>

@@ -52,6 +52,7 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let onUpdateAiConfigurations;
+  export let onRenameConversation;
 
   // Conversations History Props
   export let conversationsHistory: AiRequestConversationsDocument[];
@@ -59,6 +60,7 @@
   export let onDeleteConversation: (id: string) => void;
   export let onSwitchConversation: (
     conversationId: string,
+    conversationTitle: string,
     conversation: Conversation[],
   ) => void;
   export let fetchConversations: () => Promise<void>;
@@ -310,6 +312,7 @@
               {onOpenConversationHistoryPanel}
               {onCloseConversationHistoryPanel}
               {onSwitchConversation}
+              {onRenameConversation}
             />
           </Pane>
         </Splitpanes>

@@ -198,4 +198,5 @@
   conversationsHistory={$conversationsHistory}
   getConversationsList={getConvoList}
   onSwitchConversation={_viewModel.switchConversation}
+  onRenameConversation={_viewModel.handleRenameConversationTitle}
 />

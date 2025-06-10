@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let size = "";
+  export let size = "20";
   export let color = "";
   $: finalColor = color === "" ? "inherit" : color;
 </script>

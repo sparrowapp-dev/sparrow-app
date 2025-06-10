@@ -7,7 +7,7 @@ import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
-  constructor() {}
+  constructor() { }
 
   /**
    * @description
@@ -29,7 +29,7 @@ export class CollectionRepository {
         },
       })
       .exec();
-
+    console.log("in update Collection repo :>> ")
     await collection?.incrementalModify((value) => {
       if (data.name) value.name = data.name;
       if (data._id) value.id = data._id;
