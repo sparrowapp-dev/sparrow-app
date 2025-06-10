@@ -40,7 +40,7 @@ env:
 jobs:
   release_linux:
     runs-on: ubuntu-latest
-    environment: linux build
+    environment: development
 
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -117,8 +117,8 @@ jobs:
       #     cat /home/runner/work/sparrow-app/sparrow-app/apps/@sparrow-web/.env    
 
 
-      # - name: Install project dependencies
-      #   run: yarn
+      - name: Install project dependencies
+        run: yarn
 
       - name: Build Tauri app
         run: |
