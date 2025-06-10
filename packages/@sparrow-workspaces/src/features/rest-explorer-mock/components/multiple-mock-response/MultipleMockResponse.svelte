@@ -19,6 +19,8 @@
 
   export let mockResponses;
   export let onCreateMockResponse;
+  export let onHandleMockResponseState;
+  export let onRenameMockResponse;
 
   let inputField: HTMLInputElement;
   let responseTabElements: HTMLElement[] = [];
@@ -36,7 +38,17 @@
     newResponseName = target.value.trim();
   };
 
-  const onRenameBlur = async () => {};
+  const onRenameBlur = async () => {
+    if (newResponseName && activeResponseIdx !== null) {
+      const response = mockResponses[activeResponseIdx];
+      await onRenameMockResponse(response.id, newResponseName);
+      isRenaming = false;
+      newResponseName = "";
+    } else {
+      isRenaming = false;
+      newResponseName = "";
+    }
+  };
 
   const onRenameInputKeyPress = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
@@ -46,12 +58,6 @@
       inputField.blur();
     }
   };
-
-  function toggleActive(id) {
-    mockResponses = mockResponses.map((r) =>
-      r.id === id ? { ...r, isActive: !r.isActive } : r,
-    );
-  }
 
   function handleSelectClick(e: MouseEvent) {
     if (!showMenu) return;
@@ -93,7 +99,12 @@
         disabled: false,
       },
       {
-        onClick: () => {},
+        onClick: () => {
+          isRenaming = true;
+          newResponseName = mockResponses[activeResponseIdx].name;
+          setTimeout(() => inputField && inputField.focus(), 100);
+          showMenu = false;
+        },
         displayText: "Rename Mock Response",
         disabled: false,
       },
@@ -190,11 +201,11 @@
         >
           <Tooltip
             title={"This response is inactive."}
-            show={!response.isActive}
+            show={!response.isMockResponseActive}
             placement={"top-center"}
           >
             <span style="display: flex; margin-right:4px;">
-              {#if response.isActive}
+              {#if response.isMockResponseActive}
                 <CircleSmallFilled color="var( --icon-ds-success-400)" />
               {:else}
                 <CircleSmallRegular />
@@ -213,7 +224,7 @@
             {response?.statusCode ? response.statusCode : "-"}
           </div>
 
-          {#if isRenaming}
+          {#if isRenaming && activeResponseIdx === idx}
             <input
               class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
               style=" width: calc(100% - 50px);"
@@ -242,12 +253,17 @@
         </button>
         {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Toggle
-            bind:isActive={response.isActive}
+            bind:isMockResponseActive={response.isMockResponseActive}
             label=""
             fontSize="12px"
             textColor="var(--text-ds-neutral-200)"
             fontWeight="400"
-            on:change={() => toggleActive(response.id)}
+            onChange={() => {
+              onHandleMockResponseState(
+                response.id,
+                !response.isMockResponseActive,
+              );
+            }}
           />
         {/if}
 

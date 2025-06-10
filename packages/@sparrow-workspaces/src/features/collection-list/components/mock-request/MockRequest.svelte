@@ -20,6 +20,7 @@
     CollectionBaseInterface,
     CollectionItemBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
+  import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestMethodBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import {
     openedComponent,
@@ -354,7 +355,7 @@
     {/if} -->
 
     <span style="  display: flex; margin-right:4px; ">
-      {#if api?.items && api?.items?.length > 0}
+      {#if api?.items && api?.items?.length > 0 && api?.type !== CollectionItemTypeBaseEnum.MOCK_REQUEST}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
@@ -465,19 +466,21 @@
     ></div>
     <!-- {#if } -->
     {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
+      {#if exp.type !== CollectionItemTypeBaseEnum.MOCK_REQUEST_RESPONSE}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+      {/if}
     {/each}
   </div>
 </div>
