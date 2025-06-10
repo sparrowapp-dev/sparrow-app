@@ -10,6 +10,7 @@ import type {
   HttpResponseMockBodyModeBaseEnum,
 } from "./http-request-mock-base";
 import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
+import type { HttpResponseMockBaseInterface } from "./http-response-mock-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
 
@@ -37,6 +38,7 @@ export interface CollectionItemBaseInterface {
   graphql?: GraphqlRequestBaseInterface;
   requestResponse?: HttpRequestSavedBaseInterface;
   mockRequest?: HttpRequestMockBaseInterface;
+  mockRequestResponse?: HttpResponseMockBaseInterface;
   aiRequest?: AiRequestBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
