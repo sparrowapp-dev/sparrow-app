@@ -112,7 +112,7 @@ jobs:
           Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
 
-      - name: Install AWS CLI
+      - name: AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
         with:
           version: latest
