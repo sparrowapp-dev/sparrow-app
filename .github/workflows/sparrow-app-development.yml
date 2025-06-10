@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret.git@v1
+        uses: punitkashyup/tauri-signature-to-k8s-secret.git@main
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -221,7 +221,7 @@ jobs:
           CI: false
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret.git@v1
+        uses: punitkashyup/tauri-signature-to-k8s-secret.git@main
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -232,7 +232,7 @@ jobs:
           github-token: ${{ secrets.SP_GITHUB_TOKEN }}
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret.git@v1
+        uses: punitkashyup/tauri-signature-to-k8s-secret.git@main
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
