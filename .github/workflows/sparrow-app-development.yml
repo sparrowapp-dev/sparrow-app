@@ -103,7 +103,6 @@ jobs:
           secret-name: 'sparrow-api-secret'
           secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
           platforms: 'windows'
-          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
 
       - name: sign msi
         run: |
@@ -238,7 +237,6 @@ jobs:
           secret-name: 'sparrow-api-secret'
           secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
           platforms: 'macos'
-          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
 
       - name: Extract and Store Tauri Signatures
         uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.2
@@ -249,7 +247,6 @@ jobs:
           secret-name: 'sparrow-api-secret'
           secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
           platforms: 'macos'
-          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
 
       - name: Install AWS CLI
         run: |
