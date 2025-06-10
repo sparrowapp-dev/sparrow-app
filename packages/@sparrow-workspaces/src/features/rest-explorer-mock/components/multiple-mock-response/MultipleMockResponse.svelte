@@ -13,7 +13,8 @@
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Modal } from "@sparrow/library/ui";
 
-  export let tab;
+  export let requestName;
+  export let requestMethod;
   export let userRole;
   export let isWebApp;
 
@@ -131,20 +132,16 @@
     on:click|preventDefault={() => {}}
     class=" d-flex align-items-center position-relative bg-transparent border-0"
   >
-    <div
-      class="api-method text-{getMethodStyle(
-        $tab.property.mockRequest?.method,
-      )}"
-    >
-      {$tab.property.mockRequest?.method?.toUpperCase() === "DELETE"
+    <div class="api-method text-{getMethodStyle(requestMethod)}">
+      {requestMethod?.toUpperCase() === "DELETE"
         ? "DEL"
-        : $tab.property.mockRequest?.method?.toUpperCase()}
+        : requestMethod?.toUpperCase()}
     </div>
     <div class="api-name ellipsis" style="color:var(--bg-ds-neutral-50)">
       <p
         class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
       >
-        {$tab?.name}
+        {requestName}
       </p>
     </div>
   </button>
