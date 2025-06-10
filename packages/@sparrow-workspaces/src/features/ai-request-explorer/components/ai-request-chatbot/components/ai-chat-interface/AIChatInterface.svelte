@@ -50,6 +50,7 @@
   export let chatPanelTitle: string;
   export let onSwitchConversation;
   export let onRenameConversation;
+  export let onDeleteConversation;
 
   let isChatLoadingActive = false;
   let isConversationHistoryPanelOpen = false;
@@ -212,7 +213,7 @@
               {conversation}
               onSelectConversation={onSelectChatHistoryItem}
               {onRenameConversation}
-              onDeleteConversation={() => {}}
+              {onDeleteConversation}
             />
           {/each}
         {:else}

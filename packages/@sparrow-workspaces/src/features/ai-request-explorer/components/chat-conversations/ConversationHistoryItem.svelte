@@ -8,7 +8,7 @@
     EditRegular,
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
-  import { Options } from "@sparrow/library/ui";
+  import { Button, Modal, Options } from "@sparrow/library/ui";
 
   export let conversation: {
     id: string;
@@ -24,7 +24,10 @@
     id: string,
     conversations: Conversation,
   ) => void;
-  export let onDeleteConversation: (id: string) => void;
+  export let onDeleteConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
   export let onRenameConversation: (
     id: string,
     conversationTitle: string,
@@ -38,9 +41,10 @@
     );
   };
 
-  const handleDelete = (e: Event) => {
+  let isDeleteConversationPopupOpen = false;
+  const handleDelete = async (e: Event) => {
     e.stopPropagation();
-    onDeleteConversation(conversation.id);
+    await onDeleteConversation(conversation.id, conversation.title);
   };
 
   let showMenu = false;
@@ -200,7 +204,9 @@
         iconColor: "var(--sparrow-white)",
       },
       {
-        onClick: () => {},
+        onClick: () => {
+          isDeleteConversationPopupOpen = true;
+        },
         displayText: "Delete",
         disabled: false,
         hidden: false,
@@ -211,6 +217,52 @@
     {noOfColumns}
   />
 {/if}
+
+<Modal
+  title={"Delete Conversation"}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isDeleteConversationPopupOpen}
+  width={"43%"}
+  handleModalState={() => {
+    isDeleteConversationPopupOpen = false;
+  }}
+>
+  <div class="mt-2 mb-4">
+    <p
+      class="text-fs-14 text-ds-font-weight-medium text-ds-line-height-143"
+      style="color: lightgray; letter-spacing: 0;"
+    >
+      This will permanently delete the conversation titled "{conversation.title}".
+      This action cannot be undone, and you will no longer be able to access
+      this conversation once it is deleted.
+      <br /><br />
+      Are you sure you want to proceed?
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isDeleteConversationPopupOpen = false;
+      }}
+    ></Button>
+    <Button
+      title={"Delete"}
+      size={"medium"}
+      type={"danger"}
+      customWidth={"95px"}
+      onClick={async (e) => {
+        await handleDelete(e);
+        isDeleteConversationPopupOpen = false;
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <style>
   .conversation-item {

@@ -52,12 +52,18 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let onUpdateAiConfigurations;
-  export let onRenameConversation;
 
   // Conversations History Props
   export let conversationsHistory: AiRequestConversationsDocument[];
   export let onSelectConversation: (id: string) => void;
-  export let onDeleteConversation: (id: string) => void;
+  export let onRenameConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
+  export let onDeleteConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
   export let onSwitchConversation: (
     conversationId: string,
     conversationTitle: string,
@@ -313,6 +319,7 @@
               {onCloseConversationHistoryPanel}
               {onSwitchConversation}
               {onRenameConversation}
+              {onDeleteConversation}
             />
           </Pane>
         </Splitpanes>

@@ -29,6 +29,7 @@
   export let onCloseConversationHistoryPanel;
   export let onSwitchConversation;
   export let onRenameConversation;
+  export let onDeleteConversation;
 
   let scrollList: ScrollList;
 
@@ -130,6 +131,7 @@
       {onCloseConversationHistoryPanel}
       {onSwitchConversation}
       {onRenameConversation}
+      {onDeleteConversation}
     />
   </div>
 {/if}

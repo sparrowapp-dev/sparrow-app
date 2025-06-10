@@ -215,14 +215,14 @@ class AiRequestExplorerViewModel {
         const payload = {
           provider,
           apiKey: providerAuthKey,
-          data: [{
+          data: {
             ...commonFields,
             createdBy: isGuestUser ? "Guest User" : {
               name: user.name,
               email: user.email,
               id: user.id,
             }
-          }]
+          }
         };
 
         const response = await this.aiRequestService.addNewConversation(payload);
@@ -242,9 +242,9 @@ class AiRequestExplorerViewModel {
           provider,
           apiKey: providerAuthKey,
           id: conversationId,
-          data: [{
+          data: {
             ...commonFields,
-          }]
+          }
         };
         const response = await this.aiRequestService.updateConversation(payload);
         console.log("Conversation Updated Successfully :>> ", response);
@@ -290,7 +290,7 @@ class AiRequestExplorerViewModel {
         provider,
         apiKey: providerAuthKey,
         id: conversationId,
-        data: [{
+        data: {
           title: newConversationTitle,
           time: this.getFormattedTime(),
           date: this.getLocalDate(),
@@ -301,7 +301,7 @@ class AiRequestExplorerViewModel {
             id: user.id,
           },
 
-        }]
+        }
       };
 
       console.log("rename data :>> ", payload)
@@ -321,6 +321,51 @@ class AiRequestExplorerViewModel {
     }
     catch (error) {
       console.log("Something went wrong while updating title :>> ", error);
+    }
+  }
+
+  public handleDeleteConversation = async (conversationId: string, conversationTitle: string) => {
+    // If conversationId is null, then change title of current tab itself, no need to change in db
+    if (!conversationId) {
+      console.error("Failed to delete conversation, due to missing Conversation ID.")
+      return;
+    }
+
+    const componentData = this._tab.getValue();
+    const user = getClientUser();
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+
+    if (!conversationId || !provider || !providerAuthKey) {
+      console.error("Missing provider or authKey.");
+      return;
+    }
+
+    try {
+      const response = await this.aiRequestService.deleteConversation(provider, providerAuthKey, conversationId);
+      console.log("Conversation Title Update Response :>> ", response);
+
+      if (response.isSuccessful) {
+        if (conversationId === currTabConversationId) {
+          this.updateAiRequestConversationTitle("New Conversation");
+          this.updateAiRequestConversationId("");
+          this.updateRequestAIConversation([]);
+        }
+        await this.fetchConversations(); // Fetch to udpate the states in local db
+        notifications.success(`Conversation ${conversationTitle} deleted successfully.`);
+      } else {
+        notifications.error(`Failed to delete conversation ${conversationTitle}. Please try again.`);
+      }
+
+    }
+    catch (error) {
+      console.log("Something went wrong while deleting the conversation. :>> ", error);
     }
   }
 
@@ -748,7 +793,7 @@ class AiRequestExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success("Switched to new chat!");
+    notifications.success(`Switched to ${_conversationTitle} conversation!`);
   }
 
   /**

@@ -193,10 +193,9 @@
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   fetchConversations={_viewModel.fetchConversations}
-  onSelectConversation={(id) => console.log("Selected:", id)}
-  onDeleteConversation={(id) => console.log("Deleted:", id)}
   conversationsHistory={$conversationsHistory}
   getConversationsList={getConvoList}
   onSwitchConversation={_viewModel.switchConversation}
   onRenameConversation={_viewModel.handleRenameConversationTitle}
+  onDeleteConversation={_viewModel.handleDeleteConversation}
 />
