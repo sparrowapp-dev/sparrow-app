@@ -217,4 +217,7 @@
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
+  onCreateMockResponse={_viewModel.handleCreateMockResponse}
+  onHandleMockResponseState={_viewModel.handleMockResponseState}
+  onRenameMockResponse={_viewModel.handleRenameMockResponse}
 />

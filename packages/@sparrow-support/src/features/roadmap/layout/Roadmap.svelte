@@ -186,7 +186,7 @@
 
   {#if isLoading}
     <div class="mt-5">
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+      <Loader loaderSize={"20px"} loaderMessage="Loading..." />
     </div>
   {:else}
     <div

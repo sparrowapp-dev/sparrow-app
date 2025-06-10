@@ -54,6 +54,7 @@ import {
   InitMockRequestTab,
   InitRequestTab,
   InitWebSocketTab,
+  InitAiRequestTab,
 } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
@@ -98,7 +99,7 @@ import type { CollectionDocType } from "../../models/collection.model";
 import type { GuideQuery } from "../../types/user-guide";
 import type { FeatureQuery } from "../../types/feature-switch";
 import { ReduceQueryParams } from "@sparrow/workspaces/features/rest-explorer/utils";
-
+import { AiRequestTabAdapter } from "../../adapter";
 import { createDeepCopy } from "@sparrow/common/utils";
 import {
   CollectionTabAdapter,
@@ -144,6 +145,11 @@ import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
 import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
+import type {
+  AiModelProviderEnum,
+  AiRequestBaseInterface,
+  AIModelVariant,
+} from "@sparrow/common/types/workspace/ai-request-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -620,6 +626,48 @@ export default class CollectionsViewModel {
     }
   };
 
+  private createAiRequestDuplciateTab = async (tabId: string) => {
+    const originalTab = await this.tabRepository.getTabById(tabId); // Tab to be copied
+    const currWorkSpace =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+
+    if (currWorkSpace) {
+      const newAiRequestTab = this.initTab.aiRequest(
+        "UNTRACKED-" + uuidv4(),
+        currWorkSpace._id,
+      );
+      // MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
+
+      // Copy values using setter methods (excluding id, tabId, and timestamp)
+      const { id, tabId, timestamp, ...restOfData } =
+        originalTab.toMutableJSON();
+
+      newAiRequestTab.updateName(restOfData.name);
+      newAiRequestTab.updateDescription(restOfData.description as string);
+      newAiRequestTab.updatePath(restOfData.path as TabPath);
+      newAiRequestTab.updateAIModelProvider(
+        restOfData.property.aiRequest?.aiModelProvider as AiModelProviderEnum,
+      );
+      newAiRequestTab.updateAIModelVariant(
+        restOfData.property.aiRequest?.aiModelVariant as AIModelVariant,
+      );
+      newAiRequestTab.updateAISystemPrompt(
+        restOfData.property.aiRequest?.systemPrompt as string,
+      );
+      newAiRequestTab.updateAuth(restOfData.property.aiRequest?.auth as Auth);
+      newAiRequestTab.updateState(
+        restOfData.property.aiRequest?.state as StatePartial,
+      );
+
+      const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
+      newAiRequestTab.updatePath(filteredPath as TabPath);
+      newAiRequestTab.updateIsSave(false);
+
+      this.tabRepository.createTab(newAiRequestTab.getValue());
+      moveNavigation("right");
+    }
+  };
+
   public createDuplicateTabByTabId = async (tabId: string) => {
     const originalTab = await this.tabRepository.getTabById(tabId); // Tab to be copied
     const originalTabType = originalTab.toMutableJSON().type as TabTypeEnum;
@@ -633,6 +681,8 @@ export default class CollectionsViewModel {
         return this.createSocketIODuplciateTab(tabId);
       case TabTypeEnum.GRAPHQL:
         return this.createGraphQLDuplciateTab(tabId);
+      case TabTypeEnum.AI_REQUEST:
+        return this.createAiRequestDuplciateTab(tabId);
       default:
         break;
     }
@@ -931,6 +981,127 @@ export default class CollectionsViewModel {
     };
     const baseUrl = await this.constructBaseUrl(workspaceId);
     const res = await this.collectionService.updateMockRequestInCollection(
+      _id,
+      dt,
+      baseUrl,
+    );
+    if (res.isSuccessful) {
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          res.data.data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          res.data.data,
+        );
+      }
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  /**
+   * Save AI Request from unsaved Tab
+   * @param componentData - New Tab
+   * @param saveDescriptionOnly
+   * @returns
+   */
+  public saveAiRequest = async (componentData: Tab) => {
+    const { folderId, collectionId, workspaceId } = componentData.path;
+    if (!workspaceId || !collectionId) {
+      return {
+        status: "error",
+        message: "this AI request is not a part of any workspace or collection",
+      };
+    }
+    const _collection = await this.readCollection(collectionId);
+    let userSource = {};
+    if (_collection?.activeSync && componentData?.source === "USER") {
+      userSource = {
+        currentBranch: _collection?.currentBranch,
+        source: "USER",
+      };
+    }
+    const _id = componentData.id;
+
+    const aiRequestTabAdapter = new AiRequestTabAdapter();
+    const unadaptedAIRequest = aiRequestTabAdapter.unadapt(componentData);
+
+    // Save overall api
+    const requestMetaData = {
+      id: _id,
+      name: componentData?.name,
+      description: componentData?.description,
+      type: ItemType.AI_REQUEST,
+    };
+
+    let folderSource;
+    let itemSource;
+    if (folderId) {
+      folderSource = {
+        folderId: folderId,
+      };
+      itemSource = {
+        id: folderId,
+        type: ItemType.FOLDER,
+        items: {
+          ...requestMetaData,
+          aiRequest: unadaptedAIRequest,
+        },
+      };
+    } else {
+      itemSource = {
+        ...requestMetaData,
+        aiRequest: unadaptedAIRequest,
+      };
+    }
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+    if (isGuestUser === true) {
+      const data = {
+        id: requestMetaData.id,
+        name: requestMetaData.name,
+        description: requestMetaData.description,
+        type: "AI_REQUEST",
+        mockRequest: unadaptedAIRequest,
+        updatedAt: "",
+        updatedBy: "Guest User",
+      };
+      if (!folderId) {
+        this.collectionRepository.updateRequestOrFolderInCollection(
+          collectionId,
+          _id,
+          data,
+        );
+      } else {
+        this.collectionRepository.updateRequestInFolder(
+          collectionId,
+          folderId,
+          _id,
+          data,
+        );
+      }
+      return true;
+    }
+
+    const dt = {
+      collectionId: collectionId,
+      workspaceId: workspaceId,
+      ...folderSource,
+      ...userSource,
+      items: itemSource,
+    };
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const res = await this.collectionService.updateAiRequestInCollection(
       _id,
       dt,
       baseUrl,
@@ -1658,6 +1829,125 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handle creating a new AI request in a collection
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateAiRequestInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const aiRequest = new InitAiRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const aiRequestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: aiRequest.getValue().name,
+        type: aiRequest.getValue().type,
+        description: "",
+        aiRequest: {
+          aiModelProvider:
+            aiRequest?.getValue().property?.aiRequest?.aiModelProvider,
+          aiModelVariant:
+            aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
+        } as AiRequestBaseInterface,
+      },
+    };
+
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...aiRequestObj.items,
+        id: aiRequest.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          aiRequestObj.collectionId,
+          aiRequest.getValue().id,
+        );
+      if (res) {
+        res.id = uuidv4();
+      }
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        aiRequest.getValue().id,
+        res,
+      );
+
+      aiRequest.updateId(res?.id as string);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      aiRequest.updateIsSave(true);
+      await this.tabRepository.createTab(aiRequest.getValue());
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addAiRequestInCollection(
+      aiRequestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        aiRequest.getValue().id,
+        res,
+      );
+
+      aiRequest.updateId(res.id);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      aiRequest.updateIsSave(true);
+
+      this.tabRepository.createTab(aiRequest.getValue());
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        aiRequest.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
    * Handle creating a new web socket in a collection
    * @param workspaceId
    * @param collection - the collection in which new web socket is going to be created
@@ -2196,6 +2486,135 @@ export default class CollectionsViewModel {
         requestObj.collectionId,
         requestObj.folderId,
         sampleMockRequest.getValue().id,
+      );
+    }
+  };
+
+  /**
+   * Handles creating a new AI request in a folder
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param explorer : - the folder in which new AI request is going to be created
+   * @returns :void
+   */
+  private handleCreateAiRequestInFolder = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    explorer: CollectionItemsDto,
+  ) => {
+    const aiRequest = new InitAiRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection.activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    const aiRequestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      folderId: explorer.id,
+      items: {
+        name: explorer.name,
+        type: ItemType.FOLDER,
+        id: explorer.id,
+        items: {
+          name: aiRequest.getValue().name,
+          type: aiRequest.getValue().type,
+          description: "",
+          aiRequest: {
+            aiModelProvider:
+              aiRequest.getValue().property.aiRequest?.aiModelProvider,
+            aiModelVariant:
+              aiRequest.getValue().property.aiRequest?.aiModelVariant,
+          } as AiRequestBaseInterface,
+        },
+      },
+    };
+
+    await this.collectionRepository.addRequestInFolder(
+      aiRequestObj.collectionId,
+      aiRequestObj.folderId,
+      {
+        ...aiRequestObj.items.items,
+        id: aiRequest.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res = (await this.collectionRepository.readRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+      )) as CollectionItemsDto;
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+        res,
+      );
+
+      aiRequest.updateId(res.id);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      aiRequest.updateIsSave(true);
+      this.tabRepository.createTab(aiRequest.getValue());
+
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addAiRequestInCollection(
+      aiRequestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      this.collectionRepository.updateRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+        request,
+      );
+
+      aiRequest.updateId(request.id);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      aiRequest.updateIsSave(true);
+      this.tabRepository.createTab(aiRequest.getValue());
+
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
       );
     }
   };
@@ -2934,6 +3353,29 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handles opening a AI Request on a tab
+   * @param aiRequest : - The AI Request going to be opened on tab
+   * @param path : - The path to the AI Request
+   */
+  public handleOpenAiRequest = (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    aiRequest: CollectionItemsDto,
+  ) => {
+    const aiRequestTabAdapter = new AiRequestTabAdapter();
+    const adaptedAiRequest = aiRequestTabAdapter.adapt(
+      workspaceId || "",
+      collection?.id || "",
+      folder?.id || "",
+      aiRequest,
+    );
+    adaptedAiRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
+    this.tabRepository.createTab(adaptedAiRequest);
+    moveNavigation("right");
+  };
+
+  /**
    * Handles opening a socket io on a tab
    * @param _workspaceId  Workspace id of which tab belongs to.
    * @param _collection  Collection of which tab belongs to.
@@ -3135,6 +3577,149 @@ export default class CollectionsViewModel {
           MixpanelEvent(Events.RENAME_REQUEST, {
             source: "Collection list",
           });
+        }
+      }
+    }
+  };
+
+  /**
+   * Handles renaming a AI request
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which the request is saved
+   * @param folder : - the folder in which the request is saved(if AI request if saved inside a folder)
+   * @param request : - the AI request which is going to be renamed
+   * @param newRequestName : - the new name of the request
+   */
+  private handleRenameAiRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    folder: CollectionItemsDto,
+    aiRequest: CollectionItemsDto,
+    newRequestName: string,
+  ) => {
+    let userSource = {};
+    if (aiRequest.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (collection.id && workspaceId && !folder.id) {
+        const response =
+          await this.collectionRepository.readRequestOrFolderInCollection(
+            collection.id,
+            aiRequest.id,
+          );
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
+        await this.collectionRepository.updateRequestOrFolderInCollection(
+          collection.id,
+          aiRequest.id,
+          { name: newRequestName },
+        );
+        this.updateTab(aiRequest.id, {
+          name: newRequestName,
+        });
+        // MixpanelEvent(Events.RENAME_REQUEST, {
+        //   source: "Collection list",
+        // });
+      } else if (collection.id && workspaceId && folder.id) {
+        const response = await this.collectionRepository.readRequestInFolder(
+          collection.id,
+          folder.id,
+          aiRequest.id,
+        );
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        response.updatedAt = new Date().toISOString();
+        await this.collectionRepository.updateRequestInFolder(
+          collection.id,
+          folder.id,
+          aiRequest.id,
+          { name: newRequestName },
+        );
+        this.updateTab(aiRequest.id, {
+          name: newRequestName,
+        });
+        // MixpanelEvent(Events.RENAME_REQUEST, {
+        //   source: "Collection list",
+        // });
+      }
+      return;
+    }
+
+    if (newRequestName) {
+      if (collection.id && workspaceId && !folder.id) {
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
+        const response =
+          await this.collectionService.updateAiRequestInCollection(
+            aiRequest.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              ...userSource,
+              items: storage,
+            },
+            baseUrl,
+          );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestOrFolderInCollection(
+            collection.id,
+            aiRequest.id,
+            response.data.data,
+          );
+          this.updateTab(aiRequest.id, {
+            name: newRequestName,
+          });
+          // MixpanelEvent(Events.RENAME_REQUEST, {
+          //   source: "Collection list",
+          // });
+        }
+      } else if (collection.id && workspaceId && folder.id) {
+        const storage = aiRequest;
+        storage.name = newRequestName;
+        const baseUrl = await this.constructBaseUrl(workspaceId);
+        const response =
+          await this.collectionService.updateAiRequestInCollection(
+            aiRequest.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              ...userSource,
+              folderId: folder.id,
+              items: {
+                name: folder.name,
+                id: folder.id,
+                type: ItemType.FOLDER,
+                items: storage,
+              },
+            },
+            baseUrl,
+          );
+        if (response.isSuccessful) {
+          this.collectionRepository.updateRequestInFolder(
+            collection.id,
+            folder.id,
+            aiRequest.id,
+            response.data.data,
+          );
+          this.updateTab(aiRequest.id, {
+            name: newRequestName,
+          });
+          // MixpanelEvent(Events.RENAME_REQUEST, {
+          //   source: "Collection list",
+          // });
         }
       }
     }
@@ -4152,6 +4737,102 @@ export default class CollectionsViewModel {
   /**
    * Handle deleting request from repository as well as backend
    * @param workspaceId :string
+   * @param collection :CollectionDocument - The collection in which the AI Request is saved
+   * @param aiRequest : - The AI Request to be deleted
+   * @param folder : - The folder in which the AI Request is saved(if is saved in a folder)
+   * @returns :void
+   */
+  private handleDeleteAiRequest = async (
+    workspaceId: string,
+    collection: CollectionDto,
+    aiRequest: CollectionItemsDto,
+    folder: CollectionItemsDto,
+  ): Promise<boolean> => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    let aiRequestObject = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      folderId: "",
+      ...userSource,
+    };
+
+    if (folder && collection.id && workspaceId) {
+      aiRequestObject = {
+        ...aiRequestObject,
+        folderId: folder.id,
+      };
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      if (folder) {
+        await this.collectionRepository.deleteRequestInFolder(
+          collection.id,
+          folder.id,
+          aiRequest.id,
+        );
+        this.handleRemoveTab(aiRequest.id);
+      } else {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          collection.id,
+          aiRequest.id,
+        );
+        this.handleRemoveTab(aiRequest.id);
+      }
+
+      return true;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.deleteAiRequestInCollection(
+      aiRequest.id,
+      aiRequestObject,
+      baseUrl,
+    );
+
+    if (response.isSuccessful) {
+      if (
+        aiRequestObject.folderId &&
+        aiRequestObject.collectionId &&
+        aiRequestObject.workspaceId
+      ) {
+        await this.collectionRepository.deleteRequestInFolder(
+          aiRequestObject.collectionId,
+          aiRequestObject.folderId,
+          aiRequest.id,
+        );
+      } else if (aiRequestObject.workspaceId && aiRequestObject.collectionId) {
+        await this.collectionRepository.deleteRequestOrFolderInCollection(
+          aiRequestObject.collectionId,
+          aiRequest.id,
+        );
+      }
+
+      // Deleting the main tab no child exists
+      this.handleRemoveTab(aiRequest.id);
+
+      notifications.success(`"${aiRequest.name}" AI request deleted.`);
+      // MixpanelEvent(Events.DELETE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return true;
+    } else {
+      notifications.error("Failed to delete AI request. Please try again.");
+      return false;
+    }
+  };
+
+  /**
+   * Handle deleting request from repository as well as backend
+   * @param workspaceId :string
    * @param collection :CollectionDocument - The collection in which the request is saved
    * @param request : - The request to be deleted
    * @param folder : - The folder in which the request is saved(if is saved in a folder)
@@ -5096,8 +5777,21 @@ export default class CollectionsViewModel {
           args.folder as CollectionItemsDto,
         );
         break;
-      case "Ai-Request-Tab":
+      case "aiRequest":
         await this.createAiRequestNewTab();
+        break;
+      case "aiRequestCollection":
+        await this.handleCreateAiRequestInCollection(
+          args.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "aiRequestFolder":
+        await this.handleCreateAiRequestInFolder(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+        );
         break;
     }
     return response;
@@ -5133,6 +5827,14 @@ export default class CollectionsViewModel {
           args.workspaceId,
           args.collection as CollectionDto,
           args.request as CollectionItemsDto,
+          args.folder as CollectionItemsDto,
+        );
+        break;
+      case "aiRequest":
+        this.handleDeleteAiRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.aiRequest as CollectionItemsDto,
           args.folder as CollectionItemsDto,
         );
         break;
@@ -5212,6 +5914,15 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+          args.newName as string,
+        );
+        break;
+      case "aiRequest":
+        this.handleRenameAiRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.aiRequest as CollectionItemsDto,
           args.newName as string,
         );
         break;
@@ -5306,6 +6017,14 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
           args.request as CollectionItemsDto,
+        );
+        break;
+      case "aiRequest":
+        this.handleOpenAiRequest(
+          args.workspaceId,
+          args.collection as CollectionDto,
+          args.folder as CollectionItemsDto,
+          args.aiRequest as CollectionItemsDto,
         );
         break;
       case "saved_request":

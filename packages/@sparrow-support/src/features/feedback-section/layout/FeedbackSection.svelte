@@ -506,7 +506,12 @@
             class="sort-buttons d-flex align-items-center justify-content-between w-100"
             class:active={currentSort === "trending"}
           >
-            <div><span class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130">Trending</span></div>
+            <div>
+              <span
+                class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130"
+                >Trending</span
+              >
+            </div>
             {#if currentSort === "trending"}
               <div class="d-flex align-items-center">
                 <TickIcon
@@ -539,7 +544,10 @@
             class="sort-buttons d-flex align-items-center justify-content-between w-100 mt-1"
             class:active={currentSort === "newest"}
           >
-            <span class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130">New</span>
+            <span
+              class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130"
+              >New</span
+            >
             {#if currentSort === "newest"}
               <div class="d-flex align-items-center">
                 <TickIcon
@@ -572,7 +580,10 @@
             class="sort-buttons d-flex align-items-center justify-content-between w-100 mt-2"
             class:active={currentSort === "score"}
           >
-            <span class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130">Top</span>
+            <span
+              class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-130"
+              >Top</span
+            >
             {#if currentSort === "score"}
               <div class="d-flex align-items-center">
                 <TickIcon
@@ -617,7 +628,7 @@
                   >
                     <Tag
                       type={getColor(post?.status)}
-                      text={post?.status || "" }
+                      text={post?.status || ""}
                     />
                   </div>
                 </div>

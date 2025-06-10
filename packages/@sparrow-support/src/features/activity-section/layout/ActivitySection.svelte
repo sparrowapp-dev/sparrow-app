@@ -392,7 +392,7 @@
         <div
           style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50vh;"
         >
-          <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+          <Loader loaderSize={"20px"} loaderMessage="Loading..." />
         </div>
       {:else if searchTerm && filteredPosts.length === 0 && filteredComments.length === 0 && filteredLikedPosts.length === 0}
         <div
@@ -779,9 +779,13 @@
     color: var(--text-secondary-100);
   }
   .title:hover {
-    text-decoration: underline;
     cursor: pointer;
+    color: var(--text-ds-primary-300);
+  }
+
+  .title:active {
     color: var(--text-primary-300);
+    text-decoration: underline;
   }
 
   #search-input {

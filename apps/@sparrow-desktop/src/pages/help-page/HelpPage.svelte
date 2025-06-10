@@ -344,6 +344,6 @@
     bottom: -2px;
     width: 100%;
     height: 2px;
-    border-bottom: 4px solid var(--border-primary-300);
+    border-bottom: 2px solid var(--border-primary-300);
   }
 </style>

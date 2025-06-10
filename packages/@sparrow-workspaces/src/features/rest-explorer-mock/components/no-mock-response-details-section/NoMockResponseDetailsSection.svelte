@@ -2,6 +2,8 @@
   import { SparrowLogo } from "@sparrow/common/images";
   import { Button } from "@sparrow/library/ui";
   import { AddRegular } from "@sparrow/library/icons";
+
+  export let onCreateMockResponse;
 </script>
 
 <div
@@ -20,7 +22,7 @@
     title="Add Mock Response"
     size="small"
     type="outline-secondary"
-    onClick={() => {}}
+    onClick={onCreateMockResponse}
     startIcon={AddRegular}
   />
 </div>

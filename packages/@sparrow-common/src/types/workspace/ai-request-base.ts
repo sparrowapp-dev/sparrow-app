@@ -149,7 +149,7 @@ export type AiConfigurations = {
 ///////////////////////////////////////////////////////////////
 //              AI Request Base Interface
 ///////////////////////////////////////////////////////////////
-export interface HttpRequestBaseInterface {
+export interface AiRequestBaseInterface {
     aiModelProvider: AiModelProviderEnum;
     aiModelVariant: AIModelVariant;
     selectedAuthType: AiRequestAuthBaseInterface;
