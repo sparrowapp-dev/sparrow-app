@@ -95,7 +95,7 @@ jobs:
           version: 'latest'    
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.5
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.6
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -107,10 +107,11 @@ jobs:
       - name: sign msi
         run: |
           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          $bundlePath = "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
+        shell: pwsh
 
       - name: AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -229,7 +230,7 @@ jobs:
           version: 'latest'
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.5
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.6
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -239,7 +240,7 @@ jobs:
           platforms: 'macos'
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.5
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.6
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
