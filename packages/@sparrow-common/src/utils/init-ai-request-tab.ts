@@ -86,7 +86,7 @@ class InitAiRequestTab {
                         conversationId: "",
                         lastActiveChatBackup: [],
                         isoldChatPreviewActive: false,
-                        conversationTitle: "Conversation 1",
+                        conversationTitle: "New Conversation",
                     },
                     state: {
                         aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,

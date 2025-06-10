@@ -141,14 +141,6 @@ class AiRequestExplorerViewModel {
     return response;
   };
 
-  // public getFormattedTime = (): string => {
-  //   const date = new Date();
-  //   const hours = date.getHours();
-  //   const minutes = date.getMinutes();
-  //   const ampm = hours >= 12 ? 'PM' : 'AM';
-  //   const formattedHours = hours % 12 || 12;
-  //   return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-  // }
 
   public getFormattedTime = () => {
     const now = new Date();
@@ -159,8 +151,6 @@ class AiRequestExplorerViewModel {
     const formattedMinutes = minutes.toString().padStart(2, '0');
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
-
-
   public getLocalDate = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -772,7 +762,7 @@ class AiRequestExplorerViewModel {
    * Updates the AI conversations in the request property of the current tab.
    *
    * @param _conversations - The new AI conversations to set.
-   * @returns  A promise that resolves when the update is complete.
+   * @returns  A promise that resolves when the update is complete. 
    */
   public updateRequestAIConversation = async (
     _conversations: Conversation[],
@@ -783,8 +773,21 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
+  public handleClearConversation = async () => {
+    this.updateRequestState({ isChatbotConversationLoading: true });
+    await this.updateRequestAIConversation([]);
+    this.updateRequestState({ isChatbotConversationLoading: false });
+    notifications.success("Chat cleared successfully.")
+  }
+
+  public handleStartNewConversation = async () => {
+    this.updateRequestState({ isChatbotConversationLoading: true });
+    await this.switchConversation("", "New Conversation", []);
+    this.updateRequestState({ isChatbotConversationLoading: false });
+    notifications.success("Chat cleared successfully.")
+  }
+
   public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversation: Conversation[]) => {
-    console.log("In switchConversation() :>> ");
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
@@ -808,8 +811,6 @@ class AiRequestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-
-    // this.compareRequestWithServer();
   };
 
   /**
@@ -824,7 +825,6 @@ class AiRequestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    // this.compareRequestWithServer();
   };
 
   // AI WebSocket - Start
