@@ -95,7 +95,7 @@ jobs:
           version: 'latest'    
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.7
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -230,7 +230,7 @@ jobs:
           version: 'latest'
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.7
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
@@ -240,7 +240,7 @@ jobs:
           platforms: 'macos'
 
       - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.7
+        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
         with:
           tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
           kubernetes-config: ${{ secrets.KUBE_CONFIG }}
