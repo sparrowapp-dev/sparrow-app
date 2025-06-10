@@ -2409,9 +2409,7 @@ class RestExplorerViewModel {
   public generateAIResponseWS = async (prompt = "") => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-
-    console.log("This is component data ", componentData);
-
+    
     let workspaceId = componentData.path.workspaceId;
 
     let workspaceVal = await this.readWorkspace(workspaceId);
