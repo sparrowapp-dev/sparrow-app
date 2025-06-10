@@ -285,7 +285,7 @@
               isReplying = !isReplying;
               MixpanelEvent(Events.Reply_Comment);
             }}
-            style=",argin: 0px; color: {isReplying
+            style="margin: 0px; color: {isReplying
               ? 'white'
               : 'grey'}; text-decoration: {isReplying ? 'underline' : 'none'};"
           >
