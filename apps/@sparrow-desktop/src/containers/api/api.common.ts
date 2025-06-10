@@ -1086,7 +1086,6 @@ const makeGraphQLRequest = async (
     };
     appInsights.trackDependencyData(appInsightData);
   } catch (err) {
-    debugger;
     const endTime = performance.now();
     const duration = endTime - startTime;
     appInsights.trackDependencyData({
