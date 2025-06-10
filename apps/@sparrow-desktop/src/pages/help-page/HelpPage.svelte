@@ -12,6 +12,7 @@
     DocumentTextRegular,
     GroupIcon,
     MailInboxArrowDownRegular,
+    MapRegular,
     PeopleTeamRegular,
     RoadmapIcon,
     UpdateIcon,
@@ -153,7 +154,8 @@
                 MixpanelEvent(Events.Roadmap_Tab);
               }}
             >
-              <RoadmapIcon
+              <MapRegular
+                size={"18px"}
                 color={activeTab === "roadmap"
                   ? "var(--text-secondary-100)"
                   : "var(--text-primary-250)"}
@@ -171,8 +173,9 @@
               }}
             >
               <DocumentTextRegular
+                size={"18px"}
                 color={activeTab === "feedback"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               Feedback
@@ -188,8 +191,9 @@
               }}
             >
               <MailInboxArrowDownRegular
+                size={"18px"}
                 color={activeTab === "updates"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               Updates
@@ -205,8 +209,9 @@
               }}
             >
               <PeopleTeamRegular
+                size={"18px"}
                 color={activeTab === "community"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               Community
@@ -223,8 +228,9 @@
               }}
             >
               <BroadActivityFeedRegular
+                size={"18px"}
                 color={activeTab === "myActivity"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               My Activity
@@ -320,13 +326,15 @@
     display: flex;
     padding: 0 20px;
     cursor: pointer;
-    color: var(--text-primary-250);
+    color: var(--text-ds-neutral-100);
     position: relative;
     justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .tab.active {
-    color: var(--text-secondary-100);
+    color: var(--text-ds-neutral-50);
   }
 
   .tab.active::after {

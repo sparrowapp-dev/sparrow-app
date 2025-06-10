@@ -205,8 +205,16 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">Updates</p>
-      <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
+      <p
+        class="text-ds-font-size-20 fw-semibold mb-2"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        Updates
+      </p>
+      <p
+        class="text-ds-font-size-14"
+        style="color: var(--text-ds-neutral-400); "
+      >
         Check out our latest releases designed to boost your productivity and
         efficiency.
       </p>

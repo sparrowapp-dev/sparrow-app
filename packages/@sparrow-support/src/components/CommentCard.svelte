@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { AttachmentIcon, CrossIcon } from "@sparrow/library/icons";
+  import {
+    AttachmentIcon,
+    AttachRegular,
+    CrossIcon,
+    DismissRegular,
+  } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { CommentCard } from "@sparrow/support/components";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
@@ -202,38 +207,38 @@
 </script>
 
 <div class="comment">
-     <Avatar
-      type={"letter"}
-      size={"large"}
-      letter={comment?.author?.name.charAt(0) || ""}
-      bgColor={"var(--text-secondary-600)"}/>
+  <Avatar
+    type={"letter"}
+    size={"extra-small"}
+    letter={comment?.author?.name.charAt(0) || ""}
+    bgColor={"var(--bg-ds-surface-500)"}
+  />
 
   <div class="comment-content">
-    <div class="comment-author text-fs-14 mt-1">
+    <div class="comment-author text-fs-14">
       {comment.author.name || ""}
-      
+
       {#if comment.value === "" && comment.author?.isAdmin === true}
         <span
           class="text-fs-14"
-          style="marign-start: 4px; color: var(--text-secondary-150); font-weight: 400;"
+          style="margin-start: 4px; color: var(--text-ds-neutral-400); font-weight: 400; display: inline-flex; align-items: center; gap: 4px;"
         >
           has marked this post as
           <Tag
-           type={comment?.status}
+            type={getColor(comment?.status)}
             text={comment?.status
-              ? comment?.status.charAt(0) +
-                comment?.status.slice(1)
+              ? comment?.status.charAt(0) + comment?.status.slice(1)
               : ""}
-            /> 
+          />
         </span>
       {/if}
     </div>
     <div
-      class="text-fs-12"
-      style="font-weight: 400; color:var(--text-secondary-1000);  "
+      class="text-fs-14"
+      style="font-weight: 400; color:var(--text-ds-neutral-200);  "
     >
       {#if comment.value !== ""}
-        <p class="mb-1 pb-0" style="word-break: break-all;">
+        <p class="mb-2 pb-0" style="word-break: break-all;">
           {comment.value}
         </p>
       {/if}
@@ -274,12 +279,13 @@
       <div class="comment-moreinfo">
         <span class="comment-time">{timeAgo(comment.created)}</span>
         {#if !comment.parentID}
+          <span>|</span>
           <p
             on:click={() => {
               isReplying = !isReplying;
               MixpanelEvent(Events.Reply_Comment);
             }}
-            style="color: {isReplying
+            style=",argin: 0px; color: {isReplying
               ? 'white'
               : 'grey'}; text-decoration: {isReplying ? 'underline' : 'none'};"
           >
@@ -297,7 +303,7 @@
         class={`d-flex align-items-start search-input-container  mb-3 mt-1 p-1 px-2`}
         style=" display:felx; flex-direction:column;"
       >
-        <div class="d-flex justify-content-end" style="width: 100%;">
+        <div class="d-flex justify-content-between gap-3" style="width: 100%;">
           <input
             type="text"
             id="reply-input"
@@ -309,15 +315,17 @@
             bind:value={commentValue}
           />
 
-          <div class="d-flex align-items-center gap-2 ms-1">
+          <div class="d-flex align-items-center gap-3">
             <Attachment onFileSelect={handleInputAttachment} {inputId} />
 
             <Button
               title={`Add`}
               type={`primary`}
               loaderSize={13}
+              size={"small"}
+              customWidth={"72px"}
               textStyleProp={"font-size:11px;"}
-              buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
+              buttonStyleProp={`justify-content:center;`}
               loader={isCommenting}
               onClick={() =>
                 handleAddReply(postId, comment, uploadReplyAttachment)}
@@ -328,30 +336,28 @@
 
         <div class="">
           {#if uploadReplyAttachment?.file?.value?.length > 0}
-            <div class="mt-2 file-scroller mb-1 d-flex gap-1 flex-wrap">
+            <div class="mt-2 file-scroller d-flex gap-2 flex-wrap">
               {#each uploadReplyAttachment.file.value as file, index}
                 <div
-                  class="files d-flex align-items-center bg-tertiary-300 mb-1 px-3 py-1 border-radius-4"
+                  class="files d-flex align-items-center mb-1 px-1 py-1 border-radius-4"
                 >
                   <span>
-                    <AttachmentIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"var(--text-secondary-200)"}
+                    <AttachRegular
+                      size={"16px"}
+                      color={"var(--text-ds-neutral-100)"}
                     />
                   </span>
-                  <span class="mb-0 text-fs-12 px-2 ellipsis">{file?.name}</span
+                  <span class="mb-0 text-fs-12 px-2 filename-ellipsis"
+                    >{file?.name}</span
                   >
-                  <span
-                    on:click={() => {
+                  <Button
+                    startIcon={DismissRegular}
+                    size="extra-small"
+                    type="teritiary-regular"
+                    onClick={() => {
                       removeCommentAttachment(index);
                     }}
-                    ><CrossIcon
-                      height={"12px"}
-                      width={"9px"}
-                      color={"var(--text-secondary-200)"}
-                    /></span
-                  >
+                  />
                 </div>
               {/each}
             </div>
@@ -380,9 +386,8 @@
   .comment {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     gap: 10px;
-    padding: 10px;
   }
 
   .comment:hover {
@@ -397,8 +402,9 @@
   }
 
   .comment-author {
-    font-weight: 500;
-    margin-bottom: 4px;
+    margin-top: 2px;
+    margin-bottom: 8px;
+    color: var(--text-ds-neutral-50);
   }
 
   .comment-text {
@@ -412,12 +418,12 @@
     display: flex;
     align-items: center;
     font-size: 12px;
-    color: #8e8e8e;
+    color: var(--text-ds-neutral-400);
   }
 
   .comment-moreinfo {
     display: flex;
-    gap: 15px;
+    gap: 10px;
   }
 
   .reply-input-container {
@@ -436,12 +442,12 @@
   }
 
   .search-input-container {
-    background: var(--bg-secondary-800);
+    background: var(--bg-ds-surface-400);
     width: 100%;
+    border: 1px solid var(--bg-ds-surface-400);
     font-size: 12px;
     position: relative;
-    border: 1px solid var(--border-secondary-310);
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
   .search-input-container:focus-within {
@@ -452,5 +458,20 @@
     outline: none;
     border: none;
     box-shadow: none;
+  }
+
+  .filename-ellipsis {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .files {
+    max-width: 200px;
+    padding: 2px;
+    background-color: var(--bg-ds-surface-200);
+    cursor: default;
   }
 </style>
