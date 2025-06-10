@@ -2,7 +2,11 @@
   import { user } from "@app/store/auth.store";
   import {
     CommentIcon,
+    CommentRegular,
     CrossIcon,
+    DiversityRegular,
+    FilterRegular,
+    HourGlassRegular,
     SortIcon,
     TickIcon,
   } from "@sparrow/library/icons";
@@ -19,6 +23,7 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Search } from "@sparrow/library/forms";
+  import { SparrowLogo } from "@sparrow/common/images";
 
   /**
    * @description - Callback for inputting feedback.
@@ -328,11 +333,11 @@
   {#if !isPostopen}
     <div
       class="d-flex"
-      style=" margin-top:38px; justify-content: space-between;"
+      style=" margin-top:20px; justify-content: space-between;"
     >
       <div>
         <div
-          class={`d-flex align-items-center rounded py-1 px-2 mb-2`}
+          class={`d-flex align-items-center rounded mb-2`}
           on:click={() => {
             MixpanelEvent(Events.Feedback_Search);
           }}
@@ -341,7 +346,6 @@
             variant="primary"
             size="small"
             id="search-input"
-            customWidth={"300px"}
             placeholder="Search updates"
             bind:value={searchTerm}
             on:input={() => {
@@ -372,7 +376,8 @@
                 id: FeedbackType.ALL_CATEGORY,
               },
             ]}
-            icon={CategoryIcon}
+            icon={DiversityRegular}
+            iconColor={"var(--icon-primary-300)"}
             onclick={(id = "") => {
               feedbackType = id;
               handleCategoryChange(id);
@@ -385,7 +390,7 @@
             borderActiveType={"none"}
             borderHighlight={"hover-active"}
             headerHighlight={"hover-active"}
-            headerHeight={"26px"}
+            headerHeight={"28px"}
             minBodyWidth={"150px"}
             minHeaderWidth={"150px"}
             maxHeaderWidth={"200px"}
@@ -397,6 +402,7 @@
             headerFontSize={"12px"}
             isDropIconFilled={true}
             position={"absolute"}
+            variant={"secondary"}
           />
         </div>
         <div>
@@ -437,12 +443,13 @@
             zIndex={499}
             disabled={false}
             iconRequired={true}
-            icon={StatusIcon}
+            icon={HourGlassRegular}
+            iconColor={"var(--icon-primary-300)"}
             borderType={"none"}
             borderActiveType={"none"}
             borderHighlight={"hover-active"}
             headerHighlight={"hover-active"}
-            headerHeight={"26px"}
+            headerHeight={"28px"}
             minBodyWidth={"150px"}
             minHeaderWidth={"150px"}
             maxHeaderWidth={"200px"}
@@ -454,6 +461,7 @@
             isDropIconFilled={true}
             position={"absolute"}
             maxBodyHeight={"205px"}
+            variant={"secondary"}
           />
         </div>
       </div>
@@ -461,20 +469,20 @@
 
     <div
       class="d-flex gap-5 justify-content-between"
-      style="  margin-top:51px; "
+      style="  margin-top:24px; "
     >
       <div style="width:129px;  ">
-        <div>
-          <SortIcon width={"12px"} height={"8px"} />
+        <div class="d-flex align-items-center ps-1">
+          <FilterRegular />
           <span
-            class="text-ds-font-size-14"
-            style="padding-left: 8px; padding-top:4px ; font-weight:500;"
+            class="text-ds-font-size-12"
+            style="padding-left: 8px; font-weight:500;"
           >
             Sort By</span
           >
         </div>
         <div
-          class="d-flex flex-column"
+          class="d-flex flex-column ps-1"
           style="align-items: baseline; gap:10px; margin-top:13px; "
         >
           <button
@@ -509,7 +517,7 @@
                 <TickIcon
                   height={"12px"}
                   width={"12px"}
-                  color={"var(--icon-primary-300)"}
+                  color={"var(--icon-ds-primary-300)"}
                 />
               </div>
             {/if}
@@ -533,7 +541,7 @@
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex align-items-center justify-content-between w-100"
+            class="sort-buttons d-flex align-items-center justify-content-between w-100 mt-1"
             class:active={currentSort === "newest"}
           >
             <span
@@ -569,7 +577,7 @@
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex align-items-center justify-content-between w-100"
+            class="sort-buttons d-flex align-items-center justify-content-between w-100 mt-2"
             class:active={currentSort === "score"}
           >
             <span
@@ -591,20 +599,21 @@
 
       {#if isLoading}
         <div style="" class="w-100">
-          <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+          <Loader loaderSize={"20px"} loaderMessage="Loading..." />
         </div>
       {:else if posts?.length > 0}
         <div class="posts d-flex flex-column w-100" style="gap:26px; ">
           {#each posts as post}
             <div
-              style="display: flex; flex-direction: column; background-color: #151515; padding: 20px;border-radius:2px;"
+              class="py-3"
+              style="display: flex; flex-direction: column; background-color: var(--bg-ds-surface-700); padding: 15px; border-radius:6px;"
             >
               <div
                 style="display: flex; justify-content: space-between; align-items: flex-start;"
               >
                 <div style="flex: 1;">
                   <div
-                    class="title text-ds-font-size-18 text-ds-font-weight-medium"
+                    class="title text-ds-font-size-16 text-ds-font-weight-semi-bold"
                     on:click={async () => {
                       postId = post?.id;
                       isPostopen = true;
@@ -643,35 +652,50 @@
               <div style="margin-top: 10px; flex: 1;">
                 <p
                   class="text-ds-font-size-14"
-                  style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
+                  style="color: var(--text-ds-neutral-200); margin: 0;"
                 >
                   {post?.details}
                 </p>
               </div>
 
               <div
+                class="ps-1"
                 style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
               >
                 <span>
-                  <CommentIcon
-                    width={"15px"}
-                    height={"13.95px"}
-                    color={"var(--icon-secondary-950)"}
-                  />
+                  <CommentRegular size={"15px"} />
                 </span>
                 <span style="font-size: 13px;">{post?.commentCount}</span>
               </div>
             </div>
           {/each}
         </div>
-      {:else}
+      {:else if searchTerm && posts?.length < 0}
         <div class="w-100">
           <p
-            class="text-ds-font-size-12 mb-0 text-center"
-            style="  margin-top:45px; font-weight:500;color: var(--text-secondary-550); letter-spacing: 0.5px;"
+            class="text-ds-font-size-14 mb-0 text-center"
+            style="  margin-top: 24px; color: var(--text-ds-neutral-400); letter-spacing: 0.5px;"
           >
             No result found.
           </p>
+        </div>
+      {:else}
+        <div
+          class="h-100 w-100 d-flex justify-content-center align-items-center"
+          style="flex: 1; min-height: calc(100vh - 400px);"
+        >
+          <div
+            class="d-flex"
+            style="flex-direction:column; align-items: center;"
+          >
+            <SparrowLogo />
+            <p
+              class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-4"
+              style="color: var(--text-ds-neutral-400);"
+            >
+              Currently, there are no posts.
+            </p>
+          </div>
         </div>
       {/if}
     </div>
@@ -722,13 +746,17 @@
     box-shadow: none;
   }
   .title {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: var(--text-secondary-100);
   }
   .title:hover {
-    text-decoration: underline;
+    color: var(--text-ds-primary-300);
     cursor: pointer;
+  }
+
+  .title:active {
     color: var(--text-primary-300);
+    text-decoration: underline;
   }
 
   .category {
@@ -739,7 +767,7 @@
     line-height: 16px;
   }
   .sort-buttons {
-    color: var(--text-secondary-550) !important;
+    color: var(--text-ds-neutral-50) !important;
     background: none !important;
     outline: none !important;
     border: none !important;
@@ -747,11 +775,11 @@
   }
 
   .sort-buttons:hover {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   .sort-buttons:focus-within {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   .tick-icon {
@@ -760,7 +788,7 @@
 
   /* When a button has the 'active' class */
   .sort-buttons.active {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   .sort-buttons.active .tick-icon {

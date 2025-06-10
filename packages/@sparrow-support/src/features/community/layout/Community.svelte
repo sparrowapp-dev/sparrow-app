@@ -8,7 +8,12 @@
 <div style=" padding:20px;">
   <div style="" class="">
     <div>
-      <p class="text-ds-font-size-20 fw-semibold mb-2">Community</p>
+      <p
+        class="text-ds-font-size-20 fw-semibold mb-2"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        Community
+      </p>
       <p
         class="text-ds-font-size-14"
         style="color: var(--text-ds-neutral-400);"
