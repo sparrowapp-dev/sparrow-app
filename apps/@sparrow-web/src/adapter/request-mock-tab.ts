@@ -239,6 +239,7 @@ export class RequestMockTabAdapter {
       _mockRequest.mockRequest?.headers as KeyValueChecked[],
     );
     adaptedRequest.updatePath(path);
+    adaptedRequest.updateItems(_mockRequest.items);
 
     // parsing body type
     const selectedRequestBodyType =
