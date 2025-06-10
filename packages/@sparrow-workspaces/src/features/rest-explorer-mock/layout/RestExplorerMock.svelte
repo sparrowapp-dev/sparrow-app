@@ -131,6 +131,8 @@
   export let onUpdateResponseBody;
   export let onUpdateResponseStatus;
   export let onCreateMockResponse;
+  export let onHandleMockResponseState;
+  export let onRenameMockResponse;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -182,61 +184,7 @@
   let defaultSizePct = 0;
 
   //Multiple Mockresponses
-  let mockResponses = [
-    // {
-    //   id: "1",
-    //   name: "Mock Response 1",
-    //   isActive: true,
-    // },
-    // {
-    //   id: "2",
-    //   name: "Mock Response 2",
-    //   statusCode: 404,
-    //   isActive: false,
-    // },
-    // {
-    //   id: "3",
-    //   name: "Mock Response 3",
-    //   statusCode: 500,
-    //   isActive: false,
-    // },
-    // {
-    //   id: "4",
-    //   name: "Mock Response 4",
-    //   statusCode: 200,
-    //   isActive: true,
-    // },
-    // {
-    //   id: "5",
-    //   name: "Mock Response 5",
-    //   statusCode: 404,
-    //   isActive: false,
-    // },
-    // {
-    //   id: "6",
-    //   name: "Mock Response 6",
-    //   statusCode: 500,
-    //   isActive: false,
-    // },
-    // {
-    //   id: "7",
-    //   name: "Mock Response 7",
-    //   statusCode: 200,
-    //   isActive: true,
-    // },
-    // {
-    //   id: "8",
-    //   name: "Mock Response 8",
-    //   statusCode: 404,
-    //   isActive: false,
-    // },
-    // {
-    //   id: "9",
-    //   name: "Mock Response 9",
-    //   statusCode: 500,
-    //   isActive: false,
-    // },
-  ];
+  let mockResponses = [];
 
   /**
    * Converts the pixel-based min, max, and default sizes
@@ -786,6 +734,8 @@
                         {mockResponses}
                         {isWebApp}
                         {onCreateMockResponse}
+                        {onHandleMockResponseState}
+                        {onRenameMockResponse}
                       />
                     </div>
                     <div
