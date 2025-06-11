@@ -140,23 +140,18 @@
     </div>
   </div>
 
-  <Tooltip
-    title={"Coming Soon"}
-    placement={"left-center"}
-    distance={12}
-    zIndex={10}
-  >
+  <!-- {console.log(" info :>> ", isSave, userRole, WorkspaceRole.WORKSPACE_VIEWER)} -->
+  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <Button
       type="secondary"
       size="medium"
       loader={isSaveLoad}
       startIcon={isSaveLoad ? "" : SaveRegular}
       onClick={handleSaveRequest}
-      disable={true}
-    />
-    <!-- disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
-        : false} -->
+        : false}
+    />
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

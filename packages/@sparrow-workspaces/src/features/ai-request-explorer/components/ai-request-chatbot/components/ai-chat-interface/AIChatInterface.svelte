@@ -367,10 +367,10 @@
                       isActive={isChatAutoClearActive}
                       disabled={false}
                       onChange={async (event) => {
+                        onUpdateRequestState({
+                          isChatAutoClearActive: event?.target.checked,
+                        });
                         if (conversations?.length) {
-                          onUpdateRequestState({
-                            isChatAutoClearActive: event?.target.checked,
-                          });
                           chatContainer.scrollTo({
                             top: 0,
                             behavior: "auto",

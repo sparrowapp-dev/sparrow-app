@@ -20,6 +20,7 @@
     AiRequestSectionEnum,
     type Conversation,
   } from "@sparrow/common/types/workspace/ai-request-tab";
+  import { ModelIdNameMapping } from "@sparrow/common/types/workspace/ai-request-base";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
@@ -33,6 +34,9 @@
     DismissRegular,
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
+  import { Modal } from "@sparrow/library/ui";
+  import { SaveAsCollectionItem } from "../../save-as-request";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -40,7 +44,7 @@
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
   export let onUpdateAiSystemPrompt;
-  export let onSaveRequest;
+  export let onSaveAiRequest;
   export let onOpenCollection;
   export let onUpdateEnvironment;
   export let environmentVariables;
@@ -52,6 +56,12 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let onUpdateAiConfigurations;
+  export let readWorkspace;
+  export let onSave;
+  export let onCreateFolder;
+  export let onCreateCollection;
+  export let onRenameCollection;
+  export let onRenameFolder;
   export let onClearConversation;
 
   // Conversations History Props
@@ -79,10 +89,10 @@
   export let userRole;
   export let storeData: AiRequestExplorerData | undefined;
   export let isWebApp = false;
-  export let onSaveResponse;
   export let collectionAuth;
   export let collection;
   const loading = writable<boolean>(false);
+  let isExposeSaveAsRequest = false;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -131,6 +141,10 @@
   });
   onDestroy(() => {});
 
+  const toggleSaveRequest = (flag: boolean): void => {
+    isExposeSaveAsRequest = flag;
+  };
+
   let isConversationHistoryPanelOpened = false;
   const onOpenConversationHistoryPanel = async () => {
     maxPx += 300;
@@ -167,11 +181,7 @@
 {#if $tab.tabId}
   <div class="d-flex ai-request-explorer-layout h-100">
     <div class="w-100 d-flex flex-column h-100 p-3">
-      <div class="d-flex justify-content-between w-100 p-3 d-none">
-        <RequestName name={$tab.name} {onUpdateRequestName} />
-        <div class="d-flex justify-content-between"></div>
-      </div>
-
+      <!-- HTTP URL Section -->
       <ModelSector
         class=""
         isSaveLoad={$loading}
@@ -180,9 +190,8 @@
         {onUpdateEnvironment}
         {environmentVariables}
         {onUpdateAIModel}
-        toggleSaveRequest={() => {}}
-        {onSaveRequest}
-        {isGuestUser}
+        {toggleSaveRequest}
+        onSaveRequest={onSaveAiRequest}
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
         {onUpdateAiConversation}
@@ -340,6 +349,35 @@
       </div>
     </div>
   </div>
+
+  <Modal
+    title={"Save AI Request"}
+    type={"dark"}
+    width={"55%"}
+    zIndex={10000}
+    isOpen={isExposeSaveAsRequest}
+    handleModalState={(flag = false) => {
+      isExposeSaveAsRequest = flag;
+    }}
+  >
+    <SaveAsCollectionItem
+      onClick={(flag = false) => {
+        isExposeSaveAsRequest = flag;
+      }}
+      requestMethod={TabTypeEnum.AI_REQUEST}
+      requestUrl={ModelIdNameMapping[$tab.property.aiRequest?.aiModelProvider]}
+      requestName={$tab.name}
+      requestDescription={$tab.description}
+      requestPath={$tab.path}
+      collections={$collections}
+      {readWorkspace}
+      {onSave}
+      {onCreateFolder}
+      {onCreateCollection}
+      {onRenameCollection}
+      {onRenameFolder}
+    />
+  </Modal>
 {/if}
 
 <style>

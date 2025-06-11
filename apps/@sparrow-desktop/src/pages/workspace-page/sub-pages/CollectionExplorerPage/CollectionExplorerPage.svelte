@@ -39,6 +39,7 @@
   let collection: CollectionDocument;
 
   let prevTabName = "";
+  let isSharedWorkspace = false;
 
   /**
    * produces delay to update name of a collection.
@@ -104,6 +105,7 @@
       if (activeWorkspaceRxDoc) {
         currentWorkspace = activeWorkspaceRxDoc;
         currentWorkspaceId = activeWorkspaceRxDoc._id;
+        isSharedWorkspace = activeWorkspaceRxDoc.isShared;
         environmentId = activeWorkspaceRxDoc.environmentId as string;
         const clientUserId = getClientUser().id;
         if (clientUserId) {
@@ -211,4 +213,5 @@
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
   onUpdateRunningState={_viewModel.handleMockCollectionState}
   currentWorkspace={currentWorkspace}
+  {isSharedWorkspace}
 />

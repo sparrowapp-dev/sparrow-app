@@ -49,6 +49,7 @@
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
   import MockRequest from "../mock-request/MockRequest.svelte";
+  import AiRequest from "../ai-request/AiRequest.svelte";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -108,6 +109,7 @@
   let isRenaming = false;
   let requestCount: number;
   let mockRequestCount: number = 0;
+  let aiRequestCount: number = 0;
   let graghQlCount: number;
   let webSocketCount: number;
   let socketIoCount: number;
@@ -160,6 +162,9 @@
             requestIds.push(item.id);
           } else if (item.type === CollectionItemTypeBaseEnum.MOCK_REQUEST) {
             mockRequestCount++;
+            requestIds.push(item.id);
+          } else if (item.type === CollectionItemTypeBaseEnum.AI_REQUEST) {
+            aiRequestCount++;
             requestIds.push(item.id);
           }
         });
@@ -413,6 +418,23 @@
             });
           },
           displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+          disabled: false,
+          hidden:
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
+            onItemCreated("aiRequestFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: `Add AI Request`,
           disabled: false,
           hidden:
             !isMockCollection &&
@@ -735,6 +757,24 @@
           {userRole}
           {isSharedWorkspace}
           api={explorer}
+          {onItemRenamed}
+          {onItemDeleted}
+          {onItemOpened}
+          {activeTabPath}
+          {searchData}
+          {activeTabType}
+          {folder}
+          {collection}
+          {activeTabId}
+          {isWebApp}
+        />
+      </div>
+    {:else if explorer.type === CollectionItemTypeBaseEnum.AI_REQUEST}
+      <div style={`cursor: pointer; `}>
+        <AiRequest
+          {userRole}
+          {isSharedWorkspace}
+          aiRequest={explorer}
           {onItemRenamed}
           {onItemDeleted}
           {onItemOpened}
