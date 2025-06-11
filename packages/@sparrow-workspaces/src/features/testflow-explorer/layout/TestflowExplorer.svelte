@@ -136,6 +136,7 @@
   export let upgradePlanModel: boolean = false;
   export let handleRequestOwner: () => void;
   export let handleRedirectToAdminPanel: () => void;
+  export let planUpgradeModalOpen: boolean = false;
   let planContent: any;
 
   const checkRequestExistInNode = (_id: string) => {
@@ -1411,13 +1412,6 @@
     if (userRole) {
       planContent = planInfoByRole(userRole);
     }
-    console.log(
-      "THis is the value of it ---------->",
-      userRole,
-      TeamRole.TEAM_OWNER,
-      userRole === TeamRole.TEAM_OWNER,
-      userRole === (TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN),
-    );
   }
 </script>
 
@@ -1528,6 +1522,7 @@
           {toggleHistoryDetails}
           {toggleHistoryContainer}
           {planLimitTestFlowBlocks}
+          bind:planUpgradeModalOpen
         />
       </div>
     </div>
@@ -1840,6 +1835,26 @@
   planType="Test flow blocks"
   planLimitValue={planLimitTestFlowBlocks}
   currentPlanValue={$nodes.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={planUpgradeModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Run History"
+  planLimitValue={planLimitTestFlowBlocks}
+  currentPlanValue={testflowStore?.history.length}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

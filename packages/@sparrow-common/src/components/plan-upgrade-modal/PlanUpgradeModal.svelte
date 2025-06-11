@@ -26,7 +26,6 @@
     isOpen = false;
   };
 
-  $: console.log("THis is the owner value ------------>", isOwner);
 </script>
 
 <Modal {title} {isOpen} canClose={true} handleModalState={handleCancel}>

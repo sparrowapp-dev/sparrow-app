@@ -12,12 +12,14 @@
   import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { HistoryRegular } from "../../icons";
+  import { onMount } from "svelte";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let testflowStore;
   export let testflowName = "";
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let planLimitTestFlowBlocks;
+  export let planUpgradeModalOpen = false;
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -39,6 +41,9 @@
     }
     return name;
   };
+
+  onMount(()=>{})
+    
 </script>
 
 <div class="position-relative">
@@ -262,11 +267,21 @@
                 {/each}
               {/if}
               {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitTestFlowBlocks}
-                <div class="history-upgrade-box">
-                  <p class="history-upgrade-text">
+                <div
+                  class="history-upgrade-box d-flex flex-row justify-content-center align-items-center"
+                >
+                  <p class="history-upgrade-text" style="margin: 0px;">
                     Upgrade your plan to access the full run history for this
                     test flow.
                   </p>
+                  <Button
+                    type="primary"
+                    title="Upgrade"
+                    size="small"
+                    onClick={() => {
+                      planUpgradeModalOpen = true;
+                    }}
+                  />
                 </div>
               {/if}
             </div>

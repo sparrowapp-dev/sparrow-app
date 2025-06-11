@@ -38,6 +38,7 @@
   let planLimitTestflow: number = 3;
   let currentTestflowCount: number = 1;
   let upgradePlanModel: boolean = false;
+  let planUpgradeModalOpen: boolean = false;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -202,12 +203,15 @@
     if (teamDetails?.teamId) {
       await _viewModel1.requestToUpgradePlan(teamDetails?.teamId);
       upgradePlanModel = false;
+      planUpgradeModalOpen = false;
     }
   };
 
   const handleRedirectAdminPanel = async () => {
     if (teamDetails?.teamId) {
       await _viewModel1.handleRedirectToAdminPanel(teamDetails?.teamId);
+      upgradePlanModel = false;
+      planUpgradeModalOpen = false;
     }
   };
 
@@ -251,6 +255,7 @@
     testflowCount={currentTestflowCount}
     {teamDetails}
     {upgradePlanModel}
+    {planUpgradeModalOpen}
     handleRedirectToAdminPanel={handleRedirectAdminPanel}
     {handleRequestOwner}
   />
