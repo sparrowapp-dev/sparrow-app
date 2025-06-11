@@ -3099,6 +3099,32 @@ class RestExplorerMockViewModel {
           baseUrl,
         );
       if (response?.isSuccessful) {
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.updateSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+            { name: name },
+          );
+        } else {
+          this.collectionRepository.updateSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+            { name: name },
+          );
+        }
+        progressiveTab.property?.mockRequest?.items?.forEach((item) => {
+          if (item.id === mockResponseId) {
+            item.name = name;
+          }
+        });
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
         return true;
       } else {
         return false;
