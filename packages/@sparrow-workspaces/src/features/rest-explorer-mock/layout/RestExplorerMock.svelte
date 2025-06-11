@@ -193,10 +193,6 @@
   $: selectedResponse =
     $tab.property?.mockRequest?.items?.[activeMockResponseIdx];
 
-  $: {
-    console.log("selectedResponse", selectedResponse);
-  }
-
   /**
    * Converts the pixel-based min, max, and default sizes
    * of the chatbot pane into percentages relative to the
