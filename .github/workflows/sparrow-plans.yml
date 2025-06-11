@@ -3,8 +3,7 @@ name: Development release
 on:
   push:
     branches:
-      - development
-      - design-system
+      - feat/sparrow-plans
   workflow_dispatch:
 
 env:
