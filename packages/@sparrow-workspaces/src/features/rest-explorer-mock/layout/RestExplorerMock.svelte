@@ -794,10 +794,11 @@
                                 <ResponseNavigator
                                   requestStateSection={selectedResponse?.state
                                     ?.responseNavigation}
-                                  {onUpdateRequestState}
+                                  {onUpdateResponseState}
                                   responseHeadersLength={selectedResponse
                                     ?.mockRequestResponse?.responseHeaders
                                     ?.length || 0}
+                                  selectedResponseId={selectedResponse?.id}
                                 />
                                 <Select
                                   data={HttpStatusCodes}
@@ -866,7 +867,7 @@
                                       responseId={selectedResponse.id}
                                     />
                                   </div>
-                                {:else if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
+                                {:else if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
                                   <div style="overflow:auto;">
                                     <ResponseHeaders
                                       responseHeader={selectedResponse

@@ -966,7 +966,7 @@ class RestExplorerMockViewModel {
     _state: StatePartial,
     responseId: string,
   ) => {
-    if (_state?.responseBodyLanguage) {
+    if (_state?.responseBodyLanguage || _state?.responseNavigation) {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       // progressiveTab.property.mockRequest.state = {
       //   ...progressiveTab.property.mockRequest.state,
