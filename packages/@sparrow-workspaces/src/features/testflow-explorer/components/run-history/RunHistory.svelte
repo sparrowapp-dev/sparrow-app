@@ -41,12 +41,6 @@
     }
     return name;
   };
-
-  onMount(() => {
-    if (testflowStore?.history.length === planLimitTestFlowBlocks) {
-      planUpgradeModalOpen = true;
-    }
-  });
 </script>
 
 <div class="position-relative">
