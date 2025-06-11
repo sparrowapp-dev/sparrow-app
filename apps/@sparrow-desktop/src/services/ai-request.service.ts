@@ -20,7 +20,7 @@ export class AiRequestService {
     public fetchConversationsByApiKey = async (aiProvider: AiModelProviderEnum, providerKey: string, conversationId: string = "") => {
         const response = await makeRequest(
             "GET",
-            `${this.apiUrl}/api/assistant/get-conversation?provider=${aiProvider}&apiKey=${providerKey}${conversationId ? `&id=${conversationId}` : ""
+            `${this.apiUrl}/api/conversation/get-conversation?provider=${aiProvider}&apiKey=${providerKey}${conversationId ? `&id=${conversationId}` : ""
             }`,
             { headers: getAuthHeaders() },
         );
@@ -29,7 +29,7 @@ export class AiRequestService {
     };
 
     public addNewConversation = async (payload) => {
-        const response = await makeRequest("POST", `${this.apiUrl}/api/assistant/insert-conversation`, {
+        const response = await makeRequest("POST", `${this.apiUrl}/api/conversation/insert-conversation`, {
             headers: getAuthHeaders(),
             body: payload,
         });
@@ -38,7 +38,7 @@ export class AiRequestService {
 
 
     public updateConversation = async (payload) => {
-        const response = await makeRequest("POST", `${this.apiUrl}/api/assistant/update-conversation`, {
+        const response = await makeRequest("PUT", `${this.apiUrl}/api/conversation/update-conversation`, {
             headers: getAuthHeaders(),
             body: payload,
         });
@@ -48,7 +48,7 @@ export class AiRequestService {
     public deleteConversation = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, conversationId: string) => {
         const response = await makeRequest(
             "DELETE",
-            `${this.apiUrl}/api/assistant/delete-conversation?provider=${aiProvider}&apiKey=${providerAuthKey}&id=${conversationId}`,
+            `${this.apiUrl}/api/conversation/delete-conversation?provider=${aiProvider}&apiKey=${providerAuthKey}&id=${conversationId}`,
             { headers: getAuthHeaders() }
         );
 
