@@ -94,15 +94,15 @@ jobs:
         with:
           version: 'latest'    
 
-      - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-        with:
-          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-          kubernetes-namespace: 'sparrow-dev'
-          secret-name: 'sparrow-api-secret'
-          secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
-          platforms: 'windows'
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
+      #     platforms: 'windows'
 
       - name: sign msi
         run: |
@@ -229,25 +229,25 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-        with:
-          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-          kubernetes-namespace: 'sparrow-dev'
-          secret-name: 'sparrow-api-secret'
-          secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
-          platforms: 'macos'
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
+      #     platforms: 'macos'
 
-      - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-        with:
-          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-          kubernetes-namespace: 'sparrow-dev'
-          secret-name: 'sparrow-api-secret'
-          secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
-          platforms: 'macos'
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
+      #     platforms: 'macos'
 
       - name: Install AWS CLI
         run: |
