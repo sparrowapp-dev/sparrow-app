@@ -22,6 +22,7 @@
   export let onCreateMockResponse;
   export let onHandleMockResponseState;
   export let onRenameMockResponse;
+  export let onDeleteMockResponse;
 
   let inputField: HTMLInputElement;
   let responseTabElements: HTMLElement[] = [];
@@ -337,11 +338,13 @@
       loaderSize={18}
       type={"danger"}
       loader={deleteLoader}
-      onClick={() => {
+      onClick={async () => {
+        if (!responseToDelete) return;
         deleteLoader = true;
-        //on delete mock response functioncall
+        await onDeleteMockResponse(responseToDelete.id);
         deleteLoader = false;
         isDeletePopup = false;
+        responseToDelete = null;
       }}
     />
   </div>

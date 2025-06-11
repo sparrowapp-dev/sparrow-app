@@ -133,6 +133,7 @@
   export let onCreateMockResponse;
   export let onHandleMockResponseState;
   export let onRenameMockResponse;
+  export let onDeleteMockResponse;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -737,6 +738,7 @@
                         {onCreateMockResponse}
                         {onHandleMockResponseState}
                         {onRenameMockResponse}
+                        {onDeleteMockResponse}
                       />
                     </div>
                     <div

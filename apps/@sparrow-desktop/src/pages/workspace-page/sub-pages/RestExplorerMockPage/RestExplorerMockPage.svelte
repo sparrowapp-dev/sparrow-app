@@ -220,4 +220,5 @@
   onCreateMockResponse={_viewModel.handleCreateMockResponse}
   onHandleMockResponseState={_viewModel.handleMockResponseState}
   onRenameMockResponse={_viewModel.handleRenameMockResponse}
+  onDeleteMockResponse={_viewModel.handleDeleteMockResponse}
 />

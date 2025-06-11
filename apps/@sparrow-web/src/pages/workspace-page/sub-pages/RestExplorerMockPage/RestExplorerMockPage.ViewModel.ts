@@ -3005,7 +3005,7 @@ class RestExplorerMockViewModel {
       return "";
     }
   };
-  
+
   /**
    * Handle state of mock response in a collection
   */
@@ -3074,6 +3074,42 @@ class RestExplorerMockViewModel {
       }
     } catch (error) {
       console.error("Error renaming mock response:", error);
+      return false;
+    }
+  };
+  /**
+* Handle delete mock response in a collection (API only, no local update)
+*/
+  public handleDeleteMockResponse = async (
+    mockResponseId: string
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+
+    const deletePayload = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      folderId: progressiveTab.path.folderId || "",
+      mockRequestId: progressiveTab.id,
+      mockResponseId: mockResponseId,
+    };
+
+    try {
+      const response = await this.collectionService.deleteMockResponseInCollection(
+        mockResponseId,
+        deletePayload,
+        baseUrl
+      );
+      if (response?.isSuccessful) {
+        notifications.success("Mock response deleted successfully.");
+        return true;
+      } else {
+        notifications.error(response?.message || "Failed to delete mock response.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error deleting mock response:", error);
+      notifications.error("An error occurred while deleting mock response.");
       return false;
     }
   };
