@@ -25,7 +25,8 @@
 
   let inputField: HTMLInputElement;
   let responseTabElements: HTMLElement[] = [];
-  let activeResponseIdx: number = null;
+  export let activeResponseIdx = 0;
+  export let onSetActiveResponseIdx;
   let showMenu: boolean = false;
   let newResponseName: string = "";
   let noOfColumns = 180;
@@ -40,7 +41,7 @@
   };
 
   const onRenameBlur = async () => {
-    if (newResponseName && activeResponseIdx !== null) {
+    if (newResponseName) {
       const response = mockResponses[activeResponseIdx];
       await onRenameMockResponse(response.id, newResponseName);
       isRenaming = false;
@@ -67,7 +68,6 @@
     const activeEl = responseTabElements[activeResponseIdx];
     if (activeEl && !activeEl.contains(e.target as Node)) {
       showMenu = false;
-      activeResponseIdx = null;
     }
   }
 
@@ -187,13 +187,17 @@
       <div
         tabindex="0"
         bind:this={responseTabElements[idx]}
-        class="d-flex align-items-center justify-content-between my-button btn-primary"
+        class="d-flex align-items-center justify-content-between my-button btn-primary {activeResponseIdx ===
+        idx
+          ? 'selected-response'
+          : ''}"
         style={`height:32px; padding-left:3px; gap:4px; margin-bottom: 8px;"`}
       >
         <button
           tabindex="-1"
           on:contextmenu|preventDefault={(e) => rightClickContextMenu(e, idx)}
-          on:click|preventDefault={() => {}}
+          on:click|preventDefault={() =>
+            onSetActiveResponseIdx({ activeResponseIdx: idx })}
           class="main-file d-flex align-items-center position-relative bg-transparent border-0"
         >
           <Tooltip
@@ -348,6 +352,11 @@
 </Modal>
 
 <style>
+  .selected-response {
+    background-color: var(--bg-ds-surface-400) !important;
+    color: var(--text-ds-neutral-50) !important;
+    border-radius: 4px !important;
+  }
   .add-icon-container {
     background-color: var(--bg-ds-surface-400);
     border-radius: 4px;
@@ -424,11 +433,6 @@
   }
   .btn-primary:focus-visible .threedot-icon-container {
     visibility: visible;
-  }
-  .navbar {
-    width: 180px;
-    height: auto;
-    overflow: hidden;
   }
 
   .renameInputFieldFile {
