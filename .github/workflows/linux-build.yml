@@ -120,12 +120,19 @@ jobs:
       - name: Install project dependencies
         run: yarn
 
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
       - name: Build Tauri app
         run: |
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn workspace @sparrow/desktop tauri build
+          yarn workspace @sparrow/desktop tauri build --bundles deb
 
       - name: Generate DEB metadata
         working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
