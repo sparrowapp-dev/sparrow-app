@@ -33,6 +33,7 @@ const constants = {
   APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
   SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
   MARKETING_URL: import.meta.env.VITE_MARKETING_URL,
+  LINUX_INSTALL_DOCS: import.meta.env.VITE_LINUX_INSTALL_DOCS
 };
 
 export default constants;

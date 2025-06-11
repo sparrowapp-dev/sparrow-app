@@ -19,6 +19,8 @@
   let os = "";
   const osDetector = new OSDetector();
 
+  export let updateDoc;
+
   onMount(async () => {
     try {
       updater = await check();
@@ -36,13 +38,6 @@
 
   const handleUpdatePopUp = (flag: boolean) => {
     updateAvailable = flag;
-  };
-
-  const openUpdateDocs = async () => {
-    if (os === "linux") {
-      await open("http://www.sparrow-docs.com");
-      return;
-    }
   };
 
   const initiateUpdate = async () => {
@@ -85,7 +80,7 @@
       {#if os === "linux"}
         <p>
           To learn how to update, please refer to our documentation or click the
-          <a role="button" on:click={openUpdateDocs} class="link-button"
+          <a role="button" on:click={updateDoc} class="link-button"
             >"View Docs"</a
           > button below — this will open the documentation in your default browser.
         </p>
@@ -113,7 +108,7 @@
         textStyleProp={"font-size: var(--base-text)"}
         type={"primary"}
         loader={false}
-        onClick={os === "linux" ? openUpdateDocs : initiateUpdate}
+        onClick={os === "linux" ? updateDoc : initiateUpdate}
       />
     </div></Modal
   >{/if}

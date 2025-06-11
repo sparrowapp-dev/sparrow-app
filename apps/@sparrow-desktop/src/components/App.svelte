@@ -22,6 +22,8 @@
   import { writable, derived } from "svelte/store";
   import { policyConfig } from "@sparrow/common/store";
   import { OSDetector } from "@sparrow/common/utils";
+  import constants from "@app/constants/constants";
+  import { open } from "@tauri-apps/plugin-shell";
 
   const _viewModel = new AppViewModel();
 
@@ -46,6 +48,8 @@
       });
     }
   }
+
+  const osDetector = new OSDetector();
 
   // Track loading state
   export const policyLoading = writable(true);
@@ -78,8 +82,7 @@
 
   (async () => {
     try {
-      const os = new OSDetector();
-      if (os.getOS() === "windows") {
+      if (osDetector.getOS() === "windows") {
         await loadPolicyConfig();
       } else {
         policyLoading.set(false); // Still resolve loading
@@ -89,6 +92,14 @@
       policyLoading.set(false);
     }
   })();
+
+  const openUpdateDocs = async () => {
+    console.log(osDetector.getOS());
+    if (osDetector.getOS() === "linux") {
+      await open(constants.LINUX_INSTALL_DOCS);
+      return;
+    }
+  };
 
   onMount(async () => {
     if (typeof window !== "undefined") {
@@ -128,7 +139,7 @@
   });
 </script>
 
-<AppUpdater />
+<AppUpdater updateDoc={openUpdateDocs} />
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
