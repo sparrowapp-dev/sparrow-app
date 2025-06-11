@@ -1,4 +1,4 @@
-name: sparrow-plans release
+name: Plans release
 
 on:
   push:
@@ -67,6 +67,7 @@ jobs:
           .\rustup-init.exe -y
           rustup install 1.82.0
           rustup default 1.82.0
+
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
@@ -88,20 +89,12 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'    
 
-      # - name: Extract and Store Tauri Signatures
-      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-      #   with:
-      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-      #     kubernetes-namespace: 'sparrow-dev'
-      #     secret-name: 'sparrow-api-secret'
-      #     secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
-      #     platforms: 'windows'
+      - name: msi sig
+        run: Get-Content C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
+
+      - name: nsis sig
+        run: Get-Content C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
       - name: sign msi
         run: |
@@ -112,7 +105,7 @@ jobs:
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
         shell: pwsh
 
-      - name: AWS CLI
+      - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
         with:
           version: latest
@@ -121,7 +114,7 @@ jobs:
 
       - name: Upload files to S3
         run: |
-          aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev/sparrow-plans/ --exclude "*" --include "*.zip" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -130,7 +123,7 @@ jobs:
         run: |
           $msiFile = Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/sparrow-plans/$msiFileName"
           
           $body = @{
             "type" = "message"
@@ -142,13 +135,13 @@ jobs:
                   "body" = @(
                     @{
                       "type" = "TextBlock"
-                      "text" = "🚀 New Windows Build Available"
+                      "text" = "🚀 New Sparrow Plans Windows Build Available"
                       "weight" = "bolder"
                       "size" = "large"
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: Sparrow-plans"
+                      "text" = "Branch: feat/sparrow-plans"
                       "wrap" = $true
                     }
                     @{
@@ -190,6 +183,7 @@ jobs:
           rustup install 1.82.0
           rustup default 1.82.0
           rustup target add x86_64-apple-darwin
+
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
@@ -221,41 +215,21 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CI: false
-          
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
 
-      # - name: Extract and Store Tauri Signatures
-      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-      #   with:
-      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-      #     kubernetes-namespace: 'sparrow-dev'
-      #     secret-name: 'sparrow-api-secret'
-      #     secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
-      #     platforms: 'macos'
-
-      # - name: Extract and Store Tauri Signatures
-      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-      #   with:
-      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-      #     kubernetes-namespace: 'sparrow-dev'
-      #     secret-name: 'sparrow-api-secret'
-      #     secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
-      #     platforms: 'macos'
+      - name: file content
+        run: |
+          cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
 
       - name: Install AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
+
       - name: Upload & download File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/sparrow-plans/ --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev/sparrow-plans/ --recursive --exclude "*" --include "*.dmg"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -264,7 +238,7 @@ jobs:
         run: |
           DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           DMG_FILENAME=$(basename "$DMG_FILE")
-          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
+          DMG_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/sparrow-plans/$DMG_FILENAME"
           
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
@@ -276,13 +250,13 @@ jobs:
                     \"body\": [
                       {
                         \"type\": \"TextBlock\",
-                        \"text\": \"🍎 New macOS Build Available\",
+                        \"text\": \"🍎 New macOS Sparrow Plans Build Available\",
                         \"weight\": \"bolder\",
                         \"size\": \"large\"
                       },
                       {
                         \"type\": \"TextBlock\",
-                        \"text\": \"Branch: Sparrow-plans\",
+                        \"text\": \"Branch: feat/sparrow-plans\",
                         \"wrap\": true
                       },
                       {
