@@ -75,10 +75,10 @@ class AiRequestExplorerViewModel {
   private collectionRepository = new CollectionRepository();
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
-  private tabRepository = new TabRepository();
   private guestUserRepository = new GuestUserRepository();
-  private compareArray = new CompareArray();
   private aiRequestRepository = new AiRequestRepository();
+  private tabRepository = new TabRepository();
+  private compareArray = new CompareArray();
 
   // Services
   private environmentService = new EnvironmentService();
@@ -148,7 +148,7 @@ class AiRequestExplorerViewModel {
   private set tab(value: RequestTab) {
     this._tab.next(value);
   }
-  
+
   public openCollection = async () => {
     const collectionRx = await this.collectionRepository.readCollection(
       this._tab.getValue().path.collectionId,

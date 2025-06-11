@@ -11,14 +11,13 @@
   import { AiRequestExplorer } from "@sparrow/workspaces/features";
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { onMount, onDestroy, afterUpdate } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import {
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
-  import type { AiRequestConversationsDocType } from "src/models/ai-request-conversations.model";
   import type { Observable } from "rxjs";
 
   export let tab;
@@ -34,7 +33,9 @@
     },
   );
 
-  let conversationsHistory: Observable<AiRequestConversationsDocument[]>;
+  let conversationsHistory:
+    | Observable<AiRequestConversationsDocument[]>
+    | undefined;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -159,14 +160,14 @@
     AiRequestExplorerData = AiRequestExplorerMap.get(tab.tabId);
   });
 
+  const getConvoList = async () => {
+    conversationsHistory = _viewModel.getConversationsList();
+  };
+
   onDestroy(() => {
     collectionSubscriber.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
   });
-
-  const getConvoList = async () => {
-    conversationsHistory = _viewModel.getConversationsList();
-  };
 </script>
 
 <AiRequestExplorer

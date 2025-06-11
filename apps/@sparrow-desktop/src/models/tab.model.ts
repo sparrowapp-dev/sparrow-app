@@ -1323,24 +1323,24 @@ export const tabSchemaLiteral = {
                 deepseek: {
                   type: "object",
                   properties: {
-                      streamResponse: {
-                        type: "boolean",
-                      },
-                      jsonResponseFormat: {
-                        type: "boolean",
-                      },
-                      temperature: {
-                        type: "number",
-                      },
-                      presencePenalty: {
-                        type: "number",
-                      },
-                      frequencyPenalty: {
-                        type: "number",
-                      },
-                      maxTokens: {
-                        type: "number",
-                      },
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
+                    },
                   },
                 },
                 anthropic: {
@@ -1420,6 +1420,15 @@ export const tabSchemaLiteral = {
                 isChatAutoClearActive: {
                   type: "boolean",
                 },
+                isChatbotConversationLoading: {
+                  type: "boolean",
+                },
+                isConversationHistoryPanelOpen: {
+                  type: "boolean",
+                },
+                isConversationHistoryLoading: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
@@ -1461,7 +1470,10 @@ export const tabSchemaLiteral = {
                 prompt: {
                   type: "string",
                 },
-                threadId: {
+                conversationId: {
+                  type: "string",
+                },
+                conversationTitle: {
                   type: "string",
                 },
                 conversations: {

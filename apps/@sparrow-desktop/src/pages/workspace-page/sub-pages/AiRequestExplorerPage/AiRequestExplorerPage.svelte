@@ -1,5 +1,6 @@
 <script lang="ts">
   import type {
+    AiRequestConversationsDocument,
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
@@ -17,6 +18,7 @@
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
+  import type { Observable } from "rxjs";
 
   export let tab;
   // export let isTourGuideOpen = false;
@@ -30,6 +32,10 @@
       collection = data?.toMutableJSON();
     },
   );
+
+  let conversationsHistory:
+    | Observable<AiRequestConversationsDocument[]>
+    | undefined;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -154,6 +160,10 @@
     AiRequestExplorerData = AiRequestExplorerMap.get(tab.tabId);
   });
 
+  const getConvoList = async () => {
+    conversationsHistory = _viewModel.getConversationsList();
+  };
+
   onDestroy(() => {
     collectionSubscriber.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
@@ -189,4 +199,11 @@
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
   onOpenCollection={_viewModel.openCollection}
+  fetchConversations={_viewModel.fetchConversations}
+  getConversationsList={getConvoList}
+  conversationsHistory={$conversationsHistory}
+  onSwitchConversation={_viewModel.switchConversation}
+  onRenameConversation={_viewModel.handleRenameConversationTitle}
+  onDeleteConversation={_viewModel.handleDeleteConversation}
+  onClearConversation={_viewModel.handleClearConversation}
 />
