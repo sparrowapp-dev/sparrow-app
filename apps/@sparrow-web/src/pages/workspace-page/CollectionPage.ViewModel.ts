@@ -146,7 +146,11 @@ import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
 import { MockHistoryTabAdapter } from "src/adapter/mock-history-tab";
-import type { AiModelProviderEnum, AiRequestBaseInterface, AIModelVariant } from "@sparrow/common/types/workspace/ai-request-base";
+import type {
+  AiModelProviderEnum,
+  AiRequestBaseInterface,
+  AIModelVariant,
+} from "@sparrow/common/types/workspace/ai-request-base";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -646,7 +650,9 @@ export default class CollectionsViewModel {
       newAiRequestTab.updateName(restOfData.name);
       newAiRequestTab.updateDescription(restOfData.description as string);
       newAiRequestTab.updatePath(restOfData.path as TabPath);
-      newAiRequestTab.updateAIModelProvider(restOfData.property.aiRequest?.aiModelProvider as AiModelProviderEnum);
+      newAiRequestTab.updateAIModelProvider(
+        restOfData.property.aiRequest?.aiModelProvider as AiModelProviderEnum,
+      );
       newAiRequestTab.updateAIModelVariant(
         restOfData.property.aiRequest?.aiModelVariant as AIModelVariant,
       );
@@ -657,7 +663,6 @@ export default class CollectionsViewModel {
       newAiRequestTab.updateState(
         restOfData.property.aiRequest?.state as StatePartial,
       );
-      
 
       const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
       newAiRequestTab.updatePath(filteredPath as TabPath);
@@ -1032,7 +1037,7 @@ export default class CollectionsViewModel {
 
     const aiRequestTabAdapter = new AiRequestTabAdapter();
     const unadaptedAIRequest = aiRequestTabAdapter.unadapt(componentData);
-    
+
     // Save overall api
     const requestMetaData = {
       id: _id,
@@ -1870,8 +1875,10 @@ export default class CollectionsViewModel {
         type: aiRequest.getValue().type,
         description: "",
         aiRequest: {
-          aiModelProvider: aiRequest?.getValue().property?.aiRequest?.aiModelProvider,
-          aiModelVariant: aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
+          aiModelProvider:
+            aiRequest?.getValue().property?.aiRequest?.aiModelProvider,
+          aiModelVariant:
+            aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
         } as AiRequestBaseInterface,
       },
     };
@@ -1938,7 +1945,7 @@ export default class CollectionsViewModel {
         folderId: "",
       });
       aiRequest.updateIsSave(true);
-      
+
       this.tabRepository.createTab(aiRequest.getValue());
       moveNavigation("right");
       // MixpanelEvent(Events.CREATE_REQUEST, {
@@ -2537,8 +2544,10 @@ export default class CollectionsViewModel {
           type: aiRequest.getValue().type,
           description: "",
           aiRequest: {
-            aiModelProvider: aiRequest.getValue().property.aiRequest?.aiModelProvider,
-            aiModelVariant: aiRequest.getValue().property.aiRequest?.aiModelVariant,
+            aiModelProvider:
+              aiRequest.getValue().property.aiRequest?.aiModelProvider,
+            aiModelVariant:
+              aiRequest.getValue().property.aiRequest?.aiModelVariant,
           } as AiRequestBaseInterface,
         },
       },
@@ -3275,6 +3284,25 @@ export default class CollectionsViewModel {
     request: CollectionItemsDto,
   ) => {
     const requestTabAdapter = new RequestMockTabAdapter();
+    // Update the request data before passing to adapter
+    if (request?.items) {
+      request.items.forEach((data) => {
+        // if (data.mockRequestResponse?.selectedResponseBodyType) {
+        // Ensure state object exists
+        if (!data.state) {
+          data.state = {};
+        }
+
+        const bodyType = this.setResponseBodyType(
+          data.mockRequestResponse.selectedResponseBodyType,
+        );
+
+        data.state.responseBodyLanguage = bodyType.responseBodyLanguage;
+        data.state.responseBodyFormatter = "Pretty";
+        data.state.responseNavigation = "Response";
+        // }
+      });
+    }
     const adaptedRequest = requestTabAdapter.adapt(
       workspaceId || "",
       collection?.id || "",
@@ -3667,16 +3695,17 @@ export default class CollectionsViewModel {
         const storage = aiRequest;
         storage.name = newRequestName;
         const baseUrl = await this.constructBaseUrl(workspaceId);
-        const response = await this.collectionService.updateAiRequestInCollection(
-          aiRequest.id,
-          {
-            collectionId: collection.id,
-            workspaceId: workspaceId,
-            ...userSource,
-            items: storage,
-          },
-          baseUrl,
-        );
+        const response =
+          await this.collectionService.updateAiRequestInCollection(
+            aiRequest.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              ...userSource,
+              items: storage,
+            },
+            baseUrl,
+          );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestOrFolderInCollection(
             collection.id,
@@ -3694,22 +3723,23 @@ export default class CollectionsViewModel {
         const storage = aiRequest;
         storage.name = newRequestName;
         const baseUrl = await this.constructBaseUrl(workspaceId);
-        const response = await this.collectionService.updateAiRequestInCollection(
-          aiRequest.id,
-          {
-            collectionId: collection.id,
-            workspaceId: workspaceId,
-            ...userSource,
-            folderId: folder.id,
-            items: {
-              name: folder.name,
-              id: folder.id,
-              type: ItemType.FOLDER,
-              items: storage,
+        const response =
+          await this.collectionService.updateAiRequestInCollection(
+            aiRequest.id,
+            {
+              collectionId: collection.id,
+              workspaceId: workspaceId,
+              ...userSource,
+              folderId: folder.id,
+              items: {
+                name: folder.name,
+                id: folder.id,
+                type: ItemType.FOLDER,
+                items: storage,
+              },
             },
-          },
-          baseUrl,
-        );
+            baseUrl,
+          );
         if (response.isSuccessful) {
           this.collectionRepository.updateRequestInFolder(
             collection.id,
@@ -5783,7 +5813,8 @@ export default class CollectionsViewModel {
       case "aiRequestCollection":
         await this.handleCreateAiRequestInCollection(
           args.workspaceId,
-          args.collection as CollectionDto,);
+          args.collection as CollectionDto,
+        );
         break;
       case "aiRequestFolder":
         await this.handleCreateAiRequestInFolder(
@@ -7413,6 +7444,35 @@ export default class CollectionsViewModel {
         persistence: TabPersistenceTypeEnum.PERMANENT,
       });
     }
+  };
+
+  // parsing from backend to frontend
+  private setResponseBodyType = (header: HttpResponseSavedBodyModeBaseEnum) => {
+    let responseBodyNavigation = RequestDatasetEnum.RAW;
+    let responseBodyLanguage = RequestDataTypeEnum.TEXT;
+    switch (header) {
+      case HttpResponseSavedBodyModeBaseEnum.JSON:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.JSON;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.XML:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.XML;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.JAVASCRIPT:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.JAVASCRIPT;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.TEXT:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.HTML:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.HTML;
+        break;
+    }
+    return { responseBodyLanguage, responseBodyNavigation };
   };
 
   /**

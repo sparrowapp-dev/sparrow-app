@@ -389,6 +389,7 @@ export interface MockItem
     NameWrapper,
     TypeWrapper4,
     DescriptionWrapper,
+    StateWrapper,
     MockRequestResponseWrapper {}
 
 export interface ItemsWrapper {
