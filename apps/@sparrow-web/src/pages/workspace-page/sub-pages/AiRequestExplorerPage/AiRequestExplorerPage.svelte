@@ -160,7 +160,7 @@
     AiRequestExplorerData = AiRequestExplorerMap.get(tab.tabId);
   });
 
-  const getConvoList = async () => {
+  const getConversationList = async () => {
     conversationsHistory = _viewModel.getConversationsList();
   };
 
@@ -201,7 +201,7 @@
   onRenameFolder={_viewModel.handleRenameFolder}
   onOpenCollection={_viewModel.openCollection}
   fetchConversations={_viewModel.fetchConversations}
-  getConversationsList={getConvoList}
+  getConversationsList={getConversationList}
   conversationsHistory={$conversationsHistory}
   onSwitchConversation={_viewModel.switchConversation}
   onRenameConversation={_viewModel.handleRenameConversationTitle}
