@@ -164,10 +164,10 @@
     updateSplitpaneContSizes();
   };
 
-  $: {
-    if ($tab?.property?.aiRequest)
-      console.log("tab :>> ", $tab?.property?.aiRequest);
-  }
+  // $: {
+  //   if ($tab?.property?.aiRequest)
+  //     console.log("tab :>> ", $tab?.property?.aiRequest);
+  // }
 
   const handleOnClickUpdateRequestAuth = async () => {
     if (isConversationHistoryPanelOpened) {
