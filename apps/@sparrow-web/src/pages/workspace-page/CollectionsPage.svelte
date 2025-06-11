@@ -1774,7 +1774,7 @@
   planType="Testflow"
   planLimitValue={currentTestflow}
   currentPlanValue={userLimits?.workspacesPerHub?.value || 3}
-  isOwner={userRole === TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
   handleContactOwner={handleRequestOwner}

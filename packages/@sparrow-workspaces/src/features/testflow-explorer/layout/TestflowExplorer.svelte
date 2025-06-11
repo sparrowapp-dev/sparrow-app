@@ -1840,11 +1840,12 @@
   planType="Test flow blocks"
   planLimitValue={planLimitTestFlowBlocks}
   currentPlanValue={$nodes.length - 1}
-  isOwner={userRole === TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
   handleContactOwner={handleRequestOwner}
-  handleSubmitButton={userRole === TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={teamDetails?.teamName}

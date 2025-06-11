@@ -727,11 +727,11 @@
   currentPlanValue={upgradePlanModalInvite
     ? openTeam?._data?.users.length - 1
     : openTeam?._data?.workspaces.length}
-  isOwner={userRole === (TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN)
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
   handleContactOwner={handleRequestOwner}
-  handleSubmitButton={userRole === (TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN)
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={openTeam?._data?.name?.split(" ")[0]}
