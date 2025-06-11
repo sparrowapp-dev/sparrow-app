@@ -254,8 +254,8 @@
     {planLimitTestflow}
     testflowCount={currentTestflowCount}
     {teamDetails}
-    {upgradePlanModel}
-    {planUpgradeModalOpen}
+    bind:upgradePlanModel
+    bind:planUpgradeModalOpen
     handleRedirectToAdminPanel={handleRedirectAdminPanel}
     {handleRequestOwner}
   />
