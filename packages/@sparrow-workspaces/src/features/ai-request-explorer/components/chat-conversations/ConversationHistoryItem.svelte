@@ -313,7 +313,7 @@
     font-size: 9px;
     font-weight: 500;
     line-height: 1;
-    padding: 2px 4px;
+    padding: 2px 0px;
     border-radius: 3px;
     white-space: nowrap;
     color: #828282;

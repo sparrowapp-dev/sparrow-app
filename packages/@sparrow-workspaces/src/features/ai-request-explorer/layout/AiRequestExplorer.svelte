@@ -131,19 +131,22 @@
   });
   onDestroy(() => {});
 
+  let isConversationHistoryPanelOpened = false;
   const onOpenConversationHistoryPanel = async () => {
-    maxPx += 200;
-    defaultPx += 130;
-    minPx += 250;
+    maxPx += 300;
+    defaultPx += 250;
+    minPx += 350;
+    isConversationHistoryPanelOpened = true;
     updateSplitpaneContSizes();
     const res = await fetchConversations();
     const result = getConversationsList();
     return result;
   };
   const onCloseConversationHistoryPanel = () => {
-    maxPx -= 200;
-    defaultPx -= 130;
-    minPx -= 250;
+    maxPx -= 300;
+    defaultPx -= 250;
+    minPx -= 350;
+    isConversationHistoryPanelOpened = false;
     updateSplitpaneContSizes();
   };
 
@@ -151,6 +154,14 @@
     if ($tab?.property?.aiRequest)
       console.log("tab :>> ", $tab?.property?.aiRequest);
   }
+
+  const handleOnClickUpdateRequestAuth = async () => {
+    if (isConversationHistoryPanelOpened) {
+      const res = await fetchConversations();
+      const result = getConversationsList();
+    }
+    onUpdateRequestAuth();
+  };
 </script>
 
 {#if $tab.tabId}
@@ -175,6 +186,13 @@
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
         {onUpdateAiConversation}
+        onModelSwitch={async (provider, variant) => {
+          if (isConversationHistoryPanelOpened) {
+            const res = await fetchConversations();
+            const result = getConversationsList();
+          }
+          onSwitchConversation("", "New Conversation", []);
+        }}
       />
 
       <div
@@ -230,7 +248,7 @@
                         ?.aiModelProvider}
                       collectionAuth={$collectionAuth}
                       {onUpdateRequestState}
-                      {onUpdateRequestAuth}
+                      onUpdateRequestAuth={handleOnClickUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
                       {collection}

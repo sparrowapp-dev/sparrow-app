@@ -59,6 +59,9 @@
   export let isChatPanelLoadingActive;
   export let currTabAiInfo: Ai;
 
+  let isRenaming = false;
+  let newRequestName: string = "";
+  let inputField: HTMLInputElement;
   let conversationHistoryPanelLoader = false;
   let isConversationHistoryPanelOpen = false;
 
@@ -129,18 +132,6 @@
     isConversationHistoryPanelOpen = false;
   };
 
-  // const onSelectChatHistoryItem = (
-  //   conversationId: string,
-  //   conversationTitle: string,
-  //   conversations: Conversation[],
-  // ) => {
-  //   onSwitchConversation(conversationId, conversationTitle, conversations);
-  // };
-
-  let isRenaming = false;
-  let newRequestName: string = "";
-  let inputField: HTMLInputElement;
-
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
     newRequestName = target.value.trim();
@@ -148,7 +139,7 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
-      onRenameConversation("", newRequestName);
+      onRenameConversation(currTabAiInfo.conversationId, newRequestName);
     }
     isRenaming = false;
     newRequestName = "";
@@ -179,7 +170,9 @@
   ></div>
 </Modal>
 
-<div class="ai-chatbot-panel d-flex flex-row h-100 gap-2">
+<div
+  class="ai-chatbot-panel d-flex flex-row h-100 align-items-center justify-content-between"
+>
   <!-- Conversation History Panel -->
   {#if isConversationHistoryPanelOpen}
     <div
@@ -189,7 +182,7 @@
         class="conversation-history-header d-flex align-items-center justify-content-between mt-1"
       >
         <span
-          class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold ms-2"
+          class="history-title text-ds-font-size-14 text-ds-font-weight-semi-bold ms-1"
           >Conversation History</span
         >
 
@@ -207,7 +200,7 @@
         class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-start flex-grow-1"
       >
         {#if conversationsHistory && conversationsHistory._data.conversations.length}
-          {#each conversationsHistory._data.conversations as conversation (conversation.id)}
+          {#each [...conversationsHistory._data.conversations].reverse() as conversation (conversation.id)}
             <ConversationHistoryItem
               currOpenedConversationId={currTabAiInfo.conversationId}
               {conversation}
@@ -218,7 +211,7 @@
           {/each}
         {:else}
           <div
-            class="empty-state d-flex flex-column align-items-center justify-content-center h-100"
+            class="empty-state d-flex flex-column align-items-center justify-content-center h-100 m-auto"
           >
             <div
               style="width: 200px;"
@@ -244,6 +237,7 @@
       </div>
     </div>
   {/if}
+  <!-- <div style="width: 16px;"></div> -->
 
   <!-- ChatBot Panel -->
   <div
@@ -262,12 +256,16 @@
             <div
               class="d-flex justify-content-between align-items-center w-100"
               in:fade={{ duration: 200 }}
+              style="min-width: 0;"
             >
-              <div class="d-flex align-items-center gap-1">
+              <div
+                class="d-flex align-items-center gap-1"
+                style="flex: 1; min-width: 0;"
+              >
                 <span
                   style={isConversationHistoryPanelOpen
-                    ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px;"
-                    : ""}
+                    ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px; flex-shrink: 0;"
+                    : "flex-shrink: 0;"}
                 >
                   <Tooltip
                     title={isConversationHistoryPanelOpen
@@ -296,74 +294,73 @@
                   </Tooltip>
                 </span>
 
-                <!-- <span class="text-ds-font-size-12 fw-medium text-white"
-                  >{chatPanelTitle}</span
-                > -->
-                <!-- Chat Title - st -->
-                {#if isRenaming}
-                  <input
-                    class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-                    style="width: 60%"
-                    id="renameInputFieldFile"
-                    type="text"
-                    maxlength={100}
-                    value={chatPanelTitle}
-                    on:click|stopPropagation={() => {}}
-                    bind:this={inputField}
-                    on:input={handleRenameInput}
-                    on:blur={onRenameBlur}
-                    on:keydown={onRenameInputKeyPress}
-                  />
-                {:else}
-                  <div
-                    class="chat-panel-title ellipsis"
-                    style="color: var(--bg-ds-neutral-50); width: 105px;"
-                    on:click={() => {
-                      // isRenaming = true;
-                      // setTimeout(() => inputField.focus(), 100);
-                    }}
-                  >
-                    <p
-                      class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-                    >
-                      {chatPanelTitle}
-                    </p>
-                  </div>
-                {/if}
-                <!-- Chat Title - ed -->
-
-                <!-- <button
-                  class="btn btn-sm p-1 d-flex align-items-center justify-content-center rounded-2 btn-transparent"
+                <!-- Chat Title with Edit Button -->
+                <div
+                  class="d-flex align-items-center gap-1"
+                  style="flex: 1; min-width: 0;"
                 >
-                  <EditRegular size={"14px"} color={"white"} />
-                </button> -->
-                <Tooltip title={"Edit Title"} placement={"top-center"}>
-                  <div
-                    style="display: flex; justify-content: center; align-items: center;"
-                  >
-                    <div style="transform: scale(0.85);">
-                      <Button
-                        size="extra-small"
-                        startIcon={EditRegular}
-                        type="teritiary-regular"
-                        disable={isRenaming}
-                        onClick={() => {
-                          isRenaming = true;
-                          setTimeout(() => inputField.focus(), 100);
-                        }}
-                      />
+                  {#if isRenaming}
+                    <input
+                      class="py-0 renameInputFieldFile text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                      style="flex: 1; min-width: 0;"
+                      id="renameInputFieldFile"
+                      type="text"
+                      maxlength={100}
+                      value={chatPanelTitle}
+                      on:click|stopPropagation={() => {}}
+                      bind:this={inputField}
+                      on:input={handleRenameInput}
+                      on:blur={onRenameBlur}
+                      on:keydown={onRenameInputKeyPress}
+                    />
+                  {:else}
+                    <div
+                      class="chat-panel-title"
+                      style="color: var(--bg-ds-neutral-50); flex: 1; min-width: 0; max-width: 50%; overflow: hidden;"
+                      on:click={() => {
+                        // isRenaming = true;
+                        // setTimeout(() => inputField.focus(), 100);
+                      }}
+                    >
+                      <p
+                        class="m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-semi-bold"
+                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: Inter, sans-serif;"
+                      >
+                        {chatPanelTitle}
+                      </p>
                     </div>
-                  </div>
-                </Tooltip>
+                  {/if}
+
+                  <Tooltip title={"Edit Title"} placement={"top-center"}>
+                    <div style="flex-shrink: 0;">
+                      <div style="transform: scale(0.85);">
+                        <Button
+                          size="extra-small"
+                          startIcon={EditRegular}
+                          type="teritiary-regular"
+                          disable={isRenaming}
+                          onClick={() => {
+                            isRenaming = true;
+                            setTimeout(() => inputField.focus(), 100);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </Tooltip>
+                </div>
               </div>
-              <div class="d-flex align-items-center gap-1 justify-content-end">
+
+              <div
+                class="d-flex align-items-center gap-1"
+                style="flex-shrink: 0;"
+              >
                 <Tooltip
                   title={"Clears chat context after each message."}
                   placement={"top-center"}
                   zIndex={701}
                   show={true}
                 >
-                  <div class="d-flex align-items-center gap-2">
+                  <div class="d-flex align-items-center">
                     <Toggle
                       label={"Auto Clear"}
                       textColor={"var(--text-ds-neutral-100)"}
@@ -594,6 +591,9 @@
 <style>
   .ai-chatbot-panel {
     /* overflow-x: auto; */
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
   .ai-chat-panel {
     background-color: var(--bg-ds-surface-700);
@@ -601,6 +601,8 @@
     border: 1px solid var(--bg-ds-surface-100);
     padding: 10px;
     transition: all 0.3s ease;
+    min-width: 0;
+    overflow: hidden;
   }
 
   /* new - st*/
@@ -609,28 +611,25 @@
   .ai-chat-panel.full-width {
     width: 100%;
     flex: 1;
-    min-width: 400px;
   }
 
   /* Adjusted width when history panel is open */
 
   .ai-chat-panel.with-history {
-    width: 60%;
-    flex: 0 0 60%;
-    /* min-width: 200px; */
+    width: 59%;
+    flex: 0 0 59%;
   }
 
   /* Conversation History Panel Styles */
   .conversation-history-panel {
     width: 40%;
     flex: 0 0 40%;
-    /* min-width: 100px;
-    max-width: 250px; */
     transition: all 0.3s ease;
     background-color: var(--bg-ds-surface-600);
     border-right: 1px solid var(--border-ds-surface-200);
     border-radius: 8px;
     overflow: hidden;
+    min-width: 0;
   }
 
   .history-title {
