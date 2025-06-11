@@ -178,8 +178,10 @@ export class TestflowViewModel {
         isFirstTimeInTestFlow.set(false);
       }
       return;
-    } else if (response?.data?.statusCode) {
-      notifications.error(response?.data?.message);
+    } else if (response?.data?.statusCode === 403) {
+      if (response?.data?.message) {
+        notifications.warning("testflow limit reached. Upgrade to add more.");
+      }
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }

@@ -8,9 +8,7 @@ import type { TFRxDocumentType } from "../../models/testflow.model";
 import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import {
-  type Tab,
-} from "@sparrow/common/types/workspace/tab";
+import { type Tab } from "@sparrow/common/types/workspace/tab";
 
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
@@ -93,8 +91,8 @@ export class TestflowViewModel {
             collectionId: "",
             requestId: "",
             folderId: "",
-            name:"",
-            method:"",
+            name: "",
+            method: "",
             requestData: null,
           },
           position: { x: 100, y: 200 },
@@ -148,7 +146,9 @@ export class TestflowViewModel {
             },
           },
         ],
-    }, baseUrl);
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -177,8 +177,10 @@ export class TestflowViewModel {
         isFirstTimeInTestFlow.set(false);
       }
       return;
-    } else if (response?.data?.statusCode) {
-      notifications.error(response?.data?.message);
+    } else if (response?.data?.statusCode === 403) {
+      if (response?.data?.message) {
+        notifications.warning("testflow limit reached. Upgrade to add more.");
+      }
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }
@@ -305,7 +307,10 @@ export class TestflowViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       _testflow.workspaceId,
     );
-    const testflowTab = new TestflowTabAdapter().adapt(currentWorkspace._id, _testflow.toMutableJSON());
+    const testflowTab = new TestflowTabAdapter().adapt(
+      currentWorkspace._id,
+      _testflow.toMutableJSON(),
+    );
     this.tabRepository.createTab(testflowTab);
   };
 
@@ -379,7 +384,9 @@ export class TestflowViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentTestflow?.path?.workspaceId as string,
     );
-    const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
+    const unadaptedTestflow = new TestflowTabAdapter().unadapt(
+      currentTestflow as Tab,
+    ); // Adapt the testflow tab
 
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",

@@ -311,8 +311,9 @@ export class TeamExplorerPageViewModel {
       navigate("collections");
       notifications.success("New Workspace created successfully.");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
-    } else if (response?.data?.statusCode) {
-      notifications.error(response?.data?.message);
+    } else if (response?.data?.statusCode === 403) {
+      if (response?.data?.message) {
+        notifications.warning("Workspaces limit reached. Upgrade to add more.");
     }
   };
 
@@ -383,8 +384,8 @@ export class TeamExplorerPageViewModel {
       );
     } else {
       if (response?.message === "Plan limit reached") {
-        notifications.error(
-          "You’ve reached the collaborator limit for your current plan. Upgrade to add more collaborators.",
+        notifications.warning(
+          "Collaborator limit reached. Upgrade to add more.",
         );
       } else {
         notifications.error(

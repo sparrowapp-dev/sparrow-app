@@ -753,8 +753,8 @@
   ) => {
     if (!_id) return;
     if ($nodes.length >= planLimitTestFlowBlocks + 1) {
-      notifications.error(
-        `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
+      notifications.warning(
+        `Limit of ${planLimitTestFlowBlocks} Blocks reached. Upgrade to increase.`,
       );
       return;
     }
