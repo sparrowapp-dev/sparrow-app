@@ -1778,7 +1778,8 @@
     ? true
     : false}
   handleContactOwner={handleRequestOwner}
-  handleSubmitButton={userRole === TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
     ? handleRequestOwner
     : handleRedirectToAdminPanel}
   userName={teamDetails?.teamName}
