@@ -1103,11 +1103,7 @@ const makeGraphQLRequest = async (
       // Check if request is aborted after request fails
       throw new DOMException(abortGraphqlRequestErrorMessage, "AbortError");
     }
-    return success({
-      body: {},
-      headers: {},
-      status: 400,
-    });
+    throw new Error(err as string);
   }
   if (_signal?.aborted) {
     // Check if request is aborted after request success
