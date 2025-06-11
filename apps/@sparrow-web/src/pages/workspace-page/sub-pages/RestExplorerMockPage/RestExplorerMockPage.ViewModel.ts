@@ -695,9 +695,14 @@ class RestExplorerMockViewModel {
    *
    * @param _body - response body
    */
-  public updateResponseBody = async (_body: string) => {
+  public updateResponseBody = async (_body: string, responseId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.mockRequest.responseBody = _body;
+    // progressiveTab.property.mockRequest.responseBody = _body;
+    progressiveTab.property.mockRequest.items.forEach((data) => {
+      if (data.id === responseId) {
+        data.mockRequestResponse.responseBody = _body;
+      }
+    });
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -707,9 +712,14 @@ class RestExplorerMockViewModel {
    *
    * @param _body - response status
    */
-  public updateResponseStatus = async (_status: string) => {
+  public updateResponseStatus = async (_status: string, responseId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.mockRequest.responseStatus = _status;
+    // progressiveTab.property.mockRequest.responseStatus = _status;
+    progressiveTab.property.mockRequest.items.forEach((data) => {
+      if (data.id === responseId) {
+        data.mockRequestResponse.responseStatus = _status;
+      }
+    });
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -954,13 +964,24 @@ class RestExplorerMockViewModel {
    *
    * @param  - response state
    */
-  public updateResponseState = async (_state: StatePartial) => {
+  public updateResponseState = async (
+    _state: StatePartial,
+    responseId: string,
+  ) => {
     if (_state?.responseBodyLanguage) {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      progressiveTab.property.mockRequest.state = {
-        ...progressiveTab.property.mockRequest.state,
-        ..._state,
-      };
+      // progressiveTab.property.mockRequest.state = {
+      //   ...progressiveTab.property.mockRequest.state,
+      //   ..._state,
+      // };
+      progressiveTab.property.mockRequest.items.forEach((data) => {
+        if (data.id === responseId) {
+          data.state = {
+            ...data.state,
+            ..._state,
+          };
+        }
+      });
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       this.compareRequestWithServer();

@@ -39,6 +39,12 @@
   const onTabClick = (tabId: ResponseSectionEnum) => {
     onUpdateRequestState({ responseNavigation: tabId });
   };
+  $: {
+    if (requestStateSection) {
+      console.log("requestStateSection", requestStateSection);
+      tabs = refreshTabs(responseHeadersLength);
+    }
+  }
 </script>
 
 <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
