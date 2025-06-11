@@ -114,11 +114,6 @@
       userId,
     );
     const limits = await _viewModel.userPlanLimits(teamId);
-    console.log(
-      "---------------->",
-      usersInvitePlanCount,
-      limits?.usersPerHub?.value,
-    );
     if (usersInvitePlanCount + 1 >= (limits?.usersPerHub?.value ?? 5)) {
       console.log("-----------------hitting this --->");
       upgradePlanModalInvite = true;

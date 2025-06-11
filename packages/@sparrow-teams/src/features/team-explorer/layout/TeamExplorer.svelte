@@ -139,7 +139,6 @@
   let upgradePlanModel: boolean = false;
   let userLimits: any;
   let planContent: any;
-  let planType: "Workspaces" | "Collaborators" = "Workspaces";
 
   let selectedFilter = "All";
 
@@ -322,14 +321,6 @@
     getPlanLimits();
     if (userRole) {
       planContent = planInfoByRole(userRole);
-    }
-    if (upgradePlanModalInvite) {
-      console.log(
-        "---------------------------->teamExplorer",
-        upgradePlanModalInvite,
-      );
-      upgradePlanModel = true;
-      planType = "Collaborators";
     }
   }
 </script>
@@ -720,7 +711,7 @@
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}
   description={planContent?.description}
-  {planType}
+  planType="Workspaces"
   planLimitValue={upgradePlanModalInvite
     ? userLimits?.usersPerHub?.value + 1 || 5
     : userLimits?.workspacesPerHub?.value || 3}
@@ -731,7 +722,28 @@
     ? true
     : false}
   handleContactOwner={handleRequestOwner}
-  handleSubmitButton={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalInvite}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Collaborators"
+  planLimitValue={userLimits?.usersPerHub?.value + 1 || 5}
+  currentPlanValue={openTeam?._data?.users.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={openTeam?._data?.name?.split(" ")[0]}
