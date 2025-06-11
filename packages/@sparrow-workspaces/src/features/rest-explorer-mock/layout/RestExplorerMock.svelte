@@ -789,7 +789,7 @@
                               <div class="d-flex justify-content-between">
                                 <ResponseNavigator
                                   requestStateSection={selectedResponse?.state
-                                    ?.responseNavigation ?? "Response"}
+                                    ?.responseNavigation}
                                   {onUpdateRequestState}
                                   responseHeadersLength={selectedResponse
                                     ?.mockRequestResponse?.responseHeaders
@@ -830,16 +830,13 @@
                                 class="flex-grow-1 d-flex flex-column"
                                 style="overflow:auto; min-height:0;"
                               >
-                                {#if (selectedResponse?.state?.responseNavigation ?? "Response") === ResponseSectionEnum.RESPONSE}
-                                  {#if (selectedResponse?.state?.responseBodyLanguage ?? "Text") !== "Image"}
+                                {#if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
+                                  {#if selectedResponse?.state?.responseBodyLanguage !== "Image"}
                                     <ResponseBodyNavigator
                                       response={selectedResponse
                                         ?.mockRequestResponse
                                         ?.responseHeaders || []}
-                                      apiState={selectedResponse?.state ?? {
-                                        responseBodyLanguage: "Text",
-                                        responseBodyFormatter: "Pretty",
-                                      }}
+                                      apiState={selectedResponse?.state}
                                       path={$tab.path}
                                       {onUpdateResponseState}
                                       {onUpdateRequestState}
@@ -856,11 +853,7 @@
                                     <ResponseBody
                                       response={selectedResponse
                                         ?.mockRequestResponse?.responseBody}
-                                      apiState={selectedResponse?.state ?? {
-                                        responseBodyLanguage: "Text",
-                                        responseBodyFormatter: "Pretty",
-                                        responseNavigation: "Response",
-                                      }}
+                                      apiState={selectedResponse?.state}
                                       {onUpdateResponseBody}
                                     />
                                   </div>
