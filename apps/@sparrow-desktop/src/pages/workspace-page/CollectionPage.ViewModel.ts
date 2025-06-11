@@ -3270,6 +3270,24 @@ export default class CollectionsViewModel {
     request: CollectionItemsDto,
   ) => {
     const requestTabAdapter = new RequestMockTabAdapter();
+    // Update the request data before passing to adapter
+    if (request?.items) {
+      request.items.forEach((data) => {
+        // if (data.mockRequestResponse?.selectedResponseBodyType) {
+        // Ensure state object exists
+        if (!data.state) {
+          data.state = {};
+        }
+        const bodyType = this.setResponseBodyType(
+          data.mockRequestResponse.selectedResponseBodyType,
+        );
+
+        data.state.responseBodyLanguage = bodyType.responseBodyLanguage;
+        data.state.responseBodyFormatter = "Pretty";
+        data.state.responseNavigation = "Response";
+        // }
+      });
+    }
     const adaptedRequest = requestTabAdapter.adapt(
       workspaceId || "",
       collection?.id || "",
@@ -7378,6 +7396,35 @@ export default class CollectionsViewModel {
         _fileUploadData,
       );
     return response;
+  };
+
+  // parsing from backend to frontend
+  private setResponseBodyType = (header: HttpResponseSavedBodyModeBaseEnum) => {
+    let responseBodyNavigation = RequestDatasetEnum.RAW;
+    let responseBodyLanguage = RequestDataTypeEnum.TEXT;
+    switch (header) {
+      case HttpResponseSavedBodyModeBaseEnum.JSON:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.JSON;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.XML:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.XML;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.JAVASCRIPT:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.JAVASCRIPT;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.TEXT:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.TEXT;
+        break;
+      case HttpResponseSavedBodyModeBaseEnum.HTML:
+        responseBodyNavigation = RequestDatasetEnum.RAW;
+        responseBodyLanguage = RequestDataTypeEnum.HTML;
+        break;
+    }
+    return { responseBodyLanguage, responseBodyNavigation };
   };
 
   /**

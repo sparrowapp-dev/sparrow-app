@@ -1484,7 +1484,7 @@ class RestExplorerMockViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) { }
+  set collection(e) {}
 
   /**
    *
@@ -2983,6 +2983,11 @@ class RestExplorerMockViewModel {
             selectedResponseBodyType:
               response.data.data.mockRequestResponse.selectedResponseBodyType,
           },
+          state: {
+            responseBodyLanguage: "Text",
+            responseBodyFormatter: "Pretty",
+            responseNavigation: "Response",
+          },
         };
         progressiveTab.property?.mockRequest?.items?.push(mockResponse);
         this.tab = progressiveTab;
@@ -3005,13 +3010,15 @@ class RestExplorerMockViewModel {
   };
   /**
    * Handle state of mock response in a collection
-  */
+   */
   public handleMockResponseState = async (
     mockResponseId: string,
-    isMockResponseActive: boolean
+    isMockResponseActive: boolean,
   ) => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
 
     // Prepare the update payload matching your backend DTO
     const updatePayload = {
@@ -3024,11 +3031,12 @@ class RestExplorerMockViewModel {
     };
 
     try {
-      const response = await this.collectionService.updateMockResponseInCollection(
-        mockResponseId,
-        updatePayload,
-        baseUrl
-      );
+      const response =
+        await this.collectionService.updateMockResponseInCollection(
+          mockResponseId,
+          updatePayload,
+          baseUrl,
+        );
       if (response?.isSuccessful) {
         return true;
       } else {
@@ -3040,14 +3048,16 @@ class RestExplorerMockViewModel {
     }
   };
   /**
-  * Handle renaming of mock response in a collection
- */
+   * Handle renaming of mock response in a collection
+   */
   public handleRenameMockResponse = async (
     mockResponseId: string,
-    name: string
+    name: string,
   ) => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
 
     const updatePayload = {
       collectionId: progressiveTab.path.collectionId,
@@ -3059,11 +3069,12 @@ class RestExplorerMockViewModel {
     };
 
     try {
-      const response = await this.collectionService.updateMockResponseInCollection(
-        mockResponseId,
-        updatePayload,
-        baseUrl
-      );
+      const response =
+        await this.collectionService.updateMockResponseInCollection(
+          mockResponseId,
+          updatePayload,
+          baseUrl,
+        );
       if (response?.isSuccessful) {
         return true;
       } else {
