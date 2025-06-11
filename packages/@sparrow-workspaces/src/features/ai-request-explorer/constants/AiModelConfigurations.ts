@@ -12,15 +12,17 @@ export const disabledModelFeatures = {
 // options available for each model variant, and used to generate 
 // the configuration form in the UI.
 export const configFormat: {
-  [modelProvider in AiModelProviderEnum]?: {
+  [modelProvider in AiModelProviderEnum]: {
     [modelVariant in AIModelVariant]?: {
       [configKey: string]: {
-        type: "number" | "boolean";
+        dataType: "int" | "float" | "boolean";
         displayName: string;
         description: string;
         defaultValue: number | boolean;
-        min?: string;
-        max?: string;
+        min?: number;
+        max?: number;
+        hidden: boolean,
+        disabled: boolean
       };
     };
   };
@@ -28,398 +30,490 @@ export const configFormat: {
   openai: {
     "gpt-4o": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "gpt-4": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "gpt-4.1": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "gpt-4-turbo": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "gpt-4.5-preview": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 16384,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "gpt-4o-mini": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "gpt-3.5-turbo": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "o1": {
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       }
     },
     "o1-mini": {
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       }
     },
     "o3-mini": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     }
   },
@@ -427,182 +521,222 @@ export const configFormat: {
   anthropic: {
     "claude-3-5-sonnet-20241022": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate in the response.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the LLM response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
 
     "claude-3-5-haiku-20241022": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate in the response.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the LLM response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
 
     "claude-3-opus-20240229": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate in the response.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the LLM response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
 
     "claude-3-haiku-20240307": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate in the response.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the LLM response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
 
     // "Claude 3 Sonnet"
     "claude-3-5-sonnet-20240620": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate in the response.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the LLM response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
   },
@@ -610,171 +744,211 @@ export const configFormat: {
   google: {
     "gemini-1.5-flash": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
-        min: 1,
+        dataType: "int",
+        min: -1,
         max: 2048,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
+        defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the model's response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
     "gemini-1.5-flash-8b": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
-        min: 1,
+        dataType: "int",
+        min: -1,
         max: 2048,
         displayName: "Max Output Tokens",
         description:
           "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
+        defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the model's response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
     },
     "gemini-1.5-pro": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
-        min: 1,
+        dataType: "int",
+        min: -1,
         max: 2048,
         displayName: "Max Output Tokens",
         description:
           "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
+        defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the model's response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
       
     },
     "gemini-2.0-flash": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
-        min: 1,
+        dataType: "int",
+        min: -1,
         max: 2048,
         displayName: "Max Output Tokens",
         description:
           "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
+        defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
       top_p: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Top P",
         description:
           "Controls the randomness of the model's response.",
         defaultValue: 0.95,
+        disabled: false,
+        hidden: false,
       },
       
     },
@@ -783,104 +957,128 @@ export const configFormat: {
   deepseek: {
     "deepseek-chat": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     },
     "deepseek-reasoner": {
       streamResponse: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Stream Response",
         description: "Enables real-time output of the model's generated content.",
         defaultValue: true,
+        disabled: false,
+        hidden: false,
       },
       jsonResponseFormat: {
-        type: "boolean",
+        dataType: "boolean",
         displayName: "Response Format (JSON)",
         description:
           "Forces the model to adhere strictly to JSON formatting in its output.",
         defaultValue: false,
+        disabled: false,
+        hidden: false,
       },
       temperature: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Temperature",
         description:
           "Adjusts the creativity level of the model's responses, Higher values increase creativity and variability, while lower values make responses more focused and deterministic.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       presencePenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Presence Penalty",
         description:
           "Reduces the likelihood of the LLM mentioning new topics that haven't appeared in the conversation. Higher values discourage introducing new topics, maintaining coherence.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       frequencyPenalty: {
-        type: "number",
+        dataType: "float",
         min: 0,
         max: 1,
         displayName: "Frequency Penalty",
         description:
           "Discourages the LLM from repeating the same words or phrases frequently. Higher values promote diversity in word choice, reducing redundancy.",
         defaultValue: 0.5,
+        disabled: false,
+        hidden: false,
       },
       maxTokens: {
-        type: "number",
+        dataType: "int",
         min: -1,
         max: 4096,
         displayName: "Max Tokens",
         description:
           "The maximum number of tokens to generate. -1 means no limit.",
         defaultValue: -1,
+        disabled: false,
+        hidden: false,
       },
     }
   },

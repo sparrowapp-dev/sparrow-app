@@ -3,6 +3,7 @@ import type {
   HttpRequestMockAuthModeBaseEnum,
   HttpRequestMockMethodBaseEnum,
 } from "./http-request-mock-base";
+import type { MockRequestResponseDto } from "./http-response-mock-dto";
 
 export enum RequestMethodEnum {
   GET = "GET",
@@ -364,4 +365,33 @@ export interface HttpRequestMockTabInterface
     ResponseHeadersWrapper,
     ResponseBodyWrapper,
     ResponseDateWrapper,
-    ResponseStatusWrapper {}
+    ResponseStatusWrapper,
+    ItemsWrapper {}
+
+export interface IdWrapper {
+  id: string;
+}
+export interface NameWrapper {
+  name: string;
+}
+export interface TypeWrapper4 {
+  type: string;
+}
+export interface DescriptionWrapper {
+  description: string;
+}
+export interface MockRequestResponseWrapper {
+  mockRequestResponse: MockRequestResponseDto;
+}
+
+export interface MockItem
+  extends IdWrapper,
+    NameWrapper,
+    TypeWrapper4,
+    DescriptionWrapper,
+    StateWrapper,
+    MockRequestResponseWrapper {}
+
+export interface ItemsWrapper {
+  items: MockItem[];
+}

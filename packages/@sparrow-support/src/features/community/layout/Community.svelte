@@ -1,33 +1,40 @@
 <script>
   import { Ellipse, LogoSymbol } from "@sparrow/library/icons";
+  import DiscordPost from "../../discord-post/layout/DiscordPost.svelte";
 
   let isReadMore = false;
 </script>
 
-<div style=" padding:20px; background-color: black;">
+<div style=" padding:20px;">
   <div style="" class="">
     <div>
-      <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
+      <p
+        class="text-ds-font-size-20 fw-semibold mb-2"
+        style="color: var(--text-ds-neutral-50);"
+      >
         Community
       </p>
-      <p class="text-ds-font-size-14" style="color: var(--text-secondary-50);">
+      <p
+        class="text-ds-font-size-14"
+        style="color: var(--text-ds-neutral-400);"
+      >
         Stay updated with all feedback, from planning to progress, on a single
         roadmap.
       </p>
     </div>
     <div class="feedback-section active">
-      <h3
-        class="text-ds-font-size-14 text-ds-font-weight-semi-bold"
-        style=" line-height: 21px; "
-      >
+      <h3 class="text-ds-font-size-14 text-ds-font-weight-semi-bold" style="">
         Share your feedback on our product!!
       </h3>
-      <p class="text-ds-font-size-14 text-ds-font-weight-regular">
+      <p
+        class="text-ds-font-size-12 text-ds-font-weight-regular"
+        style="margin-bottom: 0;"
+      >
         Please let us know how we can make Sparrow the best product for you.
       </p>
     </div>
 
-    <div class="content-section px-2">
+    <div class="content-section">
       <h2
         class="text-ds-font-size-12"
         style="display:flex; align-items:center; padding: 16px, 10px, 10px, 10px;"
@@ -35,32 +42,32 @@
         <LogoSymbol height="25px" width="25px" />
         <div
           class="text-ds-font-size-16 text-ds-font-weight-semi-bold"
-          style=" padding: 3px; padding-top:9px; padding-left:5px; display:inline;"
+          style=" padding: 3px; padding-top:9px; padding-left:8px; display:inline; color: var(--text-secondary-100);"
         >
           Welcome to Sparrow’s Community Hub!
         </div>
       </h2>
       <p
         class="text-ds-font-size-14 text-ds-font-weight-regular"
-        style="color:var(--text-secondary-50);"
+        style="color:var(--text-ds-neutral-400); width: 80%;"
       >
         We're excited to hear your thoughts and suggestions on how we can
-        improve Sparrow, your go-to API management application. <br /> Whether it's
-        a new feature idea, a bug report, or general feedback, every comment is valuable
-        to us.
+        improve Sparrow, your go-to API management application. Whether it's a
+        new feature idea, a bug report, or general feedback, every comment is
+        valuable to us.
       </p>
     </div>
 
-    <div class="discord-section px-2">
+    <div class="discord-section">
       <h3
-        class="text-ds-font-size-14 text-ds-font-weight-semi-bold"
-        style="color: var(--text-secondary-100); "
+        class="text-ds-font-size-16 text-ds-font-weight-semi-bold"
+        style="color: var(--text-secondary-100); margin-bottom: 4px;"
       >
         Connect with Us
       </h3>
       <p
         class="text-ds-font-size-14 text-ds-font-weight-regular"
-        style="  color: var(--text-secondary-50); "
+        style="color:var(--text-ds-neutral-400); width: 85%;"
       >
         Utilize our integrated Discord community to send messages directly to
         our team and other users, even if you don't have a Discord account. Your
@@ -69,12 +76,15 @@
       </p>
 
       <div class="key-features">
-        <h3 class="text-ds-font-size-16 text-ds-font-weight-semi-bold">
+        <h3
+          class="text-ds-font-size-16 text-ds-font-weight-semi-bold"
+          style="color: var(--text-secondary-100); margin-bottom: 4px;"
+        >
           Key Features
         </h3>
         <p
           class="d-flex gap-2 align-items-center"
-          style="margin: 0px; color:var(--text-secondary-50);"
+          style="margin: 0px; margin-left: 8px; color:var(--text-ds-neutral-400);"
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold">Markdown Support:</span
@@ -84,7 +94,7 @@
         </p>
         <p
           class="d-flex gap-2 align-items-center"
-          style="margin: 0px; color:var(--text-secondary-50);"
+          style="margin: 0px; margin-left: 8px; color:var(--text-ds-neutral-400);"
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold">Switchable Channel:</span
@@ -94,7 +104,7 @@
         </p>
         <p
           class="d-flex gap-2 align-items-center"
-          style="margin: 0px;  color:var(--text-secondary-50);"
+          style="margin: 0px; margin-left: 8px;  color:var(--text-ds-neutral-400);"
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold">Rich media sharing:</span
@@ -105,7 +115,7 @@
         </p>
         <p
           class="d-flex gap-2 align-items-center"
-          style="margin: 0px;  color:var(--text-secondary-50);"
+          style="margin: 0px; margin-left: 8px;  color:var(--text-ds-neutral-400);"
         >
           <span><Ellipse color={"var(--icon-primary-300)"} /> </span><span
             class="fw-bold"
@@ -116,13 +126,14 @@
         </p>
         <p
           class="text-ds-font-size-14 text-ds-font-weight-regular"
-          style="margin: 0px; padding-left:17px;  color:var(--text-secondary-50);"
+          style="margin: 0px; padding-left:26px; color:var(--text-ds-neutral-400);"
         >
-          Join our community and start contributing to Sparrow.
+          Join our community and start contributing to Sparrow's development.
+          Click the button below to get started:
         </p>
       </div>
 
-      <div class="d-flex justify-content-center">
+      <!-- <div class="d-flex justify-content-center">
         <p
           role="button"
           class="d-flex align-items-center"
@@ -130,6 +141,9 @@
             isReadMore = !isReadMore;
           }}
         ></p>
+      </div> -->
+      <div class="pt-3">
+        <DiscordPost />
       </div>
     </div>
   </div>
@@ -137,26 +151,14 @@
 
 <style>
   .feedback-section {
-    background: rgba(54, 112, 247, 0.2);
-    border: 1px solid;
+    background: rgba(49, 108, 246, 0.2);
     padding: 15px;
     border-radius: 4px;
-    border-color: var(--bg-primary-600);
     display: none;
   }
 
   .feedback-section.active {
     display: block;
-  }
-
-  .feedback-section h3 {
-    margin: 0;
-    font-size: 12px;
-  }
-
-  .feedback-section p {
-    margin: 5px 0 0;
-    font-size: 0.9em;
   }
 
   .content-section {

@@ -272,3 +272,9 @@ export { default as MailInboxArrowDownRegular } from "./MailInboxArrowDownRegula
 export { default as BroadActivityFeedRegular } from "./BroadActivityFeedRegular.svelte";
 export { default as DiversityRegular } from "./DiversityRegular.svelte";
 export { default as PeopleTeamRegular } from "./PeopleTeamRegular.svelte";
+export { default as ChatMultipleRegular } from "./ChatMultipleRegular.svelte";
+export { default as CommentRegular } from "./CommentRegular.svelte";
+export { default as FilterRegular } from "./FilterRegular.svelte";
+export { default as CircleSmallRegular } from "./CircleSmallRegular.svelte";
+export { default as HourGlassRegular } from "./HourGlassRegular.svelte";
+export { default as MapRegular } from "./MapRegular.svelte";
