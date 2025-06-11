@@ -211,7 +211,7 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn desktop-build
+          yarn workspace @sparrow/desktop tauri build --debug --bundles deb
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
