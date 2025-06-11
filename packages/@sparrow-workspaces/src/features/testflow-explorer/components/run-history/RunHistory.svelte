@@ -42,8 +42,11 @@
     return name;
   };
 
-  onMount(()=>{})
-    
+  onMount(() => {
+    if (testflowStore?.history.length === planLimitTestFlowBlocks) {
+      planUpgradeModalOpen = true;
+    }
+  });
 </script>
 
 <div class="position-relative">
@@ -267,16 +270,20 @@
                 {/each}
               {/if}
               {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitTestFlowBlocks}
-                <div
+                <!-- <div
                   class="history-upgrade-box d-flex flex-row justify-content-center align-items-center"
                 >
                   <p class="history-upgrade-text" style="margin: 0px;">
                     Upgrade your plan to access the full run history for this
                     test flow.
                   </p>
+                </div> -->
+                <div
+                  class="d-flex flex-row justify-content-center align-items-center"
+                >
                   <Button
-                    type="primary"
-                    title="Upgrade"
+                    type="secondary"
+                    title="more"
                     size="small"
                     onClick={() => {
                       planUpgradeModalOpen = true;
