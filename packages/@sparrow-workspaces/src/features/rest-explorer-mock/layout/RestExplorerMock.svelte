@@ -186,6 +186,16 @@
 
   //Multiple Mockresponses
   let mockResponses = [];
+  let activeMockResponseIdx = 0;
+  function handleSetActiveResponseIdx(e) {
+    activeMockResponseIdx = e.activeResponseIdx;
+  }
+  $: selectedResponse =
+    $tab.property?.mockRequest?.items?.[activeMockResponseIdx];
+
+  $: {
+    console.log("selectedResponse", selectedResponse);
+  }
 
   /**
    * Converts the pixel-based min, max, and default sizes
@@ -739,6 +749,8 @@
                         {onHandleMockResponseState}
                         {onRenameMockResponse}
                         {onDeleteMockResponse}
+                        activeResponseIdx={activeMockResponseIdx}
+                        onSetActiveResponseIdx={handleSetActiveResponseIdx}
                       />
                     </div>
                     <div
@@ -782,19 +794,24 @@
                           > -->
                               <div class="d-flex justify-content-between">
                                 <ResponseNavigator
-                                  requestStateSection={$tab.property.mockRequest
-                                    ?.state?.responseNavigation}
-                                  {onUpdateRequestState}
-                                  responseHeadersLength={$tab.property
-                                    .mockRequest?.responseHeaders?.length || 0}
+                                  requestStateSection={selectedResponse?.state
+                                    ?.responseNavigation}
+                                  {onUpdateResponseState}
+                                  responseHeadersLength={selectedResponse
+                                    ?.mockRequestResponse?.responseHeaders
+                                    ?.length || 0}
+                                  selectedResponseId={selectedResponse?.id}
                                 />
                                 <Select
                                   data={HttpStatusCodes}
                                   onclick={(selectedItem) => {
                                     selectedStatusCode = selectedItem;
-                                    onUpdateResponseStatus(selectedItem);
+                                    onUpdateResponseStatus(
+                                      selectedItem,
+                                      selectedResponse?.id,
+                                    );
                                   }}
-                                  titleId={$tab.property.mockRequest
+                                  titleId={selectedResponse?.mockRequestResponse
                                     ?.responseStatus}
                                   placeholderText={"Status Code"}
                                   id={"httpStatusCode"}
@@ -823,14 +840,15 @@
                                 class="flex-grow-1 d-flex flex-column"
                                 style="overflow:auto; min-height:0;"
                               >
-                                {#if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
-                                  {#if $tab.property.mockRequest?.state?.responseBodyLanguage !== "Image"}
+                                {#if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
+                                  {#if selectedResponse?.state?.responseBodyLanguage !== "Image"}
                                     <ResponseBodyNavigator
-                                      response={$tab.property.mockRequest
-                                        ?.headers || []}
-                                      apiState={$tab.property.mockRequest
-                                        ?.state}
+                                      response={selectedResponse
+                                        ?.mockRequestResponse
+                                        ?.responseHeaders || []}
+                                      apiState={selectedResponse?.state}
                                       path={$tab.path}
+                                      responseId={selectedResponse.id}
                                       {onUpdateResponseState}
                                       {onUpdateRequestState}
                                       {onClearResponse}
@@ -844,17 +862,18 @@
                                     style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
                                   >
                                     <ResponseBody
-                                      response={$tab.property.mockRequest
-                                        ?.responseBody}
-                                      apiState={$tab.property.mockRequest
-                                        ?.state}
+                                      response={selectedResponse
+                                        ?.mockRequestResponse?.responseBody}
+                                      apiState={selectedResponse?.state}
                                       {onUpdateResponseBody}
+                                      responseId={selectedResponse.id}
                                     />
                                   </div>
-                                {:else if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
+                                {:else if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
                                   <div style="overflow:auto;">
                                     <ResponseHeaders
-                                      responseHeader={$tab.property.mockRequest
+                                      responseHeader={selectedResponse
+                                        ?.mockRequestResponse
                                         ?.responseHeaders || []}
                                     />
                                   </div>
