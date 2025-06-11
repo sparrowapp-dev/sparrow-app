@@ -94,26 +94,26 @@ jobs:
         with:
           version: 'latest'    
 
-      - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.2
-        with:
-          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-          kubernetes-namespace: 'sparrow-dev'
-          secret-name: 'sparrow-api-secret'
-          secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
-          platforms: 'windows'
-          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
+      #     platforms: 'windows'
 
       - name: sign msi
         run: |
           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          $bundlePath = "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
+        shell: pwsh
 
-      - name: Install AWS CLI
+      - name: AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
         with:
           version: latest
@@ -122,14 +122,14 @@ jobs:
 
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       
       - name: Post Windows Build Links to Teams
         run: |
-          $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+          $msiFile = Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
           $msiFileName = $msiFile.Name
           $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
           
@@ -229,27 +229,25 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.2
-        with:
-          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-          kubernetes-namespace: 'sparrow-dev'
-          secret-name: 'sparrow-api-secret'
-          secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
-          platforms: 'macos'
-          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
+      #     platforms: 'macos'
 
-      - name: Extract and Store Tauri Signatures
-        uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.2
-        with:
-          tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-          kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-          kubernetes-namespace: 'sparrow-dev'
-          secret-name: 'sparrow-api-secret'
-          secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
-          platforms: 'macos'
-          github-token: ${{ secrets.SP_GITHUB_TOKEN }}
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
+      #     platforms: 'macos'
 
       - name: Install AWS CLI
         run: |

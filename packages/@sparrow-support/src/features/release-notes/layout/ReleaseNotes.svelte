@@ -210,7 +210,12 @@
 <div style="height:100%; width:100%;">
   <div class="container-data" style="padding: 20px;">
     <div class="headerq">
-      <p class="text-ds-font-size-20 fw-semibold mb-2">Updates</p>
+      <p
+        class="text-ds-font-size-20 fw-semibold mb-2"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        Updates
+      </p>
       <p
         class="text-ds-font-size-14"
         style="color: var(--text-ds-neutral-400); "
