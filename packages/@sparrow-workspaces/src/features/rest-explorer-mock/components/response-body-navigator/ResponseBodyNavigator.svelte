@@ -38,6 +38,7 @@
   export let path;
   export let userRole;
   export let onUpdateRequestState;
+  export let responseId;
 
   let fileExtension: string;
   let formatedBody: string;
@@ -69,9 +70,12 @@
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
-    onUpdateResponseState({
-      responseBodyLanguage: tab,
-    });
+    onUpdateResponseState(
+      {
+        responseBodyLanguage: tab,
+      },
+      responseId,
+    );
   };
 
   $: {

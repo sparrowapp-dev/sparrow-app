@@ -192,6 +192,10 @@
   $: selectedResponse =
     $tab.property?.mockRequest?.items?.[activeMockResponseIdx];
 
+  $: {
+    console.log("selectedResponse", selectedResponse);
+  }
+
   /**
    * Converts the pixel-based min, max, and default sizes
    * of the chatbot pane into percentages relative to the
@@ -799,7 +803,10 @@
                                   data={HttpStatusCodes}
                                   onclick={(selectedItem) => {
                                     selectedStatusCode = selectedItem;
-                                    onUpdateResponseStatus(selectedItem);
+                                    onUpdateResponseStatus(
+                                      selectedItem,
+                                      selectedResponse?.id,
+                                    );
                                   }}
                                   titleId={selectedResponse?.mockRequestResponse
                                     ?.responseStatus}
@@ -838,6 +845,7 @@
                                         ?.responseHeaders || []}
                                       apiState={selectedResponse?.state}
                                       path={$tab.path}
+                                      responseId={selectedResponse.id}
                                       {onUpdateResponseState}
                                       {onUpdateRequestState}
                                       {onClearResponse}
@@ -855,6 +863,7 @@
                                         ?.mockRequestResponse?.responseBody}
                                       apiState={selectedResponse?.state}
                                       {onUpdateResponseBody}
+                                      responseId={selectedResponse.id}
                                     />
                                   </div>
                                 {:else if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
