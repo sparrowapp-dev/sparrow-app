@@ -708,6 +708,23 @@ class RestExplorerMockViewModel {
   };
 
   /**
+   * Updates the response headers for a particular mock response.
+   * @param _headers - The new headers array.
+   * @param responseId - The ID of the mock response to update.
+   */
+  public updateResponseHeaders = async (_headers: KeyValueChecked[], responseId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.mockRequest.items.forEach((data) => {
+      if (data.id === responseId) {
+        data.mockRequestResponse.responseHeaders = _headers;
+      }
+    });
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param _body - response status
    */
@@ -1503,7 +1520,7 @@ class RestExplorerMockViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) {}
+  set collection(e) { }
 
   /**
    *
@@ -2953,7 +2970,7 @@ class RestExplorerMockViewModel {
           type: ItemType.MOCK_REQUEST_RESPONSE,
           mockRequestResponse: {
             responseBody: "",
-            responseHeaders: [],
+            responseHeaders: [{ key: "", value: "", checked: false }],
             responseStatus: "",
             responseDate: "",
             selectedResponseBodyType: "",
