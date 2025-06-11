@@ -106,7 +106,7 @@
       },
       "active": true,
       "endpoints": [
-        "http://localhost:8000/{{target}}/{{arch}}/{{current_version}}"
+        "https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJCRkNBNDkwNUI2NjMwMDcKUldRSE1HWmJrS1Q4S3l4Slo5KzhUNGZoSXdlZmNuRDk3Qkh6NmY5aWJiKzU5a2FUUnQ2UlJhZUIK"
@@ -117,5 +117,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.9.0"
+  "version": "2.25.0"
 }
