@@ -25,7 +25,6 @@
   const handleCancel = () => {
     isOpen = false;
   };
-
 </script>
 
 <Modal {title} {isOpen} canClose={true} handleModalState={handleCancel}>

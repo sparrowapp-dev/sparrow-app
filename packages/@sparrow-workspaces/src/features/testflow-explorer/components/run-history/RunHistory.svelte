@@ -270,14 +270,6 @@
                 {/each}
               {/if}
               {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitTestFlowBlocks}
-                <!-- <div
-                  class="history-upgrade-box d-flex flex-row justify-content-center align-items-center"
-                >
-                  <p class="history-upgrade-text" style="margin: 0px;">
-                    Upgrade your plan to access the full run history for this
-                    test flow.
-                  </p>
-                </div> -->
                 <div
                   class="d-flex flex-row justify-content-center align-items-center"
                 >
