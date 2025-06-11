@@ -728,7 +728,7 @@
                 >
                   <!-- Response Pane -->
                   <div class="d-flex h-100" style="gap: 8px;">
-                    <div>
+                    <div style="width: 25%">
                       <MultipleMockResponse
                         requestName={$tab.name}
                         requestMethod={$tab.property.mockRequest?.method}
