@@ -428,4 +428,9 @@ export class TestflowViewModel {
       return false;
     }
   };
+
+  public currentTestflowCount = async () => {
+    const testflowDetails = await this.testflowRepository.getTestflowDoc();
+    return testflowDetails?.length;
+  };
 }

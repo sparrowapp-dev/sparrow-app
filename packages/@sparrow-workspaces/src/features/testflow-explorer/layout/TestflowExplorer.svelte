@@ -97,6 +97,9 @@
     isDynamicExpressionContent,
     updateDynamicExpressionValue,
   } from "../store/testflow";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { planInfoByRole } from "@sparrow/common/utils";
+  import { TeamRole } from "@sparrow/common/enums";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -129,6 +132,11 @@
   export let planLimitTestFlowBlocks: number = 5;
   export let planLimitTestFlows: number = 3;
   export let testflowCount: number = 1;
+  export let teamDetails: any;
+  export let upgradePlanModel: boolean = false;
+  export let handleRequestOwner: () => void;
+  export let handleRedirectToAdminPanel: () => void;
+  let planContent: any;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -753,6 +761,7 @@
   ) => {
     if (!_id) return;
     if ($nodes.length >= planLimitTestFlowBlocks + 1) {
+      upgradePlanModel = true;
       notifications.error(
         `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
       );
@@ -1397,6 +1406,19 @@
       testflowStore.history = updateHistoryItems;
     }
   };
+
+  $: {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+    console.log(
+      "THis is the value of it ---------->",
+      userRole,
+      TeamRole.TEAM_OWNER,
+      userRole === TeamRole.TEAM_OWNER,
+      userRole === (TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN),
+    );
+  }
 </script>
 
 <div
@@ -1810,6 +1832,25 @@
     }}
   />
 </Modal>
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModel}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Test flow blocks"
+  planLimitValue={planLimitTestFlowBlocks}
+  currentPlanValue={$nodes.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER || TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   :global(.svelte-flow__attribution) {

@@ -227,51 +227,53 @@ export class DashboardViewModel {
         };
         data.push(item);
       }
-    
-      
-        const planResponse =  await this.planService.getPlansByIds(
-          userPlans,
-          constants.API_URL,
-        );
-        
-        const parsedPlans =  []; 
-        if(response.isSuccessful && planResponse.data.data) {
-          for (const planData of planResponse.data.data) {
-            const rawData = planData;
-            if (!rawData?._id) continue;
-            const planDetails = {
-              planId: rawData._id,
-              name: rawData.name,
-              description: rawData.description,
-              active: rawData.active,
-              limits: {
-                workspacesPerHub: {
-                  area: rawData.limits.workspacesPerHub.area,
-                  value: rawData.limits.workspacesPerHub.value,
-                },
-                testflowPerWorkspace: {
-                  area: rawData.limits.testflowPerWorkspace.area,
-                  value: rawData.limits.testflowPerWorkspace.value,
-                },
-                blocksPerTestflow: {
-                  area: rawData.limits.blocksPerTestflow.area,
-                  value: rawData.limits.blocksPerTestflow.value,
-                },
-                selectiveTestflowRun: {
-                  area: rawData.limits.selectiveTestflowRun.area,
-                  active: rawData.limits.selectiveTestflowRun.active,
-                },
-              },
-              createdAt: rawData.createdAt,
-              updatedAt: rawData.updatedAt,
-              createdBy: rawData.createdBy,
-              updatedBy: rawData.updatedBy,
-            };
-            parsedPlans.push(planDetails);
-          } 
-          await this.planRepository.upsertMany(parsedPlans);
 
+      const planResponse = await this.planService.getPlansByIds(
+        userPlans,
+        constants.API_URL,
+      );
+
+      const parsedPlans = [];
+      if (response.isSuccessful && planResponse.data.data) {
+        for (const planData of planResponse.data.data) {
+          const rawData = planData;
+          if (!rawData?._id) continue;
+          const planDetails = {
+            planId: rawData._id,
+            name: rawData.name,
+            description: rawData.description,
+            active: rawData.active,
+            limits: {
+              workspacesPerHub: {
+                area: rawData.limits.workspacesPerHub.area,
+                value: rawData.limits.workspacesPerHub.value,
+              },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
+              testflowPerWorkspace: {
+                area: rawData.limits.testflowPerWorkspace.area,
+                value: rawData.limits.testflowPerWorkspace.value,
+              },
+              blocksPerTestflow: {
+                area: rawData.limits.blocksPerTestflow.area,
+                value: rawData.limits.blocksPerTestflow.value,
+              },
+              selectiveTestflowRun: {
+                area: rawData.limits.selectiveTestflowRun.area,
+                active: rawData.limits.selectiveTestflowRun.active,
+              },
+            },
+            createdAt: rawData.createdAt,
+            updatedAt: rawData.updatedAt,
+            createdBy: rawData.createdBy,
+            updatedBy: rawData.updatedBy,
+          };
+          parsedPlans.push(planDetails);
         }
+        await this.planRepository.upsertMany(parsedPlans);
+      }
 
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(

@@ -150,12 +150,10 @@ export class TeamsViewModel {
         };
         data.push(item);
       }
-      const planResponse =  await this.planService.getPlansByIds(
-        userPlans,
-      );
-      
-      const parsedPlans =  []; 
-      if(response.isSuccessful && planResponse.data.data) {
+      const planResponse = await this.planService.getPlansByIds(userPlans);
+
+      const parsedPlans = [];
+      if (response.isSuccessful && planResponse.data.data) {
         for (const planData of planResponse.data.data) {
           const rawData = planData;
           if (!rawData?._id) continue;
@@ -173,6 +171,10 @@ export class TeamsViewModel {
                 area: rawData.limits.testflowPerWorkspace.area,
                 value: rawData.limits.testflowPerWorkspace.value,
               },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
               blocksPerTestflow: {
                 area: rawData.limits.blocksPerTestflow.area,
                 value: rawData.limits.blocksPerTestflow.value,
@@ -188,9 +190,8 @@ export class TeamsViewModel {
             updatedBy: rawData.updatedBy,
           };
           parsedPlans.push(planDetails);
-        } 
+        }
         await this.planRepository.upsertMany(parsedPlans);
-
       }
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(
@@ -308,9 +309,9 @@ export class TeamsViewModel {
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New hub ${team.name} is created.`);
     } else {
-      if(response?.message === "Plan limit reached"){
+      if (response?.message === "Plan limit reached") {
         notifications.error("Failed to create hub. please upgrade your plan.");
-      }else{
+      } else {
         notifications.error("Failed to create hub. Please try again.");
       }
     }

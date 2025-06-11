@@ -214,13 +214,11 @@ export class DashboardViewModel {
         };
         data.push(item);
       }
-      
-      const planResponse =  await this.planService.getPlansByIds(
-        userPlans
-      );
-      
-      const parsedPlans =  []; 
-      if(response.isSuccessful && planResponse.data.data) {
+
+      const planResponse = await this.planService.getPlansByIds(userPlans);
+
+      const parsedPlans = [];
+      if (response.isSuccessful && planResponse.data.data) {
         for (const planData of planResponse.data.data) {
           const rawData = planData;
           if (!rawData?._id) continue;
@@ -238,6 +236,10 @@ export class DashboardViewModel {
                 area: rawData.limits.testflowPerWorkspace.area,
                 value: rawData.limits.testflowPerWorkspace.value,
               },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
               blocksPerTestflow: {
                 area: rawData.limits.blocksPerTestflow.area,
                 value: rawData.limits.blocksPerTestflow.value,
@@ -253,9 +255,8 @@ export class DashboardViewModel {
             updatedBy: rawData.updatedBy,
           };
           parsedPlans.push(planDetails);
-        } 
+        }
         await this.planRepository.upsertMany(parsedPlans);
-
       }
 
       await this.teamRepository.bulkInsertData(data);
