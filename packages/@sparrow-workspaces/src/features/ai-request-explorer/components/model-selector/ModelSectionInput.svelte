@@ -4,7 +4,7 @@
   import { CodeMirrorInput } from "../../../../components";
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
-  import { SaveRegular } from "@sparrow/library/icons";
+  import { CodeRegular, SaveRegular } from "@sparrow/library/icons";
   import { ModelOptions } from "..";
   import { createEventDispatcher } from "svelte";
   import {
@@ -27,6 +27,7 @@
   let isModelSelectorOpen = false;
   export let selectedModelProvider = "openai";
   export let selectedModel = "gpt-4o";
+  export let openGetCodePopup: () => void;
 
   const dispatch = createEventDispatcher();
   const theme = new UrlInputTheme().build();
@@ -135,6 +136,15 @@
       />
     </div>
   </div>
+
+  <!-- GetCode button -->
+  <Button
+    title="Get Code"
+    type="primary"
+    startIcon={CodeRegular}
+    customWidth={"112px"}
+    onClick={openGetCodePopup}
+  />
 
   <!-- {console.log(" info :>> ", isSave, userRole, WorkspaceRole.WORKSPACE_VIEWER)} -->
   <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>

@@ -18,12 +18,26 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { disabledModelFeatures } from "../constants";
+  import { disabledModelFeatures, modelCodeTemplates } from "../constants";
 
-  import { SettingsRegular, BotSparkleRegular } from "@sparrow/library/icons";
-  import { Modal } from "@sparrow/library/ui";
+  import {
+    SettingsRegular,
+    BotSparkleRegular,
+    CopyIcon,
+    CopyIcon2,
+    TickIcon,
+    CopyRegular,
+  } from "@sparrow/library/icons";
+  import { Button, Modal, notifications } from "@sparrow/library/ui";
   import { SaveAsCollectionItem } from "../../save-as-request";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { Editor, Select } from "@sparrow/library/forms";
+  import type { CodeTemplateLanguage } from "../types";
+  import {
+    CodeEditorLanguageType,
+    CodeTemplateLanguageType,
+  } from "../types/ai-request";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -107,6 +121,59 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
+
+  let codeTemplateLanguage: CodeEditorLanguageType =
+    CodeEditorLanguageType.nodejs;
+  let selectedCodeTemplateId = CodeTemplateLanguageType.NODEJS;
+  let codeTemplate: string;
+  let isCodeTemplateBeautified = true;
+
+  const handleCodeTemplateChange = (
+    codeTemplateId: CodeTemplateLanguageType,
+  ) => {
+    const provider = $tab?.property?.aiRequest?.aiModelProvider;
+    const variant = $tab?.property?.aiRequest?.aiModelVariant;
+    const apiKey = $tab?.property?.aiRequest?.auth?.apiKey?.authValue;
+    const configuration = $tab?.property?.aiRequest?.configurations;
+
+    selectedCodeTemplateId = codeTemplateId;
+    codeTemplateLanguage = CodeEditorLanguageType[selectedCodeTemplateId];
+
+    // Get the template function
+    const templateFunction =
+      modelCodeTemplates[provider][selectedCodeTemplateId]["code_template"];
+
+    // Call the template function with parameters to get the actual code string
+    codeTemplate = templateFunction(variant, apiKey, configuration[provider]);
+
+    // console.log("sel id :>> ", selectedCodeTemplateId);
+    // console.log("sel lang :>> ", codeTemplateLanguage);
+    // console.log("sel codeTemplate :>> ", templateFunction);
+  };
+
+  let isGetCodePopupOpen = false;
+  let isCodeCopied = false;
+  const onClickOpenGetCodePopup = async () => {
+    const provider = $tab?.property?.aiRequest?.aiModelProvider;
+    const variant = $tab?.property?.aiRequest?.aiModelVariant;
+    const apiKey = $tab?.property?.aiRequest?.auth?.apiKey?.authValue;
+    const configuration = $tab?.property?.aiRequest?.configurations;
+
+    codeTemplateLanguage = CodeEditorLanguageType.nodejs;
+    selectedCodeTemplateId = CodeTemplateLanguageType.NODEJS;
+    const templateFunction =
+      modelCodeTemplates[provider][selectedCodeTemplateId]["code_template"];
+    codeTemplate = templateFunction(variant, apiKey, configuration[provider]);
+
+    // console.log("id :>> ", selectedCodeTemplateId);
+    // console.log("lang :>> ", codeTemplateLanguage);
+    // console.log("content :>> ", codeTemplate);
+    isGetCodePopupOpen = true;
+  };
+
+  const updateCodeTemplateBeautifiedState = (value: boolean) => {
+    isCodeTemplateBeautified = value;
+  };
 </script>
 
 {#if $tab.tabId}
@@ -126,6 +193,7 @@
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
         {onUpdateAiConversation}
+        openGetCodePopup={onClickOpenGetCodePopup}
       />
 
       <div
@@ -294,6 +362,101 @@
       {onRenameCollection}
       {onRenameFolder}
     />
+  </Modal>
+
+  <Modal
+    title={`Code for ${$tab?.property?.aiRequest?.aiModelVariant} API`}
+    type={"dark"}
+    zIndex={1000}
+    isOpen={isGetCodePopupOpen}
+    width={"40%"}
+    handleModalState={() => {
+      isGetCodePopupOpen = false;
+    }}
+  >
+    <div
+      class="d-flex align-items-center justify-content-between mt-2 mb-2 w-100 gap-2"
+    >
+      <div class="flex-grow-1" style="max-width: 75%;">
+        <Select
+          id={"code-selector"}
+          data={[
+            {
+              id: CodeTemplateLanguageType.NODEJS,
+              name: "NodeJs",
+              disabled: false,
+              hide: false,
+            },
+            {
+              id: CodeTemplateLanguageType.JSON,
+              name: CodeEditorLanguageType.json,
+              disabled: false,
+              hide: false,
+            },
+            {
+              id: CodeTemplateLanguageType.PYTHON,
+              name: CodeEditorLanguageType.python,
+              disabled: false,
+              hide: false,
+            },
+            {
+              id: CodeTemplateLanguageType.CURL,
+              name: CodeEditorLanguageType.curl,
+              disabled: false,
+              hide: false,
+            },
+          ]}
+          titleId={selectedCodeTemplateId}
+          onclick={(id) => {
+            handleCodeTemplateChange(id);
+          }}
+          menuItem={"v2"}
+          minHeaderWidth={"100%"}
+          maxHeaderWidth={"100%"}
+          minBodyWidth={"100%"}
+          variant={"light-violet"}
+          position={"absolute"}
+          zIndex={200}
+        />
+      </div>
+
+      <div class="flex-shrink-0">
+        <Button
+          title={isCodeCopied ? "Copied" : "Copy Code"}
+          size={"small"}
+          type={"teritiary-regular"}
+          startIcon={isCodeCopied ? TickIcon : CopyRegular}
+          iconSize={14}
+          onClick={async () => {
+            if (isCodeCopied) return;
+            try {
+              await navigator.clipboard.writeText(codeTemplate);
+              isCodeCopied = true;
+              notifications.success("Code copied to clipboard.");
+              await new Sleep().setTime(1500).exec();
+              isCodeCopied = false;
+            } catch (err) {
+              notifications.success("Failed to copy the code.");
+            }
+          }}
+        />
+      </div>
+    </div>
+
+    <div
+      class="request-body position-relative w-100"
+      style="background-color: var(--bg-ds-neutral-900); border-radius: 2px; height: 260px; border: 1px solid var(--border-color, rgba(255,255,255,0.1));"
+    >
+      <Editor
+        bind:lang={codeTemplateLanguage}
+        bind:value={codeTemplate}
+        on:change={() => {}}
+        isEditable={false}
+        autofocus={false}
+        isBodyBeautified={isCodeTemplateBeautified}
+        beautifySyntaxCallback={updateCodeTemplateBeautifiedState}
+      />
+    </div>
   </Modal>
 {/if}
 
