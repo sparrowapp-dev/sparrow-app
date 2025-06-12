@@ -120,11 +120,11 @@ jobs:
           PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
           productbuild \
             --component "$BUNDLE_PATH" /Applications \
-            --sign "$CERT_ID" \
+            --sign "$INSTALLER_CERT_ID" \
             "$PKG_PATH"
         env:
-          CERT_ID: ${{ env.CERT_ID }} 
-          
+          INSTALLER_CERT_ID: "3rd Party Mac Developer Installer: Rahul Joshi (9NQFM3WKMZ)"
+
       - name: Upload .pkg to S3
         run: |
           aws s3 cp apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg s3://sparrow-assest/macos/
