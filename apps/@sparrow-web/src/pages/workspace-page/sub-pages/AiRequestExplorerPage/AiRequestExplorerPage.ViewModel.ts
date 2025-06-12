@@ -944,114 +944,69 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   }
 
-  public generateAiPrompt = async (target: "UserPrompt" | "SystemPrompt", prompt = ""): Promise<string | undefined> => {
+  public generateAiPrompt = async (
+    target: "UserPrompt" | "SystemPrompt",
+    prompt = ""
+  ): Promise<{
+    successStatus: boolean;
+    message: string;
+    aiGeneratedPrompt: string;
+    isLimitReached: boolean;
+    target: "UserPrompt" | "SystemPrompt";
+  }> => {
     await this.updateRequestState({ isDocGenerating: true });
-    const componentData = this._tab.getValue();
-    const apiData = {
-        "body": {
-            "raw": "",
-            "urlencoded": [
-                {
-                    "key": "",
-                    "value": "",
-                    "checked": false
-                }
-            ],
-            "formdata": [
-                {
-                    "key": "",
-                    "value": "",
-                    "base": "",
-                    "checked": false,
-                    "type": "text"
-                }
-            ]
-        },
-        "headers": [
-            {
-                "key": "",
-                "value": "",
-                "checked": false
-            }
-        ],
-        "method": "GET",
-        "queryParams": [
-            {
-                "key": "",
-                "value": "",
-                "checked": false
-            }
-        ],
-        "url": "www.google.com",
-        "auth": {
-            "bearerToken": "",
-            "basicAuth": {
-                "username": "",
-                "password": ""
-            },
-            "apiKey": {
-                "authKey": "",
-                "authValue": "",
-                "addTo": "Header"
-            }
-        }
-    }
-    prompt += `. Utilize the provided api data ${JSON.stringify(apiData)}`;
-    const response = await this.aiAssistentService.generateAiResponse({
-      text: prompt,
-      instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
+
+    const response = await this.aiAssistentService.generateUserOrSystemPrompts({
+      userInput: prompt,
+      emailId: getClientUser().email,
     });
 
-    let generatedPrompt = null;
     if (response.isSuccessful) {
-      if(target === "UserPrompt") {
-        // await this.updateRequestAIPrompt(response.data.data.text);
-        generatedPrompt = response.data.data.result;
-        return generatedPrompt;
-      }
-      else if (target === "SystemPrompt") {
-        const formatter = new MarkdownFormatter();
-        const formattedData = await formatter.FormatData(
-          response.data.data.result,
-        );
-        const stringifyData = JSON.stringify(formattedData.blocks);
-        // await this.updateAiSystemPrompt(stringifyData);
-        // await this.updateRequestState({
-        //   isDocAlreadyGenerated: true,
-        // });
-
-        generatedPrompt = stringifyData;
-        return generatedPrompt;
-
-      } else if (response?.message === "Limit reached") {
-        notifications.error(
-          "Failed to generate documentation. Your monthly AI usage limit is reached.",
-        );
-        generatedPrompt = "Failed to generate documentation. Your monthly AI usage limit is reached.";
-        return generatedPrompt;
-      }
-      else {
-        return response?.message || "Something went wrong. Please try again";
+      if (
+        typeof response.data?.data === "string" &&
+        response.data.data.includes("Limit Reached")
+      ) {
+        return {
+          successStatus: false,
+          message: response.data.message,
+          aiGeneratedPrompt: "",
+          isLimitReached: true,
+          target,
+        };
       }
 
-    // setTimeout(async () => {
-    //   // renders response before disabling the editor
-    //   await this.updateRequestState({ isDocGenerating: false });
-    // }, 1000);
+      return {
+        successStatus: true,
+        message: response.data.message,
+        aiGeneratedPrompt: response.data.data,
+        isLimitReached: false,
+        target,
+      };
+    }
 
-  }};
+    return {
+      successStatus: false,
+      message: response?.data?.message || "Something went wrong. Please try again",
+      aiGeneratedPrompt: "",
+      isLimitReached: false,
+      target,
+    };
+  };
+
+
 
 
   public handleInsertAiPrompt = async (target: "UserPrompt" | "SystemPrompt", response: string) => {
-    const componentData = this._tab.getValue();
     console.log("In insertAiPrompt() :> ", response);
     if (target === "UserPrompt") {
       await this.updateUserPrompt(response);
     } else if (target === "SystemPrompt") {
-      await this.updateAiSystemPrompt(response);
-      // await new Sleep().setTime(1500).exec();
-      // await this.updateRequestState({ aiNavigation: "Authorization" });
-      // await this.updateRequestState({ aiNavigation: "System Prompt" });
+      await this.updateRequestState({ isSaveDescriptionInProgress: true });
+      const formatter = new MarkdownFormatter();
+      const formattedData = await formatter.FormatData(response);
+      const stringifyData = JSON.stringify(formattedData.blocks);
+      await this.updateAiSystemPrompt(stringifyData);
+      await this.updateRequestState({ isSaveDescriptionInProgress: false });
     }
     return response;
   }

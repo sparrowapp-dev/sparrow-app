@@ -24,7 +24,7 @@
     SettingsRegular,
     BotSparkleRegular,
   } from "@sparrow/library/icons";
-  import { Alert, Button, Modal } from "@sparrow/library/ui";
+  import { Alert, Button, Modal, notifications } from "@sparrow/library/ui";
   import { Textarea } from "@sparrow/library/forms";
   import { Sleep } from "@sparrow/common/utils";
 
@@ -64,6 +64,10 @@
   let aiPromptQueryResponse = "";
   let insertBtnLoader = false;
   let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" = "None";
+  let isSparrowAiLimitReached = false;
+  let isErrorWhileGeneratePrompt = false;
+  let errorMsgForGeneratePrompt = "";
+
   const toggleGeneratePromptModal = () => {
     isGeneratePromptModalOpen = !isGeneratePromptModalOpen;
   };
@@ -174,11 +178,11 @@
                   {#if $tab.property.aiRequest?.aiModelProvider}
                     <RequestDoc
                       {onUpdateAiSystemPrompt}
-                      isEditable={disabledModelFeatures[
-                        $tab.property.aiRequest?.state?.aiNavigation
-                      ].includes($tab.property.aiRequest?.aiModelVariant)}
-                      requestDoc={$tab.property.aiRequest.systemPrompt}
+                      isEditable={true}
+                      requestDoc={$tab.property.aiRequest?.systemPrompt}
                       {activateGeneratePromptModal}
+                      isAutoPromptGenerationInProgress={$tab.property.aiRequest
+                        .state.isSaveDescriptionInProgress}
                     />
                   {:else}
                     <div
@@ -306,6 +310,7 @@
   handleModalState={() => {
     console.log("Modal closed");
     isGeneratePromptModalOpen = false;
+    isSparrowAiLimitReached = false;
   }}
 >
   <!-- Description Text -->
@@ -316,7 +321,7 @@
   </div>
 
   <!-- Two Column Layout -->
-  <div class="row g-3 mb-4">
+  <div class="row g-3 {isSparrowAiLimitReached ? 'mb-2' : 'mb-4'}">
     <!-- Left Column - Your Message -->
     <div class="col-6">
       <div class="d-flex flex-column h-100">
@@ -369,19 +374,21 @@
       </div>
     </div>
 
-    <Alert
-      heading="Generate Prompt Monthly Limit Reached"
-      description="You’ve hit your monthly usage limit for generate prompt. You can resume next month or explore our discord community for feedback and discussions. Thanks for understanding!"
-      varient="info"
-      ctaShow={false}
-      containerWidth={"100%"}
-      closeIconRequired={false}
-      onClickClose={() => {}}
-    />
+    {#if isSparrowAiLimitReached}
+      <Alert
+        heading="Generate Prompt Monthly Limit Reached"
+        description="You’ve hit your monthly usage limit for generate prompt. You can resume next month or explore our discord community for feedback and discussions. Thanks for understanding!"
+        varient="info"
+        ctaShow={false}
+        containerWidth={"100%"}
+        closeIconRequired={false}
+        onClickClose={() => {}}
+      />
+    {/if}
   </div>
 
   <!-- Action Buttons -->
-  <div class="d-flex justify-content-between gap-2 mt-4 w-100">
+  <div class="d-flex justify-content-between gap-2 mt-2 w-100">
     <Button
       title={aiPromptQueryResponse.length
         ? "Regenerate Response"
@@ -394,15 +401,24 @@
       onClick={async () => {
         console.log("Generate Response clicked");
         isPromptGenerating = true;
-        const res = await onGenerateAiPrompt(
+        const response = await onGenerateAiPrompt(
           generatePromptTarget,
           userPromptExpectation,
         );
 
-        aiPromptQueryResponse = res;
-        await new Sleep().setTime(2000).exec();
+        if (response.successStatus) {
+          aiPromptQueryResponse = response.aiGeneratedPrompt;
+        } else if (response.isLimitReached) {
+          isSparrowAiLimitReached = true;
+        } else {
+          isErrorWhileGeneratePrompt = true;
+          errorMsgForGeneratePrompt = response.message;
+          notifications.error(
+            "Something went wrong while prompt generation. Please try again",
+          );
+        }
+        // await new Sleep().setTime(2000).exec();
         isPromptGenerating = false;
-        console.log("Generated Response: ", JSON.parse(res));
       }}
     />
 
@@ -415,6 +431,7 @@
         disable={isPromptGenerating}
         onClick={() => {
           isGeneratePromptModalOpen = false;
+          isSparrowAiLimitReached = false;
         }}
       />
       <Button

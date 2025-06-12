@@ -7,6 +7,7 @@
   export let requestDoc: string;
   export let isEditable: boolean = false;
   export let activateGeneratePromptModal;
+  export let isAutoPromptGenerationInProgress = true;
 </script>
 
 <div class="request-doc-wrapper {isEditable ? 'disabled' : ''}">
@@ -18,16 +19,15 @@
           id={"editor2"}
           onInput={onUpdateAiSystemPrompt}
           value={requestDoc}
-          isReadOnly={false}
+          isReadOnly={isAutoPromptGenerationInProgress ? true : false}
         />
       </div>
     </div>
 
     <!-- <div id="generate-prompt-chip" class="" style=""> -->
-    <Tooltip title={"Generate system prompt"} placement={"top-center"}>
+    <Tooltip title={"Generate System Prompt"} placement={"top-center"}>
       <button
         on:click={() => {
-          console.log("Generate system prompt clicked");
           activateGeneratePromptModal("SystemPrompt");
         }}
         class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1"

@@ -4,6 +4,11 @@ export interface PromptDto {
   instructions: string;
 }
 
+export interface GenerateUserAndSystemPromptsDto {
+  userInput: string;
+  emailId?: string;
+}
+
 export interface StreamPromptDto {
   text: string;
   tabId: string;
