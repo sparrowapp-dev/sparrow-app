@@ -133,10 +133,10 @@
   export let planLimitTestFlows: number = 3;
   export let testflowCount: number = 1;
   export let teamDetails: any;
-  export let upgradePlanModel: boolean = false;
+  export let testflowBlocksPlanModelOpen: boolean = false;
   export let handleRequestOwner: () => void;
   export let handleRedirectToAdminPanel: () => void;
-  export let planUpgradeModalOpen: boolean = false;
+  export let runHistoryPlanModelOpen: boolean = false;
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
   let planContent: any;
@@ -764,7 +764,7 @@
   ) => {
     if (!_id) return;
     if ($nodes.length >= planLimitTestFlowBlocks + 1) {
-      upgradePlanModel = true;
+      testflowBlocksPlanModelOpen = true;
       // notifications.error(
       //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
       // );
@@ -1527,7 +1527,7 @@
           {toggleHistoryDetails}
           {toggleHistoryContainer}
           {planLimitTestFlowBlocks}
-          bind:planUpgradeModalOpen
+          bind:runHistoryPlanModelOpen
         />
       </div>
     </div>
@@ -1834,7 +1834,7 @@
 </Modal>
 
 <PlanUpgradeModal
-  bind:isOpen={upgradePlanModel}
+  bind:isOpen={testflowBlocksPlanModelOpen}
   title={planContent?.title}
   description={planContent?.description}
   planType="Test flow blocks"
@@ -1854,7 +1854,7 @@
 />
 
 <PlanUpgradeModal
-  bind:isOpen={planUpgradeModalOpen}
+  bind:isOpen={runHistoryPlanModelOpen}
   title={planContent?.title}
   description={planContent?.description}
   planType="Run History"
