@@ -150,12 +150,10 @@ export class TeamsViewModel {
         };
         data.push(item);
       }
-      const planResponse =  await this.planService.getPlansByIds(
-        userPlans,
-      );
+      const planResponse = await this.planService.getPlansByIds(userPlans);
 
-      const parsedPlans =  []; 
-      if(response.isSuccessful && planResponse.data.data) {
+      const parsedPlans = [];
+      if (response.isSuccessful && planResponse.data.data) {
         for (const planData of planResponse.data.data) {
           const rawData = planData;
           if (!rawData?._id) continue;
@@ -312,13 +310,9 @@ export class TeamsViewModel {
       notifications.success(`New hub ${team.name} is created.`);
     } else {
       if (response?.message === "Plan limit reached") {
-<<<<<<< HEAD
-        notifications.error("Failed to create hub. please upgrade your plan.");
-=======
         notifications.error(
           "You’ve reached the limit of private hub on your current plan. Upgrade to create more private hubs",
         );
->>>>>>> feat/sparrow-plans
       } else {
         notifications.error("Failed to create hub. Please try again.");
       }
