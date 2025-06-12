@@ -453,9 +453,6 @@ class AiRequestExplorerViewModel {
 
       if (response.isSuccessful) {
         if (conversationId === currTabConversationId) {
-          // this.updateAiRequestConversationTitle("New Conversation");
-          // this.updateAiRequestConversationId("");
-          // this.updateRequestAIConversation([]);
           this.handleStartNewConversation();
         }
         await this.fetchConversations(); // Fetch to udpate the states in local db
