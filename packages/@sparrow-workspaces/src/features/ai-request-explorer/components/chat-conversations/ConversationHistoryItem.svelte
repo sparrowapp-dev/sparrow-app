@@ -44,6 +44,7 @@
   export let currOpenedConversationId: string;
 
   let isDeleteConversationPopupOpen = false;
+  let isDeleteLoading = false;
   const handleDelete = async (e: Event) => {
     e.stopPropagation();
     await onDeleteConversation(conversation.id, conversation.title);
@@ -259,9 +260,12 @@
       title={"Delete"}
       size={"medium"}
       type={"danger"}
+      loader={isDeleteLoading}
       customWidth={"95px"}
       onClick={async (e) => {
+        isDeleteLoading = true;
         await handleDelete(e);
+        isDeleteLoading = false;
         isDeleteConversationPopupOpen = false;
       }}
     ></Button>
