@@ -134,6 +134,7 @@
   export let onCreateMockResponse;
   export let onHandleMockResponseState;
   export let onRenameMockResponse;
+  export let onDeleteMockResponse;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -192,10 +193,6 @@
   }
   $: selectedResponse =
     $tab.property?.mockRequest?.items?.[activeMockResponseIdx];
-
-  $: {
-    console.log("selectedResponse", selectedResponse);
-  }
 
   /**
    * Converts the pixel-based min, max, and default sizes
@@ -738,7 +735,7 @@
                 >
                   <!-- Response Pane -->
                   <div class="d-flex h-100" style="gap: 8px;">
-                    <div>
+                    <div style="width: 25%">
                       <MultipleMockResponse
                         requestName={$tab.name}
                         requestMethod={$tab.property.mockRequest?.method}
@@ -748,6 +745,7 @@
                         {onCreateMockResponse}
                         {onHandleMockResponseState}
                         {onRenameMockResponse}
+                        {onDeleteMockResponse}
                         activeResponseIdx={activeMockResponseIdx}
                         onSetActiveResponseIdx={handleSetActiveResponseIdx}
                       />

@@ -48,7 +48,6 @@
   };
   $: {
     if (requestStateSection) {
-      console.log("requestStateSection", requestStateSection);
       tabs = refreshTabs(responseHeadersLength);
     }
   }
