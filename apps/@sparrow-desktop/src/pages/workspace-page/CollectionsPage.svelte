@@ -936,7 +936,7 @@
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
-                        <TestFlowExplorerPage tab={$activeTab} />
+                        <TestFlowExplorerPage tab={$activeTab}  {teamDetails} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
