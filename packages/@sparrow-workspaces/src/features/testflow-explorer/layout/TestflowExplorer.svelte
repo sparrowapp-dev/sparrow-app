@@ -137,6 +137,8 @@
   export let handleRequestOwner: () => void;
   export let handleRedirectToAdminPanel: () => void;
   export let planUpgradeModalOpen: boolean = false;
+  export let selectiveRunModalOpen: boolean = false;
+  export let selectiveRunTestflow: boolean = false;
   let planContent: any;
 
   const checkRequestExistInNode = (_id: string) => {
@@ -1324,6 +1326,9 @@
   });
 
   const partialRun = async (_id: string, _event: string) => {
+    if (!selectiveRunTestflow) {
+      selectiveRunModalOpen = true;
+    }
     if (!testflowStore?.isTestFlowRunning) {
       unselectNodes();
       await onClickRun(_id, _event);
@@ -1855,6 +1860,25 @@
   planType="Run History"
   planLimitValue={planLimitTestFlowBlocks}
   currentPlanValue={testflowStore?.history.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={selectiveRunModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Selective Runs"
+  activePlan={selectiveRunTestflow ? "active" : "disabled"}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

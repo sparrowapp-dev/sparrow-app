@@ -12,7 +12,8 @@
     | "Selective Runs"
     | "Run History" = "Workspaces";
   export let planLimitValue: number = 3;
-  export let currentPlanValue: number = 3;
+  export let currentPlanValue: number;
+  export let activePlan: "active" | "disabled" = "disabled";
 
   export let userName: string = "";
   export let userEmail: string = "";
@@ -34,8 +35,12 @@
 
       <div class="plan-usage plan-usage-margin">
         <span class="plan-label">{planType}:</span>
-        <span class="plan-count">{currentPlanValue}</span>
-        <span class="plan-limit">/{planLimitValue}</span>
+        {#if currentPlanValue}
+          <span class="plan-count">{currentPlanValue}</span>
+          <span class="plan-limit">/{planLimitValue}</span>
+        {:else}
+          <span class="plan-active">{activePlan}</span>
+        {/if}
       </div>
 
       {#if userName && !isOwner}
@@ -140,6 +145,15 @@
     line-height: 1.43;
     letter-spacing: 0;
     color: var(--text-ds-neutral-400);
+  }
+
+  .plan-active {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.43;
+    letter-spacing: 0;
+    color: var(--text-ds-neutral-50);
   }
 
   .plan-usage {

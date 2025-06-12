@@ -37,8 +37,10 @@
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
   let currentTestflowCount: number = 1;
+  let selectiveRunTestflow: boolean = false;
   let upgradePlanModel: boolean = false;
   let planUpgradeModalOpen: boolean = false;
+  let selectiveRunModalOpen: boolean = false;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -196,6 +198,7 @@
     if (planlimits) {
       planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
     }
   };
 
@@ -204,6 +207,7 @@
       await _viewModel1.requestToUpgradePlan(teamDetails?.teamId);
       upgradePlanModel = false;
       planUpgradeModalOpen = false;
+      selectiveRunModalOpen = false;
     }
   };
 
@@ -212,6 +216,7 @@
       await _viewModel1.handleRedirectToAdminPanel(teamDetails?.teamId);
       upgradePlanModel = false;
       planUpgradeModalOpen = false;
+      selectiveRunModalOpen = false;
     }
   };
 
@@ -256,7 +261,9 @@
     {teamDetails}
     bind:upgradePlanModel
     bind:planUpgradeModalOpen
+    bind:selectiveRunModalOpen
     handleRedirectToAdminPanel={handleRedirectAdminPanel}
     {handleRequestOwner}
+    {selectiveRunTestflow}
   />
 {/if}
