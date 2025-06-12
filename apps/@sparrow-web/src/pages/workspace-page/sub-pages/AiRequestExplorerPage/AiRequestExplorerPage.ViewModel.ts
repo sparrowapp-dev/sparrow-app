@@ -450,7 +450,6 @@ class AiRequestExplorerViewModel {
 
     try {
       const response = await this.aiRequestService.deleteConversation(provider, providerAuthKey, conversationId);
-      console.log("Conversation Title Update Response :>> ", response);
 
       if (response.isSuccessful) {
         if (conversationId === currTabConversationId) {
@@ -467,7 +466,7 @@ class AiRequestExplorerViewModel {
 
     }
     catch (error) {
-      console.log("Something went wrong while deleting the conversation. :>> ", error);
+      console.error("Something went wrong while deleting the conversation. :>> ", error);
     }
   }
 
