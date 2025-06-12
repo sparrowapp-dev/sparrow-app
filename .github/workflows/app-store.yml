@@ -112,6 +112,25 @@ jobs:
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
           CI: false
+          
+      - name: Create signed .pkg for App Store
+        run: |
+          APP_NAME="Sparrow"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
+          productbuild \
+            --component "$BUNDLE_PATH" /Applications \
+            --sign "$CERT_ID" \
+            "$PKG_PATH"
+        env:
+          CERT_ID: ${{ env.CERT_ID }} 
+          
+      - name: Upload .pkg to S3
+        run: |
+          aws s3 cp apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg s3://sparrow-assest/macos/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # - name: file content
       #   run: |
