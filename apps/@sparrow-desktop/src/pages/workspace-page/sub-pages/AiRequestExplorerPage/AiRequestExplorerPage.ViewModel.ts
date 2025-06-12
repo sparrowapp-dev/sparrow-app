@@ -405,12 +405,6 @@ class AiRequestExplorerViewModel {
     }
 
     const componentData = this._tab.getValue();
-    const user = getClientUser();
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
