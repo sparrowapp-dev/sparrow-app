@@ -94,7 +94,6 @@
   })();
 
   const openUpdateDocs = async () => {
-    console.log(osDetector.getOS());
     if (osDetector.getOS() === "linux") {
       await open(constants.LINUX_INSTALL_DOCS);
       return;
