@@ -132,6 +132,7 @@
     tabindex="-1"
     on:click|preventDefault={() => {}}
     class=" d-flex align-items-center position-relative bg-transparent border-0"
+    style="gap: 8px"
   >
     <div class="api-method text-{getMethodStyle(requestMethod)}">
       {requestMethod?.toUpperCase() === "DELETE"
@@ -180,9 +181,7 @@
   </div>
   <div
     class="sparrow-thin-scrollbar"
-    style=" {isWebApp
-      ? 'max-height: 70%;'
-      : 'max-height: 75%;'} overflow-y: auto; overflow-x: hidden;"
+    style="max-height: 70%; overflow-y: auto; overflow-x: hidden;"
   >
     {#each mockResponses as response, idx (response.id)}
       <div
@@ -203,11 +202,11 @@
         >
           <Tooltip
             title={"This response is inactive."}
-            show={!response.isMockResponseActive}
+            show={!response.mockRequestResponse.isMockResponseActive}
             placement={"top-center"}
           >
             <span style="display: flex; margin-right:4px;">
-              {#if response.isMockResponseActive}
+              {#if response.mockRequestResponse.isMockResponseActive}
                 <CircleSmallFilled color="var( --icon-ds-success-400)" />
               {:else}
                 <CircleSmallRegular />
@@ -255,7 +254,8 @@
         </button>
         {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Toggle
-            bind:isMockResponseActive={response.isMockResponseActive}
+            bind:isMockResponseActive={response.mockRequestResponse
+              .isMockResponseActive}
             label=""
             fontSize="12px"
             textColor="var(--text-ds-neutral-200)"
@@ -263,7 +263,7 @@
             onChange={() => {
               onHandleMockResponseState(
                 response.id,
-                !response.isMockResponseActive,
+                !response.mockRequestResponse.isMockResponseActive,
               );
             }}
           />
@@ -382,7 +382,7 @@
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: calc(100% - 18px);
+    width: 150px;
     text-align: left;
     display: flex;
     align-items: center;
