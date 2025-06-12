@@ -97,6 +97,7 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
+  import { RequestCode } from "@sparrow/common/enums";
 
   const _viewModel = new CollectionsViewModel();
 

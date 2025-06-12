@@ -7370,6 +7370,9 @@ export default class CollectionsViewModel {
         `Request is Sent Successfully to Owner for Upgrade Plan.`,
       );
     }
+     else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {

@@ -962,6 +962,8 @@ export class TeamExplorerPageViewModel {
       notifications.success(
         `Request is Sent Successfully to Owner for Upgrade Plan.`,
       );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
     }
   };
 
