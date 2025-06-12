@@ -129,10 +129,12 @@
   export let isGuestUser = false;
   export let onOpenCollection;
   export let onUpdateResponseBody;
+  export let onUpdateResponseHeaders;
   export let onUpdateResponseStatus;
   export let onCreateMockResponse;
   export let onHandleMockResponseState;
   export let onRenameMockResponse;
+  export let onDeleteMockResponse;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -733,7 +735,7 @@
                 >
                   <!-- Response Pane -->
                   <div class="d-flex h-100" style="gap: 8px;">
-                    <div>
+                    <div style="width: 25%">
                       <MultipleMockResponse
                         requestName={$tab.name}
                         requestMethod={$tab.property.mockRequest?.method}
@@ -743,6 +745,7 @@
                         {onCreateMockResponse}
                         {onHandleMockResponseState}
                         {onRenameMockResponse}
+                        {onDeleteMockResponse}
                         activeResponseIdx={activeMockResponseIdx}
                         onSetActiveResponseIdx={handleSetActiveResponseIdx}
                       />
@@ -790,16 +793,20 @@
                                 <ResponseNavigator
                                   requestStateSection={selectedResponse?.state
                                     ?.responseNavigation}
-                                  {onUpdateRequestState}
+                                  {onUpdateResponseState}
                                   responseHeadersLength={selectedResponse
                                     ?.mockRequestResponse?.responseHeaders
                                     ?.length || 0}
+                                  selectedResponseId={selectedResponse?.id}
                                 />
                                 <Select
                                   data={HttpStatusCodes}
                                   onclick={(selectedItem) => {
                                     selectedStatusCode = selectedItem;
-                                    onUpdateResponseStatus(selectedItem);
+                                    onUpdateResponseStatus(
+                                      selectedItem,
+                                      selectedResponse?.id,
+                                    );
                                   }}
                                   titleId={selectedResponse?.mockRequestResponse
                                     ?.responseStatus}
@@ -838,6 +845,7 @@
                                         ?.responseHeaders || []}
                                       apiState={selectedResponse?.state}
                                       path={$tab.path}
+                                      responseId={selectedResponse.id}
                                       {onUpdateResponseState}
                                       {onUpdateRequestState}
                                       {onClearResponse}
@@ -855,14 +863,16 @@
                                         ?.mockRequestResponse?.responseBody}
                                       apiState={selectedResponse?.state}
                                       {onUpdateResponseBody}
+                                      responseId={selectedResponse.id}
                                     />
                                   </div>
-                                {:else if $tab.property.mockRequest?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
+                                {:else if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
                                   <div style="overflow:auto;">
                                     <ResponseHeaders
-                                      responseHeader={selectedResponse
-                                        ?.mockRequestResponse
-                                        ?.responseHeaders || []}
+                                      responseHeaders={selectedResponse
+                                        ?.mockRequestResponse?.responseHeaders}
+                                      {onUpdateResponseHeaders}
+                                      responseId={selectedResponse.id}
                                     />
                                   </div>
                                 {/if}

@@ -7,7 +7,7 @@ import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
-  constructor() {}
+  constructor() { }
 
   /**
    * @description

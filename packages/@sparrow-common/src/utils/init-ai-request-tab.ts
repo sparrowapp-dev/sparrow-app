@@ -34,9 +34,6 @@ class InitAiRequestTab {
             activeSync: false,
             property: {
                 aiRequest: {
-                    // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    // aiModelProvider: AiModelProviderEnum.OpenAI,
-                    // aiModelVariant: OpenAIModelEnum.GPT_4o,
                     aiModelProvider: "",
                     aiModelVariant: "",
                     systemPrompt: "",
@@ -86,7 +83,10 @@ class InitAiRequestTab {
                     ai: {
                         prompt: "",
                         conversations: [],
-                        threadId: "",
+                        conversationId: "",
+                        lastActiveChatBackup: [],
+                        isoldChatPreviewActive: false,
+                        conversationTitle: "New Conversation",
                     },
                     state: {
                         aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,
@@ -100,6 +100,9 @@ class InitAiRequestTab {
                         isChatAutoClearActive: false,
                         isChatbotSuggestionsActive: true,
                         isChatbotGeneratingResponse: false,
+                        isChatbotConversationLoading: false,
+                        isConversationHistoryPanelOpen: false,
+                        isConversationHistoryLoading: false
                     },
                 },
             },

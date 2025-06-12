@@ -67,6 +67,7 @@ import {
   recentWorkspaceSchema,
   type RecentWorkspaceDocType,
 } from "src/models/recent-workspace.model";
+import { aiRequestConversationsSchema, type AiRequestConversationsDocType } from "src/models/ai-request-conversations.model";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -87,6 +88,7 @@ export type GuestDocument = RxDocument<GuestUserDocType>;
 export type UpdatesDocument = RxDocument<UpdatesDocType>;
 export type RecentWorkspaceDocument = RxDocument<RecentWorkspaceDocType>;
 export type RecentWorkspaceContainer = RxCollection<RecentWorkspaceDocType>;
+export type AiRequestConversationsDocument = RxDocument<AiRequestConversationsDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -115,7 +117,7 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 export class RxDB {
   private static instance: RxDB | null = null;
   public rxdb: DatabaseType | null = null;
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): RxDB {
     if (!RxDB.instance?.rxdb) {
@@ -283,6 +285,14 @@ export class RxDB {
           11: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          12: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.isChatbotConversationLoading = false;
+              oldDoc.property.aiRequest.state.isConversationHistoryPanelOpen = false;
+              oldDoc.property.aiRequest.state.isConversationHistoryLoading = false;
+            }
+            return oldDoc;
+          }
         },
       },
       collection: {
@@ -436,6 +446,9 @@ export class RxDB {
       recentworkspace: {
         schema: recentWorkspaceSchema,
       },
+      aiRequestConversations: {
+        schema: aiRequestConversationsSchema
+      }
     });
     return { rxdb: this.rxdb };
   }
