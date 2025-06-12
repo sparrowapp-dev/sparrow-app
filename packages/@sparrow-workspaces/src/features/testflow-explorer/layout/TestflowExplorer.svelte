@@ -762,7 +762,10 @@
     // handles run from from start button click
     if (_id === "0") {
       await onClickRun();
-      selectNode("2");
+      const startingNode = handleSelectFirstNode();
+      if (startingNode) {
+        selectNode(startingNode);
+      }
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
