@@ -23,7 +23,7 @@
       {
         name: "Headers",
         id: ResponseSectionEnum.HEADERS,
-        count: _responseHeadersLength,
+        count: _responseHeadersLength - 1,
       },
     ];
   };

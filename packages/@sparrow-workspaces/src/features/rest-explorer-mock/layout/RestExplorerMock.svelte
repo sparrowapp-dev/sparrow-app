@@ -129,6 +129,7 @@
   export let isGuestUser = false;
   export let onOpenCollection;
   export let onUpdateResponseBody;
+  export let onUpdateResponseHeaders;
   export let onUpdateResponseStatus;
   export let onCreateMockResponse;
   export let onHandleMockResponseState;
@@ -868,9 +869,10 @@
                                 {:else if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
                                   <div style="overflow:auto;">
                                     <ResponseHeaders
-                                      responseHeader={selectedResponse
-                                        ?.mockRequestResponse
-                                        ?.responseHeaders || []}
+                                      responseHeaders={selectedResponse
+                                        ?.mockRequestResponse?.responseHeaders}
+                                      {onUpdateResponseHeaders}
+                                      responseId={selectedResponse.id}
                                     />
                                   </div>
                                 {/if}
