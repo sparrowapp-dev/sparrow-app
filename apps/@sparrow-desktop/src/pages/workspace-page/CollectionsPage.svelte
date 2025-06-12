@@ -527,9 +527,11 @@
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {
-   currentTestflow = await _viewModel3.currentTestflowCount($currentWorkspace?._id);
+    currentTestflow = await _viewModel3.currentTestflowCount(
+      $currentWorkspace?._id,
+    );
     const response = await _viewModel3.handleCreateTestflow();
-    if (response?.data?.statusCode) {
+    if (response?.data?.statusCode === RequestCode.FORBIDDENEXCEPTION) {
       upgradePlanModel = true;
     }
   };

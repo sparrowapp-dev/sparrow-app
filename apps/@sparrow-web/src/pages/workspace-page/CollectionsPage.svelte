@@ -97,6 +97,7 @@
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
+  import { RequestCode } from "@sparrow/common/enums";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -796,7 +797,7 @@
       $currentWorkspace?._id,
     );
     const response = await _viewModel3.handleCreateTestflow();
-    if (response?.data?.statusCode) {
+    if (response?.data?.statusCode === RequestCode.FORBIDDENEXCEPTION) {
       upgradePlanModel = true;
     }
   };

@@ -12,6 +12,7 @@
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import type { InviteBody } from "@sparrow/common/dto/team-dto";
+  import { RequestCode } from "@sparrow/common/enums";
 
   let isWebEnvironment = false;
 
@@ -113,7 +114,7 @@
 
   const handleCreateWorkspace = async (teamId: string) => {
     const response = await _viewModel.handleCreateWorkspace(teamId);
-    if (response?.data?.statusCode) {
+    if (response?.data?.statusCode === RequestCode.FORBIDDENEXCEPTION) {
       upgradePlanModel = true;
     }
   };

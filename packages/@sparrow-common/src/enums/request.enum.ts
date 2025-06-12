@@ -115,3 +115,9 @@ export enum ContentTypeEnum {
   "text/plain" = "text/plain",
   "text/html" = "text/html",
 }
+
+export enum RequestCode {
+  FORBIDDENEXCEPTION = 403,
+  SERVER_ERROR = 500,
+  SUCCESS = 201,
+}
