@@ -97,7 +97,7 @@
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
-  import { RequestMessage } from "@sparrow/common/enums";
+  import { ResponseMessage } from "@sparrow/common/enums";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -797,7 +797,7 @@
       $currentWorkspace?._id,
     );
     const response = await _viewModel3.handleCreateTestflow();
-    if (response?.data?.message === RequestMessage.PLAN_LIMIT_MESSAGE) {
+    if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModel = true;
     }
   };

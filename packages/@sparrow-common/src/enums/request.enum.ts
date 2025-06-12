@@ -115,7 +115,3 @@ export enum ContentTypeEnum {
   "text/plain" = "text/plain",
   "text/html" = "text/html",
 }
-
-export enum RequestMessage {
-  PLAN_LIMIT_MESSAGE = "Plan limit reached",
-}
