@@ -110,9 +110,9 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: var(--background-hover);
+    background: rgba(48, 48, 48, 0.7);
     -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(4px);
   }
 
   .sparrow-modal-container {

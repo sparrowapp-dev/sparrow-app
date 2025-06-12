@@ -1,5 +1,6 @@
 <script lang="ts">
   import type {
+    AiRequestConversationsDocument,
     CollectionDocument,
     WorkspaceDocument,
   } from "@app/database/database";
@@ -17,6 +18,7 @@
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
+  import type { Observable } from "rxjs";
 
   export let tab;
   // export let isTourGuideOpen = false;
@@ -30,6 +32,10 @@
       collection = data?.toMutableJSON();
     },
   );
+
+  let conversationsHistory:
+    | Observable<AiRequestConversationsDocument[]>
+    | undefined;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -76,7 +82,7 @@
     }
   }
 
-  let environmentVariables;
+  let environmentVariables = [];
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
@@ -154,6 +160,10 @@
     AiRequestExplorerData = AiRequestExplorerMap.get(tab.tabId);
   });
 
+  const getConversationList = async () => {
+    conversationsHistory = _viewModel.getConversationsList();
+  };
+
   onDestroy(() => {
     collectionSubscriber.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
@@ -168,7 +178,6 @@
   {collection}
   environmentVariables={[]}
   {isGuestUser}
-  {isLoginBannerActive}
   storeData={AiRequestExplorerData}
   onUpdateAIModel={_viewModel.onUpdateAIModel}
   onUpdateRequestName={_viewModel.updateRequestName}
@@ -179,8 +188,22 @@
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}
   onUpdateAiConfigurations={_viewModel.updateAiConfigurations}
-  isWebApp={true}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
+  readWorkspace={_viewModel.readWorkspace}
+  onSaveAiRequest={_viewModel.saveAiRequest}
+  onSave={_viewModel.saveAsRequest}
+  onCreateFolder={_viewModel.createFolder}
+  onCreateCollection={_viewModel.createCollection}
+  onRenameCollection={_viewModel.handleRenameCollection}
+  onRenameFolder={_viewModel.handleRenameFolder}
+  onOpenCollection={_viewModel.openCollection}
+  fetchConversations={_viewModel.fetchConversations}
+  getConversationsList={getConversationList}
+  conversationsHistory={$conversationsHistory}
+  onSwitchConversation={_viewModel.switchConversation}
+  onRenameConversation={_viewModel.handleRenameConversationTitle}
+  onDeleteConversation={_viewModel.handleDeleteConversation}
+  onClearConversation={_viewModel.handleClearConversation}
 />

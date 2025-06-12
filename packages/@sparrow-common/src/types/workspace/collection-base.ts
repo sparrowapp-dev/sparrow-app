@@ -1,3 +1,4 @@
+import type { AiRequestBaseInterface } from "./ai-request-base";
 import type { FolderBaseInterface } from "./folder-base";
 import type { GraphqlRequestBaseInterface } from "./graphql-request-base";
 import type { HttpRequestBaseInterface } from "./http-request-base";
@@ -9,6 +10,7 @@ import type {
   HttpResponseMockBodyModeBaseEnum,
 } from "./http-request-mock-base";
 import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
+import type { HttpResponseMockBaseInterface } from "./http-response-mock-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
 
@@ -20,6 +22,8 @@ export enum CollectionItemTypeBaseEnum {
   GRAPHQL = "GRAPHQL",
   SAVED_REQUEST = "REQUEST_RESPONSE",
   MOCK_REQUEST = "MOCK_REQUEST",
+  AI_REQUEST = "AI_REQUEST",
+  MOCK_REQUEST_RESPONSE = "MOCK_REQUEST_RESPONSE",
 }
 
 export interface CollectionItemBaseInterface {
@@ -35,6 +39,8 @@ export interface CollectionItemBaseInterface {
   graphql?: GraphqlRequestBaseInterface;
   requestResponse?: HttpRequestSavedBaseInterface;
   mockRequest?: HttpRequestMockBaseInterface;
+  mockRequestResponse?: HttpResponseMockBaseInterface;
+  aiRequest?: AiRequestBaseInterface;
   folder?: FolderBaseInterface;
   createdAt: string;
   updatedAt: string;
@@ -133,6 +139,7 @@ export interface CollectionArgsBaseInterface {
   graphql?: CollectionItemBaseInterface;
   requestResponse?: CollectionItemBaseInterface;
   mockRequest?: CollectionItemBaseInterface;
+  aiRequest?: CollectionItemBaseInterface;
   newName?: string;
   importCurl?: string;
   deletedIds?: string[];

@@ -10,7 +10,9 @@
   import {
     ModelVariantIdNameMapping,
     ModelIdNameMapping,
+    AiModelProviderEnum,
   } from "@sparrow/common/types/workspace/ai-request-base";
+  import type { Conversation } from "@sparrow/common/types/workspace/ai-request-tab";
 
   let componentClass = "";
   export { componentClass as class };
@@ -27,6 +29,7 @@
   let isModelSelectorOpen = false;
   export let selectedModelProvider = "openai";
   export let selectedModel = "gpt-4o";
+  export let onModelSwitch: () => void;
 
   const dispatch = createEventDispatcher();
   const theme = new UrlInputTheme().build();
@@ -42,17 +45,17 @@
   };
 
   // Handle model selection
-  const handleModelSelection = (
+  const handleModelSelection = async (
     provider: string,
     model: { name: string; id: string },
   ) => {
-    if (selectedModelProvider !== provider) {
-      onUpdateAiConversation([]);
-      // return;
-    }
+    const isNewProvider = selectedModelProvider !== provider;
     selectedModelProvider = provider;
     selectedModel = model.id;
-    onUpdateAIModel(provider, model.id);
+    await onUpdateAIModel(provider, model.id);
+    if (isNewProvider) {
+      onModelSwitch();
+    }
   };
 
   /**
@@ -136,23 +139,18 @@
     </div>
   </div>
 
-  <Tooltip
-    title={"Coming Soon"}
-    placement={"left-center"}
-    distance={12}
-    zIndex={10}
-  >
+  <!-- {console.log(" info :>> ", isSave, userRole, WorkspaceRole.WORKSPACE_VIEWER)} -->
+  <Tooltip title={"Save"} placement={"bottom-center"} distance={12} zIndex={10}>
     <Button
       type="secondary"
       size="medium"
       loader={isSaveLoad}
       startIcon={isSaveLoad ? "" : SaveRegular}
       onClick={handleSaveRequest}
-      disable={true}
-    />
-    <!-- disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
+      disable={isSave || userRole === WorkspaceRole.WORKSPACE_VIEWER
         ? true
-        : false} -->
+        : false}
+    />
   </Tooltip>
 </div>
 <svelte:window on:keydown={handleKeyPress} />

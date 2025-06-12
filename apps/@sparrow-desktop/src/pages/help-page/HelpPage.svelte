@@ -12,6 +12,7 @@
     DocumentTextRegular,
     GroupIcon,
     MailInboxArrowDownRegular,
+    MapRegular,
     PeopleTeamRegular,
     RoadmapIcon,
     UpdateIcon,
@@ -94,8 +95,11 @@
     if (status === "new" || status === "open") {
       return "cyan";
     }
-    if (status === "fixed" || status === "in progress") {
+    if (status === "fixed") {
       return "purple";
+    }
+    if (status === "in progress") {
+      return "pink";
     }
     if (status === "improved" || status === "complete") {
       return "green";
@@ -150,7 +154,8 @@
                 MixpanelEvent(Events.Roadmap_Tab);
               }}
             >
-              <RoadmapIcon
+              <MapRegular
+                size={"18px"}
                 color={activeTab === "roadmap"
                   ? "var(--text-secondary-100)"
                   : "var(--text-primary-250)"}
@@ -168,8 +173,9 @@
               }}
             >
               <DocumentTextRegular
+                size={"18px"}
                 color={activeTab === "feedback"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               Feedback
@@ -185,8 +191,9 @@
               }}
             >
               <MailInboxArrowDownRegular
+                size={"18px"}
                 color={activeTab === "updates"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               Updates
@@ -202,8 +209,9 @@
               }}
             >
               <PeopleTeamRegular
+                size={"18px"}
                 color={activeTab === "community"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               Community
@@ -220,8 +228,9 @@
               }}
             >
               <BroadActivityFeedRegular
+                size={"18px"}
                 color={activeTab === "myActivity"
-                  ? "var(--text-secondary-100)"
+                  ? "var(--text-ds-neutral-50)"
                   : ""}
               />
               My Activity
@@ -269,7 +278,6 @@
               />
             {:else if activeTab === "community"}
               <Community />
-              <DiscordPost />
             {:else if activeTab === "myActivity"}
               <ActivitySection
                 onInputFeedback={_viewModel.createPost}
@@ -318,13 +326,15 @@
     display: flex;
     padding: 0 20px;
     cursor: pointer;
-    color: var(--text-primary-250);
+    color: var(--text-ds-neutral-100);
     position: relative;
     justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .tab.active {
-    color: var(--text-secondary-100);
+    color: var(--text-ds-neutral-50);
   }
 
   .tab.active::after {
@@ -334,6 +344,6 @@
     bottom: -2px;
     width: 100%;
     height: 2px;
-    border-bottom: 4px solid var(--border-primary-300);
+    border-bottom: 2px solid var(--border-primary-300);
   }
 </style>
