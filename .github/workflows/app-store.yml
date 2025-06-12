@@ -152,26 +152,11 @@ jobs:
         env:
           INSTALLER_ID: ${{ env.INSTALLER_ID }}
 
-      - name: Setup Transporter
-        run: |
-          # Verify Xcode installation
-          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-          sudo xcodebuild -license accept
-          
-          # Verify Transporter is available
-          if ! command -v transporter &> /dev/null; then
-            echo "::error::Transporter not found. macOS runner may need update."
-            exit 1
-          fi
-          
-          transporter -version
-
       - name: Upload to App Store Connect
         run: |
           APP_NAME="Sparrow"
           PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
 
-          # Upload using Transporter
           xcrun altool --upload-package \
             "$PKG_PATH" \
             --type macos \
