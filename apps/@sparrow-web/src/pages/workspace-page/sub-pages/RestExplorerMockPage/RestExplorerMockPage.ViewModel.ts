@@ -3135,13 +3135,13 @@ class RestExplorerMockViewModel {
     }
   };
   /**
-* Handle delete mock response in a collection (API only, no local update)
-*/
-  public handleDeleteMockResponse = async (
-    mockResponseId: string
-  ) => {
+   * Handle delete mock response in a collection (API only, no local update)
+   */
+  public handleDeleteMockResponse = async (mockResponseId: string) => {
     const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-    const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
 
     const deletePayload = {
       collectionId: progressiveTab.path.collectionId,
@@ -3152,16 +3152,42 @@ class RestExplorerMockViewModel {
     };
 
     try {
-      const response = await this.collectionService.deleteMockResponseInCollection(
-        mockResponseId,
-        deletePayload,
-        baseUrl
-      );
+      const response =
+        await this.collectionService.deleteMockResponseInCollection(
+          mockResponseId,
+          deletePayload,
+          baseUrl,
+        );
       if (response?.isSuccessful) {
         notifications.success("Mock response deleted successfully.");
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.deleteSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+          );
+        } else {
+          this.collectionRepository.deleteSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+          );
+        }
+        progressiveTab.property.mockRequest.items =
+          progressiveTab.property?.mockRequest?.items?.filter((item) => {
+            return item.id !== mockResponseId;
+          });
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
         return true;
       } else {
-        notifications.error(response?.message || "Failed to delete mock response.");
+        notifications.error(
+          response?.message || "Failed to delete mock response.",
+        );
         return false;
       }
     } catch (error) {
