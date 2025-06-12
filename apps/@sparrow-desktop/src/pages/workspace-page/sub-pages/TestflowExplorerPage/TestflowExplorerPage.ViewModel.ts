@@ -432,13 +432,20 @@ export class TestflowExplorerPageViewModel {
     const teamObject = teamRxDoc?.toMutableJSON();
 
     if (_event === "run-from-here") {
-      const planRxDoc = await this.planRepository.getPlan(
-        teamObject.plan?.id as string,
-      );
-      const planObject = planRxDoc?.toMutableJSON();
-      if (!planObject?.limits?.selectiveTestflowRun?.active) {
-        // notifications.error("Failed to run from here. please upgrade your plan.");
-        return;
+      const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
+      });
+      if (!guestUser) {
+        const planRxDoc = await this.planRepository.getPlan(
+          teamObject.plan?.id as string,
+        );
+        const planObject = planRxDoc?.toMutableJSON();
+        if (!planObject?.limits?.selectiveTestflowRun?.active) {
+          notifications.error(
+            "Failed to run from here. please upgrade your plan.",
+          );
+          return;
+        }
       }
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
@@ -457,13 +464,20 @@ export class TestflowExplorerPageViewModel {
       this.findConnectedNodes(graph, Number(_id), nodes, result);
       runningNodes = [...result];
     } else if (_event === "run-till-here") {
-      const planRxDoc = await this.planRepository.getPlan(
-        teamObject.plan?.id as string,
-      );
-      const planObject = planRxDoc?.toMutableJSON();
-      if (!planObject?.limits?.selectiveTestflowRun?.active) {
-        // notifications.error("Failed to run till here. please upgrade your plan.");
-        return;
+      const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
+      });
+      if (!guestUser) {
+        const planRxDoc = await this.planRepository.getPlan(
+          teamObject.plan?.id as string,
+        );
+        const planObject = planRxDoc?.toMutableJSON();
+        if (!planObject?.limits?.selectiveTestflowRun?.active) {
+          notifications.error(
+            "Failed to run till here. please upgrade your plan.",
+          );
+          return;
+        }
       }
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {

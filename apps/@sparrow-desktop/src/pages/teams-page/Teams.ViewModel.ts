@@ -220,7 +220,9 @@ export class TeamsViewModel {
       notifications.success(`New hub ${team.name} is created.`);
     } else {
       if (response?.message === "Plan limit reached") {
-        notifications.error("Failed to create hub. please upgrade your plan.");
+        notifications.error(
+          "You’ve reached the limit of private hub on your current plan. Upgrade to create more private hubs",
+        );
       } else {
         notifications.error("Failed to create hub. Please try again.");
       }
