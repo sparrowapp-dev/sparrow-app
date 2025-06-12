@@ -48,7 +48,7 @@ export class AiRequestService {
     public deleteConversation = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, conversationId: string) => {
         const response = await makeRequest(
             "DELETE",
-            `${this.apiUrl}/api/conversation/delete-conversation?provider=${aiProvider}&apiKey=${providerAuthKey}&id=${conversationId}`,
+            `${this.apiUrl}/api/conversation/delete-conversation/${conversationId}?provider=${aiProvider}&apiKey=${providerAuthKey}`,
             { headers: getAuthHeaders() }
         );
 

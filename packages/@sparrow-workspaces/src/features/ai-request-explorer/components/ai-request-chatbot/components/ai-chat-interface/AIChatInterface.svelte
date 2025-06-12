@@ -411,6 +411,7 @@
                     customWidth={"60px"}
                     buttonClassProp={""}
                     type={"teritiary-regular"}
+                    disable={isGuestUser}
                     startIcon={FormNewRegular}
                     onClick={async () => {
                       // Create new conversation with empty id and conversation array

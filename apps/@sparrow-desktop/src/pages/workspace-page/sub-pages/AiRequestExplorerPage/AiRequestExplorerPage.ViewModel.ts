@@ -395,9 +395,64 @@ class AiRequestExplorerViewModel {
     } catch (error) { console.error("Error while saving conversation history :>> ", error); }
   }
 
-  public handleRenameConversationTitle = async (conversationId: string, newConversationTitle: string) => { }
+  public handleRenameConversationTitle = async (conversationId: string, newConversationTitle: string) => {
+    // If conversationId is null, then change title of current tab itself, no need to change in db
+    if (!conversationId) {
+      await this.updateAiRequestConversationTitle(newConversationTitle);
+      return;
+    }
 
-  public handleDeleteConversation = async (conversationId: string, conversationTitle: string) => { }
+    const componentData = this._tab.getValue();
+    const user = getClientUser();
+    const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
+    });
+
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+
+    if (!provider || !providerAuthKey) {
+      console.error("Missing provider, conversations, or authKey.");
+      return;
+    }
+
+    try {
+      const payload = {
+        provider,
+        apiKey: providerAuthKey,
+        id: conversationId,
+        data: {
+          title: newConversationTitle,
+          time: this.getFormattedTime(),
+          date: this.getLocalDate(),
+          authoredBy: guestUser ? "Guest User" : user.name,
+          updatedBy: guestUser ? "Guest User" : {
+            name: user.name,
+            email: user.email,
+            id: user.id,
+          },
+
+        }
+      };
+
+      const response = await this.aiRequestService.updateConversation(payload);
+
+      if (response.isSuccessful) {
+        if (conversationId === currTabConversationId) {
+          this.updateAiRequestConversationTitle(newConversationTitle);
+        }
+        await this.fetchConversations(); // Fetch to udpate the states in local db
+        notifications.success("Conversation title updated successfully.");
+      } else {
+        notifications.error("Failed to update conversation title. Please try again.");
+      }
+
+    }
+    catch (error) {
+      console.log("Something went wrong while updating title :>> ", error);
+    }
+  }
 
 
   /**
@@ -1668,11 +1723,6 @@ class AiRequestExplorerViewModel {
   }
 
   public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversations: Conversation[]) => {
-    // const componentData = this._tab.getValue();
-    // const currTabConversationId = componentData?.property?.aiRequest.ai?.conversationId;
-    // if (currTabConversationId === _conversationId) {
-    //   return;
-    // }
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
