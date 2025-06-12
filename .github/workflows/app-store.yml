@@ -152,14 +152,19 @@ jobs:
         env:
           INSTALLER_ID: ${{ env.INSTALLER_ID }}
 
-      - name: Install Transporter
+      - name: Setup Transporter
         run: |
-          # Download Transporter (if not available on runner)
+          # Verify Xcode installation
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          sudo xcodebuild -license accept
+          
+          # Verify Transporter is available
           if ! command -v transporter &> /dev/null; then
-            xcode-select --install
-            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-            sudo xcodebuild -license accept
+            echo "::error::Transporter not found. macOS runner may need update."
+            exit 1
           fi
+          
+          transporter -version
 
       - name: Upload to App Store Connect
         run: |
