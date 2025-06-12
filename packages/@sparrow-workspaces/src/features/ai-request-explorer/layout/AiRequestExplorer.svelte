@@ -333,6 +333,7 @@
           >
             <ChatBot
               {tab}
+              {isGuestUser}
               disabled={!$tab.property.aiRequest?.aiModelProvider}
               responseData={storeData}
               {onUpdateAiPrompt}

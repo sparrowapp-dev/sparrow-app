@@ -33,6 +33,7 @@
   export let onClearConversation;
   export let isConversationHistoryPanelOpened: boolean;
   export let isConversationHistoryLoading: boolean;
+  export let isGuestUser;
 
   let scrollList: ScrollList;
 
@@ -101,6 +102,7 @@
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
   <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
+      {isGuestUser}
       {responseData}
       bind:scrollList
       {onUpdateAiPrompt}

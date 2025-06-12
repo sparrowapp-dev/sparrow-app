@@ -60,6 +60,7 @@
   export let currTabAiInfo: Ai;
   export let isConversationHistoryPanelOpen = false;
   export let isConversationHistoryLoading = false;
+  export let isGuestUser = false;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -264,33 +265,35 @@
                 class="d-flex align-items-center gap-1"
                 style="flex: 1; min-width: 0;"
               >
-                <span
-                  style={isConversationHistoryPanelOpen
-                    ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px; flex-shrink: 0;"
-                    : "flex-shrink: 0;"}
-                >
-                  <Tooltip
-                    title={isConversationHistoryPanelOpen
-                      ? "Close chat history"
-                      : " Open chat history"}
-                    placement={"top-center"}
+                {#if !isGuestUser}
+                  <span
+                    style={isConversationHistoryPanelOpen
+                      ? "border: 2px solid var(--border-ds-primary-300); border-radius: 4px; flex-shrink: 0;"
+                      : "flex-shrink: 0;"}
                   >
-                    <Button
-                      size="small"
-                      startIcon={ChatHistoryRegular}
-                      type={"secondary"}
-                      disable={isConversationHistoryPanelOpen}
-                      loader={isConversationHistoryLoading}
-                      onClick={async () => {
-                        if (isConversationHistoryLoading) return;
-                        isConversationHistoryLoading = true;
-                        await handleOpenConversationHistoryPanel();
-                        isConversationHistoryPanelOpen = true;
-                        isConversationHistoryLoading = false;
-                      }}
-                    />
-                  </Tooltip>
-                </span>
+                    <Tooltip
+                      title={isConversationHistoryPanelOpen
+                        ? "Close chat history"
+                        : " Open chat history"}
+                      placement={"top-center"}
+                    >
+                      <Button
+                        size="small"
+                        startIcon={ChatHistoryRegular}
+                        type={"secondary"}
+                        disable={isConversationHistoryPanelOpen}
+                        loader={isConversationHistoryLoading}
+                        onClick={async () => {
+                          if (isConversationHistoryLoading) return;
+                          isConversationHistoryLoading = true;
+                          await handleOpenConversationHistoryPanel();
+                          isConversationHistoryPanelOpen = true;
+                          isConversationHistoryLoading = false;
+                        }}
+                      />
+                    </Tooltip>
+                  </span>
+                {/if}
 
                 <!-- Chat Title with Edit Button -->
                 <div
