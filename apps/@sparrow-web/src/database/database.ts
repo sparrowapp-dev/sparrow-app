@@ -286,6 +286,11 @@ export class RxDB {
             return oldDoc;
           },
           12: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.isChatbotConversationLoading = false;
+              oldDoc.property.aiRequest.state.isConversationHistoryPanelOpen = false;
+              oldDoc.property.aiRequest.state.isConversationHistoryLoading = false;
+            }
             return oldDoc;
           }
         },
