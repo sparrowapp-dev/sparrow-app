@@ -484,6 +484,42 @@ class AiRequestExplorerViewModel {
     }
   }
 
+  public handleDeleteConversation = async (conversationId: string, conversationTitle: string) => {
+    // If conversationId is null, then change title of current tab itself, no need to change in db
+    if (!conversationId) {
+      console.error("Failed to delete conversation, due to missing Conversation ID.")
+      return;
+    }
+
+    const componentData = this._tab.getValue();
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+
+    if (!conversationId || !provider || !providerAuthKey) {
+      console.error("Missing provider or authKey.");
+      return;
+    }
+
+    try {
+      const response = await this.aiRequestService.deleteConversation(provider, providerAuthKey, conversationId);
+
+      if (response.isSuccessful) {
+        if (conversationId === currTabConversationId) {
+          this.handleStartNewConversation();
+        }
+        await this.fetchConversations(); // Fetch to udpate the states in local db
+        notifications.success(`Conversation ${conversationTitle} deleted successfully.`);
+      } else {
+        notifications.error(`Failed to delete conversation ${conversationTitle}. Please try again.`);
+      }
+
+    }
+    catch (error) {
+      console.error("Something went wrong while deleting the conversation. :>> ", error);
+    }
+  }
+
 
   /**
    *
