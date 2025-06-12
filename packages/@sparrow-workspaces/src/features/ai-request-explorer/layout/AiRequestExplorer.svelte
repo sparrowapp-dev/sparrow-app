@@ -13,7 +13,10 @@
   import type { CollectionDocument } from "@app/database/database";
   import type { Observable } from "rxjs";
   import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
-  import { ModelIdNameMapping } from "@sparrow/common/types/workspace/ai-request-base";
+  import {
+    ModelIdNameMapping,
+    ModelVariantIdNameMapping,
+  } from "@sparrow/common/types/workspace/ai-request-base";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
@@ -365,7 +368,7 @@
   </Modal>
 
   <Modal
-    title={`Code for ${$tab?.property?.aiRequest?.aiModelVariant} API`}
+    title={`Code for "${ModelVariantIdNameMapping[$tab?.property?.aiRequest?.aiModelVariant]}" API`}
     type={"dark"}
     zIndex={1000}
     isOpen={isGetCodePopupOpen}

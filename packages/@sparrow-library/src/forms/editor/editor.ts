@@ -1,6 +1,9 @@
 import type { Compartment } from "@codemirror/state";
 import type { EditorView } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { StreamLanguage } from "@codemirror/language";
+import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { RequestDataType } from "@sparrow/common/enums";
 import { html } from "@codemirror/lang-html";
 import { jsonSetup } from "./theme";
@@ -19,6 +22,63 @@ const removeIndentation = (str: string = "") => {
   const unindentedLines = lines.map((line) => line.trim());
   // Join the lines back together
   return unindentedLines.join("\n");
+};
+
+/**
+ * @description - format Python code (simple and effective)
+ * @param code - Python code string
+ * @returns - formatted Python code
+ */
+const formatPython = (code: string): string => {
+  const lines = code.split('\n');
+  let indentLevel = 0;
+  let formattedLines: string[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const trimmedLine = lines[i].trim();
+    
+    // Skip empty lines but preserve them
+    if (!trimmedLine) {
+      formattedLines.push('');
+      continue;
+    }
+    
+    // Dedent keywords that should be at the same level as the previous block
+    if (trimmedLine.match(/^(elif|else|except|finally)\b/)) {
+      indentLevel = Math.max(0, indentLevel - 1);
+    }
+    
+    // Add proper spacing around operators and after commas/colons
+    let formattedLine = trimmedLine
+      .replace(/([^=!<>])=([^=])/g, '$1 = $2') // Add spaces around assignment
+      .replace(/,(\S)/g, ', $1') // Add space after commas
+      .replace(/\s+/g, ' ') // Clean up multiple spaces
+      .trim();
+    
+    // Apply indentation
+    const indentedLine = '    '.repeat(indentLevel) + formattedLine;
+    formattedLines.push(indentedLine);
+    
+    // Increase indent level after lines ending with colon
+    if (formattedLine.endsWith(':') && !formattedLine.startsWith('#')) {
+      indentLevel++;
+    }
+  }
+  
+  return formattedLines.join('\n');
+};
+
+/**
+ * @description - format shell/curl commands
+ * @param code - shell code string
+ * @returns - formatted shell code
+ */
+const formatShell = (code: string): string => {
+  // Basic shell formatting - mainly for curl commands
+  return code
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .replace(/\s*\\\s*/g, ' \\\n  ') // Format line continuations
+    .trim();
 };
 
 /**
@@ -81,6 +141,45 @@ const handleCodeMirrorSyntaxFormat = (
           effects: languageConf.reconfigure(
             javascript({ jsx: true, typescript: true }),
           ),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
+
+    case "Python":
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: formatPython(value),
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(python()),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
+    case "Curl":
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: formatShell(value),
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(StreamLanguage.define(shell)),
           ...payload,
         });
         beautifySyntaxCallback(false);

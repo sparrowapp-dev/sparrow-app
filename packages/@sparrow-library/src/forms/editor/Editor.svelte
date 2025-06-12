@@ -25,8 +25,15 @@
   } from "@sparrow/common/utils";
   import MergeView from "./MergeView.svelte";
 
-  export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
-    "Text";
+  export let lang:
+    | "HTML"
+    | "JSON"
+    | "XML"
+    | "JavaScript"
+    | "Text"
+    | "Graphql"
+    | "Python"
+    | "curl" = "Text";
   export let value = "";
   export let customSuggestions = false;
   export let isEnterKeyNotAllowed = false;
@@ -56,6 +63,10 @@
   let originalContent = value; // Store the original content for comparison
 
   const dispatch = createEventDispatcher();
+
+  $: {
+    if (lang) console.log("lang :>> ", lang);
+  }
 
   let componentClass = "";
   const languageConf = new Compartment();

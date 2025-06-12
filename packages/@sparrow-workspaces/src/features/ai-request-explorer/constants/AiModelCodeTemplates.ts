@@ -55,7 +55,7 @@ export const modelCodeTemplates = {
   "model": "${model}",
   "messages": [],
   ${configParams.join(',\n')}
-  }'`;
+}'`;
       }
     },
     "python": {
@@ -72,25 +72,25 @@ export const modelCodeTemplates = {
           if (key === 'jsonResponseFormat') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
-            configParams.push(`  response_format={
-  "type": ${responseFormat}
-  }`);
+            configParams.push(`    response_format={
+      "type": ${responseFormat}
+    }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  temperature=${value}`);
+            configParams.push(`    temperature=${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  max_completion_tokens=${maxTokens}`);
+            configParams.push(`    max_completion_tokens=${maxTokens}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  frequency_penalty=${value}`);
+            configParams.push(`    frequency_penalty=${value}`);
           } else if (key === 'presencePenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  presence_penalty=${value}`);
+            configParams.push(`    presence_penalty=${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  streamResponse=${value ? 'true' : 'false'}`);
+            configParams.push(`streamResponse=${value ? 'true' : 'false'}`);
           }
 
           // For specifically Anthropic & Gemini Family
@@ -101,14 +101,16 @@ export const modelCodeTemplates = {
         });
 
         return `from openai import OpenAI
-  client = OpenAI(api_key="${apiKey}")
-  
-  response = client.chat.completions.create(
-  model="${model}",
-  messages=[],
-  ${configParams.join(',\n')},
-  top_p=1
-  )`;
+
+client = OpenAI(api_key="${apiKey}")
+
+response = client.chat.completions.create(
+    model="${model}",
+    messages=[],
+    ${configParams.join(',\n')},
+    top_p=1
+)
+`;
       }
     },
     "nodejs": {
@@ -126,7 +128,7 @@ export const modelCodeTemplates = {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
             configParams.push(`  response_format: {
-  "type": ${responseFormat}
+    "type": ${responseFormat}
   }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
@@ -143,7 +145,7 @@ export const modelCodeTemplates = {
             configParams.push(`  presence_penalty: ${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  streamResponse=${value ? 'true' : 'false'}`);
+            configParams.push(`streamResponse=${value ? 'true' : 'false'}`);
           }
 
           // For specifically Anthropic & Gemini Family
@@ -155,15 +157,15 @@ export const modelCodeTemplates = {
 
         return `import OpenAI from "openai";
   
-  const openai = new OpenAI({
+const openai = new OpenAI({
   apiKey: "${apiKey}",
-  });
-  
-  const response = await openai.chat.completions.create({
+});
+
+const response = await openai.chat.completions.create({
   model: "${model}",
   messages: [],
   ${configParams.join(',\n')},
-  });`;
+});`;
       }
     },
     "json": {
@@ -181,8 +183,8 @@ export const modelCodeTemplates = {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
             configParams.push(`  "response_format": {
-  "type": ${responseFormat}
-  }`);
+    "type": ${responseFormat}
+   }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  "temperature": ${value}`);
@@ -198,7 +200,7 @@ export const modelCodeTemplates = {
             configParams.push(`  "presence_penalty": ${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "stream": ${value ? 'true' : 'false'}`);
+            configParams.push(`"streamResponse": ${value ? 'true' : 'false'}`);
           }
         });
 
@@ -206,7 +208,7 @@ export const modelCodeTemplates = {
   "model": "${model}",
   "messages": [],
   ${configParams.join(',\n')},
-  }`;
+}`;
       }
     }
   }
