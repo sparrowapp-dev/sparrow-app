@@ -23,6 +23,7 @@ import { getClientUser } from "../../../../utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import constants from "@app/constants/constants";
 import { PlanRepository } from "@app/repositories/plan.repository";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -965,10 +966,6 @@ export class TeamExplorerPageViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
-      "_blank",
-    );
-    return;
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
   };
 }
