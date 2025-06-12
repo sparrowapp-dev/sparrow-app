@@ -297,6 +297,40 @@ class RestExplorerMockViewModel {
   };
 
   /**
+   * Compares items arrays by checking responseBody and responseHeaders
+   * @param serverItems - Items array from server
+   * @param clientItems - Items array from client
+   * @returns boolean - true if arrays match, false otherwise
+   */
+  private compareItemsArray = (serverItems, clientItems) => {
+    if (serverItems.length !== clientItems.length) return false;
+
+    for (let i = 0; i < serverItems.length; i++) {
+      const serverItem = serverItems[i];
+      const clientItem = clientItems[i];
+
+      // Compare responseBody (string comparison)
+      if (
+        serverItem.mockRequestResponse?.responseBody !==
+        clientItem.mockRequestResponse?.responseBody
+      ) {
+        return false;
+      }
+
+      // Compare responseHeaders (array comparison using existing compareArray.init)
+      if (
+        !this.compareArray.init(
+          serverItem.mockRequestResponse?.responseHeaders || [],
+          clientItem.mockRequestResponse?.responseHeaders || [],
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
    * Compares the current request tab with the server version and updates the saved status accordingly.
    * This method is debounced to reduce the number of server requests.
    * @return A promise that resolves when the comparison is complete.
@@ -417,7 +451,15 @@ class RestExplorerMockViewModel {
     ) {
       result = false;
     }
-
+    // Add items comparison here
+    else if (
+      !this.compareItemsArray(
+        requestServer.items,
+        progressiveTab.property.mockRequest.items,
+      )
+    ) {
+      result = false;
+    }
     // url encode
     else if (
       !this.compareArray.init(
@@ -712,7 +754,10 @@ class RestExplorerMockViewModel {
    * @param _headers - The new headers array.
    * @param responseId - The ID of the mock response to update.
    */
-  public updateResponseHeaders = async (_headers: KeyValueChecked[], responseId: string) => {
+  public updateResponseHeaders = async (
+    _headers: KeyValueChecked[],
+    responseId: string,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.items.forEach((data) => {
       if (data.id === responseId) {
@@ -1399,6 +1444,7 @@ class RestExplorerMockViewModel {
       name: componentData?.name,
       description: componentData?.description,
       type: ItemType.MOCK_REQUEST,
+      items: componentData?.property.mockRequest?.items,
     };
 
     let folderSource;
@@ -1520,7 +1566,7 @@ class RestExplorerMockViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) { }
+  set collection(e) {}
 
   /**
    *
@@ -3007,6 +3053,7 @@ class RestExplorerMockViewModel {
           name: response.data.data.name,
           description: response.data.data.description,
           type: ItemType.MOCK_REQUEST_RESPONSE,
+
           mockRequestResponse: {
             responseBody: response.data.data.mockRequestResponse.responseBody,
             responseHeaders:
@@ -3019,6 +3066,11 @@ class RestExplorerMockViewModel {
             selectedResponseBodyType:
               response.data.data.mockRequestResponse.selectedResponseBodyType,
           },
+          source: response.data.data?.source,
+          createdAt: response.data.data?.createdAt,
+          createdBy: response.data.data?.createdBy,
+          updatedAt: response.data.data?.updatedAt,
+          updatedBy: response.data.data?.updatedBy,
           state: {
             responseBodyLanguage: "Text",
             responseBodyFormatter: "Pretty",
