@@ -11,6 +11,7 @@
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
+  import type { InviteBody } from "@sparrow/common/dto/team-dto";
 
   let isWebEnvironment = false;
 
@@ -23,6 +24,8 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+  let upgradePlanModalInvite = false;
+  let usersInvitePlanCount: number = 5;
 
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
@@ -41,6 +44,7 @@
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      usersInvitePlanCount = value?._data?.users?.length || 5;
     }
   });
 
@@ -73,6 +77,39 @@
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
   };
+
+  const handleSendInvite = async (
+    teamId: string,
+    teamName: string,
+    inviteBody: InviteBody,
+    userId: string,
+  ) => {
+    const response = await _viewModel.handleTeamInvite(
+      teamId,
+      teamName,
+      inviteBody,
+      userId,
+    );
+    const limits = await _viewModel.userPlanLimits(teamId);
+    if (usersInvitePlanCount + 1 >= (limits?.usersPerHub?.value ?? 5)) {
+      upgradePlanModalInvite = true;
+    }
+    return response;
+  };
+
+  const handleUserLimits = async () => {
+    const data = await _viewModel.userPlanLimits($activeTeam?.teamId);
+    usersInvitePlanCount = data?.usersPerHub.value || 5;
+    return data;
+  };
+
+  const handleRequestPlan = async () => {
+    await _viewModel.requestToUpgradePlan($activeTeam?.teamId);
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
+  };
 </script>
 
 <TeamExplorer
@@ -101,6 +138,9 @@
   onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
   onCopyLink={handleCopyPublicWorkspaceLink}
+  planLimits={handleUserLimits}
+  contactOwner={handleRequestPlan}
+  {handleRedirectAdminPanel}
 />
 
 <Modal
@@ -116,7 +156,7 @@
   <TeamInvite
     {userId}
     teamLogo={$activeTeam?.logo}
-    onInviteClick={_viewModel.handleTeamInvite}
+    onInviteClick={handleSendInvite}
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}

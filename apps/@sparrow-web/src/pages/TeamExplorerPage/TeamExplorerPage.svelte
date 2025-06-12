@@ -77,7 +77,6 @@
           description: value._data.description || "",
           team: value._data.team || {},
         };
-        usersInvitePlanCount = value?._data?.users?.length;
         findUserRole();
       }
     },
@@ -88,6 +87,7 @@
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      usersInvitePlanCount = value?._data?.users?.length || 5;
       isWorkspaceOpen = false;
     }
   });
@@ -115,7 +115,6 @@
     );
     const limits = await _viewModel.userPlanLimits(teamId);
     if (usersInvitePlanCount + 1 >= (limits?.usersPerHub?.value ?? 5)) {
-      console.log("-----------------hitting this --->");
       upgradePlanModalInvite = true;
     }
     return response;
