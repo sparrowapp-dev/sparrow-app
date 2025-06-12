@@ -36,7 +36,7 @@
 
   export let isWebEnvironment: boolean;
   export let upgradePlanModalInvite: boolean;
-  export let upgradePlanModel: boolean = false;
+  export let upgradePlanModal: boolean = false;
 
   /**
    * user ID
@@ -302,13 +302,13 @@
 
   const handleRedirectToAdminPanel = async () => {
     await handleRedirectAdminPanel();
-    upgradePlanModel = false;
+    upgradePlanModal = false;
     upgradePlanModalInvite = false;
   };
 
   const handleRequestOwner = async () => {
     await contactOwner();
-    upgradePlanModel = false;
+    upgradePlanModal = false;
     upgradePlanModalInvite = false;
   };
 
@@ -701,7 +701,7 @@
 {/if}
 
 <PlanUpgradeModal
-  bind:isOpen={upgradePlanModel}
+  bind:isOpen={upgradePlanModal}
   title={planContent?.title}
   description={planContent?.description}
   planType="Workspaces"

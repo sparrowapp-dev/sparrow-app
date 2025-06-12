@@ -26,7 +26,7 @@
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   let upgradePlanModalInvite = false;
-  let upgradePlanModel = false;
+  let upgradePlanModal = false;
   let usersInvitePlanCount: number = 5;
 
   const OnleaveTeam = _viewModel.leaveTeam;
@@ -115,7 +115,7 @@
   const handleCreateWorkspace = async (teamId: string) => {
     const response = await _viewModel.handleCreateWorkspace(teamId);
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
-      upgradePlanModel = true;
+      upgradePlanModal = true;
     }
   };
 </script>
@@ -126,7 +126,7 @@
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
   bind:upgradePlanModalInvite
-  bind:upgradePlanModel
+  bind:upgradePlanModal
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}

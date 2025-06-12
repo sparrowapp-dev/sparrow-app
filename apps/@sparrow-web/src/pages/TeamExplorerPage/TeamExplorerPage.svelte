@@ -27,7 +27,7 @@
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
   let upgradePlanModalInvite = false;
-  let upgradePlanModel = false;
+  let upgradePlanModal = false;
   let usersInvitePlanCount: number = 5;
 
   let isWorkspaceInviteModalOpen = false;
@@ -199,7 +199,7 @@
   const handleCreateWorkspace = async (teamId: string) => {
     const response = await _viewModel.handleCreateWorkspace(teamId);
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
-      upgradePlanModel = true;
+      upgradePlanModal = true;
     }
   };
 </script>
@@ -256,7 +256,7 @@
     bind:isTeamInviteModalOpen
     bind:isLeaveTeamModelOpen
     bind:upgradePlanModalInvite
-    bind:upgradePlanModel
+    bind:upgradePlanModal
     onAddMember={handleWorkspaceDetails}
     openTeam={$activeTeam}
     workspaces={$workspaces}
