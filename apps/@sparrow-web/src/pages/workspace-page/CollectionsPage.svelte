@@ -95,14 +95,12 @@
   import { OpenRegular } from "@sparrow/library/icons";
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
-  import { TeamExplorerPageViewModel } from "../TeamExplorerPage/TeamExplorerPage.ViewModel";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
   const _viewModel3 = new TestflowViewModel();
-  const _viewModel4 = new TeamExplorerPageViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -794,30 +792,32 @@
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {
-    currentTestflow = await _viewModel3.currentTestflowCount();
-    if (currentTestflow === userLimits?.workspacesPerHub?.value) {
+    currentTestflow = await _viewModel3.currentTestflowCount(
+      $currentWorkspace?._id,
+    );
+    const response = await _viewModel3.handleCreateTestflow();
+    if (response?.data?.statusCode) {
       upgradePlanModel = true;
     }
-    await _viewModel3.handleCreateTestflow();
   };
 
   const handleLimits = async () => {
     if (teamDetails?.teamId) {
-      const data = await _viewModel4.userPlanLimits(teamDetails?.teamId);
+      const data = await _viewModel.userPlanLimits(teamDetails?.teamId);
       userLimits = data;
     }
   };
 
   const handleRequestOwner = async () => {
     if (teamDetails?.teamId) {
-      await _viewModel4.requestToUpgradePlan(teamDetails?.teamId);
+      await _viewModel.requestToUpgradePlan(teamDetails?.teamId);
       upgradePlanModel = false;
     }
   };
 
   const handleRedirectToAdminPanel = async () => {
     if (teamDetails?.teamId) {
-      await _viewModel4.handleRedirectToAdminPanel(teamDetails?.teamId);
+      await _viewModel.handleRedirectToAdminPanel(teamDetails?.teamId);
       upgradePlanModel = false;
     }
   };
@@ -1773,7 +1773,7 @@
   description={planContent?.description}
   planType="Testflow"
   planLimitValue={currentTestflow}
-  currentPlanValue={userLimits?.workspacesPerHub?.value || 3}
+  currentPlanValue={userLimits?.testflow?.value || 3}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

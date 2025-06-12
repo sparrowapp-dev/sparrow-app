@@ -96,14 +96,12 @@
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
-  import { TeamExplorerPageViewModel } from "../teams-page/sub-pages/TeamExplorerPage/TeamExplorerPage.ViewModel";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
 
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
   const _viewModel3 = new TestflowViewModel();
-  const _viewModel4 = new TeamExplorerPageViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -529,30 +527,30 @@
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {
-    currentTestflow = await _viewModel3.currentTestflowCount();
-    if (currentTestflow === userLimits?.workspacesPerHub?.value) {
+   currentTestflow = await _viewModel3.currentTestflowCount($currentWorkspace?._id);
+    const response = await _viewModel3.handleCreateTestflow();
+    if (response?.data?.statusCode) {
       upgradePlanModel = true;
     }
-    await _viewModel3.handleCreateTestflow();
   };
 
   const handleLimits = async () => {
     if (teamDetails?.teamId) {
-      const data = await _viewModel4.userPlanLimits(teamDetails?.teamId);
+      const data = await _viewModel.userPlanLimits(teamDetails?.teamId);
       userLimits = data;
     }
   };
 
   const handleRequestOwner = async () => {
     if (teamDetails?.teamId) {
-      await _viewModel4.requestToUpgradePlan(teamDetails?.teamId);
+      await _viewModel.requestToUpgradePlan(teamDetails?.teamId);
       upgradePlanModel = false;
     }
   };
 
   const handleRedirectToAdminPanel = async () => {
     if (teamDetails?.teamId) {
-      await _viewModel4.handleRedirectToAdminPanel(teamDetails?.teamId);
+      await _viewModel.handleRedirectToAdminPanel(teamDetails?.teamId);
       upgradePlanModel = false;
     }
   };

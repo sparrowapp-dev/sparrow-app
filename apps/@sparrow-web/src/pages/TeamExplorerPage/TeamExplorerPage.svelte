@@ -26,6 +26,7 @@
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
   let upgradePlanModalInvite = false;
+  let upgradePlanModel = false;
   let usersInvitePlanCount: number = 5;
 
   let isWorkspaceInviteModalOpen = false;
@@ -113,8 +114,7 @@
       inviteBody,
       userId,
     );
-    const limits = await _viewModel.userPlanLimits(teamId);
-    if (usersInvitePlanCount + 1 >= (limits?.usersPerHub?.value ?? 5)) {
+    if (response?.message === "Plan limit reached") {
       upgradePlanModalInvite = true;
     }
     return response;
@@ -194,6 +194,13 @@
   const handleRedirectAdminPanel = async () => {
     await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
   };
+
+  const handleCreateWorkspace = async (teamId: string) => {
+    const response = await _viewModel.handleCreateWorkspace(teamId);
+    if (response?.data?.statusCode) {
+      upgradePlanModel = true;
+    }
+  };
 </script>
 
 {#if isWorkspaceOpen}
@@ -248,13 +255,14 @@
     bind:isTeamInviteModalOpen
     bind:isLeaveTeamModelOpen
     bind:upgradePlanModalInvite
+    bind:upgradePlanModel
     onAddMember={handleWorkspaceDetails}
     openTeam={$activeTeam}
     workspaces={$workspaces}
     {activeTeamTab}
     onDeleteWorkspace={handleDeleteWorkspace}
     {onUpdateActiveTab}
-    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onCreateWorkspace={handleCreateWorkspace}
     onSwitchWorkspace={async (item) => {
       await _viewModel.handleSwitchWorkspace(item);
       // isWorkspaceOpen = true;

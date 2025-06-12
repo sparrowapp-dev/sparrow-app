@@ -346,9 +346,11 @@ export class TeamExplorerPageViewModel {
       navigate("collections");
       notifications.success("New Workspace Created");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
-    } else if (response?.data?.statusCode) {
-      notifications.error(response?.data?.message);
     }
+    // else if (response?.data?.statusCode) {
+    //   notifications.error(response?.data?.message);
+    // }
+    return response;
   };
 
   /**
@@ -431,7 +433,7 @@ export class TeamExplorerPageViewModel {
       );
     } else {
       if (response?.message === "Plan limit reached") {
-        notifications.error("Failed to send invite. please upgrade your plan.");
+        // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
           response?.message || "Failed to send invite. Please try again.",

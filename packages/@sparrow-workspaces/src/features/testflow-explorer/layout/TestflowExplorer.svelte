@@ -765,9 +765,9 @@
     if (!_id) return;
     if ($nodes.length >= planLimitTestFlowBlocks + 1) {
       upgradePlanModel = true;
-      notifications.error(
-        `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
-      );
+      // notifications.error(
+      //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
+      // );
       return;
     }
     let requestData;

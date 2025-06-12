@@ -25,6 +25,7 @@
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   let upgradePlanModalInvite = false;
+  let upgradePlanModel = false;
   let usersInvitePlanCount: number = 5;
 
   const OnleaveTeam = _viewModel.leaveTeam;
@@ -90,8 +91,7 @@
       inviteBody,
       userId,
     );
-    const limits = await _viewModel.userPlanLimits(teamId);
-    if (usersInvitePlanCount + 1 >= (limits?.usersPerHub?.value ?? 5)) {
+    if (response?.message === "Plan limit reached") {
       upgradePlanModalInvite = true;
     }
     return response;
@@ -110,6 +110,13 @@
   const handleRedirectAdminPanel = async () => {
     await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
   };
+
+  const handleCreateWorkspace = async (teamId: string) => {
+    const response = await _viewModel.handleCreateWorkspace(teamId);
+    if (response?.data?.statusCode) {
+      upgradePlanModel = true;
+    }
+  };
 </script>
 
 <TeamExplorer
@@ -118,13 +125,14 @@
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
   bind:upgradePlanModalInvite
+  bind:upgradePlanModel
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
   onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
-  onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  onCreateWorkspace={handleCreateWorkspace}
   onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
   onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}

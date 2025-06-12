@@ -314,9 +314,11 @@ export class TeamExplorerPageViewModel {
       navigate("collections");
       notifications.success("New Workspace created successfully.");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
-    } else if (response?.data?.statusCode) {
-      notifications.error(response?.data?.message);
     }
+    //else if (response?.data?.statusCode) {
+    //   notifications.error(response?.data?.message);
+    // }
+    return response;
   };
 
   /**
@@ -386,7 +388,7 @@ export class TeamExplorerPageViewModel {
       );
     } else {
       if (response?.message === "Plan limit reached") {
-        notifications.error("Failed to send invite. please upgrade your plan.");
+        // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
           response?.message || "Failed to send invite. Please try again.",
@@ -943,12 +945,12 @@ export class TeamExplorerPageViewModel {
 
   public userPlanLimits = async (teamId: string) => {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
-    const currentPlan = teamDetails?._data?.plan;
+    const currentPlan = teamDetails?.toMutableJSON().plan;
     if (currentPlan) {
       const planLimits = await this.planRepository.getPlan(
         currentPlan?.id.toString(),
       );
-      return planLimits?._data?.limits;
+      return planLimits?.toMutableJSON()?.limits;
     }
   };
 

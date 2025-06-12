@@ -140,6 +140,9 @@ import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
 import { MockHistoryTabAdapter } from "src/adapter/mock-history-tab";
+import { TeamRepository } from "src/repositories/team.repository";
+import { TeamService } from "src/services/team.service";
+import { PlanRepository } from "src/repositories/plan.repository";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -150,6 +153,9 @@ export default class CollectionsViewModel {
   private workspaceService = new WorkspaceService();
   private githubService = new GithubService();
   private guideRepository = new GuideRepository();
+  private teamRepository = new TeamRepository();
+  private teamService = new TeamService();
+  private planRepository = new PlanRepository();
   private initTab = new InitTab();
 
   private featureSwitchRepository = new FeatureSwitchRepository();
@@ -7340,5 +7346,36 @@ export default class CollectionsViewModel {
       console.error("Error opening workspace:", error);
       notifications.error("Failed to open workspace. Please try again.");
     }
+  };
+
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(
+      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      "_blank",
+    );
   };
 }

@@ -36,6 +36,7 @@
 
   export let isWebEnvironment: boolean;
   export let upgradePlanModalInvite: boolean;
+  export let upgradePlanModel: boolean = false;
 
   /**
    * user ID
@@ -136,7 +137,6 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
-  let upgradePlanModel: boolean = false;
   let userLimits: any;
   let planContent: any;
 
@@ -303,17 +303,13 @@
   const handleRedirectToAdminPanel = async () => {
     await handleRedirectAdminPanel();
     upgradePlanModel = false;
-    if (upgradePlanModalInvite) {
-      upgradePlanModalInvite = false;
-    }
+    upgradePlanModalInvite = false;
   };
 
   const handleRequestOwner = async () => {
     await contactOwner();
     upgradePlanModel = false;
-    if (upgradePlanModalInvite) {
-      upgradePlanModalInvite = false;
-    }
+    upgradePlanModalInvite = false;
   };
 
   // Use reactive statement properly
@@ -427,12 +423,6 @@
                 type={`primary`}
                 startIcon={AddRegular}
                 onClick={async () => {
-                  if (
-                    openTeam?._data?.workspaces.length ===
-                    userLimits?.workspacesPerHub?.value
-                  ) {
-                    upgradePlanModel = true;
-                  }
                   await handleCreateNewWorkspace();
                 }}
                 loader={isWorkspaceCreationInProgress}
