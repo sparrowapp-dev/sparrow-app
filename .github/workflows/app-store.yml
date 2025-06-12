@@ -153,16 +153,24 @@ jobs:
           INSTALLER_ID: ${{ env.INSTALLER_ID }}
 
       - name: Upload to App Store Connect
-        run: |
-          APP_NAME="Sparrow"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
-
-          xcrun altool --upload-package \
-            "$PKG_PATH" \
-            --type macos \
-            --apiKey "$APP_STORE_CONNECT_API_KEY" \
-            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
-            --verbose
         env:
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APPLE_API_KEY }}
-          APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APPLE_API_ISSUER_ID }}
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+        run: |
+          # 1. Create temporary .p8 file
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > auth.p8
+          
+          # 2. Extract Key ID from .p8 content (first 10 chars of line after "-----BEGIN PRIVATE KEY-----")
+          API_KEY_ID=$(awk '/-----BEGIN PRIVATE KEY-----/{getline; print substr($0,1,10); exit}' auth.p8)
+          
+          # 3. Rename file to required format
+          mv auth.p8 "AuthKey_${API_KEY_ID}.p8"
+          chmod 600 "AuthKey_${API_KEY_ID}.p8"
+          
+          # 4. Upload package
+          xcrun altool --upload-package "$PKG_PATH" \
+            --type macos \
+            --apiKey "$API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
+            --apiKeyFile "AuthKey_${API_KEY_ID}.p8" \
+            --verbose
