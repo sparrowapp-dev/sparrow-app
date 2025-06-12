@@ -993,6 +993,8 @@ export class TeamExplorerPageViewModel {
       notifications.success(
         `Request is Sent Successfully to Owner for Upgrade Plan.`,
       );
+    } else {
+      notifications.error("Failed to Sent request. Please try again.");
     }
   };
 
