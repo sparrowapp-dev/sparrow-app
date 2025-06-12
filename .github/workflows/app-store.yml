@@ -121,8 +121,6 @@ jobs:
           yarn cache clean
           yarn install
           yarn workspace @sparrow/desktop tauri build
-          
-
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -154,86 +152,27 @@ jobs:
         env:
           INSTALLER_ID: ${{ env.INSTALLER_ID }}
 
-      - name: Upload .pkg to S3
+      - name: Install Transporter
         run: |
-          aws s3 cp apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg s3://sparrow-assest/macos/
+          # Download Transporter (if not available on runner)
+          if ! command -v transporter &> /dev/null; then
+            xcode-select --install
+            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+            sudo xcodebuild -license accept
+          fi
+
+      - name: Upload to App Store Connect
+        run: |
+          APP_NAME="Sparrow"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
+
+          # Upload using Transporter
+          xcrun altool --upload-package \
+            "$PKG_PATH" \
+            --type macos \
+            --apiKey "$APP_STORE_CONNECT_API_KEY" \
+            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
+            --verbose
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # - name: file content
-      #   run: |
-      #     cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
-        
-      - name: Compress entire macos/ folder
-        run: |
-          cd /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/release/bundle
-          ditto -c -k --sequesterRsrc --keepParent macos macos_bundle.zip
-
-
-      - name: Install AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-          sudo installer -pkg AWSCLIV2.pkg -target /
-          aws --version
-
-      - name: Upload zipped macos bundle to S3
-        run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/release/bundle/macos_bundle.zip s3://sparrow-assest/macos/
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-
-      # - name: Upload & download File to S3
-      #   run: |
-      #    aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-assest/macos/ --recursive
-   #       aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
-        # env:
-        #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # - name: Post macOS Build Links to Teams
-      #   run: |
-      #     DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
-      #     DMG_FILENAME=$(basename "$DMG_FILE")
-      #     DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
-          
-      #     curl -H "Content-Type: application/json" -d "{
-      #       \"type\": \"message\",
-      #         \"attachments\": [
-      #           {
-      #             \"contentType\": \"application/vnd.microsoft.card.adaptive\",
-      #             \"content\": {
-      #               \"type\": \"AdaptiveCard\",
-      #               \"body\": [
-      #                 {
-      #                   \"type\": \"TextBlock\",
-      #                   \"text\": \"🍎 New macOS Build Available\",
-      #                   \"weight\": \"bolder\",
-      #                   \"size\": \"large\"
-      #                 },
-      #                 {
-      #                   \"type\": \"TextBlock\",
-      #                   \"text\": \"Branch: development\",
-      #                   \"wrap\": true
-      #                 },
-      #                 {
-      #                   \"type\": \"TextBlock\",
-      #                   \"text\": \"Download Link:\",
-      #                   \"wrap\": true
-      #                 },
-      #                 {
-      #                   \"type\": \"TextBlock\",
-      #                   \"text\": \"$DMG_URL\",
-      #                   \"color\": \"accent\",
-      #                   \"wrap\": true
-      #                 }
-      #               ],
-      #               \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
-      #               \"version\": \"1.2\"
-      #             }
-      #           }
-      #         ]
-      #       }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
-        shell: bash
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APPLE_API_ISSUER_ID }}
