@@ -369,7 +369,8 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn workspace @sparrow/desktop tauri build --bundles deb
+          yarn workspace @sparrow/desktop tauri build --bundles deb 
+          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
 
       - name: Generate DEB metadata
         working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
