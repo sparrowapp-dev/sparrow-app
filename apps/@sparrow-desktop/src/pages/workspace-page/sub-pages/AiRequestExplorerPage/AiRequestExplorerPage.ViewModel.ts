@@ -404,9 +404,8 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const user = getClientUser();
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
+    const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
     });
 
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
@@ -427,8 +426,8 @@ class AiRequestExplorerViewModel {
           title: newConversationTitle,
           time: this.getFormattedTime(),
           date: this.getLocalDate(),
-          authoredBy: isGuestUser ? "Guest User" : user.name,
-          updatedBy: isGuestUser ? "Guest User" : {
+          authoredBy: guestUser ? "Guest User" : user.name,
+          updatedBy: guestUser ? "Guest User" : {
             name: user.name,
             email: user.email,
             id: user.id,
