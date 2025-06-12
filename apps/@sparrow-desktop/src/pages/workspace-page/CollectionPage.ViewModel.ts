@@ -143,6 +143,7 @@ import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { TeamService } from "@app/services/team.service";
 import { PlanRepository } from "@app/repositories/plan.repository";
+import { open } from "@tauri-apps/plugin-shell";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
