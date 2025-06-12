@@ -156,9 +156,10 @@ jobs:
         env:
           PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
           # 1. Create temporary .p8 file
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > auth.p8
+          echo "$APP_STORE_CONNECT_API_KEY" > auth.p8
           
           # 2. Extract Key ID from .p8 content (first 10 chars of line after "-----BEGIN PRIVATE KEY-----")
           API_KEY_ID=$(awk '/-----BEGIN PRIVATE KEY-----/{getline; print substr($0,1,10); exit}' auth.p8)
