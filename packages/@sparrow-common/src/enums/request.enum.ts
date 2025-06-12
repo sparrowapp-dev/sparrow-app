@@ -116,8 +116,6 @@ export enum ContentTypeEnum {
   "text/html" = "text/html",
 }
 
-export enum RequestCode {
-  FORBIDDENEXCEPTION = 403,
-  SERVER_ERROR = 500,
-  SUCCESS = 201,
+export enum RequestMessage {
+  PLAN_LIMIT_MESSAGE = "Plan limit reached",
 }

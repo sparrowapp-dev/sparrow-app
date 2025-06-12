@@ -97,7 +97,7 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
-  import { RequestCode } from "@sparrow/common/enums";
+  import { RequestMessage } from "@sparrow/common/enums";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -532,7 +532,7 @@
       $currentWorkspace?._id,
     );
     const response = await _viewModel3.handleCreateTestflow();
-    if (response?.data?.statusCode === RequestCode.FORBIDDENEXCEPTION) {
+    if (response?.data?.message === RequestMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModel = true;
     }
   };
