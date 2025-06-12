@@ -146,22 +146,23 @@
   };
 
   let isConversationHistoryPanelOpened = false;
+  let isConversationHistoryLoading = false;
   const onOpenConversationHistoryPanel = async () => {
+    const res = await fetchConversations();
+    const result = getConversationsList();
     maxPx += 300;
     defaultPx += 250;
     minPx += 350;
-    isConversationHistoryPanelOpened = true;
     updateSplitpaneContSizes();
-    const res = await fetchConversations();
-    const result = getConversationsList();
+    isConversationHistoryPanelOpened = true;
     return result;
   };
   const onCloseConversationHistoryPanel = () => {
     maxPx -= 300;
     defaultPx -= 250;
     minPx -= 350;
-    isConversationHistoryPanelOpened = false;
     updateSplitpaneContSizes();
+    isConversationHistoryPanelOpened = false;
   };
 
   // $: {
@@ -171,8 +172,10 @@
 
   const handleOnClickUpdateRequestAuth = async () => {
     if (isConversationHistoryPanelOpened) {
+      isConversationHistoryLoading = true;
       const res = await fetchConversations();
       const result = getConversationsList();
+      isConversationHistoryLoading = false;
     }
     onUpdateRequestAuth();
   };
@@ -196,11 +199,13 @@
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
         {onUpdateAiConversation}
         onModelSwitch={async (provider, variant) => {
+          onSwitchConversation("", "New Conversation", []);
           if (isConversationHistoryPanelOpened) {
+            isConversationHistoryLoading = true;
             const res = await fetchConversations();
             const result = getConversationsList();
+            isConversationHistoryLoading = false;
           }
-          onSwitchConversation("", "New Conversation", []);
         }}
       />
 
@@ -343,6 +348,8 @@
               {onRenameConversation}
               {onDeleteConversation}
               {onClearConversation}
+              bind:isConversationHistoryPanelOpened
+              bind:isConversationHistoryLoading
             />
           </Pane>
         </Splitpanes>

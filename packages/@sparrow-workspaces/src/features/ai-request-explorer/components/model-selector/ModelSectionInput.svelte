@@ -45,18 +45,17 @@
   };
 
   // Handle model selection
-  const handleModelSelection = (
+  const handleModelSelection = async (
     provider: string,
     model: { name: string; id: string },
   ) => {
-    if (selectedModelProvider !== provider) {
-      onModelSwitch();
-      // onUpdateAiConversation([]);
-      // return;
-    }
+    const isNewProvider = selectedModelProvider !== provider;
     selectedModelProvider = provider;
     selectedModel = model.id;
-    onUpdateAIModel(provider, model.id);
+    await onUpdateAIModel(provider, model.id);
+    if (isNewProvider) {
+      onModelSwitch();
+    }
   };
 
   /**

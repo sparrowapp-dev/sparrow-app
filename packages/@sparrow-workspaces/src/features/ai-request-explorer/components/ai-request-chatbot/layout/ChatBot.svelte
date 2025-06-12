@@ -31,6 +31,8 @@
   export let onRenameConversation;
   export let onDeleteConversation;
   export let onClearConversation;
+  export let isConversationHistoryPanelOpened: boolean;
+  export let isConversationHistoryLoading: boolean;
 
   let scrollList: ScrollList;
 
@@ -125,6 +127,8 @@
       isChatPanelLoadingActive={$tab?.property?.aiRequest?.state
         ?.isChatbotConversationLoading}
       currTabAiInfo={$tab.property?.aiRequest?.ai}
+      bind:isConversationHistoryPanelOpened
+      bind:isConversationHistoryLoading
     />
   </div>
 {/if}

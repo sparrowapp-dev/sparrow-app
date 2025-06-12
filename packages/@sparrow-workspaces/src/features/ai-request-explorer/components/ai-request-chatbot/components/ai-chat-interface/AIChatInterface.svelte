@@ -58,12 +58,12 @@
   export let onDeleteConversation;
   export let isChatPanelLoadingActive;
   export let currTabAiInfo: Ai;
+  export let isConversationHistoryPanelOpen = false;
+  export let isConversationHistoryLoading = false;
 
   let isRenaming = false;
   let newRequestName: string = "";
   let inputField: HTMLInputElement;
-  let conversationHistoryPanelLoader = false;
-  let isConversationHistoryPanelOpen = false;
 
   let chatContainer: HTMLElement;
   /**
@@ -125,11 +125,11 @@
 
   const handleOpenConversationHistoryPanel = async () => {
     await onOpenConversationHistoryPanel();
-    isConversationHistoryPanelOpen = true;
+    // isConversationHistoryPanelOpen = true;
   };
   const handleCloseConversationHistoryPanel = async () => {
     await onCloseConversationHistoryPanel();
-    isConversationHistoryPanelOpen = false;
+    // isConversationHistoryPanelOpen = false;
   };
 
   const handleRenameInput = (event: Event) => {
@@ -190,8 +190,10 @@
           size="extra-small"
           startIcon={DismissRegular}
           type="teritiary-regular"
-          onClick={() => {
-            handleCloseConversationHistoryPanel();
+          onClick={async () => {
+            await handleCloseConversationHistoryPanel();
+            isConversationHistoryPanelOpen = false;
+            isConversationHistoryLoading = false;
           }}
         />
       </div>
@@ -199,8 +201,8 @@
       <div
         class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-start flex-grow-1"
       >
-        {#if conversationsHistory && conversationsHistory._data.conversations.length}
-          {#each [...conversationsHistory._data.conversations].reverse() as conversation (conversation.id)}
+        {#if !isConversationHistoryLoading && conversationsHistory && conversationsHistory._data.conversations.length}
+          {#each [...conversationsHistory._data.conversations] as conversation (conversation.id)}
             <ConversationHistoryItem
               currOpenedConversationId={currTabAiInfo.conversationId}
               {conversation}
@@ -277,18 +279,14 @@
                       size="small"
                       startIcon={ChatHistoryRegular}
                       type={"secondary"}
-                      loader={conversationHistoryPanelLoader}
+                      disable={isConversationHistoryPanelOpen}
+                      loader={isConversationHistoryLoading}
                       onClick={async () => {
-                        conversationHistoryPanelLoader = true;
-                        isConversationHistoryPanelOpen =
-                          !isConversationHistoryPanelOpen;
-                        if (isConversationHistoryPanelOpen) {
-                          await handleOpenConversationHistoryPanel();
-                          conversationHistoryPanelLoader = false;
-                        } else {
-                          await handleCloseConversationHistoryPanel();
-                          conversationHistoryPanelLoader = false;
-                        }
+                        if (isConversationHistoryLoading) return;
+                        isConversationHistoryLoading = true;
+                        await handleOpenConversationHistoryPanel();
+                        isConversationHistoryPanelOpen = true;
+                        isConversationHistoryLoading = false;
                       }}
                     />
                   </Tooltip>
