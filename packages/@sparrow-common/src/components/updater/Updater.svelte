@@ -8,7 +8,6 @@
   export let onUpdate;
   export let updateDoc;
   const osDetector = new OSDetector();
-  console.log(osDetector.getOS());
 </script>
 
 {#if show}
