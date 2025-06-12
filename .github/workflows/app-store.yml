@@ -124,16 +124,10 @@ jobs:
           
 
         env:
-          APPLE_SIGNING_IDENTITY: "${{ env.CERT_ID }}"
-          APPLE_CERTIFICATE: "${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}" # this is the apple distribution certificate
-          APPLE_CERTIFICATE_PASSWORD: "" # password is blank
+          APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          # APPLE_ID: ${{ secrets.APPLE_ID }}
-          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
           CI: false
 
       - name: Create signed .pkg for App Store
