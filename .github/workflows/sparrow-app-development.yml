@@ -354,7 +354,6 @@ jobs:
           sudo apt install -y yarn
 
 
-
       - name: Install project dependencies
         run: yarn
 
@@ -436,11 +435,11 @@ jobs:
           SOURCE_DIR: gh-pages
           DEST_DIR: linux 
 
-      # - name: Notify Teams Channel
-      #   run: |
-      #     curl -H 'Content-Type: application/json' \
-      #       -d '{
-      #         "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
-      #       }' \
-      #       ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
+      - name: Notify Teams Channel
+        run: |
+          curl -H 'Content-Type: application/json' \
+            -d '{
+              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+            }' \
+            ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
         
