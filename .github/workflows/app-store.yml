@@ -112,7 +112,22 @@ jobs:
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
           CI: false
-          
+
+      - name: Import .p12 Certificate
+        run: |
+          echo "${{ secrets.MAC_INSTALLER_CERT }}" | base64 --decode > InstallerCert.p12
+          security import InstallerCert.p12 \
+            -k ~/Library/Keychains/login.keychain-db \
+            -P "${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}" \
+            -T /usr/bin/productbuild
+        env:
+          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
+          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+
+      # Verify both certs are installed
+      - name: Debug - List Certificates
+        run: security find-identity -v -p codesigning
+        
       - name: Create signed .pkg for App Store
         run: |
           APP_NAME="Sparrow"
@@ -120,10 +135,12 @@ jobs:
           PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
           productbuild \
             --component "$BUNDLE_PATH" /Applications \
-            --sign "$INSTALLER_CERT_ID" \
+            --sign "$MAC_INSTALLER_CERT_ID" \
             "$PKG_PATH"
         env:
-          INSTALLER_CERT_ID: "3rd Party Mac Developer Installer: Rahul Joshi (9NQFM3WKMZ)"
+          MAC_INSTALLER_CERT_ID: ${{ secrets.MAC_INSTALLER_CERT_ID }}
+          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}     
+          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
 
       - name: Upload .pkg to S3
         run: |
