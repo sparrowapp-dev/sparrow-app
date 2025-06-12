@@ -63,6 +63,7 @@ import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
+import { TeamService } from "src/services/team.service";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -79,6 +80,7 @@ export class TestflowExplorerPageViewModel {
   private testflowService = new TestflowService();
   private compareArray = new CompareArray();
   private environmentService = new EnvironmentService();
+  private teamService = new TeamService();
   /**
    * Utils
    */
@@ -1738,5 +1740,48 @@ export class TestflowExplorerPageViewModel {
     const data = await this.testflowRepository.getTestflowDoc();
     count = data?.length;
     return count;
+  };
+
+  /**
+   * @description - This function will provide user Limits based on teamId.
+   */
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?._data?.plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?._data?.limits;
+    }
+  };
+
+  /**
+   * @description - This function will send Email request to the Owner.
+   */
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error("Failed to Sent request. Please try again.");
+    }
+  };
+
+  /**
+   * @description - This function will redirect you to billing section.
+   */
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(
+      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      "_blank",
+    );
+    return;
   };
 }

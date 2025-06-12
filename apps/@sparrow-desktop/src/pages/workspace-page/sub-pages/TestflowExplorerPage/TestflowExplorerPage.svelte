@@ -14,11 +14,9 @@
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
-  import { TeamExplorerPageViewModel } from "@app/pages/teams-page/sub-pages/TeamExplorerPage/TeamExplorerPage.ViewModel";
   export let tab;
   export let teamDetails;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
-  const _viewModel1 = new TeamExplorerPageViewModel();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
 
@@ -205,7 +203,7 @@
 
   const handleRequestOwner = async () => {
     if ($activeWorkspace?._data?.team?.teamId) {
-      await _viewModel1.requestToUpgradePlan(
+      await _viewModel.requestToUpgradePlan(
         $activeWorkspace?._data?.team?.teamId,
       );
       testflowBlocksPlanModelOpen = false;
@@ -216,7 +214,7 @@
 
   const handleRedirectAdminPanel = async () => {
     if ($activeWorkspace?._data?.team?.teamId) {
-      await _viewModel1.handleRedirectToAdminPanel(
+      await _viewModel.handleRedirectToAdminPanel(
         $activeWorkspace?._data?.team?.teamId,
       );
       testflowBlocksPlanModelOpen = false;
