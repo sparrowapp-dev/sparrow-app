@@ -117,6 +117,7 @@
   bind:userId
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
+  bind:upgradePlanModalInvite
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
