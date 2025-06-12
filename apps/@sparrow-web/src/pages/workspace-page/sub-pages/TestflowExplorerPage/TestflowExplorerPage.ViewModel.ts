@@ -446,9 +446,9 @@ export class TestflowExplorerPageViewModel {
         );
         const planObject = planRxDoc?.toMutableJSON();
         if (!planObject?.limits?.selectiveTestflowRun?.active) {
-          notifications.error(
-            "Failed to run from here. please upgrade your plan.",
-          );
+          // notifications.error(
+          //   "Failed to run from here. please upgrade your plan.",
+          // );
           return;
         }
       }
@@ -478,9 +478,9 @@ export class TestflowExplorerPageViewModel {
         );
         const planObject = planRxDoc?.toMutableJSON();
         if (!planObject?.limits?.selectiveTestflowRun?.active) {
-          notifications.error(
-            "Failed to run till here. please upgrade your plan.",
-          );
+          // notifications.error(
+          //   "Failed to run till here. please upgrade your plan.",
+          // );
           return;
         }
       }
