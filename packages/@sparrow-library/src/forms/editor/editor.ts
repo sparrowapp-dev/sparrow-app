@@ -10,6 +10,21 @@ import { jsonSetup } from "./theme";
 import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
 
+
+/**
+ * @description - remove indentation from the string
+ * @param code - text that should be shown on code mirror view
+ * @returns - plain text code without indentation
+ */
+const removeIndentation = (str: string = "") => {
+  // Split the code into lines
+  const lines = str.split("\n");
+  // Remove leading whitespace from each line
+  const unindentedLines = lines.map((line) => line.trim());
+  // Join the lines back together
+  return unindentedLines.join("\n");
+};
+
 /**
  * @description - adds syntax highlighting and formatting to code mirror view
  * @param codeMirrorView - code mirror constructor object
@@ -103,7 +118,7 @@ const handleCodeMirrorSyntaxFormat = (
             changes: {
               from: 0,
               to: codeMirrorView.state.doc.length,
-              insert: value, // manual beautification is done, as beautify lib. is not available for curl 
+              insert: value,
             },
           };
         }
