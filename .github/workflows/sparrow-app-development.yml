@@ -311,12 +311,11 @@ jobs:
   release_linux:
     runs-on: ubuntu-latest
     environment: development
+    needs: release_macos
 
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-      AWS_REGION: 'us-east-1'
-      AWS_S3_BUCKET: sparrow-assest
       CI: false
 
     steps:
