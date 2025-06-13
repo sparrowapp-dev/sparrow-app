@@ -35,6 +35,7 @@
   let deleteLoader: boolean = false;
   let isDeletePopup: boolean = false;
   let responseToDelete = null;
+  let isResponseCreating = false;
 
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -159,7 +160,12 @@
         size="extra-small"
         customWidth={"24px"}
         type="teritiary-regular"
-        onClick={onCreateMockResponse}
+        disable={isResponseCreating}
+        onClick={async () => {
+          isResponseCreating = true;
+          await onCreateMockResponse();
+          isResponseCreating = false;
+        }}
         startIcon={AddRegular}
       />
     </span>

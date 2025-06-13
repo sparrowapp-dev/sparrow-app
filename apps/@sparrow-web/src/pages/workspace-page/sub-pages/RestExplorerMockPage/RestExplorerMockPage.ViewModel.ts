@@ -3080,6 +3080,9 @@ class RestExplorerMockViewModel {
             responseNavigation: "Response",
           },
         };
+        if (!progressiveTab.property?.mockRequest?.items) {
+          progressiveTab.property.mockRequest.items = [];
+        }
         progressiveTab.property?.mockRequest?.items?.push(mockResponse);
         this.tab = progressiveTab;
         await this.tabRepository.updateTab(
@@ -3138,9 +3141,9 @@ class RestExplorerMockViewModel {
             mockResponseId,
             {
               mockRequestResponse: {
-                isMockResponseActive: isMockResponseActive
-              }
-            }
+                isMockResponseActive: isMockResponseActive,
+              },
+            },
           );
         } else {
           this.collectionRepository.updateSavedRequestInCollection(
@@ -3149,15 +3152,16 @@ class RestExplorerMockViewModel {
             mockResponseId,
             {
               mockRequestResponse: {
-                isMockResponseActive: isMockResponseActive
-              }
-            }
+                isMockResponseActive: isMockResponseActive,
+              },
+            },
           );
         }
         debugger;
         progressiveTab.property?.mockRequest?.items?.forEach((item) => {
           if (item.id === mockResponseId) {
-            item.mockRequestResponse.isMockResponseActive = isMockResponseActive;
+            item.mockRequestResponse.isMockResponseActive =
+              isMockResponseActive;
           }
         });
         this.tab = progressiveTab;
