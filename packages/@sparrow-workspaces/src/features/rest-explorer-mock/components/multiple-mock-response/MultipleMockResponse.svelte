@@ -132,7 +132,7 @@
     tabindex="-1"
     on:click|preventDefault={() => {}}
     class=" d-flex align-items-center position-relative bg-transparent border-0"
-    style="gap: 8px"
+    style="gap: 4px"
   >
     <div class="api-method text-{getMethodStyle(requestMethod)}">
       {requestMethod?.toUpperCase() === "DELETE"
@@ -215,14 +215,17 @@
           </Tooltip>
           <div
             class="api-method"
-            style="font-size: 9px; color: {response?.statusCode >= 200 &&
-            response?.statusCode < 400
-              ? 'var(--text-ds-danger-300)'
-              : response.statusCode
-                ? 'var(--text-ds-success-300)'
+            style="font-size: 9px; color: {response?.mockRequestResponse
+              ?.responseStatus >= 200 &&
+            response?.mockRequestResponse?.responseStatus < 400
+              ? 'var(--text-ds-success-300)'
+              : response?.mockRequestResponse?.responseStatus
+                ? 'var(--text-ds-danger-300)'
                 : 'var(--text-ds-neutral-50)'};"
           >
-            {response?.statusCode ? response.statusCode : "-"}
+            {response?.mockRequestResponse?.responseStatus
+              ? response.mockRequestResponse.responseStatus
+              : "-"}
           </div>
 
           {#if isRenaming && activeResponseIdx === idx}
