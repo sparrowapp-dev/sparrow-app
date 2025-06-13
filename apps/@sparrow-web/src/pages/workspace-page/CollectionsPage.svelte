@@ -797,29 +797,37 @@
     currentTestflow = await _viewModel3.currentTestflowCount(
       $currentWorkspace?._id,
     );
+    console.log("--------------->currrent testflow ->", currentTestflow);
     const response = await _viewModel3.handleCreateTestflow();
+    handleLimits();
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModel = true;
     }
   };
 
   const handleLimits = async () => {
-    if (teamDetails?.teamId) {
-      const data = await _viewModel.userPlanLimits(teamDetails?.teamId);
+    if ($currentWorkspace?._data?.team?.teamId) {
+      const data = await _viewModel.userPlanLimits(
+        $currentWorkspace?._data?.team?.teamId,
+      );
       userLimits = data;
     }
   };
 
   const handleRequestOwner = async () => {
-    if (teamDetails?.teamId) {
-      await _viewModel.requestToUpgradePlan(teamDetails?.teamId);
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $currentWorkspace?._data?.team?.teamId,
+      );
       upgradePlanModel = false;
     }
   };
 
   const handleRedirectToAdminPanel = async () => {
-    if (teamDetails?.teamId) {
-      await _viewModel.handleRedirectToAdminPanel(teamDetails?.teamId);
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $currentWorkspace?._data?.team?.teamId,
+      );
       upgradePlanModel = false;
     }
   };
