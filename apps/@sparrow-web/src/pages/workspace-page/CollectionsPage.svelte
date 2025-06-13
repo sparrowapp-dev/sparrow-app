@@ -1805,7 +1805,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={_viewModel.handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
