@@ -118,7 +118,7 @@ const handleCodeMirrorSyntaxFormat = (
             changes: {
               from: 0,
               to: codeMirrorView.state.doc.length,
-              insert: value,
+              insert: value, // manual beautification is done, as beautify lib. is not available for curl 
             },
           };
         }
