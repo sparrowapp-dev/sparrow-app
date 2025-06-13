@@ -24,6 +24,7 @@
   import { OSDetector } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { open } from "@tauri-apps/plugin-shell";
+  import { Platform } from "@sparrow/common/enums";
 
   const _viewModel = new AppViewModel();
 
@@ -82,7 +83,7 @@
 
   (async () => {
     try {
-      if (osDetector.getOS() === "windows") {
+      if (osDetector.getOS() === Platform.WINDOWS) {
         await loadPolicyConfig();
       } else {
         policyLoading.set(false); // Still resolve loading
@@ -94,7 +95,7 @@
   })();
 
   const openUpdateDocs = async () => {
-    if (osDetector.getOS() === "linux") {
+    if (osDetector.getOS() === Platform.LINUX) {
       await open(constants.LINUX_INSTALL_DOCS);
       return;
     }

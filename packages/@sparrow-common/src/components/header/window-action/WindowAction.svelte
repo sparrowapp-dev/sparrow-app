@@ -37,7 +37,7 @@
   let isFullscreen: boolean = false;
 
   const toggleSize = async () => {
-    if (platform === "macos") {
+    if (platform === Platform.MACOS) {
       const currentFullscreenState = await appWindow.isFullscreen();
 
       // Show original Toolbar when window is maximized
@@ -68,7 +68,7 @@
     isMaximizeWindow = await appWindow.isMaximized();
   };
 
-  if (platform === "windows") {
+  if (platform === Platform.WINDOWS) {
     try {
       // Add event listener for window resize
       const unlistenResize = appWindow.onResized(checkSize);
