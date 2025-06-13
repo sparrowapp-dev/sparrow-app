@@ -145,7 +145,7 @@
     isExposeSaveAsRequest = flag;
   };
 
-  let isConversationHistoryPanelOpened = false;
+  let isConversationHistoryPanelOpen = false;
   let isConversationHistoryLoading = false;
   const onOpenConversationHistoryPanel = async () => {
     const res = await fetchConversations();
@@ -154,7 +154,7 @@
     defaultPx += 250;
     minPx += 350;
     updateSplitpaneContSizes();
-    isConversationHistoryPanelOpened = true;
+    isConversationHistoryPanelOpen = true;
     return result;
   };
   const onCloseConversationHistoryPanel = () => {
@@ -162,7 +162,7 @@
     defaultPx -= 250;
     minPx -= 350;
     updateSplitpaneContSizes();
-    isConversationHistoryPanelOpened = false;
+    isConversationHistoryPanelOpen = false;
   };
 
   // $: {
@@ -171,7 +171,7 @@
   // }
 
   const handleOnClickUpdateRequestAuth = async () => {
-    if (isConversationHistoryPanelOpened) {
+    if (!isGuestUser && isConversationHistoryPanelOpen) {
       isConversationHistoryLoading = true;
       const res = await fetchConversations();
       const result = getConversationsList();
@@ -198,14 +198,17 @@
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
         {onUpdateAiConversation}
-        onModelSwitch={async (provider, variant) => {
+        onModelSwitch={async () => {
           onSwitchConversation("", "New Conversation", []);
-          if (isConversationHistoryPanelOpened) {
-            isConversationHistoryLoading = true;
-            const res = await fetchConversations();
-            const result = getConversationsList();
-            isConversationHistoryLoading = false;
+          if (isConversationHistoryPanelOpen) {
+            onCloseConversationHistoryPanel();
           }
+          // if (!isGuestUser && isConversationHistoryPanelOpen) {
+          //   isConversationHistoryLoading = true;
+          //   const res = await fetchConversations();
+          //   const result = getConversationsList();
+          //   isConversationHistoryLoading = false;
+          // }
         }}
       />
 
@@ -349,7 +352,7 @@
               {onRenameConversation}
               {onDeleteConversation}
               {onClearConversation}
-              bind:isConversationHistoryPanelOpened
+              bind:isConversationHistoryPanelOpen
               bind:isConversationHistoryLoading
             />
           </Pane>

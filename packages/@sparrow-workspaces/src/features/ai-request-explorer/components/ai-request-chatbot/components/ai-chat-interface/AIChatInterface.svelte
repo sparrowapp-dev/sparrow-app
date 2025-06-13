@@ -154,6 +154,54 @@
       inputField.blur();
     }
   };
+
+  //
+  function groupConversationsByDate(conversations) {
+    const grouped = {};
+
+    conversations.forEach((conversation) => {
+      const date = conversation.date;
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+      grouped[date].push(conversation);
+    });
+
+    // Get today and yesterday in the same format as your getLocalDate function
+    const now = new Date();
+    const today = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}`;
+
+    const yesterdayDate = new Date(now);
+    yesterdayDate.setDate(now.getDate() - 1);
+    const yesterday = `${yesterdayDate.getFullYear()}-${(yesterdayDate.getMonth() + 1).toString().padStart(2, "0")}-${yesterdayDate.getDate().toString().padStart(2, "0")}`;
+
+    return Object.entries(grouped)
+      .map(([date, convs]) => {
+        let displayLabel;
+
+        if (date === today) {
+          displayLabel = "Today";
+        } else if (date === yesterday) {
+          displayLabel = "Yesterday";
+        } else {
+          displayLabel = new Date(date + "T00:00:00").toLocaleDateString(
+            "en-US",
+            {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            },
+          );
+        }
+
+        return {
+          dateKey: date,
+          displayLabel,
+          conversations: convs,
+        };
+      })
+      .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+  }
 </script>
 
 <!-- Code Block Preview Modal -->
@@ -203,14 +251,31 @@
         class="conversation-list d-flex flex-column mt-2 gap-2 align-items-start justify-content-start flex-grow-1"
       >
         {#if !isConversationHistoryLoading && conversationsHistory && conversationsHistory._data.conversations.length}
-          {#each [...conversationsHistory._data.conversations] as conversation (conversation.id)}
-            <ConversationHistoryItem
-              currOpenedConversationId={currTabAiInfo.conversationId}
-              {conversation}
-              onSelectConversation={onSwitchConversation}
-              {onRenameConversation}
-              {onDeleteConversation}
-            />
+          {#each groupConversationsByDate( [...conversationsHistory._data.conversations], ) as dateGroup (dateGroup.dateKey)}
+            <div class="date-group w-100">
+              <!-- Date Header -->
+              <div class="date-header mb-1">
+                <span
+                  class="date-label text-ds-font-weight-medium"
+                  style="font-family: Inter, sans-serif; font-size: 10px;"
+                >
+                  {dateGroup.displayLabel}
+                </span>
+              </div>
+
+              <!-- Conversations for this date -->
+              <div class="conversations-for-date d-flex flex-column gap-2">
+                {#each dateGroup.conversations as conversation (conversation.id)}
+                  <ConversationHistoryItem
+                    currOpenedConversationId={currTabAiInfo.conversationId}
+                    {conversation}
+                    onSelectConversation={onSwitchConversation}
+                    {onRenameConversation}
+                    {onDeleteConversation}
+                  />
+                {/each}
+              </div>
+            </div>
           {/each}
         {:else}
           <div
@@ -240,7 +305,6 @@
       </div>
     </div>
   {/if}
-  <!-- <div style="width: 16px;"></div> -->
 
   <!-- ChatBot Panel -->
   <div
@@ -257,7 +321,7 @@
         <div class="d-flex h-100 flex-column">
           <div class="chatbox-heading">
             <div
-              class="d-flex justify-content-between align-items-center w-100"
+              class="d-flex justify-content-between align-items-center w-100 gap-3"
               in:fade={{ duration: 200 }}
               style="min-width: 0;"
             >
@@ -272,10 +336,9 @@
                       : "flex-shrink: 0;"}
                   >
                     <Tooltip
-                      title={isConversationHistoryPanelOpen
-                        ? "Close chat history"
-                        : " Open chat history"}
+                      title={"Open chat history"}
                       placement={"top-center"}
+                      show={!isConversationHistoryPanelOpen}
                     >
                       <Button
                         size="small"
@@ -317,7 +380,7 @@
                   {:else}
                     <div
                       class="chat-panel-title"
-                      style="color: var(--bg-ds-neutral-50); flex: 1; min-width: 0; max-width: 50%; overflow: hidden;"
+                      style="color: var(--bg-ds-neutral-50); flex: 1; min-width: 0; max-width: max-content; overflow: hidden;"
                       on:click={() => {
                         // isRenaming = true;
                         // setTimeout(() => inputField.focus(), 100);
@@ -607,8 +670,6 @@
     overflow: hidden;
   }
 
-  /* new - st*/
-
   /* Full width when history panel is closed */
   .ai-chat-panel.full-width {
     width: 100%;
@@ -645,35 +706,6 @@
     min-height: 0;
     width: 100%;
   }
-
-  /* Hide scrollbar completely while keeping scroll functionality */
-  .conversation-list::-webkit-scrollbar {
-    display: none;
-  }
-  .conversation-list {
-    scrollbar-width: none;
-  }
-
-  /* Custom scrollbar styling */
-  /* .conversation-list::-webkit-scrollbar {
-    width: 4px;
-  }
-  .conversation-list::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .conversation-list::-webkit-scrollbar-thumb {
-    background: var(--border-ds-surface-300);
-    border-radius: 2px;
-  }
-  .conversation-list::-webkit-scrollbar-thumb:hover {
-    background: var(--border-ds-surface-400);
-  }
-  .conversation-list {
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-ds-surface-300) transparent;
-  } */
-
-  /* new - ed */
 
   .chat-box {
     background-color: var(--bg-ds-surface-700);
@@ -752,9 +784,4 @@
   .chat-panel-title:focus {
     border: 1px solid var(--bg-ds-primary-300) !important;
   }
-  /* .chat-panel-title:hover {
-    border: 1px solid var(--bg-ds-primary-300) !important;
-    border-radius: 4px;
-    cursor: text;
-  } */
 </style>
