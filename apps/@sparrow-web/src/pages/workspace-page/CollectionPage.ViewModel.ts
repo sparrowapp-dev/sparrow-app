@@ -3302,6 +3302,8 @@ export default class CollectionsViewModel {
         data.state.responseNavigation = "Response";
         // }
       });
+    } else {
+      request.items = [];
     }
     const adaptedRequest = requestTabAdapter.adapt(
       workspaceId || "",
