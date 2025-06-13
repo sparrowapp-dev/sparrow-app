@@ -45,6 +45,7 @@
   import * as Sentry from "@sentry/svelte";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
+  import { planInfoByRole } from "@sparrow/common/utils";
 
   const _viewModel = new DashboardViewModel();
   let userId;
