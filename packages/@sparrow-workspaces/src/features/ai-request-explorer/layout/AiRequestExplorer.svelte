@@ -424,7 +424,6 @@
   isOpen={isGeneratePromptModalOpen}
   width={"35%"}
   handleModalState={() => {
-    console.log("Modal closed");
     isGeneratePromptModalOpen = false;
     isSparrowAiLimitReached = false;
   }}
@@ -517,7 +516,6 @@
       loader={isPromptGenerating}
       disable={!userPromptExpectation.length}
       onClick={async () => {
-        console.log("Generate Response clicked");
         isPromptGenerating = true;
         const response = await onGenerateAiPrompt(
           generatePromptTarget,

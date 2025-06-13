@@ -2296,7 +2296,6 @@ class AiRequestExplorerViewModel {
   };
 
   public handleInsertAiPrompt = async (target: "UserPrompt" | "SystemPrompt", response: string) => {
-    console.log("In insertAiPrompt() :> ", response);
     if (target === "UserPrompt") {
       await this.updateUserPrompt(response);
     } else if (target === "SystemPrompt") {
