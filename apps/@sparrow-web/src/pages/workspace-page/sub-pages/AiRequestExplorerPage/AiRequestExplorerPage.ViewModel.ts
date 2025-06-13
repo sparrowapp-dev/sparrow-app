@@ -349,120 +349,6 @@ class AiRequestExplorerViewModel {
     return `${year}-${month}-${day}`;  // e.g. "2025-06-10"
   };
 
-  // public saveConversationHistory = async () => {
-  //   let isGuestUser = await this.getGuestUser();
-  //   if(isGuestUser) {
-  //     return; // Not storing conversation for guest users
-  //   }
-  //   const user = getClientUser();
-  //   const componentData = this._tab.getValue();
-  //   const provider = componentData?.property?.aiRequest?.aiModelProvider;
-  //   const conversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-  //   const conversationId = componentData?.property?.aiRequest?.ai?.conversationId;
-  //   const conversationTitle = componentData?.property?.aiRequest?.ai?.conversationTitle;
-  //   const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
-
-  //   // if (!conversations.length || !provider || !providerAuthKey) {
-  //   if (!provider || !providerAuthKey) {
-  //     console.error("Missing provider, conversations, or authKey.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const { inputTokens, outputTokens } = conversations.reduce((acc, item) => {
-  //       if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
-  //       if (item.type === "Receiver") acc.outputTokens += item.outputTokens || 0;
-  //       return acc;
-  //     }, { inputTokens: 0, outputTokens: 0 });
-
-  //     const commonFields = {
-  //       title: conversationTitle,
-  //       inputTokens,
-  //       outputTokens,
-  //       date: this.getLocalDate(),
-  //       time: this.getFormattedTime(),
-  //       conversation: conversations,
-  //       authoredBy: isGuestUser ? "Guest User" : user.name,
-  //       updatedBy: isGuestUser ? "Guest User" : {
-  //         name: user.name,
-  //         email: user.email,
-  //         id: user.id,
-  //       }
-  //     };
-
-  //     if (!conversationId) {
-  //       const payload = {
-  //         provider,
-  //         apiKey: providerAuthKey,
-  //         data: {
-  //           ...commonFields,
-  //           createdBy: isGuestUser ? "Guest User" : {
-  //             name: user.name,
-  //             email: user.email,
-  //             id: user.id,
-  //           }
-  //         }
-  //       };
-
-  //       const response = await this.aiRequestService.addNewConversation(payload);
-  //       const newConversationId = response.data.data;
-  //       this.updateAiRequestConversationId(newConversationId);
-
-  //       if (response.isSuccessful) { await this.fetchConversations(); }
-  //       else { console.error("Failed to save conversation. Please try again. ", response); }
-  //     } else {
-  //       const payload = {
-  //         provider,
-  //         apiKey: providerAuthKey,
-  //         id: conversationId,
-  //         data: {
-  //           ...commonFields,
-  //         }
-  //       };
-
-  //       payload.data.conversation = this.limitConversations(conversations, 7);
-
-  //       const response = await this.aiRequestService.updateConversation(payload);
-  //       if (response.isSuccessful) { await this.fetchConversations(); }
-  //       else { console.error("Something went wrong while updating conversation. ", response); }
-  //     }
-  //   } catch (error) { console.error("Error while saving conversation history :>> ", error); }
-  // }
-
-  // // Function to limit conversations to last 30 Receiver types with their Senders
-  // public limitConversations = (conversations, maxReceivers = 30) => {
-  //   if (conversations.length === 0) return conversations;
-    
-  //   // Find all Receiver message indices
-  //   const receiverIndices = [];
-  //   conversations.forEach((conv, index) => {
-  //     if (conv.type === "Receiver") {
-  //       receiverIndices.push(index);
-  //     }
-  //   });
-    
-  //   // If we have 30 or fewer Receivers, return all conversations
-  //   if (receiverIndices.length <= maxReceivers) {
-  //     return conversations;
-  //   }
-    
-  //   // Get the index of the (n-30)th Receiver from the end
-  //   const startReceiverIndex = receiverIndices[receiverIndices.length - maxReceivers];
-    
-  //   // Find the first Sender before this Receiver (if any) to maintain conversation context
-  //   let startIndex = startReceiverIndex;
-  //   for (let i = startReceiverIndex - 1; i >= 0; i--) {
-  //     if (conversations[i].type === "Sender") {
-  //       startIndex = i;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-    
-  //   // Return conversations from startIndex to end
-  //   return conversations.slice(startIndex);
-  // };
-
   public saveConversationHistory = async () => {
     let isGuestUser = await this.getGuestUser();
     if(isGuestUser) {
@@ -527,7 +413,6 @@ class AiRequestExplorerViewModel {
       } else {
         // Limit conversations for updates
         const limitedConversations = this.limitConversations(conversations, 7);
-        console.log("lim :>> ", limitedConversations)
         // Recalculate tokens for limited conversations
         const { inputTokens: limitedInputTokens, outputTokens: limitedOutputTokens } = limitedConversations.reduce((acc, item) => {
           if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
@@ -1974,11 +1859,6 @@ class AiRequestExplorerViewModel {
   }
 
   public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversations: Conversation[]) => {
-    // const componentData = this._tab.getValue();
-    // const currTabConversationId = componentData?.property?.aiRequest.ai?.conversationId;
-    // if (currTabConversationId === _conversationId) {
-    //   return;
-    // }
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;

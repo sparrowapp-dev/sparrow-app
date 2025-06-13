@@ -260,6 +260,11 @@ class AiRequestExplorerViewModel {
   );
 
   public fetchConversations = async () => {
+    let isGuestUser = await this.getGuestUser();
+    if(isGuestUser) {
+      return; // Not storing conversation for guest users
+    }
+
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
     const providerAuthKey = componentData.property.aiRequest.auth.apiKey.authValue;
@@ -317,13 +322,12 @@ class AiRequestExplorerViewModel {
   };
 
   public saveConversationHistory = async () => {
-    const componentData = this._tab.getValue();
+    let isGuestUser = await this.getGuestUser();
+    if(isGuestUser) {
+      return; // Not storing conversation for guest users
+    }
     const user = getClientUser();
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
-
+    const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const conversations = componentData?.property?.aiRequest?.ai?.conversations || [];
     const conversationId = componentData?.property?.aiRequest?.ai?.conversationId;
@@ -379,12 +383,24 @@ class AiRequestExplorerViewModel {
         if (response.isSuccessful) { await this.fetchConversations(); }
         else { console.error("Failed to save conversation. Please try again. ", response); }
       } else {
+        // Limit conversations for updates
+        const limitedConversations = this.limitConversations(conversations, 7);
+        // Recalculate tokens for limited conversations
+        const { inputTokens: limitedInputTokens, outputTokens: limitedOutputTokens } = limitedConversations.reduce((acc, item) => {
+          if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
+          if (item.type === "Receiver") acc.outputTokens += item.outputTokens || 0;
+          return acc;
+        }, { inputTokens: 0, outputTokens: 0 });
+
         const payload = {
           provider,
           apiKey: providerAuthKey,
           id: conversationId,
           data: {
             ...commonFields,
+            conversation: limitedConversations,
+            inputTokens: limitedInputTokens,
+            outputTokens: limitedOutputTokens,
           }
         };
 
@@ -395,18 +411,53 @@ class AiRequestExplorerViewModel {
     } catch (error) { console.error("Error while saving conversation history :>> ", error); }
   }
 
+  // Function to limit conversations to last N Receiver types with their Senders
+  public limitConversations = (conversations, maxReceivers = 30) => {
+    if (conversations.length === 0) return conversations;
+    
+    // Find all Receiver message indices
+    const receiverIndices = [];
+    conversations.forEach((conv, index) => {
+      if (conv.type === "Receiver") {
+        receiverIndices.push(index);
+      }
+    });
+    
+    // If we have maxReceivers or fewer Receivers, return all conversations
+    if (receiverIndices.length <= maxReceivers) {
+      return conversations;
+    }
+    
+    // Get the index of the (n-maxReceivers)th Receiver from the end
+    const startReceiverIndex = receiverIndices[receiverIndices.length - maxReceivers];
+    
+    // Find the first Sender before this Receiver (if any) to maintain conversation context
+    let startIndex = startReceiverIndex;
+    for (let i = startReceiverIndex - 1; i >= 0; i--) {
+      if (conversations[i].type === "Sender") {
+        startIndex = i;
+      } else {
+        break;
+      }
+    }
+    
+    // Return conversations from startIndex to end
+    return conversations.slice(startIndex);
+  };
+
   public handleRenameConversationTitle = async (conversationId: string, newConversationTitle: string) => {
+    const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
+    });
+    
     // If conversationId is null, then change title of current tab itself, no need to change in db
-    if (!conversationId) {
+    if (!conversationId || guestUser) {
       await this.updateAiRequestConversationTitle(newConversationTitle);
       return;
     }
 
     const componentData = this._tab.getValue();
     const user = getClientUser();
-    const guestUser = await this.guestUserRepository.findOne({
-        name: "guestUser",
-    });
 
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
@@ -455,6 +506,11 @@ class AiRequestExplorerViewModel {
   }
 
   public handleDeleteConversation = async (conversationId: string, conversationTitle: string) => {
+    let isGuestUser = await this.getGuestUser();
+    if(isGuestUser) {
+      return; // Not storing conversation for guest users
+    }
+    
     // If conversationId is null, then change title of current tab itself, no need to change in db
     if (!conversationId) {
       console.error("Failed to delete conversation, due to missing Conversation ID.")
@@ -479,7 +535,7 @@ class AiRequestExplorerViewModel {
           this.handleStartNewConversation();
         }
         await this.fetchConversations(); // Fetch to udpate the states in local db
-        notifications.success(`Conversation ${conversationTitle} deleted successfully.`);
+        notifications.success(`Conversation  “${conversationTitle}” deleted successfully.`);
       } else {
         notifications.error(`Failed to delete conversation ${conversationTitle}. Please try again.`);
       }
@@ -1768,7 +1824,7 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
+    // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
   }
 
   /**
