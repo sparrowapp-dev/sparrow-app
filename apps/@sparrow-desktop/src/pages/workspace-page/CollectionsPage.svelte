@@ -524,6 +524,7 @@
   let isReplaceCollectionModalOpen = false;
   let userLimits: any;
   let upgradePlanModel: boolean = false;
+  let isActiveSyncPlanModalOpen = false;
   let planContent: any;
   let currentTestflow: number = 3;
 
@@ -1228,6 +1229,8 @@
     onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
     onValidateOapiText={_viewModel.validateOapiDataSyntax}
     onValidateOapiFile={_viewModel.validateOapiFileSyntax}
+    isActiveSyncRequired={userLimits?.activeSync?.active || false}
+    bind:isActiveSyncPlanModalOpen
   />
 </Modal>
 
@@ -1679,6 +1682,25 @@
   planType="Testflow"
   planLimitValue={currentTestflow}
   currentPlanValue={userLimits?.workspacesPerHub?.value || 3}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={isActiveSyncPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Active Sync"
+  activePlan={"disabled"}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

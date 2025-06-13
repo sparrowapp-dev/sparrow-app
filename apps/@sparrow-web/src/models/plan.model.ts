@@ -8,7 +8,7 @@ export const planSchemaLiteral = {
   title: "plan",
   primaryKey: "planId",
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     planId: {
       type: "string",
@@ -71,6 +71,17 @@ export const planSchemaLiteral = {
           },
         },
         selectiveTestflowRun: {
+          type: "object",
+          properties: {
+            area: {
+              type: "string",
+            },
+            active: {
+              type: "boolean",
+            },
+          },
+        },
+        activeSync: {
           type: "object",
           properties: {
             area: {
