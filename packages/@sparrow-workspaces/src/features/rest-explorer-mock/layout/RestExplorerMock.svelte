@@ -735,7 +735,7 @@
                 >
                   <!-- Response Pane -->
                   <div class="d-flex h-100" style="gap: 8px;">
-                    <div style="width: 25%">
+                    <div style="width: 300px">
                       <MultipleMockResponse
                         requestName={$tab.name}
                         requestMethod={$tab.property.mockRequest?.method}
@@ -760,9 +760,7 @@
                         : 'ps-2'}"
                       style="flex:1;"
                     >
-                      {#if $tab.property.mockRequest?.items?.length === 0}
-                        <NoMockResponseDetailsSection {onCreateMockResponse} />
-                      {:else}
+                      {#if $tab.property.mockRequest?.items && $tab.property.mockRequest?.items?.length > 0}
                         <div class="h-100 d-flex flex-column">
                           <div style="flex:1; overflow:auto;">
                             <!-- {#if storeData?.isSendRequestInProgress}
@@ -881,6 +879,8 @@
                             <!-- {/if} -->
                           </div>
                         </div>
+                      {:else}
+                        <NoMockResponseDetailsSection {onCreateMockResponse} />
                       {/if}
                     </div>
                   </div>

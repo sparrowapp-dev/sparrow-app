@@ -12,8 +12,9 @@
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onDestroy, onMount } from "svelte";
   import { WindowMultipleIcon } from "@sparrow/library/icons";
+  import { Platform } from "../../../enums";
 
-  export let isWindows = true;
+  export let platform: "windows" | "macos" | "linux" = "windows";
 
   let appWindow = getCurrentWindow();
 
@@ -36,7 +37,7 @@
   let isFullscreen: boolean = false;
 
   const toggleSize = async () => {
-    if (!isWindows) {
+    if (platform === Platform.MACOS) {
       const currentFullscreenState = await appWindow.isFullscreen();
 
       // Show original Toolbar when window is maximized
@@ -51,7 +52,7 @@
       isFullscreen = !currentFullscreenState;
       console.log("Updated fullscreen state:", isFullscreen);
     } else {
-      // Other platforms: Use maximize
+      // Windows and Linux: Use maximize
       const isMaximized = await appWindow.isMaximized();
       if (isMaximized) {
         appWindow.unmaximize();
@@ -67,13 +68,12 @@
     isMaximizeWindow = await appWindow.isMaximized();
   };
 
-  
-  if (isWindows) {
+  if (platform === Platform.WINDOWS) {
     try {
       // Add event listener for window resize
       const unlistenResize = appWindow.onResized(checkSize);
 
-      // // Cleanup listener when component is destroyed
+      // Cleanup listener when component is destroyed
       onDestroy(() => {
         unlistenResize.then((f) => f());
       });
@@ -82,7 +82,17 @@
     }
   }
 
-  if (!isWindows) {
+  if (platform === Platform.LINUX) {
+    // Add event listener for window resize for Linux
+    const unlistenResize = appWindow.onResized(checkSize);
+
+    // Cleanup listener when component is destroyed
+    onDestroy(() => {
+      unlistenResize.then((f) => f());
+    });
+  }
+
+  if (platform === Platform.MACOS) {
     const unlistenResize = appWindow.onResized(async () => {
       isFullscreen = await appWindow.isFullscreen();
     });
@@ -91,12 +101,13 @@
       unlistenResize.then((f) => f());
     });
   }
+
   onMount(() => {
     checkSize();
   });
 </script>
 
-{#if isWindows}
+{#if platform === Platform.WINDOWS}
   <!-- Windows Style Buttons -->
   <div class="d-flex">
     <div class="controller-btn">
@@ -207,7 +218,7 @@
 
   .mac-nav:nth-child(3) {
     background-color: #62c554;
-    margin-left: 1pxz;
+    margin-left: 1px;
   }
 
   .custom-header-button {

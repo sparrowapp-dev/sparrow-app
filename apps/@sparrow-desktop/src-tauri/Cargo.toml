@@ -54,3 +54,6 @@ winreg = "0.11"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 cocoa = "0.26.0"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = "0.18.2"

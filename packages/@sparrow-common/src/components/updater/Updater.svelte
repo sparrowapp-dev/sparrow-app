@@ -2,10 +2,12 @@
   import { CrossIcon } from "@sparrow/library/icons";
   import { RocketIcon } from "@sparrow/library/icons";
   import { Link } from "svelte-navigator";
-
+  import { OSDetector } from "../../utils";
   export let show = true;
   export let hideUpdater;
   export let onUpdate;
+  export let updateDoc;
+  const osDetector = new OSDetector();
 </script>
 
 {#if show}
@@ -32,7 +34,11 @@
         <!-- See Release button -->
       </button>
 
-      <button class="update-btn" on:click={onUpdate}> Update </button>
+      {#if osDetector.getOS() === "linux"}
+        <button class="update-btn" on:click={updateDoc}>View Docs</button>
+      {:else}
+        <button class="update-btn" on:click={onUpdate}>Update</button>
+      {/if}
 
       <button class="cross-btn" on:click={hideUpdater}>
         <CrossIcon height={"16px"} width={"12px"} color={"var(--cross-icon)"} />

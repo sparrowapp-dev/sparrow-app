@@ -309,10 +309,15 @@ class RestExplorerMockViewModel {
       const serverItem = serverItems[i];
       const clientItem = clientItems[i];
 
-      // Compare responseBody (string comparison)
+      // Compare responseBody and status (string comparison)
       if (
         serverItem.mockRequestResponse?.responseBody !==
         clientItem.mockRequestResponse?.responseBody
+      ) {
+        return false;
+      } else if (
+        serverItem.mockRequestResponse?.responseStatus !==
+        clientItem.mockRequestResponse?.responseStatus
       ) {
         return false;
       }
@@ -3077,6 +3082,9 @@ class RestExplorerMockViewModel {
             responseNavigation: "Response",
           },
         };
+        if (!progressiveTab.property?.mockRequest?.items) {
+          progressiveTab.property.mockRequest.items = [];
+        }
         progressiveTab.property?.mockRequest?.items?.push(mockResponse);
         this.tab = progressiveTab;
         await this.tabRepository.updateTab(
@@ -3126,6 +3134,42 @@ class RestExplorerMockViewModel {
           baseUrl,
         );
       if (response?.isSuccessful) {
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.updateMockResponseInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+            {
+              mockRequestResponse: {
+                isMockResponseActive: isMockResponseActive,
+              },
+            },
+          );
+        } else {
+          this.collectionRepository.updateMockResponseInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+            {
+              mockRequestResponse: {
+                isMockResponseActive: isMockResponseActive,
+              },
+            },
+          );
+        }
+        progressiveTab.property?.mockRequest?.items?.forEach((item) => {
+          if (item.id === mockResponseId) {
+            item.mockRequestResponse.isMockResponseActive =
+              isMockResponseActive;
+          }
+        });
+
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
         return true;
       } else {
         return false;

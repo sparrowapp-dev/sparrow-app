@@ -35,6 +35,7 @@
   let deleteLoader: boolean = false;
   let isDeletePopup: boolean = false;
   let responseToDelete = null;
+  let isResponseCreating = false;
 
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -132,6 +133,7 @@
     tabindex="-1"
     on:click|preventDefault={() => {}}
     class=" d-flex align-items-center position-relative bg-transparent border-0"
+    style="gap: 4px"
   >
     <div class="api-method text-{getMethodStyle(requestMethod)}">
       {requestMethod?.toUpperCase() === "DELETE"
@@ -158,7 +160,12 @@
         size="extra-small"
         customWidth={"24px"}
         type="teritiary-regular"
-        onClick={onCreateMockResponse}
+        disable={isResponseCreating}
+        onClick={async () => {
+          isResponseCreating = true;
+          await onCreateMockResponse();
+          isResponseCreating = false;
+        }}
         startIcon={AddRegular}
       />
     </span>
@@ -180,9 +187,7 @@
   </div>
   <div
     class="sparrow-thin-scrollbar"
-    style=" {isWebApp
-      ? 'max-height: 70%;'
-      : 'max-height: 75%;'} overflow-y: auto; overflow-x: hidden;"
+    style="max-height: 70%; overflow-y: auto; overflow-x: hidden;"
   >
     {#each mockResponses as response, idx (response.id)}
       <div
@@ -203,11 +208,11 @@
         >
           <Tooltip
             title={"This response is inactive."}
-            show={!response.isMockResponseActive}
+            show={!response.mockRequestResponse.isMockResponseActive}
             placement={"top-center"}
           >
             <span style="display: flex; margin-right:4px;">
-              {#if response.isMockResponseActive}
+              {#if response.mockRequestResponse.isMockResponseActive}
                 <CircleSmallFilled color="var( --icon-ds-success-400)" />
               {:else}
                 <CircleSmallRegular />
@@ -216,14 +221,17 @@
           </Tooltip>
           <div
             class="api-method"
-            style="font-size: 9px; color: {response?.statusCode >= 200 &&
-            response?.statusCode < 400
-              ? 'var(--text-ds-danger-300)'
-              : response.statusCode
-                ? 'var(--text-ds-success-300)'
+            style="font-size: 9px; color: {response?.mockRequestResponse
+              ?.responseStatus >= 200 &&
+            response?.mockRequestResponse?.responseStatus < 400
+              ? 'var(--text-ds-success-300)'
+              : response?.mockRequestResponse?.responseStatus
+                ? 'var(--text-ds-danger-300)'
                 : 'var(--text-ds-neutral-50)'};"
           >
-            {response?.statusCode ? response.statusCode : "-"}
+            {response?.mockRequestResponse?.responseStatus
+              ? response.mockRequestResponse.responseStatus
+              : "-"}
           </div>
 
           {#if isRenaming && activeResponseIdx === idx}
@@ -255,7 +263,7 @@
         </button>
         {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Toggle
-            bind:isMockResponseActive={response.isMockResponseActive}
+            isActive={response.mockRequestResponse.isMockResponseActive}
             label=""
             fontSize="12px"
             textColor="var(--text-ds-neutral-200)"
@@ -263,7 +271,7 @@
             onChange={() => {
               onHandleMockResponseState(
                 response.id,
-                !response.isMockResponseActive,
+                !response.mockRequestResponse.isMockResponseActive,
               );
             }}
           />
@@ -382,7 +390,7 @@
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: calc(100% - 18px);
+    width: 150px;
     text-align: left;
     display: flex;
     align-items: center;

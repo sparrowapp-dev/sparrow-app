@@ -13,7 +13,7 @@
   export let environmentVariables;
   export let requestStateAuth: any = {};
   export let onUpdateRequestAuth;
-  export let onUpdateEnvironment = () => {};
+  export let onUpdateEnvironment;
 
   const onUpdateAuthType = (id = "") => {
     requestStateAuth = {
