@@ -11,6 +11,8 @@
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
+  import type { InviteBody } from "@sparrow/common/dto/team-dto";
+  import { ResponseMessage } from "@sparrow/common/enums";
 
 
   export let sparrowAdminUrl:string
@@ -26,6 +28,9 @@
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+  let upgradePlanModalInvite = false;
+  let upgradePlanModal = false;
+  let usersInvitePlanCount: number = 5;
 
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
@@ -44,6 +49,7 @@
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      usersInvitePlanCount = value?._data?.users?.length || 5;
     }
   });
 
@@ -76,6 +82,45 @@
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
   };
+
+  const handleSendInvite = async (
+    teamId: string,
+    teamName: string,
+    inviteBody: InviteBody,
+    userId: string,
+  ) => {
+    const response = await _viewModel.handleTeamInvite(
+      teamId,
+      teamName,
+      inviteBody,
+      userId,
+    );
+    if (response?.message === "Plan limit reached") {
+      upgradePlanModalInvite = true;
+    }
+    return response;
+  };
+
+  const handleUserLimits = async () => {
+    const data = await _viewModel.userPlanLimits($activeTeam?.teamId);
+    usersInvitePlanCount = data?.usersPerHub.value || 5;
+    return data;
+  };
+
+  const handleRequestPlan = async () => {
+    await _viewModel.requestToUpgradePlan($activeTeam?.teamId);
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
+  };
+
+  const handleCreateWorkspace = async (teamId: string) => {
+    const response = await _viewModel.handleCreateWorkspace(teamId);
+    if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModal = true;
+    }
+  };
 </script>
 
 <TeamExplorer
@@ -83,13 +128,15 @@
   bind:userId
   bind:isTeamInviteModalOpen
   bind:isLeaveTeamModelOpen
+  bind:upgradePlanModalInvite
+  bind:upgradePlanModal
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
   activeTeamTab={$activeTeamTab}
   onDeleteWorkspace={handleDeleteWorkspace}
   onUpdateActiveTab={_viewModel.updateActiveTeamTab}
-  onCreateWorkspace={_viewModel.handleCreateWorkspace}
+  onCreateWorkspace={handleCreateWorkspace}
   onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
   onRemoveMembersAtTeam={_viewModel.removeMembersAtTeam}
   onDemoteToMemberAtTeam={_viewModel.demoteToMemberAtTeam}
@@ -105,6 +152,10 @@
   {isWebEnvironment}
   onCopyLink={handleCopyPublicWorkspaceLink}
     {sparrowAdminUrl}
+  planLimits={handleUserLimits}
+  contactOwner={handleRequestPlan}
+  {handleRedirectAdminPanel}
+  handleContactSales={_viewModel.handleContactSales}
 />
 
 <Modal
@@ -120,7 +171,7 @@
   <TeamInvite
     {userId}
     teamLogo={$activeTeam?.logo}
-    onInviteClick={_viewModel.handleTeamInvite}
+    onInviteClick={handleSendInvite}
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}

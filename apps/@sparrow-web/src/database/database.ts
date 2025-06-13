@@ -71,7 +71,7 @@ addRxPlugin(RxDBUpdatePlugin);
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
-export type PlanContainer = RxCollection<PlanDocType>
+export type PlanContainer = RxCollection<PlanDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
 export type TeamDocument = RxDocument<TeamDocType>;
 export type TeamContainer = RxCollection<TeamDocType>;
@@ -409,6 +409,12 @@ export class RxDB {
             return oldDoc;
           },
           2: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: PlanDocument) {
             return oldDoc;
           },
         },

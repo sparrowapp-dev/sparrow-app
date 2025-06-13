@@ -10,11 +10,17 @@
   import { onDestroy, onMount } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
+  import {
+    environmentType,
+    ResponseMessage,
+    WorkspaceRole,
+  } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let tab;
+  export let teamDetails;
+  export let upgradePlanModel;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
@@ -34,6 +40,10 @@
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
   let currentTestflowCount: number = 1;
+  let testflowBlocksPlanModalOpen: boolean = false;
+  let runHistoryPlanModalOpen: boolean = false;
+  let selectiveRunTestflow: boolean = false;
+  let selectiveRunModalOpen: boolean = false;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -192,6 +202,36 @@
     if (planlimits) {
       planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
+    }
+  };
+
+  const handleRequestOwner = async () => {
+    if ($activeWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $activeWorkspace?._data?.team?.teamId,
+      );
+      testflowBlocksPlanModalOpen = false;
+      runHistoryPlanModalOpen = false;
+      selectiveRunModalOpen = false;
+    }
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    if ($activeWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $activeWorkspace?._data?.team?.teamId,
+      );
+      testflowBlocksPlanModalOpen = false;
+      runHistoryPlanModalOpen = false;
+      selectiveRunModalOpen = false;
+    }
+  };
+
+  const handleSaveTestflow = async () => {
+    const response = await _viewModel.saveTestflow();
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModel = true;
     }
   };
 
@@ -217,7 +257,7 @@
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onUpdateBlockData={_viewModel.updateBlockData}
-    onSaveTestflow={_viewModel.saveTestflow}
+    onSaveTestflow={handleSaveTestflow}
     onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
@@ -233,5 +273,13 @@
     {planLimitTestFlowBlocks}
     {planLimitTestflow}
     testflowCount={currentTestflowCount}
+    {teamDetails}
+    bind:testflowBlocksPlanModalOpen
+    bind:runHistoryPlanModalOpen
+    bind:selectiveRunModalOpen
+    handleRedirectToAdminPanel={handleRedirectAdminPanel}
+    {handleRequestOwner}
+    {selectiveRunTestflow}
+    handleContactSales={_viewModel.handleContactSales}
   />
 {/if}

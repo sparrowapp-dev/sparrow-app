@@ -150,12 +150,10 @@ export class TeamsViewModel {
         };
         data.push(item);
       }
-      const planResponse =  await this.planService.getPlansByIds(
-        userPlans,
-      );
+      const planResponse = await this.planService.getPlansByIds(userPlans);
 
-      const parsedPlans =  []; 
-      if(response.isSuccessful && planResponse.data.data) {
+      const parsedPlans = [];
+      if (response.isSuccessful && planResponse.data.data) {
         for (const planData of planResponse.data.data) {
           const rawData = planData;
           if (!rawData?._id) continue;
@@ -173,6 +171,10 @@ export class TeamsViewModel {
                 area: rawData.limits.testflowPerWorkspace.area,
                 value: rawData.limits.testflowPerWorkspace.value,
               },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
               blocksPerTestflow: {
                 area: rawData.limits.blocksPerTestflow.area,
                 value: rawData.limits.blocksPerTestflow.value,
@@ -180,6 +182,10 @@ export class TeamsViewModel {
               selectiveTestflowRun: {
                 area: rawData.limits.selectiveTestflowRun.area,
                 active: rawData.limits.selectiveTestflowRun.active,
+              },
+              activeSync: {
+                area: rawData.limits.activeSync.area,
+                active: rawData.limits.activeSync.active,
               },
             },
             createdAt: rawData.createdAt,
@@ -190,7 +196,6 @@ export class TeamsViewModel {
           parsedPlans.push(planDetails);
         }
         await this.planRepository.upsertMany(parsedPlans);
-
       }
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(

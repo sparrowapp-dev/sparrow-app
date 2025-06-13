@@ -4,7 +4,7 @@
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
-  import { base64ToURL } from "@sparrow/common/utils";
+  import { base64ToURL, planInfoByRole } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
@@ -32,12 +32,15 @@
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
   import { open } from "@tauri-apps/plugin-shell";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
 
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
+  export let upgradePlanModalInvite: boolean;
+  export let upgradePlanModal: boolean = false;
 
-  export let   sparrowAdminUrl
+  export let sparrowAdminUrl;
 
   /**
    * user ID
@@ -125,6 +128,10 @@
   export let onAddMember;
   export let openInDesktop;
   export let onCopyLink;
+  export let planLimits;
+  export let contactOwner;
+  export let handleRedirectAdminPanel;
+  export let handleContactSales;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -135,11 +142,10 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+  let userLimits: any;
+  let planContent: any;
 
   let selectedFilter = "All";
-
- 
-
 
   const addButtonData = [
     {
@@ -237,6 +243,10 @@
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
+      getPlanLimits();
+      if (userRole) {
+        planContent = planInfoByRole(userRole);
+      }
     }
   }
 
@@ -293,6 +303,23 @@
       filteredWorkspaces = workspaces;
     }
   }
+
+  const getPlanLimits = async () => {
+    const data = await planLimits();
+    userLimits = data;
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    await handleRedirectAdminPanel();
+    upgradePlanModal = false;
+    upgradePlanModalInvite = false;
+  };
+
+  const handleRequestOwner = async () => {
+    await contactOwner();
+    upgradePlanModal = false;
+    upgradePlanModalInvite = false;
+  };
 </script>
 
 {#if openTeam}
@@ -328,13 +355,15 @@
                 >{openTeam?.name || ""}
               </span>
 
-                {#if openTeam?.toMutableJSON()?.plan?.name}
-                <div class="ms-2 d-flex  align-items-center gap-1 mt-3 text-primary-400 cursor-pointer"
-                on:click={()=>{
-                  open(sparrowAdminUrl)
-                }}>
+              {#if openTeam?.toMutableJSON()?.plan?.name}
+                <div
+                  class="ms-2 d-flex align-items-center gap-1 mt-3 text-primary-400 cursor-pointer"
+                  on:click={() => {
+                    open(sparrowAdminUrl);
+                  }}
+                >
                   <p class="text-fs-12 pb-0 mb-0">Launch Admin Panel</p>
-                  <OpenRegular/>
+                  <OpenRegular />
                 </div>
               {/if}
               <!-- {#if openTeam?.toMutableJSON()?.plan?.name}
@@ -683,6 +712,46 @@
     {/if}
   </div>
 {/if}
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModal}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Workspaces"
+  planLimitValue={userLimits?.workspacesPerHub?.value || 3}
+  currentPlanValue={openTeam?._data?.workspaces.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalInvite}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Collaborators"
+  planLimitValue={userLimits?.usersPerHub?.value + 1 || 5}
+  currentPlanValue={openTeam?._data?.users.length - 1 || 5}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   .filter-button:hover {

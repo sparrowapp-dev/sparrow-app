@@ -13,5 +13,5 @@ export { default as WorkspaceGrid } from "./workspace-grid/WorkspaceGrid.svelte"
 export { default as MenuView } from "./menu-view/MenuView.svelte";
 export { default as Card } from "./card/Card.svelte";
 export { default as UpgradePlanBanner } from "./upgrade-plan/UpgradePlanBanner.svelte";
-
 export { default as UpgradePlanPopUp } from "./upgrade-plan-pop-up/UpgradePlanPopUp.svelte";
+export { default as PlanUpgradeModal } from "./plan-upgrade-modal/PlanUpgradeModal.svelte";

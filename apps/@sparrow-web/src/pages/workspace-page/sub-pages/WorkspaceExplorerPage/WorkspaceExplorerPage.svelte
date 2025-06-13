@@ -18,9 +18,12 @@
   import type { UpdatesDocType } from "../../../../models/updates.model";
   import { user } from "@app/store/auth.store";
   import constants from "src/constants/constants";
+  import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+  import { ResponseMessage } from "@sparrow/common/enums";
 
   export let collectionList;
   export let tab;
+  export let teamDetails;
 
   const _viewModel = new WorkspaceExplorerViewModel(tab);
   const activeWorkspace: Observable<WorkspaceDocument> =
@@ -39,6 +42,7 @@
   let isPublishedModalOpen = false;
   let isShareModalOpen = false;
   let isFailedPublishedModalOpen = false;
+  let upgradePlanModalInvite: boolean = false;
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -113,6 +117,45 @@
 
   const workspaceLink = `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${currentWorkspace.id}`;
 
+  const handleInviteWorkspace = async (
+    workspaceId: string,
+    workspaceName: string,
+    data: addUsersInWorkspacePayload,
+    invitedUserCount: number,
+  ) => {
+    const response = await _viewModel.inviteUserToWorkspace(
+      workspaceId,
+      workspaceName,
+      data,
+      invitedUserCount,
+    );
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceInviteModalOpen = false;
+      upgradePlanModalInvite = true;
+    }
+    return response;
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    if (teamDetails?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(teamDetails?.teamId);
+      upgradePlanModalInvite = false;
+    }
+  };
+
+  const handleContactOwner = async () => {
+    if (teamDetails?.teamId) {
+      await _viewModel.requestToUpgradePlan(teamDetails?.teamId);
+      upgradePlanModalInvite = false;
+    }
+  };
+
+  const planLimits = async () => {
+    if (teamDetails?.teamId) {
+      await _viewModel.userPlanLimits(teamDetails?.teamId);
+    }
+  };
+
   // $:{
   //   if(userId )
   // }
@@ -128,6 +171,7 @@
 <WorkspaceExplorer
   bind:userRole
   bind:isShareModalOpen
+  bind:upgradePlanModalInvite
   tab={_viewModel.tab}
   {isSharedWorkspace}
   {workspaceType}
@@ -147,6 +191,11 @@
   onMakeWorkspacePublic={() => (isWorkspacePublicModalOpen = true)}
   onShareWorkspace={_viewModel.handleShareWorkspace}
   activeWorkspace={$activeWorkspace}
+  {handleRedirectAdminPanel}
+  {handleContactOwner}
+  handleContactSales={_viewModel.handleContactSales}
+  {planLimits}
+  {teamDetails}
 />
 
 <Modal
@@ -166,7 +215,7 @@
     currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
-    onInviteUserToWorkspace={_viewModel.inviteUserToWorkspace}
+    onInviteUserToWorkspace={handleInviteWorkspace}
   />
 </Modal>
 

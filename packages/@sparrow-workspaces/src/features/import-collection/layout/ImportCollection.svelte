@@ -15,8 +15,7 @@
   import { Drop } from "../components";
   import { InfoIcon } from "@sparrow/library/icons";
   import * as Sentry from "@sentry/svelte";
-  import {policyConfig} from "@sparrow/common/store"
-
+  import { policyConfig } from "@sparrow/common/store";
 
   export let currentWorkspaceId;
   export let onCloseModal;
@@ -31,6 +30,9 @@
 
   export let onImportOapiText; // Sends the (JSON / XML) text to backend and create a collection                                        (3)
   export let onImportOapiFile; // Sends the (JSON / XML) file to backend and create a collection                                        (3)
+
+  export let isActiveSyncRequired;
+  export let isActiveSyncPlanModalOpen;
 
   const ProgressTitle = {
     IDENTIFYING_SYNTAX: "Identifying Syntax...",
@@ -806,7 +808,12 @@
       <Toggle
         isActive={isActiveSyncEnabled}
         onChange={() => {
-          isActiveSyncEnabled = !isActiveSyncEnabled;
+          if (isActiveSyncRequired) {
+            isActiveSyncEnabled = !isActiveSyncEnabled;
+          } else {
+            isActiveSyncPlanModalOpen = true;
+            onCloseModal();
+          }
         }}
       />
     {/if}

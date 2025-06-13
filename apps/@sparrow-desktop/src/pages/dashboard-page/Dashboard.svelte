@@ -2,6 +2,7 @@
   import {
     LoginBanner,
     LoginSignupConfirmation,
+    PlanUpgradeModal,
     SwitchWorkspace,
     UpgradePlanBanner,
     UpgradePlanPopUp,
@@ -48,6 +49,8 @@
   import { GlobalSearch } from "@sparrow/common/features";
   import * as Sentry from "@sentry/svelte";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
+  import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
+  import { planInfoByRole } from "@sparrow/common/utils";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -79,6 +82,11 @@
   let switchWorkspaceName = "";
   let switchRequestName = "";
   let switchWorkspaceId = "";
+  let upgradePlanModalWorkspace: boolean = false;
+  let planContent: any;
+  let userRole: string = "";
+  let userLimits: any;
+  let teamDetails: {};
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -105,6 +113,7 @@
   let currentTeamName = "";
   let currentTeamId = "";
   let selectedType = "";
+  let currentWorkspaceCount = 1;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
@@ -113,6 +122,18 @@
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
+
+        const user = activeWorkspaceRxDoc?._data.users.find(
+          (u) => u.id === userId,
+        );
+        userRole = user?.role || "";
+        const OwnerDetails = activeWorkspaceRxDoc?._data.users[0];
+        teamDetails = {
+          teamId: OwnerDetails?.id,
+          teamName: OwnerDetails?.name,
+          teamEmail: OwnerDetails?.email,
+        };
+        handlegetWorkspaceCount(currentTeamId);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -127,6 +148,10 @@
       }
     },
   );
+
+  const handlegetWorkspaceCount = async (teamId: string) => {
+    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
+  };
 
   const onModalStateChanged = (flag: boolean) => {
     isPopupOpen = flag;
@@ -542,6 +567,43 @@
       handlehideGlobalSearch(false);
     }
   };
+
+  const handleCreateWorkspace = async (
+    workspaceName: string,
+    teamId: string,
+  ) => {
+    const response = await _viewModel.handleCreateWorkspace(
+      workspaceName,
+      teamId,
+    );
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceModalOpen = false;
+      upgradePlanModalWorkspace = true;
+    }
+    return response;
+  };
+
+  const handleLimits = async () => {
+    const data = await _viewModel.userPlanLimits(currentTeamId);
+    userLimits = data;
+  };
+
+  const handleRequestOwner = async () => {
+    await _viewModel.requestToUpgradePlan(currentTeamId);
+    upgradePlanModalWorkspace = true;
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    upgradePlanModalWorkspace = true;
+  };
+
+  $: {
+    handleLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+  }
 </script>
 
 {#if isGlobalSearchOpen && !hideGlobalSearch}
@@ -614,7 +676,9 @@
     />
   {/if}
 
-  <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
+    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {/if}
 
   <!-- 
     -- Guest Login Banner - shows login option to guest users.
@@ -698,7 +762,7 @@
     handleModalState={(flag = false) => {
       isWorkspaceModalOpen = flag;
     }}
-    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onCreateWorkspace={handleCreateWorkspace}
   />
 </Modal>
 
@@ -733,6 +797,25 @@
 >
   <UpgradePlanPopUp bind:isUpgradePlanModelOpen {sparrowAdminUrl} />
 </Modal>
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalWorkspace}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Workspaces"
+  planLimitValue={userLimits?.workspacesPerHub?.value}
+  currentPlanValue={currentWorkspaceCount}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName || ""}
+  userEmail={teamDetails?.teamEmail || ""}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   .dashboard {
