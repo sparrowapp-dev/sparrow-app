@@ -4,7 +4,7 @@
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
-  import { base64ToURL } from "@sparrow/common/utils";
+  import { base64ToURL, planInfoByRole } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
@@ -30,10 +30,13 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
 
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
+  export let upgradePlanModalInvite: boolean;
+  export let upgradePlanModal: boolean = false;
 
   /**
    * user ID
@@ -121,6 +124,9 @@
   export let onAddMember;
   export let openInDesktop;
   export let onCopyLink;
+  export let planLimits;
+  export let contactOwner;
+  export let handleRedirectAdminPanel;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -131,6 +137,8 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+  let userLimits: any;
+  let planContent: any;
 
   let selectedFilter = "All";
 
@@ -284,6 +292,31 @@
       );
     } else {
       filteredWorkspaces = workspaces;
+    }
+  }
+
+  const getPlanLimits = async () => {
+    const data = await planLimits();
+    userLimits = data;
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    await handleRedirectAdminPanel();
+    upgradePlanModal = false;
+    upgradePlanModalInvite = false;
+  };
+
+  const handleRequestOwner = async () => {
+    await contactOwner();
+    upgradePlanModal = false;
+    upgradePlanModalInvite = false;
+  };
+
+  // Use reactive statement properly
+  $: {
+    getPlanLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
     }
   }
 </script>
@@ -666,6 +699,50 @@
     {/if}
   </div>
 {/if}
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModal}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Workspaces"
+  planLimitValue={upgradePlanModalInvite
+    ? userLimits?.usersPerHub?.value + 1 || 5
+    : userLimits?.workspacesPerHub?.value || 3}
+  currentPlanValue={upgradePlanModalInvite
+    ? openTeam?._data?.users.length - 1
+    : openTeam?._data?.workspaces.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalInvite}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Collaborators"
+  planLimitValue={userLimits?.usersPerHub?.value + 1 || 5}
+  currentPlanValue={openTeam?._data?.users.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   .filter-button:hover {

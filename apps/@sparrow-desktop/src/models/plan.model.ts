@@ -8,7 +8,7 @@ export const planSchemaLiteral = {
   title: "plan",
   primaryKey: "planId",
   type: "object",
-  version: 2,
+  version: 3,
   properties: {
     planId: {
       type: "string",
@@ -59,7 +59,18 @@ export const planSchemaLiteral = {
             },
           },
         },
-        selectiveTestflowRun:{
+        usersPerHub: {
+          type: "object",
+          properties: {
+            area: {
+              type: "string",
+            },
+            value: {
+              type: "number",
+            },
+          },
+        },
+        selectiveTestflowRun: {
           type: "object",
           properties: {
             area: {
@@ -69,7 +80,7 @@ export const planSchemaLiteral = {
               type: "boolean",
             },
           },
-        }
+        },
       },
     },
     createdAt: {

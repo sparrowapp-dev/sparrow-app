@@ -97,6 +97,9 @@
     isDynamicExpressionContent,
     updateDynamicExpressionValue,
   } from "../store/testflow";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { planInfoByRole } from "@sparrow/common/utils";
+  import { TeamRole } from "@sparrow/common/enums";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -129,6 +132,14 @@
   export let planLimitTestFlowBlocks: number = 5;
   export let planLimitTestFlows: number = 3;
   export let testflowCount: number = 1;
+  export let teamDetails: any;
+  export let testflowBlocksPlanModalOpen: boolean = false;
+  export let handleRequestOwner: () => void;
+  export let handleRedirectToAdminPanel: () => void;
+  export let runHistoryPlanModalOpen: boolean = false;
+  export let selectiveRunModalOpen: boolean = false;
+  export let selectiveRunTestflow: boolean = false;
+  let planContent: any;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -753,9 +764,10 @@
   ) => {
     if (!_id) return;
     if ($nodes.length >= planLimitTestFlowBlocks + 1) {
-      notifications.error(
-        `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
-      );
+      testflowBlocksPlanModalOpen = true;
+      // notifications.error(
+      //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
+      // );
       return;
     }
     let requestData;
@@ -1314,6 +1326,9 @@
   });
 
   const partialRun = async (_id: string, _event: string) => {
+    if (!selectiveRunTestflow) {
+      selectiveRunModalOpen = true;
+    }
     if (!testflowStore?.isTestFlowRunning) {
       unselectNodes();
       await onClickRun(_id, _event);
@@ -1397,6 +1412,12 @@
       testflowStore.history = updateHistoryItems;
     }
   };
+
+  $: {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+  }
 </script>
 
 <div
@@ -1506,6 +1527,7 @@
           {toggleHistoryDetails}
           {toggleHistoryContainer}
           {planLimitTestFlowBlocks}
+          bind:runHistoryPlanModalOpen
         />
       </div>
     </div>
@@ -1810,6 +1832,65 @@
     }}
   />
 </Modal>
+
+<PlanUpgradeModal
+  bind:isOpen={testflowBlocksPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Test flow blocks"
+  planLimitValue={planLimitTestFlowBlocks}
+  currentPlanValue={$nodes.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={runHistoryPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Run History"
+  planLimitValue={planLimitTestFlowBlocks}
+  currentPlanValue={testflowStore?.history.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={selectiveRunModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Selective Runs"
+  activePlan={selectiveRunTestflow ? "active" : "disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactOwner={handleRequestOwner}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   :global(.svelte-flow__attribution) {
