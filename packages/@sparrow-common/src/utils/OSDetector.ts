@@ -7,6 +7,8 @@ export class OSDetector {
         os = "macos";
       } else if (userAgent.indexOf("Windows") !== -1) {
         os = "windows";
+      } else if (userAgent.indexOf("Linux") !== -1 || userAgent.indexOf("X11") !== -1) {
+        os = "linux";
       } else {
         os = "";
       }

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Sparrow
+Exec=sparrow %u
+Icon=sparrow
+Type=Application
+Categories=Utility;
+MimeType=x-scheme-handler/sparrow;
+StartupWMClass=Sparrow
+Comment=Sparrow Desktop Application
+Terminal=false
