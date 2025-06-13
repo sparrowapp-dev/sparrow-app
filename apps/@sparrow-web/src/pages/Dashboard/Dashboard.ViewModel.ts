@@ -1207,4 +1207,48 @@ export class DashboardViewModel {
 
     return { collection, folder, file, workspace, testflow, environment };
   }
+
+  public getWorkspaceCount = async (teamId: string) => {
+    const workspaces = await this.teamRepository.getTeamDoc(teamId);
+    const count = workspaces?._data.workspaces?.length;
+    return count;
+  };
+
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?._data?.plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?._data?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error("Failed to Sent request. Please try again.");
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(
+      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      "_blank",
+    );
+    return;
+  };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
+  };
 }

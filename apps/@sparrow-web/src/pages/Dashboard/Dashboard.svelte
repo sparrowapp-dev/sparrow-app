@@ -2,6 +2,7 @@
   import {
     LoginBanner,
     LoginSignupConfirmation,
+    PlanUpgradeModal,
     SwitchWorkspace,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
@@ -34,7 +35,7 @@
   import { fade } from "svelte/transition";
   import { GlobalSearch } from "@sparrow/common/features";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
-  import { ResponseMessage } from "@sparrow/common/enums";
+  import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -70,6 +71,9 @@
   let switchWorkspaceId = "";
   let upgradePlanModalWorkspace: boolean = false;
   let planContent: any;
+  let userRole: string = "";
+  let userLimits: any;
+  let teamDetails: {};
 
   const openDefaultBrowser = async () => {
     // await open(externalSparrowLink);
@@ -79,6 +83,7 @@
   let currentWorkspaceName = "";
   let currentTeamName = "";
   let currentTeamId = "";
+  let currentWorkspaceCount = 1;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
@@ -87,6 +92,18 @@
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
+
+        const user = activeWorkspaceRxDoc?._data.users.find(
+          (u) => u.id === userId,
+        );
+        userRole = user?.role || "";
+        const OwnerDetails = activeWorkspaceRxDoc?._data.users[0];
+        teamDetails = {
+          teamId: OwnerDetails?.id,
+          teamName: OwnerDetails?.name,
+          teamEmail: OwnerDetails?.email,
+        };
+        handlegetWorkspaceCount(currentTeamId);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -101,6 +118,10 @@
       }
     },
   );
+
+  const handlegetWorkspaceCount = async (teamId: string) => {
+    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
+  };
 
   let handlehideGlobalSearch = (val: boolean) => {
     hideGlobalSearch = val;
@@ -482,8 +503,26 @@
     return response;
   };
 
+  const handleLimits = async () => {
+    const data = await _viewModel.userPlanLimits(currentTeamId);
+    userLimits = data;
+  };
+
+  const handleRequestOwner = async () => {
+    await _viewModel.requestToUpgradePlan(currentTeamId);
+    upgradePlanModalWorkspace = true;
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    upgradePlanModalWorkspace = true;
+  };
+
   $: {
-    planContent = planInfoByRole("general");
+    handleLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
   }
 </script>
 
@@ -672,21 +711,25 @@
   />
 </Modal>
 
-<Modal
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalWorkspace}
   title={planContent?.title}
-  type={"primary"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={upgradePlanModalWorkspace}
-  handleModalState={(flag) => {
-    upgradePlanModalWorkspace = flag;
-  }}
->
-  <div>
-    <p class="" style="margin: 0px;">{planContent?.description}</p>
-    <p />
-  </div>
-</Modal>
+  description={planContent?.description}
+  planType="Workspaces"
+  planLimitValue={userLimits?.workspacesPerHub?.value}
+  currentPlanValue={currentWorkspaceCount}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName || ""}
+  userEmail={teamDetails?.teamEmail || ""}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   .dashboard {
