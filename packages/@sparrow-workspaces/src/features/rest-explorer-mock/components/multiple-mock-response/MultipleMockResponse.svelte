@@ -132,7 +132,7 @@
     tabindex="-1"
     on:click|preventDefault={() => {}}
     class=" d-flex align-items-center position-relative bg-transparent border-0"
-    style="gap: 8px"
+    style="gap: 4px"
   >
     <div class="api-method text-{getMethodStyle(requestMethod)}">
       {requestMethod?.toUpperCase() === "DELETE"
@@ -178,7 +178,7 @@
     style="color: var(--text-neutral-400); padding-left: 8px; padding-bottom: 8px;"
   >
     {mockResponses.length} Response{mockResponses.length === 1 ? "" : "s"}
-  </d
+  </div>
   <div
     class="sparrow-thin-scrollbar"
     style="max-height: 70%; overflow-y: auto; overflow-x: hidden;"
@@ -216,14 +216,14 @@
           <div
             class="api-method"
             style="font-size: 9px; color: {response?.mockRequestResponse
-              .responseStatus >= 200 &&
-            response?.mockRequestResponse.responseStatus < 400
+              ?.responseStatus >= 200 &&
+            response?.mockRequestResponse?.responseStatus < 400
               ? 'var(--text-ds-success-300)'
-              : response.mockRequestResponse.responseStatus
+              : response?.mockRequestResponse?.responseStatus
                 ? 'var(--text-ds-danger-300)'
                 : 'var(--text-ds-neutral-50)'};"
           >
-            {response?.mockRequestResponse.responseStatus
+            {response?.mockRequestResponse?.responseStatus
               ? response.mockRequestResponse.responseStatus
               : "-"}
           </div>

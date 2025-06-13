@@ -321,7 +321,7 @@
       if (!isRenaming) {
         // expand = !expand;
         // if (expand) {
-        addCollectionItem(api.id, "Request");
+        // addCollectionItem(api.id, "Request");
         onItemOpened("mockRequest", {
           workspaceId: collection.workspaceId,
           collection,
