@@ -144,6 +144,7 @@
     startIcon={CodeRegular}
     customWidth={"112px"}
     onClick={openGetCodePopup}
+    disable={!selectedModelProvider}
   />
 
   <!-- {console.log(" info :>> ", isSave, userRole, WorkspaceRole.WORKSPACE_VIEWER)} -->
