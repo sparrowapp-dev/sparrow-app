@@ -78,6 +78,9 @@
   let switchWorkspaceId = "";
   let upgradePlanModalWorkspace: boolean = false;
   let planContent: any;
+  let userRole: string = "";
+  let userLimits: any;
+  let teamDetails: {};
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -102,6 +105,7 @@
   let currentTeamName = "";
   let currentTeamId = "";
   let selectedType = "";
+  let currentWorkspaceCount = 1;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
