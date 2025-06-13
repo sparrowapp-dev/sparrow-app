@@ -9,6 +9,7 @@
     RequestDoc,
     AiConfigs,
     ConversationHistoryItem,
+    GeneratePromptModal,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type {
@@ -33,10 +34,11 @@
     BotSparkleRegular,
     DismissRegular,
   } from "@sparrow/library/icons";
-  import { Button } from "@sparrow/library/ui";
-  import { Modal } from "@sparrow/library/ui";
   import { SaveAsCollectionItem } from "../../save-as-request";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { Alert, Button, Modal, notifications } from "@sparrow/library/ui";
+  import { Textarea } from "@sparrow/library/forms";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -64,6 +66,11 @@
   export let onRenameFolder;
   export let onClearConversation;
 
+  let isGeneratePromptModalOpen = false;
+  let isConversationHistoryLoading = false;
+  let isConversationHistoryPanelOpened = false;
+  let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" = "None";
+
   // Conversations History Props
   export let conversationsHistory: AiRequestConversationsDocument[];
   export let onSelectConversation: (id: string) => void;
@@ -84,6 +91,7 @@
   export let getConversationsList: () => Observable<
     AiRequestConversationsDocument[]
   >;
+  export let onGenerateAiPrompt;
 
   // Role of user in active workspace
   export let userRole;
@@ -91,6 +99,7 @@
   export let isWebApp = false;
   export let collectionAuth;
   export let collection;
+  export let onHandleInsertPrompt;
   const loading = writable<boolean>(false);
   let isExposeSaveAsRequest = false;
 
@@ -127,26 +136,10 @@
     defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
   }
 
-  onMount(async () => {
-    // Delay to ensure DOM is ready before measuring container width
-    setTimeout(() => {
-      updateSplitpaneContSizes();
-      // Watch for container size changes and update pane size percentages
-      const resizeObserver = new ResizeObserver(() => {
-        updateSplitpaneContSizes();
-      });
-      resizeObserver.observe(splitpaneContainer);
-      return () => resizeObserver.disconnect(); // Cleanup on component unmount
-    }, 0);
-  });
-  onDestroy(() => {});
-
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
 
-  let isConversationHistoryPanelOpened = false;
-  let isConversationHistoryLoading = false;
   const onOpenConversationHistoryPanel = async () => {
     const res = await fetchConversations();
     const result = getConversationsList();
@@ -165,11 +158,6 @@
     isConversationHistoryPanelOpened = false;
   };
 
-  // $: {
-  //   if ($tab?.property?.aiRequest)
-  //     console.log("tab :>> ", $tab?.property?.aiRequest);
-  // }
-
   const handleOnClickUpdateRequestAuth = async () => {
     if (isConversationHistoryPanelOpened) {
       isConversationHistoryLoading = true;
@@ -179,6 +167,28 @@
     }
     onUpdateRequestAuth();
   };
+
+  // Update the activateGeneratePromptModal function:
+  const activateGeneratePromptModal = (
+    target: "UserPrompt" | "SystemPrompt",
+  ) => {
+    generatePromptTarget = target;
+    isGeneratePromptModalOpen = true;
+  };
+
+  onMount(async () => {
+    // Delay to ensure DOM is ready before measuring container width
+    setTimeout(() => {
+      updateSplitpaneContSizes();
+      // Watch for container size changes and update pane size percentages
+      const resizeObserver = new ResizeObserver(() => {
+        updateSplitpaneContSizes();
+      });
+      resizeObserver.observe(splitpaneContainer);
+      return () => resizeObserver.disconnect(); // Cleanup on component unmount
+    }, 0);
+  });
+  onDestroy(() => {});
 </script>
 
 {#if $tab.tabId}
@@ -227,10 +237,12 @@
                   {#if $tab.property.aiRequest?.aiModelProvider}
                     <RequestDoc
                       {onUpdateAiSystemPrompt}
-                      isEditable={disabledModelFeatures[
-                        $tab.property.aiRequest?.state?.aiNavigation
-                      ].includes($tab.property.aiRequest?.aiModelVariant)}
-                      requestDoc={$tab.property.aiRequest.systemPrompt}
+                      isEditable={true}
+                      requestDoc={$tab.property.aiRequest?.systemPrompt}
+                      {activateGeneratePromptModal}
+                      isAutoPromptGenerationInProgress={$tab.property.aiRequest
+                        .state.isSaveDescriptionInProgress}
+                      {isGuestUser}
                     />
                   {:else}
                     <div
@@ -333,6 +345,7 @@
           >
             <ChatBot
               {tab}
+              {isGuestUser}
               disabled={!$tab.property.aiRequest?.aiModelProvider}
               responseData={storeData}
               {onUpdateAiPrompt}
@@ -340,6 +353,7 @@
               {onUpdateRequestState}
               {onGenerateAiResponse}
               {onStopGeneratingAIResponse}
+              {activateGeneratePromptModal}
               {onToggleLike}
               {conversationsHistory}
               {onOpenConversationHistoryPanel}
@@ -386,6 +400,28 @@
     />
   </Modal>
 {/if}
+
+<Modal
+  title={`Generate ${generatePromptTarget === "UserPrompt" ? "User Prompt" : "System Prompt"}`}
+  zIndex={1000}
+  isOpen={isGeneratePromptModalOpen}
+  width="35%"
+  handleModalState={() => {
+    isGeneratePromptModalOpen = false;
+    generatePromptTarget = "None";
+  }}
+>
+  <GeneratePromptModal
+    {generatePromptTarget}
+    {onGenerateAiPrompt}
+    {onHandleInsertPrompt}
+    on:close={() => {
+      isGeneratePromptModalOpen = false;
+      generatePromptTarget = "None";
+    }}
+    on:insert={(event) => {}}
+  />
+</Modal>
 
 <style>
   .ai-request-explorer-layout {

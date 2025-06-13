@@ -16,6 +16,8 @@
   export let onUpdateAiPrompt;
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
+  export let activateGeneratePromptModal;
+  export let isGuestUser;
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -94,16 +96,22 @@
   <div
     class="actions-container d-flex justify-content-between align-items-center"
   >
+    <!-- {#if !isGuestUser} -->
     <div id="generate-prompt-chip">
-      <Tooltip title={"Coming Soon"} placement={"top-center"}>
-        <button
-          class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1 opacity-50"
-        >
-          <BotSparkleFilled size={"15px"} color="#4387f4" />
-          <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>
-        </button>
-      </Tooltip>
+      <!-- <Tooltip title={"Generate user prompt"} placement={"top-center"}> -->
+      <button
+        on:click={() => {
+          activateGeneratePromptModal("UserPrompt");
+        }}
+        disabled={isGuestUser}
+        class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1"
+      >
+        <BotSparkleFilled size={"15px"} color="#4387f4" />
+        <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>
+      </button>
+      <!-- </Tooltip> -->
     </div>
+    <!-- {/if} -->
 
     <Tooltip
       title={isResponseGenerating ? "Stop" : "Send"}
@@ -182,14 +190,18 @@
   }
 
   .generate-prompt-btn {
-    background-color: var(--bg-ds-surface-700);
+    font-family: Inter, sans-serif;
+    background-color: var(--bg-ds-surface-400);
     color: var(--sparrow-white);
     border: 1px solid var(--bg-ds-surface-100);
     font-size: 12px;
     font-weight: 500;
+    transition: all 0.2s ease; /* Smooth hover */
   }
 
-  /* .generate-prompt-btn:hover {
-    background-color: rgba(30, 30, 35, 0.95);
-  } */
+  .generate-prompt-btn:hover {
+    background-color: var(--bg-ds-surface-700);
+    border: 1px solid var(--border-ds-primary-400);
+    box-shadow: 0 0 4px 1px rgba(17, 173, 240, 0.3); /* shadow-glow effect */
+  }
 </style>
