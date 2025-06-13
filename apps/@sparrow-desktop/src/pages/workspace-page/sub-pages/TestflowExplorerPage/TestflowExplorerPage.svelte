@@ -104,6 +104,16 @@
     }
   });
 
+  const handleBlockLimitTestflow = async () => {
+    const planlimits = await _viewModel.userLimitBlockPerTestflow();
+    if (planlimits) {
+      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
+      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
+      planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+    }
+  };
+
   testFlowDataStore.subscribe((val) => {
     if (val) {
       testflowStore = val.get(tab?.tabId) as TFDataStoreType;
@@ -197,16 +207,6 @@
       component: "TestFlowExplorer",
       targetUrl: constants.TESTFLOW_DOCS_URL,
     });
-  };
-
-  const handleBlockLimitTestflow = async () => {
-    const planlimits = await _viewModel.userLimitBlockPerTestflow();
-    if (planlimits) {
-      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
-      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
-      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
-      planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
-    }
   };
 
   const handleRequestOwner = async () => {
