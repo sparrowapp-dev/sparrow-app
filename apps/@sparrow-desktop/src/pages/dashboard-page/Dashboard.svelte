@@ -101,6 +101,11 @@
     switchWorkspaceId = _workspaceId;
   };
 
+  const handleLimits = async (currentTeamId: string) => {
+    const data = await _viewModel.userPlanLimits(currentTeamId);
+    userLimits = data;
+  };
+
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
   let currentTeamName = "";
@@ -127,6 +132,7 @@
           teamEmail: OwnerDetails?.email,
         };
         handlegetWorkspaceCount(currentTeamId);
+        handleLimits(currentTeamId);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -569,16 +575,15 @@
       workspaceName,
       teamId,
     );
+    const limits = await _viewModel.userPlanLimits(teamId);
+    userLimits?.workspacesPerHub?.value;
+    userLimits = limits;
+    handlegetWorkspaceCount(teamId);
     if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       isWorkspaceModalOpen = false;
       upgradePlanModalWorkspace = true;
     }
     return response;
-  };
-
-  const handleLimits = async () => {
-    const data = await _viewModel.userPlanLimits(currentTeamId);
-    userLimits = data;
   };
 
   const handleRequestOwner = async () => {
@@ -592,7 +597,6 @@
   };
 
   $: {
-    handleLimits();
     if (userRole) {
       planContent = planInfoByRole(userRole);
     }

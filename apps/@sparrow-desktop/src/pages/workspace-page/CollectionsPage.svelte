@@ -533,38 +533,38 @@
       $currentWorkspace?._id,
     );
     const response = await _viewModel3.handleCreateTestflow();
+    handleLimits();
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModel = true;
     }
   };
 
   const handleLimits = async () => {
-    if (teamDetails?.teamId) {
-      const data = await _viewModel.userPlanLimits(teamDetails?.teamId);
+    if ($currentWorkspace?._data?.team?.teamId) {
+      const data = await _viewModel.userPlanLimits(
+        $currentWorkspace?._data?.team?.teamId,
+      );
       userLimits = data;
     }
   };
 
   const handleRequestOwner = async () => {
-    if (teamDetails?.teamId) {
-      await _viewModel.requestToUpgradePlan(teamDetails?.teamId);
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $currentWorkspace?._data?.team?.teamId,
+      );
       upgradePlanModel = false;
     }
   };
 
   const handleRedirectToAdminPanel = async () => {
-    if (teamDetails?.teamId) {
-      await _viewModel.handleRedirectToAdminPanel(teamDetails?.teamId);
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $currentWorkspace?._data?.team?.teamId,
+      );
       upgradePlanModel = false;
     }
   };
-
-  $: {
-    handleLimits();
-    if (userRole) {
-      planContent = planInfoByRole(userRole);
-    }
-  }
 
   // Add userValidation state
   let userValidation = {
@@ -1685,8 +1685,8 @@
   title={planContent?.title}
   description={planContent?.description}
   planType="Testflow"
-  planLimitValue={currentTestflow}
-  currentPlanValue={userLimits?.workspacesPerHub?.value}
+  planLimitValue={userLimits?.testflowPerWorkspace?.value}
+  currentPlanValue={currentTestflow}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

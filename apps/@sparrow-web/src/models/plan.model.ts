@@ -8,7 +8,7 @@ export const planSchemaLiteral = {
   title: "plan",
   primaryKey: "planId",
   type: "object",
-  version: 4,
+  version: 5,
   properties: {
     planId: {
       type: "string",
@@ -29,67 +29,50 @@ export const planSchemaLiteral = {
         workspacesPerHub: {
           type: "object",
           properties: {
-            area: {
-              type: "string",
-            },
-            value: {
-              type: "number",
-            },
+            area: { type: "string" },
+            value: { type: "number" },
           },
         },
         testflowPerWorkspace: {
           type: "object",
           properties: {
-            area: {
-              type: "string",
-            },
-            value: {
-              type: "number",
-            },
+            area: { type: "string" },
+            value: { type: "number" },
           },
         },
         blocksPerTestflow: {
           type: "object",
           properties: {
-            area: {
-              type: "string",
-            },
-            value: {
-              type: "number",
-            },
+            area: { type: "string" },
+            value: { type: "number" },
           },
         },
         usersPerHub: {
           type: "object",
           properties: {
-            area: {
-              type: "string",
-            },
-            value: {
-              type: "number",
-            },
+            area: { type: "string" },
+            value: { type: "number" },
           },
         },
         selectiveTestflowRun: {
           type: "object",
           properties: {
-            area: {
-              type: "string",
-            },
-            active: {
-              type: "boolean",
-            },
+            area: { type: "string" },
+            active: { type: "boolean" },
           },
         },
         activeSync: {
           type: "object",
           properties: {
-            area: {
-              type: "string",
-            },
-            active: {
-              type: "boolean",
-            },
+            area: { type: "string" },
+            active: { type: "boolean" },
+          },
+        },
+        testflowRunHistory: {
+          type: "object",
+          properties: {
+            area: { type: "string" },
+            value: { type: "number" },
           },
         },
       },

@@ -18,8 +18,8 @@
   export let testflowName = "";
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
-  export let planLimitTestFlowBlocks;
-  export let runHistoryPlanModalOpen =false
+  export let planLimitRunHistoryCount;
+  export let runHistoryPlanModalOpen = false;
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -263,7 +263,7 @@
                   </div>
                 {/each}
               {/if}
-              {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitTestFlowBlocks}
+              {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitRunHistoryCount}
                 <div
                   class="d-flex flex-row justify-content-center align-items-center"
                 >

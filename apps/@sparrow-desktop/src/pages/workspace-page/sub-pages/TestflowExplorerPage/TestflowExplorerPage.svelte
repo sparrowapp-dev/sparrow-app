@@ -44,6 +44,7 @@
   let runHistoryPlanModalOpen: boolean = false;
   let selectiveRunTestflow: boolean = false;
   let selectiveRunModalOpen: boolean = false;
+  let planLimitRunHistoryCount: number = 5;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -103,6 +104,16 @@
     }
   });
 
+  const handleBlockLimitTestflow = async () => {
+    const planlimits = await _viewModel.userLimitBlockPerTestflow();
+    if (planlimits) {
+      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
+      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
+      planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+    }
+  };
+
   testFlowDataStore.subscribe((val) => {
     if (val) {
       testflowStore = val.get(tab?.tabId) as TFDataStoreType;
@@ -116,6 +127,7 @@
     } else {
       isTestFlowEmpty = false;
     }
+    handleBlockLimitTestflow();
   });
 
   const userSubscriber = user.subscribe((value) => {
@@ -197,15 +209,6 @@
     });
   };
 
-  const handleBlockLimitTestflow = async () => {
-    const planlimits = await _viewModel.userLimitBlockPerTestflow();
-    if (planlimits) {
-      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
-      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
-      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
-    }
-  };
-
   const handleRequestOwner = async () => {
     if ($activeWorkspace?._data?.team?.teamId) {
       await _viewModel.requestToUpgradePlan(
@@ -272,6 +275,7 @@
     {handleEventOnClickQuestionMark}
     {planLimitTestFlowBlocks}
     {planLimitTestflow}
+    {planLimitRunHistoryCount}
     testflowCount={currentTestflowCount}
     {teamDetails}
     bind:testflowBlocksPlanModalOpen
