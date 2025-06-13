@@ -136,7 +136,7 @@
   export let testflowBlocksPlanModalOpen: boolean = false;
   export let handleRequestOwner: () => void;
   export let handleRedirectToAdminPanel: () => void;
-  export let handleContactSales:() => void;
+  export let handleContactSales: () => void;
   export let runHistoryPlanModalOpen: boolean = false;
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
@@ -1720,7 +1720,7 @@
   {/if}
 
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    {#if testflowCount !== planLimitTestFlows}
+    {#if testflowCount <= planLimitTestFlows}
       <p
         class="mb-0 pb-0 text-fs-14"
         style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
@@ -1844,7 +1844,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactSales={handleContactSales}
+  {handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
@@ -1864,7 +1864,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactSales={handleContactSales}
+  {handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
@@ -1883,7 +1883,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactSales={handleContactSales}
+  {handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
