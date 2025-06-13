@@ -763,7 +763,10 @@
     // handles run from from start button click
     if (_id === "0") {
       await onClickRun();
-      selectNode("2");
+      const startingNode = handleSelectFirstNode();
+      if (startingNode) {
+        selectNode(startingNode);
+      }
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
@@ -1249,6 +1252,23 @@
   };
 
   /**
+   * This Function will the pass the value of first Node is Connected Target value.
+   */
+  const handleSelectFirstNode = () => {
+    let defaultNode = "2";
+    edges.update((_edges) => {
+      for (let item = 0; item < _edges.length; item++) {
+        if (_edges[item]?.source === "1") {
+          defaultNode = _edges[item]?.target;
+          break;
+        }
+      }
+      return _edges;
+    });
+    return defaultNode;
+  };
+
+  /**
    * Focuses the div element by calling its focus method.
    */
   const focusDiv = () => {
@@ -1433,7 +1453,10 @@
                 onClick={async () => {
                   unselectNodes();
                   await onClickRun();
-                  selectNode("2");
+                  const startingNode = handleSelectFirstNode();
+                  if (startingNode) {
+                    selectNode(startingNode);
+                  }
                   MixpanelEvent(Events.Run_TestFlows);
                   handleEventOnRunBlocks();
                 }}
