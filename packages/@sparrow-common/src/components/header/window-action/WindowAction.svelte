@@ -12,6 +12,7 @@
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { onDestroy, onMount } from "svelte";
   import { WindowMultipleIcon } from "@sparrow/library/icons";
+  import { Platform } from "../../../enums";
 
   export let platform: "windows" | "macos" | "linux" = "windows";
 
@@ -81,7 +82,7 @@
     }
   }
 
-  if (platform === "linux") {
+  if (platform === Platform.LINUX) {
     try {
       // Add event listener for window resize for Linux
       const unlistenResize = appWindow.onResized(checkSize);
@@ -95,7 +96,7 @@
     }
   }
 
-  if (platform === "macos") {
+  if (platform === Platform.MACOS) {
     const unlistenResize = appWindow.onResized(async () => {
       isFullscreen = await appWindow.isFullscreen();
     });
@@ -110,7 +111,7 @@
   });
 </script>
 
-{#if platform === "windows"}
+{#if platform === Platform.WINDOWS}
   <!-- Windows Style Buttons -->
   <div class="d-flex">
     <div class="controller-btn">

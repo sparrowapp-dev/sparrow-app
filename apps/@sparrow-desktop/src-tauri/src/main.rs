@@ -176,10 +176,6 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
             } else {
                 gtk_window.set_decorated(true);
             }
-
-            // if remove_toolbar {
-            //     self.set_toolbar_visibility(false);
-            // }
         }
     }
 
@@ -1274,10 +1270,10 @@ fn main() {
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             // Get the main window (fallback to "windows" if "main" isn't available)
             #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
-                {
+            {
                 use tauri_plugin_deep_link::DeepLinkExt;
                 app.deep_link().register_all();
-                }
+            }
             let window = if app.get_webview_window("main").is_some() {
                 app.get_webview_window("main").unwrap()
             } else {
@@ -1287,23 +1283,27 @@ fn main() {
             let _ = window.unminimize();
             let _ = window.show();
             let _ = window.set_focus();
-        
+
             // Emit general single-instance payload
-            let _ = app.emit(
-                "single-instance",
-                SingleInstancePayload {
-                    args: argv.clone(),
-                    cwd: _cwd,
-                },
-            ).unwrap();
+            let _ = app
+                .emit(
+                    "single-instance",
+                    SingleInstancePayload {
+                        args: argv.clone(),
+                        cwd: _cwd,
+                    },
+                )
+                .unwrap();
 
             if argv.len() > 1 {
-                let _ = app.emit(
-                    "deep-link-urls",
-                    Payload {
-                        url: argv[1].to_string(),
-                    },
-                ).unwrap();
+                let _ = app
+                    .emit(
+                        "deep-link-urls",
+                        Payload {
+                            url: argv[1].to_string(),
+                        },
+                    )
+                    .unwrap();
             } else {
                 // Handle the case where argv is empty or doesn't have enough elements
                 println!("No URL provided in command line arguments.");
