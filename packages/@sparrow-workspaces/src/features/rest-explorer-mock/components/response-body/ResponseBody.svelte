@@ -10,6 +10,7 @@
   export let response: Response;
   export let apiState;
   export let onUpdateResponseBody;
+  export let responseId;
 
   let language = apiState.bodyLanguage;
   $: {
@@ -70,7 +71,7 @@
         bind:lang={language}
         bind:value={response}
         on:change={(e) => {
-          onUpdateResponseBody(e.detail);
+          onUpdateResponseBody(e.detail, responseId);
         }}
         isEditable={true}
       />{/if}

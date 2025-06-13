@@ -17,6 +17,7 @@
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
   export let activateGeneratePromptModal;
+  export let isGuestUser;
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -66,25 +67,20 @@
     autocapitalize="off"
     maxlength={10000}
     on:keydown={(event) => {
-      // isTyping = true;
-      if (event.key === "Enter" && prompt && !isResponseGenerating) {
-        sendPrompt(prompt);
-        onUpdateAiPrompt("");
-        captureEvent("ai_chatbot_send_button_clicked", {
-          component: "PromptInput",
-          message_length: prompt.length,
-          selected_engine: "GPT-4o",
-          timestamp: new Date().toISOString(),
-          response_time: null,
-        });
-        isTyping = false;
-        isPromptBoxFocused = false;
-        event.target.blur();
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        if (!isResponseGenerating && prompt.trim()) {
+          sendPrompt(prompt);
+          onUpdateAiPrompt("");
+          isTyping = false;
+          isPromptBoxFocused = false;
+          event.target.blur();
 
-        // allows the DOM to update first before resetting the height.
-        setTimeout(() => {
-          adjustTextareaHeight();
-        }, 0);
+          // allows the DOM to update first before resetting the height.
+          setTimeout(() => {
+            adjustTextareaHeight();
+          }, 0);
+        }
       }
     }}
     on:focus={() => {
@@ -100,19 +96,22 @@
   <div
     class="actions-container d-flex justify-content-between align-items-center"
   >
+    <!-- {#if !isGuestUser} -->
     <div id="generate-prompt-chip">
-      <Tooltip title={"Generate user prompt"} placement={"top-center"}>
-        <button
-          on:click={() => {
-            activateGeneratePromptModal("UserPrompt");
-          }}
-          class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1"
-        >
-          <BotSparkleFilled size={"15px"} color="#4387f4" />
-          <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>
-        </button>
-      </Tooltip>
+      <!-- <Tooltip title={"Generate user prompt"} placement={"top-center"}> -->
+      <button
+        on:click={() => {
+          activateGeneratePromptModal("UserPrompt");
+        }}
+        disabled={isGuestUser}
+        class="generate-prompt-btn d-flex align-items-center gap-1 px-2 py-1 rounded-1"
+      >
+        <BotSparkleFilled size={"15px"} color="#4387f4" />
+        <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>
+      </button>
+      <!-- </Tooltip> -->
     </div>
+    <!-- {/if} -->
 
     <Tooltip
       title={isResponseGenerating ? "Stop" : "Send"}
@@ -191,14 +190,18 @@
   }
 
   .generate-prompt-btn {
-    background-color: var(--bg-ds-surface-700);
+    font-family: Inter, sans-serif;
+    background-color: var(--bg-ds-surface-400);
     color: var(--sparrow-white);
     border: 1px solid var(--bg-ds-surface-100);
     font-size: 12px;
     font-weight: 500;
+    transition: all 0.2s ease; /* Smooth hover */
   }
 
-  /* .generate-prompt-btn:hover {
-    background-color: rgba(30, 30, 35, 0.95);
-  } */
+  .generate-prompt-btn:hover {
+    background-color: var(--bg-ds-surface-700);
+    border: 1px solid var(--border-ds-primary-400);
+    box-shadow: 0 0 4px 1px rgba(17, 173, 240, 0.3); /* shadow-glow effect */
+  }
 </style>

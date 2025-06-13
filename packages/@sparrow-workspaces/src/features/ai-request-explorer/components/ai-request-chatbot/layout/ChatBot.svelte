@@ -24,7 +24,17 @@
   export let handleApplyChangeOnAISuggestion;
   export let responseData: AiRequestExplorerData;
   export let disabled = false;
+  export let conversationsHistory;
+  export let onOpenConversationHistoryPanel;
+  export let onCloseConversationHistoryPanel;
+  export let onSwitchConversation;
+  export let onRenameConversation;
+  export let onDeleteConversation;
+  export let onClearConversation;
+  export let isConversationHistoryPanelOpened: boolean;
+  export let isConversationHistoryLoading: boolean;
   export let activateGeneratePromptModal;
+  export let isGuestUser: boolean;
 
   let scrollList: ScrollList;
 
@@ -69,12 +79,6 @@
     }
   };
 
-  const clearChat = async () => {
-    if ($tab?.property?.aiRequest?.ai?.conversations.length) {
-      onUpdateAiConversation([]);
-    }
-  };
-
   onMount(() => {
     setTimeout(() => {
       if (scrollList) scrollList("bottom", -1, "auto");
@@ -99,22 +103,35 @@
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
   <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
-      conversations={$tab?.property?.aiRequest?.ai?.conversations}
       {responseData}
-      prompt={$tab?.property?.aiRequest?.ai?.prompt}
+      {isGuestUser}
+      bind:scrollList
       {onUpdateAiPrompt}
       {sendPrompt}
-      isResponseGenerating={$tab?.property?.aiRequest?.state
-        ?.isChatbotGeneratingResponse}
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      onChatClear={clearChat}
+      {conversationsHistory}
+      {onOpenConversationHistoryPanel}
+      {onCloseConversationHistoryPanel}
+      {onSwitchConversation}
+      {onRenameConversation}
+      {onDeleteConversation}
+      {onClearConversation}
+      conversations={$tab?.property?.aiRequest?.ai?.conversations}
+      prompt={$tab?.property?.aiRequest?.ai?.prompt}
+      chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
+      isResponseGenerating={$tab?.property?.aiRequest?.state
+        ?.isChatbotGeneratingResponse}
       isChatAutoClearActive={$tab?.property?.aiRequest?.state
         ?.isChatAutoClearActive}
-      bind:scrollList
+      isChatPanelLoadingActive={$tab?.property?.aiRequest?.state
+        ?.isChatbotConversationLoading}
+      currTabAiInfo={$tab.property?.aiRequest?.ai}
+      bind:isConversationHistoryPanelOpened
+      bind:isConversationHistoryLoading
       {activateGeneratePromptModal}
     />
   </div>
