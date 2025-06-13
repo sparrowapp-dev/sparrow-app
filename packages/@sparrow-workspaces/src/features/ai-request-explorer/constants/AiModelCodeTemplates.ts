@@ -435,7 +435,7 @@ main();`;
   },
   
   
-  // DeepSeek Family
+  // Anthropic Family
   anthropic: {
     "curl": {
       environment: "none",
@@ -658,6 +658,7 @@ console.log(msg);
     }
   },
   
+  // Google Family
   google: {
     "curl": {
       environment: "none",
@@ -703,7 +704,8 @@ console.log(msg);
           }
         });
 
-        return `curl "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}" \
+        return `
+curl "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}" \
   -H 'Content-Type: application/json' \
   -X POST \
   -d '{
@@ -716,9 +718,8 @@ console.log(msg);
         ]
       }
     ]
-  }'`;
-      }
-    },
+  }'
+`;}},
     "python": {
       environment: "Python",
       language: "python",
@@ -766,8 +767,10 @@ console.log(msg);
 client = genai.Client(api_key="${apiKey}")
 
 response = client.models.generate_content(
-    model="${model}", contents="Explain how AI works in a few words"
+    model="${model}", 
+    contents="Explain how AI works in a few words"
 )
+
 print(response.text)
 `;
       }
@@ -875,6 +878,5 @@ main();
       }
     }
   },
-
-
+  
 }
