@@ -8,11 +8,18 @@
     ChatBot,
     RequestDoc,
     AiConfigs,
+    ConversationHistoryItem,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import type { CollectionDocument } from "@app/database/database";
+  import type {
+    CollectionDocument,
+    AiRequestConversationsDocument,
+  } from "@app/database/database";
   import type { Observable } from "rxjs";
-  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
+  import {
+    AiRequestSectionEnum,
+    type Conversation,
+  } from "@sparrow/common/types/workspace/ai-request-tab";
   import {
     ModelIdNameMapping,
     ModelVariantIdNameMapping,
@@ -24,8 +31,12 @@
   import { disabledModelFeatures, modelCodeTemplates } from "../constants";
 
   import {
+    BotRegular,
+   
     SettingsRegular,
+   
     BotSparkleRegular,
+    DismissRegular,
     CopyIcon,
     CopyIcon2,
     TickIcon,
@@ -66,6 +77,28 @@
   export let onCreateCollection;
   export let onRenameCollection;
   export let onRenameFolder;
+  export let onClearConversation;
+
+  // Conversations History Props
+  export let conversationsHistory: AiRequestConversationsDocument[];
+  export let onSelectConversation: (id: string) => void;
+  export let onRenameConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
+  export let onDeleteConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
+  export let onSwitchConversation: (
+    conversationId: string,
+    conversationTitle: string,
+    conversation: Conversation[],
+  ) => void;
+  export let fetchConversations: () => Promise<void>;
+  export let getConversationsList: () => Observable<
+    AiRequestConversationsDocument[]
+  >;
 
   // Role of user in active workspace
   export let userRole;
@@ -81,9 +114,11 @@
   let splitpaneContainerWidth = 0;
 
   // Chatbot pane size constraints in pixels (based on Figma design)
-  const minPx = 343;
-  const maxPx = 525;
-  const defaultPx = 452;
+  // const minPx = 343;
+  // const maxPx = 525;
+  let minPx = 343;
+  let maxPx = 525;
+  let defaultPx = 452;
 
   // Chatbot pane size constraints in percentage (calculated at runtime)
   let minSizePct = 0;
@@ -123,6 +158,41 @@
 
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
+  };
+
+  let isConversationHistoryPanelOpened = false;
+  let isConversationHistoryLoading = false;
+  const onOpenConversationHistoryPanel = async () => {
+    const res = await fetchConversations();
+    const result = getConversationsList();
+    maxPx += 300;
+    defaultPx += 250;
+    minPx += 350;
+    updateSplitpaneContSizes();
+    isConversationHistoryPanelOpened = true;
+    return result;
+  };
+  const onCloseConversationHistoryPanel = () => {
+    maxPx -= 300;
+    defaultPx -= 250;
+    minPx -= 350;
+    updateSplitpaneContSizes();
+    isConversationHistoryPanelOpened = false;
+  };
+
+  // $: {
+  //   if ($tab?.property?.aiRequest)
+  //     console.log("tab :>> ", $tab?.property?.aiRequest);
+  // }
+
+  const handleOnClickUpdateRequestAuth = async () => {
+    if (isConversationHistoryPanelOpened) {
+      isConversationHistoryLoading = true;
+      const res = await fetchConversations();
+      const result = getConversationsList();
+      isConversationHistoryLoading = false;
+    }
+    onUpdateRequestAuth();
   };
 
   let codeTemplateLanguage: CodeEditorLanguageType =
@@ -199,6 +269,15 @@
         selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
         selectedModel={$tab.property.aiRequest?.aiModelVariant}
         {onUpdateAiConversation}
+        onModelSwitch={async (provider, variant) => {
+          onSwitchConversation("", "New Conversation", []);
+          if (isConversationHistoryPanelOpened) {
+            isConversationHistoryLoading = true;
+            const res = await fetchConversations();
+            const result = getConversationsList();
+            isConversationHistoryLoading = false;
+          }
+        }}
         openGetCodePopup={onClickOpenGetCodePopup}
       />
 
@@ -255,7 +334,7 @@
                         ?.aiModelProvider}
                       collectionAuth={$collectionAuth}
                       {onUpdateRequestState}
-                      {onUpdateRequestAuth}
+                      onUpdateRequestAuth={handleOnClickUpdateRequestAuth}
                       {onUpdateEnvironment}
                       {environmentVariables}
                       {collection}
@@ -334,6 +413,15 @@
               {onGenerateAiResponse}
               {onStopGeneratingAIResponse}
               {onToggleLike}
+              {conversationsHistory}
+              {onOpenConversationHistoryPanel}
+              {onCloseConversationHistoryPanel}
+              {onSwitchConversation}
+              {onRenameConversation}
+              {onDeleteConversation}
+              {onClearConversation}
+              bind:isConversationHistoryPanelOpened
+              bind:isConversationHistoryLoading
             />
           </Pane>
         </Splitpanes>

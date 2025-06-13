@@ -7,22 +7,31 @@
   import { Modal } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import * as Sentry from "@sentry/svelte";
+  import { OSDetector } from "../../../utils";
+  import { open } from "@tauri-apps/plugin-shell";
 
   let showProgressBar = false;
   let updateAvailable = false;
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
+
+  let os = "";
+  const osDetector = new OSDetector();
+
+  export let updateDoc;
+
   onMount(async () => {
     try {
       updater = await check();
+      os = osDetector.getOS();
       if (updater?.available) {
         // notifications.info("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
     } catch (error) {
-      Sentry.captureException(error); 
+      Sentry.captureException(error);
       console.error(error);
     }
   });
@@ -45,7 +54,7 @@
         }, WAIT_TIME_BEFORE_RESTART_IN_SECONDS * 1000);
       }
     } catch (e) {
-      Sentry.captureException(e); 
+      Sentry.captureException(e);
       notifications.error("Update Failed.");
       console.error(e);
     } finally {
@@ -68,7 +77,16 @@
     handleModalState={handleUpdatePopUp}
   >
     <div class="text-lightGray mb-1 sparrow-fs-14">
-      <p>Update for new features and improvements</p>
+      {#if os === "linux"}
+        <p>
+          To learn how to update, please refer to our documentation or click the
+          <a role="button" on:click={updateDoc} class="link-button"
+            >"View Docs"</a
+          > button below — this will open the documentation in your default browser.
+        </p>
+      {:else}
+        <p>Update for new features and improvements</p>
+      {/if}
     </div>
     <div
       class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
@@ -86,11 +104,11 @@
 
       <Button
         disable={showProgressBar}
-        title={"Update"}
+        title={os === "linux" ? "View Docs" : "Update"}
         textStyleProp={"font-size: var(--base-text)"}
         type={"primary"}
         loader={false}
-        onClick={initiateUpdate}
+        onClick={os === "linux" ? updateDoc : initiateUpdate}
       />
     </div></Modal
   >{/if}

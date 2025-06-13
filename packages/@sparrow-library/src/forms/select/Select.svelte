@@ -283,7 +283,6 @@
     e.stopPropagation();
     searchData = headerSearchValue;
   };
-
   $: {
     if (titleId) {
       data.forEach((element) => {
@@ -291,6 +290,9 @@
           selectedRequest = element;
         }
       });
+    } else {
+      // Clear selectedRequest when titleId is empty or null
+      selectedRequest = false;
     }
   }
 

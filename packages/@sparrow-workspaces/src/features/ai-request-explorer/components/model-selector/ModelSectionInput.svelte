@@ -10,7 +10,9 @@
   import {
     ModelVariantIdNameMapping,
     ModelIdNameMapping,
+    AiModelProviderEnum,
   } from "@sparrow/common/types/workspace/ai-request-base";
+  import type { Conversation } from "@sparrow/common/types/workspace/ai-request-tab";
 
   let componentClass = "";
   export { componentClass as class };
@@ -27,6 +29,7 @@
   let isModelSelectorOpen = false;
   export let selectedModelProvider = "openai";
   export let selectedModel = "gpt-4o";
+  export let onModelSwitch: () => void;
   export let openGetCodePopup: () => void;
 
   const dispatch = createEventDispatcher();
@@ -43,17 +46,17 @@
   };
 
   // Handle model selection
-  const handleModelSelection = (
+  const handleModelSelection = async (
     provider: string,
     model: { name: string; id: string },
   ) => {
-    if (selectedModelProvider !== provider) {
-      onUpdateAiConversation([]);
-      // return;
-    }
+    const isNewProvider = selectedModelProvider !== provider;
     selectedModelProvider = provider;
     selectedModel = model.id;
-    onUpdateAIModel(provider, model.id);
+    await onUpdateAIModel(provider, model.id);
+    if (isNewProvider) {
+      onModelSwitch();
+    }
   };
 
   /**
