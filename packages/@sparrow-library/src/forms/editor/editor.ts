@@ -147,7 +147,7 @@ const handleCodeMirrorSyntaxFormat = (
       }
       break;
 
-    case "Python":
+    case RequestDataType.PYTHON:
       if (codeMirrorView) {
         let payload = {};
         if (isFormatted) {
@@ -166,7 +166,7 @@ const handleCodeMirrorSyntaxFormat = (
         beautifySyntaxCallback(false);
       }
       break;
-    case "Curl":
+    case RequestDataType.CURL:
       if (codeMirrorView) {
         let payload = {};
         if (isFormatted) {
