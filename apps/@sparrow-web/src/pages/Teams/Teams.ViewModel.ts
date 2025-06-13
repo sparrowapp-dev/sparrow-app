@@ -183,6 +183,10 @@ export class TeamsViewModel {
                 area: rawData.limits.selectiveTestflowRun.area,
                 active: rawData.limits.selectiveTestflowRun.active,
               },
+              activeSync: {
+                area: rawData.limits.activeSync.area,
+                active: rawData.limits.activeSync.active,
+              },
             },
             createdAt: rawData.createdAt,
             updatedAt: rawData.updatedAt,
