@@ -31,10 +31,13 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
+  import { open } from "@tauri-apps/plugin-shell";
 
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
+
+  export let   sparrowAdminUrl
 
   /**
    * user ID
@@ -134,6 +137,9 @@
   let isInviteAcceptProgress = false;
 
   let selectedFilter = "All";
+
+ 
+
 
   const addButtonData = [
     {
@@ -323,7 +329,10 @@
               </span>
 
                 {#if openTeam?.toMutableJSON()?.plan?.name}
-                <div class="ms-2 d-flex  align-items-center gap-1 mt-3 text-primary-400 cursor-pointer">
+                <div class="ms-2 d-flex  align-items-center gap-1 mt-3 text-primary-400 cursor-pointer"
+                on:click={()=>{
+                  open(sparrowAdminUrl)
+                }}>
                   <p class="text-fs-12 pb-0 mb-0">Launch Admin Panel</p>
                   <OpenRegular/>
                 </div>

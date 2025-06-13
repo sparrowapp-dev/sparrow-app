@@ -12,6 +12,9 @@
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
 
+
+  export let sparrowAdminUrl:string
+
   let isWebEnvironment = false;
 
   let isDeleteWorkspaceModalOpen = false;
@@ -101,6 +104,7 @@
   onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
   onCopyLink={handleCopyPublicWorkspaceLink}
+    {sparrowAdminUrl}
 />
 
 <Modal

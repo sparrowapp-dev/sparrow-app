@@ -66,6 +66,9 @@
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
+     const sparrowAdminUrl=  constants.SPARROW_ADMIN_URL
+
+
   onMount(async () => {
     _viewModel.refreshTeams(userId);
     _viewModel.refreshWorkspaces(userId);
@@ -110,7 +113,6 @@
 </script>
 
 <Motion {...pagesMotion} let:motion>
-  <UpgradePlanBanner bind:isUpgradePlanModelOpen />
   <div class="h-100" use:motion>
     <Splitpanes
       class="team-splitter h-100"
@@ -238,7 +240,7 @@
         minSize={60}
         class="bg-secondary-800-important"
       >
-        <TeamExplorerPage />
+        <TeamExplorerPage {sparrowAdminUrl} />
       </Pane>
     </Splitpanes>
   </div>
@@ -262,18 +264,6 @@
   />
 </Modal>
 
-<Modal
-  title={"Time to Unlock More Features"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isUpgradePlanModelOpen}
-  handleModalState={(flag) => {
-    isUpgradePlanModelOpen = flag;
-  }}
->
-  <UpgradePlanPopUp bind:isUpgradePlanModelOpen />
-</Modal>
 
 <style>
   .githubStar {

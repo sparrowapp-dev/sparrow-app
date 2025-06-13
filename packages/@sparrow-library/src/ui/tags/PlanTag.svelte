@@ -33,13 +33,13 @@
     background-color: {planPalette[plan].bg};
     color: {planPalette[plan].text};
     border: 1px solid {planPalette[plan].border};
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 2px 4px;
     height: {height}px;
     text-align: center;
     font-family: Inter, sans-serif;
-    width: fit-content;
-    max-width: 188px;
+    width: 100%;
+    max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -52,5 +52,5 @@
   "
   title={text || formatPlan(plan)}
 >
-  {formatPlan(plan)}
+  {text || formatPlan(plan)}
 </button>

@@ -1,6 +1,9 @@
 <script>
   import { Button } from "@sparrow/library/ui";
   export let isUpgradePlanModelOpen;
+  import { open } from "@tauri-apps/plugin-shell";
+
+  export let sparrowAdminUrl;
 </script>
 
 <div class="text-fs-14 pt-3">
@@ -24,6 +27,9 @@
       title={"Go to Admin Panel"}
       textStyleProp={"font-size:14px; font-weight:500;"}
       type={"primary"}
+      onClick={async () => {
+        await open(sparrowAdminUrl);
+      }}
     />
   </div>
 </div>

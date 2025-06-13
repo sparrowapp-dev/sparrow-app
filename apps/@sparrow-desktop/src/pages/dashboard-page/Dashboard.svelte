@@ -3,9 +3,14 @@
     LoginBanner,
     LoginSignupConfirmation,
     SwitchWorkspace,
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
+
+  let isUpgradePlanModelOpen: boolean = false;
+
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
@@ -92,6 +97,8 @@
     switchRequestName = _requestName;
     switchWorkspaceId = _workspaceId;
   };
+
+  const sparrowAdminUrl = constants.SPARROW_ADMIN_URL;
 
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
@@ -607,6 +614,8 @@
     />
   {/if}
 
+  <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+
   <!-- 
     -- Guest Login Banner - shows login option to guest users.
     -->
@@ -710,6 +719,19 @@
     handleSwitch={handleWorkspaceSwitch}
     {handlehideGlobalSearch}
   />
+</Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradePlanModelOpen}
+  handleModalState={(flag) => {
+    isUpgradePlanModelOpen = flag;
+  }}
+>
+  <UpgradePlanPopUp bind:isUpgradePlanModelOpen {sparrowAdminUrl} />
 </Modal>
 
 <style>
