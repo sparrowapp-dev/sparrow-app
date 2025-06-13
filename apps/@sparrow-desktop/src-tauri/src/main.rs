@@ -180,14 +180,18 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
     }
 
     fn set_toolbar_visibility(&self, visible: bool) {
-        use gtk::prelude::*;
-        if let Ok(gtk_window) = self.gtk_window() {
-            if visible {
-                gtk_window.show();
-            } else {
-                gtk_window.hide();
-            }
-        }
+        // No-op: Not supported on Linux
+    }
+}
+
+#[cfg(target_os = "windows")]
+impl<R: Runtime> WindowExt for WebviewWindow<R> {
+    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
+        // No-op: Not supported on Windows
+    }
+
+    fn set_toolbar_visibility(&self, visible: bool) {
+        // No-op: Not supported on Windows
     }
 }
 
