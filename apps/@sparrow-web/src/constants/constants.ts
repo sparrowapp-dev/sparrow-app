@@ -35,6 +35,7 @@ const constants = {
   SENTRY_DSN: import.meta.env.VITE_WEB_SENTRY_DSN,
   APP_ENVIRONMENT: import.meta.env.VITE_WEB_APP_ENVIRONMENT,
   SPARROW_WEB_APP_URL: import.meta.env.VITE_WEB_SPARROW_WEB_APP_URL,
+  SPARROW_ADMIN_URL:import.meta.env.VITE_WEB_SPARROW_ADMIN_URL,
   ADMIN_URL:import.meta.env.VITE_WEB_ADMIN_URL,
 };
 

@@ -14,6 +14,9 @@
   import type { InviteBody } from "@sparrow/common/dto/team-dto";
   import { ResponseMessage } from "@sparrow/common/enums";
 
+
+  export let sparrowAdminUrl:string
+
   let isWebEnvironment = false;
 
   let isDeleteWorkspaceModalOpen = false;
@@ -148,6 +151,7 @@
   onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
   onCopyLink={handleCopyPublicWorkspaceLink}
+    {sparrowAdminUrl}
   planLimits={handleUserLimits}
   contactOwner={handleRequestPlan}
   {handleRedirectAdminPanel}

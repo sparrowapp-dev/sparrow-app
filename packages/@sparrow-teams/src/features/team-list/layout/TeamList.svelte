@@ -1,5 +1,11 @@
 <script>
-  import { Button, ButtonV2, List, Tooltip } from "@sparrow/library/ui";
+  import {
+    Button,
+    ButtonV2,
+    List,
+    PlanTag,
+    Tooltip,
+  } from "@sparrow/library/ui";
   import { PeopleIcon, PlusIcon } from "@sparrow/library/assets";
   import { base64ToURL } from "@sparrow/common/utils";
   import { Avatar } from "@sparrow/library/ui";
@@ -86,12 +92,19 @@
                 image={base64ToURL(team.logo)}
               />
             {/if}
-            <p
-              style=" padding:2px 4px; "
-              class="ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-            >
-              {team.name || ""}
-            </p>
+            <div class="d-flex align-items-center team-row-content">
+              <p
+                class="team-name-ellipsis ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+              >
+                {team.name || ""}
+              </p>
+              <span class="ps-2 team-plan-tag">
+                <PlanTag
+                  plan={(team?.plan?.name || "community").toLowerCase()}
+                  text={team?.plan?.label || ""}
+                />
+              </span>
+            </div>
           </div>
           {#if team.isNewInvite}
             <p class="mb-0 new-invite text-labelColor w-50 ellipsis">
@@ -210,5 +223,26 @@
 
   .github-icon {
     padding-bottom: 50px !important;
+  }
+  .team-row-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .team-name-ellipsis {
+    max-width: 90px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
+  }
+  .team-plan-tag {
+    flex-shrink: 0;
+    min-width: 0;
+    max-width: 120px;
+    display: flex;
+    align-items: center;
   }
 </style>
