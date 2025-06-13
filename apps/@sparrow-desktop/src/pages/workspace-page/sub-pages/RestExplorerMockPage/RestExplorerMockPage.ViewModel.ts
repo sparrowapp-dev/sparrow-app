@@ -309,10 +309,15 @@ class RestExplorerMockViewModel {
       const serverItem = serverItems[i];
       const clientItem = clientItems[i];
 
-      // Compare responseBody (string comparison)
+      // Compare responseBody and status (string comparison)
       if (
         serverItem.mockRequestResponse?.responseBody !==
         clientItem.mockRequestResponse?.responseBody
+      ) {
+        return false;
+      } else if (
+        serverItem.mockRequestResponse?.responseStatus !==
+        clientItem.mockRequestResponse?.responseStatus
       ) {
         return false;
       }
