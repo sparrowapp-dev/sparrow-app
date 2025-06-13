@@ -147,7 +147,7 @@ export class TeamService {
     return response;
   };
 
-   public withdrawInvite = async (
+  public withdrawInvite = async (
     teamId: string,
     email: string,
     baseUrl: string,
@@ -188,8 +188,19 @@ export class TeamService {
       },
     );
     return response;
-    }
+  };
 
+  public requestOwnerToUpgradePlan = async (
+    teamId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/team/${teamId}/requestPlan`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
-
-

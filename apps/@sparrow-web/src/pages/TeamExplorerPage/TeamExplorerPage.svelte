@@ -17,6 +17,8 @@
   import { navigate } from "svelte-navigator";
   import constants from "src/constants/constants";
   import { copyToClipBoard } from "@sparrow/common/utils";
+  import type { InviteBody } from "@sparrow/common/dto/team-dto";
+  import { ResponseMessage } from "@sparrow/common/enums";
 
   export let activeTeamTab;
   export let onUpdateActiveTab;
@@ -24,6 +26,9 @@
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
+  let upgradePlanModalInvite = false;
+  let upgradePlanModal = false;
+  let usersInvitePlanCount: number = 5;
 
   let isWorkspaceInviteModalOpen = false;
   let isWebEnvironment = true;
@@ -84,6 +89,7 @@
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      usersInvitePlanCount = value?._data?.users?.length || 5;
       isWorkspaceOpen = false;
     }
   });
@@ -95,6 +101,24 @@
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
+  };
+
+  const handleSendInvite = async (
+    teamId: string,
+    teamName: string,
+    inviteBody: InviteBody,
+    userId: string,
+  ) => {
+    const response = await _viewModel.handleTeamInvite(
+      teamId,
+      teamName,
+      inviteBody,
+      userId,
+    );
+    if (response?.message === "Plan limit reached") {
+      upgradePlanModalInvite = true;
+    }
+    return response;
   };
 
   onMount(async () => {
@@ -157,6 +181,27 @@
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
   };
+
+  const handleUserLimits = async () => {
+    const data = await _viewModel.userPlanLimits($activeTeam?.teamId);
+    usersInvitePlanCount = data?.usersPerHub.value || 5;
+    return data;
+  };
+
+  const handleRequestPlan = async () => {
+    await _viewModel.requestToUpgradePlan($activeTeam?.teamId);
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
+  };
+
+  const handleCreateWorkspace = async (teamId: string) => {
+    const response = await _viewModel.handleCreateWorkspace(teamId);
+    if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModal = true;
+    }
+  };
 </script>
 
 {#if isWorkspaceOpen}
@@ -210,13 +255,15 @@
     bind:userId
     bind:isTeamInviteModalOpen
     bind:isLeaveTeamModelOpen
+    bind:upgradePlanModalInvite
+    bind:upgradePlanModal
     onAddMember={handleWorkspaceDetails}
     openTeam={$activeTeam}
     workspaces={$workspaces}
     {activeTeamTab}
     onDeleteWorkspace={handleDeleteWorkspace}
     {onUpdateActiveTab}
-    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onCreateWorkspace={handleCreateWorkspace}
     onSwitchWorkspace={async (item) => {
       await _viewModel.handleSwitchWorkspace(item);
       // isWorkspaceOpen = true;
@@ -236,6 +283,9 @@
     onAcceptInvite={_viewModel.acceptInvite}
     onIgnoreInvite={_viewModel.ignoreInvite}
     onCopyLink={handleCopyPublicWorkspaceLink}
+    planLimits={handleUserLimits}
+    contactOwner={handleRequestPlan}
+    {handleRedirectAdminPanel}
   />
 {/if}
 
@@ -252,7 +302,7 @@
   <TeamInvite
     {userId}
     teamLogo={$activeTeam?.logo}
-    onInviteClick={_viewModel.handleTeamInvite}
+    onInviteClick={handleSendInvite}
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}

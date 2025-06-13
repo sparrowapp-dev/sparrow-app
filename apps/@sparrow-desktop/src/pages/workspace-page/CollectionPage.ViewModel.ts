@@ -140,6 +140,10 @@ import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { navigate } from "svelte-navigator";
 import * as Sentry from "@sentry/svelte";
 import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { TeamService } from "@app/services/team.service";
+import { PlanRepository } from "@app/repositories/plan.repository";
+import { open } from "@tauri-apps/plugin-shell";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -151,6 +155,10 @@ export default class CollectionsViewModel {
   private workspaceService = new WorkspaceService();
   private githubService = new GithubService();
   private guideRepository = new GuideRepository();
+  private teamRepository = new TeamRepository();
+  private teamService = new TeamService();
+  private planRepository = new PlanRepository();
+
   private initTab = new InitTab();
 
   private featureSwitchRepository = new FeatureSwitchRepository();
@@ -7303,5 +7311,35 @@ export default class CollectionsViewModel {
       console.error("Error opening workspace:", error);
       notifications.error("Failed to open workspace. Please try again.");
     }
+  };
+
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
   };
 }

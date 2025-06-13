@@ -61,6 +61,7 @@ import { WorkspaceService } from "@app/services/workspace.service";
 import { open } from "@tauri-apps/plugin-shell";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
+import { TeamService } from "@app/services/team.service";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -77,6 +78,7 @@ export class TestflowExplorerPageViewModel {
   private environmentService = new EnvironmentService();
   private teamRepository = new TeamRepository();
   private planRepository = new PlanRepository();
+  private teamService = new TeamService();
 
   /**
    * Utils
@@ -223,12 +225,7 @@ export class TestflowExplorerPageViewModel {
     }
 
     // nodes
-    else if (
-   !this.compareArray.init(
-     testflowServer.nodes,
-          tabServer.nodes,
-    )        
-    ) {
+    else if (!this.compareArray.init(testflowServer.nodes, tabServer.nodes)) {
       result = false;
     }
 
@@ -391,9 +388,14 @@ export class TestflowExplorerPageViewModel {
     return collectionAuth;
   };
 
-  private findConnectedNodes  = (adj: any[], start: number,nodes, result, visited = new Set(), ) => {
+  private findConnectedNodes = (
+    adj: any[],
+    start: number,
+    nodes,
+    result,
+    visited = new Set(),
+  ) => {
     if (visited.has(start)) return;
-
 
     for (let i = 0; i < nodes.length; i++) {
       if (Number(nodes[i].id) === start) {
@@ -404,7 +406,7 @@ export class TestflowExplorerPageViewModel {
     visited.add(start);
 
     for (const neighbor of adj[start]) {
-      this.findConnectedNodes(adj, neighbor, nodes, result, visited,);
+      this.findConnectedNodes(adj, neighbor, nodes, result, visited);
     }
   };
   /**
@@ -422,20 +424,28 @@ export class TestflowExplorerPageViewModel {
 
     let runningNodes: any[] = [];
 
-    const workspaceRxDoc = await this.workspaceRepository.readWorkspace(progressiveTab.path.workspaceId);
+    const workspaceRxDoc = await this.workspaceRepository.readWorkspace(
+      progressiveTab.path.workspaceId,
+    );
     const workspaceObject = workspaceRxDoc.toMutableJSON();
-    const teamRxDoc = await this.teamRepository.getTeamDoc(workspaceObject?.team?.teamId as string);
+    const teamRxDoc = await this.teamRepository.getTeamDoc(
+      workspaceObject?.team?.teamId as string,
+    );
     const teamObject = teamRxDoc?.toMutableJSON();
-   
+
     if (_event === "run-from-here") {
       const guestUser = await this.guestUserRepository.findOne({
         name: "guestUser",
       });
-      if(!guestUser){
-        const planRxDoc = await this.planRepository.getPlan(teamObject.plan?.id as string);
+      if (!guestUser) {
+        const planRxDoc = await this.planRepository.getPlan(
+          teamObject.plan?.id as string,
+        );
         const planObject = planRxDoc?.toMutableJSON();
-        if(!planObject?.limits?.selectiveTestflowRun?.active){
-          notifications.error("Failed to run from here. please upgrade your plan.");
+        if (!planObject?.limits?.selectiveTestflowRun?.active) {
+          // notifications.error(
+          //   "Failed to run from here. please upgrade your plan.",
+          // );
           return;
         }
       }
@@ -447,24 +457,27 @@ export class TestflowExplorerPageViewModel {
       // Initialize adjacency list
       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
       // Populate adjacency list
-  
 
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].source)].push(Number(edges[i].target));
       }
 
       let result = [];
-      this.findConnectedNodes(graph, Number(_id), nodes,result );
+      this.findConnectedNodes(graph, Number(_id), nodes, result);
       runningNodes = [...result];
     } else if (_event === "run-till-here") {
       const guestUser = await this.guestUserRepository.findOne({
         name: "guestUser",
       });
-      if(!guestUser){
-        const planRxDoc = await this.planRepository.getPlan(teamObject.plan?.id as string);
+      if (!guestUser) {
+        const planRxDoc = await this.planRepository.getPlan(
+          teamObject.plan?.id as string,
+        );
         const planObject = planRxDoc?.toMutableJSON();
-        if(!planObject?.limits?.selectiveTestflowRun?.active){
-          notifications.error("Failed to run till here. please upgrade your plan.");
+        if (!planObject?.limits?.selectiveTestflowRun?.active) {
+          // notifications.error(
+          //   "Failed to run till here. please upgrade your plan.",
+          // );
           return;
         }
       }
@@ -476,15 +489,14 @@ export class TestflowExplorerPageViewModel {
       // Initialize adjacency list
       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
       // Populate adjacency list
-  
 
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].target)].push(Number(edges[i].source));
       }
 
       let result = [];
-      this.findConnectedNodes(graph, Number(_id), nodes,result );
-      runningNodes = [...(result.reverse())];
+      this.findConnectedNodes(graph, Number(_id), nodes, result);
+      runningNodes = [...result.reverse()];
     } else {
       let maxNodeId = 1;
       for (let i = 0; i < nodes.length; i++) {
@@ -494,14 +506,13 @@ export class TestflowExplorerPageViewModel {
       // Initialize adjacency list
       const graph = Array.from({ length: maxNodeId + 1 }, () => []);
       // Populate adjacency list
-  
 
       for (let i = 0; i < edges.length; i++) {
         graph[Number(edges[i].source)].push(Number(edges[i].target));
       }
 
       let result = [];
-      this.findConnectedNodes(graph, Number("1"), nodes,result );
+      this.findConnectedNodes(graph, Number("1"), nodes, result);
       runningNodes = [...result];
     }
 
@@ -516,7 +527,7 @@ export class TestflowExplorerPageViewModel {
           abortController: abortController,
           nodes: [],
           history: [],
-          runner:{},
+          runner: {},
           isRunHistoryEnable: false,
           isTestFlowRunning: true,
           isTestFlowSaveInProgress: false,
@@ -560,13 +571,10 @@ export class TestflowExplorerPageViewModel {
           request,
         );
 
-
-
-
         const decodeData = this._decodeRequest.init(
           adaptedRequest.property.request,
           environments?.filtered || [],
-          requestChainResponse
+          requestChainResponse,
         );
         const start = Date.now();
 
@@ -609,9 +617,7 @@ export class TestflowExplorerPageViewModel {
                 time: duration,
                 size: responseSizeKB,
                 responseContentType:
-                    this._decodeRequest.setResponseContentType(
-                      formattedHeaders,
-                    ),
+                  this._decodeRequest.setResponseContentType(formattedHeaders),
               };
 
               if (
@@ -652,66 +658,77 @@ export class TestflowExplorerPageViewModel {
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
-
               });
 
-              const responseHeader = this._decodeRequest.setResponseContentType(
-                formattedHeaders,
-              );
+              const responseHeader =
+                this._decodeRequest.setResponseContentType(formattedHeaders);
 
               const reqParam = {};
               const params = new URL(decodeData[0]).searchParams;
-              
 
               for (const [key, value] of params.entries()) {
                 reqParam[key] = value;
               }
 
               const headersObject = Object.fromEntries(
-                  JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
+                JSON.parse(decodeData[2]).map(({ key, value }) => [key, value]),
               );
-                
 
               let reqBody;
-                if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
-                  try{
+              if (decodeData[4] === "application/json") {
+                // tried to handle js but that is treated as text/plain, skipping that for now
+                try {
                   reqBody = JSON.parse(decodeData[3]);
-                  }
-                  catch(e){
+                } catch (e) {
                   reqBody = {};
                 }
-                }
-                else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
+              } else if (
+                decodeData[4] === "multipart/form-data" ||
+                decodeData[4] === "application/x-www-form-urlencoded"
+              ) {
                 const formDataObject = Object.fromEntries(
-                    JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
+                  JSON.parse(decodeData[3]).map(({ key, value }) => [
+                    key,
+                    value,
+                  ]),
                 );
-                  reqBody = formDataObject || {}
-                }
-                else{
+                reqBody = formDataObject || {};
+              } else {
                 reqBody = decodeData[3];
               }
-                requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+              requestChainResponse[
+                "$$" +
+                  element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
+              ] = {
                 response: {
-                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
-                    headers: response?.data?.headers
+                  body:
+                    responseHeader === "JSON"
+                      ? JSON.parse(resData.body)
+                      : resData.body,
+                  headers: response?.data?.headers,
                 },
                 request: {
                   headers: headersObject || {},
-                    body:reqBody,
-                    parameters:reqParam || {}
-                  }
-                }
-                requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  body: reqBody,
+                  parameters: reqParam || {},
+                },
+              };
+              requestChainResponse[
+                "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
+              ] = {
                 response: {
-                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
-                    headers: response?.data?.headers
+                  body:
+                    responseHeader === "JSON"
+                      ? JSON.parse(resData.body)
+                      : resData.body,
+                  headers: response?.data?.headers,
                 },
                 request: {
                   headers: headersObject || {},
-                    body:reqBody,
-                    parameters:reqParam || {}
-                  }
-                }
+                  body: reqBody,
+                  parameters: reqParam || {},
+                },
+              };
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
@@ -742,29 +759,34 @@ export class TestflowExplorerPageViewModel {
                 request: adaptedRequest,
               });
 
-              requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+              requestChainResponse[
+                "$$" +
+                  element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
+              ] = {
                 response: {
                   body: {},
-                  headers:{}
+                  headers: {},
                 },
                 request: {
-                    headers:{},
-                    body:{},
-                    parameters:{}
-                }
-              }
+                  headers: {},
+                  body: {},
+                  parameters: {},
+                },
+              };
 
-              requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+              requestChainResponse[
+                "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
+              ] = {
                 response: {
                   body: {},
-                  headers:{}
+                  headers: {},
                 },
                 request: {
-                    headers:{},
-                    body:{},
-                    parameters:{}
-                }
-              }
+                  headers: {},
+                  body: {},
+                  parameters: {},
+                },
+              };
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
@@ -815,14 +837,18 @@ export class TestflowExplorerPageViewModel {
     text: string,
     environmentVariables,
   ): string => {
-    let updatedText = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, squareContent) => {
+    let updatedText = text.replace(
+      /\[\*\$\[(.*?)\]\$\*\]/gs,
+      (_, squareContent) => {
         const updated = squareContent
-      .replace(/\\/g, '').replace(/"/g, `'`)
+          .replace(/\\/g, "")
+          .replace(/"/g, `'`)
           .replace(/\{\{(.*?)\}\}/g, (_, inner) => {
             return `'{{${inner.trim()}}}'`;
           });
         return `[*$[${updated}]$*]`;
-    });
+      },
+    );
     environmentVariables.forEach((element) => {
       const regex = new RegExp(`{{(${element.key})}}`, "g");
       updatedText = updatedText.replace(regex, element.value);
@@ -830,33 +856,34 @@ export class TestflowExplorerPageViewModel {
     return updatedText;
   };
 
-  private setDynamicExpression2 = (
-    text: string,
-    response,
-  ): any => {
+  private setDynamicExpression2 = (text: string, response): any => {
     let status = "fail";
     let contentType = "Text";
     const result = text.replace(/\[\*\$\[(.*?)\]\$\*\]/gs, (_, expr) => {
       try {
-        const de = expr.replace(/'\{\{(.*?)\}\}'/g,"undefined"); // convert missing environments to undefined 
+        const de = expr.replace(/'\{\{(.*?)\}\}'/g, "undefined"); // convert missing environments to undefined
         // Use Function constructor to evaluate with access to `response`
-        const fn = new Function("response", `
+        const fn = new Function(
+          "response",
+          `
           with (response) {
             return (${de});
           }
-        `);
+        `,
+        );
         const s = fn(response);
-        if(typeof s === "string"){
+        if (typeof s === "string") {
           status = "pass";
           contentType = "Text";
           return s;
         }
-        if (typeof s === "object" && s !== null) {  // unwraps [object Object] to string
+        if (typeof s === "object" && s !== null) {
+          // unwraps [object Object] to string
           status = "pass";
-          contentType = "JSON"
+          contentType = "JSON";
           return `${JSON.stringify(s)}`; // serialize object
         }
-        contentType = "JavaScript"
+        contentType = "JavaScript";
         status = "pass";
         return s;
       } catch (e) {
@@ -865,11 +892,10 @@ export class TestflowExplorerPageViewModel {
         return e.message;
       }
     });
-    return {result, status, contentType};
+    return { result, status, contentType };
   };
 
- public handlePreviewExpression = async(expression) => {
-
+  public handlePreviewExpression = async (expression) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const environments = await this.getActiveEnvironments(
       progressiveTab.path.workspaceId,
@@ -883,8 +909,14 @@ export class TestflowExplorerPageViewModel {
       }
       return testFlowDataMap;
     });
-  return this.setDynamicExpression2(this.setEnvironmentVariables("[*$[" + expression + "]$*]", environments?.filtered || []), runner);
- }
+    return this.setDynamicExpression2(
+      this.setEnvironmentVariables(
+        "[*$[" + expression + "]$*]",
+        environments?.filtered || [],
+      ),
+      runner,
+    );
+  };
 
   /**
    * Runs a single test flow node and updates the testFlowDataStore
@@ -1211,7 +1243,9 @@ export class TestflowExplorerPageViewModel {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
-    const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
+    const unadaptedTestflow = new TestflowTabAdapter().unadapt(
+      currentTestflow as Tab,
+    ); // Adapt the testflow tab
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       await this.testflowRepository.updateTestflow(
@@ -1690,10 +1724,49 @@ export class TestflowExplorerPageViewModel {
   /**
    * @description - This function will provide the Count of TestFlow are Created.
    */
-  public fetchCountofTestFlow = async() => {
+  public fetchCountofTestFlow = async () => {
     let count = 0;
     const data = await this.testflowRepository.getTestflowDoc();
     count = data?.length;
     return count;
+  };
+
+  /**
+   * @description - This function will provide user Limits based on teamId.
+   */
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  /**
+   * @description - This function will send Email request to the Owner.
+   */
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  /**
+   * @description - This function will redirect you to billing section.
+   */
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
   };
 }
