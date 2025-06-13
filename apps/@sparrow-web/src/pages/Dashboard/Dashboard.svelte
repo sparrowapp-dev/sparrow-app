@@ -30,10 +30,11 @@
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import type { CollectionDocument } from "@app/database/database";
   import { isGuestUserActive } from "@app/store/auth.store";
-  import { OSDetector } from "@sparrow/common/utils";
+  import { OSDetector, planInfoByRole } from "@sparrow/common/utils";
   import { fade } from "svelte/transition";
   import { GlobalSearch } from "@sparrow/common/features";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
+  import { ResponseMessage } from "@sparrow/common/enums";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -67,6 +68,8 @@
   let switchWorkspaceName = "";
   let switchRequestName = "";
   let switchWorkspaceId = "";
+  let upgradePlanModalWorkspace: boolean = false;
+  let planContent: any;
 
   const openDefaultBrowser = async () => {
     // await open(externalSparrowLink);
@@ -463,6 +466,25 @@
       handlehideGlobalSearch(false);
     }
   };
+
+  const handleCreateWorkspace = async (
+    workspaceName: string,
+    teamId: string,
+  ) => {
+    const response = await _viewModel.handleCreateWorkspace(
+      workspaceName,
+      teamId,
+    );
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceModalOpen = false;
+      upgradePlanModalWorkspace = true;
+    }
+    return response;
+  };
+
+  $: {
+    planContent = planInfoByRole("general");
+  }
 </script>
 
 {#if isGlobalSearchOpen && !hideGlobalSearch}
@@ -627,7 +649,7 @@
     handleModalState={(flag = false) => {
       isWorkspaceModalOpen = flag;
     }}
-    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onCreateWorkspace={handleCreateWorkspace}
   />
 </Modal>
 
@@ -648,6 +670,22 @@
     handleSwitch={handleWorkspaceSwitch}
     {handlehideGlobalSearch}
   />
+</Modal>
+
+<Modal
+  title={planContent?.title}
+  type={"primary"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={upgradePlanModalWorkspace}
+  handleModalState={(flag) => {
+    upgradePlanModalWorkspace = flag;
+  }}
+>
+  <div>
+    <p class="" style="margin: 0px;">{planContent?.description}</p>
+    <p />
+  </div>
 </Modal>
 
 <style>

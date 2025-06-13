@@ -40,7 +40,7 @@ import {
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events, ItemType } from "@sparrow/common/enums";
+import { Events, ItemType, ResponseMessage } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
@@ -511,6 +511,7 @@ export class DashboardViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
+    } else if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
     } else {
       notifications.error(response?.message);
     }

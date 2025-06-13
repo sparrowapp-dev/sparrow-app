@@ -10,12 +10,17 @@
   import { onDestroy, onMount } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
+  import {
+    environmentType,
+    ResponseMessage,
+    WorkspaceRole,
+  } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let tab;
   export let teamDetails;
+  export let upgradePlanModel;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
@@ -211,6 +216,13 @@
     }
   };
 
+  const handleSaveTestflow = async () => {
+    const response = await _viewModel.saveTestflow();
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModel = true;
+    }
+  };
+
   const handleRedirectAdminPanel = async () => {
     if ($activeWorkspace?._data?.team?.teamId) {
       await _viewModel.handleRedirectToAdminPanel(
@@ -244,7 +256,7 @@
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onUpdateBlockData={_viewModel.updateBlockData}
-    onSaveTestflow={_viewModel.saveTestflow}
+    onSaveTestflow={handleSaveTestflow}
     isWebApp={true}
     onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
@@ -267,5 +279,6 @@
     handleRedirectToAdminPanel={handleRedirectAdminPanel}
     {handleRequestOwner}
     {selectiveRunTestflow}
+    handleContactSales={_viewModel.handleContactSales}
   />
 {/if}

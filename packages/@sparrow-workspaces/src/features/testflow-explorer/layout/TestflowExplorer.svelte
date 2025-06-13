@@ -136,6 +136,7 @@
   export let testflowBlocksPlanModalOpen: boolean = false;
   export let handleRequestOwner: () => void;
   export let handleRedirectToAdminPanel: () => void;
+  export let handleContactSales:() => void;
   export let runHistoryPlanModalOpen: boolean = false;
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
@@ -1522,12 +1523,12 @@
       </div>
       <div class="position-relative">
         <RunHistory
+          bind:runHistoryPlanModalOpen
           {testflowStore}
           testflowName={$tab?.name}
           {toggleHistoryDetails}
           {toggleHistoryContainer}
           {planLimitTestFlowBlocks}
-          bind:runHistoryPlanModalOpen
         />
       </div>
     </div>
@@ -1843,7 +1844,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
@@ -1863,7 +1864,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
@@ -1882,7 +1883,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
