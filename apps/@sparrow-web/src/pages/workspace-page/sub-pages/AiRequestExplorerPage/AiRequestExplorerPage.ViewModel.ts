@@ -412,7 +412,7 @@ class AiRequestExplorerViewModel {
         else { console.error("Failed to save conversation. Please try again. ", response); }
       } else {
         // Limit conversations for updates
-        const limitedConversations = this.limitConversations(conversations, 7);
+        const limitedConversations = this.limitConversations(conversations, 30);
         // Recalculate tokens for limited conversations
         const { inputTokens: limitedInputTokens, outputTokens: limitedOutputTokens } = limitedConversations.reduce((acc, item) => {
           if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
