@@ -257,8 +257,7 @@
         </button>
         {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Toggle
-            bind:isMockResponseActive={response.mockRequestResponse
-              .isMockResponseActive}
+            isActive={response.mockRequestResponse.isMockResponseActive}
             label=""
             fontSize="12px"
             textColor="var(--text-ds-neutral-200)"
