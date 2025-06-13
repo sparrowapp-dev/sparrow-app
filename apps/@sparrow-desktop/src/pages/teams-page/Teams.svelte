@@ -34,6 +34,10 @@
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
   import { open } from "@tauri-apps/plugin-shell";
+  import {
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
+  } from "@sparrow/common/components";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -43,6 +47,7 @@
   const modifyTeam = _viewModel.modifyTeam;
 
   let isCreateTeamModalOpen: boolean = false;
+  let isUpgradePlanModelOpen: boolean = false;
   const collectionList = _viewModel.collection;
   const onApiClick = _viewModel.handleApiClick;
   const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
@@ -105,6 +110,7 @@
 </script>
 
 <Motion {...pagesMotion} let:motion>
+  <UpgradePlanBanner bind:isUpgradePlanModelOpen />
   <div class="h-100" use:motion>
     <Splitpanes
       class="team-splitter h-100"
@@ -254,6 +260,19 @@
     }}
     onCreateTeam={_viewModel.createTeam}
   />
+</Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradePlanModelOpen}
+  handleModalState={(flag) => {
+    isUpgradePlanModelOpen = flag;
+  }}
+>
+  <UpgradePlanPopUp bind:isUpgradePlanModelOpen />
 </Modal>
 
 <style>

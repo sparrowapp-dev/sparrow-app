@@ -16,6 +16,7 @@
     GlobeRegular,
     ListRegular,
     LockClosedRegular,
+    OpenRegular,
     PeopleRegular,
   } from "@sparrow/library/icons";
 
@@ -320,7 +321,14 @@
                 class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
                 >{openTeam?.name || ""}
               </span>
-              {#if openTeam?.toMutableJSON()?.plan?.name}
+
+                {#if openTeam?.toMutableJSON()?.plan?.name}
+                <div class="ms-2 d-flex  align-items-center gap-1 mt-3 text-primary-400 cursor-pointer">
+                  <p class="text-fs-12 pb-0 mb-0">Launch Admin Panel</p>
+                  <OpenRegular/>
+                </div>
+              {/if}
+              <!-- {#if openTeam?.toMutableJSON()?.plan?.name}
                 <span class="ps-2">
                   <Tag
                     type={"cyan"}
@@ -328,7 +336,7 @@
                       "Invalid Plan"}
                   />
                 </span>
-              {/if}
+              {/if} -->
               <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
               {#if !isGuestUser && openTeam?.teamId !== "sharedWorkspaceTeam"}
                 {#if userRole !== "owner"}
