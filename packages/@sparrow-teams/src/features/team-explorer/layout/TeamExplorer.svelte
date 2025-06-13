@@ -127,6 +127,7 @@
   export let planLimits;
   export let contactOwner;
   export let handleRedirectAdminPanel;
+  export let handleContactSales;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -238,6 +239,10 @@
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
+      getPlanLimits();
+      if (userRole) {
+        planContent = planInfoByRole(userRole);
+      }
     }
   }
 
@@ -311,14 +316,6 @@
     upgradePlanModal = false;
     upgradePlanModalInvite = false;
   };
-
-  // Use reactive statement properly
-  $: {
-    getPlanLimits();
-    if (userRole) {
-      planContent = planInfoByRole(userRole);
-    }
-  }
 </script>
 
 {#if openTeam}
@@ -705,16 +702,12 @@
   title={planContent?.title}
   description={planContent?.description}
   planType="Workspaces"
-  planLimitValue={upgradePlanModalInvite
-    ? userLimits?.usersPerHub?.value + 1 || 5
-    : userLimits?.workspacesPerHub?.value || 3}
-  currentPlanValue={upgradePlanModalInvite
-    ? openTeam?._data?.users.length - 1
-    : openTeam?._data?.workspaces.length}
+  planLimitValue={userLimits?.workspacesPerHub?.value || 3}
+  currentPlanValue={openTeam?._data?.workspaces.length}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  {handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
@@ -730,11 +723,11 @@
   description={planContent?.description}
   planType="Collaborators"
   planLimitValue={userLimits?.usersPerHub?.value + 1 || 5}
-  currentPlanValue={openTeam?._data?.users.length - 1}
+  currentPlanValue={openTeam?._data?.users.length - 1 || 5}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  {handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel

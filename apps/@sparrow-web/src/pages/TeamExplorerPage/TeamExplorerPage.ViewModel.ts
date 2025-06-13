@@ -1005,4 +1005,8 @@ export class TeamExplorerPageViewModel {
     );
     return;
   };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
+  };
 }

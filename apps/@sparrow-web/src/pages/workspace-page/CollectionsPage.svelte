@@ -789,6 +789,7 @@
   };
   let userLimits: any;
   let upgradePlanModel: boolean = false;
+  let isActiveSyncPlanModalOpen = false;
   let planContent: any;
   let currentTestflow: number = 3;
 
@@ -977,6 +978,7 @@
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
+                          {teamDetails}
                         />
                       </div>
                     </Motion>
@@ -989,7 +991,11 @@
                   {:else if $activeTab?.type === ItemType.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
-                        <TestFlowExplorerPage tab={$activeTab} {teamDetails} />
+                        <TestFlowExplorerPage
+                          tab={$activeTab}
+                          {teamDetails}
+                          bind:upgradePlanModel
+                        />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.SOCKET_IO}
@@ -1287,6 +1293,8 @@
     onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
     onValidateOapiText={_viewModel.validateOapiDataSyntax}
     onValidateOapiFile={_viewModel.validateOapiFileSyntax}
+    isActiveSyncRequired={userLimits?.activeSync?.active || false}
+    bind:isActiveSyncPlanModalOpen
   />
 </Modal>
 
@@ -1778,7 +1786,26 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={isActiveSyncPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Active Sync"
+  activePlan={"disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel

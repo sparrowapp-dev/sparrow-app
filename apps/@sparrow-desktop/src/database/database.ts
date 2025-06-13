@@ -584,6 +584,9 @@ export class RxDB {
           3: function (oldDoc: PlanDocument) {
             return oldDoc;
           },
+          4: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
         },
       },
       githubrepo: {

@@ -7369,8 +7369,7 @@ export default class CollectionsViewModel {
       notifications.success(
         `Request is Sent Successfully to Owner for Upgrade Plan.`,
       );
-    }
-     else {
+    } else {
       notifications.error(`Failed to Send Request for Upgrade Plan`);
     }
   };
@@ -7380,5 +7379,9 @@ export default class CollectionsViewModel {
       constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
       "_blank",
     );
+  };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
   };
 }

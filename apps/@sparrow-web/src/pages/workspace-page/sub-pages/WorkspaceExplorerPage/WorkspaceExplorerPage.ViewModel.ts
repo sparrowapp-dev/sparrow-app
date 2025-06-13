@@ -31,6 +31,8 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 import constants from "src/constants/constants";
+import { PlanRepository } from "src/repositories/plan.repository";
+import { TeamService } from "src/services/team.service";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -45,6 +47,8 @@ export default class WorkspaceExplorerViewModel {
   private collectionService = new CollectionService();
   private workspaceService = new WorkspaceService();
   private updatesService = new UpdatesService();
+  private planRepository = new PlanRepository();
+  private teamService = new TeamService();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
@@ -330,9 +334,9 @@ export default class WorkspaceExplorerViewModel {
       );
     } else {
       if (response?.message === "Plan limit reached") {
-        notifications.error(
-          "You’ve reached the collaborator limit for your current plan. Upgrade to add more collaborators.",
-        );
+        // notifications.error(
+        //   "You’ve reached the collaborator limit for your current plan. Upgrade to add more collaborators.",
+        // );
       } else {
         notifications.error(`Failed to send invite. Please try again.`);
       }
@@ -593,5 +597,48 @@ export default class WorkspaceExplorerViewModel {
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
     );
     notifications.success("Link copied to clipboard.");
+  };
+
+  /**
+   * @description - This function will provide user Limits based on teamId.
+   */
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  /**
+   * @description - This function will send Email request to the Owner.
+   */
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  /**
+   * @description - This function will redirect you to billing section.
+   */
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+  };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
   };
 }
