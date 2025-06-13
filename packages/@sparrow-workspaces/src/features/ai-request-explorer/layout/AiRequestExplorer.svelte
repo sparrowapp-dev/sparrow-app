@@ -32,9 +32,7 @@
 
   import {
     BotRegular,
-   
     SettingsRegular,
-   
     BotSparkleRegular,
     DismissRegular,
     CopyIcon,
@@ -218,12 +216,7 @@
 
     // Call the template function with parameters to get the actual code string
     codeTemplate = templateFunction(variant, apiKey, configuration[provider]);
-
     updateCodeTemplateBeautifiedState(true);
-
-    // console.log("sel id :>> ", selectedCodeTemplateId);
-    // console.log("sel lang :>> ", codeTemplateLanguage);
-    // console.log("sel codeTemplate :>> ", templateFunction);
   };
 
   let isGetCodePopupOpen = false;
@@ -240,9 +233,6 @@
       modelCodeTemplates[provider][selectedCodeTemplateId]["code_template"];
     codeTemplate = templateFunction(variant, apiKey, configuration[provider]);
 
-    // console.log("id :>> ", selectedCodeTemplateId);
-    // console.log("lang :>> ", codeTemplateLanguage);
-    // console.log("content :>> ", codeTemplate);
     isGetCodePopupOpen = true;
     updateCodeTemplateBeautifiedState(true);
   };

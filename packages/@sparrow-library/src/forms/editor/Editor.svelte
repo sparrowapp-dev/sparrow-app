@@ -33,7 +33,7 @@
     | "Text"
     | "Graphql"
     | "Python"
-    | "curl" = "Text";
+    | "Curl" = "Text";
   export let value = "";
   export let customSuggestions = false;
   export let isEnterKeyNotAllowed = false;
@@ -63,10 +63,6 @@
   let originalContent = value; // Store the original content for comparison
 
   const dispatch = createEventDispatcher();
-
-  $: {
-    if (lang) console.log("lang :>> ", lang);
-  }
 
   let componentClass = "";
   const languageConf = new Compartment();

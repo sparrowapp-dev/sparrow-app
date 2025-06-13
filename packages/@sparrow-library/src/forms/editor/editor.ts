@@ -25,7 +25,7 @@ const removeIndentation = (str: string = "") => {
 };
 
 /**
- * @description - format Python code (simple and effective)
+ * @description - format Python code
  * @param code - Python code string
  * @returns - formatted Python code
  */
