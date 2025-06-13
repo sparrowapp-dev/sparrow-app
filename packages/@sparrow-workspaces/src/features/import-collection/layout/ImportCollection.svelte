@@ -806,13 +806,12 @@
         </p>
       </div>
       <Toggle
-        bind:isActive={isActiveSyncEnabled}
+        isActive={isActiveSyncEnabled}
         onChange={() => {
           if (isActiveSyncRequired) {
             isActiveSyncEnabled = !isActiveSyncEnabled;
           } else {
             isActiveSyncPlanModalOpen = true;
-            isActiveSyncEnabled = false;
             onCloseModal();
           }
         }}
