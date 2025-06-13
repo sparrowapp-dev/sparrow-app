@@ -78,9 +78,6 @@
       activeResponseIdx = idx;
     }, 100);
   }
-  $: {
-    console.log("dd", activeResponseIdx);
-  }
 </script>
 
 <svelte:window
@@ -181,7 +178,7 @@
     style="color: var(--text-neutral-400); padding-left: 8px; padding-bottom: 8px;"
   >
     {mockResponses.length} Response{mockResponses.length === 1 ? "" : "s"}
-  </div>
+  </d
   <div
     class="sparrow-thin-scrollbar"
     style="max-height: 70%; overflow-y: auto; overflow-x: hidden;"
