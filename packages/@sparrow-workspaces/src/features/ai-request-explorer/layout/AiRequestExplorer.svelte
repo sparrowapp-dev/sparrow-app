@@ -9,6 +9,7 @@
     RequestDoc,
     AiConfigs,
     ConversationHistoryItem,
+    GeneratePromptModal,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type {
@@ -65,6 +66,11 @@
   export let onRenameFolder;
   export let onClearConversation;
 
+  let isGeneratePromptModalOpen = false;
+  let isConversationHistoryLoading = false;
+  let isConversationHistoryPanelOpened = false;
+  let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" = "None";
+
   // Conversations History Props
   export let conversationsHistory: AiRequestConversationsDocument[];
   export let onSelectConversation: (id: string) => void;
@@ -96,20 +102,6 @@
   export let onHandleInsertPrompt;
   const loading = writable<boolean>(false);
   let isExposeSaveAsRequest = false;
-
-  let isGeneratePromptModalOpen = false;
-  let isPromptGenerating = false;
-  let userPromptExpectation = "";
-  let aiPromptQueryResponse = "";
-  let insertBtnLoader = false;
-  let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" = "None";
-  let isSparrowAiLimitReached = false;
-  let isErrorWhileGeneratePrompt = false;
-  let errorMsgForGeneratePrompt = "";
-
-  const toggleGeneratePromptModal = () => {
-    isGeneratePromptModalOpen = !isGeneratePromptModalOpen;
-  };
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -144,26 +136,10 @@
     defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
   }
 
-  onMount(async () => {
-    // Delay to ensure DOM is ready before measuring container width
-    setTimeout(() => {
-      updateSplitpaneContSizes();
-      // Watch for container size changes and update pane size percentages
-      const resizeObserver = new ResizeObserver(() => {
-        updateSplitpaneContSizes();
-      });
-      resizeObserver.observe(splitpaneContainer);
-      return () => resizeObserver.disconnect(); // Cleanup on component unmount
-    }, 0);
-  });
-  onDestroy(() => {});
-
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
 
-  let isConversationHistoryPanelOpened = false;
-  let isConversationHistoryLoading = false;
   const onOpenConversationHistoryPanel = async () => {
     const res = await fetchConversations();
     const result = getConversationsList();
@@ -182,11 +158,6 @@
     isConversationHistoryPanelOpened = false;
   };
 
-  // $: {
-  //   if ($tab?.property?.aiRequest)
-  //     console.log("tab :>> ", $tab?.property?.aiRequest);
-  // }
-
   const handleOnClickUpdateRequestAuth = async () => {
     if (isConversationHistoryPanelOpened) {
       isConversationHistoryLoading = true;
@@ -197,15 +168,27 @@
     onUpdateRequestAuth();
   };
 
+  // Update the activateGeneratePromptModal function:
   const activateGeneratePromptModal = (
     target: "UserPrompt" | "SystemPrompt",
   ) => {
-    isGeneratePromptModalOpen = true;
-    userPromptExpectation = "";
-    aiPromptQueryResponse = "";
-    isPromptGenerating = false;
     generatePromptTarget = target;
+    isGeneratePromptModalOpen = true;
   };
+
+  onMount(async () => {
+    // Delay to ensure DOM is ready before measuring container width
+    setTimeout(() => {
+      updateSplitpaneContSizes();
+      // Watch for container size changes and update pane size percentages
+      const resizeObserver = new ResizeObserver(() => {
+        updateSplitpaneContSizes();
+      });
+      resizeObserver.observe(splitpaneContainer);
+      return () => resizeObserver.disconnect(); // Cleanup on component unmount
+    }, 0);
+  });
+  onDestroy(() => {});
 </script>
 
 {#if $tab.tabId}
@@ -422,160 +405,22 @@
   title={`Generate ${generatePromptTarget === "UserPrompt" ? "User Prompt" : "System Prompt"}`}
   zIndex={1000}
   isOpen={isGeneratePromptModalOpen}
-  width={"35%"}
+  width="35%"
   handleModalState={() => {
     isGeneratePromptModalOpen = false;
-    isSparrowAiLimitReached = false;
+    generatePromptTarget = "None";
   }}
 >
-  <!-- Description Text -->
-  <div class="mb-4">
-    <p
-      class="text-muted mb-0 text-ds-font-size-14 text-ds-font-weight-medium text-ds-line-height-130"
-    >
-      Describe your task or goal to generate a suitable prompt.
-    </p>
-  </div>
-
-  <!-- Two Column Layout -->
-  <div class="row g-3 {isSparrowAiLimitReached ? 'mb-2' : 'mb-4'}">
-    <!-- Left Column - Your Message -->
-    <div class="col-6">
-      <div class="d-flex flex-column h-100">
-        <label
-          class="form-label mb-2 text-ds-font-size-12 text-ds-font-weight-semi-bold"
-          style="color: var(--text-ds-neutral-200);"
-        >
-          Your Message
-        </label>
-        <Textarea
-          id={"user-prompt-textarea"}
-          bind:value={userPromptExpectation}
-          placeholder={"Describe your task..."}
-          height={"150px"}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="var(--border-ds-neutral-300)"
-          focusedBorderColor={"var(--border-ds-primary-300)"}
-          class="text-ds-font-size-12 bg-tertiary-300 text-ds-font-weight-medium p-2 border-radius-4 flex-grow-1"
-          style="outline:none; resize: none; min-height: 150px;"
-          disabled={false}
-          maxlength={1000}
-          placeholderColor={"var(--text-secondary-200)"}
-        />
-      </div>
-    </div>
-
-    <!-- Right Column - Generated Response -->
-    <div class="col-6">
-      <div class="d-flex flex-column h-100">
-        <label
-          class="form-label mb-2 text-ds-font-size-12 text-ds-font-weight-semi-bold"
-          style="color: var(--text-ds-neutral-200);"
-        >
-          Generated Response
-        </label>
-        <Textarea
-          id={"ai-response-textarea"}
-          value={aiPromptQueryResponse}
-          placeholder={"Your response will be generated here"}
-          height={"150px"}
-          defaultBorderColor="transparent"
-          hoveredBorderColor="var(--border-ds-neutral-300)"
-          focusedBorderColor={"var(--border-ds-primary-300)"}
-          class="text-ds-font-size-12 bg-tertiary-300 text-ds-font-weight-medium p-2 border-radius-4 flex-grow-1"
-          style="outline:none; resize: none; min-height: 150px;"
-          disabled={isPromptGenerating}
-          maxlength={1000}
-          placeholderColor={"var(--text-secondary-200)"}
-        />
-      </div>
-    </div>
-
-    {#if isSparrowAiLimitReached}
-      <Alert
-        heading="Generate Prompt Monthly Limit Reached"
-        description="You’ve hit your monthly usage limit for generate prompt. You can resume next month or explore our discord community for feedback and discussions. Thanks for understanding!"
-        varient="info"
-        ctaShow={false}
-        containerWidth={"100%"}
-        closeIconRequired={false}
-        onClickClose={() => {}}
-      />
-    {/if}
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="d-flex justify-content-between gap-2 mt-2 w-100">
-    <Button
-      title={aiPromptQueryResponse.length
-        ? "Regenerate Response"
-        : "Generate Response"}
-      size={"medium"}
-      customWidth={"160px"}
-      type={"outline-secondary"}
-      loader={isPromptGenerating}
-      disable={!userPromptExpectation.length}
-      onClick={async () => {
-        isPromptGenerating = true;
-        const response = await onGenerateAiPrompt(
-          generatePromptTarget,
-          userPromptExpectation,
-        );
-
-        if (response.successStatus) {
-          aiPromptQueryResponse = response.aiGeneratedPrompt;
-        } else if (response.isLimitReached) {
-          isSparrowAiLimitReached = true;
-        } else {
-          isErrorWhileGeneratePrompt = true;
-          errorMsgForGeneratePrompt = response.message;
-          notifications.error(
-            "Something went wrong while prompt generation. Please try again",
-          );
-        }
-        // await new Sleep().setTime(2000).exec();
-        isPromptGenerating = false;
-      }}
-    />
-
-    <div class="d-flex align-items-center gap-2">
-      <Button
-        title={"Cancel"}
-        size={"medium"}
-        type={"secondary"}
-        customWidth={"100px"}
-        disable={isPromptGenerating}
-        onClick={() => {
-          isGeneratePromptModalOpen = false;
-          isSparrowAiLimitReached = false;
-        }}
-      />
-      <Button
-        title={"Insert"}
-        size={"medium"}
-        type={"primary"}
-        customWidth={"100px"}
-        disable={isPromptGenerating || !aiPromptQueryResponse.length}
-        loader={insertBtnLoader}
-        onClick={async () => {
-          insertBtnLoader = true;
-          await onHandleInsertPrompt(
-            generatePromptTarget,
-            aiPromptQueryResponse,
-          );
-          // await new Sleep().setTime(1500).exec();
-          // onUpdateRequestState({
-          // aiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
-          // });
-          userPromptExpectation = "";
-          aiPromptQueryResponse = "";
-          isPromptGenerating = false;
-          insertBtnLoader = false;
-          isGeneratePromptModalOpen = false;
-        }}
-      />
-    </div>
-  </div>
+  <GeneratePromptModal
+    {generatePromptTarget}
+    {onGenerateAiPrompt}
+    {onHandleInsertPrompt}
+    on:close={() => {
+      isGeneratePromptModalOpen = false;
+      generatePromptTarget = "None";
+    }}
+    on:insert={(event) => {}}
+  />
 </Modal>
 
 <style>
