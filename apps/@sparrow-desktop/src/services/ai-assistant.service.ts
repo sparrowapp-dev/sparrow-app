@@ -1,6 +1,6 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-import type { PromptDto } from "@sparrow/common/dto/ai-assistant";
+import type { PromptDto, GenerateUserAndSystemPromptsDto } from "@sparrow/common/dto/ai-assistant";
 
 export class AiAssistantService {
   constructor() {}
@@ -11,6 +11,19 @@ export class AiAssistantService {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/assistant/prompt`,
+      {
+        body: _prompt,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+    public generateUserOrSystemPrompts = async (_prompt: GenerateUserAndSystemPromptsDto) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/assistant/generate-prompt`,
       {
         body: _prompt,
         headers: getAuthHeaders(),

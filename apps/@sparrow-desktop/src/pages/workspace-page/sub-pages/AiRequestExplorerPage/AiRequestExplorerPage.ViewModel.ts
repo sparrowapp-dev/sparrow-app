@@ -1,5 +1,5 @@
 // ---- Utils
-import { createDeepCopy, InitAiRequestTab, moveNavigation, Sleep } from "@sparrow/common/utils";
+import { createDeepCopy, InitAiRequestTab, MarkdownFormatter, moveNavigation, Sleep } from "@sparrow/common/utils";
 
 // ---- DB
 import type {
@@ -2238,6 +2238,77 @@ class AiRequestExplorerViewModel {
       console.error("Error stopping AI response generation:", error);
     }
   };
+
+    public updateUserPrompt = async (userInput: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.ai.prompt = userInput;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  }
+
+  public generateAiPrompt = async (
+    target: "UserPrompt" | "SystemPrompt",
+    prompt = ""
+  ): Promise<{
+    successStatus: boolean;
+    message: string;
+    aiGeneratedPrompt: string;
+    isLimitReached: boolean;
+    target: "UserPrompt" | "SystemPrompt";
+  }> => {
+    await this.updateRequestState({ isDocGenerating: true });
+
+    const response = await this.aiAssistentService.generateUserOrSystemPrompts({
+      userInput: prompt,
+      emailId: getClientUser().email,
+    });
+
+    if (response.isSuccessful) {
+      if (
+        typeof response.data?.data === "string" &&
+        response.data.data.includes("Limit Reached")
+      ) {
+        return {
+          successStatus: false,
+          message: response.data.message,
+          aiGeneratedPrompt: "",
+          isLimitReached: true,
+          target,
+        };
+      }
+
+      return {
+        successStatus: true,
+        message: response.data.message,
+        aiGeneratedPrompt: response.data.data,
+        isLimitReached: false,
+        target,
+      };
+    }
+
+    return {
+      successStatus: false,
+      message: response?.data?.message || "Something went wrong. Please try again",
+      aiGeneratedPrompt: "",
+      isLimitReached: false,
+      target,
+    };
+  };
+
+  public handleInsertAiPrompt = async (target: "UserPrompt" | "SystemPrompt", response: string) => {
+    console.log("In insertAiPrompt() :> ", response);
+    if (target === "UserPrompt") {
+      await this.updateUserPrompt(response);
+    } else if (target === "SystemPrompt") {
+      await this.updateRequestState({ isSaveDescriptionInProgress: true });
+      const formatter = new MarkdownFormatter();
+      const formattedData = await formatter.FormatData(response);
+      const stringifyData = JSON.stringify(formattedData.blocks);
+      await this.updateAiSystemPrompt(stringifyData);
+      await this.updateRequestState({ isSaveDescriptionInProgress: false });
+    }
+    return response;
+  }
 
   /**
    * Toggles the like or dislike status of a chat message.
