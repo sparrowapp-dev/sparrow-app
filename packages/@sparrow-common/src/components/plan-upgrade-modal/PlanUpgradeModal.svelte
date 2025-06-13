@@ -10,7 +10,8 @@
     | "Collaborators"
     | "Test flow blocks"
     | "Selective Runs"
-    | "Run History" = "Workspaces";
+    | "Run History"
+    | "Active Sync" = "Workspaces";
   export let planLimitValue: number = 3;
   export let currentPlanValue: number;
   export let activePlan: "active" | "disabled" = "disabled";
