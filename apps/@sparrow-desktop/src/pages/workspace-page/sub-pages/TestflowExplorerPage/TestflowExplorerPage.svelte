@@ -44,6 +44,7 @@
   let runHistoryPlanModalOpen: boolean = false;
   let selectiveRunTestflow: boolean = false;
   let selectiveRunModalOpen: boolean = false;
+  let planLimitRunHistoryCount: number = 5;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -116,6 +117,7 @@
     } else {
       isTestFlowEmpty = false;
     }
+    handleBlockLimitTestflow();
   });
 
   const userSubscriber = user.subscribe((value) => {
@@ -203,6 +205,7 @@
       planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
       selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
+      planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
     }
   };
 
@@ -272,6 +275,7 @@
     {handleEventOnClickQuestionMark}
     {planLimitTestFlowBlocks}
     {planLimitTestflow}
+    {planLimitRunHistoryCount}
     testflowCount={currentTestflowCount}
     {teamDetails}
     bind:testflowBlocksPlanModalOpen
