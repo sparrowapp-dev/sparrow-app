@@ -797,7 +797,6 @@
     currentTestflow = await _viewModel3.currentTestflowCount(
       $currentWorkspace?._id,
     );
-    console.log("--------------->currrent testflow ->", currentTestflow);
     const response = await _viewModel3.handleCreateTestflow();
     handleLimits();
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
@@ -1789,8 +1788,8 @@
   title={planContent?.title}
   description={planContent?.description}
   planType="Testflow"
-  planLimitValue={currentTestflow}
-  currentPlanValue={userLimits?.testflow?.value || 3}
+  planLimitValue={userLimits?.testflow?.value || 3}
+  currentPlanValue={currentTestflow}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

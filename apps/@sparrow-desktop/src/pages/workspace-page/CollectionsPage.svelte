@@ -1685,8 +1685,8 @@
   title={planContent?.title}
   description={planContent?.description}
   planType="Testflow"
-  planLimitValue={currentTestflow}
-  currentPlanValue={userLimits?.workspacesPerHub?.value}
+  planLimitValue={userLimits?.workspacesPerHub?.value}
+  currentPlanValue={currentTestflow}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
