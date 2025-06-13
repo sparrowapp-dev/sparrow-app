@@ -83,17 +83,13 @@
   }
 
   if (platform === Platform.LINUX) {
-    try {
-      // Add event listener for window resize for Linux
-      const unlistenResize = appWindow.onResized(checkSize);
+    // Add event listener for window resize for Linux
+    const unlistenResize = appWindow.onResized(checkSize);
 
-      // Cleanup listener when component is destroyed
-      onDestroy(() => {
-        unlistenResize.then((f) => f());
-      });
-    } catch {
-      console.log("Inside catch - Linux");
-    }
+    // Cleanup listener when component is destroyed
+    onDestroy(() => {
+      unlistenResize.then((f) => f());
+    });
   }
 
   if (platform === Platform.MACOS) {
