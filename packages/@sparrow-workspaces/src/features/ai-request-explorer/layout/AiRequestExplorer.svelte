@@ -149,6 +149,8 @@
     // Call the template function with parameters to get the actual code string
     codeTemplate = templateFunction(variant, apiKey, configuration[provider]);
 
+    updateCodeTemplateBeautifiedState(true);
+
     // console.log("sel id :>> ", selectedCodeTemplateId);
     // console.log("sel lang :>> ", codeTemplateLanguage);
     // console.log("sel codeTemplate :>> ", templateFunction);
@@ -172,6 +174,7 @@
     // console.log("lang :>> ", codeTemplateLanguage);
     // console.log("content :>> ", codeTemplate);
     isGetCodePopupOpen = true;
+    updateCodeTemplateBeautifiedState(true);
   };
 
   const updateCodeTemplateBeautifiedState = (value: boolean) => {
