@@ -64,7 +64,7 @@ import type {
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 
 export class CollectionService {
-  constructor() {}
+  constructor() { }
 
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
@@ -558,7 +558,7 @@ export class CollectionService {
   };
 
   public addAiRequestInCollection = async (
-    _aiRequest: 
+    _aiRequest:
       AiRequestCreateUpdateInCollectionPayloadDtoInterface
       | AiRequestCreateUpdateInFolderPayloadDtoInterface,
     baseUrl: string,

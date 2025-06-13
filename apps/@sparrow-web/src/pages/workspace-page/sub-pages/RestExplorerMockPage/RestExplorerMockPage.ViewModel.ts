@@ -3130,6 +3130,41 @@ class RestExplorerMockViewModel {
           baseUrl,
         );
       if (response?.isSuccessful) {
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.updateSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+            {
+              mockRequestResponse: {
+                isMockResponseActive: isMockResponseActive
+              }
+            }
+          );
+        } else {
+          this.collectionRepository.updateSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+            {
+              mockRequestResponse: {
+                isMockResponseActive: isMockResponseActive
+              }
+            }
+          );
+        }
+        debugger;
+        progressiveTab.property?.mockRequest?.items?.forEach((item) => {
+          if (item.id === mockResponseId) {
+            item.mockRequestResponse.isMockResponseActive = isMockResponseActive;
+          }
+        });
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
         return true;
       } else {
         return false;
