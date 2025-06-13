@@ -286,6 +286,7 @@
     planLimits={handleUserLimits}
     contactOwner={handleRequestPlan}
     {handleRedirectAdminPanel}
+    handleContactSales={_viewModel.handleContactSales}
   />
 {/if}
 

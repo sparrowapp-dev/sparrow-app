@@ -1,5 +1,5 @@
 import { makeHttpRequestV2 } from "@app/containers/api/api.common";
-import { ResponseStatusCode } from "@sparrow/common/enums";
+import { ResponseMessage, ResponseStatusCode } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums";
 import {
   createDeepCopy,
@@ -1314,6 +1314,8 @@ export class TestflowExplorerPageViewModel {
       // await this.updateEnvironmentState({ isSaveInProgress: false });
       if (response.message === "Network Error") {
         notifications.error(response.message);
+      } else if (response.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+        return response;
       } else {
         notifications.error(
           `Failed to save changes for ${currentTestflow.name} testflow.`,
@@ -1768,5 +1770,9 @@ export class TestflowExplorerPageViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+  };
+
+  public handleContactSales = async () => {
+    await open(`${constants.MARKETING_URL}/pricing/`);
   };
 }

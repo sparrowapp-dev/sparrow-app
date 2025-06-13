@@ -8,10 +8,12 @@
     WorkspaceSetting,
     WorkspaceUpdates,
   } from "../components";
-  import { WorkspaceType } from "@sparrow/common/enums";
+  import { TeamRole, WorkspaceType } from "@sparrow/common/enums";
   import { Button } from "@sparrow/library/ui";
   import { ShareMultipleRegular } from "@sparrow/library/icons";
   import { SparrowOutlineIcon } from "@sparrow/common/icons";
+  import { planInfoByRole } from "@sparrow/common/utils";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
 
   /**
    * The length of collections related to the workspace.
@@ -73,6 +75,16 @@
 
   export let isShareModalOpen;
 
+  export let upgradePlanModalInvite: boolean = false;
+  export let handleRedirectAdminPanel: () => void;
+  export let contactOwner: () => void;
+  export let handleContactSales: () => void;
+  export let planLimits: () => void;
+  export let teamDetails: any;
+
+  let userLimits: any;
+  let planContent: any;
+
   let workspaceID = $tab?.id;
 
   let workspaceNavigatorId: string = "about";
@@ -106,6 +118,18 @@
       return ``;
     }
   };
+
+  const getPlanLimits = async () => {
+    const data = await planLimits();
+    userLimits = data;
+  };
+
+  $: {
+    getPlanLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+  }
 </script>
 
 {#if isSharedWorkspace && workspaceType === WorkspaceType.PUBLIC}
@@ -235,6 +259,26 @@
     </div>
   </div>
 {/if}
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalInvite}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Collaborators"
+  planLimitValue={userLimits?.usersPerHub?.value + 1 || 5}
+  currentPlanValue={activeWorkspace?._data?.users.length - 1 || 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectAdminPanel
+    : contactOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   .background-icon {

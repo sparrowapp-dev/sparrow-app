@@ -19,9 +19,8 @@
   export let userName: string = "";
   export let userEmail: string = "";
   export let handleSubmitButton: () => void;
-  export let handleContactOwner: () => void;
-  export let submitButtonName: "Go to Admin Panel" | "Contact Owner" =
-    "Contact Owner";
+  export let handleContactSales: () => void;
+  export let submitButtonName: "Go to Admin Panel" | "Contact Owner";
   export let isOwner: boolean = false;
 
   const handleCancel = () => {
@@ -64,7 +63,7 @@
         <div class="note-wrapper">
           <p class="note-text no-margin">
             Note: To unlock the New plan and access more features, please<br />
-            <span class="contact-sales" on:click={handleContactOwner}>
+            <span class="contact-sales" on:click={handleContactSales}>
               contact sales
             </span>
             for more information.
@@ -74,18 +73,20 @@
     </div>
 
     <div class="d-flex justify-content-end action-buttons">
-      <Button
-        type="secondary"
-        size="medium"
-        onClick={handleCancel}
-        title="Cancel"
-      />
-      <Button
-        type="primary"
-        size="medium"
-        onClick={handleSubmitButton}
-        title={submitButtonName}
-      />
+      {#if submitButtonName}
+        <Button
+          type="secondary"
+          size="medium"
+          onClick={handleCancel}
+          title="Cancel"
+        />
+        <Button
+          type="primary"
+          size="medium"
+          onClick={handleSubmitButton}
+          title={submitButtonName}
+        />
+      {/if}
     </div>
   </div>
 </Modal>

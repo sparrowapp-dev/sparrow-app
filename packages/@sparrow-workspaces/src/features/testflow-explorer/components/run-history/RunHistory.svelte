@@ -19,7 +19,7 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let planLimitTestFlowBlocks;
-  export let runHistoryPlanModelOpen = false;
+  export let runHistoryPlanModalOpen =false
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -272,7 +272,7 @@
                     title="more"
                     size="small"
                     onClick={() => {
-                      runHistoryPlanModelOpen = true;
+                      runHistoryPlanModalOpen = true;
                     }}
                   />
                 </div>

@@ -40,7 +40,7 @@ import {
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events, ItemType } from "@sparrow/common/enums";
+import { Events, ItemType, ResponseMessage } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
@@ -515,6 +515,7 @@ export class DashboardViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
+    } else if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
     } else {
       notifications.error(response?.message);
     }
@@ -1135,4 +1136,53 @@ export class DashboardViewModel {
 
     return { collection, folder, file, workspace, testflow, environment };
   }
+
+  public getWorkspaceCount = async (teamId: string) => {
+    const workspaces = await this.teamRepository.getTeamDoc(teamId);
+    const count = workspaces?._data.workspaces?.length;
+    return count;
+  };
+
+  /**
+   * @description - This function will provide user Limits based on teamId.
+   */
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  /**
+   * @description - This function will send Email request to the Owner.
+   */
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  /**
+   * @description - This function will redirect you to billing section.
+   */
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+  };
+
+  public handleContactSales = async () => {
+    await open(`${constants.MARKETING_URL}/pricing/`);
+  };
 }

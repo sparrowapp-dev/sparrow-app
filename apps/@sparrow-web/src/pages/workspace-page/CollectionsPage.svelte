@@ -978,6 +978,7 @@
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
+                          {teamDetails}
                         />
                       </div>
                     </Motion>
@@ -990,7 +991,11 @@
                   {:else if $activeTab?.type === ItemType.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
-                        <TestFlowExplorerPage tab={$activeTab} {teamDetails} />
+                        <TestFlowExplorerPage
+                          tab={$activeTab}
+                          {teamDetails}
+                          bind:upgradePlanModel
+                        />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.SOCKET_IO}
@@ -1781,7 +1786,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={_viewModel.handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
@@ -1800,7 +1805,7 @@
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
-  handleContactOwner={handleRequestOwner}
+  handleContactSales={_viewModel.handleContactSales}
   handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
   userRole === TeamRole.TEAM_ADMIN
     ? handleRedirectToAdminPanel
