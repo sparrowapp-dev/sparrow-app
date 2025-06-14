@@ -1,1 +1,1 @@
-export { type CodeTemplateLanguage } from "./ai-request"
+export { type CodeTemplateLanguage, CodeTemplateLanguageType, CodeEditorLanguageType } from "./ai-request"

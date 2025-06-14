@@ -1,5 +1,3 @@
-import { Language } from "@codemirror/language";
-
 export type CodeTemplateLanguage = "Curl" | "Python" | "JavaScript" | "JSON";
 
 export enum CodeTemplateLanguageType {
