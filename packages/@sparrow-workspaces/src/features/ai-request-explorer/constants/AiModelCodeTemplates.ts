@@ -29,8 +29,7 @@ export const modelCodeTemplates = {
             configParams.push(`  "temperature": ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  "max_completion_tokens": ${maxTokens}`);
+            configParams.push(`  "max_completion_tokens": ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  "frequency_penalty": ${value}`);
@@ -41,12 +40,6 @@ export const modelCodeTemplates = {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  streamResponse=${value ? 'true' : 'false'}`);
           }
-
-          // For specifically Anthropic & Gemini Family
-          // else if (key === 'top_p') {
-          //   const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-          //   configParams.push(`  "top_p": ${value}`);
-          // }
         });
 
         return `curl https://api.openai.com/v1/chat/completions \\
@@ -60,7 +53,7 @@ export const modelCodeTemplates = {
       }
     },
     "python": {
-      environment: "Python",
+      environment: "none",
       language: "python",
       code_template: function (model, apiKey, configuration) {
         const config = configuration || {};
@@ -81,8 +74,7 @@ export const modelCodeTemplates = {
             configParams.push(`    temperature=${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`    max_completion_tokens=${maxTokens}`);
+            configParams.push(`    max_completion_tokens=${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`    frequency_penalty=${value}`);
@@ -93,12 +85,6 @@ export const modelCodeTemplates = {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`streamResponse=${value ? 'true' : 'false'}`);
           }
-
-          // For specifically Anthropic & Gemini Family
-          // else if (key === 'top_p') {
-          //   const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-          //   configParams.push(`  "top_p": ${value}`);
-          // }
         });
 
         return `from openai import OpenAI
@@ -109,7 +95,6 @@ response = client.chat.completions.create(
     model="${model}",
     messages=[],
     ${configParams.join(',\n')},
-    top_p=1
 )
 `;
       }
@@ -136,8 +121,7 @@ response = client.chat.completions.create(
             configParams.push(`  temperature: ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  max_completion_tokens: ${maxTokens}`);
+            configParams.push(`  max_completion_tokens: ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  frequency_penalty: ${value}`);
@@ -148,12 +132,6 @@ response = client.chat.completions.create(
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`streamResponse=${value ? 'true' : 'false'}`);
           }
-
-          // For specifically Anthropic & Gemini Family
-          // else if (key === 'top_p') {
-          //   const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-          //   configParams.push(`  "top_p": ${value}`);
-          // }
         });
 
         return `import OpenAI from "openai";
@@ -191,8 +169,7 @@ const response = await openai.chat.completions.create({
             configParams.push(`  "temperature": ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  "max_completion_tokens": ${maxTokens}`);
+            configParams.push(`  "max_completion_tokens": ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  "frequency_penalty": ${value}`);
@@ -240,8 +217,7 @@ const response = await openai.chat.completions.create({
             configParams.push(`  "temperature": ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  "max_completion_tokens": ${maxTokens}`);
+            configParams.push(`  "max_completion_tokens": ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  "frequency_penalty": ${value}`);
@@ -250,14 +226,8 @@ const response = await openai.chat.completions.create({
             configParams.push(`  "presence_penalty": ${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  stream=${value ? 'true' : 'false'}`);
+            configParams.push(`"stream"=${value ? 'true' : 'false'}`);
           }
-
-          // For specifically Anthropic & Gemini Family
-          // else if (key === 'top_p') {
-          //   const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-          //   configParams.push(`  "top_p": ${value}`);
-          // }
         });
 
         return `curl https://api.deepseek.com/chat/completions \\
@@ -265,10 +235,19 @@ const response = await openai.chat.completions.create({
   -H "Authorization: Bearer ${apiKey}" \\
   -d '{
   "model": "${model}",
-  "messages": [{"role": "system", "content": "You are a helpful assistant."},
-          {"role": "user", "content": "Hello!"}],
+  "messages": [
+    {
+      "role": "system", 
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user", 
+      "content": "Hello!"
+    }
+  ],
   ${configParams.join(',\n')}
-}'`;
+}'
+`;
       }
     },
     "python": {
@@ -285,45 +264,51 @@ const response = await openai.chat.completions.create({
           if (key === 'jsonResponseFormat') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
-            configParams.push(`    response_format={
-      "type": ${responseFormat}
-    }`);
+            configParams.push(`  response_format={
+    "type": ${responseFormat}
+  }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`    temperature=${value}`);
+            configParams.push(`  temperature=${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`    max_completion_tokens=${maxTokens}`);
+            configParams.push(`  max_completion_tokens=${maxTokens}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`    frequency_penalty=${value}`);
+            configParams.push(`  frequency_penalty=${value}`);
           } else if (key === 'presencePenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`    presence_penalty=${value}`);
+            configParams.push(`  presence_penalty=${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`stream=${value ? 'true' : 'false'}`);
           }
-
-          // For specifically Anthropic & Gemini Family
-          // else if (key === 'top_p') {
-          //   const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-          //   configParams.push(`  "top_p": ${value}`);
-          // }
         });
 
         return `from openai import OpenAI
 
-client = OpenAI(api_key="${apiKey}", base_url="https://api.deepseek.com")
+client = OpenAI(
+  api_key="${apiKey}", 
+  base_url="https://api.deepseek.com"
+)
 
 response = client.chat.completions.create(
-    model="${model}",
-    messages=[{"role": "system", "content": "You are a helpful assistant"},
-        {"role": "user", "content": "Hello"}],
-    ${configParams.join(',\n')},
-    top_p=1
+  model="${model}",
+  messages=[
+    {
+      "role": "system", 
+      "content": "You are a helpful assistant"
+    },
+    {
+      "role": "user", 
+      "content": "Hello"
+    }
+  ],
+  ${configParams.join(',\n')},
 )
+
+print(response.choices[0].message.content)
 `;
       }
     },
@@ -341,32 +326,26 @@ response = client.chat.completions.create(
           if (key === 'jsonResponseFormat') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
-            configParams.push(`  response_format: {
-    "type": ${responseFormat}
-  }`);
+            configParams.push(`    response_format: {
+      "type": ${responseFormat}
+    }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  temperature: ${value}`);
+            configParams.push(`   temperature: ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  max_completion_tokens: ${maxTokens}`);
+            configParams.push(`   max_completion_tokens: ${maxTokens}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  frequency_penalty: ${value}`);
+            configParams.push(`   frequency_penalty: ${value}`);
           } else if (key === 'presencePenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  presence_penalty: ${value}`);
+            configParams.push(`   presence_penalty: ${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`streamResponse=${value ? 'true' : 'false'}`);
           }
-
-          // For specifically Anthropic & Gemini Family
-          // else if (key === 'top_p') {
-          //   const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-          //   configParams.push(`  "top_p": ${value}`);
-          // }
         });
 
         return `import OpenAI from "openai";
@@ -379,14 +358,20 @@ const openai = new OpenAI({
 async function main () {
   const completion = await openai.chat.completions.create({
     model: "${model}",
-    messages: [{ role: "system", content: "You are a helpful assistant." }],
+    messages: [
+      { 
+        role: "system", 
+        content: "You are a helpful assistant."
+      }
+    ],
     ${configParams.join(',\n')},
   });
 
   console.log(completion.choices[0].message.content);
 };
 
-main();`;
+main();
+`;
       }
     },
     "json": {
@@ -453,43 +438,45 @@ main();`;
           if (key === 'jsonResponseFormat') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
-            configParams.push(`  "response_format": {
+            configParams.push(`   "response_format": {
   "type": ${responseFormat}
   }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "temperature": ${value}`);
+            configParams.push(`    "temperature": ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  "max_completion_tokens": ${maxTokens}`);
+            configParams.push(`    "max_completion_tokens": ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "frequency_penalty": ${value}`);
+            configParams.push(`    "frequency_penalty": ${value}`);
           } else if (key === 'presencePenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "presence_penalty": ${value}`);
+            configParams.push(`    "presence_penalty": ${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  stream=${value ? 'true' : 'false'}`);
+            configParams.push(`"stream"=${value ? 'true' : 'false'}`);
           }
 
           // For specifically Anthropic & Gemini Family
           else if (key === 'top_p') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "top_p": ${value}`);
+            configParams.push(`    "top_p": ${value}`);
           }
         });
 
-        return `curl https://api.anthropic.com/v1/messages \  
-  --header "x-api-key: ${apiKey}" \
-  --header "anthropic-version: 2023-06-01" \
-  --header "content-type: application/json" \
-  --data \
+        return `curl https://api.anthropic.com/v1/messages \\  
+  --header "x-api-key: ${apiKey ? apiKey : '<DeepSeek API Key>'}" \\
+  --header "anthropic-version: 2023-06-01" \\
+  --header "content-type: application/json" \\
+  --data \\
   '{
     "model": ${model},
     "messages": [
-      {"role": "user", "content": "Hello, world"}
+      {
+        "role": "user", 
+        "content": "Hello, world"
+      }
     ],
     ${configParams.join(',\n')}
   }'
@@ -510,22 +497,21 @@ main();`;
           if (key === 'jsonResponseFormat') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
-            configParams.push(`    response_format={
+            configParams.push(`  response_format={
       "type": ${responseFormat}
     }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`    temperature=${value}`);
+            configParams.push(`  temperature=${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`    max_completion_tokens=${maxTokens}`);
+            configParams.push(`  max_completion_tokens=${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`    frequency_penalty=${value}`);
+            configParams.push(`  frequency_penalty=${value}`);
           } else if (key === 'presencePenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`    presence_penalty=${value}`);
+            configParams.push(`  presence_penalty=${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`stream=${value ? 'true' : 'false'}`);
@@ -534,23 +520,27 @@ main();`;
           // For specifically Anthropic & Gemini Family
           else if (key === 'top_p') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "top_p": ${value}`);
+            configParams.push(`  top_p: ${value}`);
           }
         });
 
         return `import anthropic
 
 client = anthropic.Anthropic(
-    # defaults to os.environ.get("${apiKey}")
-    api_key="${apiKey}",
+    # defaults to os.environ.get("ANTHROPIC_API_KEY")
+    api_key = "${apiKey ? apiKey : "<Anthropic API Key>"}",
 )
 message = client.messages.create(
-    model="${model}",
-    messages=[
-        {"role": "user", "content": "Hello, Claude"}
-    ],
-    ${configParams.join(',\n')}
+  model="${model}",
+  messages=[
+    {
+      "role": "user", 
+      "content": "Hello, Claude"
+    }
+  ],
+  ${configParams.join(',\n')}
 )
+    
 print(message.content)
 `;
       }
@@ -577,8 +567,7 @@ print(message.content)
             configParams.push(`  temperature: ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  max_completion_tokens: ${maxTokens}`);
+            configParams.push(`  max_completion_tokens: ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  frequency_penalty: ${value}`);
@@ -600,12 +589,18 @@ print(message.content)
         return `import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
-  apiKey: '${apiKey}', // defaults to process.env["ANTHROPIC_API_KEY"]
+  // defaults to process.env["ANTHROPIC_API_KEY"]
+  apiKey: '${apiKey ? apiKey : "<Anthropic API Key>"}',
 });
 
 const msg = await anthropic.messages.create({
   model: "${model}",
-  messages: [{ role: "user", content: "Hello, Claude" }],
+  messages: [
+    { 
+      role: "user", 
+      content: "Hello, Claude"
+    }
+  ],
   ${configParams.join(',\n')}
 });
 
@@ -635,8 +630,7 @@ console.log(msg);
             configParams.push(`  "temperature": ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  "max_completion_tokens": ${maxTokens}`);
+            configParams.push(`  "max_completion_tokens": ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  "frequency_penalty": ${value}`);
@@ -704,21 +698,20 @@ console.log(msg);
           }
         });
 
-        return `
-curl "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}" \
-  -H 'Content-Type: application/json' \
-  -X POST \
+        return `curl "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey ? apiKey : "<Your_API_Key>"}" \\
+  -H 'Content-Type: application/json' \\
+  -X POST \\
   -d '{
-    "contents": [
-      {
-        "parts": [
-          {
-            "text": "Explain how AI works in a few words"
-          }
-        ]
-      }
-    ]
-  }'
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": "Explain how AI works in a few words"
+            }
+          ]
+        }
+      ]
+    }'
 `;}},
     "python": {
       environment: "Python",
@@ -764,7 +757,7 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateC
 
         return `from google import genai
 
-client = genai.Client(api_key="${apiKey}")
+client = genai.Client(api_key = ${apiKey ? apiKey : "<Your_API_Key>"})
 
 response = client.models.generate_content(
     model="${model}", 
@@ -789,22 +782,22 @@ print(response.text)
           if (key === 'jsonResponseFormat') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const responseFormat = value ? '"json_object"' : '"text"';
-            configParams.push(`  response_format: {
-    "type": ${responseFormat}
-  }`);
+            configParams.push(`    response_format: {
+      "type": ${responseFormat}
+    }`);
           } else if (key === 'temperature') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  temperature: ${value}`);
+            configParams.push(`    temperature: ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  max_completion_tokens: ${maxTokens}`);
+            configParams.push(`    max_completion_tokens: ${maxTokens}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  frequency_penalty: ${value}`);
+            configParams.push(`    frequency_penalty: ${value}`);
           } else if (key === 'presencePenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  presence_penalty: ${value}`);
+            configParams.push(`    presence_penalty: ${value}`);
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`streamResponse=${value ? 'true' : 'false'}`);
@@ -813,13 +806,13 @@ print(response.text)
           // For specifically Anthropic & Gemini Family
           else if (key === 'top_p') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            configParams.push(`  "top_p": ${value}`);
+            configParams.push(`    top_p: ${value}`);
           }
         });
 
         return `import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: "${apiKey}" });
+const ai = new GoogleGenAI({ apiKey: "${apiKey ? apiKey : "<Your_API_Key>"}" });
 
 async function main() {
   const response = await ai.models.generateContent({
@@ -827,6 +820,7 @@ async function main() {
     contents: "Explain how AI works in a few words",
     ${configParams.join(',\n')},
   });
+
   console.log(response.text);
 }
 
@@ -856,8 +850,7 @@ main();
             configParams.push(`  "temperature": ${value}`);
           } else if (key === 'maxTokens') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
-            const maxTokens = value === -1 ? 10000 : value;
-            configParams.push(`  "max_completion_tokens": ${maxTokens}`);
+            configParams.push(`  "max_completion_tokens": ${value}`);
           } else if (key === 'frequencyPenalty') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`  "frequency_penalty": ${value}`);
@@ -867,6 +860,12 @@ main();
           } else if (key === 'streamResponse') {
             const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
             configParams.push(`"streamResponse": ${value ? 'true' : 'false'}`);
+          }
+
+          // For specifically Anthropic & Gemini Family
+          else if (key === 'top_p') {
+            const value = config[key] !== undefined ? config[key] : availableConfig[key].defaultValue;
+            configParams.push(`  "top_p": ${value}`);
           }
         });
 
