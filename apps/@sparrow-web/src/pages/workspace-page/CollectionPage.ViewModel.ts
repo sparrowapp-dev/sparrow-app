@@ -1746,7 +1746,7 @@ export default class CollectionsViewModel {
         description: "",
         mockRequest: {
           method: mockRequest?.getValue().property?.mockRequest?.method,
-          url: collection?.mockCollectionUrl,
+          url: "",
         },
       },
     };
@@ -2417,7 +2417,7 @@ export default class CollectionsViewModel {
           description: "",
           mockRequest: {
             method: sampleMockRequest.getValue().property.mockRequest?.method,
-            url: collection?.mockCollectionUrl,
+            url: "",
           } as RequestDto,
         },
       },
