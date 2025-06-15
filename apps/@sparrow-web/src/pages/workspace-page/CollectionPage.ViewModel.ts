@@ -1816,7 +1816,7 @@ export default class CollectionsViewModel {
         collectionId: collection.id,
         folderId: "",
       });
-      mockRequest.updateUrl(collection?.mockCollectionUrl);
+      // mockRequest.updateUrl(collection?.mockCollectionUrl);
       mockRequest.updateIsSave(true);
       // this.handleOpenRequest(
       //   workspaceId,
@@ -2487,7 +2487,7 @@ export default class CollectionsViewModel {
         folderId: explorer.id,
       });
       sampleMockRequest.updateIsSave(true);
-      sampleMockRequest.updateUrl(collection?.mockCollectionUrl);
+      // sampleMockRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleMockRequest.getValue());
 
       moveNavigation("right");

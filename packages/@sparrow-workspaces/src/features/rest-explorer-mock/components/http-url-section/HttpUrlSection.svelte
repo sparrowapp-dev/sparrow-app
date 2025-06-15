@@ -24,6 +24,7 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
+  export let mockCollectionUrl = "";
 
   const theme = new MockUrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -131,7 +132,7 @@
   />
   <div class="w-100 d-flex align-items-start">
     <div class="static-url-section">
-      <span class="api-url">https://api.example.com/</span>
+      <span class="api-url">{mockCollectionUrl}</span>
     </div>
     <div class="w-100">
       <CodeMirrorInput
