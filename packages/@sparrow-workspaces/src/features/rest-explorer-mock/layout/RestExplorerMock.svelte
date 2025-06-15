@@ -160,6 +160,8 @@
   export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  export let onRenameCollection;
+  export let onRenameFolder;
   const loading = writable<boolean>(false);
 
   // Props for showing merge/diff view in RequestBody, Headers and Params
@@ -239,9 +241,6 @@
       return () => resizeObserver.disconnect(); // Cleanup on component unmount
     }, 0);
   });
-
-  export let onRenameCollection;
-  export let onRenameFolder;
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
@@ -575,6 +574,7 @@
         {toggleSaveRequest}
         {onSaveRequest}
         {isGuestUser}
+        mockCollectionUrl={collection?.mockCollectionUrl || ""}
       />
 
       <div
