@@ -99,8 +99,9 @@
 />
 
 <div
-  class="conversation-item position-relative w-100 d-flex align-items-start justify-content-between p-2 rounded-2 cursor-pointer"
+  class="conversation-item position-relative d-flex align-items-start justify-content-between p-2 rounded-2 cursor-pointer"
   class:active={currOpenedConversationId === conversation.id ? true : false}
+  style="width: 98%;"
   on:click={() => {
     handleSelect();
   }}
@@ -169,7 +170,10 @@
 
       <!-- Updated by -->
       {#if conversation.authoredBy}
-        <span class="updated-by">
+        <span
+          class="updated-by text-truncate"
+          style="width: 40%; text-align: right; display: inline-block;"
+        >
           {`By ${conversation.authoredBy}`}
         </span>
       {/if}
@@ -276,7 +280,6 @@
   .conversation-item {
     transition: background-color 0.15s ease;
     cursor: pointer;
-    /* margin: 0 4px 2px 0px; */
     background-color: var(--bg-ds-surface-500) !important;
   }
 
