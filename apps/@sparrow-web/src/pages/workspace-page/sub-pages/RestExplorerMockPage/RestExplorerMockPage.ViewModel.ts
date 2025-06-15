@@ -320,6 +320,11 @@ class RestExplorerMockViewModel {
         clientItem.mockRequestResponse?.responseStatus
       ) {
         return false;
+      } else if (
+        serverItem.mockRequestResponse?.selectedResponseBodyType !==
+        clientItem.mockRequestResponse?.selectedResponseBodyType
+      ) {
+        return false;
       }
 
       // Compare responseHeaders (array comparison using existing compareArray.init)
@@ -1048,6 +1053,10 @@ class RestExplorerMockViewModel {
             ...data.state,
             ..._state,
           };
+          if (_state?.responseBodyLanguage && data.mockRequestResponse) {
+            data.mockRequestResponse.selectedResponseBodyType =
+              this.getResponseBodyType(_state.responseBodyLanguage);
+          }
         }
       });
       this.tab = progressiveTab;
