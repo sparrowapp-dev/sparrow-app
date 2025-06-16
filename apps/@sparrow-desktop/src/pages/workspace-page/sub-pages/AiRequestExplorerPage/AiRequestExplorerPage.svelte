@@ -206,4 +206,6 @@
   onRenameConversation={_viewModel.handleRenameConversationTitle}
   onDeleteConversation={_viewModel.handleDeleteConversation}
   onClearConversation={_viewModel.handleClearConversation}
+  onGenerateAiPrompt={_viewModel.generateAiPrompt}
+  onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
 />

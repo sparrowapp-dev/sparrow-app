@@ -33,6 +33,8 @@
   export let onClearConversation;
   export let isConversationHistoryPanelOpened: boolean;
   export let isConversationHistoryLoading: boolean;
+  export let activateGeneratePromptModal;
+  export let isGuestUser: boolean;
 
   let scrollList: ScrollList;
 
@@ -102,6 +104,7 @@
   <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
       {responseData}
+      {isGuestUser}
       bind:scrollList
       {onUpdateAiPrompt}
       {sendPrompt}
@@ -129,6 +132,7 @@
       currTabAiInfo={$tab.property?.aiRequest?.ai}
       bind:isConversationHistoryPanelOpened
       bind:isConversationHistoryLoading
+      {activateGeneratePromptModal}
     />
   </div>
 {/if}
