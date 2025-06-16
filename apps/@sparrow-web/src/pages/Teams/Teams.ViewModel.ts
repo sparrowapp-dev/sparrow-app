@@ -16,12 +16,13 @@ import type { HttpClientResponseInterface } from "@app/types/http-client";
 import type { Team } from "@sparrow/common/interfaces";
 import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events } from "@sparrow/common/enums";
+import { Events, planType } from "@sparrow/common/enums";
 import { BehaviorSubject, Observable } from "rxjs";
 import { WorkspaceService } from "../../services/workspace.service";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { PlanService } from "src/services/plan.service";
 import constants from "src/constants/constants";
+import { planBannerisOpen } from "@sparrow/common/store";
 
 export class TeamsViewModel {
   constructor() {}
@@ -316,6 +317,9 @@ export class TeamsViewModel {
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New hub ${team.name} is created.`);
+      if (response?.data?.data.plan?.name === planType.COMMUNITY) {
+        planBannerisOpen.set(true);
+      }
     } else {
       if (response?.message === "Plan limit reached") {
         notifications.error(
@@ -369,6 +373,10 @@ export class TeamsViewModel {
    */
   public setOpenTeam = async (id: string) => {
     await this.teamRepository.setOpenTeam(id);
+    const team = await this.teamRepository.getTeamDoc(id);
+    if (team._data.plan?.name !== planType.COMMUNITY) {
+      planBannerisOpen.set(false);
+    }
   };
 
   /**

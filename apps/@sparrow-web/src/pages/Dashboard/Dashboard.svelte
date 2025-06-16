@@ -4,6 +4,8 @@
     LoginSignupConfirmation,
     PlanUpgradeModal,
     SwitchWorkspace,
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
@@ -36,6 +38,7 @@
   import { GlobalSearch } from "@sparrow/common/features";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
+  import { planBannerisOpen } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -74,6 +77,7 @@
   let userRole: string = "";
   let userLimits: any;
   let teamDetails: {};
+  let isUpgradePlanModelOpen: boolean = false;
 
   const openDefaultBrowser = async () => {
     // await open(externalSparrowLink);
@@ -108,6 +112,7 @@
           teamName: OwnerDetails?.name,
           teamEmail: OwnerDetails?.email,
         };
+        planBannerisOpen.set(false);
         handlegetWorkspaceCount(currentTeamId);
         handleLimits(currentTeamId);
         const envIdInitiatedToWorkspace =
@@ -521,6 +526,13 @@
   const handleRedirectToAdminPanel = async () => {
     await _viewModel.handleRedirectToAdminPanel(currentTeamId);
     upgradePlanModalWorkspace = true;
+    planBannerisOpen.set(false);
+  };
+
+  const handleRedirectToAdmin = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    planBannerisOpen.set(false);
+    isUpgradePlanModelOpen = false;
   };
 
   $: {
@@ -597,6 +609,10 @@
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
   />
+
+  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
+    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {/if}
 
   <!-- 
     -- Guest Login Banner - shows login option to guest users.
@@ -712,6 +728,23 @@
     requestName={switchRequestName}
     handleSwitch={handleWorkspaceSwitch}
     {handlehideGlobalSearch}
+  />
+</Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradePlanModelOpen}
+  handleModalState={(flag) => {
+    isUpgradePlanModelOpen = flag;
+    planBannerisOpen.set(false);
+  }}
+>
+  <UpgradePlanPopUp
+    bind:isUpgradePlanModelOpen
+    handleSubmit={handleRedirectToAdmin}
   />
 </Modal>
 
