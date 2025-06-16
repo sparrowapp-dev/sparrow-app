@@ -5,6 +5,12 @@ export interface PromptDto {
   model: string;
 }
 
+export interface GenerateUserAndSystemPromptsDto {
+  userInput: string;
+  emailId: string;
+  teamId: string
+}
+
 export interface StreamPromptDto {
   text: string;
   tabId: string;
