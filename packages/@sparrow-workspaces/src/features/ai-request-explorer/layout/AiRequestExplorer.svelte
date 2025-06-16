@@ -4,11 +4,10 @@
     ModelSector,
     RequestNavigator,
     RequestAuth,
-    RequestName,
     ChatBot,
     RequestDoc,
     AiConfigs,
-    ConversationHistoryItem,
+    GetCode,
     GeneratePromptModal,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
@@ -21,12 +20,15 @@
     AiRequestSectionEnum,
     type Conversation,
   } from "@sparrow/common/types/workspace/ai-request-tab";
-  import { ModelIdNameMapping } from "@sparrow/common/types/workspace/ai-request-base";
+  import {
+    ModelIdNameMapping,
+    ModelVariantIdNameMapping,
+  } from "@sparrow/common/types/workspace/ai-request-base";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { disabledModelFeatures } from "../constants";
+  import { disabledModelFeatures, modelCodeTemplates } from "../constants";
 
   import {
     BotRegular,
@@ -168,6 +170,11 @@
     onUpdateRequestAuth();
   };
 
+  let isGetCodePopupOpen = false;
+  const onClickOpenGetCodePopup = async () => {
+    isGetCodePopupOpen = true;
+  };
+
   // Update the activateGeneratePromptModal function:
   const activateGeneratePromptModal = (
     target: "UserPrompt" | "SystemPrompt",
@@ -217,6 +224,7 @@
             isConversationHistoryLoading = false;
           }
         }}
+        openGetCodePopup={onClickOpenGetCodePopup}
       />
 
       <div
@@ -397,6 +405,24 @@
       {onCreateCollection}
       {onRenameCollection}
       {onRenameFolder}
+    />
+  </Modal>
+
+  <Modal
+    title={`Code for "${ModelVariantIdNameMapping[$tab?.property?.aiRequest?.aiModelVariant]}" API`}
+    type={"dark"}
+    zIndex={1000}
+    isOpen={isGetCodePopupOpen}
+    width={"40%"}
+    handleModalState={() => {
+      isGetCodePopupOpen = false;
+    }}
+  >
+    <GetCode
+      selectedModelVariant={$tab?.property?.aiRequest?.aiModelVariant}
+      aiModelProvider={$tab?.property?.aiRequest?.aiModelProvider}
+      providerApiKey={$tab?.property?.aiRequest?.auth?.apiKey?.authValue}
+      configurations={$tab?.property?.aiRequest?.configurations}
     />
   </Modal>
 {/if}
