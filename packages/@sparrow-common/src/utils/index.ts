@@ -35,4 +35,4 @@ export * from "./conversion.helper";
 export * from "./environment.helper";
 export * from "./navigation";
 export * from "./team.helper";
-export { planInfoByRole } from "./planUpgradeContent";
+export { planInfoByRole,planContentDisable } from "./planUpgradeContent";

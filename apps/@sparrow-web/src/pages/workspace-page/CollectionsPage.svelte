@@ -1045,7 +1045,7 @@
                           {currentWorkspace}
                           {handleCreateEnvironment}
                           onCreateTestflow={() => {
-                            _viewModel3.handleCreateTestflow();
+                            handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
