@@ -123,7 +123,7 @@
           {onUpdateEnvironment}
           {environmentVariables}
           codeId={"url"}
-          class={"input-url no-caret-input"}
+          class={"no-caret-input"}
           {userRole}
           isFocusedOnMount={false}
           disabled={true}
