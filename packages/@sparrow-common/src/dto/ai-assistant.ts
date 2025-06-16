@@ -7,7 +7,8 @@ export interface PromptDto {
 
 export interface GenerateUserAndSystemPromptsDto {
   userInput: string;
-  emailId?: string;
+  emailId: string;
+  teamId: string
 }
 
 export interface StreamPromptDto {

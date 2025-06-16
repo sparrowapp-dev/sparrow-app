@@ -2283,11 +2283,14 @@ class AiRequestExplorerViewModel {
     isLimitReached: boolean;
     target: "UserPrompt" | "SystemPrompt";
   }> => {
-    await this.updateRequestState({ isDocGenerating: true });
-
+    const componentData = this._tab.getValue();
+    let workspaceId = componentData.path.workspaceId;
+    let workspaceVal = await this.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
     const response = await this.aiAssistentService.generateUserOrSystemPrompts({
       userInput: prompt,
       emailId: getClientUser().email,
+      teamId: teamId
     });
 
     if (response.isSuccessful) {
