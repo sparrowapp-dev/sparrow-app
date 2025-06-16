@@ -631,7 +631,9 @@ export default class WorkspaceExplorerViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    await open(
+      `${constants.ADMIN_URL}/billing/billingInformation/changePlan/${teamId}`,
+    );
   };
 
   public handleContactSales = async () => {

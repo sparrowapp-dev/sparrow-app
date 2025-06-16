@@ -1246,7 +1246,7 @@ export class DashboardViewModel {
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL + `/billing/billingInformation/changePlan/${teamId}`,
       "_blank",
     );
     return;

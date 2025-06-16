@@ -968,7 +968,9 @@ export class TeamExplorerPageViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    await open(
+      `${constants.ADMIN_URL}/billing/billingInformation/changePlan/${teamId}`,
+    );
   };
 
   public handleContactSales = async () => {
