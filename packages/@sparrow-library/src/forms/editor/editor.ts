@@ -1,11 +1,15 @@
 import type { Compartment } from "@codemirror/state";
 import type { EditorView } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { StreamLanguage } from "@codemirror/language";
+import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { RequestDataType } from "@sparrow/common/enums";
 import { html } from "@codemirror/lang-html";
 import { jsonSetup } from "./theme";
 import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
+
 
 /**
  * @description - remove indentation from the string
@@ -81,6 +85,45 @@ const handleCodeMirrorSyntaxFormat = (
           effects: languageConf.reconfigure(
             javascript({ jsx: true, typescript: true }),
           ),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
+
+    case RequestDataType.PYTHON:
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: value, // manual beautification is done, as beautify lib. is not available for python 
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(python()),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
+    case RequestDataType.CURL:
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: value, // manual beautification is done, as beautify lib. is not available for curl 
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure(StreamLanguage.define(shell)),
           ...payload,
         });
         beautifySyntaxCallback(false);

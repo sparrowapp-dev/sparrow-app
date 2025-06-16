@@ -33,7 +33,8 @@
   export let onClearConversation;
   export let isConversationHistoryPanelOpen: boolean;
   export let isConversationHistoryLoading: boolean;
-  export let isGuestUser;
+  export let activateGeneratePromptModal;
+  export let isGuestUser: boolean;
 
   let scrollList: ScrollList;
 
@@ -131,6 +132,7 @@
       currTabAiInfo={$tab.property?.aiRequest?.ai}
       bind:isConversationHistoryPanelOpen
       bind:isConversationHistoryLoading
+      {activateGeneratePromptModal}
     />
   </div>
 {/if}

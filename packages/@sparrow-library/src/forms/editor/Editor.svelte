@@ -25,8 +25,15 @@
   } from "@sparrow/common/utils";
   import MergeView from "./MergeView.svelte";
 
-  export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
-    "Text";
+  export let lang:
+    | "HTML"
+    | "JSON"
+    | "XML"
+    | "JavaScript"
+    | "Text"
+    | "Graphql"
+    | "Python"
+    | "Curl" = "Text";
   export let value = "";
   export let customSuggestions = false;
   export let isEnterKeyNotAllowed = false;

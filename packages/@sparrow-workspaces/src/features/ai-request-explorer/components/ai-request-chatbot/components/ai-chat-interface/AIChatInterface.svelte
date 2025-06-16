@@ -15,7 +15,6 @@
   import { cubicOut } from "svelte/easing";
   import { generatingImage, SparrowLogo } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-  // import type { Ai, Conversation } from "@sparrow/common/types/workspace";
   import { fade, fly } from "svelte/transition";
   import {
     Button,
@@ -49,6 +48,7 @@
   export let responseData: AiRequestExplorerData;
   export let onClearConversation;
   export let isChatAutoClearActive = false;
+  export let activateGeneratePromptModal;
   export let conversationsHistory;
   export let onOpenConversationHistoryPanel;
   export let onCloseConversationHistoryPanel;
@@ -60,7 +60,7 @@
   export let currTabAiInfo: Ai;
   export let isConversationHistoryPanelOpen = false;
   export let isConversationHistoryLoading = false;
-  export let isGuestUser = false;
+  export let isGuestUser: boolean;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -597,8 +597,10 @@
           {onUpdateAiPrompt}
           {isResponseGenerating}
           {onStopGeneratingAIResponse}
+          {activateGeneratePromptModal}
           placeholder={"Write a prompt or generate one from generate prompt."}
           {sendPrompt}
+          {isGuestUser}
         />
       </div>
     </div>

@@ -7,4 +7,6 @@ export { default as ModelOptions } from "./model-options/ModelOptions.svelte";
 export { default as RequestDoc } from "./request-doc/RequestDoc.svelte";
 export { default as AiConfigs } from "./ai-config-selection/AiConfigurations.svelte";
 export { default as ConversationHistoryItem } from "./chat-conversations/ConversationHistoryItem.svelte";
+export { default as GeneratePromptModal } from "./generate-prompt/GeneratePrompt.svelte"
+export { default as GetCode } from "./get-code/GetCodeModal.svelte";
 export { ChatBot } from "./ai-request-chatbot";
