@@ -129,6 +129,7 @@
   export let onPreviewExpression;
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
+  export let planLimitRunHistoryCount: number = 5;
   export let planLimitTestFlowBlocks: number = 5;
   export let planLimitTestFlows: number = 3;
   export let testflowCount: number = 1;
@@ -1408,7 +1409,7 @@
     if (testflowStore?.history) {
       const updateHistoryItems = testflowStore.history.slice(
         0,
-        planLimitTestFlowBlocks,
+        planLimitRunHistoryCount,
       );
       testflowStore.history = updateHistoryItems;
     }
@@ -1524,11 +1525,11 @@
       <div class="position-relative">
         <RunHistory
           bind:runHistoryPlanModalOpen
+          bind:planLimitRunHistoryCount
           {testflowStore}
           testflowName={$tab?.name}
           {toggleHistoryDetails}
           {toggleHistoryContainer}
-          {planLimitTestFlowBlocks}
         />
       </div>
     </div>
@@ -1859,7 +1860,7 @@
   title={planContent?.title}
   description={planContent?.description}
   planType="Run History"
-  planLimitValue={planLimitTestFlowBlocks}
+  planLimitValue={planLimitRunHistoryCount}
   currentPlanValue={testflowStore?.history.length}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
