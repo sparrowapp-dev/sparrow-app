@@ -9,9 +9,6 @@
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
-
-  let isUpgradePlanModelOpen: boolean = false;
-
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
@@ -51,6 +48,7 @@
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
   import { planInfoByRole } from "@sparrow/common/utils";
+  import { planBannerisOpen } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
   let userId;
@@ -87,6 +85,7 @@
   let userRole: string = "";
   let userLimits: any;
   let teamDetails: {};
+  let isUpgradePlanModelOpen: boolean = false;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -106,13 +105,10 @@
     switchWorkspaceId = _workspaceId;
   };
 
-  const sparrowAdminUrl = constants.SPARROW_ADMIN_URL;
-
   const handleLimits = async (currentTeamId: string) => {
     const data = await _viewModel.userPlanLimits(currentTeamId);
     userLimits = data;
   };
-
 
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
@@ -604,6 +600,12 @@
     upgradePlanModalWorkspace = true;
   };
 
+  const handleRedirectToAdmin = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    planBannerisOpen.set(false);
+    isUpgradePlanModelOpen = false;
+  };
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -681,7 +683,7 @@
     />
   {/if}
 
-  {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
+  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
     <UpgradePlanBanner bind:isUpgradePlanModelOpen />
   {/if}
 
@@ -798,10 +800,15 @@
   isOpen={isUpgradePlanModelOpen}
   handleModalState={(flag) => {
     isUpgradePlanModelOpen = flag;
+    planBannerisOpen.set(false);
   }}
 >
-  <UpgradePlanPopUp bind:isUpgradePlanModelOpen {sparrowAdminUrl} />
+  <UpgradePlanPopUp
+    bind:isUpgradePlanModelOpen
+    handleSubmit={handleRedirectToAdmin}
+  />
 </Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModalWorkspace}
   title={planContent?.title}
