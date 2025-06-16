@@ -784,6 +784,13 @@
     mockCollectionUrl = url;
     isMockURLModelOpen = true;
   };
+
+  $: {
+    handleLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
