@@ -4,9 +4,14 @@
     LoginSignupConfirmation,
     PlanUpgradeModal,
     SwitchWorkspace,
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
+
+  let isUpgradePlanModelOpen: boolean = false;
+
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
@@ -101,10 +106,13 @@
     switchWorkspaceId = _workspaceId;
   };
 
+  const sparrowAdminUrl = constants.SPARROW_ADMIN_URL;
+
   const handleLimits = async (currentTeamId: string) => {
     const data = await _viewModel.userPlanLimits(currentTeamId);
     userLimits = data;
   };
+
 
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
@@ -673,6 +681,10 @@
     />
   {/if}
 
+  {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
+    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {/if}
+
   <!-- 
     -- Guest Login Banner - shows login option to guest users.
     -->
@@ -778,6 +790,18 @@
   />
 </Modal>
 
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradePlanModelOpen}
+  handleModalState={(flag) => {
+    isUpgradePlanModelOpen = flag;
+  }}
+>
+  <UpgradePlanPopUp bind:isUpgradePlanModelOpen {sparrowAdminUrl} />
+</Modal>
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModalWorkspace}
   title={planContent?.title}
