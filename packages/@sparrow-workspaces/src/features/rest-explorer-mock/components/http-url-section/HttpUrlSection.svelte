@@ -134,7 +134,7 @@
     <div class="static-url-section">
       <span class="api-url">{mockCollectionUrl}</span>
     </div>
-    <div class="w-100">
+    <div class="w-100 position-relative">
       <CodeMirrorInput
         value={requestUrl}
         onUpdateInput={onUpdateRequestUrl}
@@ -223,6 +223,12 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
+  :global(.input-url .cm-editor.cm-focused) {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
   .static-url-section {
     height: 36px;
     background-color: var(--bg-ds-surface-600);
