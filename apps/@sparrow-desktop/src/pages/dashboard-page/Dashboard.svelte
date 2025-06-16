@@ -683,7 +683,7 @@
     />
   {/if}
 
-  {#if userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER}
+  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
     <UpgradePlanBanner bind:isUpgradePlanModelOpen />
   {/if}
 
@@ -800,6 +800,7 @@
   isOpen={isUpgradePlanModelOpen}
   handleModalState={(flag) => {
     isUpgradePlanModelOpen = flag;
+    planBannerisOpen.set(false);
   }}
 >
   <UpgradePlanPopUp
