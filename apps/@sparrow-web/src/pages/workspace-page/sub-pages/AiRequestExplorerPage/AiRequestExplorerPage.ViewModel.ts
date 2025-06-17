@@ -506,13 +506,7 @@ class AiRequestExplorerViewModel {
           title: newConversationTitle,
           time: this.getFormattedTime(),
           date: this.getLocalDate(),
-          authoredBy: guestUser ? "Guest User" : user.name,
-          updatedBy: guestUser ? "Guest User" : {
-            name: user.name,
-            email: user.email,
-            id: user.id,
-          },
-
+          authoredBy: user.name,
         }
       };
 
@@ -522,8 +516,8 @@ class AiRequestExplorerViewModel {
         if (conversationId === currTabConversationId) {
           this.updateAiRequestConversationTitle(newConversationTitle);
         }
-        await this.fetchConversations(); // Fetch to udpate the states in local db
         notifications.success("Conversation title updated successfully.");
+        await this.fetchConversations(); // Fetch to udpate the states in local db
       } else {
         notifications.error("Failed to update conversation title. Please try again.");
       }
@@ -2097,8 +2091,8 @@ class AiRequestExplorerViewModel {
                   inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  statusCode: response.statusCode,
-                  time: response.timeTaken.replace("ms", ""),
+                  statusCode: response?.statusCode,
+                  time: response?.timeTaken?.replace("ms", "") || 0,
                   modelProvider,
                   modelVariant
                 },
@@ -2111,11 +2105,11 @@ class AiRequestExplorerViewModel {
               const newData: AiRequestExplorerData = {
                 response: {
                   messageId: "",
-                  statusCode: response.statusCode || 400,
                   inputTokens: 0,
                   outputTokens: 0,
                   totalTokens: 0,
-                  time: response.timeTaken.replace("ms", ""),
+                  statusCode: response?.statusCode || 400,
+                  time: response?.timeTaken?.replace("ms", "") || 0,
                   modelProvider,
                   modelVariant
                 },
