@@ -34,15 +34,8 @@ const constants = {
   APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
   SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
   MARKETING_URL: import.meta.env.VITE_MARKETING_URL,
-<<<<<<< HEAD
   LINUX_INSTALL_DOCS: import.meta.env.VITE_SPARROW_DOCS + "/docs/usermanual/linux-install",
-  SPARROW_ADMIN_URL:import.meta.env.VITE_SPARROW_ADMIN_URL,
   ADMIN_URL: import.meta.env.VITE_SPARROW_ADMIN_URL,
-=======
-  SPARROW_ADMIN_URL: import.meta.env.VITE_SPARROW_ADMIN_URL,
-  LINUX_INSTALL_DOCS:
-    import.meta.env.VITE_SPARROW_DOCS + "/docs/usermanual/linux-install",
->>>>>>> 4247a363b073f9b06aa4093ee56afc23ccb7b555
 };
 
 export default constants;
