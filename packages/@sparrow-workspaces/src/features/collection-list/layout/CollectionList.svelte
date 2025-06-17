@@ -202,7 +202,9 @@
       collectionList.subscribe((value) => {
         collectionListDocument = value;
         collectionListDocument = collectionListDocument?.filter(
-          (value) => value.workspaceId === activeWorkspace?._id,
+          (value) =>
+            value.workspaceId === activeWorkspace?._id &&
+            !(value?.activeSync && activeWorkspace?.isShared),
         );
         collectionFilter = searchCollection(searchData, collectionListDocument);
       });
@@ -431,6 +433,8 @@
               >
                 {#each collectionFilter as col}
                   <Collection
+                    isMockCollection={col?.collectionType ===
+                      CollectionTypeBaseEnum.MOCK}
                     bind:userRole
                     {isSharedWorkspace}
                     {onItemCreated}

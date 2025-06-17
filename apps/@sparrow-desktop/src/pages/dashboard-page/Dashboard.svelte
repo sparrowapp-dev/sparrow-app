@@ -45,6 +45,8 @@
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
 
   const _viewModel = new DashboardViewModel();
+  const osDetector = new OSDetector();
+
   let userId;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -150,8 +152,7 @@
   let teamDocuments: Observable<TeamDocument[]>;
 
   const decidingKey = (event) => {
-    const os = new OSDetector();
-    if (os.getOS() == "macos") {
+    if (osDetector.getOS() == "macos") {
       if (event.metaKey) return true;
       else return false;
     } else {
@@ -329,7 +330,7 @@
       id: SidebarItemIdEnum.MARKETPLACE,
       route: "marketplace",
       heading: "Marketplace",
-      disabled: false,
+      disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
@@ -539,6 +540,13 @@
       handlehideGlobalSearch(false);
     }
   };
+
+  const openUpdateDocs = async () => {
+    if (osDetector.getOS() === "linux") {
+      await open(constants.LINUX_INSTALL_DOCS);
+      return;
+    }
+  };
 </script>
 
 {#if isGlobalSearchOpen && !hideGlobalSearch}
@@ -611,6 +619,7 @@
       show={updaterVisible && updateAvailable}
       {hideUpdater}
       onUpdate={initiateUpdate}
+      updateDoc={openUpdateDocs}
     />
   {/if}
 

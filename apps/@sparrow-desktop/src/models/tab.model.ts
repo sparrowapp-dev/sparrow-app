@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 26,
+  version: 28,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1323,33 +1323,29 @@ export const tabSchemaLiteral = {
                 deepseek: {
                   type: "object",
                   properties: {
-                    type: "object",
-                    properties: {
-                      streamResponse: {
-                        type: "boolean",
-                      },
-                      jsonResponseFormat: {
-                        type: "boolean",
-                      },
-                      temperature: {
-                        type: "number",
-                      },
-                      presencePenalty: {
-                        type: "number",
-                      },
-                      frequencyPenalty: {
-                        type: "number",
-                      },
-                      maxTokens: {
-                        type: "number",
-                      },
+                    streamResponse: {
+                      type: "boolean",
+                    },
+                    jsonResponseFormat: {
+                      type: "boolean",
+                    },
+                    temperature: {
+                      type: "number",
+                    },
+                    presencePenalty: {
+                      type: "number",
+                    },
+                    frequencyPenalty: {
+                      type: "number",
+                    },
+                    maxTokens: {
+                      type: "number",
                     },
                   },
                 },
                 anthropic: {
                   type: "object",
                   properties: {
-                    type: "object",
                     streamResponse: {
                       type: "boolean",
                     },
@@ -1367,7 +1363,6 @@ export const tabSchemaLiteral = {
                 google: {
                   type: "object",
                   properties: {
-                    type: "object",
                     streamResponse: {
                       type: "boolean",
                     },
@@ -1425,6 +1420,15 @@ export const tabSchemaLiteral = {
                 isChatAutoClearActive: {
                   type: "boolean",
                 },
+                isChatbotConversationLoading: {
+                  type: "boolean",
+                },
+                isConversationHistoryPanelOpen: {
+                  type: "boolean",
+                },
+                isConversationHistoryLoading: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
@@ -1466,7 +1470,10 @@ export const tabSchemaLiteral = {
                 prompt: {
                   type: "string",
                 },
-                threadId: {
+                conversationId: {
+                  type: "string",
+                },
+                conversationTitle: {
                   type: "string",
                 },
                 conversations: {

@@ -76,25 +76,27 @@
     autocapitalize="off"
     maxlength={10000}
     on:keydown={(event) => {
-      // isTyping = true;
-      if (event.key === "Enter" && prompt && !isResponseGenerating) {
-        sendPrompt(prompt);
-        onUpdateAiPrompt("");
-        captureEvent("ai_chatbot_send_button_clicked", {
-          component: "PromptInput",
-          message_length: prompt.length,
-          selected_engine: "GPT-4o",
-          timestamp: new Date().toISOString(),
-          response_time: null,
-        });
-        isTyping = false;
-        isPromptBoxFocused = false;
-        event.target.blur();
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        if (!isResponseGenerating && prompt.trim()) {
+          sendPrompt(prompt);
+          onUpdateAiPrompt("");
+          captureEvent("ai_chatbot_send_button_clicked", {
+            component: "PromptInput",
+            message_length: prompt.length,
+            selected_engine: "deepseek",
+            timestamp: new Date().toISOString(),
+            response_time: null,
+          });
+          isTyping = false;
+          isPromptBoxFocused = false;
+          event.target.blur();
 
-        // allows the DOM to update first before resetting the height.
-        setTimeout(() => {
-          adjustTextareaHeight();
-        }, 0);
+          // allows the DOM to update first before resetting the height.
+          setTimeout(() => {
+            adjustTextareaHeight();
+          }, 0);
+        }
       }
     }}
     on:focus={() => {

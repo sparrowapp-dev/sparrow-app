@@ -35,6 +35,8 @@ const constants = {
   SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
   MARKETING_URL: import.meta.env.VITE_MARKETING_URL,
   SPARROW_ADMIN_URL: import.meta.env.VITE_SPARROW_ADMIN_URL,
+  LINUX_INSTALL_DOCS:
+    import.meta.env.VITE_SPARROW_DOCS + "/docs/usermanual/linux-install",
 };
 
 export default constants;

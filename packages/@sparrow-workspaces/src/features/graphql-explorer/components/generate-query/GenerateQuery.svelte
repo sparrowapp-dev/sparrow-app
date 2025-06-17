@@ -89,8 +89,9 @@
   /**
    * Saves Query and Mutation to database.
    */
-  const saveSchemaToDatabase = () => {
+  const saveSchemaToDatabase = (isCheckBoxChecked: boolean) => {
     const s = JSON.parse(schema);
+    s.isCheckBoxChecked = isCheckBoxChecked;
     if (requestOperationSection === GraphqlRequestOperationTabEnum.QUERY) {
       s.Query.items = querySchema;
     } else if (
@@ -338,9 +339,9 @@
     _level: number,
     _isExpandedNode: boolean,
     _isLeafNode: boolean,
+    isCheckBoxChecked: boolean = false,
   ) => {
     // Update the data with the modified check state
-
     if (_isExpandedNode) {
       querySchema = collapseAllTheChildNodes(querySchema, 0, _id, _level);
     } else {
@@ -352,7 +353,7 @@
         _isLeafNode,
       );
     }
-    saveSchemaToDatabase();
+    saveSchemaToDatabase(isCheckBoxChecked);
   };
 
   /**
@@ -441,7 +442,7 @@
       }
     }
 
-    saveSchemaToDatabase();
+    saveSchemaToDatabase(!_isCheckedNode);
   };
 
   /**
@@ -465,7 +466,7 @@
     };
     for (let i = 0; i < querySchema.length; i++) {
       if (searchFieldById(querySchema[i])) {
-        saveSchemaToDatabase();
+        saveSchemaToDatabase(true);
         return;
       }
     }
@@ -494,7 +495,7 @@
     };
     for (let i = 0; i < querySchema.length; i++) {
       if (searchFieldById(querySchema[i])) {
-        saveSchemaToDatabase();
+        saveSchemaToDatabase(true);
         return;
       }
     }
@@ -617,6 +618,7 @@
                         0,
                         item.isExpanded,
                         item.isLeafNode,
+                        item.isSelected,
                       );
                     }}
                   >
@@ -758,6 +760,7 @@
                         index,
                         t.isExpanded,
                         t.isLeafNode,
+                        t.isSelected,
                       );
                     }}
                   >

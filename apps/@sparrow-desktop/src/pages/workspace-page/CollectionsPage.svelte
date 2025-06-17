@@ -249,6 +249,7 @@
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.MOCK_REQUEST ||
+        tab?.type === TabTypeEnum.AI_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.WORKSPACE ||
@@ -406,6 +407,7 @@
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.MOCK_REQUEST ||
+      removeTab.type === TabTypeEnum.AI_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL ||
       removeTab.type === TabTypeEnum.FOLDER
     ) {
@@ -428,6 +430,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("Mock Request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.AI_REQUEST) {
+          const res = await _viewModel.saveAiRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("AI Request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);
@@ -996,7 +1006,7 @@
       }}
       disabled={false}
     />
-    <p class="m-0">I understand, don't show this agian.</p>
+    <p class="m-0">I understand, don't show this again.</p>
   </div>
 
   <div

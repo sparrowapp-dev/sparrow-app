@@ -25,6 +25,9 @@ export class TabularInputTheme{
         overflowY: "auto",
         overflowX: "hidden",
       },
+      ".cm-line": {
+        width: "0",
+      },
       ".cm-panels": {
         backgroundColor: "var(--bg-ds-surface-400)",
         color: "var(--white-color)",

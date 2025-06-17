@@ -33,7 +33,7 @@
       <div class="d-flex align-items-center gap-3">
         <Tooltip
           title="HTTP Status - {response.status}"
-          placement={"bottom-center"}
+          placement={"top-center"}
           zIndex={500}
         >
           <span
@@ -59,11 +59,7 @@
             >
           </span>
         </Tooltip>
-        <Tooltip
-          title="Time"
-          placement={"bottom-center"}
-          zIndex={500}
-        >
+        <Tooltip title="Time" placement={"top-center"} zIndex={500}>
           <span
             class="text-fs-12 d-flex align-items-center border-0 justify-content-center align-items-center rounded time-primary1 response-text"
             style=" color:{checkIfRequestSucceed(response?.status)
@@ -95,11 +91,7 @@
             </p>
           </span>
         </Tooltip>
-        <Tooltip
-          title="Size"
-          placement={"bottom-center"}
-          zIndex={500}
-        >
+        <Tooltip title="Size" placement={"top-center"} zIndex={500}>
           <span
             class="d-flex align-items-center justify-content-center rounded border-0 text-backgroundColor size-primary1 response-text"
             style="font-size: 12px;"

@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/common",
-  "version": "2.24.0",
+  "version": "2.25.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -43,6 +43,7 @@
     "./types/workspace/http-request-mock-tab": "./src/types/workspace/http-request-mock-tab.ts",
     "./types/workspace/http-request-mock-base": "./src/types/workspace/http-request-mock-base.ts",
     "./types/workspace/http-request-mock-dto": "./src/types/workspace/http-request-mock-dto.ts",
+    "./types/workspace/http-response-mock-dto": "./src/types/workspace/http-response-mock-dto.ts",
     "./types/workspace/graphql-request-base": "./src/types/workspace/graphql-request-base.ts",
     "./types/workspace/graphql-request-dto": "./src/types/workspace/graphql-request-dto.ts",
     "./types/workspace/graphql-request-tab": "./src/types/workspace/graphql-request-tab.ts",

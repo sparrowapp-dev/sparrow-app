@@ -187,4 +187,22 @@ export class EnvironmentRepository {
       })
       .exec();
   };
+
+  /* Remove environments by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter environments
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeEnvironmentsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb.environment.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
+  };
 }

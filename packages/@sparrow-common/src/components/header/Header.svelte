@@ -249,6 +249,7 @@
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
+  import { Platform } from "@sparrow/common/enums";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -314,8 +315,8 @@
 
   <div class="d-flex ms-2 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
-      {#if isWindows === false}
-        <WindowAction isWindows={false} />
+      {#if os === "macos"}
+        <WindowAction platform={Platform.MACOS} />
       {/if}
     {/if}
 
@@ -481,7 +482,10 @@
 
   <div
     class="d-flex align-items-center no-drag"
-    style="position: relative; display:flex; gap: 16px;"
+    style="position: relative; display:flex; gap: 16px; margin-right: {isWebApp ||
+    !isWindows
+      ? '16px'
+      : '0px'}"
   >
     {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
       <Tooltip
@@ -664,7 +668,7 @@
     {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-1"}>
+      <div>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
@@ -676,9 +680,9 @@
     {/if}
 
     {#if isWebApp === false}
-      {#if isWindows}
+      {#if os === "windows" || os === "linux"}
         <div class="d-flex gap-3 no-drag">
-          <WindowAction isWindows={true} />
+          <WindowAction platform={Platform.WINDOWS} />
         </div>
       {/if}
     {/if}
