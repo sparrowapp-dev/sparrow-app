@@ -6,10 +6,9 @@
     SendRegular,
     StopFilled,
   } from "@sparrow/library/icons";
-  import { Select } from "@sparrow/library/forms";
   import { Button, Tooltip } from "@sparrow/library/ui";
+  import { FileItem } from "../../..";
 
-  import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let placeholder = "";
   export let sendPrompt;
   export let prompt: string = "";
@@ -18,6 +17,19 @@
   export let onStopGeneratingAIResponse;
   export let activateGeneratePromptModal;
   export let isGuestUser;
+
+  //
+  export let uploadedFiles: Array<{
+    id: string;
+    name: string;
+    type: string;
+    size: number;
+  }> = [
+    { id: "123", name: "DIV Contentsdddddddd.pdf", type: "csv", size: 1.34 },
+    { id: "123", name: "first file", type: "csv", size: 1.34 },
+    { id: "123", name: "first file", type: "csv", size: 1.34 },
+  ];
+  export let onRemoveFile;
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -48,51 +60,64 @@
     ? 'focused'
     : ''} {isTyping ? 'typing' : ''}"
 >
-  <textarea
-    bind:value={prompt}
-    on:input={() => {
-      isTyping = true;
-      onUpdateAiPrompt(prompt);
-      adjustTextareaHeight(event.target);
-    }}
-    disabled={isResponseGenerating ? true : false}
-    required
-    id={"input-prompt-text"}
-    {placeholder}
-    class="w-100 prompt-text-field-area"
-    style="border:1px solid grey; outline: none; background-color: var(--bg-ds-surface-400); border: 1px solid var(--border-tertiary-190); "
-    autocomplete="off"
-    spellcheck="false"
-    autocorrect="off"
-    autocapitalize="off"
-    maxlength={10000}
-    on:keydown={(event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        if (!isResponseGenerating && prompt.trim()) {
-          sendPrompt(prompt);
-          onUpdateAiPrompt("");
-          isTyping = false;
-          isPromptBoxFocused = false;
-          event.target.blur();
+  <div class="textarea-wrapper">
+    <!-- File Chips Display -->
+    {#if uploadedFiles.length > 0}
+      <div class="file-chips-container d-flex flex-wrap gap-2 mb-2">
+        {#each uploadedFiles as file}
+          <FileItem {file} onRemove={onRemoveFile} size="small" />
+        {/each}
+      </div>
+    {/if}
 
-          // allows the DOM to update first before resetting the height.
-          setTimeout(() => {
-            adjustTextareaHeight();
-          }, 0);
+    <!-- Textarea Input -->
+    <textarea
+      bind:value={prompt}
+      on:input={() => {
+        isTyping = true;
+        onUpdateAiPrompt(prompt);
+        adjustTextareaHeight(event.target);
+      }}
+      disabled={isResponseGenerating ? true : false}
+      required
+      id={"input-prompt-text"}
+      {placeholder}
+      class="w-100 prompt-text-field-area"
+      style="border:1px solid grey; outline: none; background-color: var(--bg-ds-surface-400); border: 1px solid var(--border-tertiary-190); "
+      autocomplete="off"
+      spellcheck="false"
+      autocorrect="off"
+      autocapitalize="off"
+      maxlength={10000}
+      on:keydown={(event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          if (!isResponseGenerating && prompt.trim()) {
+            sendPrompt(prompt);
+            onUpdateAiPrompt("");
+            isTyping = false;
+            isPromptBoxFocused = false;
+            event.target.blur();
+
+            // allows the DOM to update first before resetting the height.
+            setTimeout(() => {
+              adjustTextareaHeight();
+            }, 0);
+          }
         }
-      }
-    }}
-    on:focus={() => {
-      isPromptBoxFocused = true;
-      isTyping = false;
-    }}
-    on:blur={() => {
-      isPromptBoxFocused = false;
-      isTyping = false;
-    }}
-  />
+      }}
+      on:focus={() => {
+        isPromptBoxFocused = true;
+        isTyping = false;
+      }}
+      on:blur={() => {
+        isPromptBoxFocused = false;
+        isTyping = false;
+      }}
+    />
+  </div>
 
+  <!-- Action Btn Section -->
   <div
     class="actions-container d-flex justify-content-between align-items-center"
   >
@@ -139,6 +164,15 @@
 </div>
 
 <style>
+  .textarea-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .file-chips-container {
+    margin-bottom: 4px;
+  }
+
   .prompt-input-container {
     background-color: var(--bg-ds-surface-400) !important;
     border-radius: 4px;
@@ -160,7 +194,7 @@
   .prompt-text-field-area {
     width: 100%;
     height: 20px;
-    max-height: 160px !important;
+    max-height: 100px !important;
     font-family: "inter", sans-serif;
     font-size: 14px;
     font-weight: 400;
