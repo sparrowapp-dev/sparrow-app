@@ -96,7 +96,7 @@
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
   import { PlanUpgradeModal } from "@sparrow/common/components";
-  import { planInfoByRole } from "@sparrow/common/utils";
+  import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
   import { ResponseMessage } from "@sparrow/common/enums";
 
@@ -537,6 +537,7 @@
   let upgradePlanModel: boolean = false;
   let isActiveSyncPlanModalOpen = false;
   let planContent: any;
+  let planContentNonActive: any;
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {
@@ -808,6 +809,13 @@
     currentWorkspaceId = workspaceId;
     isCreateMockCollectionPopup = true;
   };
+  $: {
+    handleLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
+    }
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -1016,7 +1024,7 @@
                           {currentWorkspace}
                           {handleCreateEnvironment}
                           onCreateTestflow={() => {
-                            _viewModel3.handleCreateTestflow();
+                            handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
@@ -1784,7 +1792,7 @@
 <PlanUpgradeModal
   bind:isOpen={isActiveSyncPlanModalOpen}
   title={planContent?.title}
-  description={planContent?.description}
+  description={planContentNonActive?.description}
   planType="Active Sync"
   activePlan={"disabled"}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN

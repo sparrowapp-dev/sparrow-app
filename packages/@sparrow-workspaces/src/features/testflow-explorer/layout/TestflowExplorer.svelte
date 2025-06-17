@@ -101,6 +101,7 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums";
+  import { planContentDisable } from "@sparrow/common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -143,6 +144,7 @@
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
   let planContent: any;
+  let planContentNonActive: any;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -1439,6 +1441,7 @@
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
     }
   }
 </script>
@@ -1904,7 +1907,7 @@
 <PlanUpgradeModal
   bind:isOpen={selectiveRunModalOpen}
   title={planContent?.title}
-  description={planContent?.description}
+  description={planContentNonActive?.description}
   planType="Selective Runs"
   activePlan={selectiveRunTestflow ? "active" : "disabled"}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
