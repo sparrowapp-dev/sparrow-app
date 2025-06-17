@@ -23,6 +23,7 @@ import { WorkspaceTabAdapter } from "src/adapter";
 import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
+import { PlanRepository } from "src/repositories/plan.repository";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -36,6 +37,7 @@ export class TeamExplorerPageViewModel {
   private guestUserRepository = new GuestUserRepository();
   private userService = new UserService();
   private recentWorkspaceRepository = new RecentWorkspaceRepository();
+  private planRepository = new PlanRepository();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -179,6 +181,7 @@ export class TeamExplorerPageViewModel {
           workspaces,
           owner,
           admins,
+          plan,
           createdAt,
           createdBy,
           updatedAt,
@@ -204,6 +207,7 @@ export class TeamExplorerPageViewModel {
           workspaces: updatedWorkspaces,
           owner,
           admins,
+          plan,
           isActiveTeam: false,
           createdAt,
           createdBy,
@@ -345,6 +349,10 @@ export class TeamExplorerPageViewModel {
       notifications.success("New Workspace Created");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
+    // else if (response?.data?.statusCode) {
+    //   notifications.error(response?.data?.message);
+    // }
+    return response;
   };
 
   /**
@@ -491,9 +499,13 @@ export class TeamExplorerPageViewModel {
         `Invite sent to ${_inviteBody.users.length} person for ${_teamName}.`,
       );
     } else {
-      notifications.error(
-        response?.message || "Failed to send invite. Please try again.",
-      );
+      if (response?.message === "Plan limit reached") {
+        // notifications.error("Failed to send invite. please upgrade your plan.");
+      } else {
+        notifications.error(
+          response?.message || "Failed to send invite. Please try again.",
+        );
+      }
     }
     return response;
   };
@@ -1025,5 +1037,43 @@ export class TeamExplorerPageViewModel {
     } else {
       notifications.error("Failed to ignore invite. Please try again.");
     }
+  };
+
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?._data?.plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?._data?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error("Failed to Sent request. Please try again.");
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(
+      constants.ADMIN_URL + `/billing/billingInformation/changePlan/${teamId}`,
+      "_blank",
+    );
+    return;
+  };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
   };
 }

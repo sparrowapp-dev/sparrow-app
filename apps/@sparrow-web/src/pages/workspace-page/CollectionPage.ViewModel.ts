@@ -151,6 +151,9 @@ import type {
   AiRequestBaseInterface,
   AIModelVariant,
 } from "@sparrow/common/types/workspace/ai-request-base";
+import { TeamRepository } from "src/repositories/team.repository";
+import { TeamService } from "src/services/team.service";
+import { PlanRepository } from "src/repositories/plan.repository";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -161,6 +164,9 @@ export default class CollectionsViewModel {
   private workspaceService = new WorkspaceService();
   private githubService = new GithubService();
   private guideRepository = new GuideRepository();
+  private teamRepository = new TeamRepository();
+  private teamService = new TeamService();
+  private planRepository = new PlanRepository();
   private initTab = new InitTab();
 
   private featureSwitchRepository = new FeatureSwitchRepository();
@@ -8172,5 +8178,41 @@ export default class CollectionsViewModel {
         "Failed to create mock collection. Please try again.",
       );
     }
+  };
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(
+      constants.ADMIN_URL + `/billing/billingInformation/changePlan/${teamId}`,
+      "_blank",
+    );
+  };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
   };
 }

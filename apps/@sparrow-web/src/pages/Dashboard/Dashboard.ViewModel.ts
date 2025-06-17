@@ -42,11 +42,13 @@ import {
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events, ItemType } from "@sparrow/common/enums";
+import { Events, ItemType, ResponseMessage } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import constants from "src/constants/constants";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
+import { PlanRepository } from "src/repositories/plan.repository";
+import { PlanService } from "src/services/plan.service";
 
 export class DashboardViewModel {
   constructor() {}
@@ -65,6 +67,8 @@ export class DashboardViewModel {
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
   private recentWorkspaceRepository = new RecentWorkspaceRepository();
+  private planRepository = new PlanRepository();
+  private planService = new PlanService();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -165,9 +169,11 @@ export class DashboardViewModel {
     if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
     let isAnyTeamsOpen: undefined | string = undefined;
+    const userPlans = [];
     if (response?.isSuccessful && response?.data?.data) {
       const data = [];
       for (const elem of response.data.data) {
+        userPlans.push(elem?.plan?.id.toString());
         const {
           _id,
           name,
@@ -181,6 +187,7 @@ export class DashboardViewModel {
           workspaces,
           owner,
           admins,
+          plan,
           createdAt,
           createdBy,
           updatedAt,
@@ -206,6 +213,7 @@ export class DashboardViewModel {
           workspaces: updatedWorkspaces,
           owner,
           admins,
+          plan,
           isActiveTeam: false,
           createdAt,
           createdBy,
@@ -215,6 +223,58 @@ export class DashboardViewModel {
           isOpen: isOpenTeam,
         };
         data.push(item);
+      }
+
+      const planResponse = await this.planService.getPlansByIds(userPlans);
+
+      const parsedPlans = [];
+      if (response.isSuccessful && planResponse.data.data) {
+        for (const planData of planResponse.data.data) {
+          const rawData = planData;
+          if (!rawData?._id) continue;
+          const planDetails = {
+            planId: rawData._id,
+            name: rawData.name,
+            description: rawData.description,
+            active: rawData.active,
+            limits: {
+              workspacesPerHub: {
+                area: rawData.limits.workspacesPerHub.area,
+                value: rawData.limits.workspacesPerHub.value,
+              },
+              testflowPerWorkspace: {
+                area: rawData.limits.testflowPerWorkspace.area,
+                value: rawData.limits.testflowPerWorkspace.value,
+              },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
+              blocksPerTestflow: {
+                area: rawData.limits.blocksPerTestflow.area,
+                value: rawData.limits.blocksPerTestflow.value,
+              },
+              selectiveTestflowRun: {
+                area: rawData.limits.selectiveTestflowRun.area,
+                active: rawData.limits.selectiveTestflowRun.active,
+              },
+              activeSync: {
+                area: rawData.limits.activeSync.area,
+                active: rawData.limits.activeSync.active,
+              },
+              testflowRunHistory: {
+                area: rawData.limits.testflowRunHistory.area,
+                value: rawData.limits.testflowRunHistory.value,
+              },
+            },
+            createdAt: rawData.createdAt,
+            updatedAt: rawData.updatedAt,
+            createdBy: rawData.createdBy,
+            updatedBy: rawData.updatedBy,
+          };
+          parsedPlans.push(planDetails);
+        }
+        await this.planRepository.upsertMany(parsedPlans);
       }
 
       await this.teamRepository.bulkInsertData(data);
@@ -481,6 +541,7 @@ export class DashboardViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
+    } else if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
     } else {
       notifications.error(response?.message);
     }
@@ -1242,4 +1303,48 @@ export class DashboardViewModel {
 
     return { collection, folder, file, workspace, testflow, environment };
   }
+
+  public getWorkspaceCount = async (teamId: string) => {
+    const workspaces = await this.teamRepository.getTeamDoc(teamId);
+    const count = workspaces?._data.workspaces?.length;
+    return count;
+  };
+
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?._data?.plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?._data?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error("Failed to Sent request. Please try again.");
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    window.open(
+      constants.ADMIN_URL + `/billing/billingInformation/changePlan/${teamId}`,
+      "_blank",
+    );
+    return;
+  };
+
+  public handleContactSales = async () => {
+    window.open(`${constants.MARKETING_URL}/pricing/`);
+  };
 }
