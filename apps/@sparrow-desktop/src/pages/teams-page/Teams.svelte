@@ -66,8 +66,7 @@
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-     const sparrowAdminUrl=  constants.SPARROW_ADMIN_URL
-
+  const sparrowAdminUrl = constants.ADMIN_URL;
 
   onMount(async () => {
     _viewModel.refreshTeams(userId);
@@ -263,7 +262,6 @@
     onCreateTeam={_viewModel.createTeam}
   />
 </Modal>
-
 
 <style>
   .githubStar {
