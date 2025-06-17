@@ -607,6 +607,7 @@
     onSearchClick={handleViewGlobalSearch}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
+    onAdminRedirect={_viewModel.onAdminRedirect}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
   />
 

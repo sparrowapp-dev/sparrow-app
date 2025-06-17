@@ -2,7 +2,8 @@ const constants = {
   API_URL: import.meta.env.VITE_WEB_API_URL,
   ENABLE_MIX_PANEL: import.meta.env.VITE_WEB_ENABLE_MIX_PANEL,
   MIX_PANEL_TOKEN: import.meta.env.VITE_WEB_MIX_PANEL_TOKEN,
-  POSTHOG_CONNECTION_API_KEY: import.meta.env.VITE_WEB_POSTHOG_CONNECTION_API_KEY,
+  POSTHOG_CONNECTION_API_KEY: import.meta.env
+    .VITE_WEB_POSTHOG_CONNECTION_API_KEY,
   POSTHOG_API_URL: import.meta.env.VITE_WEB_POSTHOG_API_URL,
   API_SEND_TIMEOUT: import.meta.env.VITE_WEB_API_TIMEOUT,
   RXDB_DB_NAME: "sparrow-db",
@@ -26,7 +27,8 @@ const constants = {
   BASE_URL: import.meta.env.VITE_WEB_BASE_URL,
   MARKETING_URL: import.meta.env.VITE_WEB_MARKETING_URL,
   INTRO_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/intro",
-  TESTFLOW_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/usermanual/testflows",
+  TESTFLOW_DOCS_URL:
+    import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/usermanual/testflows",
   PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
   SOCKET_IO_API_URL: import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_WEB_APP_ENVIRONMENT_PATH,
@@ -35,6 +37,7 @@ const constants = {
   SENTRY_DSN: import.meta.env.VITE_WEB_SENTRY_DSN,
   APP_ENVIRONMENT: import.meta.env.VITE_WEB_APP_ENVIRONMENT,
   SPARROW_WEB_APP_URL: import.meta.env.VITE_WEB_SPARROW_WEB_APP_URL,
+  SPARROW_WEB_ADMIN_URL: import.meta.env.VITE_WEB_SPARROW_ADMIN_URL,
 };
 
 export default constants;

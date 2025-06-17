@@ -143,6 +143,10 @@ export class DashboardViewModel {
     return;
   };
 
+  public onAdminRedirect = async () => {
+    await open(`${constants.SPARROW_ADMIN_URL}`);
+    return;
+  };
   /**
    *
    * @returns guest user state
@@ -814,7 +818,7 @@ export class DashboardViewModel {
         tree.type === ItemType.SOCKET_IO ||
         tree.type === ItemType.WEB_SOCKET
       ) {
-        let currentFolderDetails =
+        const currentFolderDetails =
           tree.folderId && tree.folderName
             ? { id: tree.folderId, name: tree.folderName }
             : tree.parentFolder
@@ -1047,15 +1051,15 @@ export class DashboardViewModel {
       { teamName: string; workspaceName: string }
     > = {},
   ) {
-    let collectionTree = await this.collectionRepository.getCollectionDocs();
+    const collectionTree = await this.collectionRepository.getCollectionDocs();
     const s = collectionTree.map((_t) => {
       return _t.toMutableJSON();
     });
 
-    let newtree = s;
-    let collection = [];
-    let folder = [];
-    let file = [];
+    const newtree = s;
+    const collection = [];
+    const folder = [];
+    const file = [];
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
