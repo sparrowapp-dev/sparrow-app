@@ -756,7 +756,20 @@
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
       onClick={(e) => {
         e.stopPropagation();
-        visibility = !visibility;
+        if (!isRenaming) {
+          visibility = !visibility;
+          if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+            if (visibility) {
+              addCollectionItem(collection.id, "collection");
+              onItemOpened("collection", {
+                workspaceId: collection.workspaceId,
+                collection,
+              });
+            } else {
+              removeCollectionItem(collection.id);
+            }
+          }
+        }
       }}
     />
     {#if isRenaming}
