@@ -330,7 +330,7 @@ export default class WorkspaceExplorerViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} person for ${_workspaceName}.`,
       );
     } else {
       if (response?.message === "Plan limit reached") {

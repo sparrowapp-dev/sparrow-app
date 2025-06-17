@@ -791,7 +791,7 @@
   let upgradePlanModel: boolean = false;
   let isActiveSyncPlanModalOpen = false;
   let planContent: any;
-  let planContentNonActive
+  let planContentNonActive:any;
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {

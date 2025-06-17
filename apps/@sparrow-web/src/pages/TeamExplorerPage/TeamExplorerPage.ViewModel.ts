@@ -429,7 +429,7 @@ export class TeamExplorerPageViewModel {
       await this.refreshWorkspaces(_userId);
       await this.teamRepository.modifyTeam(_teamId, responseData);
       notifications.success(
-        `Invite sent to ${_inviteBody.users.length} people for ${_teamName}.`,
+        `Invite sent to ${_inviteBody.users.length} person for ${_teamName}.`,
       );
     } else {
       if (response?.message === "Plan limit reached") {
@@ -883,7 +883,7 @@ export class TeamExplorerPageViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} person for ${_workspaceName}.`,
       );
     } else {
       notifications.error(`Failed to sent invite. Please try again.`);
@@ -917,7 +917,7 @@ export class TeamExplorerPageViewModel {
     );
     if (response.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
-      notifications.success(`Invite resent successfully!`);
+      notifications.success(`Invite resent successfully`);
       return response;
     } else {
       notifications.error("Failed to resend invite. Please try again.");
