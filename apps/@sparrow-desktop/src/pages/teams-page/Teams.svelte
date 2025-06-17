@@ -34,6 +34,10 @@
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
   import { open } from "@tauri-apps/plugin-shell";
+  import {
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
+  } from "@sparrow/common/components";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -43,6 +47,7 @@
   const modifyTeam = _viewModel.modifyTeam;
 
   let isCreateTeamModalOpen: boolean = false;
+  let isUpgradePlanModelOpen: boolean = false;
   const collectionList = _viewModel.collection;
   const onApiClick = _viewModel.handleApiClick;
   const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
@@ -60,6 +65,8 @@
   });
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  const sparrowAdminUrl = constants.ADMIN_URL;
 
   onMount(async () => {
     _viewModel.refreshTeams(userId);
@@ -232,7 +239,7 @@
         minSize={60}
         class="bg-secondary-800-important"
       >
-        <TeamExplorerPage />
+        <TeamExplorerPage {sparrowAdminUrl} />
       </Pane>
     </Splitpanes>
   </div>
