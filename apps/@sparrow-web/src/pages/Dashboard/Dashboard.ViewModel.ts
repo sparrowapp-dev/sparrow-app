@@ -474,7 +474,7 @@ export class DashboardViewModel {
     return;
   };
   public onAdminRedirect = async () => {
-    await open(`${constants.SPARROW_WEB_ADMIN_URL}`);
+    await open(`${constants.ADMIN_URL}`);
     return;
   };
   /**
