@@ -181,7 +181,7 @@ const makeRequest = async (
     if (e.code === "ERR_NETWORK") {
       return error(e.message);
     } else if (e.response?.data) {
-      return error(e.response?.data?.message);
+      return error(e.response?.data?.message, e.response?.data);
     }
     return error(e);
   } finally {

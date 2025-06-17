@@ -8,7 +8,7 @@
     EditRegular,
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
-  import { Button, Modal, Options } from "@sparrow/library/ui";
+  import { Button, Modal, notifications, Options } from "@sparrow/library/ui";
 
   export let conversation: {
     id: string;
@@ -42,6 +42,7 @@
     );
   };
   export let currOpenedConversationId: string;
+  export let chatPanelTitleLoader: boolean;
 
   let isDeleteConversationPopupOpen = false;
   let isDeleteLoading = false;
@@ -56,6 +57,7 @@
   let isRenaming = false;
   let newRequestName: string = "";
   let inputField: HTMLInputElement;
+  let renameLoader = false;
 
   function rightClickContextMenu(event) {
     event.stopPropagation();
@@ -77,7 +79,14 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
-      onRenameConversation(conversation.id, newRequestName);
+      if (currOpenedConversationId === conversation.id)
+        chatPanelTitleLoader = true;
+      renameLoader = true;
+      await onRenameConversation(conversation.id, newRequestName);
+      renameLoader = false;
+      if (currOpenedConversationId === conversation.id)
+        chatPanelTitleLoader = false;
+      notifications.success("Conversation title updated successfully.");
     }
     isRenaming = false;
     newRequestName = "";
@@ -108,7 +117,7 @@
   role="button"
   tabindex="0"
 >
-  <div class="conversation-content flex-fill pe-2">
+  <div class="conversation-content flex-fill">
     <!-- Title -->
     {#if isRenaming}
       <input
@@ -180,14 +189,25 @@
     </div>
   </div>
 
-  <button
-    id={"conversation-item-menu"}
-    bind:this={chatItemTabWrapper}
-    class="delete-btn position-absolute btn p-0 rounded-1 d-flex align-items-center justify-content-center"
-    on:click|stopPropagation={rightClickContextMenu}
-  >
-    <MoreHorizontalRegular size="12px" color="var(--icon-ds-neutral-100)" />
-  </button>
+  {#if renameLoader || (currOpenedConversationId === conversation.id && chatPanelTitleLoader)}
+    <Button
+      size="extra-small"
+      type="teritiary-regular"
+      loader={renameLoader ||
+      (currOpenedConversationId === conversation.id && chatPanelTitleLoader)
+        ? true
+        : false}
+    />
+  {:else}
+    <button
+      id={"conversation-item-menu"}
+      bind:this={chatItemTabWrapper}
+      class="delete-btn position-absolute btn p-0 rounded-1 d-flex align-items-center justify-content-center"
+      on:click|stopPropagation={rightClickContextMenu}
+    >
+      <MoreHorizontalRegular size="12px" color="var(--icon-ds-neutral-100)" />
+    </button>
+  {/if}
 </div>
 
 {#if showMenu}

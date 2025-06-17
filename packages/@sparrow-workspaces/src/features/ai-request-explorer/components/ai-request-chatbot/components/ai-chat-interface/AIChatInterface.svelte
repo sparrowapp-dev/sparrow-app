@@ -65,6 +65,7 @@
   let isRenaming = false;
   let newRequestName: string = "";
   let inputField: HTMLInputElement;
+  let renameLoader = false;
 
   let chatContainer: HTMLElement;
   /**
@@ -140,7 +141,10 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
-      onRenameConversation(currTabAiInfo.conversationId, newRequestName);
+      renameLoader = true;
+      await onRenameConversation(currTabAiInfo.conversationId, newRequestName);
+      renameLoader = false;
+      notifications.success("Conversation title updated successfully.");
     }
     isRenaming = false;
     newRequestName = "";
@@ -272,6 +276,7 @@
                     onSelectConversation={onSwitchConversation}
                     {onRenameConversation}
                     {onDeleteConversation}
+                    bind:chatPanelTitleLoader={renameLoader}
                   />
                 {/each}
               </div>
@@ -398,16 +403,24 @@
                   <Tooltip title={"Edit Title"} placement={"top-center"}>
                     <div style="flex-shrink: 0;">
                       <div style="transform: scale(0.85);">
-                        <Button
-                          size="extra-small"
-                          startIcon={EditRegular}
-                          type="teritiary-regular"
-                          disable={isRenaming}
-                          onClick={() => {
-                            isRenaming = true;
-                            setTimeout(() => inputField.focus(), 100);
-                          }}
-                        />
+                        {#if renameLoader}
+                          <Button
+                            size="extra-small"
+                            type="teritiary-regular"
+                            loader={renameLoader}
+                          />
+                        {:else}
+                          <Button
+                            size="extra-small"
+                            startIcon={EditRegular}
+                            type="teritiary-regular"
+                            disable={isRenaming}
+                            onClick={() => {
+                              isRenaming = true;
+                              setTimeout(() => inputField.focus(), 100);
+                            }}
+                          />
+                        {/if}
                       </div>
                     </div>
                   </Tooltip>

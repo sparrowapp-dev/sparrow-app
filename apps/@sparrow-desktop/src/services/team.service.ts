@@ -194,4 +194,17 @@ export class TeamService {
     );
     return response;
   };
+  public requestOwnerToUpgradePlan = async (
+    teamId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/team/${teamId}/requestPlan`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

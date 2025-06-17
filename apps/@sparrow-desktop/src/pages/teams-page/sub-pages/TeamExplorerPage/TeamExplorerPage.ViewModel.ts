@@ -28,6 +28,8 @@ import { getClientUser } from "../../../../utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
+import { PlanRepository } from "@app/repositories/plan.repository";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -41,6 +43,7 @@ export class TeamExplorerPageViewModel {
   private guestUserRepository = new GuestUserRepository();
   private userService = new UserService();
   private recentWorkspaceRepository = new RecentWorkspaceRepository();
+  private planRepository = new PlanRepository();
 
   private _activeTeamTab: BehaviorSubject<string> = new BehaviorSubject(
     "Workspaces",
@@ -153,6 +156,7 @@ export class TeamExplorerPageViewModel {
           workspaces,
           owner,
           admins,
+          plan,
           createdAt,
           createdBy,
           updatedAt,
@@ -178,6 +182,7 @@ export class TeamExplorerPageViewModel {
           workspaces: updatedWorkspaces,
           owner,
           admins,
+          plan,
           isActiveTeam: false,
           createdAt,
           createdBy,
@@ -317,6 +322,10 @@ export class TeamExplorerPageViewModel {
       notifications.success("New Workspace created successfully.");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
+    //else if (response?.data?.statusCode) {
+    //   notifications.error(response?.data?.message);
+    // }
+    return response;
   };
 
   /**
@@ -447,12 +456,16 @@ export class TeamExplorerPageViewModel {
       await this.refreshWorkspaces(_userId);
       await this.teamRepository.modifyTeam(_teamId, responseData);
       notifications.success(
-        `Invite sent to ${_inviteBody.users.length} person for ${_teamName}.`,
+        `Invite sent to ${_inviteBody.users.length} ${
+          _inviteBody.users.length === 1 ? "person" : "people"
+        } for ${_teamName}.`,
       );
     } else {
-      notifications.error(
-        response?.message || "Failed to send invite. Please try again.",
-      );
+      if (response?.message === "Plan limit reached") {
+        // notifications.error("Failed to send invite. please upgrade your plan.");
+      } else {
+        notifications.error("Failed to Sent request. Please try again.");
+      }
     }
     return response;
   };
@@ -920,7 +933,9 @@ export class TeamExplorerPageViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} person for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} ${
+          _invitedUserCount === 1 ? "person" : "people"
+        } for ${_workspaceName}.`,
       );
     } else {
       notifications.error(`Failed to send invite. Please try again.`);
@@ -1000,5 +1015,41 @@ export class TeamExplorerPageViewModel {
     } else {
       notifications.error(`Failed to ignore invite. Please try again.`);
     }
+  };
+
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    await open(
+      `${constants.ADMIN_URL}/billing/billingInformation/changePlan/${teamId}`,
+    );
+  };
+
+  public handleContactSales = async () => {
+    await open(`${constants.MARKETING_URL}/pricing/`);
   };
 }
