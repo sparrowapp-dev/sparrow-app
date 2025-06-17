@@ -96,7 +96,7 @@
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import { PlanUpgradeModal } from "@sparrow/common/components";
-  import { planInfoByRole } from "@sparrow/common/utils";
+  import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { ResponseMessage } from "@sparrow/common/enums";
   const _viewModel = new CollectionsViewModel();
 
@@ -791,6 +791,7 @@
   let upgradePlanModel: boolean = false;
   let isActiveSyncPlanModalOpen = false;
   let planContent: any;
+  let planContentNonActive:any;
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {
@@ -835,6 +836,7 @@
     handleLimits();
     if (userRole) {
       planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
     }
   }
 </script>
@@ -1045,7 +1047,7 @@
                           {currentWorkspace}
                           {handleCreateEnvironment}
                           onCreateTestflow={() => {
-                            _viewModel3.handleCreateTestflow();
+                            handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
@@ -1806,7 +1808,7 @@
 <PlanUpgradeModal
   bind:isOpen={isActiveSyncPlanModalOpen}
   title={planContent?.title}
-  description={planContent?.description}
+  description={planContentNonActive?.description}
   planType="Active Sync"
   activePlan={"disabled"}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN

@@ -265,8 +265,8 @@
   title={planContent?.title}
   description={planContent?.description}
   planType="Collaborators"
-  planLimitValue={userLimits?.usersPerHub?.value + 1 || 5}
-  currentPlanValue={activeWorkspace?._data?.users.length - 1 || 1}
+  planLimitValue={userLimits?.usersPerHub?.value}
+  currentPlanValue={currentWorkspace?.users.length - 1 || 1}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
