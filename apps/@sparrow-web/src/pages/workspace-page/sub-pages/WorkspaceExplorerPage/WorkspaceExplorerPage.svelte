@@ -197,7 +197,7 @@
   {handleContactOwner}
   onClickHubUrl={_viewModel.handleHubTabCreation}
   handleContactSales={_viewModel.handleContactSales}
-  {currrentInvites}
+  bind:currrentInvites
   {planLimits}
   {teamDetails}
 />

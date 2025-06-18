@@ -197,7 +197,7 @@
   handleContactSales={_viewModel.handleContactSales}
   {planLimits}
   {teamDetails}
-  {currrentInvites}
+  bind:currrentInvites
   activeWorkspace={$activeWorkspace}
   onClickHubUrl={_viewModel.handleHubTabCreation}
 />
