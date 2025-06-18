@@ -2845,7 +2845,7 @@ class RestExplorerViewModel {
         isDocAlreadyGenerated: true,
       });
     } else if (response?.message === "Limit reached. Please try again later.") {
-      notifications.warning(
+      notifications.error(
         "Failed to generate documentation. Your monthly AI usage limit is reached.",
       );
     }
