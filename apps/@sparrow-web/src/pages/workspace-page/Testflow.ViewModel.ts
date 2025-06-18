@@ -178,9 +178,12 @@ export class TestflowViewModel {
         isFirstTimeInTestFlow.set(false);
       }
       return;
+    } else if (response?.data?.statusCode) {
+      // notifications.error(response?.data?.message);
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }
+    return response;
   };
 
   /**
@@ -446,5 +449,11 @@ export class TestflowViewModel {
       }
       return false;
     }
+  };
+
+  public currentTestflowCount = async (workspaceId: string) => {
+    const testflowDetails =
+      await this.testflowRepository.getTestflowByWorkspaceId(workspaceId);
+    return testflowDetails?.length;
   };
 }

@@ -98,6 +98,10 @@
     updateDynamicExpressionValue,
   } from "../store/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { planInfoByRole } from "@sparrow/common/utils";
+  import { TeamRole } from "@sparrow/common/enums";
+  import { planContentDisable } from "@sparrow/common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -127,6 +131,20 @@
   export let onPreviewExpression;
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
+  export let planLimitRunHistoryCount: number = 5;
+  export let planLimitTestFlowBlocks: number = 5;
+  export let planLimitTestFlows: number = 3;
+  export let testflowCount: number = 1;
+  export let teamDetails: any;
+  export let testflowBlocksPlanModalOpen: boolean = false;
+  export let handleRequestOwner: () => void;
+  export let handleRedirectToAdminPanel: () => void;
+  export let handleContactSales: () => void;
+  export let runHistoryPlanModalOpen: boolean = false;
+  export let selectiveRunModalOpen: boolean = false;
+  export let selectiveRunTestflow: boolean = false;
+  let planContent: any;
+  let planContentNonActive: any;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -750,7 +768,13 @@
     _direction = "add-block-after",
   ) => {
     if (!_id) return;
-
+    if ($nodes.length >= planLimitTestFlowBlocks + 1) {
+      testflowBlocksPlanModalOpen = true;
+      // notifications.error(
+      //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
+      // );
+      return;
+    }
     let requestData;
     if (_requestData) {
       requestData = await createCustomRequestObject(
@@ -1093,6 +1117,9 @@
       if (!isIdExist) {
         selectedNode = undefined;
       }
+      if (testflowStore?.history.length > 0) {
+        handleTestFlowHistoryLimit();
+      }
     }
   }
 
@@ -1324,6 +1351,9 @@
   });
 
   const partialRun = async (_id: string, _event: string) => {
+    if (!selectiveRunTestflow) {
+      selectiveRunModalOpen = true;
+    }
     if (!testflowStore?.isTestFlowRunning) {
       unselectNodes();
       await onClickRun(_id, _event);
@@ -1397,6 +1427,23 @@
       });
     }
   };
+
+  const handleTestFlowHistoryLimit = () => {
+    if (testflowStore?.history) {
+      const updateHistoryItems = testflowStore.history.slice(
+        0,
+        planLimitRunHistoryCount,
+      );
+      testflowStore.history = updateHistoryItems;
+    }
+  };
+
+  $: {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
+    }
+  }
 </script>
 
 <div
@@ -1506,6 +1553,8 @@
       {/if}
       <div class="position-relative">
         <RunHistory
+          bind:runHistoryPlanModalOpen
+          bind:planLimitRunHistoryCount
           {testflowStore}
           testflowName={$tab?.name}
           {toggleHistoryDetails}
@@ -1701,16 +1750,18 @@
   {/if}
 
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    <p
-      class="mb-0 pb-0 text-fs-14"
-      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
-      on:click={() => {
-        currentStep.set(1);
-        isTestFlowTourGuideOpen.set(true);
-      }}
-    >
-      Need help?
-    </p>
+    {#if testflowCount <= planLimitTestFlows}
+      <p
+        class="mb-0 pb-0 text-fs-14"
+        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
+        on:click={() => {
+          currentStep.set(1);
+          isTestFlowTourGuideOpen.set(true);
+        }}
+      >
+        Need help?
+      </p>
+    {/if}
   </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
@@ -1812,6 +1863,65 @@
     }}
   />
 </Modal>
+
+<PlanUpgradeModal
+  bind:isOpen={testflowBlocksPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Test flow blocks"
+  planLimitValue={planLimitTestFlowBlocks}
+  currentPlanValue={$nodes.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={runHistoryPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Run History"
+  planLimitValue={planLimitRunHistoryCount}
+  currentPlanValue={testflowStore?.history.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={selectiveRunModalOpen}
+  title={planContent?.title}
+  description={planContentNonActive?.description}
+  planType="Selective Runs"
+  activePlan={selectiveRunTestflow ? "active" : "disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   :global(.svelte-flow__attribution) {
