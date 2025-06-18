@@ -189,25 +189,33 @@
     </div>
   </div>
 
-  {#if renameLoader || (currOpenedConversationId === conversation.id && chatPanelTitleLoader)}
-    <Button
-      size="extra-small"
-      type="teritiary-regular"
-      loader={renameLoader ||
-      (currOpenedConversationId === conversation.id && chatPanelTitleLoader)
-        ? true
-        : false}
-    />
-  {:else}
-    <button
-      id={"conversation-item-menu"}
+  <div
+    id={"conversation-item-menu"}
+    style="flex-shrink: 0;"
+    class="delete-btn position-absolute"
+    class:menu-open={showMenu}
+    class:loading={renameLoader ||
+      (currOpenedConversationId === conversation.id && chatPanelTitleLoader)}
+  >
+    <div
+      style="transform: scale(0.85); line-height: 1;"
       bind:this={chatItemTabWrapper}
-      class="delete-btn position-absolute btn p-0 rounded-1 d-flex align-items-center justify-content-center"
-      on:click|stopPropagation={rightClickContextMenu}
     >
-      <MoreHorizontalRegular size="12px" color="var(--icon-ds-neutral-100)" />
-    </button>
-  {/if}
+      <Button
+        id="conversation-item-menu"
+        size="extra-small"
+        type="teritiary-regular"
+        buttonClassProp=""
+        loader={renameLoader ||
+          (currOpenedConversationId === conversation.id &&
+            chatPanelTitleLoader)}
+        startIcon={renameLoader || chatPanelTitleLoader
+          ? ""
+          : MoreHorizontalRegular}
+        onClick={rightClickContextMenu}
+      />
+    </div>
+  </div>
 </div>
 
 {#if showMenu}
@@ -387,18 +395,17 @@
     transition:
       opacity 0.15s ease,
       background-color 0.15s ease;
-    top: 6px;
+    top: 4px;
     right: 8px;
     width: 20px;
     height: 20px;
+    z-index: 10;
   }
 
-  .conversation-item:hover .delete-btn {
+  .conversation-item:hover .delete-btn,
+  .delete-btn.menu-open,
+  .delete-btn.loading {
     opacity: 1;
-  }
-
-  .delete-btn:hover {
-    background-color: var(--bg-ds-surface-600) !important;
   }
 
   .cursor-pointer {
