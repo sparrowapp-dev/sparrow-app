@@ -268,6 +268,7 @@
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
+    {isGuestUser}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
