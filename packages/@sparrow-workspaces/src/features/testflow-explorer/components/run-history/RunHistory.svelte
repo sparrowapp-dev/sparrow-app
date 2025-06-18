@@ -20,6 +20,7 @@
   export let toggleHistoryContainer;
   export let planLimitRunHistoryCount;
   export let runHistoryPlanModalOpen = false;
+  export let isGuestUser = false;
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -263,7 +264,7 @@
                   </div>
                 {/each}
               {/if}
-              {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitRunHistoryCount}
+              {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitRunHistoryCount && !isGuestUser}
                 <div
                   class="d-flex flex-row justify-content-center align-items-center"
                 >
