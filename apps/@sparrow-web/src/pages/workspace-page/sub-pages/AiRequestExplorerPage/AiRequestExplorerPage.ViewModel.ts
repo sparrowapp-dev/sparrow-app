@@ -2073,6 +2073,8 @@ class AiRequestExplorerViewModel {
 
               if (response.message.includes("Limit Reached")) {
                 errorMessage = "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+              } else if (response.message.includes("Some Issue Occurred")) {
+                errorMessage = "Some issue occurred from server while processing your request, please try again.";
               } else {
                 errorMessage = response.message; // Use the actual error message from the response
               }
