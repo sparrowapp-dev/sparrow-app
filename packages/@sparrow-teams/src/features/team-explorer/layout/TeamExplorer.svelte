@@ -742,7 +742,9 @@
   description={planContent?.description}
   planType="Collaborators"
   planLimitValue={userLimits?.usersPerHub?.value || 5}
-  currentPlanValue={openTeam?._data?.users.length - 1 || 5}
+  currentPlanValue={(openTeam?._data?.invites?.length || 0) +
+    (openTeam?._data?.users?.length || 0) -
+    1}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

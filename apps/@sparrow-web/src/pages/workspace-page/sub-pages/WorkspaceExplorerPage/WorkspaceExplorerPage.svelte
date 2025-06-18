@@ -42,6 +42,7 @@
   let isPublishedModalOpen = false;
   let isShareModalOpen = false;
   let isFailedPublishedModalOpen = false;
+  let currrentInvites: number;
   let upgradePlanModalInvite: boolean = false;
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
@@ -99,6 +100,7 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        currrentInvites = currentTeam._data.invites?.length || 0;
         isSharedWorkspace = value._data.isShared;
         workspaceType = value._data?.workspaceType || "PRIVATE";
       }
@@ -151,9 +153,11 @@
   };
 
   const planLimits = async () => {
+    let response;
     if (teamDetails?.teamId) {
-      await _viewModel.userPlanLimits(teamDetails?.teamId);
+      response = await _viewModel.userPlanLimits(teamDetails?.teamId);
     }
+    return response;
   };
 
   // $:{
@@ -195,6 +199,7 @@
   {handleContactOwner}
   onClickHubUrl={_viewModel.handleHubTabCreation}
   handleContactSales={_viewModel.handleContactSales}
+  bind:currrentInvites
   {planLimits}
   {teamDetails}
 />

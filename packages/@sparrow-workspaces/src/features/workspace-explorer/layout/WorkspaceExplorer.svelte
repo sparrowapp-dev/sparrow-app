@@ -14,6 +14,7 @@
   import { SparrowOutlineIcon } from "@sparrow/common/icons";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { onMount } from "svelte";
 
   /**
    * The length of collections related to the workspace.
@@ -74,6 +75,7 @@
   export let activeWorkspace;
 
   export let isShareModalOpen;
+  export let currrentInvites;
 
   export let upgradePlanModalInvite: boolean = false;
   export let handleRedirectAdminPanel: () => void;
@@ -125,12 +127,12 @@
     userLimits = data;
   };
 
-  $: {
+  onMount(() => {
     getPlanLimits();
     if (userRole) {
       planContent = planInfoByRole(userRole);
     }
-  }
+  });
 </script>
 
 {#if isSharedWorkspace && workspaceType === WorkspaceType.PUBLIC}
@@ -275,7 +277,9 @@
   description={planContent?.description}
   planType="Collaborators"
   planLimitValue={userLimits?.usersPerHub?.value}
-  currentPlanValue={currentWorkspace?.users.length - 1 || 1}
+  currentPlanValue={currrentInvites +
+    (currentWorkspace?.users?.length || 0) -
+    1}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
