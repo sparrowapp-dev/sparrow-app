@@ -403,24 +403,17 @@
                   <Tooltip title={"Edit Title"} placement={"top-center"}>
                     <div style="flex-shrink: 0;">
                       <div style="transform: scale(0.85);">
-                        {#if renameLoader}
-                          <Button
-                            size="extra-small"
-                            type="teritiary-regular"
-                            loader={renameLoader}
-                          />
-                        {:else}
-                          <Button
-                            size="extra-small"
-                            startIcon={EditRegular}
-                            type="teritiary-regular"
-                            disable={isRenaming}
-                            onClick={() => {
-                              isRenaming = true;
-                              setTimeout(() => inputField.focus(), 100);
-                            }}
-                          />
-                        {/if}
+                        <Button
+                          size="extra-small"
+                          startIcon={renameLoader ? "" : EditRegular}
+                          type="teritiary-regular"
+                          disable={isRenaming}
+                          loader={renameLoader}
+                          onClick={() => {
+                            isRenaming = true;
+                            setTimeout(() => inputField.focus(), 100);
+                          }}
+                        />
                       </div>
                     </div>
                   </Tooltip>
