@@ -14,6 +14,7 @@
   import { SparrowOutlineIcon } from "@sparrow/common/icons";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { onMount } from "svelte";
 
   /**
    * The length of collections related to the workspace.
@@ -126,12 +127,12 @@
     userLimits = data;
   };
 
-  $: {
+  onMount(() => {
     getPlanLimits();
     if (userRole) {
       planContent = planInfoByRole(userRole);
     }
-  }
+  });
 </script>
 
 {#if isSharedWorkspace && workspaceType === WorkspaceType.PUBLIC}

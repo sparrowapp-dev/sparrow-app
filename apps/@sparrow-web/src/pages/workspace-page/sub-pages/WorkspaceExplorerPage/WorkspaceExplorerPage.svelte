@@ -153,9 +153,11 @@
   };
 
   const planLimits = async () => {
+    let response;
     if (teamDetails?.teamId) {
-      await _viewModel.userPlanLimits(teamDetails?.teamId);
+      response = await _viewModel.userPlanLimits(teamDetails?.teamId);
     }
+    return response;
   };
 
   // $:{
