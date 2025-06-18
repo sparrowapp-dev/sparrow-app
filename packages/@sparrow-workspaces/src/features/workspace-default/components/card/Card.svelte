@@ -33,7 +33,7 @@
     width: 155px;
     border: 0.5px solid var(--border-tertiary-400);
     border: none;
-    background-color: var(--bg-secondary-850);
+    background-color: var(--bg-ds-surface-800);
     border-radius: 4px;
     cursor: pointer;
     display: flex;

@@ -247,8 +247,8 @@ export class DashboardViewModel {
         constants.API_URL,
       );
 
-      const parsedPlans = [];
-      if (response.isSuccessful && planResponse.data.data) {
+      if (planResponse.isSuccessful && planResponse.data.data) {
+        const parsedPlans = [];
         for (const planData of planResponse.data.data) {
           const rawData = planData;
           if (!rawData?._id) continue;
@@ -295,17 +295,16 @@ export class DashboardViewModel {
           parsedPlans.push(planDetails);
         }
         await this.planRepository.upsertMany(parsedPlans);
-      }
-
-      await this.teamRepository.bulkInsertData(data);
-      await this.teamRepository.deleteOrphanTeams(
-        data.map((_team) => {
-          return _team.teamId;
-        }),
-      );
-      if (!isAnyTeamsOpen) {
-        this.teamRepository.setOpenTeam(data[0].teamId);
-        return;
+        await this.teamRepository.bulkInsertData(data);
+        await this.teamRepository.deleteOrphanTeams(
+          data.map((_team) => {
+            return _team.teamId;
+          }),
+        );
+        if (!isAnyTeamsOpen) {
+          this.teamRepository.setOpenTeam(data[0].teamId);
+          return;
+        }
       }
     }
   };

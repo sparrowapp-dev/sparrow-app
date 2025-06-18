@@ -157,8 +157,8 @@ export class TeamsViewModel {
       }
       const planResponse = await this.planService.getPlansByIds(userPlans);
 
-      const parsedPlans = [];
-      if (response.isSuccessful && planResponse.data.data) {
+      if (planResponse.isSuccessful && planResponse.data.data) {
+        const parsedPlans = [];
         for (const planData of planResponse.data.data) {
           const rawData = planData;
           if (!rawData?._id) continue;
@@ -205,16 +205,16 @@ export class TeamsViewModel {
           parsedPlans.push(planDetails);
         }
         await this.planRepository.upsertMany(parsedPlans);
-      }
-      await this.teamRepository.bulkInsertData(data);
-      await this.teamRepository.deleteOrphanTeams(
-        data.map((_team) => {
-          return _team.teamId;
-        }),
-      );
-      if (!isAnyTeamsOpen) {
-        this.teamRepository.setOpenTeam(data[0].teamId);
-        return;
+        await this.teamRepository.bulkInsertData(data);
+        await this.teamRepository.deleteOrphanTeams(
+          data.map((_team) => {
+            return _team.teamId;
+          }),
+        );
+        if (!isAnyTeamsOpen) {
+          this.teamRepository.setOpenTeam(data[0].teamId);
+          return;
+        }
       }
     }
   };
@@ -337,20 +337,68 @@ export class TeamsViewModel {
     if (response?.isSuccessful && response?.data?.data) {
       const teamAdapter = new TeamAdapter();
       const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
-      await this.teamRepository.insert(adaptedTeam);
-      await this.teamRepository.setOpenTeam(response.data.data?._id);
-      notifications.success(`New hub ${team.name} is created.`);
-      if (response?.data?.data.plan?.name === planType.COMMUNITY) {
-        planBannerisOpen.set(true);
+      const planResponse = await this.planService.getPlansByIds([adaptedTeam.plan.id]);
+
+      if (planResponse.isSuccessful && planResponse.data.data) {
+        const parsedPlans = [];
+        for (const planData of planResponse.data.data) {
+          const rawData = planData;
+          if (!rawData?._id) continue;
+          const planDetails = {
+            planId: rawData._id,
+            name: rawData.name,
+            description: rawData.description,
+            active: rawData.active,
+            limits: {
+              workspacesPerHub: {
+                area: rawData.limits.workspacesPerHub.area,
+                value: rawData.limits.workspacesPerHub.value,
+              },
+              testflowPerWorkspace: {
+                area: rawData.limits.testflowPerWorkspace.area,
+                value: rawData.limits.testflowPerWorkspace.value,
+              },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
+              blocksPerTestflow: {
+                area: rawData.limits.blocksPerTestflow.area,
+                value: rawData.limits.blocksPerTestflow.value,
+              },
+              selectiveTestflowRun: {
+                area: rawData.limits.selectiveTestflowRun.area,
+                active: rawData.limits.selectiveTestflowRun.active,
+              },
+              activeSync: {
+                area: rawData.limits.activeSync.area,
+                active: rawData.limits.activeSync.active,
+              },
+              testflowRunHistory: {
+                area: rawData.limits.testflowRunHistory.area,
+                value: rawData.limits.testflowRunHistory.value,
+              },
+            },
+            createdAt: rawData.createdAt,
+            updatedAt: rawData.updatedAt,
+            createdBy: rawData.createdBy,
+            updatedBy: rawData.updatedBy,
+          };
+          parsedPlans.push(planDetails);
+        }
+        await this.planRepository.upsertMany(parsedPlans);
+        await this.teamRepository.insert(adaptedTeam);
+        await this.teamRepository.setOpenTeam(response.data.data?._id);
+        notifications.success(`New hub ${team.name} is created.`);
+        if (response?.data?.data.plan?.name === planType.COMMUNITY) {
+          planBannerisOpen.set(true);
+        }
+      }else{
+        notifications.error("Failed to fetch plan. Please try again.");
       }
     } else {
-      if (response?.message === "Plan limit reached") {
-        notifications.error(
-          "You’ve reached the limit of private hub on your current plan. Upgrade to create more private hubs",
-        );
-      } else {
         notifications.error("Failed to create hub. Please try again.");
-      }
+      
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
