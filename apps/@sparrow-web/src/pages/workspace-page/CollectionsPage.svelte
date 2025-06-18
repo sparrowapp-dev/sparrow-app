@@ -590,6 +590,15 @@
     }
   };
 
+  const handleLimits = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      const data = await _viewModel.userPlanLimits(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      userLimits = data;
+    }
+  };
+
   let isInitialDataLoading = true;
 
   const cw = currentWorkspace.subscribe(async (value) => {
@@ -815,7 +824,7 @@
   let upgradePlanModel: boolean = false;
   let isActiveSyncPlanModalOpen = false;
   let planContent: any;
-  let planContentNonActive:any;
+  let planContentNonActive: any;
   let currentTestflow: number = 3;
 
   const handleCreateTestflowCheck = async () => {
@@ -826,15 +835,6 @@
     handleLimits();
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModel = true;
-    }
-  };
-
-  const handleLimits = async () => {
-    if ($currentWorkspace?._data?.team?.teamId) {
-      const data = await _viewModel.userPlanLimits(
-        $currentWorkspace?._data?.team?.teamId,
-      );
-      userLimits = data;
     }
   };
 

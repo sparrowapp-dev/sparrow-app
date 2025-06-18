@@ -98,12 +98,14 @@
               >
                 {team.name || ""}
               </p>
-              <span class="ps-2 team-plan-tag">
-                <PlanTag
-                  plan={(team?.plan?.name || "community").toLowerCase()}
-                  text={team?.plan?.label || ""}
-                />
-              </span>
+              {#if team?.plan?.name}
+                <span class="ps-2 team-plan-tag">
+                  <PlanTag
+                    plan={(team?.plan?.name || "community").toLowerCase()}
+                    text={team?.plan?.label || ""}
+                  />
+                </span>
+              {/if}
             </div>
           </div>
           {#if team.isNewInvite}

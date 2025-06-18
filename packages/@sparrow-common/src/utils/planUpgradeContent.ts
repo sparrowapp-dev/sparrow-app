@@ -42,6 +42,6 @@ export const planInfoByRole = (role: string): RoleInfo => {
 export const planContentDisable = () => {
   return {
     description:
-      "This feature is currently disabled for your current plan. To continue using this feature, you’ll need to upgrade Only the owner can upgrade the plan. Please contact the owner to get the plan upgraded.",
+      "This feature is currently disabled for your current plan. To continue using this feature, you’ll need to upgrade. Only the owner can upgrade the plan. Please contact the owner to get the plan upgraded.",
   };
 };
