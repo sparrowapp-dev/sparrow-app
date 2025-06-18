@@ -143,6 +143,7 @@
   export let runHistoryPlanModalOpen: boolean = false;
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
+  export let isGuestUser = false;
   let planContent: any;
   let planContentNonActive: any;
 
@@ -768,7 +769,7 @@
     _direction = "add-block-after",
   ) => {
     if (!_id) return;
-    if ($nodes.length >= planLimitTestFlowBlocks + 1) {
+    if ($nodes.length >= planLimitTestFlowBlocks + 1 && !isGuestUser) {
       testflowBlocksPlanModalOpen = true;
       // notifications.error(
       //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
@@ -1351,7 +1352,7 @@
   });
 
   const partialRun = async (_id: string, _event: string) => {
-    if (!selectiveRunTestflow) {
+    if (!selectiveRunTestflow && !isGuestUser) {
       selectiveRunModalOpen = true;
     }
     if (!testflowStore?.isTestFlowRunning) {
@@ -1429,7 +1430,7 @@
   };
 
   const handleTestFlowHistoryLimit = () => {
-    if (testflowStore?.history) {
+    if (testflowStore?.history && !isGuestUser) {
       const updateHistoryItems = testflowStore.history.slice(
         0,
         planLimitRunHistoryCount,
@@ -1559,6 +1560,7 @@
           testflowName={$tab?.name}
           {toggleHistoryDetails}
           {toggleHistoryContainer}
+          {isGuestUser}
         />
       </div>
     </div>
@@ -1750,7 +1752,7 @@
   {/if}
 
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    {#if testflowCount <= planLimitTestFlows}
+    {#if testflowCount <= planLimitTestFlows || isGuestUser}
       <p
         class="mb-0 pb-0 text-fs-14"
         style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
