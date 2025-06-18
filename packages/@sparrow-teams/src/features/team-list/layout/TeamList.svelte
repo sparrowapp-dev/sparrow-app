@@ -98,16 +98,16 @@
               >
                 {team.name || ""}
               </p>
-              {#if team?.plan?.name}
-                <span class="ps-2 team-plan-tag">
-                  <PlanTag
-                    plan={(team?.plan?.name || "community").toLowerCase()}
-                    text={team?.plan?.label || ""}
-                  />
-                </span>
-              {/if}
             </div>
           </div>
+          {#if team?.plan?.name}
+            <span class="ps-2 team-plan-tag">
+              <PlanTag
+                plan={(team?.plan?.name || "community").toLowerCase()}
+                text={team?.plan?.label || ""}
+              />
+            </span>
+          {/if}
           {#if team.isNewInvite}
             <p class="mb-0 new-invite text-labelColor w-50 ellipsis">
               NEW INVITE
@@ -210,7 +210,7 @@
     font-size: 12px !important;
   }
   .teams-title {
-    width: calc(100% - 40px);
+    /* width: calc(100% - 40px); */
     text-align: left;
   }
 
@@ -233,7 +233,7 @@
     min-width: 0;
   }
   .team-name-ellipsis {
-    max-width: 90px;
+    /* max-width: 90px; */
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
