@@ -2338,6 +2338,16 @@ class AiRequestExplorerViewModel {
         isLimitReached: false,
         target,
       };
+    } else if (
+      response?.data?.message === "Limit reached. Please try again later."
+    ) {
+      return {
+        successStatus: false,
+        message: response.data.message,
+        aiGeneratedPrompt: "",
+        isLimitReached: true,
+        target,
+      };
     }
 
     return {

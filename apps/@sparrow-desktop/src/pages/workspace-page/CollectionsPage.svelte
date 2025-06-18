@@ -540,6 +540,15 @@
   let planContentNonActive: any;
   let currentTestflow: number = 3;
 
+  const handleLimits = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      const data = await _viewModel.userPlanLimits(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      userLimits = data;
+    }
+  };
+
   const handleCreateTestflowCheck = async () => {
     currentTestflow = await _viewModel3.currentTestflowCount(
       $currentWorkspace?._id,
@@ -548,15 +557,6 @@
     handleLimits();
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModel = true;
-    }
-  };
-
-  const handleLimits = async () => {
-    if ($currentWorkspace?._data?.team?.teamId) {
-      const data = await _viewModel.userPlanLimits(
-        $currentWorkspace?._data?.team?.teamId,
-      );
-      userLimits = data;
     }
   };
 

@@ -44,6 +44,7 @@
   let isShareModalOpen = false;
   let isFailedPublishedModalOpen = false;
   let upgradePlanModalInvite: boolean = false;
+  let currrentInvites: number;
 
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
@@ -101,6 +102,7 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
+        currrentInvites = currentTeam._data.invites?.length || 0;
         isSharedWorkspace = value._data.isShared;
         workspaceType = value._data?.workspaceType || "PRIVATE";
       }
@@ -195,6 +197,7 @@
   handleContactSales={_viewModel.handleContactSales}
   {planLimits}
   {teamDetails}
+  {currrentInvites}
   activeWorkspace={$activeWorkspace}
   onClickHubUrl={_viewModel.handleHubTabCreation}
 />

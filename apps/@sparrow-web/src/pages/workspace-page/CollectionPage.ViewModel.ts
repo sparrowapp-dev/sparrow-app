@@ -8207,7 +8207,7 @@ export default class CollectionsViewModel {
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
     window.open(
-      constants.ADMIN_URL + `/billing/billingInformation/changePlan/${teamId}`,
+      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
       "_blank",
     );
   };

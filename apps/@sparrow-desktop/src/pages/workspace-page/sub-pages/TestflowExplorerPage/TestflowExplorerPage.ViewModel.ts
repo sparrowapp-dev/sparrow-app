@@ -1548,12 +1548,14 @@ export class TestflowExplorerPageViewModel {
           isSuccessful: true,
         };
       }
-      const baseUrl = await this.constructBaseUrl(this._tab.getValue().path.workspaceId);
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
         environmentVariables.global.id,
         payload,
-        baseUrl
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list
@@ -1771,9 +1773,7 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(
-      `${constants.ADMIN_URL}/billing/billingInformation/changePlan/${teamId}`,
-    );
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
   };
 
   public handleContactSales = async () => {

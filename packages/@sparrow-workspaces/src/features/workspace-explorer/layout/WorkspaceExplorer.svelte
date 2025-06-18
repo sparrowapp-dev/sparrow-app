@@ -74,6 +74,7 @@
   export let activeWorkspace;
 
   export let isShareModalOpen;
+  export let currrentInvites;
 
   export let upgradePlanModalInvite: boolean = false;
   export let handleRedirectAdminPanel: () => void;
@@ -275,7 +276,9 @@
   description={planContent?.description}
   planType="Collaborators"
   planLimitValue={userLimits?.usersPerHub?.value}
-  currentPlanValue={currentWorkspace?.users.length - 1 || 1}
+  currentPlanValue={currrentInvites +
+    (currentWorkspace?.users?.length || 0) -
+    1}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}
