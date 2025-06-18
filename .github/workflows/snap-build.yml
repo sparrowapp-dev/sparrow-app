@@ -80,7 +80,6 @@ jobs:
           sudo apt update
           sudo apt install -y yarn
 
-
       - name: Install project dependencies
         run: yarn
 
@@ -96,11 +95,11 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn workspace @sparrow/desktop tauri build --bundles deb 
-          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
+          # yarn workspace @sparrow/desktop tauri build --bundles deb 
+          yarn workspace @sparrow/desktop tauri build --debug --bundles deb
 
       - name: Generate DEB metadata
-        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        working-directory: apps/@sparrow-desktop/src-tauri/target/debug/bundle
         run: |
           mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
           cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
@@ -161,13 +160,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           SOURCE_DIR: gh-pages
-          DEST_DIR: linux 
+          DEST_DIR: snap 
 
-      - name: Notify Teams Channel
-        run: |
-          curl -H 'Content-Type: application/json' \
-            -d '{
-              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
-            }' \
-            ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
+      # - name: Notify Teams Channel
+      #   run: |
+      #     curl -H 'Content-Type: application/json' \
+      #       -d '{
+      #         "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+      #       }' \
+      #       ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
         
