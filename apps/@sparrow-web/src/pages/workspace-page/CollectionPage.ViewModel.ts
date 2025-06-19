@@ -1605,6 +1605,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
     let userSource = {};
     if (collection?.activeSync) {
@@ -1626,6 +1630,7 @@ export default class CollectionsViewModel {
         request: {
           method: request?.getValue().property?.request?.method,
         } as RequestDto,
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
       },
     };
     await this.collectionRepository.addRequestOrFolderInCollection(
@@ -1635,10 +1640,6 @@ export default class CollectionsViewModel {
         id: request.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res =
@@ -3524,7 +3525,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
