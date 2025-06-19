@@ -8,7 +8,7 @@
     EditRegular,
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
-  import { Button, Modal, Options } from "@sparrow/library/ui";
+  import { Button, Modal, notifications, Options } from "@sparrow/library/ui";
 
   export let conversation: {
     id: string;
@@ -42,6 +42,7 @@
     );
   };
   export let currOpenedConversationId: string;
+  export let chatPanelTitleLoader: boolean;
 
   let isDeleteConversationPopupOpen = false;
   let isDeleteLoading = false;
@@ -56,6 +57,7 @@
   let isRenaming = false;
   let newRequestName: string = "";
   let inputField: HTMLInputElement;
+  let renameLoader = false;
 
   function rightClickContextMenu(event) {
     event.stopPropagation();
@@ -77,7 +79,14 @@
 
   const onRenameBlur = async () => {
     if (newRequestName) {
-      onRenameConversation(conversation.id, newRequestName);
+      if (currOpenedConversationId === conversation.id)
+        chatPanelTitleLoader = true;
+      renameLoader = true;
+      await onRenameConversation(conversation.id, newRequestName);
+      renameLoader = false;
+      if (currOpenedConversationId === conversation.id)
+        chatPanelTitleLoader = false;
+      notifications.success("Conversation title updated successfully.");
     }
     isRenaming = false;
     newRequestName = "";
@@ -108,7 +117,7 @@
   role="button"
   tabindex="0"
 >
-  <div class="conversation-content flex-fill pe-2">
+  <div class="conversation-content flex-fill">
     <!-- Title -->
     {#if isRenaming}
       <input
@@ -180,14 +189,33 @@
     </div>
   </div>
 
-  <button
+  <div
     id={"conversation-item-menu"}
-    bind:this={chatItemTabWrapper}
-    class="delete-btn position-absolute btn p-0 rounded-1 d-flex align-items-center justify-content-center"
-    on:click|stopPropagation={rightClickContextMenu}
+    style="flex-shrink: 0;"
+    class="delete-btn position-absolute"
+    class:menu-open={showMenu}
+    class:loading={renameLoader ||
+      (currOpenedConversationId === conversation.id && chatPanelTitleLoader)}
   >
-    <MoreHorizontalRegular size="12px" color="var(--icon-ds-neutral-100)" />
-  </button>
+    <div
+      style="transform: scale(0.85); line-height: 1;"
+      bind:this={chatItemTabWrapper}
+    >
+      <Button
+        id="conversation-item-menu"
+        size="extra-small"
+        type="teritiary-regular"
+        buttonClassProp=""
+        loader={renameLoader ||
+          (currOpenedConversationId === conversation.id &&
+            chatPanelTitleLoader)}
+        startIcon={renameLoader || chatPanelTitleLoader
+          ? ""
+          : MoreHorizontalRegular}
+        onClick={rightClickContextMenu}
+      />
+    </div>
+  </div>
 </div>
 
 {#if showMenu}
@@ -367,18 +395,17 @@
     transition:
       opacity 0.15s ease,
       background-color 0.15s ease;
-    top: 6px;
+    top: 4px;
     right: 8px;
     width: 20px;
     height: 20px;
+    z-index: 10;
   }
 
-  .conversation-item:hover .delete-btn {
+  .conversation-item:hover .delete-btn,
+  .delete-btn.menu-open,
+  .delete-btn.loading {
     opacity: 1;
-  }
-
-  .delete-btn:hover {
-    background-color: var(--bg-ds-surface-600) !important;
   }
 
   .cursor-pointer {

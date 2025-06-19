@@ -70,7 +70,7 @@
     ) {
       toggleSaveRequest(true);
     } else if (x.status === "success") {
-      notifications.success("API request saved successfully.");
+      notifications.success("AI request saved successfully.");
     }
   };
 

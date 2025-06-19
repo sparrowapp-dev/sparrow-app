@@ -325,7 +325,7 @@ class FolderExplorerPage {
       totalSocketIo,
       totalWebSocket,
       totalMockRequests,
-      totalAiRequests
+      totalAiRequests,
     };
   };
 
@@ -505,7 +505,7 @@ class FolderExplorerPage {
           description: "",
           mockRequest: {
             method: sampleRequest.getValue().property.mockRequest?.method,
-            url: collection?.mockCollectionUrl,
+            url: "",
           },
         },
       },
@@ -575,7 +575,7 @@ class FolderExplorerPage {
         folderId: explorer.id,
       });
       sampleRequest.updateIsSave(true);
-      sampleRequest.updateUrl(collection?.mockCollectionUrl);
+      // sampleRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleRequest.getValue());
 
       moveNavigation("right");
@@ -928,7 +928,7 @@ class FolderExplorerPage {
     }
   };
 
-   /**
+  /**
    * Handles creating a new request in a folder
    * @param workspaceId :string
    * @param collection :CollectionDocument - the collection in which new request is going to be created
@@ -968,8 +968,10 @@ class FolderExplorerPage {
           type: aiRequest.getValue().type,
           description: "",
           aiRequest: {
-            aiModelProvider: aiRequest.getValue().property.aiRequest?.aiModelProvider,
-            aiModelVariant: aiRequest.getValue().property.aiRequest?.aiModelVariant,
+            aiModelProvider:
+              aiRequest.getValue().property.aiRequest?.aiModelProvider,
+            aiModelVariant:
+              aiRequest.getValue().property.aiRequest?.aiModelVariant,
           },
         },
       },
