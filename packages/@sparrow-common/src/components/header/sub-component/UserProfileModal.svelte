@@ -15,6 +15,7 @@
 
 <script lang="ts">
   import { SignOutIconRegular } from "@sparrow/library/icons";
+  import { AdminLoginLogo } from "@sparrow/library/icons";
   import { afterUpdate, onMount } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
   /**
@@ -22,6 +23,7 @@
    */
   export let item: SidebarProfileObj;
   export let onLogout: () => void;
+  export let onAdminRedirect: () => void;
   let isHovered = false;
   let isRouteActive = false;
   let buttonElement: HTMLButtonElement;
@@ -93,11 +95,26 @@
     >
       <div class="d-flex align-iems-center justify-content-center">
         {#if isHovered && item.hoveredLogo && !item.disabled}
-          <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
+          <Avatar
+            type="letter"
+            size="small"
+            letter={user?.name[0]}
+            bgColor="var(--icon-ds-secondary-400)"
+          />
         {:else if isRouteActive && item.selectedLogo}
-          <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
+          <Avatar
+            type="letter"
+            size="small"
+            letter={user?.name[0]}
+            bgColor="var(--icon-ds-secondary-400)"
+          />
         {:else}
-          <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
+          <Avatar
+            type="letter"
+            size="small"
+            letter={user?.name[0]}
+            bgColor="var(--icon-ds-secondary-400)"
+          />
         {/if}
       </div>
     </button>
@@ -109,25 +126,53 @@
         : 'd-none'}"
       style="right:10px; top:47px; min-width: 200px; z-index: 500; display:flex; flex-direction:column;gap:4px; background-color:var(--bg-ds-surface-600);"
     >
-      <div class="align-items-center py-1 px-2 profile-item" style="display: flex; gap:8px">
-        <Avatar type="letter" size="small" letter={user?.name[0]} bgColor="var(--icon-ds-secondary-400)" />
+      <div
+        class="align-items-center py-1 px-2 profile-item"
+        style="display: flex; gap:8px"
+      >
+        <Avatar
+          type="letter"
+          size="small"
+          letter={user?.name[0]}
+          bgColor="var(--icon-ds-secondary-400)"
+        />
         <div class="d-flex flex-column ms-1">
-          <div class="ellipsis text-ds-font-weight-medium text-ds-line-height-130" style="max-width: 200px;">
+          <div
+            class="ellipsis text-ds-font-weight-medium text-ds-line-height-130"
+            style="max-width: 200px;"
+          >
             {user?.name}
           </div>
-          <div style="max-width: 200px;color:var(--text-ds-neutral-300) " class="ellipsis text-ds-font-weight-regular text-ds-line-height-150">
+          <div
+            style="max-width: 200px;color:var(--text-ds-neutral-300) "
+            class="ellipsis text-ds-font-weight-regular text-ds-line-height-150"
+          >
             {user?.email}
           </div>
         </div>
       </div>
+      <button
+        class="border-0 bg-transparent d-flex align-items-center sign-out-button"
+        style="border-radius: 3px;padding: 7px 12px;"
+        on:click={onAdminRedirect}
+      >
+        <AdminLoginLogo />
+        <span
+          class="ms-3 text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
+          >Launch Admin Panel</span
+        ></button
+      >
 
       <button
         class="border-0 bg-transparent d-flex align-items-center sign-out-button"
         style="border-radius: 3px;padding: 7px 12px;"
         on:click={onLogout}
-        >
-        <SignOutIconRegular size={"16px"} color="var(--icon-ds-nuetral-50)" />
-         <span class="ms-3 text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12 ">Sign Out</span></button
+      >
+        <SignOutIconRegular size={"16px"} color="var(--icon-ds-neutral-50)" />
+        <span
+          class="ms-3 text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
+          >Sign Out</span
+        ></button
       >
     </div>
   </Tooltip>
@@ -147,7 +192,7 @@
   .sign-out-button:hover {
     background-color: var(--bg-ds-surface-400) !important;
   } /* CardBody+BlurEffects */
-  .profile-item:hover{
-     background-color: var(--bg-ds-surface-400) !important;
+  .profile-item:hover {
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>

@@ -165,8 +165,8 @@
     border: 1px solid var(--bg-ds-surface-100);
     box-shadow: 0px 16px 32px 0px rgba(0, 0, 0, 0.4);
     display: flex;
-    max-width: 650px;
-    width: 650px;
+    max-width: 656px;
+    width: 656px;
     max-height: 540px;
     flex-direction: column;
     overflow: hidden;

@@ -98,8 +98,8 @@
         {
           id: CodeTemplateLanguageType.CURL,
           name: CodeEditorLanguageType.curl,
-          disabled: false,
-          hide: false,
+          disabled: true,
+          hide: true,
         },
       ]}
       titleId={selectedCodeTemplateId}

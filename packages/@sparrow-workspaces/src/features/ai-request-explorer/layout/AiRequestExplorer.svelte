@@ -144,19 +144,21 @@
 
   let isConversationHistoryPanelOpen = false;
   const onOpenConversationHistoryPanel = async () => {
-    const res = await fetchConversations();
+    // fetchConversations(); // fetch the updated state from DB
+    // await new Sleep().setTime(1500).exec(); // wait for UI to load
+    await fetchConversations();
     const result = getConversationsList();
-    maxPx += 300;
-    defaultPx += 250;
-    minPx += 350;
+    maxPx += 230;
+    defaultPx += 220;
+    minPx += 300;
     updateSplitpaneContSizes();
     isConversationHistoryPanelOpen = true;
     return result;
   };
   const onCloseConversationHistoryPanel = () => {
-    maxPx -= 300;
-    defaultPx -= 250;
-    minPx -= 350;
+    maxPx -= 230;
+    defaultPx -= 220;
+    minPx -= 300;
     updateSplitpaneContSizes();
     isConversationHistoryPanelOpen = false;
   };

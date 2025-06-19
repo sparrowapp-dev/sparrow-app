@@ -223,12 +223,6 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
-  :global(.input-url .cm-editor.cm-focused) {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-  }
-
   .static-url-section {
     height: 36px;
     background-color: var(--bg-ds-surface-600);

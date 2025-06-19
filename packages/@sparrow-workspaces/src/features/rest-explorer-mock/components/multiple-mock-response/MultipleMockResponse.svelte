@@ -76,7 +76,10 @@
   function rightClickContextMenu(e: Event, idx) {
     setTimeout(() => {
       showMenu = !showMenu;
-      activeResponseIdx = idx;
+      if (activeResponseIdx !== idx) {
+        activeResponseIdx = idx;
+        onSetActiveResponseIdx({ activeResponseIdx: idx });
+      }
     }, 100);
   }
 </script>
@@ -187,7 +190,7 @@
   </div>
   <div
     class="sparrow-thin-scrollbar"
-    style="max-height: 70%; overflow-y: auto; overflow-x: hidden;"
+    style="max-height: calc(100% - 60px); overflow-y: auto; overflow-x: hidden;"
   >
     {#each mockResponses as response, idx (response.id)}
       <div

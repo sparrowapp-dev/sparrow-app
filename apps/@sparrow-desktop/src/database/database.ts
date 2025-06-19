@@ -72,6 +72,7 @@ import {
   recentWorkspaceSchema,
   type RecentWorkspaceDocType,
 } from "@app/models/recent-workspace.model";
+import { planSchema, type PlanDocType } from "../models/plan.model";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -79,6 +80,7 @@ addRxPlugin(RxDBUpdatePlugin);
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
+export type PlanContainer = RxCollection<PlanDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
 export type TeamDocument = RxDocument<TeamDocType>;
 export type TeamContainer = RxCollection<TeamDocType>;
@@ -95,6 +97,8 @@ export type UpdatesDocument = RxDocument<UpdatesDocType>;
 export type RecentWorkspaceDocument = RxDocument<RecentWorkspaceDocType>;
 export type RecentWorkspaceContainer = RxCollection<RecentWorkspaceDocType>;
 export type AiRequestConversationsDocument = RxDocument<AiRequestConversationsDocType>;
+export type PlanDocument = RxDocument<PlanDocType>;
+export type PlanCollection = RxCollection<PlanDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -114,6 +118,7 @@ export type DatabaseCollections = {
   team: TeamContainer;
   testflow: TFRxContainerType;
   recentworkspace: RecentWorkspaceContainer;
+  plan: PlanContainer;
 };
 
 // define the Rx database type
@@ -476,6 +481,9 @@ export class RxDB {
           5: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
+          6: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
         },
       },
       environment: {
@@ -591,6 +599,27 @@ export class RxDB {
             return oldDoc;
           },
           3: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+        },
+      },
+      plan: {
+        schema: planSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: PlanDocument) {
             return oldDoc;
           },
         },
