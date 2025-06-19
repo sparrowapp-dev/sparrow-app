@@ -867,7 +867,7 @@ class CollectionExplorerPage {
       totalFolders,
       lastUpdated,
       totalMockRequests,
-      totalAiRequests
+      totalAiRequests,
     };
   };
 
@@ -1168,7 +1168,7 @@ class CollectionExplorerPage {
         description: "",
         mockRequest: {
           method: request?.getValue().property?.mockRequest?.method,
-          url: collection?.mockCollectionUrl,
+          url: "",
         } as HttpRequestBaseInterface,
       },
     };
@@ -1230,7 +1230,7 @@ class CollectionExplorerPage {
         folderId: "",
       });
       request.updateIsSave(true);
-      request.updateUrl(collection?.mockCollectionUrl);
+      // request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
       return;
@@ -1276,8 +1276,10 @@ class CollectionExplorerPage {
         type: aiRequest.getValue().type,
         description: "",
         aiRequest: {
-          aiModelProvider: aiRequest?.getValue().property?.aiRequest?.aiModelProvider,
-          aiModelVariant: aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
+          aiModelProvider:
+            aiRequest?.getValue().property?.aiRequest?.aiModelProvider,
+          aiModelVariant:
+            aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
         } as AiRequestBaseInterface,
       },
     };

@@ -41,13 +41,15 @@ import {
 import { navigate } from "svelte-navigator";
 import type { Observable } from "rxjs";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events, ItemType } from "@sparrow/common/enums";
+import { Events, ItemType, ResponseMessage } from "@sparrow/common/enums";
 import { AiAssistantWebSocketService } from "../../services/ai-assistant.ws.service";
 import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import constants from "@app/constants/constants";
 import { open } from "@tauri-apps/plugin-shell";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
+import { PlanRepository } from "@app/repositories/plan.repository";
+import { PlanService } from "@app/services/plan.service";
 
 export class DashboardViewModel {
   constructor() {}
@@ -66,6 +68,8 @@ export class DashboardViewModel {
   private collectionRepository = new CollectionRepository();
   private testflowRepository = new TestflowRepository();
   private recentWorkspaceRepository = new RecentWorkspaceRepository();
+  private planRepository = new PlanRepository();
+  private planService = new PlanService();
 
   public getTeamData = async () => {
     return await this.teamRepository.getTeamData();
@@ -143,6 +147,10 @@ export class DashboardViewModel {
     return;
   };
 
+  public onAdminRedirect = async () => {
+    await open(`${constants.ADMIN_URL}`);
+    return;
+  };
   /**
    *
    * @returns guest user state
@@ -178,9 +186,11 @@ export class DashboardViewModel {
     if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
     let isAnyTeamsOpen: undefined | string = undefined;
+    const userPlans = [];
     if (response?.isSuccessful && response?.data?.data) {
       const data = [];
       for (const elem of response.data.data) {
+        userPlans.push(elem?.plan?.id.toString());
         const {
           _id,
           name,
@@ -193,6 +203,7 @@ export class DashboardViewModel {
           logo,
           workspaces,
           owner,
+          plan,
           admins,
           createdAt,
           createdBy,
@@ -218,6 +229,7 @@ export class DashboardViewModel {
           logo,
           workspaces: updatedWorkspaces,
           owner,
+          plan,
           admins,
           isActiveTeam: false,
           createdAt,
@@ -230,15 +242,69 @@ export class DashboardViewModel {
         data.push(item);
       }
 
-      await this.teamRepository.bulkInsertData(data);
-      await this.teamRepository.deleteOrphanTeams(
-        data.map((_team) => {
-          return _team.teamId;
-        }),
+      const planResponse = await this.planService.getPlansByIds(
+        userPlans,
+        constants.API_URL,
       );
-      if (!isAnyTeamsOpen) {
-        this.teamRepository.setOpenTeam(data[0].teamId);
-        return;
+
+      if (planResponse.isSuccessful && planResponse.data.data) {
+        const parsedPlans = [];
+        for (const planData of planResponse.data.data) {
+          const rawData = planData;
+          if (!rawData?._id) continue;
+          const planDetails = {
+            planId: rawData._id,
+            name: rawData.name,
+            description: rawData.description,
+            active: rawData.active,
+            limits: {
+              workspacesPerHub: {
+                area: rawData.limits.workspacesPerHub.area,
+                value: rawData.limits.workspacesPerHub.value,
+              },
+              usersPerHub: {
+                area: rawData.limits.usersPerHub.area,
+                value: rawData.limits.usersPerHub.value,
+              },
+              testflowPerWorkspace: {
+                area: rawData.limits.testflowPerWorkspace.area,
+                value: rawData.limits.testflowPerWorkspace.value,
+              },
+              blocksPerTestflow: {
+                area: rawData.limits.blocksPerTestflow.area,
+                value: rawData.limits.blocksPerTestflow.value,
+              },
+              selectiveTestflowRun: {
+                area: rawData.limits.selectiveTestflowRun.area,
+                active: rawData.limits.selectiveTestflowRun.active,
+              },
+              activeSync: {
+                area: rawData.limits.activeSync.area,
+                active: rawData.limits.activeSync.active,
+              },
+              testflowRunHistory: {
+                area: rawData.limits.testflowRunHistory.area,
+                value: rawData.limits.testflowRunHistory.value,
+              },
+            },
+            createdAt: rawData.createdAt,
+            updatedAt: rawData.updatedAt,
+            createdBy: rawData.createdBy,
+            updatedBy: rawData.updatedBy,
+          };
+          parsedPlans.push(planDetails);
+        }
+        await this.planRepository.upsertMany(parsedPlans);
+        await this.teamRepository.bulkInsertData(data);
+        await this.teamRepository.deleteOrphanTeams(
+          data.map((_team) => {
+            return _team.teamId;
+          }),
+        );
+        if (!isAnyTeamsOpen) {
+          this.teamRepository.setOpenTeam(data[0].teamId);
+          return;
+        }
       }
     }
   };
@@ -466,6 +532,7 @@ export class DashboardViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       navigate("collections");
       notifications.success("New Workspace created successfully.");
+    } else if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
     } else {
       notifications.error(response?.message);
     }
@@ -814,7 +881,7 @@ export class DashboardViewModel {
         tree.type === ItemType.SOCKET_IO ||
         tree.type === ItemType.WEB_SOCKET
       ) {
-        let currentFolderDetails =
+        const currentFolderDetails =
           tree.folderId && tree.folderName
             ? { id: tree.folderId, name: tree.folderName }
             : tree.parentFolder
@@ -1047,15 +1114,15 @@ export class DashboardViewModel {
       { teamName: string; workspaceName: string }
     > = {},
   ) {
-    let collectionTree = await this.collectionRepository.getCollectionDocs();
+    const collectionTree = await this.collectionRepository.getCollectionDocs();
     const s = collectionTree.map((_t) => {
       return _t.toMutableJSON();
     });
 
-    let newtree = s;
-    let collection = [];
-    let folder = [];
-    let file = [];
+    const newtree = s;
+    const collection = [];
+    const folder = [];
+    const file = [];
 
     if (searchText.trim() === "") {
       // Clear existing arrays before populating with latest items
@@ -1167,4 +1234,53 @@ export class DashboardViewModel {
 
     return { collection, folder, file, workspace, testflow, environment };
   }
+
+  public getWorkspaceCount = async (teamId: string) => {
+    const workspaces = await this.teamRepository.getTeamDoc(teamId);
+    const count = workspaces?._data.workspaces?.length;
+    return count;
+  };
+
+  /**
+   * @description - This function will provide user Limits based on teamId.
+   */
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  /**
+   * @description - This function will send Email request to the Owner.
+   */
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  /**
+   * @description - This function will redirect you to billing section.
+   */
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+  };
+
+  public handleContactSales = async () => {
+    await open(`${constants.MARKETING_URL}/pricing/`);
+  };
 }
