@@ -513,6 +513,7 @@
                     }) || []}
                     {onSwitchWorkspace}
                     {onDeleteWorkspace}
+                    {selectedFilter}
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
                   />
