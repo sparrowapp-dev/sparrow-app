@@ -12,6 +12,7 @@ export interface MockRequestResponseDto {
   responseDate: string;
   selectedResponseBodyType: string;
   isMockResponseActive: boolean;
+  responseWeightRatio?: number;
 }
 
 export interface MockResponseItemsDto {
