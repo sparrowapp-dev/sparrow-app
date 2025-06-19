@@ -732,7 +732,7 @@
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={openTeam?._data?.name?.split(" ")[0]}
-  userEmail={openTeam?._data?.users[0]?.email || ""}
+  userEmail={openTeam?._data?.users?.[0]?.email || ""}
   submitButtonName={planContent?.buttonName}
 />
 
@@ -754,7 +754,7 @@
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={openTeam?._data?.name?.split(" ")[0]}
-  userEmail={openTeam?._data?.users[0]?.email || ""}
+  userEmail={openTeam?._data?.users?.[0]?.email || ""}
   submitButtonName={planContent?.buttonName}
 />
 
