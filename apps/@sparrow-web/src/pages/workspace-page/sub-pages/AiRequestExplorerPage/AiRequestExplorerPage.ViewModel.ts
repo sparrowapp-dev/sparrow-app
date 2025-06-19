@@ -570,6 +570,25 @@ class AiRequestExplorerViewModel {
     }
   }
 
+  public handleUploadFilesToCloud = (filesToUpload: []) => {
+
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(`Promise resolved after ${2000 / 1000} seconds!`);
+      }, 20000);
+    });
+  }
+
+  public handleDeleteFilesFromCloud = (filesToDelete: []) => {
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(`Promise resolved after ${2000 / 1000} seconds!`);
+      }, 2000);
+    });
+  }
+
 
   /**
    *

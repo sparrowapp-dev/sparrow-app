@@ -61,6 +61,8 @@
   export let isConversationHistoryPanelOpen = false;
   export let isConversationHistoryLoading = false;
   export let isGuestUser: boolean;
+  export let onUploadFiles;
+  export let onDeleteFiles;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -607,6 +609,8 @@
           placeholder={"Write a prompt or generate one from generate prompt."}
           {sendPrompt}
           {isGuestUser}
+          onFileUpload={onUploadFiles}
+          onRemoveFile={onDeleteFiles}
         />
       </div>
     </div>

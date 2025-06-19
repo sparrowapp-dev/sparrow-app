@@ -5,9 +5,12 @@
     BotSparkleFilled,
     SendRegular,
     StopFilled,
+    AttachRegular,
   } from "@sparrow/library/icons";
   import { Button, Tooltip } from "@sparrow/library/ui";
   import { FileItem } from "../../..";
+  import { notifications } from "@sparrow/library/ui";
+  import { v4 as uuidv4 } from "uuid";
 
   export let placeholder = "";
   export let sendPrompt;
@@ -17,19 +20,52 @@
   export let onStopGeneratingAIResponse;
   export let activateGeneratePromptModal;
   export let isGuestUser;
+  export let onRemoveFile;
+  export let onFileUpload; // Callback to handle cloud upload
 
-  //
   export let uploadedFiles: Array<{
     id: string;
     name: string;
     type: string;
     size: number;
+    isUploading?: boolean;
+    cloudUrl?: string;
   }> = [
-    { id: "123", name: "DIV Contentsdddddddd.pdf", type: "csv", size: 1.34 },
-    { id: "123", name: "first file", type: "csv", size: 1.34 },
-    { id: "123", name: "first file", type: "csv", size: 1.34 },
+    // {
+    //   id: "123",
+    //   name: "DIV Contentsdddddddd.pdf",
+    //   type: "csv",
+    //   size: 1.34,
+    //   isUploading: false,
+    //   cloudUrl: "www.google.com",
+    // },
+    // {
+    //   id: "124",
+    //   name: "first file",
+    //   type: "csv",
+    //   size: 1.34,
+    //   isUploading: false,
+    //   cloudUrl: "www.google.com",
+    // },
+    // {
+    //   id: "125",
+    //   name: "first file",
+    //   type: "csv",
+    //   size: 1.34,
+    //   isUploading: true,
+    //   cloudUrl: "www.google.com",
+    // },
   ];
-  export let onRemoveFile;
+
+  $: {
+    if (uploadedFiles.length) console.log(uploadedFiles);
+  }
+
+  // File restrictions
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+  const ALLOWED_EXTENSIONS = ["pdf", "txt", "docx", "csv"];
+  const MAX_FILES = 5;
+  let fileInput: HTMLInputElement;
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -53,6 +89,104 @@
       MixpanelEvent(Events.AI_Initiate_Response);
     }
   };
+
+  // File Upload
+  const handleAttachClick = () => {
+    if (uploadedFiles.length >= MAX_FILES) {
+      notifications.error(`Maximum ${MAX_FILES} files allowed.`);
+      return;
+    }
+    fileInput?.click();
+  };
+
+  const getFileExtension = (filename: string): string => {
+    return filename.split(".").pop()?.toLowerCase() || "";
+  };
+
+  const handleFileSelect = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      // Check file count limit
+      if (uploadedFiles.length >= MAX_FILES) {
+        notifications.error(`Maximum ${MAX_FILES} files allowed`);
+        break;
+      }
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        notifications.error(`File "${file.name}" exceeds 5MB limit`);
+        continue;
+      }
+
+      // Check file extension
+      const extension = getFileExtension(file.name);
+      if (!ALLOWED_EXTENSIONS.includes(extension)) {
+        notifications.error(
+          `File "${file.name}" has unsupported format. Only ${ALLOWED_EXTENSIONS.join(", ")} files are allowed.`,
+        );
+        continue;
+      }
+
+      // Create file object with loading state
+      const fileObj = {
+        id: uuidv4(),
+        name: file.name.split(".").slice(0, -1).join("."), // Remove extension from display name
+        type: extension,
+        size: parseFloat((file.size / (1024 * 1024)).toFixed(2)), // Convert to MB
+        isUploading: true,
+        cloudUrl: undefined,
+      };
+
+      // Add to files array immediately to show in UI
+      uploadedFiles = [...uploadedFiles, fileObj];
+
+      try {
+        // Upload to cloud storage
+        const cloudUrl = await onFileUpload?.(file, fileObj.id);
+        console.log("cl ddd :>> ", cloudUrl);
+        // Update file object with cloud URL and remove loading state
+        uploadedFiles = uploadedFiles.map((f) =>
+          f.id === fileObj.id ? { ...f, isUploading: false, cloudUrl } : f,
+        );
+
+        notifications.success(`File "${file.name}" uploaded successfully`);
+      } catch (error) {
+        console.error("File upload failed:", error);
+
+        // Remove file from array if upload failed
+        uploadedFiles = uploadedFiles.filter((f) => f.id !== fileObj.id);
+        notifications.error(
+          `Failed to upload "${file.name}". Please try again.`,
+        );
+      }
+    }
+
+    // Clear the input
+    target.value = "";
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    uploadedFiles = uploadedFiles.filter((f) => f.id !== fileId);
+    onRemoveFile?.(fileId);
+  };
+
+  const handleFileDownload = (file: any) => {
+    if (file.cloudUrl && !file.isUploading) {
+      // Create a temporary link to download the file
+      const link = document.createElement("a");
+      link.href = file.cloudUrl;
+      link.download = `${file.name}.${file.type}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 </script>
 
 <div
@@ -64,8 +198,13 @@
     <!-- File Chips Display -->
     {#if uploadedFiles.length > 0}
       <div class="file-chips-container d-flex flex-wrap gap-2 mb-2">
-        {#each uploadedFiles as file}
-          <FileItem {file} onRemove={onRemoveFile} size="small" />
+        {#each uploadedFiles as file (file.id)}
+          <FileItem
+            {file}
+            onRemove={handleRemoveFile}
+            onDownload={handleFileDownload}
+            size="small"
+          />
         {/each}
       </div>
     {/if}
@@ -138,28 +277,55 @@
     </div>
     <!-- {/if} -->
 
-    <Tooltip
-      title={isResponseGenerating ? "Stop" : "Send"}
-      placement={"top-center"}
-      size={"small"}
-    >
-      <Button
-        textStyleProp={"font-size: var(--base-text)"}
-        type={"outline-primary"}
+    <!-- Hidden file input -->
+    <input
+      type="file"
+      bind:this={fileInput}
+      on:change={handleFileSelect}
+      multiple
+      accept=".pdf,.txt,.docx,.csv"
+      style="display: none;"
+    />
+    <div class="d-flex">
+      <Tooltip
+        title={"Attach File:"}
+        subtext={"You can upload up to 5 files (max 5 MB each) in .pdf, .txt, .docx, or .csv format."}
+        placement={"top-right"}
+        size={"medium"}
+        styleProp={"width: 220px;"}
+      >
+        <Button
+          type={"teritiary-regular"}
+          size={"small"}
+          startIcon={AttachRegular}
+          onClick={handleAttachClick}
+          disable={uploadedFiles.length >= MAX_FILES}
+        />
+      </Tooltip>
+
+      <Tooltip
+        title={isResponseGenerating ? "Stop" : "Send"}
+        placement={"top-center"}
         size={"small"}
-        startIcon={isResponseGenerating ? StopFilled : SendRegular}
-        onClick={() => {
-          if (isResponseGenerating) {
-            onStopGeneratingAIResponse();
-            return;
-          }
-          if (!isResponseGenerating && prompt.trim()) {
-            hanldeStartGenerating();
-            return;
-          }
-        }}
-      ></Button>
-    </Tooltip>
+      >
+        <Button
+          textStyleProp={"font-size: var(--base-text)"}
+          type={"outline-primary"}
+          size={"small"}
+          startIcon={isResponseGenerating ? StopFilled : SendRegular}
+          onClick={() => {
+            if (isResponseGenerating) {
+              onStopGeneratingAIResponse();
+              return;
+            }
+            if (!isResponseGenerating && prompt.trim()) {
+              hanldeStartGenerating();
+              return;
+            }
+          }}
+        ></Button>
+      </Tooltip>
+    </div>
   </div>
 </div>
 
