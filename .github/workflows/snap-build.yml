@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Snap from DEB
         run: |
-          snapcraft --destructive-mode
+          sudo snapcraft --destructive-mode
 
       - name: Upload Snap to Snap Store
         run: |
