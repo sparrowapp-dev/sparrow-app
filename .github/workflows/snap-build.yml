@@ -10,6 +10,7 @@ env:
 jobs:
   build-snap:
     runs-on: ubuntu-latest
+    environment: Snapbuild
 
     env:
       SNAP_CHANNEL: ${{ secrets.SNAP_RELEASE_CHANNEL || 'edge' }}
