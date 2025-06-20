@@ -1413,7 +1413,7 @@ class RestExplorerViewModel {
         description: requestMetaData.description,
         type: "REQUEST",
         request: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
@@ -2409,7 +2409,7 @@ class RestExplorerViewModel {
   public generateAIResponseWS = async (prompt = "") => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-    
+
     let workspaceId = componentData.path.workspaceId;
 
     let workspaceVal = await this.readWorkspace(workspaceId);

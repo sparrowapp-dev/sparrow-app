@@ -1418,7 +1418,7 @@ class RestExplorerViewModel {
         description: requestMetaData.description,
         type: "REQUEST",
         request: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
