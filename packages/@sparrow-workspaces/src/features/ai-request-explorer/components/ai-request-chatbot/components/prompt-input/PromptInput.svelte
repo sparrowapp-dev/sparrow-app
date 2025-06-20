@@ -31,30 +31,30 @@
     isUploading?: boolean;
     cloudUrl?: string;
   }> = [
-    // {
-    //   id: "123",
-    //   name: "DIV Contentsdddddddd.pdf",
-    //   type: "csv",
-    //   size: 1.34,
-    //   isUploading: false,
-    //   cloudUrl: "www.google.com",
-    // },
-    // {
-    //   id: "124",
-    //   name: "first file",
-    //   type: "csv",
-    //   size: 1.34,
-    //   isUploading: false,
-    //   cloudUrl: "www.google.com",
-    // },
-    // {
-    //   id: "125",
-    //   name: "first file",
-    //   type: "csv",
-    //   size: 1.34,
-    //   isUploading: true,
-    //   cloudUrl: "www.google.com",
-    // },
+    {
+      id: "123",
+      name: "DIV Contentsdddddddd.pdf",
+      type: "csv",
+      size: 1.34,
+      isUploading: false,
+      cloudUrl: "www.google.com",
+    },
+    {
+      id: "124",
+      name: "first file",
+      type: "csv",
+      size: 1.34,
+      isUploading: false,
+      cloudUrl: "www.google.com",
+    },
+    {
+      id: "125",
+      name: "first file",
+      type: "csv",
+      size: 1.34,
+      isUploading: true,
+      cloudUrl: "www.google.com",
+    },
   ];
 
   $: {

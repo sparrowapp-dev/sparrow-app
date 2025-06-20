@@ -996,7 +996,7 @@ export class TeamExplorerPageViewModel {
       return response;
     } else {
       notifications.error(
-        `Failed to join the ${response?.data?.data.name} Hub. Please try again.`,
+        `Failed to join the Hub. Please try again.`,
       );
     }
   };
