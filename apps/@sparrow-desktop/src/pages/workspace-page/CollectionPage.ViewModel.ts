@@ -2982,6 +2982,7 @@ export default class CollectionsViewModel {
       description: "",
       type: ItemType.FOLDER,
       items: [],
+      updatedAt: new Date().toISOString(),
     };
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -3204,6 +3205,10 @@ export default class CollectionsViewModel {
           baseUrl,
         );
         if (response.isSuccessful) {
+          let updatedResponse = {
+            ...response.data.data,
+            updatedAt: new Date().toISOString(),
+          };
           this.collectionRepository.updateRequestOrFolderInCollection(
             collection.id,
             explorer.id,

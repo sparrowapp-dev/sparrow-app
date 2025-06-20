@@ -3031,6 +3031,7 @@ export default class CollectionsViewModel {
         description: "",
         type: ItemType.FOLDER,
         items: [],
+        updatedAt: new Date().toISOString(),
       };
 
       const path = {
@@ -3220,10 +3221,14 @@ export default class CollectionsViewModel {
           baseUrl,
         );
         if (response.isSuccessful) {
+          let updatedResponse = {
+            ...response.data.data,
+            updatedAt: new Date().toISOString(),
+          };
           this.collectionRepository.updateRequestOrFolderInCollection(
             collection.id,
             explorer.id,
-            response.data.data,
+            updatedResponse,
           );
 
           this.updateTab(explorer.id, {
