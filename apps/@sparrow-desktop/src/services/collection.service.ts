@@ -60,7 +60,8 @@ import type {
 import type {
   HttpResponseMockCreateUpdatePayloadDtoInterface,
   HttpResponseMockDeletePayloadDtoInterface,
-  HttpResponseMockUpdatePayloadDtoInterface
+  HttpResponseMockUpdatePayloadDtoInterface,
+  HttpResponseRatiosMockUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 
 export class CollectionService {
@@ -909,6 +910,21 @@ export class CollectionService {
       `${baseUrl}/api/collection/mock-response/${responseId}`,
       {
         body: deleteResponseBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateMockResponseRatios = async (
+    payload: HttpResponseRatiosMockUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${baseUrl}/api/collection/mock-response/ratios`,
+      {
+        body: payload,
         headers: getAuthHeaders(),
       },
     );

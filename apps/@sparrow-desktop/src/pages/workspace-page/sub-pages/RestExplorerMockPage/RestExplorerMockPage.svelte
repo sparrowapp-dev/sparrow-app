@@ -222,4 +222,5 @@
   onRenameMockResponse={_viewModel.handleRenameMockResponse}
   onDeleteMockResponse={_viewModel.handleDeleteMockResponse}
   onUpdateResponseHeaders={_viewModel.updateResponseHeaders}
+  onUpdateResponseRatios={_viewModel.updateResponseRatios}
 />
