@@ -21,6 +21,8 @@
     ResponseStatus,
     MultipleMockResponse,
     NoMockResponseDetailsSection,
+    MockResponesRatio,
+    MockResponseState,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -135,6 +137,7 @@
   export let onHandleMockResponseState;
   export let onRenameMockResponse;
   export let onDeleteMockResponse;
+  export let onUpdateResponseRatios;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -195,6 +198,10 @@
   }
   $: selectedResponse =
     $tab.property?.mockRequest?.items?.[activeMockResponseIdx];
+
+  let isResponseRatioModalOpen = false;
+  let isResponseStateModalOpen = false;
+  let responseToToggle;
 
   /**
    * Converts the pixel-based min, max, and default sizes
@@ -737,6 +744,9 @@
                   <div class="d-flex h-100" style="gap: 8px;">
                     <div style="width: 300px">
                       <MultipleMockResponse
+                        bind:isResponseRatioModalOpen
+                        bind:isResponseStateModalOpen
+                        bind:responseToToggle
                         requestName={$tab.name}
                         requestMethod={$tab.property.mockRequest?.method}
                         mockResponses={$tab.property.mockRequest?.items || []}
@@ -1049,6 +1059,40 @@
     </div>
   </div>
 {/if}
+
+<Modal
+  title="Set Response Ratios"
+  type="primary"
+  width="40%"
+  zIndex={1000}
+  isOpen={isResponseRatioModalOpen}
+  handleModalState={(flag) => {
+    isResponseRatioModalOpen = flag;
+  }}
+>
+  <MockResponesRatio
+    bind:isResponseRatioModalOpen
+    mockResponses={$tab.property.mockRequest?.items || []}
+    {onUpdateResponseRatios}
+  />
+</Modal>
+
+<Modal
+  title="Disable Response with Ratio"
+  type="primary"
+  width="40%"
+  zIndex={1000}
+  isOpen={isResponseStateModalOpen}
+  handleModalState={(flag) => {
+    isResponseStateModalOpen = flag;
+  }}
+>
+  <MockResponseState
+    bind:isResponseStateModalOpen
+    bind:responseToToggle
+    {onHandleMockResponseState}
+  />
+</Modal>
 
 <style>
   .chatten-box {

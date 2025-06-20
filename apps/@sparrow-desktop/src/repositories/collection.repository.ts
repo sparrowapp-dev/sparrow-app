@@ -486,6 +486,114 @@ export class CollectionRepository {
     });
   };
 
+  public updateMockResponseRatiosInCollection = async (
+    collectionId: string,
+    requestId: string,
+    mockResponseRatios: Array<{ mockResponseId: string, responseWeightRatio: number }>
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+
+    if (!collection) {
+      console.error(`Collection not found: ${collectionId}`);
+      return;
+    }
+
+    const items = createDeepCopy(collection.items);
+
+    const updatedItems = items.map((request) => {
+      if (request.id === requestId) {
+        if (request.items && Array.isArray(request.items)) {
+          // Update each response that matches an ID in the mockResponseRatios array
+          request.items = request.items.map(item => {
+            const ratioUpdate = mockResponseRatios.find(
+              ratio => ratio.mockResponseId === item.id
+            );
+            if (ratioUpdate) {
+              return {
+                ...item,
+                mockRequestResponse: {
+                  ...(item.mockRequestResponse || {}),
+                  responseWeightRatio: ratioUpdate.responseWeightRatio
+                }
+              };
+            }
+            return item;
+          });
+        }
+      }
+      return request;
+    });
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  }
+
+  /**
+ * Updates mock response ratios in a folder
+ * @param collectionId - ID of the collection
+ * @param folderId - ID of the folder
+ * @param requestId - ID of the request
+ * @param mockResponseRatios - Array of mockResponseId and responseWeightRatio pairs
+ */
+  public updateMockResponseRatiosInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    mockResponseRatios: Array<{ mockResponseId: string, responseWeightRatio: number }>
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+
+    if (!collection) {
+      console.error(`Collection not found: ${collectionId}`);
+      return;
+    }
+
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((folder) => {
+      if (folder.id === folderId) {
+        if (folder.items && Array.isArray(folder.items)) {
+          folder.items = folder.items.map(request => {
+            if (request.id === requestId) {
+              if (request.items && Array.isArray(request.items)) {
+                request.items = request.items.map(item => {
+                  const ratioUpdate = mockResponseRatios.find(
+                    ratio => ratio.mockResponseId === item.id
+                  );
+
+                  if (ratioUpdate) {
+                    return {
+                      ...item,
+                      mockRequestResponse: {
+                        ...(item.mockRequestResponse || {}),
+                        responseWeightRatio: ratioUpdate.responseWeightRatio
+                      }
+                    };
+                  }
+
+                  return item;
+                });
+              }
+            }
+            return request;
+          });
+        }
+      }
+      return folder;
+    });
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  }
+
+
+
   // Updates a mock response inside a request at the collection root
   public updateMockResponseInCollection = async (
     collectionId: string,
@@ -540,10 +648,10 @@ export class CollectionRepository {
       if (folder.id === folderId) {
         folder.items?.forEach((request) => {
           if (request.id === requestId) {
-            for (let i = 0; i < request.items.items.length; i++) {
-              if (request.items.items[i].id === mockResponseId) {
-                request.items.items[i] = {
-                  ...request.items.items[i],
+            for (let i = 0; i < request.items.length; i++) {
+              if (request.items[i].id === mockResponseId) {
+                request.items[i] = {
+                  ...request.items[i],
                   ...updatedMockResponse,
                   mockRequestResponse: {
                     ...(request.items[i].mockRequestResponse || {}),

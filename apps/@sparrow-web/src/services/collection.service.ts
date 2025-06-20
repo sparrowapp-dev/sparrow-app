@@ -60,10 +60,11 @@ import type {
   HttpResponseMockCreateUpdatePayloadDtoInterface,
   HttpResponseMockDeletePayloadDtoInterface,
   HttpResponseMockUpdatePayloadDtoInterface,
+  HttpResponseRatiosMockUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 
 export class CollectionService {
-  constructor() {}
+  constructor() { }
 
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
@@ -547,7 +548,7 @@ export class CollectionService {
   };
 
   public addAiRequestInCollection = async (
-    _aiRequest: 
+    _aiRequest:
       AiRequestCreateUpdateInCollectionPayloadDtoInterface
       | AiRequestCreateUpdateInFolderPayloadDtoInterface,
     baseUrl: string,
@@ -889,19 +890,19 @@ export class CollectionService {
   };
 
   public createMockResponseInCollection = async (
-  mockResponse: HttpResponseMockCreateUpdatePayloadDtoInterface,
-  baseUrl: string,
+    mockResponse: HttpResponseMockCreateUpdatePayloadDtoInterface,
+    baseUrl: string,
   ) => {
-  const response = await makeRequest(
-    "POST",
-    `${baseUrl}/api/collection/mock-response`,
-    {
-      body: mockResponse,
-      headers: getAuthHeaders(),
-    },
-  );
-  return response;
-};
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/mock-response`,
+      {
+        body: mockResponse,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 
   public updateMockResponseInCollection = async (
     responseId: string,
@@ -929,6 +930,21 @@ export class CollectionService {
       `${baseUrl}/api/collection/mock-response/${responseId}`,
       {
         body: deleteResponseBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateMockResponseRatios = async (
+    payload: HttpResponseRatiosMockUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${baseUrl}/api/collection/mock-response/ratios`,
+      {
+        body: payload,
         headers: getAuthHeaders(),
       },
     );
