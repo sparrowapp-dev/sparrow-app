@@ -155,7 +155,7 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn workspace @sparrow/desktop tauri build
+          yarn workspace @sparrow/desktop tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
