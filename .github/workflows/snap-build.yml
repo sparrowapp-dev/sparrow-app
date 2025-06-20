@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - build-snap
+env:
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
   build-snap:
@@ -22,11 +24,9 @@ jobs:
 
       - name: Set Snapcraft Credentials from Base64
         run: |
-          echo "${{ secrets.SNAPCRAFT_STORE_CREDENTIALS_B64 }}" | base64 --decode > snaplogin
-          export SNAPCRAFT_STORE_CREDENTIALS="$(cat snaplogin)"
-          snapcraft whoami || echo "Logged in successfully"
+          snapcraft whoami
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ""
+          SNAPCRAFT_STORE_CREDENTIALS: " "
 
 
       - name: Set up Sparrow APT Repo
