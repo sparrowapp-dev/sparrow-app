@@ -1,0 +1,79 @@
+name: sparrow
+base: core24
+version: '2.25.0'
+summary: API testing tool with AI assistance # 79 char long summary
+description: |
+  Sparrow is an API testing application that helps developers test different types of APIs with AI assistance for enhanced productivity and debugging capabilities.
+
+grade: stable
+confinement: strict
+
+layout:
+  /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+
+apps:
+  sparrow:
+    command: usr/bin/sparrow
+    desktop: usr/share/applications/sparrow.desktop
+    extensions: [gnome]
+    plugs:
+      - xdg-open
+      - network
+      - single-instance-plug # add this if you're using the single-instance plugin
+    slots:
+      - single-instance-plug # add this if you're using the single-instance plugin
+
+# Add these lines only if you're using the single-instance plugin
+# Check https://v2.tauri.app/plugin/single-instance/ for details
+slots:
+ single-instance:
+   interface: dbus
+   bus: session
+   name: org.dev_sparrowapp_desktop.SingleInstance # Remember to change net_mydomain_MyApp to your app ID with "_" instead of "." and "-"
+
+plugs:
+ single-instance-plug:
+   interface: dbus
+   bus: session
+   name: org.dev_sparrowapp_desktop.SingleInstance # Remember to change net_mydomain_MyApp to your app ID with "_" instead of "." and "-"
+
+
+parts:
+  sparrow:
+    plugin: dump
+    build-snaps:
+      - node/20/stable
+      - rustup/latest/stable
+    source: .
+    build-packages:
+      - libwebkit2gtk-4.1-dev
+      - build-essential
+      - curl
+      - wget
+      - file
+      - libxdo-dev
+      - libssl-dev
+      - libayatana-appindicator3-dev
+      - librsvg2-dev
+      - dpkg
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libayatana-appindicator3-1
+    override-build: |
+      set -eu
+      mkdir -p $SNAP_USER_COMMON/.cache
+
+      # Download the latest .deb file
+      SPARROW_VERSION=2.25.0
+      DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/pool/stable/main/binary-amd64/sparrow_${SPARROW_VERSION}_amd64.deb"
+
+      # If version is "latest", you might need to curl a version endpoint or use a fixed URL
+      # For now, assuming you pass the version as environment variable
+      curl -L -o sparrow.deb "$DEB_URL"
+
+      # Extract the .deb file
+      dpkg -x sparrow.deb $SNAPCRAFT_PART_INSTALL/
+
+      # Fix the desktop file icon path
+      sed -i -e "s|Icon=sparrow|Icon=/usr/share/icons/hicolor/32x32/apps/sparrow.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop
