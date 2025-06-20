@@ -35,6 +35,8 @@
   export let isConversationHistoryLoading: boolean;
   export let activateGeneratePromptModal;
   export let isGuestUser: boolean;
+  export let onUploadFiles;
+  export let onDeleteFiles;
 
   let scrollList: ScrollList;
 
@@ -133,6 +135,8 @@
       bind:isConversationHistoryPanelOpen
       bind:isConversationHistoryLoading
       {activateGeneratePromptModal}
+      {onUploadFiles}
+      {onDeleteFiles}
     />
   </div>
 {/if}

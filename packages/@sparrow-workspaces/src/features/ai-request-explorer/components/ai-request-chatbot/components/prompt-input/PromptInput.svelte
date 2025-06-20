@@ -31,30 +31,30 @@
     isUploading?: boolean;
     cloudUrl?: string;
   }> = [
-    {
-      id: "123",
-      name: "DIV Contentsdddddddd.pdf",
-      type: "csv",
-      size: 1.34,
-      isUploading: false,
-      cloudUrl: "www.google.com",
-    },
-    {
-      id: "124",
-      name: "first file",
-      type: "csv",
-      size: 1.34,
-      isUploading: false,
-      cloudUrl: "www.google.com",
-    },
-    {
-      id: "125",
-      name: "first file",
-      type: "csv",
-      size: 1.34,
-      isUploading: true,
-      cloudUrl: "www.google.com",
-    },
+    // {
+    //   id: "123",
+    //   name: "DIV Contentsdddddddd.pdf",
+    //   type: "csv",
+    //   size: 1.34,
+    //   isUploading: false,
+    //   cloudUrl: "www.google.com",
+    // },
+    // {
+    //   id: "124",
+    //   name: "first file",
+    //   type: "csv",
+    //   size: 1.34,
+    //   isUploading: false,
+    //   cloudUrl: "www.google.com",
+    // },
+    // {
+    //   id: "125",
+    //   name: "first file",
+    //   type: "csv",
+    //   size: 1.34,
+    //   isUploading: true,
+    //   cloudUrl: "www.google.com",
+    // },
   ];
 
   $: {
@@ -96,7 +96,7 @@
       notifications.error(`Maximum ${MAX_FILES} files allowed.`);
       return;
     }
-    fileInput?.click();
+    fileInput.click();
   };
 
   const getFileExtension = (filename: string): string => {
@@ -108,12 +108,13 @@
     const files = target.files;
 
     if (!files || files.length === 0) return;
+    const validFiles: { file: File; fileObj: any }[] = []; // Validate all files first and create file objects
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
       // Check file count limit
-      if (uploadedFiles.length >= MAX_FILES) {
+      if (uploadedFiles.length + validFiles.length >= MAX_FILES) {
         notifications.error(`Maximum ${MAX_FILES} files allowed`);
         break;
       }
@@ -133,7 +134,6 @@
         continue;
       }
 
-      // Create file object with loading state
       const fileObj = {
         id: uuidv4(),
         name: file.name.split(".").slice(0, -1).join("."), // Remove extension from display name
@@ -142,38 +142,70 @@
         isUploading: true,
         cloudUrl: undefined,
       };
-
-      // Add to files array immediately to show in UI
-      uploadedFiles = [...uploadedFiles, fileObj];
-
-      try {
-        // Upload to cloud storage
-        const cloudUrl = await onFileUpload?.(file, fileObj.id);
-        console.log("cl ddd :>> ", cloudUrl);
-        // Update file object with cloud URL and remove loading state
-        uploadedFiles = uploadedFiles.map((f) =>
-          f.id === fileObj.id ? { ...f, isUploading: false, cloudUrl } : f,
-        );
-
-        notifications.success(`File "${file.name}" uploaded successfully`);
-      } catch (error) {
-        console.error("File upload failed:", error);
-
-        // Remove file from array if upload failed
-        uploadedFiles = uploadedFiles.filter((f) => f.id !== fileObj.id);
-        notifications.error(
-          `Failed to upload "${file.name}". Please try again.`,
-        );
-      }
+      validFiles.push({ file, fileObj });
     }
 
-    // Clear the input
-    target.value = "";
+    // Add all valid files to the UI immediately
+    if (validFiles.length > 0) {
+      uploadedFiles = [
+        ...uploadedFiles,
+        ...validFiles.map((validFile) => validFile.fileObj),
+      ];
+    }
+
+    // Upload all files in parallel
+    const uploadPromises = validFiles.map(async ({ file, fileObj }) => {
+      try {
+        const cloudUrl = await onFileUpload(file, fileObj.id); // Upload to cloud storage
+
+        // Update specific file object with cloud URL and remove loading state
+        uploadedFiles = uploadedFiles.map((file) =>
+          file.id === fileObj.id
+            ? { ...file, isUploading: false, cloudUrl }
+            : file,
+        );
+        // notifications.success(`File "${file.name}" uploaded successfully`);
+        return { success: true, fileId: fileObj.id, fileName: file.name };
+      } catch (error) {
+        console.error("File upload failed:", error);
+        uploadedFiles = uploadedFiles.filter((file) => file.id !== fileObj.id); // Remove file from array if upload failed
+        // notifications.error(
+        //   `Failed to upload "${file.name}". Please try again.`,
+        // );
+        return { success: false, fileId: fileObj.id, fileName: file.name };
+      }
+    });
+
+    // Wait for all uploads to complete (optional - you can remove this if you don't need to track completion)
+    try {
+      const results = await Promise.allSettled(uploadPromises);
+      const successCount = results.filter(
+        (r) => r.status === "fulfilled" && r.value.success,
+      ).length;
+      const failureCount = results.length - successCount;
+
+      // Simplified notification logic
+      if (failureCount === 0) {
+        notifications.success(
+          `All ${successCount} files uploaded successfully!`,
+        );
+      } else if (successCount === 0) {
+        notifications.error(`All ${failureCount} files failed to upload.`);
+      } else {
+        notifications.warning(
+          `${successCount} uploaded, ${failureCount} failed`,
+        );
+      }
+    } catch (error) {
+      console.error("Error in parallel upload:", error);
+    }
+
+    target.value = ""; // Clear the input
   };
 
   const handleRemoveFile = (fileId: string) => {
     uploadedFiles = uploadedFiles.filter((f) => f.id !== fileId);
-    onRemoveFile?.(fileId);
+    onRemoveFile(fileId);
   };
 
   const handleFileDownload = (file: any) => {
@@ -203,7 +235,7 @@
             {file}
             onRemove={handleRemoveFile}
             onDownload={handleFileDownload}
-            size="small"
+            size={"small"}
           />
         {/each}
       </div>

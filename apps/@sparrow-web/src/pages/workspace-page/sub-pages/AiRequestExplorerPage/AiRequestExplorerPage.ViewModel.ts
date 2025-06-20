@@ -572,11 +572,11 @@ class AiRequestExplorerViewModel {
 
   public handleUploadFilesToCloud = (filesToUpload: []) => {
 
-
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(`Promise resolved after ${2000 / 1000} seconds!`);
-      }, 20000);
+        // reject(`Promise resolved after ${2000 / 1000} seconds!`);
+      }, 5000);
     });
   }
 

@@ -151,11 +151,19 @@
   };
   export let onRemove: (fileId: string) => void;
   export let onDownload: (file: any) => void;
+  export let size: "small" | "medium" | "large" = "small";
 
   const handleFileClick = () => {
-    if (!file.isUploading && file.cloudUrl) {
-      onDownload(file);
-    }
+    // onDownload(file);
+    // if (!file.isUploading && file.cloudUrl) {
+    //   // Create a temporary link to download the file
+    //   const link = document.createElement("a");
+    //   link.href = file.cloudUrl;
+    //   link.download = `${file.name}.${file.type}`;
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // }
   };
 
   const getFileExtension = () => {
