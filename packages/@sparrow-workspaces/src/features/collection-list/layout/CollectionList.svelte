@@ -248,8 +248,8 @@
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right + 5}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top - 0,
-      collectionTabWrapper.getBoundingClientRect().bottom + 2,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={701}
     menuItems={[
@@ -282,7 +282,6 @@
         hidden: isGuestUser ? true : false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 

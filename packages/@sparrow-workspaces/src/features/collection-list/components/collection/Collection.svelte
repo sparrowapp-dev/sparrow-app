@@ -492,7 +492,7 @@
       ? collectionTabWrapper.getBoundingClientRect().right - 115
       : collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top + 20,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -550,7 +550,6 @@
         hidden: false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -560,7 +559,7 @@
       ? collectionTabWrapper.getBoundingClientRect().right - 115
       : collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top + 20,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -619,7 +618,6 @@
         hidden: false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -627,7 +625,7 @@
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 55}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top - 0,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -705,7 +703,6 @@
         icon: BotRegular,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 

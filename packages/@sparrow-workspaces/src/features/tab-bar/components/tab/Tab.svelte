@@ -142,7 +142,7 @@
     <Options
       isTabMenu={true}
       xAxis={mouseX}
-      yAxis={[mouseY, mouseY + 20]}
+      yAxis={[mouseY, mouseY]}
       zIndex={500}
       menuItems={[
         {
@@ -198,7 +198,6 @@
           icon: CopyRegular,
         },
       ]}
-      {noOfColumns}
     />
   {/if}
 

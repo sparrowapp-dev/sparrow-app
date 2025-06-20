@@ -202,7 +202,7 @@
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().top - 5,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -256,7 +256,6 @@
             : true,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
