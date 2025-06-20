@@ -155,7 +155,7 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn workspace @sparrow/desktop tauri build
+          yarn workspace @sparrow/desktop tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -166,8 +166,8 @@ jobs:
       - name: Create signed .pkg for App Store
         run: |
           APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}.pkg"
           
           if [ ! -d "$BUNDLE_PATH" ]; then
             echo "::error::App bundle not found at $BUNDLE_PATH"
@@ -189,7 +189,7 @@ jobs:
 
       - name: Upload to App Store Connect
         env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
