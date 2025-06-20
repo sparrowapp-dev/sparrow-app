@@ -13,7 +13,7 @@ jobs:
     environment: Snapbuild
 
     env:
-      SNAP_CHANNEL: ${{ secrets.SNAP_RELEASE_CHANNEL || 'edge' }}
+      SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
 
     steps:
       - name: Checkout Repo
@@ -48,4 +48,4 @@ jobs:
         run: |
           SNAP_FILE=$(ls *.snap | head -n 1)
           echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
-          snapcraft upload "$SNAP_FILE" --release="$SNAP_CHANNEL"
+          snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
