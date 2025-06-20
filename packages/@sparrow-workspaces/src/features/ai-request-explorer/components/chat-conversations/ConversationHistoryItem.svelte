@@ -222,7 +222,7 @@
   <Options
     xAxis={chatItemTabWrapper.getBoundingClientRect().right - 10}
     yAxis={[
-      chatItemTabWrapper.getBoundingClientRect().top - 0,
+      chatItemTabWrapper.getBoundingClientRect().top - 5,
       chatItemTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -249,7 +249,6 @@
         iconColor: "var(--icon-ds-danger-300)",
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
