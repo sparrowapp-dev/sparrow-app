@@ -1,4 +1,4 @@
-name: Build & Release Snap
+name: Development Snap
 
 on:
   push:
@@ -20,11 +20,14 @@ jobs:
         run: |
           sudo snap install snapcraft --classic
 
-      - name: Snapcraft Login
+      - name: Set Snapcraft Credentials from Base64
         run: |
-          echo "${{ secrets.SNAPCRAFT_PASSWORD }}" | snapcraft login --with -
+          echo "${{ secrets.SNAPCRAFT_STORE_CREDENTIALS_B64 }}" | base64 --decode > snaplogin
+          export SNAPCRAFT_STORE_CREDENTIALS="$(cat snaplogin)"
+          snapcraft whoami || echo "Logged in successfully"
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: '{"email": "${{ secrets.SNAPCRAFT_EMAIL }}", "password": "${{ secrets.SNAPCRAFT_PASSWORD }}"}'
+          SNAPCRAFT_STORE_CREDENTIALS: ""
+
 
       - name: Set up Sparrow APT Repo
         run: |
