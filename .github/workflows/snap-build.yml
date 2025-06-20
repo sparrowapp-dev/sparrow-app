@@ -39,8 +39,6 @@ jobs:
 
       - name: Download Latest Sparrow DEB
         run: |
-          mkdir -p deb-download
-          cd deb-download
           apt download sparrow
 
       - name: Build Snap from DEB
