@@ -40,7 +40,17 @@
 
   let scrollList: ScrollList;
 
-  const sendPrompt = async (text: string) => {
+  const sendPrompt = async (
+    text: string,
+    attchedFiles: Array<{
+      id: string;
+      name: string;
+      type: string;
+      size: number;
+      isUploading?: boolean;
+      cloudUrl?: string;
+    }>,
+  ) => {
     if (text) {
       const isAutoClearEnabled =
         $tab?.property?.aiRequest?.state?.isChatAutoClearActive || false;
@@ -55,6 +65,7 @@
               status: true,
               modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
               modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+              attchedFiles,
             },
           ]
         : [
@@ -68,6 +79,7 @@
               status: true,
               modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
               modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+              attchedFiles,
             },
           ];
       onUpdateAiConversation(updatedConverstaion);

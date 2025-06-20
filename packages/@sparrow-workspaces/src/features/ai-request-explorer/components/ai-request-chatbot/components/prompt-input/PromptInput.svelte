@@ -84,7 +84,7 @@
     }, 0);
 
     if (prompt) {
-      sendPrompt(prompt);
+      sendPrompt(prompt, uploadedFiles);
       onUpdateAiPrompt("");
       MixpanelEvent(Events.AI_Initiate_Response);
     }

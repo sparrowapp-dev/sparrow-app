@@ -582,6 +582,7 @@
                           : false}
                         {isResponseGenerating}
                         {handleApplyChangeOnAISuggestion}
+                        attachedFilesWithMsg={chat.attchedFiles}
                       />
                     </div>
                   {/each}
