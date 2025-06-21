@@ -34,46 +34,11 @@ env:
   VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
   VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
   VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
+  VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
 
 jobs:
-  # list_apps_simple:
-  #   runs-on: macos-latest
-  #   environment: development
-
-  #   steps:
-  #     - name: Setup App Store Connect API Key
-  #       env:
-  #         APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-  #         APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-  #         APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-  #       run: |
-  #         mkdir -p ~/.appstoreconnect/private_keys
-  #         echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-  #         chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-
-  #     - name: List all apps
-  #       env:
-  #         APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-  #         APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-  #       run: |
-  #         echo "=== All Apps in App Store Connect ==="
-  #         xcrun altool --list-apps \
-  #           --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-  #           --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
-  #           --output-format normal
-
-  #     - name: List apps with XML output for detailed info
-  #       env:
-  #         APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-  #         APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-  #       run: |
-  #         echo "=== Detailed App Information (XML) ==="
-  #         xcrun altool --list-apps \
-  #           --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-  #           --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
-  #           --output-format xml
   release_macos:
     runs-on: macos-latest
     environment: development
