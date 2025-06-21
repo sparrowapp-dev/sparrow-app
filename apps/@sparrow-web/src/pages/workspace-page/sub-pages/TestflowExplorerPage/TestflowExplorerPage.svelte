@@ -7,14 +7,20 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
+  import {
+    environmentType,
+    ResponseMessage,
+    WorkspaceRole,
+  } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let tab;
+  export let teamDetails;
+  export let upgradePlanModel;
   const _viewModel = new TestflowExplorerPageViewModel(tab);
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
@@ -31,6 +37,14 @@
   let isGuestUser = false;
   let currentWorkspaceId = "";
   let currentWorkspace;
+  let planLimitRunHistoryCount: number = 5;
+  let planLimitTestFlowBlocks: number = 5;
+  let planLimitTestflow: number = 3;
+  let currentTestflowCount: number = 1;
+  let selectiveRunTestflow: boolean = false;
+  let testflowBlocksPlanModalOpen: boolean = false;
+  let runHistoryPlanModalOpen: boolean = false;
+  let selectiveRunModalOpen: boolean = false;
 
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.activeWorkspace;
@@ -90,6 +104,16 @@
     }
   });
 
+  const handleBlockLimitTestflow = async () => {
+    const planlimits = await _viewModel.userLimitBlockPerTestflow();
+    if (planlimits) {
+      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
+      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
+      planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+    }
+  };
+
   testFlowDataStore.subscribe((val) => {
     if (val) {
       testflowStore = val.get(tab?.tabId) as TFDataStoreType;
@@ -103,6 +127,7 @@
     } else {
       isTestFlowEmpty = false;
     }
+    handleBlockLimitTestflow();
   });
 
   const userSubscriber = user.subscribe((value) => {
@@ -157,6 +182,10 @@
     _viewModel.updateNameWithTestFlowList as any,
     1000,
   );
+  const handleTestflowCount = async () => {
+    const data = await _viewModel.fetchCountofTestFlow();
+    currentTestflowCount = data;
+  };
 
   let prevTabName = "";
   $: {
@@ -167,7 +196,7 @@
       prevTabName = tab.name;
       findUserRole();
     }
-
+    handleTestflowCount();
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
@@ -178,6 +207,39 @@
       targetUrl: constants.TESTFLOW_DOCS_URL,
     });
   };
+
+  const handleRequestOwner = async () => {
+    if ($activeWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $activeWorkspace?._data?.team?.teamId,
+      );
+      testflowBlocksPlanModalOpen = false;
+      runHistoryPlanModalOpen = false;
+      selectiveRunModalOpen = false;
+    }
+  };
+
+  const handleSaveTestflow = async () => {
+    const response = await _viewModel.saveTestflow();
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModel = true;
+    }
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    if ($activeWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $activeWorkspace?._data?.team?.teamId,
+      );
+      testflowBlocksPlanModalOpen = false;
+      runHistoryPlanModalOpen = false;
+      selectiveRunModalOpen = false;
+    }
+  };
+
+  onMount(() => {
+    handleBlockLimitTestflow();
+  });
 </script>
 
 {#if render}
@@ -197,7 +259,7 @@
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onUpdateBlockData={_viewModel.updateBlockData}
-    onSaveTestflow={_viewModel.saveTestflow}
+    onSaveTestflow={handleSaveTestflow}
     isWebApp={true}
     onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
@@ -206,9 +268,22 @@
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
+    {isGuestUser}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
     {handleEventOnClickQuestionMark}
+    {planLimitTestFlowBlocks}
+    {planLimitTestflow}
+    {planLimitRunHistoryCount}
+    testflowCount={currentTestflowCount}
+    {teamDetails}
+    bind:testflowBlocksPlanModalOpen
+    bind:runHistoryPlanModalOpen
+    bind:selectiveRunModalOpen
+    handleRedirectToAdminPanel={handleRedirectAdminPanel}
+    {handleRequestOwner}
+    {selectiveRunTestflow}
+    handleContactSales={_viewModel.handleContactSales}
   />
 {/if}

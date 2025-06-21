@@ -127,6 +127,27 @@ const websocketItems = {
     properties: params,
   },
 };
+
+const mockRequestResponseItems = {
+  responseBody: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedResponseBodyType: {
+    type: "string",
+  },
+  responseHeaders: {
+    type: "array",
+    properties: params,
+  },
+  responseStatus: {
+    type: "string",
+  },
+  isMockResponseActive: {
+    type: "boolean",
+  },
+};
+
 const itemsProperties = {
   id: {
     type: "number",
@@ -158,6 +179,10 @@ const itemsProperties = {
     type: "object",
     properties: websocketItems,
   },
+  mockRequestResponse: {
+    type: "object",
+    properties: mockRequestResponseItems,
+  },
   createdAt: {
     type: "date-time",
   },
@@ -187,7 +212,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 5,
+  version: 6,
   properties: {
     collectionId: {
       type: "string",

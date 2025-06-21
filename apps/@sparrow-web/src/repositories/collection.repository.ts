@@ -7,7 +7,7 @@ import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
-  constructor() {}
+  constructor() { }
 
   /**
    * @description
@@ -476,6 +476,86 @@ export class CollectionRepository {
       return value;
     });
   };
+
+  // Updates a mock response inside a request at the collection root
+  public updateMockResponseInCollection = async (
+    collectionId: string,
+    requestId: string,
+    mockResponseId: string,
+    updatedMockResponse: any
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+    const items = createDeepCopy(collection.items);
+
+    const updatedItems = items.map((request) => {
+      if (request.id === requestId) {
+        for (let i = 0; i < request.items.length; i++) {
+          if (request.items[i].id === mockResponseId) {
+            request.items[i] = {
+              ...request.items[i],
+              ...updatedMockResponse,
+              mockRequestResponse: {
+                ...(request.items[i].mockRequestResponse || {}),
+                ...(updatedMockResponse?.mockRequestResponse || {}),
+              },
+            };
+            break;
+          }
+        }
+      }
+      return request;
+    });
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  // Updates a mock response inside a request within a folder
+  public updateMockResponseInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    mockResponseId: string,
+    updatedMockResponse: any
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+    const items = createDeepCopy(collection.items);
+
+    const updatedItems = items.map((folder) => {
+      if (folder.id === folderId) {
+        folder.items?.forEach((request) => {
+          if (request.id === requestId) {
+            for (let i = 0; i < request.items.items.length; i++) {
+              if (request.items.items[i].id === mockResponseId) {
+                request.items.items[i] = {
+                  ...request.items.items[i],
+                  ...updatedMockResponse,
+                  mockRequestResponse: {
+                    ...(request.items[i].mockRequestResponse || {}),
+                    ...(updatedMockResponse?.mockRequestResponse || {}),
+                  },
+                };
+                break;
+              }
+            }
+          }
+        });
+      }
+      return folder;
+    });
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
 
   public deleteSavedRequestInFolder = async (
     collectionId: string,

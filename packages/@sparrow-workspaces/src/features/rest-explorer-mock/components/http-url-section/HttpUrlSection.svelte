@@ -3,7 +3,7 @@
   import { Select } from "@sparrow/library/forms";
   import { notifications, Button } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
-  import { UrlInputTheme } from "../../../../utils/";
+  import { MockUrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { ArrowUpRightRegular, SaveRegular } from "@sparrow/library/icons";
 
@@ -24,8 +24,9 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
+  export let mockCollectionUrl = "";
 
-  const theme = new UrlInputTheme().build();
+  const theme = new MockUrlInputTheme().build();
   const handleDropdown = (tab: string) => {
     onUpdateRequestMethod(tab);
   };
@@ -129,12 +130,15 @@
     menuItem={"v2"}
     highlightTickedItem={false}
   />
-  <div class="w-100 d-flex align-items-center position-relative">
-    <div class="position-absolute top-0" style="width: calc(100% );">
+  <div class="w-100 d-flex align-items-start">
+    <div class="static-url-section">
+      <span class="api-url">{mockCollectionUrl}</span>
+    </div>
+    <div class="w-100 position-relative">
       <CodeMirrorInput
         value={requestUrl}
         onUpdateInput={onUpdateRequestUrl}
-        placeholder={"Enter a URL"}
+        placeholder={"Enter path"}
         {theme}
         {onUpdateEnvironment}
         {environmentVariables}
@@ -219,6 +223,27 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
+  .static-url-section {
+    height: 36px;
+    background-color: var(--bg-ds-surface-600);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    max-width: 70%;
+    flex-shrink: 0;
+  }
+  .api-url {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
   .save-disk {
     padding: 7px;
     background-color: var(--bg-secondary-400);

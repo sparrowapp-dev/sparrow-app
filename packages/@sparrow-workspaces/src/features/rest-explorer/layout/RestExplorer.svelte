@@ -782,22 +782,22 @@
                               />
 
                               <div class="d-flex">
-                                {#if $policyConfig.enableAIAssistance}
+                                {#if !isGuestUser && $policyConfig.enableAIAssistance}
                                   <!-- AI debugging trigger button -->
                                   <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
                                   <div
-                                    class="d-flex"
-                                    style="height: 32px;
-                                  {isAIDebugBtnEnable
-                                      ? 'border: 2px solid #316CF6;'
-                                      : ''} border-radius: 4px; background-color: {isAIDebugBtnEnable
-                                      ? '#272935;'
-                                      : '#14181f'}"
+                                    class="d-flex ai-chip-button"
+                                    class:enabled={isAIDebugBtnEnable}
+                                    style="height: 32px; border: 1px solid {isAIDebugBtnEnable
+                                      ? 'var(--border-ds-surface-100)'
+                                      : 'var(--bg-secondary-550)'};  border-radius: 4px;  background-color: {isAIDebugBtnEnable
+                                      ? 'var(--border-ds-surface-700)'
+                                      : 'var(--border-ds-surface-500)'}"
                                   >
                                     <Button
                                       title="Help me debug"
                                       size={"small"}
-                                      type={"secondary"}
+                                      type={"teritiary-regular"}
                                       startIcon={SparkleFilled}
                                       disable={!isAIDebugBtnEnable}
                                       onClick={handleOnClickAIDebug}
@@ -1087,5 +1087,10 @@
     color: var(--text-primary-300);
     text-decoration: underline;
     cursor: pointer;
+  }
+
+  .ai-chip-button.enabled:hover {
+    border-color: var(--border-ds-primary-400) !important;
+    box-shadow: 0 0 4px 1px rgba(17, 173, 240, 0.4) !important;
   }
 </style>

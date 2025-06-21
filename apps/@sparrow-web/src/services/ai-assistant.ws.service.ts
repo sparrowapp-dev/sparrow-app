@@ -90,7 +90,6 @@ export class AiAssistantWebSocketService {
       );
     }
     AiAssistantWebSocketService.instance = this;
-
   }
 
   /**
@@ -111,7 +110,6 @@ export class AiAssistantWebSocketService {
     return AiAssistantWebSocketService.instance;
   }
 
-
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //                         **** Connection Management Methods ****
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,22 +119,23 @@ export class AiAssistantWebSocketService {
    * Initializes the WebSocket connection and sets up event handlers.
    */
   public connectWebSocket = () => {
-
     try {
-
       // If already connected or connecting, no need to create a new connection
       if (
         this.webSocket &&
         (this.webSocket.readyState === WebSocket.OPEN ||
           this.webSocket.readyState === WebSocket.CONNECTING)
-      ) { return true; }
+      ) {
+        return true;
+      }
 
       // Clean up any existing connection
       this.cleanup();
 
       // Create new WebSocket connection
       // ToDo: Need to add autentication to avoid absure of ai socket url
-      this.webSocket = new WebSocket(this.baseUrl,
+      this.webSocket = new WebSocket(
+        this.baseUrl,
         // {
         // transports: ["websocket"],
         // auth: getAuthHeaders(),
@@ -158,7 +157,7 @@ export class AiAssistantWebSocketService {
   };
 
   /**
-   * Returns the current connection status 
+   * Returns the current connection status
    * @returns {boolean} - Whether the WebSocket is currently connected or not
    */
   public isWsConnected = (): boolean => {
@@ -183,7 +182,6 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private handleClose = (event: CloseEvent) => {
-
     this._isConnected = false;
     this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
 
@@ -225,7 +223,6 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private scheduleReconnect = () => {
-
     // Clear any existing reconnect timer
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
@@ -239,7 +236,8 @@ export class AiAssistantWebSocketService {
       this.reconnectTimer = setTimeout(() => {
         // Adding this console info, to debug in deployed environments
         console.debug(
-          `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts
+          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
+            this.maxReconnectAttempts
           })...`,
         );
         this.reconnectAttempts++;
@@ -281,16 +279,16 @@ export class AiAssistantWebSocketService {
       this.webSocket.onclose = null;
 
       // Close the connection if it's not already closed
-      if (this.webSocket.readyState === WebSocket.OPEN ||
-        this.webSocket.readyState === WebSocket.CONNECTING) {
+      if (
+        this.webSocket.readyState === WebSocket.OPEN ||
+        this.webSocket.readyState === WebSocket.CONNECTING
+      ) {
         this.webSocket.close(1000, "Closed by client");
       }
 
       this.webSocket = null;
     }
   }
-
-
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //                         **** Service Application Methods ****
@@ -314,7 +312,6 @@ export class AiAssistantWebSocketService {
     }
   };
 
-
   /**
    * Sends a message to the AI Assistant server via WebSocket.
    *
@@ -333,7 +330,8 @@ export class AiAssistantWebSocketService {
     apiContext: string,
     conversation,
     model,
-    activity
+    activity,
+    teamId,
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -344,7 +342,8 @@ export class AiAssistantWebSocketService {
       conversation,
       model,
       activity,
-      "feature": "sparrow-ai"
+      teamId,
+      feature: "sparrow-ai",
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
@@ -370,7 +369,6 @@ export class AiAssistantWebSocketService {
     conversation?: string,
     configs: modelsConfigType;
   }): Promise<boolean> => {
-
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send message");
       return false;
@@ -519,14 +517,17 @@ export class AiAssistantWebSocketService {
    * @param tabId - The tab ID for which to stop generation
    * @returns {boolean} - Whether the signal was sent successfully
    */
-  public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
+  public stopGeneration = async (
+    tabId: string,
+    threadId: string,
+    userEmail: string,
+  ): Promise<boolean> => {
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send stop signal");
       return false;
     }
 
     try {
-
       this.removeListener(`assistant-response_${tabId}`);
 
       // Server is not handling stop generation event, so disabling it now will add it later.
@@ -546,6 +547,4 @@ export class AiAssistantWebSocketService {
       return false;
     }
   };
-
-
 }

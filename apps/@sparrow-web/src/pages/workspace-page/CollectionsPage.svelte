@@ -38,7 +38,7 @@
   import { DownloadApp } from "@sparrow/common/features";
 
   // ---- Interface, enum & constants
-  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
+  import { TeamRole, WorkspaceRole } from "@sparrow/common/enums/team.enum";
 
   // ---- View Model
   import CollectionsViewModel from "./CollectionPage.ViewModel";
@@ -96,6 +96,9 @@
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
+  import { ResponseMessage } from "@sparrow/common/enums";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -126,6 +129,7 @@
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
+  let teamDetails: any;
 
   // let isExpandEnvironment = false;
   // let isExpandTestflow = false;
@@ -250,6 +254,7 @@
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.MOCK_REQUEST ||
+        tab?.type === TabTypeEnum.AI_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.WORKSPACE ||
@@ -420,6 +425,7 @@
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.MOCK_REQUEST ||
+      removeTab.type === TabTypeEnum.AI_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL ||
       removeTab.type === TabTypeEnum.FOLDER
     ) {
@@ -442,6 +448,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("Mock Request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.AI_REQUEST) {
+          const res = await _viewModel.saveAiRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("AI Request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);
@@ -576,6 +590,15 @@
     }
   };
 
+  const handleLimits = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      const data = await _viewModel.userPlanLimits(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      userLimits = data;
+    }
+  };
+
   let isInitialDataLoading = true;
 
   const cw = currentWorkspace.subscribe(async (value) => {
@@ -591,6 +614,14 @@
             isWelcomePopupOpen = false;
           }
         });
+        teamDetails = {
+          teamId: value?._data?.team?.teamId || "",
+          teamName: value?._data?.team?.teamName || "",
+          teamOwnerEmail: value?._data?.users[0]?.email,
+        };
+        if (teamDetails.teamId) {
+          handleLimits();
+        }
         tabList = _viewModel.getTabListWithWorkspaceId(value._id);
         activeTab = _viewModel.getActiveTab(value._id);
         totalTeamCount = value._data?.users?.length || 0;
@@ -789,6 +820,49 @@
     currentWorkspaceId = workspaceId;
     isCreateMockCollectionPopup = true;
   };
+  let userLimits: any;
+  let upgradePlanModel: boolean = false;
+  let isActiveSyncPlanModalOpen = false;
+  let planContent: any;
+  let planContentNonActive: any;
+  let currentTestflow: number = 3;
+
+  const handleCreateTestflowCheck = async () => {
+    currentTestflow = await _viewModel3.currentTestflowCount(
+      $currentWorkspace?._id,
+    );
+    const response = await _viewModel3.handleCreateTestflow();
+    handleLimits();
+    if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModel = true;
+    }
+  };
+
+  const handleRequestOwner = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      upgradePlanModel = false;
+    }
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      upgradePlanModel = false;
+    }
+  };
+
+  $: {
+    handleLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
+    }
+  }
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -845,7 +919,7 @@
           onUpdateEnvironment={_viewModel2.onUpdateEnvironment}
           onOpenEnvironment={_viewModel2.onOpenEnvironment}
           onSelectEnvironment={_viewModel2.onSelectEnvironment}
-          onCreateTestflow={_viewModel3.handleCreateTestflow}
+          onCreateTestflow={handleCreateTestflowCheck}
           testflows={_viewModel3.testflows}
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
@@ -938,6 +1012,7 @@
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
+                          {teamDetails}
                         />
                       </div>
                     </Motion>
@@ -950,7 +1025,11 @@
                   {:else if $activeTab?.type === ItemType.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100" use:motion>
-                        <TestFlowExplorerPage tab={$activeTab} />
+                        <TestFlowExplorerPage
+                          tab={$activeTab}
+                          {teamDetails}
+                          bind:upgradePlanModel
+                        />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.SOCKET_IO}
@@ -999,7 +1078,7 @@
                           {currentWorkspace}
                           {handleCreateEnvironment}
                           onCreateTestflow={() => {
-                            _viewModel3.handleCreateTestflow();
+                            handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
@@ -1254,6 +1333,8 @@
     onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
     onValidateOapiText={_viewModel.validateOapiDataSyntax}
     onValidateOapiFile={_viewModel.validateOapiFileSyntax}
+    isActiveSyncRequired={userLimits?.activeSync?.active || false}
+    bind:isActiveSyncPlanModalOpen
   />
 </Modal>
 
@@ -1785,6 +1866,44 @@
     />
   </div>
 </Modal>
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModel}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Testflow"
+  planLimitValue={userLimits?.testflowPerWorkspace?.value || 3}
+  currentPlanValue={currentTestflow}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={isActiveSyncPlanModalOpen}
+  title={planContent?.title}
+  description={planContentNonActive?.description}
+  planType="Active Sync"
+  activePlan={"disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   :global(.collection-splitter .splitpanes__splitter) {

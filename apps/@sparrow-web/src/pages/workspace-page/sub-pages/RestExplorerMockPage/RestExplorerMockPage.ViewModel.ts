@@ -297,6 +297,50 @@ class RestExplorerMockViewModel {
   };
 
   /**
+   * Compares items arrays by checking responseBody and responseHeaders
+   * @param serverItems - Items array from server
+   * @param clientItems - Items array from client
+   * @returns boolean - true if arrays match, false otherwise
+   */
+  private compareItemsArray = (serverItems, clientItems) => {
+    if (serverItems.length !== clientItems.length) return false;
+
+    for (let i = 0; i < serverItems.length; i++) {
+      const serverItem = serverItems[i];
+      const clientItem = clientItems[i];
+
+      // Compare responseBody and status (string comparison)
+      if (
+        serverItem.mockRequestResponse?.responseBody !==
+        clientItem.mockRequestResponse?.responseBody
+      ) {
+        return false;
+      } else if (
+        serverItem.mockRequestResponse?.responseStatus !==
+        clientItem.mockRequestResponse?.responseStatus
+      ) {
+        return false;
+      } else if (
+        serverItem.mockRequestResponse?.selectedResponseBodyType !==
+        clientItem.mockRequestResponse?.selectedResponseBodyType
+      ) {
+        return false;
+      }
+
+      // Compare responseHeaders (array comparison using existing compareArray.init)
+      if (
+        !this.compareArray.init(
+          serverItem.mockRequestResponse?.responseHeaders || [],
+          clientItem.mockRequestResponse?.responseHeaders || [],
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
    * Compares the current request tab with the server version and updates the saved status accordingly.
    * This method is debounced to reduce the number of server requests.
    * @return A promise that resolves when the comparison is complete.
@@ -414,6 +458,15 @@ class RestExplorerMockViewModel {
     else if (
       requestServer.mockRequest.body.raw !==
       progressiveTab.property.mockRequest.body.raw
+    ) {
+      result = false;
+    }
+    // Add items comparison here
+    else if (
+      !this.compareItemsArray(
+        requestServer.items,
+        progressiveTab.property.mockRequest.items,
+      )
     ) {
       result = false;
     }
@@ -695,9 +748,34 @@ class RestExplorerMockViewModel {
    *
    * @param _body - response body
    */
-  public updateResponseBody = async (_body: string) => {
+  public updateResponseBody = async (_body: string, responseId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.mockRequest.responseBody = _body;
+    // progressiveTab.property.mockRequest.responseBody = _body;
+    progressiveTab.property.mockRequest.items.forEach((data) => {
+      if (data.id === responseId) {
+        data.mockRequestResponse.responseBody = _body;
+      }
+    });
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   * Updates the response headers for a particular mock response.
+   * @param _headers - The new headers array.
+   * @param responseId - The ID of the mock response to update.
+   */
+  public updateResponseHeaders = async (
+    _headers: KeyValueChecked[],
+    responseId: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.mockRequest.items.forEach((data) => {
+      if (data.id === responseId) {
+        data.mockRequestResponse.responseHeaders = _headers;
+      }
+    });
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -707,9 +785,14 @@ class RestExplorerMockViewModel {
    *
    * @param _body - response status
    */
-  public updateResponseStatus = async (_status: string) => {
+  public updateResponseStatus = async (_status: string, responseId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.mockRequest.responseStatus = _status;
+    // progressiveTab.property.mockRequest.responseStatus = _status;
+    progressiveTab.property.mockRequest.items.forEach((data) => {
+      if (data.id === responseId) {
+        data.mockRequestResponse.responseStatus = _status;
+      }
+    });
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -954,13 +1037,28 @@ class RestExplorerMockViewModel {
    *
    * @param  - response state
    */
-  public updateResponseState = async (_state: StatePartial) => {
-    if (_state?.responseBodyLanguage) {
+  public updateResponseState = async (
+    _state: StatePartial,
+    responseId: string,
+  ) => {
+    if (_state?.responseBodyLanguage || _state?.responseNavigation) {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      progressiveTab.property.mockRequest.state = {
-        ...progressiveTab.property.mockRequest.state,
-        ..._state,
-      };
+      // progressiveTab.property.mockRequest.state = {
+      //   ...progressiveTab.property.mockRequest.state,
+      //   ..._state,
+      // };
+      progressiveTab.property.mockRequest.items.forEach((data) => {
+        if (data.id === responseId) {
+          data.state = {
+            ...data.state,
+            ..._state,
+          };
+          if (_state?.responseBodyLanguage && data.mockRequestResponse) {
+            data.mockRequestResponse.selectedResponseBodyType =
+              this.getResponseBodyType(_state.responseBodyLanguage);
+          }
+        }
+      });
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       this.compareRequestWithServer();
@@ -1054,7 +1152,7 @@ class RestExplorerMockViewModel {
       return;
     }
     initRequestTab.updateBody(progressiveTab.property.mockRequest?.body);
-    initRequestTab.updateUrl(progressiveTab.property.mockRequest?.url);
+    initRequestTab.updateUrl(collectionData?.mockCollectionUrl + progressiveTab.property.mockRequest?.url);
     initRequestTab.updateName(progressiveTab.name);
     initRequestTab.updateDescription(progressiveTab.description);
     initRequestTab.updateMethod(progressiveTab.property.mockRequest?.method);
@@ -1363,6 +1461,7 @@ class RestExplorerMockViewModel {
       name: componentData?.name,
       description: componentData?.description,
       type: ItemType.MOCK_REQUEST,
+      items: componentData?.property.mockRequest?.items,
     };
 
     let folderSource;
@@ -2805,6 +2904,7 @@ class RestExplorerMockViewModel {
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
+      model: "deepseek",
     });
     if (response.isSuccessful) {
       const formatter = new MarkdownFormatter();
@@ -2914,6 +3014,308 @@ class RestExplorerMockViewModel {
         progressiveTab.description = tab.description;
         this.tab = progressiveTab;
       }
+    }
+  };
+
+  /**
+   * Handle create mock response in a collection
+   */
+  public handleCreateMockResponse = async () => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    try {
+      const mockResponseObj = {
+        collectionId: progressiveTab.path.collectionId,
+        workspaceId: progressiveTab.path.workspaceId,
+        mockRequestId: progressiveTab.id,
+        folderId: progressiveTab.path.folderId || "",
+        items: {
+          name: "New Mock REST API - Response",
+          description: "",
+          type: ItemType.MOCK_REQUEST_RESPONSE,
+          mockRequestResponse: {
+            responseBody: "",
+            responseHeaders: [{ key: "", value: "", checked: false }],
+            responseStatus: "",
+            responseDate: "",
+            selectedResponseBodyType: "",
+            isMockResponseActive: false,
+          },
+        },
+      };
+      const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+      const response =
+        await this.collectionService.createMockResponseInCollection(
+          mockResponseObj,
+          baseUrl,
+        );
+      if (response?.isSuccessful && response.data?.data) {
+        notifications.success("Mock response created successfully.");
+        if (progressiveTab.path?.folderId) {
+          this.collectionRepository.addSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            response.data.data,
+          );
+        } else {
+          this.collectionRepository.addSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            response.data.data,
+          );
+        }
+        const mockResponse = {
+          id: response.data.data.id,
+          name: response.data.data.name,
+          description: response.data.data.description,
+          type: ItemType.MOCK_REQUEST_RESPONSE,
+          mockRequestResponse: {
+            responseBody: response.data.data.mockRequestResponse.responseBody,
+            responseHeaders:
+              response.data.data.mockRequestResponse.responseHeaders,
+            responseStatus:
+              response.data.data.mockRequestResponse.responseStatus,
+            responseDate: response.data.data.mockRequestResponse.responseDate,
+            isMockResponseActive:
+              response.data.data.mockRequestResponse.isMockResponseActive,
+            selectedResponseBodyType:
+              response.data.data.mockRequestResponse.selectedResponseBodyType,
+          },
+          source: response.data.data?.source,
+          createdAt: response.data.data?.createdAt,
+          createdBy: response.data.data?.createdBy,
+          updatedAt: response.data.data?.updatedAt,
+          updatedBy: response.data.data?.updatedBy,
+          state: {
+            responseBodyLanguage: "Text",
+            responseBodyFormatter: "Pretty",
+            responseNavigation: "Response",
+          },
+        };
+        if (!progressiveTab.property?.mockRequest?.items) {
+          progressiveTab.property.mockRequest.items = [];
+        }
+        progressiveTab.property?.mockRequest?.items?.push(mockResponse);
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        return response.data.data;
+      } else {
+        notifications.error(
+          response?.message || "Failed to create mock response.",
+        );
+        return "";
+      }
+    } catch (error) {
+      console.error("Error creating mock response:", error);
+      notifications.error("An error occurred while creating mock response.");
+      return "";
+    }
+  };
+
+  /**
+   * Handle state of mock response in a collection
+   */
+  public handleMockResponseState = async (
+    mockResponseId: string,
+    isMockResponseActive: boolean,
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+
+    // Prepare the update payload matching your backend DTO
+    const updatePayload = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      folderId: progressiveTab.path.folderId || "",
+      mockRequestId: progressiveTab.id,
+      mockResponseId: mockResponseId,
+      isMockResponseActive: isMockResponseActive,
+    };
+
+    try {
+      const response =
+        await this.collectionService.updateMockResponseInCollection(
+          mockResponseId,
+          updatePayload,
+          baseUrl,
+        );
+      if (response?.isSuccessful) {
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.updateSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+            {
+              mockRequestResponse: {
+                isMockResponseActive: isMockResponseActive,
+              },
+            },
+          );
+        } else {
+          this.collectionRepository.updateSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+            {
+              mockRequestResponse: {
+                isMockResponseActive: isMockResponseActive,
+              },
+            },
+          );
+        }
+        debugger;
+        progressiveTab.property?.mockRequest?.items?.forEach((item) => {
+          if (item.id === mockResponseId) {
+            item.mockRequestResponse.isMockResponseActive =
+              isMockResponseActive;
+          }
+        });
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating mock response state:", error);
+      return false;
+    }
+  };
+  /**
+   * Handle renaming of mock response in a collection
+   */
+  public handleRenameMockResponse = async (
+    mockResponseId: string,
+    name: string,
+  ) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+
+    const updatePayload = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      folderId: progressiveTab.path.folderId || "",
+      mockRequestId: progressiveTab.id,
+      mockResponseId: mockResponseId,
+      name: name,
+    };
+
+    try {
+      const response =
+        await this.collectionService.updateMockResponseInCollection(
+          mockResponseId,
+          updatePayload,
+          baseUrl,
+        );
+      if (response?.isSuccessful) {
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.updateSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+            { name: name },
+          );
+        } else {
+          this.collectionRepository.updateSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+            { name: name },
+          );
+        }
+        progressiveTab.property?.mockRequest?.items?.forEach((item) => {
+          if (item.id === mockResponseId) {
+            item.name = name;
+          }
+        });
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Error renaming mock response:", error);
+      return false;
+    }
+  };
+  /**
+   * Handle delete mock response in a collection (API only, no local update)
+   */
+  public handleDeleteMockResponse = async (mockResponseId: string) => {
+    const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+
+    const deletePayload = {
+      collectionId: progressiveTab.path.collectionId,
+      workspaceId: progressiveTab.path.workspaceId,
+      folderId: progressiveTab.path.folderId || "",
+      mockRequestId: progressiveTab.id,
+      mockResponseId: mockResponseId,
+    };
+
+    try {
+      const response =
+        await this.collectionService.deleteMockResponseInCollection(
+          mockResponseId,
+          deletePayload,
+          baseUrl,
+        );
+      if (response?.isSuccessful) {
+        notifications.success("Mock response deleted successfully.");
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.deleteSavedRequestInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseId,
+          );
+        } else {
+          this.collectionRepository.deleteSavedRequestInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseId,
+          );
+        }
+        progressiveTab.property.mockRequest.items =
+          progressiveTab.property?.mockRequest?.items?.filter((item) => {
+            return item.id !== mockResponseId;
+          });
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        return true;
+      } else {
+        notifications.error(
+          response?.message || "Failed to delete mock response.",
+        );
+        return false;
+      }
+    } catch (error) {
+      console.error("Error deleting mock response:", error);
+      notifications.error("An error occurred while deleting mock response.");
+      return false;
     }
   };
 }

@@ -3,7 +3,8 @@
   import { ResponseSectionEnum } from "@sparrow/common/types/workspace";
   import { Navigator } from "@sparrow/library/ui";
   export let requestStateSection: string;
-  export let onUpdateRequestState;
+  export let onUpdateResponseState;
+  export let selectedResponseId;
   export let responseHeadersLength = 0;
 
   let tabs: {
@@ -19,11 +20,11 @@
   const refreshTabs = (_responseHeadersLength: number) => {
     return [
       { name: "Body", id: ResponseSectionEnum.RESPONSE, count: 0 },
-      // {
-      //   name: "Headers",
-      //   id: ResponseSectionEnum.HEADERS,
-      //   count: _responseHeadersLength,
-      // },
+      {
+        name: "Headers",
+        id: ResponseSectionEnum.HEADERS,
+        count: _responseHeadersLength - 1,
+      },
     ];
   };
 
@@ -36,9 +37,20 @@
     }
   }
 
+  $: {
+    if (requestStateSection) {
+      tabs = refreshTabs(responseHeadersLength);
+    }
+  }
+
   const onTabClick = (tabId: ResponseSectionEnum) => {
-    onUpdateRequestState({ responseNavigation: tabId });
+    onUpdateResponseState({ responseNavigation: tabId }, selectedResponseId);
   };
+  $: {
+    if (requestStateSection) {
+      tabs = refreshTabs(responseHeadersLength);
+    }
+  }
 </script>
 
 <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />

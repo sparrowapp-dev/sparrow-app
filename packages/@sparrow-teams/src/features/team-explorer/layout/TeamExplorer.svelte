@@ -4,11 +4,11 @@
   import { workspaceView } from "../store/workspace-view";
   import { onDestroy } from "svelte";
   import { SearchIcon } from "@sparrow/library/assets";
-  import { base64ToURL } from "@sparrow/common/utils";
+  import { base64ToURL, planInfoByRole } from "@sparrow/common/utils";
   import { PeopleIcon } from "@sparrow/library/assets";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { TeamRole } from "@sparrow/common/enums";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Tag } from "@sparrow/library/ui";
   import { Navigator } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
   import { WorkspaceType } from "@sparrow/common/enums";
@@ -17,6 +17,7 @@
     GlobeRegular,
     ListRegular,
     LockClosedRegular,
+    OpenRegular,
     PeopleRegular,
   } from "@sparrow/library/icons";
 
@@ -31,10 +32,16 @@
   import { Tooltip, Dropdown } from "@sparrow/library/ui";
   import { Search } from "@sparrow/library/forms";
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
+  import { open } from "@tauri-apps/plugin-shell";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
 
   export let isWebApp = false;
 
   export let isWebEnvironment: boolean;
+  export let upgradePlanModalInvite: boolean;
+  export let upgradePlanModal: boolean = false;
+
+  export let sparrowAdminUrl;
 
   /**
    * user ID
@@ -122,6 +129,10 @@
   export let onAddMember;
   export let openInDesktop;
   export let onCopyLink;
+  export let planLimits;
+  export let contactOwner;
+  export let handleRedirectAdminPanel;
+  export let handleContactSales;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -132,6 +143,8 @@
   let leaveButtonMenu: boolean = false;
   let isInviteIgnoreProgress = false;
   let isInviteAcceptProgress = false;
+  let userLimits: any;
+  let planContent: any;
 
   let selectedFilter = "All";
 
@@ -231,6 +244,10 @@
         onUpdateActiveTab(TeamTabsEnum.WORKSPACES);
       }
       previousTeamId = openTeam?.teamId;
+      getPlanLimits();
+      if (userRole) {
+        planContent = planInfoByRole(userRole);
+      }
     }
   }
 
@@ -287,6 +304,27 @@
       filteredWorkspaces = workspaces;
     }
   }
+
+  const getPlanLimits = async () => {
+    const data = await planLimits();
+    userLimits = data;
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    await handleRedirectAdminPanel();
+    upgradePlanModal = false;
+    upgradePlanModalInvite = false;
+  };
+
+  const handleRedirectToAdmin = async () => {
+    await handleRedirectAdminPanel();
+  };
+
+  const handleRequestOwner = async () => {
+    await contactOwner();
+    upgradePlanModal = false;
+    upgradePlanModalInvite = false;
+  };
 </script>
 
 {#if openTeam}
@@ -300,7 +338,9 @@
           <div
             class="team-heading d-flex justify-content-between position-relative pb-3"
           >
-            <h2 class="d-flex ellipsis overflow-visible mb-0 team-title">
+            <h2
+              class="d-flex ellipsis overflow-visible mb-0 team-title align-items-center"
+            >
               {#if openTeam?.logo?.size}
                 <Avatar
                   type="image"
@@ -319,6 +359,25 @@
                 class="ms-3 my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
                 >{openTeam?.name || ""}
               </span>
+
+              {#if openTeam?.toMutableJSON()?.plan?.name}
+                <div
+                  class="ms-2 d-flex align-items-center gap-1 text-primary-400 cursor-pointer"
+                  on:click={handleRedirectToAdmin}
+                >
+                  <p class="text-fs-12 mb-0 pb-0">Launch Admin Panel</p>
+                  <OpenRegular />
+                </div>
+              {/if}
+              <!-- {#if openTeam?.toMutableJSON()?.plan?.name}
+                <span class="ps-2">
+                  <Tag
+                    type={"cyan"}
+                    text={openTeam?.toMutableJSON()?.plan?.name ||
+                      "Invalid Plan"}
+                  />
+                </span>
+              {/if} -->
               <!-- The leave team option will be availabe to only where you are invited team owner cannot leave the team -->
               {#if !isGuestUser && openTeam?.teamId !== "sharedWorkspaceTeam"}
                 {#if userRole !== "owner"}
@@ -657,6 +716,48 @@
   </div>
 {/if}
 
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModal}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Workspaces"
+  planLimitValue={userLimits?.workspacesPerHub?.value || 3}
+  currentPlanValue={openTeam?._data?.workspaces.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users?.[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalInvite}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Collaborators"
+  planLimitValue={userLimits?.usersPerHub?.value || 5}
+  currentPlanValue={(openTeam?._data?.invites?.length || 0) +
+    (openTeam?._data?.users?.length || 0) -
+    1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={openTeam?._data?.name?.split(" ")[0]}
+  userEmail={openTeam?._data?.users?.[0]?.email || ""}
+  submitButtonName={planContent?.buttonName}
+/>
+
 <style>
   .filter-button:hover {
     background-color: var(--bg-ds-surface-400);
@@ -692,10 +793,10 @@
       brightness(103%) contrast(104%);
   }
   .team-title {
-    width: calc(100% - 351px);
+    width: calc(100% - 470px);
   }
   .heading {
-    max-width: calc(100% - 150px);
+    max-width: calc(100% - 250px);
   }
   .cursor-pointer {
     cursor: pointer;
