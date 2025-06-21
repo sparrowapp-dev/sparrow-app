@@ -13,6 +13,7 @@
   import constants from "@app/constants/constants";
   import type { InviteBody } from "@sparrow/common/dto/team-dto";
   import { ResponseMessage } from "@sparrow/common/enums";
+  import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 
 
   export let sparrowAdminUrl:string
@@ -121,6 +122,24 @@
       upgradePlanModal = true;
     }
   };
+
+  const handleAddWorkspace = async (
+    workspaceId: string,
+    workspaceName: string,
+    data: addUsersInWorkspacePayload,
+    invitedUserCount: number,
+  ) => {
+    const response = await _viewModel.inviteUserToWorkspace(
+      workspaceId,
+      workspaceName,
+      data,
+      invitedUserCount,
+    );
+    if (response?.data.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModalInvite = true;
+    }
+    return response;
+  };
 </script>
 
 <TeamExplorer
@@ -151,7 +170,7 @@
   onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
   onCopyLink={handleCopyPublicWorkspaceLink}
-    {sparrowAdminUrl}
+  {sparrowAdminUrl}
   planLimits={handleUserLimits}
   contactOwner={handleRequestPlan}
   {handleRedirectAdminPanel}
@@ -247,6 +266,6 @@
     currentWorkspaceDetails={workspaceDetails}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
-    onInviteUserToWorkspace={_viewModel.inviteUserToWorkspace}
+    onInviteUserToWorkspace={handleAddWorkspace}
   />
 </Modal>
