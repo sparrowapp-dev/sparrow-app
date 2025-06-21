@@ -1,7 +1,12 @@
 import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 import type { InviteBody } from "@sparrow/common/dto/team-dto";
-import { Events, UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
+import {
+  Events,
+  ResponseMessage,
+  UntrackedItems,
+  WorkspaceRole,
+} from "@sparrow/common/enums";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "../../database/database";
@@ -990,6 +995,8 @@ export class TeamExplorerPageViewModel {
       this.teamRepository.modifyTeam(teamId, response.data.data);
       notifications.success(`Invite resent successfully.`);
       return response;
+    } else if (response?.data?.message === ResponseMessage.INVITE_DECLINED) {
+      notifications.warning(`The invite has been declined by Collaborate.`);
     } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
@@ -1021,9 +1028,7 @@ export class TeamExplorerPageViewModel {
       );
       return response;
     } else {
-      notifications.error(
-        `Failed to join the Hub. Please try again.`,
-      );
+      notifications.error(`Failed to join the Hub. Please try again.`);
     }
   };
 
