@@ -217,6 +217,7 @@
       invitedUserCount,
     );
     if (response?.data.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceInviteModalOpen = false;
       upgradePlanModalInvite = true;
     }
     return response;

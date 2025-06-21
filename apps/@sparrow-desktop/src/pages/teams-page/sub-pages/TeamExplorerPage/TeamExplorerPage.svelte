@@ -15,8 +15,7 @@
   import { ResponseMessage } from "@sparrow/common/enums";
   import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 
-
-  export let sparrowAdminUrl:string
+  export let sparrowAdminUrl: string;
 
   let isWebEnvironment = false;
 
@@ -136,6 +135,7 @@
       invitedUserCount,
     );
     if (response?.data.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceInviteModalOpen = false;
       upgradePlanModalInvite = true;
     }
     return response;
