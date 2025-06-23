@@ -441,5 +441,5 @@ jobs:
             -d '{
               "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
             }' \
-            ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
+            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         
