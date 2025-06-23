@@ -1007,11 +1007,11 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       await this.teamRepository.removeTeam(teamId);
       const teams = await this.teamRepository.getTeamsDocuments();
-      const remainingTeams = teams
+      const nextTeam = teams
         .map((team) => team.toMutableJSON())
-        .filter((team) => team.teamId !== teamId);
-      if (remainingTeams.length > 0) {
-        await this.teamRepository.setOpenTeam(remainingTeams[0].teamId);
+        .find((team) => team.teamId !== teamId);
+      if (nextTeam) {
+        await this.teamRepository.setOpenTeam(nextTeam.teamId);
       }
       notifications.success(
         `Invite ignored. The hub has been removed from your panel.`,
