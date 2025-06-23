@@ -152,8 +152,9 @@
 
             {#if exceededLimit && lastModifiedIndex === index}
               <div
-                class="d-flex align-items-start gap-1
+                class="d-flex align-items-start
               input-error-message"
+                style="gap: 1px"
               >
                 <span class="error-icon">
                   <ErrorCircleRegular
@@ -273,7 +274,7 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 2.5px;
   }
 
   .ellipsis {
