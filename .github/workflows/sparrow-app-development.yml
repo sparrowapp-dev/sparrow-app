@@ -293,7 +293,14 @@ jobs:
           
       #     Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
       #   shell: pwsh
-      - name: Post Windows Build Links to Teams
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload files to S3
         run: |
           # Find the actual bundle path dynamically
           $possiblePaths = @(
@@ -305,68 +312,40 @@ jobs:
           foreach ($path in $possiblePaths) {
               if (Test-Path $path) {
                   $bundlePath = $path
+                  Write-Host "Found bundle path: $bundlePath"
                   break
               }
           }
           
           if (-not $bundlePath) {
-              throw "Could not find bundle directory for Teams notification"
+              throw "Could not find bundle directory for S3 upload"
           }
           
-          # Find MSI file
-          $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Select-Object -First 1
-          
-          if (-not $msiFile) {
-              throw "No MSI file found in $bundlePath\msi\"
+          # Check if msi directory exists
+          $msiPath = "$bundlePath\msi"
+          if (-not (Test-Path $msiPath)) {
+              throw "MSI directory not found at: $msiPath"
           }
           
-          $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
-          
-          Write-Host "MSI file found: $msiFileName"
-          Write-Host "Download URL: $msiUrl"
-          
-          $body = @{
-            "type" = "message"
-            "attachments" = @(
-              @{
-                "contentType" = "application/vnd.microsoft.card.adaptive"
-                "content" = @{
-                  "type" = "AdaptiveCard"
-                  "body" = @(
-                    @{
-                      "type" = "TextBlock"
-                      "text" = "🚀 New Windows Build Available"
-                      "weight" = "bolder"
-                      "size" = "large"
-                    }
-                    @{
-                      "type" = "TextBlock"
-                      "text" = "Branch: development"
-                      "wrap" = $true
-                    }
-                    @{
-                      "type" = "TextBlock"
-                      "text" = "Download Link:"
-                      "wrap" = $true
-                    }
-                    @{
-                      "type" = "TextBlock"
-                      "text" = $msiUrl
-                      "color" = "accent"
-                      "wrap" = $true
-                    }
-                  )
-                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
-                  "version" = "1.2"
-                }
-              }
-            )
+          # List files before upload for debugging
+          Write-Host "Files in MSI directory:"
+          Get-ChildItem $msiPath | ForEach-Object {
+              Write-Host "  $($_.Name) - $($_.Length) bytes"
           }
           
-          $jsonBody = $body | ConvertTo-Json -Depth 10
+          # Test AWS connectivity
+          Write-Host "Testing AWS connectivity..."
+          aws sts get-caller-identity
           
-          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+          # Upload to S3
+          Write-Host "Starting S3 upload..."
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "S3 upload completed successfully" -ForegroundColor Green
+          } else {
+              throw "S3 upload failed with exit code: $LASTEXITCODE"
+          }
         shell: pwsh
 
   release_macos:
