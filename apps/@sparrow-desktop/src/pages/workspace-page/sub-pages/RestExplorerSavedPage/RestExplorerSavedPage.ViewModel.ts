@@ -1601,6 +1601,7 @@ export class RestExplorerSavedViewModel {
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
+      model: "deepseek",
     });
     if (response.isSuccessful) {
       const formatter = new MarkdownFormatter();
@@ -1612,7 +1613,7 @@ export class RestExplorerSavedViewModel {
       await this.updateRequestState({
         isDocAlreadyGenerated: true,
       });
-    } else if (response?.message === "Limit reached") {
+    } else if (response?.message === "Limit reached. Please try again later.") {
       notifications.error(
         "Failed to generate documentation. Your monthly AI usage limit is reached.",
       );

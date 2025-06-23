@@ -15,3 +15,5 @@ export { default as ResponseBodyNavigator } from "./response-body-navigator/Resp
 export { default as RequestName } from "./request-name/RequestName.svelte";
 export { default as RestExtensionPanel } from "./rest-extension-panel/RestExtensionPanel.svelte";
 export { default as ResponseStatus } from "./response-status/ResponseStatus.svelte";
+export {default as MultipleMockResponse} from "./multiple-mock-response/MultipleMockResponse.svelte";
+export {default as NoMockResponseDetailsSection} from "./no-mock-response-details-section/NoMockResponseDetailsSection.svelte";

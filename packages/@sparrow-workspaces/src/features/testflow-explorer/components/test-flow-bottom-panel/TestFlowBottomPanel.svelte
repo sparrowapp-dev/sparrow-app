@@ -329,6 +329,7 @@
               onUpdateRequestState={handleUpdateRequestData}
               {environmentVariables}
               {handleOpenCurrentDynamicExpression}
+              {onUpdateEnvironment}
             />
           {:else if requestNavigation === RequestSectionEnum.REQUEST_BODY}
             <RequestBodyTestFlow
@@ -338,6 +339,7 @@
               {environmentVariables}
               onUpdateRequestState={handleUpdateRequestData}
               {handleOpenCurrentDynamicExpression}
+              {onUpdateEnvironment}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow
@@ -350,7 +352,7 @@
               {environmentVariables}
               onHeadersChange={handleUpdateRequestData}
               {handleOpenCurrentDynamicExpression}
-              {selectedBlock}
+              {onUpdateEnvironment}
             />
           {:else if requestNavigation === RequestSectionEnum.AUTHORIZATION}
             <RequestAuthorizationTestFlow
@@ -359,6 +361,7 @@
               requestStateAuth={selectedBlock?.data?.requestData?.state}
               onUpdateRequestAuth={handleUpdateRequestData}
               {handleOpenCurrentDynamicExpression}
+              {onUpdateEnvironment}
             />
           {/if}
         </div>

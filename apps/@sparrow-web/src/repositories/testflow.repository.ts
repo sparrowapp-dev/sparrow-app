@@ -30,6 +30,15 @@ export class TestflowRepository {
   };
 
   /**
+   * Retrieves the list of test flow documents from the database.
+   *
+   * @returns array of test flow documents, sorted by their creation date in ascending order.
+   */
+  public getTestflowDoc = async (): Promise<any> => {
+    return await this.rxdb?.find().sort({ createdAt: "asc" }).exec();
+  };
+
+  /**
    * Updates a test flow with the provided data.
    *
    * @param uuid - The unique identifier of the test flow (reference to mongoId).

@@ -208,6 +208,26 @@ const mockRequestItems = {
   },
 };
 
+const mockRequestResponseItems = {
+  responseBody: {
+    type: "array",
+    properties: requestBody,
+  },
+  selectedResponseBodyType: {
+    type: "string",
+  },
+  responseHeaders: {
+    type: "array",
+    properties: params,
+  },
+  responseStatus: {
+    type: "string",
+  },
+  isMockResponseActive: {
+    type: "boolean",
+  },
+};
+
 const websocketItems = {
   url: {
     type: "string",
@@ -318,6 +338,10 @@ const itemsProperties = {
     type: "object",
     properties: graphqlItems,
   },
+  mockRequestResponse: {
+    type: "object",
+    properties: mockRequestResponseItems,
+  },
 
   createdAt: {
     type: "date-time",
@@ -348,7 +372,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 14,
+  version: 15,
   properties: {
     collectionId: {
       type: "string",

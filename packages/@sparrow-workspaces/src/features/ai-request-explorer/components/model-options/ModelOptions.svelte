@@ -10,6 +10,7 @@
     DeepseekVectorIcon,
     CheckMarkIcon,
   } from "@sparrow/library/icons";
+  import { Sleep } from "@sparrow/common/utils";
 
   // Types
   export let selectedModelProvider: string = "openai";
@@ -17,6 +18,7 @@
   export let isOpen: boolean = false;
   let isModelProviderChangeAlertPopupOpen = false;
   let nextModelSelectRequest;
+  let isProceedBtnLoading = false;
 
   // Props
   export let onSelect: (
@@ -244,10 +246,14 @@
       textClassProp={"fs-6"}
       type={"primary"}
       customWidth={"95px"}
+      loader={isProceedBtnLoading}
       disable={false}
-      onClick={() => {
+      onClick={async () => {
+        isProceedBtnLoading = true;
         handleModelSelection(nextModelSelectRequest);
+        await new Sleep().setTime(1500).exec(); // Waiting to let dom and tab properties update
         isModelProviderChangeAlertPopupOpen = false;
+        isProceedBtnLoading = false;
       }}
     ></Button>
   </div>

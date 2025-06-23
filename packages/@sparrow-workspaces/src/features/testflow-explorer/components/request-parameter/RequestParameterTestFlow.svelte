@@ -7,6 +7,7 @@
   import { Events } from "@sparrow/common/enums";
 
   export let handleOpenCurrentDynamicExpression;
+  export let onUpdateEnvironment;
 
   export let requestUrl;
   export let params;
@@ -62,7 +63,7 @@
     readable={authParameter}
     keyValue={createDeepCopy(params)}
     callback={handleParamsChange}
-    onUpdateEnvironment={() => {}}
+    {onUpdateEnvironment}
     {environmentVariables}
     dynamicExpression={true}
     handleOpenCurrentDynamicExpression={(obj) => {
