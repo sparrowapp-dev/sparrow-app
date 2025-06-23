@@ -18,12 +18,11 @@ apps:
     desktop: usr/share/applications/sparrow.desktop
     extensions: [gnome]
     plugs:
-      - xdg-open
       - network
       - network-status
       - single-instance-plug # add this if you're using the single-instance plugin
     slots:
-      - single-instance-plug # add this if you're using the single-instance plugin
+      - single-instance # add this if you're using the single-instance plugin
 
 # Add these lines only if you're using the single-instance plugin
 # Check https://v2.tauri.app/plugin/single-instance/ for details
