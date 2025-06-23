@@ -47,5 +47,5 @@ jobs:
       - name: Upload Snap to Snap Store
         run: |
           SNAP_FILE=$(ls *.snap | head -n 1)
-          echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
+          echo "Uploading the $SNAP_FILE to $SNAP_CHANNEL"
           snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
