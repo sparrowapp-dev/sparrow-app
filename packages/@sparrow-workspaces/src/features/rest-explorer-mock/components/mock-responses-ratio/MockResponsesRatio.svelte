@@ -1,6 +1,9 @@
 <script>
   import { NumberInput } from "@sparrow/library/forms";
-  import { CircleSmallFilled } from "@sparrow/library/icons";
+  import {
+    CircleSmallFilled,
+    ErrorCircleRegular,
+  } from "@sparrow/library/icons";
   import { ProgressBar } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
   import { onMount } from "svelte";
@@ -148,9 +151,17 @@
             />
 
             {#if exceededLimit && lastModifiedIndex === index}
-              <div class="input-error-message">
-                Total exceeds 100%. Adjust the values to make the total 100% or
-                less.
+              <div
+                class="d-flex align-items-start gap-1
+              input-error-message"
+              >
+                <span class="error-icon">
+                  <ErrorCircleRegular
+                    size={"14px"}
+                    color={"var(--icon-ds-danger-300)"}
+                  />
+                </span>
+                Total exceeds 100%. Adjust the values to make the total 100% or less.
               </div>
             {/if}
           </div>
@@ -251,11 +262,18 @@
   .input-error-message {
     color: var(--text-ds-danger-300);
     font-size: 12px;
-    margin-top: 4px;
+    margin-top: 2px;
     text-align: left;
     width: 100%;
     white-space: normal;
     overflow-wrap: break-word;
+  }
+
+  .error-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 
   .ellipsis {
