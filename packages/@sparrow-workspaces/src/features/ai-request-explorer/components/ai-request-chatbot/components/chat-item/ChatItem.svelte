@@ -522,7 +522,7 @@
         responseType={"Sender"}
       />
 
-      {#if attachedFilesWithMsg.length}
+      {#if attachedFilesWithMsg && attachedFilesWithMsg.length}
         <div
           class="attached-files-container d-flex flex-column align-items-end justify-content-end p-2 gap-2"
         >

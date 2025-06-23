@@ -202,11 +202,11 @@
   });
   onDestroy(() => {});
 
-  $: {
-    if ($tab?.property?.aiRequest?.ai) {
-      console.log("conv :>> ", $tab.property.aiRequest.ai.conversations);
-    }
-  }
+  // $: {
+  //   if ($tab?.property?.aiRequest?.ai) {
+  //     console.log("conv :>> ", $tab.property.aiRequest.ai.conversations);
+  //   }
+  // }
 </script>
 
 {#if $tab.tabId}

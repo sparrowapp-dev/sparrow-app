@@ -13,6 +13,7 @@
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import type { PromptFileAttachment } from "@sparrow/common/types/workspace/ai-request-base";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -42,14 +43,7 @@
 
   const sendPrompt = async (
     text: string,
-    attchedFiles: Array<{
-      id: string;
-      name: string;
-      type: string;
-      size: number;
-      isUploading?: boolean;
-      cloudUrl?: string;
-    }>,
+    attachedFiles: PromptFileAttachment[],
   ) => {
     if (text) {
       const isAutoClearEnabled =
@@ -65,7 +59,7 @@
               status: true,
               modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
               modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
-              attchedFiles,
+              attachedFiles,
             },
           ]
         : [
@@ -79,14 +73,14 @@
               status: true,
               modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
               modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
-              attchedFiles,
+              attachedFiles,
             },
           ];
       onUpdateAiConversation(updatedConverstaion);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
-      const response = await onGenerateAiResponse(text, "", "");
+      const response = await onGenerateAiResponse(text, attachedFiles);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);

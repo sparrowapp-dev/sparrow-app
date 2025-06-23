@@ -48,7 +48,7 @@ import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspac
 import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum, type modelsConfigType, type AIModelVariant, OpenAIModelEnum } from "@sparrow/common/types/workspace/ai-request-base";
+import { AiModelProviderEnum, type modelsConfigType, type AIModelVariant, OpenAIModelEnum, type PromptFileAttachment } from "@sparrow/common/types/workspace/ai-request-base";
 import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
 import {
   startLoading,
@@ -289,7 +289,7 @@ class AiRequestExplorerViewModel {
 
   public fetchConversations = async () => {
     let isGuestUser = await this.getGuestUser();
-    if(isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
 
@@ -351,7 +351,7 @@ class AiRequestExplorerViewModel {
 
   public saveConversationHistory = async () => {
     let isGuestUser = await this.getGuestUser();
-    if(isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
     const user = getClientUser();
@@ -442,7 +442,7 @@ class AiRequestExplorerViewModel {
   // Function to limit conversations to last N Receiver types with their Senders
   public limitConversations = (conversations, maxReceivers = 30) => {
     if (conversations.length === 0) return conversations;
-    
+
     // Find all Receiver message indices
     const receiverIndices = [];
     conversations.forEach((conv, index) => {
@@ -450,15 +450,15 @@ class AiRequestExplorerViewModel {
         receiverIndices.push(index);
       }
     });
-    
+
     // If we have maxReceivers or fewer Receivers, return all conversations
     if (receiverIndices.length <= maxReceivers) {
       return conversations;
     }
-    
+
     // Get the index of the (n-maxReceivers)th Receiver from the end
     const startReceiverIndex = receiverIndices[receiverIndices.length - maxReceivers];
-    
+
     // Find the first Sender before this Receiver (if any) to maintain conversation context
     let startIndex = startReceiverIndex;
     for (let i = startReceiverIndex - 1; i >= 0; i--) {
@@ -468,7 +468,7 @@ class AiRequestExplorerViewModel {
         break;
       }
     }
-    
+
     // Return conversations from startIndex to end
     return conversations.slice(startIndex);
   };
@@ -476,7 +476,7 @@ class AiRequestExplorerViewModel {
   public handleRenameConversationTitle = async (conversationId: string, newConversationTitle: string) => {
 
     const guestUser = await this.guestUserRepository.findOne({
-        name: "guestUser",
+      name: "guestUser",
     });
 
     // If conversationId is null, then change title of current tab itself, no need to change in db
@@ -487,7 +487,7 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const user = getClientUser();
-    
+
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
@@ -530,7 +530,7 @@ class AiRequestExplorerViewModel {
 
   public handleDeleteConversation = async (conversationId: string, conversationTitle: string) => {
     let isGuestUser = await this.getGuestUser();
-    if(isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
 
@@ -570,14 +570,54 @@ class AiRequestExplorerViewModel {
     }
   }
 
-  public handleUploadFilesToCloud = (filesToUpload: []) => {
+  public handleUploadFilesToCloud = async (filesToUpload: []) => {
+    const componentData = this._tab.getValue();
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(`Promise resolved after ${2000 / 1000} seconds!`);
-        // reject(`Promise resolved after ${2000 / 1000} seconds!`);
-      }, 5000);
-    });
+    if (!provider || !providerAuthKey) {
+      console.error("Missing provider or authKey.");
+      return;
+    }
+
+
+    try {
+      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
+
+      if (response.isSuccessful) {
+        console.log("response :>> ", response.data.data);
+        return response.data.data;
+      } else {
+        notifications.error(`Failed to upload files. Please try again.`);
+      }
+
+      console.log("file :>> ", filesToUpload)
+    }
+    catch (error) {
+      console.error("Something went wrong while deleting the conversation. :>> ", error);
+    }
+
+
+    // return new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     resolve([
+    //       {
+    //         "fileId": "file-DmRAaEWo2n7f38MNo963Ak",
+    //         "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+    //       },
+    //       {
+    //         "fileId": "file-DmRAaEWo2n7f38MNo963Al",
+    //         "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+    //       },
+    //       {
+    //         "fileId": "file-DmRAaEWo2n7f38MNo963Am",
+    //         "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+    //       }
+    //     ]);
+    //     // reject(`Promise resolved after ${2000 / 1000} seconds!`);
+
+    //   }, 5000);
+    // });
   }
 
   public handleDeleteFilesFromCloud = (filesToDelete: []) => {
@@ -1973,7 +2013,7 @@ class AiRequestExplorerViewModel {
    * Generates the AI Response from server with websocket communication protocol
    * @param Prompt - Prompt from the user
    */
-  public generateAIResponseWS = async (prompt = "") => {
+  public generateAIResponseWS = async (prompt = "", fileAttachments: PromptFileAttachment[]) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const tabId = componentData.tabId;
@@ -1986,7 +2026,6 @@ class AiRequestExplorerViewModel {
     const isJsonFormatConfigAvailable = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
     const isJsonFormatEnabed = isJsonFormatConfigAvailable ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
 
-
     let finalSP = null;
     if (systemPrompt.length) {
       const SPDatas = JSON.parse(systemPrompt);
@@ -1995,30 +2034,21 @@ class AiRequestExplorerViewModel {
 
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
 
-    let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
-    if (!isChatAutoClearActive) {
-      const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-
-      formattedConversations = rawConversations
-        .filter(({ status }) => status !== false) // Exclude items with status === false
-        .map(({ type, message }) => ({
-          role: type === 'Sender' ? 'user' : 'assistant',
-          content: isJsonFormatEnabed ? `${message} (Give Response In JSON Format)` : message,
-        }));
-    }
+    const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
+      modelProvider,
+      prompt,
+      finalSP || "Answer my queries.",
+      !isChatAutoClearActive,
+      componentData?.property?.aiRequest?.ai?.conversations || [],
+      isJsonFormatEnabed,
+      fileAttachments
+    );
 
     const modelSpecificConfig: modelsConfigType = {};
     const allowedConfigs = configFormat[modelProvider][modelVariant];
     Object.keys(allowedConfigs).forEach((key) => {
       modelSpecificConfig[key] = currConfigurations[modelProvider][key];
     });
-    const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
-      modelProvider,
-      prompt,
-      finalSP || "Answer my queries.",
-      !isChatAutoClearActive,
-      formattedConversations
-    );
 
     const aiRequestData = {
       feature: "llm-evaluation",
