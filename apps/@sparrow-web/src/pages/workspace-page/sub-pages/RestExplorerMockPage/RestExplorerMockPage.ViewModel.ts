@@ -3174,7 +3174,6 @@ class RestExplorerMockViewModel {
             },
           );
         }
-        debugger;
         progressiveTab.property?.mockRequest?.items?.forEach((item) => {
           if (item.id === mockResponseId) {
             item.mockRequestResponse.isMockResponseActive =
