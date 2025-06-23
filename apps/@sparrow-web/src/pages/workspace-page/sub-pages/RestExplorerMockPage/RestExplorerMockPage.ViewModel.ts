@@ -3151,7 +3151,7 @@ class RestExplorerMockViewModel {
         );
       if (response?.isSuccessful) {
         if (progressiveTab.path.folderId) {
-          this.collectionRepository.updateSavedRequestInFolder(
+          this.collectionRepository.updateMockResponseInFolder(
             progressiveTab.path.collectionId,
             progressiveTab.path.folderId,
             progressiveTab.id,
@@ -3163,7 +3163,7 @@ class RestExplorerMockViewModel {
             },
           );
         } else {
-          this.collectionRepository.updateSavedRequestInCollection(
+          this.collectionRepository.updateMockResponseInCollection(
             progressiveTab.path.collectionId,
             progressiveTab.id,
             mockResponseId,
@@ -3185,8 +3185,10 @@ class RestExplorerMockViewModel {
           progressiveTab.tabId,
           progressiveTab,
         );
-        return true;
-      } else {
+            return true; 
+      } else
+      
+      {
         return false;
       }
     } catch (error) {
