@@ -1152,7 +1152,10 @@ class RestExplorerMockViewModel {
       return;
     }
     initRequestTab.updateBody(progressiveTab.property.mockRequest?.body);
-    initRequestTab.updateUrl(collectionData?.mockCollectionUrl + progressiveTab.property.mockRequest?.url);
+    initRequestTab.updateUrl(
+      collectionData?.mockCollectionUrl +
+        progressiveTab.property.mockRequest?.url,
+    );
     initRequestTab.updateName(progressiveTab.name);
     initRequestTab.updateDescription(progressiveTab.description);
     initRequestTab.updateMethod(progressiveTab.property.mockRequest?.method);
@@ -3148,7 +3151,7 @@ class RestExplorerMockViewModel {
         );
       if (response?.isSuccessful) {
         if (progressiveTab.path.folderId) {
-          this.collectionRepository.updateSavedRequestInFolder(
+          this.collectionRepository.updateMockResponseInFolder(
             progressiveTab.path.collectionId,
             progressiveTab.path.folderId,
             progressiveTab.id,
@@ -3160,7 +3163,7 @@ class RestExplorerMockViewModel {
             },
           );
         } else {
-          this.collectionRepository.updateSavedRequestInCollection(
+          this.collectionRepository.updateMockResponseInCollection(
             progressiveTab.path.collectionId,
             progressiveTab.id,
             mockResponseId,
@@ -3171,7 +3174,6 @@ class RestExplorerMockViewModel {
             },
           );
         }
-        debugger;
         progressiveTab.property?.mockRequest?.items?.forEach((item) => {
           if (item.id === mockResponseId) {
             item.mockRequestResponse.isMockResponseActive =
