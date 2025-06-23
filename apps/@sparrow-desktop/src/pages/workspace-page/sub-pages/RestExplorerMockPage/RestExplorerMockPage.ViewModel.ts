@@ -3136,6 +3136,7 @@ class RestExplorerMockViewModel {
       mockRequestId: progressiveTab.id,
       mockResponseId: mockResponseId,
       isMockResponseActive: isMockResponseActive,
+      responseWeightRatio: 0,
     };
 
     try {
@@ -3155,6 +3156,7 @@ class RestExplorerMockViewModel {
             {
               mockRequestResponse: {
                 isMockResponseActive: isMockResponseActive,
+                responseWeightRatio: 0,
               },
             },
           );
@@ -3166,6 +3168,7 @@ class RestExplorerMockViewModel {
             {
               mockRequestResponse: {
                 isMockResponseActive: isMockResponseActive,
+                responseWeightRatio: 0,
               },
             },
           );
@@ -3174,6 +3177,8 @@ class RestExplorerMockViewModel {
           if (item.id === mockResponseId) {
             item.mockRequestResponse.isMockResponseActive =
               isMockResponseActive;
+              item.mockRequestResponse.responseWeightRatio =
+              0;
           }
         });
 
