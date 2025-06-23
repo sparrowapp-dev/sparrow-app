@@ -575,9 +575,11 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
+    // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
-      return;
+      // notifications.error("Please provde Authentication key before uploading files.");
+      return Promise.reject("API key missing. Please authenticate before uploading the files.");
     }
 
 

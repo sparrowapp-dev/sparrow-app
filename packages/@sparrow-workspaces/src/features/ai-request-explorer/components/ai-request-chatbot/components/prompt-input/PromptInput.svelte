@@ -11,7 +11,17 @@
   import { FileItem } from "../../..";
   import { notifications } from "@sparrow/library/ui";
   import { v4 as uuidv4 } from "uuid";
-  import type { PromptFileAttachment } from "@sparrow/common/types/workspace/ai-request-base";
+  import {
+    ModelIdNameMapping,
+    ModelVariantIdNameMapping,
+    type AiModelProviderEnum,
+    type AIModelVariant,
+    type PromptFileAttachment,
+  } from "@sparrow/common/types/workspace/ai-request-base";
+  import {
+    getFileRestrictions,
+    isFileUploadSupported,
+  } from "../../../../constants";
 
   export let placeholder = "";
   export let sendPrompt;
@@ -23,28 +33,32 @@
   export let isGuestUser;
   export let onRemoveFile;
   export let onFileUpload; // Callback to handle cloud upload
+  export let currentProvider: AiModelProviderEnum;
+  export let currentModel: AIModelVariant;
 
-  export let uploadedFiles: PromptFileAttachment[] = [
-    // {
-    //   id: "123",
-    //   name: "DIV Contentsdddddddd.pdf",
-    //   type: "csv",
-    //   size: 1.34,
-    //   isUploading: false,
-    //   url: "www.google.com",
-    // },
-  ];
+  export let uploadedFiles: PromptFileAttachment[] = [];
 
   $: {
     if (uploadedFiles.length) console.log(uploadedFiles);
   }
 
   // File restrictions
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-  const ALLOWED_EXTENSIONS = ["pdf", "txt", "docx", "csv"];
-  const MAX_FILES = 5;
-  let fileInput: HTMLInputElement;
+  // Dynamic file restrictions based on provider and model
+  $: fileRestrictions = getFileRestrictions(currentProvider, currentModel);
+  $: isUploadSupported = isFileUploadSupported(currentProvider, currentModel);
 
+  // Default fallback values
+  $: MAX_FILE_SIZE = fileRestrictions?.maxFileSize || 5 * 1024 * 1024;
+  $: ALLOWED_EXTENSIONS = fileRestrictions?.supportedExtensions || [];
+  $: MAX_FILES = fileRestrictions?.maxFiles || 5;
+  // const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+  // const ALLOWED_EXTENSIONS = ["pdf", "txt", "docx", "csv"];
+  // const MAX_FILES = 5;
+
+  // Generate accept attribute for file input
+  $: acceptAttribute = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(",");
+
+  let fileInput: HTMLInputElement;
   let isPromptBoxFocused = false;
   let isTyping = false;
 
@@ -192,9 +206,9 @@
       const filesToUpload = validFiles.map((validFile) => validFile.file);
       const fileIds = validFiles.map((validFile) => validFile.fileObj.id);
 
-      console.log(`Starting upload for ${filesToUpload.length} files...`);
+      // console.log(`Starting upload for ${filesToUpload.length} files...`);
       const uploadResults = await onFileUpload(filesToUpload); // Upload ALL files at once
-      console.log("Upload completed:", uploadResults);
+      // console.log("Upload completed:", uploadResults);
       updateFilesUploadStatus(fileIds, uploadResults, true); // Update all files' status to success
 
       // if (filesToUpload.length === 1) {
@@ -207,12 +221,14 @@
       //   );
       // }
     } catch (error) {
-      console.error("Batch file upload failed:", error);
+      console.error("File upload failed:", error);
       const fileIds = validFiles.map((validFile) => validFile.fileObj.id); // Remove all failed files from UI
       updateFilesUploadStatus(fileIds, [], false);
 
       // Show error notification
-      if (validFiles.length === 1) {
+      if (error.includes("API key missing")) {
+        notifications.error(error);
+      } else if (validFiles.length === 1) {
         notifications.error(
           `Failed to upload "${validFiles[0].file.name}". Please try again.`,
         );
@@ -224,111 +240,6 @@
     }
     target.value = ""; // Clear the input
   };
-
-  // old
-  // const handleFileSelect = async (event: Event) => {
-  //   const target = event.target as HTMLInputElement;
-  //   const files = target.files;
-
-  //   if (!files || files.length === 0) return;
-  //   const validFiles: { file: File; fileObj: any }[] = []; // Validate all files first and create file objects
-
-  //   for (let i = 0; i < files.length; i++) {
-  //     const file = files[i];
-
-  //     // Check file count limit
-  //     if (uploadedFiles.length + validFiles.length >= MAX_FILES) {
-  //       notifications.error(`Maximum ${MAX_FILES} files allowed`);
-  //       break;
-  //     }
-
-  //     // Check file size
-  //     if (file.size > MAX_FILE_SIZE) {
-  //       notifications.error(`File "${file.name}" exceeds 5MB limit`);
-  //       continue;
-  //     }
-
-  //     // Check file extension
-  //     const extension = getFileExtension(file.name);
-  //     if (!ALLOWED_EXTENSIONS.includes(extension)) {
-  //       notifications.error(
-  //         `File "${file.name}" has unsupported format. Only ${ALLOWED_EXTENSIONS.join(", ")} files are allowed.`,
-  //       );
-  //       continue;
-  //     }
-
-  //     const fileObj = {
-  //       id: uuidv4(),
-  //       name: file.name.split(".").slice(0, -1).join("."), // Remove extension from display name
-  //       type: extension,
-  //       size: parseFloat((file.size / (1024 * 1024)).toFixed(2)), // Convert to MB
-  //       isUploading: true,
-  //       url: undefined,
-  //     };
-  //     validFiles.push({ file, fileObj });
-  //   }
-
-  //   // Add all valid files to the UI immediately
-  //   if (validFiles.length > 0) {
-  //     uploadedFiles = [
-  //       ...uploadedFiles,
-  //       ...validFiles.map((validFile) => validFile.fileObj),
-  //     ];
-  //   }
-
-  //   // Upload all files in parallel
-  //   const uploadPromises = validFiles.map(async ({ file, fileObj }) => {
-  //     try {
-  //       const uploadedFileData = await onFileUpload([file]); // Upload to cloud storage
-  //       console.log("kkkkk:>> ", uploadedFileData);
-  //       uploadedFiles = uploadedFiles.map((file) =>
-  //         file.id === fileObj.id
-  //           ? {
-  //               ...file,
-  //               isUploading: false,
-  //               url: uploadedFileData[0].fileUrl,
-  //               fileId: uploadedFileData[0].fileId,
-  //             }
-  //           : file,
-  //       );
-  //       // notifications.success(`File "${file.name}" uploaded successfully`);
-  //       return { success: true, fileId: fileObj.id, fileName: file.name };
-  //     } catch (error) {
-  //       console.error("File upload failed:", error);
-  //       uploadedFiles = uploadedFiles.filter((file) => file.id !== fileObj.id); // Remove file from array if upload failed
-  //       // notifications.error(
-  //       //   `Failed to upload "${file.name}". Please try again.`,
-  //       // );
-  //       return { success: false, fileId: fileObj.id, fileName: file.name };
-  //     }
-  //   });
-
-  //   // Wait for all uploads to complete (optional - you can remove this if you don't need to track completion)
-  //   try {
-  //     const results = await Promise.allSettled(uploadPromises);
-  //     const successCount = results.filter(
-  //       (result) => result.status === "fulfilled" && result.value.success,
-  //     ).length;
-  //     const failureCount = results.length - successCount;
-
-  //     // Simplified notification logic
-  //     if (failureCount === 0) {
-  //       notifications.success(
-  //         `All ${successCount} files uploaded successfully!`,
-  //       );
-  //     } else if (successCount === 0) {
-  //       notifications.error(`All ${failureCount} files failed to upload.`);
-  //     } else {
-  //       notifications.warning(
-  //         `${successCount} uploaded, ${failureCount} failed`,
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error in parallel upload:", error);
-  //   }
-
-  //   target.value = ""; // Clear the input
-  // };
 
   const handleRemoveFile = (fileId: string) => {
     // uploadedFiles = uploadedFiles.filter((f) => f.id !== fileId);
@@ -358,6 +269,16 @@
   };
 
   $: isAnyFileUploading = uploadedFiles.some((file) => file.isUploading);
+
+  // Dynamic tooltip text based on current file upload restrictions
+  $: fileUploadTooltip = isUploadSupported
+    ? `You can upload up to ${MAX_FILES} files (max ${MAX_FILE_SIZE / (1024 * 1024)}MB each) in ${ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(", ")} format.`
+    : `File upload is not supported for <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);">${ModelVariantIdNameMapping[currentModel]} </b> model`;
+
+  // With text highlighting
+  // $: fileUploadTooltip = isUploadSupported
+  //   ? `You can upload up to <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);"> ${MAX_FILES} </b> files (max <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);"> ${MAX_FILE_SIZE / (1024 * 1024)}MB </b> each) in <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);"> ${ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(", ")} </b> format.`
+  //   : `File upload is not supported for <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);">${ModelVariantIdNameMapping[currentModel]} </b> model`;
 </script>
 
 <div
@@ -456,13 +377,13 @@
       bind:this={fileInput}
       on:change={handleFileSelect}
       multiple
-      accept=".pdf,.txt,.docx,.csv"
+      accept={acceptAttribute}
       style="display: none;"
     />
     <div class="d-flex">
       <Tooltip
         title={"Attach File:"}
-        subtext={"You can upload up to 5 files (max 5 MB each) in .pdf, .txt, .docx, or .csv format."}
+        subtext={fileUploadTooltip}
         placement={"top-right"}
         size={"medium"}
         styleProp={"width: 220px;"}
@@ -472,7 +393,7 @@
           size={"small"}
           startIcon={AttachRegular}
           onClick={handleAttachClick}
-          disable={uploadedFiles.length >= MAX_FILES}
+          disable={!isUploadSupported || uploadedFiles.length >= MAX_FILES}
         />
       </Tooltip>
 

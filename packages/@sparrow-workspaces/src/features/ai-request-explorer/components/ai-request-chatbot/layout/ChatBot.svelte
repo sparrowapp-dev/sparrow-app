@@ -128,6 +128,8 @@
       {onRenameConversation}
       {onDeleteConversation}
       {onClearConversation}
+      currentProvider = {$tab?.property?.aiRequest?.aiModelProvider}
+      currentModel = {$tab?.property?.aiRequest?.aiModelVariant}
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       prompt={$tab?.property?.aiRequest?.ai?.prompt}
       chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}

@@ -63,6 +63,8 @@
   export let isGuestUser: boolean;
   export let onUploadFiles;
   export let onDeleteFiles;
+  export let currentProvider;
+  export let currentModel;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -612,6 +614,8 @@
           {isGuestUser}
           onFileUpload={onUploadFiles}
           onRemoveFile={onDeleteFiles}
+          {currentProvider}
+          {currentModel}
         />
       </div>
     </div>
