@@ -375,7 +375,7 @@ jobs:
         working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
         run: |
           mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
-          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
           cd ../../../../../../publishDir
           mkdir -p dists/stable/main/binary-amd64/
           dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
