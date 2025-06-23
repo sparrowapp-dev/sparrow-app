@@ -1033,9 +1033,12 @@ export class TeamExplorerPageViewModel {
     if (response.isSuccessful) {
       await this.teamRepository.removeTeam(teamId);
       const teams = await this.teamRepository.getTeamsDocuments();
-      const nextTeam = teams
-        .map((team) => team.toMutableJSON())
-        .find((team) => team.teamId !== teamId);
+      const mutableTeams = teams.map((team) => team.toMutableJSON());
+      const index = mutableTeams.findIndex((team) => team.teamId === teamId);
+      const nextTeam =
+        index === 0 && mutableTeams.length > 1
+          ? mutableTeams[1]
+          : mutableTeams.find((team) => team.teamId !== teamId);
       if (nextTeam) {
         await this.teamRepository.setOpenTeam(nextTeam.teamId);
       }
