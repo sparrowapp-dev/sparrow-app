@@ -111,7 +111,7 @@ jobs:
             $templatePath = ".github\workflows\msix_packaging\Sparrow_template.xml"
             $outputPath = "output/TechdomeApp.msix"
             New-Item -ItemType Directory -Force -Path output
-            & ${{ steps.locate_tool.outputs.toolpath }} create-package `
+            & MsixPackagingTool.exe create-package `
             --template $templatePath `
             --output $outputPath `
             --verbose
