@@ -9,6 +9,7 @@ on:
 jobs:
   msix-build:
     runs-on: windows-latest
+    environment: MSIXBuild
 
     steps:
       - name: Checkout source
