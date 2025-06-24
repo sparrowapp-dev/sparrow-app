@@ -375,7 +375,7 @@ jobs:
         working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
         run: |
           mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
-          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
           cd ../../../../../../publishDir
           mkdir -p dists/stable/main/binary-amd64/
           dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
@@ -441,5 +441,5 @@ jobs:
             -d '{
               "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
             }' \
-            ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
+            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         
