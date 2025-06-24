@@ -37,7 +37,7 @@
   let exceededLimit = false;
   let lastModifiedIndex = null;
 
-  function handleChange(index, event) {
+  const handleChange = (index, event) => {
     const isEmpty = event.detail === "" || event.detail === null;
     const activeResponse = activeResponses[index];
     const responseId = activeResponse.id;
@@ -60,10 +60,9 @@
       exceededLimit = true;
       lastModifiedIndex = index;
     }
-  }
-
+  };
   // Calculate total from input values
-  function calculateTotal() {
+  const calculateTotal = () => {
     totalPercentage = 0;
 
     activeResponses.forEach((response) => {
@@ -73,7 +72,7 @@
           ? 0
           : Number(value);
     });
-  }
+  };
 
   // Calculate total when component mounts
   onMount(() => {
