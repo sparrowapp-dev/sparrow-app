@@ -72,7 +72,11 @@
   // import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
   // import type { CollectionDocument, TabDocument } from "@app/database/database";
   // import { WorkspaceRole } from "@sparrow/common/enums";
-  import { CollectionAuth, CollectionNavigator } from "../components";
+  import {
+    CollectionAuth,
+    CollectionAuthProfiles,
+    CollectionNavigator,
+  } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
   import {
     Button,
@@ -772,8 +776,8 @@
                   ? 'input-outline'
                   : ''} w-100 p-2"
                 placeholder={isSharedWorkspace
-                ? "No description added."
-                : "Add Description"}
+                  ? "No description added."
+                  : "Add Description"}
                 on:input={handleInputDescription}
                 style="background-color: {isSharedWorkspace
                   ? 'var(--bg-ds-surface-900)'
@@ -969,7 +973,7 @@
           </div>
         </div>
       {:else}
-        <CollectionAuth
+        <!-- <CollectionAuth
           auth={$tab?.property?.collection?.auth}
           requestStateAuth={$tab?.property?.collection?.state
             ?.collectionAuthNavigation}
@@ -977,7 +981,8 @@
           onUpdateRequestState={onUpdateCollectionState}
           {onUpdateEnvironment}
           {environmentVariables}
-        />
+        /> -->
+        <CollectionAuthProfiles />
       {/if}
     {/if}
   </div>
