@@ -341,7 +341,11 @@
     <!-- <div >
       <WorkspaceRegular />
     </div> -->
-    <div class="no-drag" style="margin-left: 8px;" id="workspace-container">
+    <div
+      class="no-drag"
+      style="margin-left: 8px; margin-right:8px;"
+      id="workspace-container"
+    >
       {#if isGuestUser}
         <div style="display: flex;">
           <Select
