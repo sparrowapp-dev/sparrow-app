@@ -26,6 +26,46 @@ jobs:
           Import-PfxCertificate -FilePath "cert.pfx" -CertStoreLocation "Cert:\CurrentUser\My" -Password $securePassword
         shell: pwsh
 
+      - name: Install winget
+        shell: powershell
+        run: |
+            # Install winget-install script with Force parameter to skip confirmation
+            Install-Script -Name winget-install -RequiredVersion 4.1.2 -Force -Scope CurrentUser
+            
+            # Run the winget-install script
+            winget-install.ps1
+            
+            # Verify winget installation
+            winget --version
+            
+      - name: Install MSIX Packaging Tool
+        shell: powershell
+        run: |
+            # Install MSIX Packaging Tool from Microsoft Store
+            winget install "MSIX Packaging Tool" --source msstore --accept-package-agreements --accept-source-agreements
+            
+      - name: Verify MSIX Packaging Tool installation
+        shell: powershell
+        run: |
+            # Check if MSIX Packaging Tool is installed
+            $msixTool = winget list "MSIX Packaging Tool"
+            if ($msixTool -match "MSIX Packaging Tool") {
+                Write-Host "✅ MSIX Packaging Tool installed successfully"
+                Write-Host $msixTool
+            } else {
+                Write-Host "❌ MSIX Packaging Tool installation failed"
+                exit 1
+            }
+            
+      - name: Display installed tools
+        shell: powershell
+        run: |
+            Write-Host "=== Winget Version ==="
+            winget --version
+        
+            Write-Host "`n=== Installed Packages ==="
+            winget list "MSIX Packaging Tool"
+
       - name: Install Chocolatey
         run: |
             Set-ExecutionPolicy Bypass -Scope Process -Force
