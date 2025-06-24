@@ -30,71 +30,13 @@ jobs:
         shell: powershell
         run: |
             winget --version
-            # Install winget-install script with Force parameter to skip confirmation
-            Install-Script -Name winget-install -Force -Scope CurrentUser
-            
-            # Run the winget-install script with ForceClose parameter to handle dependency issues
-            try {
-                winget-install.ps1 -ForceClose
-            } catch {
-                Write-Host "First attempt failed, trying alternative method..."
-                # Alternative: Install winget using Microsoft's official method
-                $progressPreference = 'silentlyContinue'
-                
-                # Download and install VCLibs
-                $vcLibsUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-                $vcLibsPath = "$env:TEMP\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-                Invoke-WebRequest -Uri $vcLibsUrl -OutFile $vcLibsPath
-                Add-AppxPackage -Path $vcLibsPath -ForceApplicationShutdown
-                
-                # Download and install UI.Xaml
-                $xamlUrl = "https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx"
-                $xamlPath = "$env:TEMP\Microsoft.UI.Xaml.2.8.x64.appx"
-                Invoke-WebRequest -Uri $xamlUrl -OutFile $xamlPath
-                Add-AppxPackage -Path $xamlPath -ForceApplicationShutdown
-                
-                # Download and install winget
-                $wingetUrl = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-                $wingetPath = "$env:TEMP\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-                Invoke-WebRequest -Uri $wingetUrl -OutFile $wingetPath
-                Add-AppxPackage -Path $wingetPath -ForceApplicationShutdown
-            }
-            
-            # Wait a moment for winget to register
-            Start-Sleep -Seconds 10
-            
-            # Refresh environment variables
-            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-            
-            # Verify winget installation
-            try {
-                winget --version
-            } catch {
-                # Try alternative path
-                & "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe" --version
-            }
-            
+
       - name: Install MSIX Packaging Tool
         shell: powershell
         run: |
-            # Ensure winget is available in PATH
-            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-            
-            # Try to find winget executable
-            $wingetPath = Get-Command winget -ErrorAction SilentlyContinue
-            if (-not $wingetPath) {
-                $wingetPath = Get-ChildItem "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe" | Select-Object -First 1
-                if ($wingetPath) {
-                    $wingetExe = $wingetPath.FullName
-                } else {
-                    throw "Winget executable not found"
-                }
-            } else {
-                $wingetExe = "winget"
-            }
-            
+
             # Install MSIX Packaging Tool from Microsoft Store
-            & $wingetExe install "MSIX Packaging Tool" --source msstore --accept-package-agreements --accept-source-agreements --silent
+            winget install "MSIX Packaging Tool" --source msstore --accept-package-agreements --accept-source-agreements --silent
             
       - name: Verify MSIX Packaging Tool installation
         shell: powershell
@@ -135,25 +77,6 @@ jobs:
             
             Write-Host "`n=== Installed Packages ==="
             winget list "MSIX Packaging Tool"
-      - name: Display installed tools
-        shell: powershell
-        run: |
-            Write-Host "=== Winget Version ==="
-            winget --version
-        
-            Write-Host "`n=== Installed Packages ==="
-            winget list "MSIX Packaging Tool"
-
-      - name: Install Chocolatey
-        run: |
-            Set-ExecutionPolicy Bypass -Scope Process -Force
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-        shell: powershell
-
-      - name: Install MSIX Packaging Tool CLI via Chocolatey
-        run: choco install msix-packaging -y
-        shell: powershell
 
       - name: Locate MSIXPackagingTool.exe
         id: locate_tool
