@@ -102,9 +102,7 @@ jobs:
       - name: Locate MSIXPackagingTool.exe
         id: locate_tool
         run: |
-            $pkg = Get-ChildItem "C:\Program Files\WindowsApps" -Filter "MsixPackagingTool.exe" -Recurse | Select-Object -First 1
-            if (-not $pkg) { Write-Error "MSIX Packaging Tool not found"; exit 1 }
-            Write-Output "::set-output name=toolpath::$($pkg.FullName)"
+            MsixPackagingTool.exe --version
         shell: pwsh
 
       - name: Convert MSI to MSIX
