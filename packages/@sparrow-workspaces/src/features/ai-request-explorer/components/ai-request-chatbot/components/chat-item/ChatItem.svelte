@@ -524,7 +524,7 @@
 
       {#if attachedFilesWithMsg && attachedFilesWithMsg.length}
         <div
-          class="attached-files-container d-flex flex-column align-items-end justify-content-end p-2 gap-2"
+          class="attached-files-container d-flex flex-wrap align-items-end justify-content-end p-1 gap-1 w-100"
         >
           {#each attachedFilesWithMsg as attachedFile}
             <FileItem file={attachedFile} />

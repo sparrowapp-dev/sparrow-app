@@ -35,28 +35,16 @@
   export let onFileUpload; // Callback to handle cloud upload
   export let currentProvider: AiModelProviderEnum;
   export let currentModel: AIModelVariant;
-
   export let uploadedFiles: PromptFileAttachment[] = [];
-
-  $: {
-    if (uploadedFiles.length) console.log(uploadedFiles);
-  }
 
   // File restrictions
   // Dynamic file restrictions based on provider and model
   $: fileRestrictions = getFileRestrictions(currentProvider, currentModel);
   $: isUploadSupported = isFileUploadSupported(currentProvider, currentModel);
-
-  // Default fallback values
   $: MAX_FILE_SIZE = fileRestrictions?.maxFileSize || 5 * 1024 * 1024;
   $: ALLOWED_EXTENSIONS = fileRestrictions?.supportedExtensions || [];
   $: MAX_FILES = fileRestrictions?.maxFiles || 5;
-  // const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
-  // const ALLOWED_EXTENSIONS = ["pdf", "txt", "docx", "csv"];
-  // const MAX_FILES = 5;
-
-  // Generate accept attribute for file input
-  $: acceptAttribute = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(",");
+  $: acceptAttribute = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(","); // Generate accept attribute for file input
 
   let fileInput: HTMLInputElement;
   let isPromptBoxFocused = false;
@@ -83,7 +71,6 @@
     }
   };
 
-  // File Upload
   const handleAttachClick = () => {
     if (uploadedFiles.length >= MAX_FILES) {
       notifications.error(`Maximum ${MAX_FILES} files allowed.`);
@@ -202,8 +189,7 @@
     uploadedFiles = [...uploadedFiles, ...newFileObjects];
 
     try {
-      // Extract just the File objects for upload
-      const filesToUpload = validFiles.map((validFile) => validFile.file);
+      const filesToUpload = validFiles.map((validFile) => validFile.file); // Extract just the File objects for upload
       const fileIds = validFiles.map((validFile) => validFile.fileObj.id);
 
       // console.log(`Starting upload for ${filesToUpload.length} files...`);
@@ -254,19 +240,7 @@
     }
   };
 
-  // Move this download fun. to fileItem component itself
-  const handleFileDownload = (file: any) => {
-    if (file.url && !file.isUploading) {
-      // Create a temporary link to download the file
-      const link = document.createElement("a");
-      link.href = file.url;
-      link.download = `${file.name}.${file.type}`;
-      link.setAttribute("target", "_blank"); // Opens the linked document in a new window or tab
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
+  $: if (uploadedFiles.length) console.log(uploadedFiles);
 
   $: isAnyFileUploading = uploadedFiles.some((file) => file.isUploading);
 
@@ -274,11 +248,6 @@
   $: fileUploadTooltip = isUploadSupported
     ? `You can upload up to ${MAX_FILES} files (max ${MAX_FILE_SIZE / (1024 * 1024)}MB each) in ${ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(", ")} format.`
     : `File upload is not supported for <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);">${ModelVariantIdNameMapping[currentModel]} </b> model`;
-
-  // With text highlighting
-  // $: fileUploadTooltip = isUploadSupported
-  //   ? `You can upload up to <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);"> ${MAX_FILES} </b> files (max <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);"> ${MAX_FILE_SIZE / (1024 * 1024)}MB </b> each) in <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);"> ${ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(", ")} </b> format.`
-  //   : `File upload is not supported for <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);">${ModelVariantIdNameMapping[currentModel]} </b> model`;
 </script>
 
 <div
@@ -294,8 +263,8 @@
           <FileItem
             {file}
             onRemove={handleRemoveFile}
-            onDownload={handleFileDownload}
             size={"small"}
+            isReadOnly={false}
           />
         {/each}
       </div>
@@ -354,9 +323,7 @@
   <div
     class="actions-container d-flex justify-content-between align-items-center"
   >
-    <!-- {#if !isGuestUser} -->
     <div id="generate-prompt-chip">
-      <!-- <Tooltip title={"Generate user prompt"} placement={"top-center"}> -->
       <button
         on:click={() => {
           activateGeneratePromptModal("UserPrompt");
@@ -367,9 +334,7 @@
         <BotSparkleFilled size={"15px"} color="#4387f4" />
         <span class="text-ds-font-size-12 fw-medium">Generate Prompt</span>
       </button>
-      <!-- </Tooltip> -->
     </div>
-    <!-- {/if} -->
 
     <!-- Hidden file input -->
     <input

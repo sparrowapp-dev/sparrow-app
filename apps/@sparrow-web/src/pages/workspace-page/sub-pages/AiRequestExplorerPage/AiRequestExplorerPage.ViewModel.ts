@@ -571,55 +571,63 @@ class AiRequestExplorerViewModel {
   }
 
   public handleUploadFilesToCloud = async (filesToUpload: []) => {
-    const componentData = this._tab.getValue();
-    const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    // const componentData = this._tab.getValue();
+    // const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    // const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
-    // Don't allow file uploads when auth key is not present.
-    if (!provider || !providerAuthKey) {
-      console.error("Missing provider or authKey.");
-      // notifications.error("Please provde Authentication key before uploading files.");
-      return Promise.reject("API key missing. Please authenticate before uploading the files.");
-    }
-
-
-    try {
-      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
-
-      if (response.isSuccessful) {
-        console.log("response :>> ", response.data.data);
-        return response.data.data;
-      } else {
-        notifications.error(`Failed to upload files. Please try again.`);
-      }
-
-      console.log("file :>> ", filesToUpload)
-    }
-    catch (error) {
-      console.error("Something went wrong while deleting the conversation. :>> ", error);
-    }
+    // // Don't allow file uploads when auth key is not present.
+    // if (!provider || !providerAuthKey) {
+    //   console.error("Missing provider or authKey.");
+    //   // notifications.error("Please provde Authentication key before uploading files.");
+    //   return Promise.reject("API key missing. Please authenticate before uploading the files.");
+    // }
 
 
-    // return new Promise((resolve, reject) => {
-    //   setTimeout(() => {
-    //     resolve([
-    //       {
-    //         "fileId": "file-DmRAaEWo2n7f38MNo963Ak",
-    //         "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
-    //       },
-    //       {
-    //         "fileId": "file-DmRAaEWo2n7f38MNo963Al",
-    //         "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
-    //       },
-    //       {
-    //         "fileId": "file-DmRAaEWo2n7f38MNo963Am",
-    //         "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
-    //       }
-    //     ]);
-    //     // reject(`Promise resolved after ${2000 / 1000} seconds!`);
+    // try {
+    //   const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
 
-    //   }, 5000);
-    // });
+    //   if (response.isSuccessful) {
+    //     console.log("response :>> ", response.data.data);
+    //     return response.data.data;
+    //   } else {
+    //     notifications.error(`Failed to upload files. Please try again.`);
+    //   }
+
+    //   console.log("file :>> ", filesToUpload)
+    // }
+    // catch (error) {
+    //   console.error("Something went wrong while deleting the conversation. :>> ", error);
+    // }
+
+
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve([
+          {
+            "fileId": "file-DmRAaEWo2n7f38MNo963Ak",
+            "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+          },
+          {
+            "fileId": "file-DmRAaEWo2n7f38MNo963Al",
+            "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+          },
+          {
+            "fileId": "file-DmRAaEWo2n7f38MNo963Am",
+            "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+          },
+          {
+            "fileId": "file-DmRAaEWo2n7f38MNo963Am",
+            "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+          },
+          {
+            "fileId": "file-DmRAaEWo2n7f38MNo963Am",
+            "fileUrl": "https://sparrowassets.blob.core.windows.net/aiconversationblobdev/86829c3c-94bf-4897-a609-d7d0fb33973f-docs.pdf"
+          }
+        ]);
+        // reject(`Promise resolved after ${2000 / 1000} seconds!`);
+
+      }, 5000);
+    });
   }
 
   public handleDeleteFilesFromCloud = (filesToDelete: []) => {

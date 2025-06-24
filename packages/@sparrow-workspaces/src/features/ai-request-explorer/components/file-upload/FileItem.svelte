@@ -3,8 +3,6 @@
     DismissCircleFilled,
     DocumentTextRegular,
     ArrowDownloadRegular,
-    // Import your fluent loading icon here
-    // SpinnerRegular or similar loading icon
   } from "@sparrow/library/icons";
 
   export let file: {
@@ -19,18 +17,25 @@
   export let onRemove: (fileId: string) => void;
   export let onDownload: (file: any) => void;
   export let size: "small" | "medium" | "large" = "small";
+  export let isReadOnly: boolean = true;
 
   const handleFileClick = () => {
-    // onDownload(file);
-    // if (!file.isUploading && file.url) {
-    //   // Create a temporary link to download the file
-    //   const link = document.createElement("a");
-    //   link.href = file.url;
-    //   link.download = `${file.name}.${file.type}`;
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // }
+    if (!file.isUploading && file.url) {
+      // Create a temporary link to download the file
+      const link = document.createElement("a");
+      link.href = file.url;
+      link.download = `${file.name}.${file.type}`;
+      link.setAttribute("target", "_blank"); // Opens the linked document in a new window or tab
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const getDisplayName = () => {
+    const extension = file.type || "pdf";
+    const baseName = file.name;
+    return { baseName, extension };
   };
 
   const getFileExtension = () => {
@@ -38,7 +43,11 @@
   };
 </script>
 
-<div class="file-chip" class:uploading={file.isUploading}>
+<div
+  class="file-chip"
+  class:uploading={file.isUploading}
+  class:readonly={isReadOnly}
+>
   <div
     class="file-content"
     on:click={handleFileClick}
@@ -63,12 +72,20 @@
       {/if}
     </div>
     <div class="file-info">
-      <span
+      <div
+        class="file-name text-ds-font-size-14 text-ds-font-weight-semi-bold text-ds-line-height-143"
+        title={`${getDisplayName().baseName}.${getDisplayName().extension}`}
+      >
+        <span class="file-basename">{getDisplayName().baseName}</span><span
+          class="file-extension">.{getDisplayName().extension}</span
+        >
+      </div>
+      <!-- <span
         class="file-name text-ds-font-size-14 text-ds-font-weight-semi-bold text-ds-line-height-143 text-truncate"
         title={`${file.name}.${getFileExtension()}`}
       >
         {`${file.name}.${getFileExtension()}`}
-      </span>
+      </span> -->
       {#if file.size}
         <span
           class="file-size text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
@@ -82,9 +99,14 @@
     </div>
   </div>
 
-  <button class="remove-btn" on:click|stopPropagation={() => onRemove(file.id)}>
-    <DismissCircleFilled size="14px" />
-  </button>
+  {#if !isReadOnly}
+    <button
+      class="remove-btn"
+      on:click|stopPropagation={() => onRemove(file.id)}
+    >
+      <DismissCircleFilled size="14px" />
+    </button>
+  {/if}
 </div>
 
 <style>
@@ -208,6 +230,25 @@
     color: var(--text-ds-primary);
     white-space: nowrap;
     overflow: hidden;
+    display: flex;
+  }
+
+  .file-chip.readonly {
+    /* width: auto;
+    max-width: 120px;
+    min-width: 100px;
+    margin: 2px;
+    flex: 0 0 auto; */
+  }
+
+  .file-basename {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .file-extension {
+    flex-shrink: 0;
   }
 
   .file-size {
