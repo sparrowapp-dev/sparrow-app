@@ -280,3 +280,4 @@ export { default as CircleSmallRegular } from "./CircleSmallRegular.svelte";
 export { default as HourGlassRegular } from "./HourGlassRegular.svelte";
 export { default as MapRegular } from "./MapRegular.svelte";
 export { default as CodeRegular } from "./CodeRegular.svelte";
+export { default as DocumentPercentRegular} from "./DocumentPercentRegular.svelte";

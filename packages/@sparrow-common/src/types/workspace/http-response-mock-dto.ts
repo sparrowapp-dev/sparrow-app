@@ -12,6 +12,7 @@ export interface MockRequestResponseDto {
   responseDate: string;
   selectedResponseBodyType: string;
   isMockResponseActive: boolean;
+  responseWeightRatio?: number;
 }
 
 export interface MockResponseItemsDto {
@@ -45,4 +46,17 @@ export interface HttpResponseMockDeletePayloadDtoInterface {
   workspaceId: string;
   mockRequestId: string;
   folderId?: string;
+}
+
+export interface MockResponseRatio {
+  mockResponseId: string;
+  responseWeightRatio: number;
+}
+
+export interface HttpResponseRatiosMockUpdatePayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  mockRequestId: string;
+  folderId?: string;
+  mockResponseRatios: MockResponseRatio[];
 }
