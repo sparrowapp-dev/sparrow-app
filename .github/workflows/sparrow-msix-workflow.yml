@@ -1,0 +1,75 @@
+name: Convert MSI to MSIX
+
+on:
+  push:
+    branches:
+      - build/msix
+  workflow_dispatch:
+
+jobs:
+  msix-build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Restore PFX certificate from base64
+        run: |
+          [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String("${{ vars.CERT_BASE64 }}"))
+        shell: pwsh
+
+      - name: Import certificate into local store
+        run: |
+          $securePassword = ConvertTo-SecureString -String "${{ vars.CERT_PASSWORD }}" -AsPlainText -Force
+          Import-PfxCertificate -FilePath "cert.pfx" -CertStoreLocation "Cert:\CurrentUser\My" -Password $securePassword
+        shell: pwsh
+
+      - name: Install MSIX Packaging Tool CLI
+        run: |
+            winget install --id "MSIX Packaging Tool" -e --accept-source-agreements --accept-package-agreements --silent
+        shell: pwsh
+
+      - name: Locate MSIXPackagingTool.exe
+        id: locate_tool
+        run: |
+            $pkg = Get-ChildItem "C:\Program Files\WindowsApps" -Filter "MsixPackagingTool.exe" -Recurse | Select-Object -First 1
+            if (-not $pkg) { Write-Error "MSIX Packaging Tool not found"; exit 1 }
+            Write-Output "::set-output name=toolpath::$($pkg.FullName)"
+        shell: pwsh
+
+      - name: Convert MSI to MSIX
+        run: |
+            $msiPath = ".github\workflows\msix_packaging\Sparrow.msi"
+            $templatePath = ".github\workflows\msix_packaging\Sparrow_template.xml"
+            $outputPath = "output/TechdomeApp.msix"
+            New-Item -ItemType Directory -Force -Path output
+            & ${{ steps.locate_tool.outputs.toolpath }} create-package `
+            --template $templatePath `
+            --output $outputPath `
+            --verbose
+        shell: pwsh
+
+
+      - name: Sign MSIX Package
+        run: |
+          $timestampUrl = "http://timestamp.digicert.com"
+          $securePassword = ConvertTo-SecureString -String "${{ vars.CERT_PASSWORD }}" -AsPlainText -Force
+
+          & "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign `
+              /fd SHA256 /f "cert.pfx" /p "${{ vars.CERT_PASSWORD }}" `
+              /tr $timestampUrl /td SHA256 `
+              "output\TechdomeApp.msix"
+        shell: pwsh
+
+      - name: see the package
+        run: |
+         ls
+         dir
+        shell: pwsh
+
+      - name: Upload MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TechdomeApp-MSIX
+          path: output/TechdomeApp.msix
