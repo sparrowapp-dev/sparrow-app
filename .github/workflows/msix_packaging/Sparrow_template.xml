@@ -297,7 +297,7 @@
     </ExclusionItems>
   </Settings>
   <PrepareComputer DisableWindowsSearchService="false" />
-  <SaveLocation PackagePath="${{ github.workspace }}\msix-output" TemplatePath="${{ github.workspace }}\.github\workflows\msix_packaging\Sparrow_template.xml" />
-  <Installer Path="${{ github.workspace }}\.github\workflows\msix_packaging\Sparrow.msi" />
+  <SaveLocation PackagePath="msix-output" />
+  <Installer Path="$.github\workflows\msix_packaging\Sparrow.msi" />
   <PackageInformation PackageName="Sparrow" PackageDisplayName="Sparrow" PublisherName="CN=Techdome Solutions, O=Techdome Solutions, C=IN" PublisherDisplayName="sparrowapp" Version="2.26.0.0" p4:PackageDescription="Sparrow" xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/1910" />
 </MsixPackagingToolTemplate>
