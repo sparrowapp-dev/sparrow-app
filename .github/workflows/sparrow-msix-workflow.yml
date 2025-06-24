@@ -107,17 +107,8 @@ jobs:
 
       - name: Convert MSI to MSIX
         run: |
-            $msiPath = ".github\workflows\msix_packaging\Sparrow.msi"
-            $templatePath = ".github\workflows\msix_packaging\Sparrow_template.xml"
-            $outputPath = "output/TechdomeApp.msix"
-            New-Item -ItemType Directory -Force -Path output
-            & MsixPackagingTool.exe create-package `
-            --template $templatePath `
-            --output $outputPath `
-            --verbose
-        shell: pwsh
-
             MsixPackagingTool.exe create-package --template c:\users\documents\ConversionTemplate.xml -v
+        shell: pwsh
 
 
       - name: see the package
