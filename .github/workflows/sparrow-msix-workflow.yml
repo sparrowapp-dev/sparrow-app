@@ -8,7 +8,7 @@ on:
 
 jobs:
   msix-build:
-    runs-on: windows-latest
+    runs-on: windows-2025
     environment: MSIXBuild
 
     steps:
@@ -29,8 +29,9 @@ jobs:
       - name: Install winget
         shell: powershell
         run: |
+            winget --version
             # Install winget-install script with Force parameter to skip confirmation
-            Install-Script -Name winget-install -RequiredVersion 4.1.2 -Force -Scope CurrentUser
+            Install-Script -Name winget-install -Force -Scope CurrentUser
             
             # Run the winget-install script with ForceClose parameter to handle dependency issues
             try {
