@@ -26,10 +26,16 @@ jobs:
           Import-PfxCertificate -FilePath "cert.pfx" -CertStoreLocation "Cert:\CurrentUser\My" -Password $securePassword
         shell: pwsh
 
-      - name: Install MSIX Packaging Tool CLI
+      - name: Install Chocolatey
         run: |
-            winget install --id "MSIX Packaging Tool" -e --accept-source-agreements --accept-package-agreements --silent
-        shell: pwsh
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        shell: powershell
+
+      - name: Install MSIX Packaging Tool CLI via Chocolatey
+        run: choco install msix-packaging -y
+        shell: powershell
 
       - name: Locate MSIXPackagingTool.exe
         id: locate_tool
