@@ -78,6 +78,27 @@ jobs:
             Write-Host "`n=== Installed Packages ==="
             winget list "MSIX Packaging Tool"
 
+      - name: Update template with actual paths
+        shell: powershell
+        run: |
+            $workspacePath = "${{ github.workspace }}" -replace "\\", "\\"
+            $templateContent = Get-Content ".github\workflows\msix_packaging\Sparrow_template.xml" -Raw
+            
+            # Replace placeholders with actual paths
+            $templateContent = $templateContent -replace '\$\{\{ github\.workspace \}\}', $workspacePath
+            
+            # Create the updated template
+            $templateContent | Set-Content ".github\workflows\msix_packaging\Sparrow_template_updated.xml"
+            
+            Write-Output "Template updated with workspace path: $workspacePath"
+
+
+      - name: Create output directories
+        shell: powershell
+        run: |
+            New-Item -ItemType Directory -Force -Path "msix-output"
+            Write-Output "Created msix-output directory"
+
       - name: Locate MSIXPackagingTool.exe
         id: locate_tool
         run: |
@@ -98,17 +119,8 @@ jobs:
             --verbose
         shell: pwsh
 
+            MsixPackagingTool.exe create-package --template c:\users\documents\ConversionTemplate.xml -v
 
-      - name: Sign MSIX Package
-        run: |
-          $timestampUrl = "http://timestamp.digicert.com"
-          $securePassword = ConvertTo-SecureString -String "${{ vars.CERT_PASSWORD }}" -AsPlainText -Force
-
-          & "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign `
-              /fd SHA256 /f "cert.pfx" /p "${{ vars.CERT_PASSWORD }}" `
-              /tr $timestampUrl /td SHA256 `
-              "output\TechdomeApp.msix"
-        shell: pwsh
 
       - name: see the package
         run: |
