@@ -1005,7 +1005,6 @@ export class TeamExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.ignoreInvite(teamId, baseUrl);
     if (response.isSuccessful) {
-      await this.teamRepository.removeTeam(teamId);
       const teams = await this.teamRepository.getTeamsDocuments();
       const team0 = teams[0]?.toMutableJSON();
       const team1 = teams[1]?.toMutableJSON();
@@ -1014,6 +1013,7 @@ export class TeamExplorerPageViewModel {
       } else if (team1) {
         await this.teamRepository.setOpenTeam(team1.teamId);
       }
+      await this.teamRepository.removeTeam(teamId);
       notifications.success(
         `Invite ignored. The hub has been removed from your panel.`,
       );
