@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { ChevronUpRegular, ChevronDownRegular } from "@sparrow/library/icons";
-  import Input from "../Input/Input.svelte";
+  import { Input } from "@sparrow/library/forms";
 
   export let variant: "primary" | "stroke" | "inline" | "secondary" = "primary";
   export let placeholder = "0";
