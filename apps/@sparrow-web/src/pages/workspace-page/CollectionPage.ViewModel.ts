@@ -3221,14 +3221,10 @@ export default class CollectionsViewModel {
           baseUrl,
         );
         if (response.isSuccessful) {
-          let updatedResponse = {
-            ...response.data.data,
-            updatedAt: new Date().toISOString(),
-          };
           this.collectionRepository.updateRequestOrFolderInCollection(
             collection.id,
             explorer.id,
-            updatedResponse,
+            response.data.data,
           );
 
           this.updateTab(explorer.id, {
@@ -3535,7 +3531,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3676,7 +3672,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           aiRequest.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(aiRequest.id, {
           name: newRequestName,
@@ -3697,7 +3693,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           aiRequest.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(aiRequest.id, {
           name: newRequestName,
@@ -3819,7 +3815,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3840,7 +3836,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           request.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3957,7 +3953,7 @@ export default class CollectionsViewModel {
           collection.id,
           request.id,
           requestResponse.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         await this.updateTab(requestResponse.id, {
           name: newRequestName,
@@ -3971,7 +3967,7 @@ export default class CollectionsViewModel {
           folder.id,
           request.id,
           requestResponse.id,
-          { name: newRequestName, updatedAt: new Date().toString() },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         await this.updateTab(requestResponse.id, {
           name: newRequestName,
@@ -4087,7 +4083,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           websocket.id,
-          { name: newWebSocketName, updatedAt: new Date().toString() },
+          { name: newWebSocketName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(websocket.id, {
           name: newWebSocketName,
@@ -4107,7 +4103,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           websocket.id,
-          { name: newWebSocketName, updatedAt: new Date().toString() },
+          { name: newWebSocketName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(websocket.id, {
           name: newWebSocketName,
@@ -4215,7 +4211,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newSocketIoName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestOrFolderInCollection(
           _collection.id,
           _socketIo.id,
@@ -4238,7 +4237,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newSocketIoName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestInFolder(
           _collection.id,
           _folder.id,
@@ -4390,7 +4392,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newGraphqlName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestOrFolderInCollection(
           _collection.id,
           _graphql.id,
@@ -4413,7 +4418,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newGraphqlName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestInFolder(
           _collection.id,
           _folder.id,

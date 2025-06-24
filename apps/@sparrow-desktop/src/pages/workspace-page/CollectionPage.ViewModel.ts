@@ -3205,10 +3205,6 @@ export default class CollectionsViewModel {
           baseUrl,
         );
         if (response.isSuccessful) {
-          let updatedResponse = {
-            ...response.data.data,
-            updatedAt: new Date().toISOString(),
-          };
           this.collectionRepository.updateRequestOrFolderInCollection(
             collection.id,
             explorer.id,
@@ -4198,7 +4194,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newSocketIoName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestOrFolderInCollection(
           _collection.id,
           _socketIo.id,
@@ -4221,7 +4220,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newSocketIoName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestInFolder(
           _collection.id,
           _folder.id,
@@ -4373,7 +4375,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newGraphqlName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestOrFolderInCollection(
           _collection.id,
           _graphql.id,
@@ -4396,7 +4401,10 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newGraphqlName;
         }
-        const newResponse = { ...response, updatedAt: new Date().toString() };
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestInFolder(
           _collection.id,
           _folder.id,
