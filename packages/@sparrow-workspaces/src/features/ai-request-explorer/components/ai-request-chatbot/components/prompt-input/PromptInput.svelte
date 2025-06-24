@@ -35,21 +35,25 @@
   export let onFileUpload; // Callback to handle cloud upload
   export let currentProvider: AiModelProviderEnum;
   export let currentModel: AIModelVariant;
-  export let uploadedFiles: PromptFileAttachment[] = [];
+  export let filesToUpload: PromptFileAttachment[] = [];
 
-  // File restrictions
-  // Dynamic file restrictions based on provider and model
+  // Props
+
+  // File restrictions Props - Dynamic file restrictions based on provider and model
   $: fileRestrictions = getFileRestrictions(currentProvider, currentModel);
   $: isUploadSupported = isFileUploadSupported(currentProvider, currentModel);
   $: MAX_FILE_SIZE = fileRestrictions?.maxFileSize || 5 * 1024 * 1024;
   $: ALLOWED_EXTENSIONS = fileRestrictions?.supportedExtensions || [];
   $: MAX_FILES = fileRestrictions?.maxFiles || 5;
-  $: acceptAttribute = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(","); // Generate accept attribute for file input
+  $: acceptAttribute = ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(","); // Generates accept attribute for file input
 
-  let fileInput: HTMLInputElement;
-  let isPromptBoxFocused = false;
+  // Prompt box state management props
   let isTyping = false;
+  let isUploadingFiles = false;
+  let isPromptBoxFocused = false;
+  let fileInput: HTMLInputElement;
 
+  // Methods
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
     if (!textAreaInput) return;
@@ -58,21 +62,26 @@
   }
 
   const hanldeStartGenerating = async () => {
-    // allows the DOM to update first before resetting the height.
-    setTimeout(() => {
-      adjustTextareaHeight();
-    }, 0);
+    if (!prompt.trim()) return;
 
-    if (prompt) {
+    try {
+      const uploadedFiles = await handleUploadFiles(); // Upload files if any
+      setTimeout(adjustTextareaHeight, 0); // waiting for the DOM to update.
       await sendPrompt(prompt, uploadedFiles);
       await onUpdateAiPrompt("");
-      uploadedFiles.length = 0;
+      filesToUpload = [];
       MixpanelEvent(Events.AI_Initiate_Response);
+    } catch (error) {
+      console.error("Error in generating response:", error);
     }
   };
 
+  //////////////////////////////////////////////////////////////////////////////
+  //                        File Upload Methods - start
+  //////////////////////////////////////////////////////////////////////////////
   const handleAttachClick = () => {
-    if (uploadedFiles.length >= MAX_FILES) {
+    // if (uploadedFiles.length >= MAX_FILES) {
+    if (filesToUpload.length >= MAX_FILES) {
       notifications.error(`Maximum ${MAX_FILES} files allowed.`);
       return;
     }
@@ -83,9 +92,7 @@
     return filename.split(".").pop()?.toLowerCase() || "";
   };
 
-  /**
-   * Validates a single file against size and extension restrictions
-   */
+  // Function to Validate a single file against size and extension restrictions
   const validateFile = (file: File): { isValid: boolean; error?: string } => {
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
@@ -107,45 +114,16 @@
     return { isValid: true };
   };
 
-  /**
-   * Updates the upload status of multiple files
-   */
-  const updateFilesUploadStatus = (
-    fileIds: string[],
-    uploadResults: Array<{ fileUrl: string; fileId: string }>,
-    isSuccess: boolean = true,
-  ) => {
-    uploadedFiles = uploadedFiles
-      .map((file) => {
-        const fileIndex = fileIds.indexOf(file.id);
-        if (fileIndex !== -1) {
-          if (isSuccess && uploadResults[fileIndex]) {
-            return {
-              ...file,
-              isUploading: false,
-              url: uploadResults[fileIndex].fileUrl,
-              fileId: uploadResults[fileIndex].fileId,
-            };
-          } else if (!isSuccess) {
-            return null; // Remove failed files from the array
-          }
-        }
-        return file;
-      })
-      .filter(Boolean); // Remove null values (failed uploads)
-  };
-
-  /**
-   * Creates a file object for UI display
-   */
+  // Function to create a file object for UI display
   const createFileObject = (file: File) => ({
     id: uuidv4(),
     name: file.name.split(".").slice(0, -1).join("."), // Remove extension from display name
     type: getFileExtension(file.name),
     size: parseFloat((file.size / (1024 * 1024)).toFixed(2)), // Convert to MB
-    isUploading: true,
+    isUploading: false,
     url: undefined,
     fileId: "",
+    fileObject: file,
   });
 
   const handleFileSelect = async (event: Event) => {
@@ -154,7 +132,7 @@
 
     if (!files || files.length === 0) return;
 
-    const validFiles: { file: File; fileObj: any }[] = [];
+    const validFileObjects: any[] = [];
     const errors: string[] = [];
 
     // Validate all files first
@@ -162,7 +140,7 @@
       const file = files[i];
 
       // Check file count limit
-      if (uploadedFiles.length + validFiles.length >= MAX_FILES) {
+      if (filesToUpload.length + validFileObjects.length >= MAX_FILES) {
         errors.push(`Maximum ${MAX_FILES} files allowed`);
         break;
       }
@@ -174,65 +152,70 @@
       }
 
       const fileObj = createFileObject(file);
-      validFiles.push({ file, fileObj });
+      validFileObjects.push(fileObj);
     }
-    errors.forEach((error) => notifications.error(error)); // To show validation errors
+
+    errors.forEach((error) => notifications.error(error));
 
     // If no valid files, return early
-    if (validFiles.length === 0) {
+    if (validFileObjects.length === 0) {
       target.value = "";
       return;
     }
 
-    // Add all valid files to the UI immediately with loading state
-    const newFileObjects = validFiles.map((validFile) => validFile.fileObj);
-    uploadedFiles = [...uploadedFiles, ...newFileObjects];
+    // Add files to filesToUpload array
+    filesToUpload = [...filesToUpload, ...validFileObjects];
 
-    try {
-      const filesToUpload = validFiles.map((validFile) => validFile.file); // Extract just the File objects for upload
-      const fileIds = validFiles.map((validFile) => validFile.fileObj.id);
-
-      // console.log(`Starting upload for ${filesToUpload.length} files...`);
-      const uploadResults = await onFileUpload(filesToUpload); // Upload ALL files at once
-      // console.log("Upload completed:", uploadResults);
-      updateFilesUploadStatus(fileIds, uploadResults, true); // Update all files' status to success
-
-      // if (filesToUpload.length === 1) {
-      //   notifications.success(
-      //     `File "${filesToUpload[0].name}" uploaded successfully!`,
-      //   );
-      // } else {
-      //   notifications.success(
-      //     `All ${filesToUpload.length} files uploaded successfully!`,
-      //   );
-      // }
-    } catch (error) {
-      console.error("File upload failed:", error);
-      const fileIds = validFiles.map((validFile) => validFile.fileObj.id); // Remove all failed files from UI
-      updateFilesUploadStatus(fileIds, [], false);
-
-      // Show error notification
-      if (error.includes("API key missing")) {
-        notifications.error(error);
-      } else if (validFiles.length === 1) {
-        notifications.error(
-          `Failed to upload "${validFiles[0].file.name}". Please try again.`,
-        );
-      } else {
-        notifications.error(
-          `Failed to upload ${validFiles.length} files. Please try again.`,
-        );
-      }
-    }
     target.value = ""; // Clear the input
   };
 
-  const handleRemoveFile = (fileId: string) => {
-    // uploadedFiles = uploadedFiles.filter((f) => f.id !== fileId);
-    // onRemoveFile(fileId);
+  const handleUploadFiles = async () => {
+    if (filesToUpload.length === 0) return filesToUpload;
 
-    const fileToRemove = uploadedFiles.find((f) => f.id === fileId);
-    uploadedFiles = uploadedFiles.filter((f) => f.id !== fileId);
+    try {
+      isUploadingFiles = true;
+      filesToUpload = filesToUpload.map((file) => ({
+        ...file,
+        isUploading: true,
+      }));
+
+      // Extract File objects from filesToUpload for upload
+      const fileObjects = filesToUpload.map((file) => file.fileObject);
+      const uploadResults = await onFileUpload(fileObjects);
+
+      // Update file objects with upload results
+      const updatedFiles = filesToUpload.map((file, index) => ({
+        ...file,
+        isUploading: false,
+        url: uploadResults[index].fileUrl,
+        fileId: uploadResults[index].fileId,
+      }));
+
+      filesToUpload = updatedFiles;
+      return updatedFiles;
+    } catch (error) {
+      console.error("File upload failed:", error);
+
+      // Reset uploading state on failure
+      filesToUpload = filesToUpload.map((file) => ({
+        ...file,
+        isUploading: false,
+      }));
+
+      if (error.includes("API key missing")) {
+        notifications.error(error);
+      } else {
+        notifications.error("Failed to upload files. Please try again.");
+      }
+      throw error;
+    } finally {
+      isUploadingFiles = false;
+    }
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    const fileToRemove = filesToUpload.find((f) => f.id === fileId);
+    filesToUpload = filesToUpload.filter((f) => f.id !== fileId);
 
     // Call the parent component's remove handler with the actual fileId
     if (fileToRemove?.fileId) {
@@ -240,14 +223,14 @@
     }
   };
 
-  $: if (uploadedFiles.length) console.log(uploadedFiles);
-
-  $: isAnyFileUploading = uploadedFiles.some((file) => file.isUploading);
-
   // Dynamic tooltip text based on current file upload restrictions
   $: fileUploadTooltip = isUploadSupported
     ? `You can upload up to ${MAX_FILES} files (max ${MAX_FILE_SIZE / (1024 * 1024)}MB each) in ${ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(", ")} format.`
     : `File upload is not supported for <b class="text-ds-font-weight-semi-bold" style="color: var(--white-color);">${ModelVariantIdNameMapping[currentModel]} </b> model`;
+
+  //////////////////////////////////////////////////////////////////////////////
+  //                        File Upload Methods - End
+  //////////////////////////////////////////////////////////////////////////////
 </script>
 
 <div
@@ -257,9 +240,9 @@
 >
   <div class="textarea-wrapper">
     <!-- File Chips Display -->
-    {#if uploadedFiles.length > 0}
+    {#if filesToUpload.length > 0}
       <div class="file-chips-container d-flex flex-wrap gap-2 mb-2">
-        {#each uploadedFiles as file (file.id)}
+        {#each filesToUpload as file (file.id)}
           <FileItem
             {file}
             onRemove={handleRemoveFile}
@@ -293,18 +276,12 @@
       on:keydown={async (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault();
-          if (!isResponseGenerating && prompt.trim()) {
-            await sendPrompt(prompt, uploadedFiles);
-            await onUpdateAiPrompt("");
-            uploadedFiles.length = 0;
+          if (!isResponseGenerating && !isUploadingFiles && prompt.trim()) {
+            await hanldeStartGenerating();
             isTyping = false;
             isPromptBoxFocused = false;
             event.target.blur();
-
-            // allows the DOM to update first before resetting the height.
-            setTimeout(() => {
-              adjustTextareaHeight();
-            }, 0);
+            setTimeout(adjustTextareaHeight, 0); // waiting for the DOM to update.
           }
         }
       }}
@@ -358,7 +335,7 @@
           size={"small"}
           startIcon={AttachRegular}
           onClick={handleAttachClick}
-          disable={!isUploadSupported || uploadedFiles.length >= MAX_FILES}
+          disable={!isUploadSupported || filesToUpload.length >= MAX_FILES}
         />
       </Tooltip>
 
@@ -372,7 +349,8 @@
           type={"outline-primary"}
           size={"small"}
           startIcon={isResponseGenerating ? StopFilled : SendRegular}
-          disable={isAnyFileUploading}
+          disable={isUploadingFiles}
+          loader={isUploadingFiles}
           onClick={() => {
             if (isResponseGenerating) {
               onStopGeneratingAIResponse();
