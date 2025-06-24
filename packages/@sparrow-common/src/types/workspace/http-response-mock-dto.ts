@@ -47,3 +47,16 @@ export interface HttpResponseMockDeletePayloadDtoInterface {
   mockRequestId: string;
   folderId?: string;
 }
+
+export interface MockResponseRatio {
+  mockResponseId: string;
+  responseWeightRatio: number;
+}
+
+export interface HttpResponseRatiosMockUpdatePayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  mockRequestId: string;
+  folderId?: string;
+  mockResponseRatios: MockResponseRatio[];
+}
