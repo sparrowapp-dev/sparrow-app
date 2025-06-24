@@ -3,9 +3,8 @@ name: Development release
 on:
   push:
     branches:
-      # - development
-      # - design-system
-      - astitva/sparrow-version-bump-v2.26.0
+      - development
+      - design-system
   workflow_dispatch:
 
 env:
