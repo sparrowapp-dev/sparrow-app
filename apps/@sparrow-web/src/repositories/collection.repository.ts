@@ -7,7 +7,7 @@ import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
-  constructor() { }
+  constructor() {}
 
   /**
    * @description
@@ -482,7 +482,7 @@ export class CollectionRepository {
     collectionId: string,
     requestId: string,
     mockResponseId: string,
-    updatedMockResponse: any
+    updatedMockResponse: any,
   ): Promise<void> => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({ selector: { id: collectionId } })
@@ -520,7 +520,7 @@ export class CollectionRepository {
     folderId: string,
     requestId: string,
     mockResponseId: string,
-    updatedMockResponse: any
+    updatedMockResponse: any,
   ): Promise<void> => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({ selector: { id: collectionId } })
@@ -531,10 +531,10 @@ export class CollectionRepository {
       if (folder.id === folderId) {
         folder.items?.forEach((request) => {
           if (request.id === requestId) {
-            for (let i = 0; i < request.items.items.length; i++) {
-              if (request.items.items[i].id === mockResponseId) {
-                request.items.items[i] = {
-                  ...request.items.items[i],
+            for (let i = 0; i < request.items.length; i++) {
+              if (request.items[i].id === mockResponseId) {
+                request.items[i] = {
+                  ...request.items[i],
                   ...updatedMockResponse,
                   mockRequestResponse: {
                     ...(request.items[i].mockRequestResponse || {}),
@@ -555,7 +555,6 @@ export class CollectionRepository {
       return value;
     });
   };
-
 
   public deleteSavedRequestInFolder = async (
     collectionId: string,
