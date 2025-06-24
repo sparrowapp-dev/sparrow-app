@@ -406,7 +406,23 @@
       onClick={async () => {
         if (!responseToDelete) return;
         deleteLoader = true;
+
+        const deleteIndex = mockResponses.findIndex(
+          (r) => r.id === responseToDelete.id,
+        );
+        const totalResponses = mockResponses.length;
+        const isDeletingCurrentlySelected = deleteIndex === activeResponseIdx;
         await onDeleteMockResponse(responseToDelete.id);
+        if (totalResponses > 1) {
+          if (deleteIndex === totalResponses - 1) {
+            onSetActiveResponseIdx({ activeResponseIdx: deleteIndex - 1 });
+          } else if (isDeletingCurrentlySelected) {
+          } else if (deleteIndex < activeResponseIdx) {
+            onSetActiveResponseIdx({
+              activeResponseIdx: activeResponseIdx - 1,
+            });
+          }
+        }
         deleteLoader = false;
         isDeletePopup = false;
         responseToDelete = null;
