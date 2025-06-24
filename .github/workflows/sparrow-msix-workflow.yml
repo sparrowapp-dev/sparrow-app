@@ -107,13 +107,16 @@ jobs:
 
       - name: Convert MSI to MSIX
         run: |
-            MsixPackagingTool.exe create-package --template .github\workflows\msix_packaging\Sparrow_template.xml -v
+            Get-Location
+            $templatePath = ".github\workflows\msix_packaging\Sparrow_template.xml"
+            MsixPackagingTool.exe create-package --template $templatePath -v
         shell: pwsh
+
+            # MsixPackagingTool.exe create-package --template .github\workflows\msix_packaging\Sparrow_template.xml -v
 
 
       - name: see the package
         run: |
-         cd msix-output
          ls
          dir
         shell: pwsh
