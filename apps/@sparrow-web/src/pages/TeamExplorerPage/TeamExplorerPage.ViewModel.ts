@@ -996,7 +996,7 @@ export class TeamExplorerPageViewModel {
       notifications.success(`Invite resent successfully.`);
       return response;
     } else if (response?.data?.message === ResponseMessage.INVITE_DECLINED) {
-      notifications.warning(`The invite has been declined by Collaborate.`);
+      notifications.error(`The invite has been declined by Collaborate.`);
     } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
