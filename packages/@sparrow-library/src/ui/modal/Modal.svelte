@@ -26,6 +26,7 @@
   export let description: string;
   export let helpingIcon: boolean = false;
   export let onClickHelpIcon: () => void;
+  let animate = false;
 
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -38,8 +39,12 @@
 
   $: {
     if (isOpen) {
+      requestAnimationFrame(() => {
+        animate = true;
+      });
       document.addEventListener("keydown", trapTab);
     } else {
+      animate = false;
       document.removeEventListener("keydown", trapTab);
     }
   }
@@ -52,15 +57,14 @@
 
 {#if isOpen}
   <div
-    class="sparrow-modal-bg-overlay"
+    class="sparrow-modal-bg-overlay sparrow-model-overlay{animate
+      ? '-animate'
+      : ''}"
     style={`z-index: ${zIndex} !important`}
-    transition:fade={{ delay: 0, duration: 200 }}
   />
   <div
-    class="sparrow-modal-container"
-    style={`z-index: ${zIndex + 1};`}
-    in:scale={{ start: 0.8, duration: 300 }}
-    out:scale={{ start: 0.8, duration: 300 }}
+    class="sparrow-modal-container sparrow-modal{animate ? '-animate' : ''}"
+    style="z-index: {zIndex + 1}"
   >
     <div
       on:click={canClose ? handleModalState(false) : null}
@@ -84,7 +88,7 @@
                 <h3
                   class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold ellipsis"
                   style="color: var(--text-ds-neutral-50);"
-              >
+                >
                   {title}
                 </h3>
                 {#if helpingIcon}
@@ -193,5 +197,27 @@
     color: var(--text-ds-neutral-100);
     font-weight: 400;
     line-height: 20px;
+  }
+  /* animation css for model open and close. */
+  .sparrow-modal {
+    transform: scale(0.8);
+    opacity: 0;
+    transition:
+      transform 80ms ease-out 1ms,
+      opacity 80ms ease-out 1ms;
+  }
+  .sparrow-modal-animate {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  /* animation css for overlay */
+  .sparrow-model-overlay {
+    opacity: 0;
+    transition: opacity 80ms ease-out 1ms;
+  }
+
+  .sparrow-model-overlay-animate {
+    opacity: 1;
   }
 </style>
