@@ -1,5 +1,5 @@
 <script>
-  import { NumberInput } from "@sparrow/library/forms";
+  import { NumberInput } from "@sparrow/common/components";
   import {
     CircleSmallFilled,
     ErrorCircleRegular,
