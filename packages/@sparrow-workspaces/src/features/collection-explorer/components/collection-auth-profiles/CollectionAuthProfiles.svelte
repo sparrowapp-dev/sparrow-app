@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Table } from "./sub-component";
-  import Row from "./sub-component/Row.svelte";
+  import { Button } from "@sparrow/library/ui";
+  import { Table, Row } from "./sub-component";
+  import { AddRegular } from "@sparrow/library/icons";
 
   let isAscending = false;
 
@@ -37,6 +38,24 @@
 </script>
 
 <div class="h-100 d-flex flex-column">
+  <div class="d-flex align-items-center justify-content-between mb-1">
+    <p
+      class="m-0 text-ds-font-size-14 text-ds-font-weight-semi-bold text-ds-line-height-143"
+      style="font-family: Inter,sans-serif;"
+    >
+      Auth Profiles
+    </p>
+    <Button
+      id={`add-auth-profile`}
+      disable={false}
+      title={"Add Profile"}
+      type={"outline-primary"}
+      onClick={() => {}}
+      size="medium"
+      startIcon={AddRegular}
+    />
+  </div>
+
   <div
     class="table-container sparrow-thin-scrollbar overflow-y-auto"
     style="flex:1; overflow:auto;"
