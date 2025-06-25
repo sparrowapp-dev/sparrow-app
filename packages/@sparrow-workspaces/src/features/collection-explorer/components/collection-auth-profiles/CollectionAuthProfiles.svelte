@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button } from "@sparrow/library/ui";
-  import { Table, Row } from "./sub-component";
+  import { Button, Modal } from "@sparrow/library/ui";
+  import { Table, Row, CreateAuthProfile } from "./sub-component";
   import { AddRegular } from "@sparrow/library/icons";
 
   let isAscending = false;
@@ -88,6 +88,24 @@
     </Table>
   </div>
 </div>
+
+<Modal
+  title={"Add Authentication Profile"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={true}
+  handleModalState={(flag) => {
+    // isCreateTeamModalOpen = flag;
+  }}
+>
+  <CreateAuthProfile
+    handleModalState={(flag = false) => {
+      // isCreateTeamModalOpen = flag;
+    }}
+    onCreateProfile={() => {}}
+  />
+</Modal>
 
 <style>
 </style>

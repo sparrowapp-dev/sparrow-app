@@ -7,17 +7,17 @@
   /**
    * Types
    */
-  import type { TeamForm } from "../../types";
+  import type { ProfileForm } from "../../../../types";
 
   /**
    * Constants
    */
-  import { DESCRIPTION_CONFIG } from "../../constants";
+  import { DESCRIPTION_CONFIG } from "../../../../constants";
 
   /**
    * Exports
    */
-  export let teamForm: TeamForm;
+  export let profileForm: ProfileForm;
 
   /**
    * Data
@@ -25,7 +25,7 @@
   const TEXTAREA_ID: string = "team-description-area";
 </script>
 
-<div class="pb-4">
+<div class="pb-2">
   <!-- 
     -- Textarea with Labels 
   -->
@@ -35,12 +35,12 @@
     supportLabelText={DESCRIPTION_CONFIG.DESCRIPTION}
     type="textarea"
     maxTextLength={DESCRIPTION_CONFIG.MAX_TEXT_SIZE}
-    currentTextLength={teamForm?.description?.value?.length}
+    currentTextLength={profileForm?.description?.value?.length}
     helpLabel={true}
   >
     <Textarea
       id={TEXTAREA_ID}
-      bind:value={teamForm.description.value}
+      bind:value={profileForm.description.value}
       placeholder={DESCRIPTION_CONFIG.PLACEHOLDER}
       height={"77px"}
       defaultBorderColor="transparent"
