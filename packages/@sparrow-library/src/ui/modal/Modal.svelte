@@ -55,13 +55,12 @@
   <div
     class="sparrow-modal-bg-overlay"
     style={`z-index: ${zIndex} !important`}
-    transition:fade={{ delay: 1, duration: 300, easing: cubicOut }}
+    transition:fade={{ delay: 1, duration: 220, easing: cubicOut }}
   />
   <div
     class="sparrow-modal-container"
     style={`z-index: ${zIndex + 1};`}
-    in:scale={{ start: 0.8, delay: 1, duration: 300, easing: cubicOut }}
-    out:scale={{ start: 0.8, delay: 1, duration: 300, easing: cubicOut }}
+    transition:fade={{ delay: 1, duration: 300, easing: cubicOut }}
   >
     <div
       on:click={canClose ? handleModalState(false) : null}
