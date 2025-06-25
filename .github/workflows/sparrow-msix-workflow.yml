@@ -79,6 +79,14 @@ jobs:
             winget list "MSIX Packaging Tool"
             Write-Host "Current directory: $(Get-Location)"
 
+      - name: Update template with actual workspace path
+        shell: powershell
+        run: |
+          $workspace = "${{ github.workspace }}"          
+
+          $template = Get-Content ".github\\workflows\\msix_packaging\\Sparrow_template.xml" -Raw
+          $template = $template -replace '\$\{\{ github\.workspace \}\}', $workspace
+          Write-Output "Replaced \${{ github.workspace }} with $workspace"
 
       - name: Print name and lcoation
         shell: powershell
@@ -107,15 +115,6 @@ jobs:
                   Write-Host ".github directory not found in current location" -ForegroundColor Red
               }
           }
-
-      - name: Update template with actual workspace path
-        shell: powershell
-        run: |
-          $workspace = "${{ github.workspace }}"          
-
-          $template = Get-Content ".github\\workflows\\msix_packaging\\Sparrow_template.xml" -Raw
-          $template = $template -replace '\$\{\{ github\.workspace \}\}', $workspace
-          Write-Output "Replaced \${{ github.workspace }} with $workspace"
 
       - name: Create output directories
         shell: powershell
