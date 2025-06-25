@@ -67,11 +67,9 @@ parts:
       SPARROW_VERSION=2.25.0
       DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/pool/stable/main/binary-amd64/sparrow.deb"
 
-      # If version is "latest", you might need to curl a version endpoint or use a fixed URL
-      # For now, assuming you pass the version as environment variable
       # curl -L -o sparrow.deb "$DEB_URL"
       # wget --timeout=30 --tries=3 -O sparrow.deb "$DEB_URL"
-      cp $CRAFT_PROJECT_DIR/sparrow.deb sparrow.deb
+      # cp $CRAFT_PROJECT_DIR/sparrow.deb sparrow.deb
 
       # Extract the .deb file
       dpkg -x sparrow.deb $SNAPCRAFT_PART_INSTALL/

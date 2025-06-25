@@ -39,6 +39,8 @@ jobs:
       - name: Download Latest Sparrow DEB
         run: |
           apt download sparrow
+          deb_file=$(ls sparrow_*.deb | head -n 1)
+          mv "$deb_file" sparrow.deb
 
       - name: Build Snap from DEB
         run: |
