@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo snap install snapcraft --classic
 
-      - name: Set Snapcraft Credentials from Base64
+      - name: Check Snapcraft Credentials
         run: |
           snapcraft whoami
 
