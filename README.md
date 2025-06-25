@@ -80,7 +80,7 @@ After completing the required steps of setting up the repository and env, follow
 
 #### -> [METHOD 1] Docker Method
 
-- To install all services(mongo + kafka + api server + auth server + proxy server) as docker containers, and start the web app on port 1422, run:
+- To install all services(mongo + api server + auth server + proxy server) as docker containers, and start the web app on port 1422, run:
 
   `yarn docker:up `
 
@@ -89,7 +89,6 @@ After completing the required steps of setting up the repository and env, follow
         yarn docker:<SERVICE NAME>
 
   - `yarn docker:mongo` - Runs only mongo in a docker container
-  - `yarn docker:kafka` - Runs only kafka in a docker container
   - `yarn docker:sparrow-api` - Runs only the api server
   - `yarn docker:sparrow-auth` - Runs only the auth service
   - `yarn docker:sparrow-proxy` - Runs only the proxy service
@@ -108,7 +107,7 @@ After completing the required steps of setting up the repository and env, follow
 
   Points to remember:
 
-  - `Mongo and Kafka setup is already included in Sparrow API setup.`
+  - `Mongo setup is already included in Sparrow API setup.`
 
 #### -> Run The App Locally
 
