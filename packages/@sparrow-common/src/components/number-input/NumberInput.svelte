@@ -14,6 +14,7 @@
   export let step: number = 1;
   export let id = "";
   export let isError = false;
+  export let showErrorMessage: boolean = true;
 
   const dispatch = createEventDispatcher();
   let inputElement: HTMLInputElement;
@@ -222,7 +223,7 @@
     </div>
   </div>
 
-  {#if hasNonNumericInput || isError}
+  {#if showErrorMessage && (hasNonNumericInput || isError)}
     <div class="error-message">
       {errorMessage}
     </div>

@@ -305,27 +305,34 @@
               ? 'menu-open'
               : ''}"
           >
-            <Toggle
-              isActive={response.mockRequestResponse.isMockResponseActive}
-              label=""
-              fontSize="12px"
-              textColor="var(--text-ds-neutral-200)"
-              fontWeight="400"
-              onChange={() => {
-                if (
-                  response?.mockRequestResponse?.isMockResponseActive &&
-                  response?.mockRequestResponse?.responseWeightRatio > 0
-                ) {
+            {#if response?.mockRequestResponse?.isMockResponseActive && response?.mockRequestResponse?.responseWeightRatio > 0}
+              <Toggle
+                isActive={response.mockRequestResponse.isMockResponseActive}
+                label=""
+                editable={false}
+                fontSize="12px"
+                textColor="var(--text-ds-neutral-200)"
+                fontWeight="400"
+                onChange={() => {
                   isResponseStateModalOpen = true;
                   responseToToggle = response;
-                } else {
+                }}
+              />
+            {:else}
+              <Toggle
+                isActive={response.mockRequestResponse.isMockResponseActive}
+                label=""
+                fontSize="12px"
+                textColor="var(--text-ds-neutral-200)"
+                fontWeight="400"
+                onChange={() => {
                   onHandleMockResponseState(
                     response.id,
                     !response.mockRequestResponse.isMockResponseActive,
                   );
-                }
-              }}
-            />
+                }}
+              />
+            {/if}
 
             <div
               style="position: relative; display: flex; align-items: center;"
