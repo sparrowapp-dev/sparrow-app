@@ -110,7 +110,7 @@ jobs:
               Write-Host $updatedContent
               
               # Optionally save the updated content to a new file
-              $outputPath = ".github\workflows\msix_packaging\Sparrow_template_updated.xml"
+              $outputPath = ".github\workflows\msix_packaging\Sparrow_template.xml"
               $updatedContent | Out-File -FilePath $outputPath -Encoding UTF8
               Write-Host "`nUpdated XML saved to: $outputPath" -ForegroundColor Yellow
               
