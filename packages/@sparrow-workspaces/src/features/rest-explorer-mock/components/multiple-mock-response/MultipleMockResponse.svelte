@@ -98,7 +98,7 @@
     xAxis={responseTabElements[activeResponseIdx].getBoundingClientRect()
       .right - 30}
     yAxis={[
-      responseTabElements[activeResponseIdx].getBoundingClientRect().top - 0,
+      responseTabElements[activeResponseIdx].getBoundingClientRect().top - 5,
       responseTabElements[activeResponseIdx].getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -128,7 +128,6 @@
         disabled: false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 <div
