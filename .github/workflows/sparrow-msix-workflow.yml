@@ -9,7 +9,7 @@ on:
 jobs:
   msix-build:
     runs-on: windows-2025
-    environment: MSIXBuild
+    environment: development
 
     steps:
       - name: Checkout source
@@ -184,17 +184,34 @@ jobs:
             MsixPackagingTool.exe create-package --template $templatePath -v
         shell: pwsh
 
-            # MsixPackagingTool.exe create-package --template .github\workflows\msix_packaging\Sparrow_template.xml -v
-
-
-      - name: see the package
+      - name: Find MSIX file
+        id: find_msix
+        shell: powershell
         run: |
-         ls
-         dir
-        shell: pwsh
+          $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
+          if ($msixFile) {
+            Write-Host "Found MSIX file: $($msixFile.FullName)"
+            echo "msix_path=$($msixFile.FullName)" >> $env:GITHUB_OUTPUT
+            echo "msix_name=$($msixFile.Name)" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No MSIX file found!"
+            exit 1
+          }
 
-      - name: Upload MSIX artifact
+      - name: Upload MSIX artifact  
         uses: actions/upload-artifact@v4
         with:
-          name: TechdomeApp-MSIX
-          path: output/TechdomeApp.msix
+          name: msix-package
+          path: ${{ steps.find_msix.outputs.msix_path }}
+
+      - name: Upload MSIX to S3 bucket
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          SOURCE_DIR: .github/workflows/msix_packaging
+          DEST_DIR: MSIX
