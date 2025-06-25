@@ -46,11 +46,13 @@
   let reviewEnv;
   $: {
     if (environmentVariables) {
-      environmentVariables.filtered.forEach((element) => {
+      for (let i = 0; i < environmentVariables.filtered.length; i++) {
+        const element = environmentVariables.filtered[i];
         if (element.key === localEnvKey) {
           reviewEnv = element;
+          break;
         }
-      });
+      }
     }
   }
 </script>
@@ -99,7 +101,7 @@
             >VALUE</span
           >
           <div class="d-flex" style="width: calc(100% - 55px);">
-             <div
+            <div
               style="width: calc(100% - 20px); font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50); max-width:105px;whitespace:nowrap; overflow:hidden; text-overflow:ellipsis;"
             >
               {reviewEnv?.value}
