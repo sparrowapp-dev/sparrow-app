@@ -198,20 +198,60 @@ jobs:
             exit 1
           }
 
+      - name: Sign MSIX file
+        shell: powershell
+        run: |
+          # Find the MSIX file
+          $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
+          
+          if (-not $msixFile) {
+            Write-Host "No MSIX file found to sign!"
+            exit 1
+          }
+          
+          Write-Host "Found MSIX file to sign: $($msixFile.FullName)"
+          
+          # Find SignTool
+          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Name "signtool.exe" | Select-Object -First 1
+          
+          if (-not $signTool) {
+            Write-Host "SignTool not found!"
+            exit 1
+          }
+          
+          $signToolPath = $signTool.FullName
+          Write-Host "Using SignTool at: $signToolPath"
+          
+          # Sign the MSIX file
+          & $signToolPath sign /f "cert.pfx" /p "${{ vars.CERT_PASSWORD }}" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $msixFile.FullName
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ MSIX file signed successfully"
+          } else {
+            Write-Host "❌ Failed to sign MSIX file"
+            exit 1
+          }
+
+      - name: Verify MSIX signature
+        shell: powershell
+        run: |
+          $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
+          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Name "signtool.exe" | Select-Object -First 1
+          $signToolPath = $signTool.FullName
+          
+          Write-Host "Verifying signature for: $($msixFile.FullName)"
+          & $signToolPath verify /pa $msixFile.FullName
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ MSIX signature verification successful"
+          } else {
+            Write-Host "❌ MSIX signature verification failed"
+            exit 1
+          }
+
       - name: Upload MSIX artifact  
         uses: actions/upload-artifact@v4
         with:
           name: msix-package
           path: ${{ steps.find_msix.outputs.msix_path }}
 
-      - name: Upload MSIX to S3 bucket
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --delete
-        env:
-          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_DIR: .github/workflows/msix_packaging
-          DEST_DIR: MSIX
