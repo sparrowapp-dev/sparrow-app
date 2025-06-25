@@ -11,24 +11,19 @@
   import { Rows } from "@sparrow/teams/components";
   import { TeamSkeleton } from "../../images";
   import { SparrowLogo } from "@sparrow/common/images";
+  import { WorkspaceType } from "@sparrow/common/enums";
 
   export let data: any;
   export let openTeam: TeamDocument;
   export let isWebEnvironment: boolean;
-
   export let onSwitchWorkspace: (id: string) => void;
-
   export let searchQuery;
-
   export let onDeleteWorkspace;
-
   export let openInDesktop;
-
   export let isAdminOrOwner: boolean;
-
   export let isGuestUser = false;
-
   export let onAddMember;
+  export let selectedFilter;
 
   let filterText = "";
   let currentSortField = "updatedAt";
@@ -108,17 +103,17 @@
     {/if}
     {#if isGuestUser}
       <div class="container">
-        <div class="sparrow-logo">
+        <div class="sparrow-logo pb-3">
           <SparrowLogo />
         </div>
         <p
-          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
+          style="color:var(--text-ds-neutral-400); font-size: 12px; font-weight:500; height:2px"
         >
           Collaborate seamlessly with your team and manage your projects
           effectively in Sparrow.
         </p>
         <p
-          style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+          style="color:var(--text-ds-neutral-400); font-size: 12px; font-weight:500;"
         >
           Create an account or Sign in to access hubs, workspaces and unlock
           powerful features today!
@@ -127,12 +122,17 @@
     {/if}
 
     {#if !isGuestUser}
-      {#if searchQuery == "" && data && data?.length === 0}
-        <p class="not-found-text mt-3">
-          {isAdminOrOwner
-            ? "Add Workspaces to this hub."
-            : "You don't have access to any workspace in this hub."}
-        </p>
+      {#if searchQuery == "" && data && data?.length === 0 && !isAdminOrOwner}
+        <div class="container">
+          <div class="sparrow-logo pb-3">
+            <SparrowLogo />
+          </div>
+          <p
+            style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+          >
+            You don't have access to any workspace in this hub.
+          </p>
+        </div>
       {:else if searchQuery !== "" && data
           .slice()
           .reverse()
@@ -140,7 +140,41 @@
               .toLowerCase()
               .startsWith(filterText.toLowerCase()))
           .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length == 0}
-        <p class="not-found-text mt-3">No result found.</p>
+        <div class="container">
+          <div class="sparrow-logo pb-3">
+            <SparrowLogo />
+          </div>
+          <p
+            style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+          >
+            No result found.
+          </p>
+        </div>
+      {:else if data.length === 0}
+        <div class="container">
+          <div class="sparrow-logo pb-3">
+            <SparrowLogo />
+          </div>
+          {#if selectedFilter === WorkspaceType.PUBLIC}
+            <p
+              style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+            >
+              Welcome to Sparrow! Explore your public workspaces here.
+            </p>
+          {:else if selectedFilter === WorkspaceType.PRIVATE}
+            <p
+              style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+            >
+              Welcome to Sparrow! Explore your private workspaces here.
+            </p>
+          {:else}
+            <p
+              style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+            >
+              Welcome to Sparrow! Explore your all workspaces here.
+            </p>
+          {/if}
+        </div>
       {/if}
     {/if}
   </div>

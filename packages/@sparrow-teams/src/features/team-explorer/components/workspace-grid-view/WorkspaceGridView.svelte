@@ -122,12 +122,27 @@
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap" style="gap:16px">
           {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
-            <p class="not-found-text mx-auto mt-3">
-              You don't have access to any workspace in this team.
-            </p>
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              <p
+                style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+              >
+                You don't have access to any workspace in this hub.
+              </p>
+            </div>
           {:else if searchQuery !== "" && filteredWorkspaces.length === 0}
-            <span class="not-found-text mx-auto ellipsis">No result found.</span
-            >
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              <p
+                style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+              >
+                No result found.
+              </p>
+            </div>
           {:else if workspaces.length === 0}
             <div class="container">
               <div class="sparrow-logo">
