@@ -96,7 +96,7 @@ jobs:
         run: |
           $path = ".github\\workflows\\msix_packaging\\Sparrow_template_updated.xml"
           
-          Write-Host "📄 Showing last 6 lines of $path:"
+          Write-Host "Showing last 6 lines of $path:"
           Get-Content $path | Select-Object -Last 6
 
 
