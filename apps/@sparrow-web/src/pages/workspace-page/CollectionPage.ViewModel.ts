@@ -45,7 +45,7 @@ import {
 } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation } from "@sparrow/common/utils/navigation";
+import { moveNavigation,scrollToTab } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -3282,7 +3282,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(request.id);
   };
 
   /**
@@ -3326,7 +3326,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(request.id);
   };
 
   /**
@@ -3351,7 +3351,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(_savedRequest.id);
   };
 
   /**
@@ -3374,7 +3374,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(_graphql.id);
   };
 
   /**
@@ -3397,7 +3397,7 @@ export default class CollectionsViewModel {
     );
     adaptedSocket.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocket);
-    moveNavigation("right");
+    scrollToTab(websocket.id);
   };
 
   /**
@@ -3445,7 +3445,7 @@ export default class CollectionsViewModel {
     );
     adaptedSocketIo.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocketIo);
-    moveNavigation("right");
+    scrollToTab(_socketIo.id);
   };
 
   public handleOpenFolder = (
@@ -3459,7 +3459,7 @@ export default class CollectionsViewModel {
       folder,
     );
     this.handleCreateTab(folderTab);
-    moveNavigation("right");
+    scrollToTab(folder.id);
   };
 
   public handleOpenCollection = (
@@ -3474,7 +3474,7 @@ export default class CollectionsViewModel {
     );
     collectionTabAdapter.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(collectionTabAdapter);
-    moveNavigation("right");
+    scrollToTab(collection.id);
   };
 
   public handleOpenMockHistory = (
@@ -3486,7 +3486,7 @@ export default class CollectionsViewModel {
       collection.id,
     );
     this.handleCreateTab(mockHistroyTab);
-    moveNavigation("right");
+    scrollToTab(mockHistroyTab.id);
   };
 
   /**
