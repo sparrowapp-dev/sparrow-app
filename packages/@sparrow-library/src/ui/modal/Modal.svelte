@@ -9,6 +9,7 @@
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
   import { Button } from "../button";
+  import { cubicOut } from "svelte/easing";
 
   export let isOpen = false;
   export let title: string;
@@ -26,7 +27,6 @@
   export let description: string;
   export let helpingIcon: boolean = false;
   export let onClickHelpIcon: () => void;
-  let animate = false;
 
   const trapTab = (event: KeyboardEvent) => {
     if (event.key === "Tab") {
@@ -39,12 +39,8 @@
 
   $: {
     if (isOpen) {
-      requestAnimationFrame(() => {
-        animate = true;
-      });
       document.addEventListener("keydown", trapTab);
     } else {
-      animate = false;
       document.removeEventListener("keydown", trapTab);
     }
   }
@@ -57,14 +53,15 @@
 
 {#if isOpen}
   <div
-    class="sparrow-modal-bg-overlay sparrow-model-overlay{animate
-      ? '-animate'
-      : ''}"
+    class="sparrow-modal-bg-overlay"
     style={`z-index: ${zIndex} !important`}
+    transition:fade={{ delay: 1, duration: 300, easing: cubicOut }}
   />
   <div
-    class="sparrow-modal-container sparrow-modal{animate ? '-animate' : ''}"
-    style="z-index: {zIndex + 1}"
+    class="sparrow-modal-container"
+    style={`z-index: ${zIndex + 1};`}
+    in:scale={{ start: 0.8, delay: 1, duration: 300, easing: cubicOut }}
+    out:scale={{ start: 0.8, delay: 1, duration: 300, easing: cubicOut }}
   >
     <div
       on:click={canClose ? handleModalState(false) : null}
@@ -145,7 +142,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: var(--background-hover);
+    background: var(--sparrow-modal-overlay);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
   }
@@ -197,27 +194,5 @@
     color: var(--text-ds-neutral-100);
     font-weight: 400;
     line-height: 20px;
-  }
-  /* animation css for model open and close. */
-  .sparrow-modal {
-    transform: scale(0.8);
-    opacity: 0;
-    transition:
-      transform 80ms ease-out 1ms,
-      opacity 80ms ease-out 1ms;
-  }
-  .sparrow-modal-animate {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  /* animation css for overlay */
-  .sparrow-model-overlay {
-    opacity: 0;
-    transition: opacity 80ms ease-out 1ms;
-  }
-
-  .sparrow-model-overlay-animate {
-    opacity: 1;
   }
 </style>

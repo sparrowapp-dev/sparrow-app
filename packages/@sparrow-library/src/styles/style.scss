@@ -83,6 +83,7 @@ $sparrow-tab-request-text-default: #4a4d4f;
 $sparrow-tab-unsave-icon: #cb4a4a;
 $sparrow-cross-icon: #f5f5f5;
 
+$sparrow-bg-modal-overlay:#000000a6;
 $sparrow-bg-container: #8989890d;
 $sparrow-bg-container-border: #313233;
 $sparrow-bg-container-one: #1392f0;
@@ -254,6 +255,7 @@ $theme-green-00A86B: #00a86b;
   --tab-request-divider-line: #{$sparrow-key-value-pair};
   --tab-unsave-icon: #{$sparrow-tab-unsave-icon};
   --cross-icon: #{$sparrow-cross-icon};
+  --sparrow-modal-overlay: #{$sparrow-bg-modal-overlay};
 
   --bg-conatiner: #{$sparrow-bg-container};
   --bg-container-border: #{$sparrow-bg-container-border};
