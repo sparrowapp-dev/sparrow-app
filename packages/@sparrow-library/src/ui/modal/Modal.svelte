@@ -144,10 +144,10 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: var(--sparrow-modal-overlay);
+    background: var(--bg-ds-neutral-900);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    animation: fadeOverlayIn 200ms ease-out both;
+    animation: fadeOverlayIn 120ms ease-out both;
     animation-delay: 1ms;
   }
   .sparrow-modal-container {
@@ -172,7 +172,7 @@
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
     padding: 30px 30px 20px 30px;
-    animation: smartFadeIn 80ms ease-out both;
+    animation: smartFadeIn 240ms ease-out both;
   }
   .sparrow-modal-heading {
     width: 400px;
