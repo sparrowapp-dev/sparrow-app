@@ -8,13 +8,14 @@
   import { onMount } from "svelte";
   import { OSDetector } from "../../utils";
   import WindowAction from "../header/window-action/WindowAction.svelte";
+  import { Platform } from "../../enums";
 
   let isWindows = false;
   let os = "";
   const osDetector = new OSDetector();
   onMount(() => {
     os = osDetector.getOS();
-    if (os === "windows") {
+    if (os === Platform.WINDOWS) {
       isWindows = true;
     }
   });
@@ -42,8 +43,8 @@
   on:mousedown={handleMouseDown}
 >
   <div class="d-flex ms-3 justify-content-cdenter align-items-center no-drag">
-    {#if !isWindows}
-      <WindowAction isWindows={false} />
+    {#if os === "macos"}
+      <WindowAction platform={Platform.MACOS} />
     {/if}
 
     <div>
@@ -56,9 +57,9 @@
   </div>
 
   <div class="d-flex align-items-center no-drag" style="position: relative;">
-    {#if isWindows}
+    {#if os === "linux" || os === "windows"}
       <div class="d-flex gap-3 ms-4 no-drag">
-        <WindowAction isWindows={true} />
+        <WindowAction platform={Platform.WINDOWS} />
       </div>
     {/if}
   </div>

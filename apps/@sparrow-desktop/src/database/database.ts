@@ -41,6 +41,10 @@ import {
   windowSettingsSchema,
   type WindowSettingsDocType,
 } from "../models/window-settings-model";
+import {
+  aiRequestConversationsSchema,
+  type AiRequestConversationsDocType,
+} from "../models/ai-request-conversations.model";
 
 import { releaseSchema, type ReleaseDocType } from "../models/release.model";
 import { guideSchema, type GuideDocType } from "../models/guide.model";
@@ -71,6 +75,7 @@ import {
   recentWorkspaceSchema,
   type RecentWorkspaceDocType,
 } from "@app/models/recent-workspace.model";
+import { planSchema, type PlanDocType } from "../models/plan.model";
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBMigrationPlugin);
@@ -78,6 +83,7 @@ addRxPlugin(RxDBUpdatePlugin);
 export type WorkspaceDocument = RxDocument<WorkspaceDocType>;
 export type WorkspaceContainer = RxCollection<WorkspaceDocType>;
 export type CollectionContainer = RxCollection<CollectionDocType>;
+export type PlanContainer = RxCollection<PlanDocType>;
 export type CollectionDocument = RxDocument<CollectionDocType>;
 export type TeamDocument = RxDocument<TeamDocType>;
 export type TeamContainer = RxCollection<TeamDocType>;
@@ -93,6 +99,10 @@ export type GuestDocument = RxDocument<GuestUserDocType>;
 export type UpdatesDocument = RxDocument<UpdatesDocType>;
 export type RecentWorkspaceDocument = RxDocument<RecentWorkspaceDocType>;
 export type RecentWorkspaceContainer = RxCollection<RecentWorkspaceDocType>;
+export type AiRequestConversationsDocument =
+  RxDocument<AiRequestConversationsDocType>;
+export type PlanDocument = RxDocument<PlanDocType>;
+export type PlanCollection = RxCollection<PlanDocType>;
 // collate all the Rx collections
 
 export type TabDocument = RxDocument<TabDocType>;
@@ -112,6 +122,7 @@ export type DatabaseCollections = {
   team: TeamContainer;
   testflow: TFRxContainerType;
   recentworkspace: RecentWorkspaceContainer;
+  plan: PlanContainer;
 };
 
 // define the Rx database type
@@ -385,6 +396,20 @@ export class RxDB {
           26: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          27: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          28: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.isChatbotConversationLoading =
+                false;
+              oldDoc.property.aiRequest.state.isConversationHistoryPanelOpen =
+                false;
+              oldDoc.property.aiRequest.state.isConversationHistoryLoading =
+                false;
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -433,6 +458,12 @@ export class RxDB {
           14: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
+          15: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          16: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
         },
       },
       activesidebartab: {
@@ -458,6 +489,9 @@ export class RxDB {
             return oldDoc;
           },
           5: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          6: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },
@@ -579,6 +613,27 @@ export class RxDB {
           },
         },
       },
+      plan: {
+        schema: planSchema,
+        migrationStrategies: {
+          //   // database  migration functions
+          1: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          2: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          3: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: PlanDocument) {
+            return oldDoc;
+          },
+        },
+      },
       githubrepo: {
         schema: githubRepoSchema,
       },
@@ -599,6 +654,9 @@ export class RxDB {
       },
       recentworkspace: {
         schema: recentWorkspaceSchema,
+      },
+      aiRequestConversations: {
+        schema: aiRequestConversationsSchema,
       },
     });
     return { rxdb: this.rxdb };

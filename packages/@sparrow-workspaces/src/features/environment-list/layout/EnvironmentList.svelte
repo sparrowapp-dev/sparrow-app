@@ -160,6 +160,8 @@
       });
     }
   }
+
+  let isNewEnvironmentCreating = false;
 </script>
 
 <div
@@ -212,7 +214,7 @@
         title={"Add Environment"}
         placement={"bottom-center"}
         distance={13}
-        show={isHovered}
+        show={isHovered && !isNewEnvironmentCreating}
         zIndex={701}
       >
         <span class="add-icon-container d-flex">
@@ -222,9 +224,12 @@
             size="extra-small"
             customWidth={"24px"}
             type="teritiary-regular"
-            onClick={(e) => {
+            disable={isNewEnvironmentCreating}
+            onClick={async (e) => {
               e.stopPropagation();
-              handleCreateEnvironment(e);
+              isNewEnvironmentCreating = true;
+              await handleCreateEnvironment(e);
+              isNewEnvironmentCreating = false;
             }}
             startIcon={AddRegular}
           />

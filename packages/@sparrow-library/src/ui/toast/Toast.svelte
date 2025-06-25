@@ -14,7 +14,7 @@
   };
 </script>
 
-<div class= "custom-toast-container">
+<div class="custom-toast-container">
   <ToastContainer width={"fit-content"} let:data>
     <div
       class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
@@ -138,7 +138,7 @@
     color: var(--text-ds-neutral-100);
     width: 236px;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

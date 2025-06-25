@@ -35,6 +35,7 @@ env:
   VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
   VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
   VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
+  VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
 
@@ -89,40 +90,194 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'    
 
-      - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
+      #     platforms: 'windows'
 
-      - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
-
+      # - name: sign msi
+      #   run: |
+      #     $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+      #     $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+      #     $bundlePath = "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+      #     Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
+      #     & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
+      #   shell: pwsh
       - name: sign msi
         run: |
+          # Create self-signed certificate
           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
+          
+          # Convert password to secure string
           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
-
-      - name: Install AWS CLI
-        uses: chrislennon/action-aws-cli@v1.1
+          
+          # Find the actual bundle path dynamically (check both D: and C: drives)
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  Write-Host "Found bundle path: $bundlePath"
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "Could not find bundle directory in any of the expected locations"
+          }
+          
+          # Export certificate with password parameter (THIS WAS MISSING)
+          Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
+          
+          # Verify the certificate file was created
+          if (-not (Test-Path "$bundlePath\Certificate.pfx")) {
+              throw "Certificate file was not created successfully"
+          }
+          
+          Write-Host "Certificate exported successfully to: $bundlePath\Certificate.pfx"
+          
+          # Find and sign MSI files individually
+          $msiFiles = Get-ChildItem "$bundlePath\msi\*.msi" -ErrorAction SilentlyContinue
+          if ($msiFiles) {
+              Write-Host "Found $($msiFiles.Count) MSI file(s) to sign"
+              foreach ($file in $msiFiles) {
+                  Write-Host "Signing MSI: $($file.Name)"
+                  $result = & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
+                  } else {
+                      Write-Error "Failed to sign $($file.Name): $result"
+                  }
+              }
+          } else {
+              Write-Warning "No MSI files found in $bundlePath\msi\"
+          }
+          
+          # Find and sign EXE files individually
+          $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
+          if ($exeFiles) {
+              Write-Host "Found $($exeFiles.Count) EXE file(s) to sign"
+              foreach ($file in $exeFiles) {
+                  Write-Host "Signing EXE: $($file.Name)"
+                  $result = & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
+                  } else {
+                      Write-Error "Failed to sign $($file.Name): $result"
+                  }
+              }
+          } else {
+              Write-Warning "No EXE files found in $bundlePath\nsis\"
+          }
+          
+          # Debug: List all files in the bundle directory
+          Write-Host "`nBundle directory contents:"
+          Get-ChildItem $bundlePath -Recurse | ForEach-Object {
+              Write-Host "  $($_.FullName)"
+          }
+        shell: pwsh
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: latest
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Upload files to S3
         run: |
-          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
+          # Find the actual bundle path dynamically
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  Write-Host "Found bundle path: $bundlePath"
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "Could not find bundle directory for S3 upload"
+          }
+          
+          # Check if msi directory exists
+          $msiPath = "$bundlePath\msi"
+          if (-not (Test-Path $msiPath)) {
+              throw "MSI directory not found at: $msiPath"
+          }
+          
+          # List files before upload for debugging
+          Write-Host "Files in MSI directory:"
+          Get-ChildItem $msiPath | ForEach-Object {
+              Write-Host "  $($_.Name) - $($_.Length) bytes"
+          }
+          
+          # Test AWS connectivity
+          Write-Host "Testing AWS connectivity..."
+          aws sts get-caller-identity
+          
+          # Upload to S3
+          Write-Host "Starting S3 upload..."
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "S3 upload completed successfully" -ForegroundColor Green
+          } else {
+              throw "S3 upload failed with exit code: $LASTEXITCODE"
+          }
+        shell: pwsh
+
       - name: Post Windows Build Links to Teams
         run: |
-          $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+          # Find the actual bundle path dynamically
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "Could not find bundle directory for Teams notification"
+          }
+          
+          # Find MSI file
+          $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Select-Object -First 1
+          
+          if (-not $msiFile) {
+              throw "No MSI file found in $bundlePath\msi\"
+          }
+          
           $msiFileName = $msiFile.Name
           $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          
+          Write-Host "MSI file found: $msiFileName"
+          Write-Host "Download URL: $msiUrl"
           
           $body = @{
             "type" = "message"
@@ -166,6 +321,108 @@ jobs:
           
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
+
+      # - name: AWS CLI
+      #   uses: chrislennon/action-aws-cli@v1.1
+      #   with:
+      #     version: latest
+      #     aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # - name: Upload files to S3
+      #   run: |
+      #     aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      # #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Upload files to S3
+      #   run: |
+      #     # Find the actual bundle path dynamically
+      #     $possiblePaths = @(
+      #         "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+      #         "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+      #     )
+          
+      #     $bundlePath = $null
+      #     foreach ($path in $possiblePaths) {
+      #         if (Test-Path $path) {
+      #             $bundlePath = $path
+      #             Write-Host "Found bundle path: $bundlePath"
+      #             break
+      #         }
+      #     }
+          
+      #     if (-not $bundlePath) {
+      #         throw "Could not find bundle directory for S3 upload"
+      #     }
+          
+      #     # Check if msi directory exists
+      #     $msiPath = "$bundlePath\msi"
+      #     if (-not (Test-Path $msiPath)) {
+      #         throw "MSI directory not found at: $msiPath"
+      #     }
+          
+      #     # List files before upload for debugging
+      #     Write-Host "Files in MSI directory:"
+      #     Get-ChildItem $msiPath | ForEach-Object {
+      #         Write-Host "  $($_.Name) - $($_.Length) bytes"
+      #     }
+          
+      #     # Upload to S3
+      #     aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+      #   shell: pwsh
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      # - name: Post Windows Build Links to Teams
+      #   run: |
+      #     $msiFile = Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+      #     $msiFileName = $msiFile.Name
+      #     $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          
+      #     $body = @{
+      #       "type" = "message"
+      #       "attachments" = @(
+      #         @{
+      #           "contentType" = "application/vnd.microsoft.card.adaptive"
+      #           "content" = @{
+      #             "type" = "AdaptiveCard"
+      #             "body" = @(
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = "🚀 New Windows Build Available"
+      #                 "weight" = "bolder"
+      #                 "size" = "large"
+      #               }
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = "Branch: development"
+      #                 "wrap" = $true
+      #               }
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = "Download Link:"
+      #                 "wrap" = $true
+      #               }
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = $msiUrl
+      #                 "color" = "accent"
+      #                 "wrap" = $true
+      #               }
+      #             )
+      #             "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+      #             "version" = "1.2"
+      #           }
+      #         }
+      #       )
+      #     }
+          
+      #     $jsonBody = $body | ConvertTo-Json -Depth 10
+          
+      #     Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+      #   shell: pwsh
 
   release_macos:
     runs-on: macos-latest
@@ -214,10 +471,31 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CI: false
+          
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
-      - name: file content
-        run: |
-          cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
+      #     platforms: 'macos'
+
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
+      #     platforms: 'macos'
 
       - name: Install AWS CLI
         run: |
@@ -277,3 +555,138 @@ jobs:
               ]
             }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
         shell: bash
+
+  release_linux:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: release_macos
+
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      CI: false
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Rust 1.82.0
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.82.0
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config libssl-dev libcairo2-dev \
+            libwebkit2gtk-4.1-dev build-essential \
+            curl wget file libxdo-dev \
+            libayatana-appindicator3-dev librsvg2-dev \
+            gnupg software-properties-common tree
+
+      - name: Setup Node.js 22
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+
+      - name: Install Yarn (Ubuntu 24.04 compatible)
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/yarn.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install -y yarn
+
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Build Tauri app
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn workspace @sparrow/desktop tauri build --bundles deb 
+          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
+
+      - name: Generate DEB metadata
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        run: |
+          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
+          cd ../../../../../../publishDir
+          mkdir -p dists/stable/main/binary-amd64/
+          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
+      - name: Prepare publish directory
+        run: |
+          cd publishDir
+          cat > apt-release.conf <<EOF
+          APT::FTPArchive::Release {
+            Origin "Sparrow";
+            Label "Sparrow";
+            Suite "stable";
+            Codename "stable";
+            Architectures "amd64";
+            Components "main";
+            Description "Sparrow Debian Repository";
+          };
+          EOF
+
+          cd dists/stable
+          apt-ftparchive -c ../../apt-release.conf release . > Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
+
+          cd ../../
+          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
+
+          cd ..
+          mv publishDir gh-pages
+
+      - name: Upload gh-pages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh-pages
+          path: gh-pages
+
+      - name: Upload to S3 bucket
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          SOURCE_DIR: gh-pages
+          DEST_DIR: linux 
+
+      - name: Notify Teams Channel
+        run: |
+          curl -H 'Content-Type: application/json' \
+            -d '{
+              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+            }' \
+            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+        

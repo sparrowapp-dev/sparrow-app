@@ -1,8 +1,10 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
+  import { onMount } from "svelte";
+
   export let isTabMenu = false;
   export let xAxis = 0;
-  export let yAxis = [0, 0];
+  export let yAxis = [0, 0]; // [top, bottom]
   export let menuItems: Array<{
     onClick: () => void;
     displayText: string;
@@ -11,62 +13,40 @@
     icon?: any;
     iconColor?: string;
   }> = [];
-  export let noOfColumns = 0;
+  export let width = "180px";
   export let zIndex = 4;
+
   let mouseX = 0;
   let mouseY = 0;
+  let dropdownEl: HTMLElement;
 
-  const calculateRightOptionWidth = () => {
-    const firstOptionWidth = noOfColumns + 20;
-    const secondOptionWidth = noOfColumns;
-    return [firstOptionWidth, secondOptionWidth];
-  };
-
-  /**
-   * @description - recalculates positions for element that overflows window
-   */
-  const calculateAdjustedAxis = () => {
-    const itemHeight = 20;
-    const containerPadding = 16;
-    const dialogHeight =
-      menuItems.filter((elem) => {
-        if (elem?.hide) {
-          return false;
-        }
-        return true;
-      }).length *
-        itemHeight +
-      containerPadding;
-    const windowHeight = window.innerHeight;
-    const windowWidth = window.innerWidth;
+  onMount(() => {
     mouseX = xAxis;
-    mouseY = yAxis[1];
-    const [xWidth, xTranslate] = calculateRightOptionWidth();
-    if (windowHeight < yAxis[1] + dialogHeight) {
-      mouseY = yAxis[0] - dialogHeight;
-    }
-    if (windowWidth < xAxis + xWidth) {
-      mouseX = xAxis - xTranslate;
-    }
-  };
 
-  $: {
-    if (xAxis) {
-      calculateAdjustedAxis();
-    }
-    if (yAxis) {
-      calculateAdjustedAxis();
-    }
-  }
+    // Wait one tick for the menu to render and measure
+    requestAnimationFrame(() => {
+      const dropdownHeight = dropdownEl?.offsetHeight || 0;
+      const spaceBelow = window.innerHeight - yAxis[1];
+
+      if (spaceBelow < dropdownHeight) {
+        // Not enough space below, open upward from yAxis[0]
+        mouseY = yAxis[0] - dropdownHeight;
+      } else {
+        // Enough space, open downward from yAxis[1]
+        mouseY = yAxis[1];
+      }
+    });
+  });
 </script>
 
 <nav
+  bind:this={dropdownEl}
   style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex};"
   in:scale={{ start: 0.8, duration: 400 }}
   out:scale={{ start: 0.8, duration: 400 }}
 >
   <div
-    style={`width: ${noOfColumns}px; background-color: var(--bg-ds-surface-600);`}
+    style={`width: ${width}; background-color: var(--bg-ds-surface-600);`}
     class="overflow-hidden navbar pb-0 pt-0 d-flex flex-column border-radius-4 align-items-start justify-content-start text-whiteColor"
   >
     <ul class="p-1 w-100 mb-0">

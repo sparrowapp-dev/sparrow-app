@@ -68,6 +68,11 @@
         ]
       }
     },
+    "linux": {
+      "deb": {
+        "desktopTemplate": "./assets/LinuxDeeplink.template"
+      }
+    },
     "macOS": {
       "dmg": {
         "background": "./icons/background.png",
@@ -112,5 +117,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.24.0"
+  "version": "2.26.0"
 }

@@ -247,7 +247,7 @@
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().top - 5,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -292,7 +292,6 @@
             : true,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -398,7 +397,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
+        class="api-name ellipsis"
         style={`color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
         <p

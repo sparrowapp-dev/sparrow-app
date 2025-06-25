@@ -12,7 +12,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant, DefaultAiConfig } from "../types/workspace/ai-request-base";
+import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/ai-request-base";
 import { AiRequestSectionEnum } from "../types/workspace/ai-request-tab";
 class InitAiRequestTab {
     private _tab: Tab;
@@ -34,9 +34,6 @@ class InitAiRequestTab {
             activeSync: false,
             property: {
                 aiRequest: {
-                    // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    // aiModelProvider: AiModelProviderEnum.OpenAI,
-                    // aiModelVariant: OpenAIModelEnum.GPT_4o,
                     aiModelProvider: "",
                     aiModelVariant: "",
                     systemPrompt: "",
@@ -53,15 +50,43 @@ class InitAiRequestTab {
                         },
                     },
                     configurations: {
-                        openai: DefaultAiConfig.OPENAI,
-                        deepseek: DefaultAiConfig.DEEPSEEK,
-                        anthropic: DefaultAiConfig.ANTHROPIC,
-                        google: DefaultAiConfig.GOOGLE,
+                        openai: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        deepseek: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        anthropic: {
+                            streamResponse: true,
+                            maxTokens: -1,
+                            temperature: 0.5,
+                            top_p: 0.95,
+                        },
+                        google: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            maxTokens: -1,
+                            top_p: 0.95,
+                        },
                     },
                     ai: {
                         prompt: "",
                         conversations: [],
-                        threadId: "",
+                        conversationId: "",
+                        lastActiveChatBackup: [],
+                        isoldChatPreviewActive: false,
+                        conversationTitle: "New Conversation",
                     },
                     state: {
                         aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,
@@ -75,6 +100,9 @@ class InitAiRequestTab {
                         isChatAutoClearActive: false,
                         isChatbotSuggestionsActive: true,
                         isChatbotGeneratingResponse: false,
+                        isChatbotConversationLoading: false,
+                        isConversationHistoryPanelOpen: false,
+                        isConversationHistoryLoading: false
                     },
                 },
             },
@@ -122,19 +150,22 @@ class InitAiRequestTab {
             this._tab.property.aiRequest.aiModelVariant = _modalVariantName;
         }
     }
+    public updateAISystemPrompt(_systemPrompt: string) {
+        if (_systemPrompt && this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.systemPrompt = _systemPrompt;
+        }
+    }
+    // ToDo: Method to update AI modal configurations
+    // public updateAIConfigurations(_configurations) {
+    //     if (_configurations && this._tab.property.aiRequest) {
+    //         this._tab.property.aiRequest.configurations = _configurations;
+    //     }
+    // }
     public updateAuth(_auth: Auth) {
         if (_auth && this._tab.property.aiRequest) {
             this._tab.property.aiRequest.auth = _auth;
         }
     }
-
-    // ToDo: Method to update AI modal configurations
-    // public updateAIConfigurations(_headers: KeyValueChecked[]) {
-    //     if (_headers && this._tab.property.aiRequest) {
-    //         this._tab.property.aiRequest.Configurations = _headers;
-    //     }
-    // }
-
     public updateIsSave(_isSave: boolean) {
         this._tab.isSaved = _isSave;
     }

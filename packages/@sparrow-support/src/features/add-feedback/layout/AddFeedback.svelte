@@ -1,9 +1,13 @@
 <script lang="ts">
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
+    AddRegular,
     AttachmentIcon,
+    AttachRegular,
     CategoryIcon,
     CrossIcon,
+    DismissRegular,
+    DiversityRegular,
     PlusIcon,
   } from "@sparrow/library/icons";
   import { Button, Modal } from "@sparrow/library/ui";
@@ -102,10 +106,10 @@
         const res = onAddFeedback();
         isExposeFeedbackForm = res;
       }}
-      class="add-feedback w-100 outline-none border-0 border-radius-4 text-ds-font-size-14 text-ds-font-weight-regular"
+      class="add-feedback d-flex align-items-center justify-content-center gap-2 w-100 outline-none border-0 border-radius-6 text-ds-font-size-14"
     >
-      <PlusIcon height={"20"} width={"20"} />
-      <span class="px-2"> Add Feedback</span>
+      <AddRegular />
+      <span>Add Feedback</span>
     </button>
   </Tooltip>
 </div>
@@ -132,8 +136,8 @@
       };
     }}
   >
-    <div class="pt-2"></div>
-    <div class="d-flex pb-2">
+    <div class="pt-3"></div>
+    <div class="d-flex pb-3">
       <Select
         data={[
           {
@@ -150,7 +154,8 @@
           },
         ]}
         iconRequired={true}
-        icon={CategoryIcon}
+        icon={DiversityRegular}
+        iconColor={"var(--icon-primary-300)"}
         placeholderText={"Category"}
         id={`feeds-${selectId}`}
         zIndex={499}
@@ -164,40 +169,45 @@
         borderActiveType={"none"}
         borderHighlight={"hover-active"}
         headerHighlight={"hover-active"}
-        headerHeight={"36px"}
+        headerHeight={"28px"}
         minBodyWidth={"150px"}
         minHeaderWidth={"161px"}
         maxHeaderWidth={"200px"}
         borderRounded={"4px"}
-        headerTheme={"violet2"}
+        headerTheme={"light-violet"}
         bodyTheme={"violet"}
         menuItem={"v2"}
         headerFontSize={"13px"}
         isDropIconFilled={true}
         position={"absolute"}
+        variant={"light-violet"}
       />
     </div>
-    {#if isSelectEmpty}
+    <!-- {#if isSelectEmpty}
       <p class="error-message">Please select a feedback category.</p>
-    {/if}
+    {/if} -->
     <div style="">
       <p
         class="text-ds-font-size-14 text-ds-font-weight-regular mb-0"
-        style="color: var(--text-secondary-1000);"
+        style="color: var(--text-ds-neutral-200);"
       >
         Description
       </p>
-      <p class="text-ds-font-size-12 text-secondary-200 mb-1">
+      <p
+        class="text-ds-font-size-12 mb-2"
+        style="color: var(--text-ds-neutral-400);"
+      >
         {feedbackDescription.length} / 200
       </p>
 
       <div
-        class="p-2 bg-tertiary-300 {isDescriptionEmpty ||
+        class="p-2 {isDescriptionEmpty ||
         isSubjectEmpty ||
-        isTextArea
+        isTextArea ||
+        isSelectEmpty
           ? 'empty-data-error mb-0'
           : 'mb-3'}"
-        style="height: 137px; border-radius: 4px; color:#676A80; "
+        style="height: 137px; border-radius: 4px; color: var(--text-ds-neutral-400); background-color: var(--bg-ds-surface-400);"
       >
         <Input
           on:input={() => {
@@ -209,6 +219,7 @@
           id="feedback-subject"
           width={"100%"}
           type="text"
+          size={"large"}
           isEditIconRequired={false}
           bind:value={feedbackSubject}
           blankTextarea={true}
@@ -218,7 +229,7 @@
           placeholder="Subject"
           maxlength={200}
         />
-        <hr class="m-0 ms-2" style="padding-bottom:5px;" />
+        <hr class="m-0 ms-2" style="padding-bottom:5px; border-width: 2px;" />
         <Textarea
           on:input={() => {
             if (feedbackDescription.length > 0) {
@@ -227,7 +238,7 @@
             }
           }}
           id="feedback-description"
-          height={"90px"}
+          height={"76px"}
           bind:value={feedbackDescription}
           defaultBorderColor="transparent"
           hoveredBorderColor="transparent"
@@ -242,16 +253,34 @@
       </div>
 
       {#if isSubjectEmpty}
-        <p class="error-message">Enter a relevant subject for feedback.</p>
+        <p class="error-message">Enter a suitable subject for the feedback.</p>
       {/if}
       {#if isDescriptionEmpty}
-        <p class="error-message">Enter a relevant description for feedback.</p>
+        <p class="error-message">Enter relevant description for feedback.</p>
       {/if}
       {#if isTextArea}
         <p class="error-message">
           Please enter subject and description for adding a feedback.
         </p>
       {/if}
+      {#if isSelectEmpty}
+        <p class="error-message">
+          Choose an appropriate category for the feedback.
+        </p>
+      {/if}
+
+      <p
+        class="text-ds-font-size-14 text-ds-font-weight-regular mb-0"
+        style="color: var(--text-ds-neutral-200);"
+      >
+        Upload Files
+      </p>
+      <p
+        class="text-ds-font-size-12 mb-2"
+        style="color: var(--text-ds-neutral-400);"
+      >
+        Upload up to 5 images. Max size: 2MB each.
+      </p>
 
       <div class="drop-box mb-2" style="">
         <Drop
@@ -262,7 +291,7 @@
           inputId="upload--feedback-file-input"
           inputPlaceholder="Drag and Drop or"
           supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
-          height={"80px"}
+          height={"120px"}
           infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
         />
         <div class="d-flex justify-content-between">
@@ -276,31 +305,23 @@
       </div>
     </div>
     {#if uploadFeedback?.file?.value?.length > 0}
-      <div class="file-scroller mb-2 d-flex gap-1 flex-wrap">
+      <div class="file-scroller mb-2 d-flex gap-2 flex-wrap">
         {#each uploadFeedback.file.value as file, index}
-          <div
-            class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
-          >
-            <span>
-              <AttachmentIcon
-                height={"12px"}
-                width={"12px"}
-                color={"var(--text-secondary-200)"}
-              />
+          <div class="files d-flex align-items-center px-1 border-radius-4">
+            <span class="flex-shrink-0">
+              <AttachRegular size={"16px"} />
             </span>
-            <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
+            <span class="mb-0 text-ds-font-size-12 px-2 filename-ellipsis"
               >{file.name}</span
             >
-            <span
-              on:click={() => {
+            <Button
+              startIcon={DismissRegular}
+              size="extra-small"
+              type="teritiary-regular"
+              onClick={() => {
                 removeFile(index);
               }}
-              ><CrossIcon
-                height={"12px"}
-                width={"9px"}
-                color={"var(--text-secondary-200)"}
-              /></span
-            >
+            />
           </div>
         {/each}
       </div>
@@ -312,6 +333,7 @@
         <Button
           type={"secondary"}
           title={"Cancel"}
+          customWidth={"96px"}
           buttonClassProp={"me-2"}
           onClick={async () => {
             isExposeFeedbackForm = false;
@@ -332,6 +354,7 @@
         <Button
           type={"primary"}
           title={"Add"}
+          customWidth={"96px"}
           loader={isLoading}
           onClick={async () => {
             isLoading = true;
@@ -386,7 +409,7 @@
 
 <style>
   .add-feedback {
-    padding: 10px 16px 10px 12px;
+    padding: 8px 16px 8px 12px;
     background-color: var(--bg-primary-300);
   }
   .add-feedback:hover {
@@ -405,5 +428,19 @@
     color: var(--error--color);
     font-size: 12px;
     margin-bottom: 20px;
+  }
+
+  .filename-ellipsis {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .files {
+    max-width: 200px;
+    padding: 2px;
+    background-color: var(--bg-ds-surface-200);
   }
 </style>

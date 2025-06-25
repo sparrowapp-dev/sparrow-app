@@ -81,12 +81,16 @@
       />
     </span>
     <Button
-      disable={!requestName}
+      disable={!requestName?.trim()}
       title={"Create"}
       textClassProp={"fs-6"}
       type={"primary"}
       onClick={() => {
-        handleCreateCustomRequest(requestName, httpRequestMethod, requestURL);
+        handleCreateCustomRequest(
+          requestName?.trim() || "New Request",
+          httpRequestMethod,
+          requestURL,
+        );
       }}
       loader={false}
     />

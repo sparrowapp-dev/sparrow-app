@@ -247,7 +247,7 @@
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().top - 5,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -292,7 +292,6 @@
             : true,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -314,23 +313,23 @@
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault={() => {
-      if (api?.items && api?.items?.length > 0) {
-      } else {
-        expand = false;
-      }
+      // if (api?.items && api?.items?.length > 0) {
+      // } else {
+      //   expand = false;
+      // }
       if (!isRenaming) {
-        expand = !expand;
-        if (expand) {
-          addCollectionItem(api.id, "Request");
-          onItemOpened("mockRequest", {
-            workspaceId: collection.workspaceId,
-            collection,
-            folder,
-            request: api,
-          });
-        } else {
-          removeCollectionItem(api.id);
-        }
+        // expand = !expand;
+        // if (expand) {
+        // addCollectionItem(api.id, "Request");
+        onItemOpened("mockRequest", {
+          workspaceId: collection.workspaceId,
+          collection,
+          folder,
+          request: api,
+        });
+        // } else {
+        //   removeCollectionItem(api.id);
+        // }
       }
     }}
     style={folder?.id
@@ -353,8 +352,8 @@
       <img src={reloadSyncIcon} class="ms-2 d-none" alt="" />
     {/if} -->
 
-    <span style="  display: flex; margin-right:4px; ">
-      {#if api?.items && api?.items?.length > 0}
+    <!-- <span style="  display: flex; margin-right:4px; "> -->
+    <!-- {#if api?.items && api?.items?.length > 0}
         <Button
           startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
           size="extra-small"
@@ -370,8 +369,8 @@
           class="api-method"
           style="width: 24px !important; height:24px !important; padding:0;"
         ></div>
-      {/if}
-    </span>
+      {/if} -->
+    <!-- </span> -->
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
@@ -397,9 +396,13 @@
         on:keydown={onRenameInputKeyPress}
       />
     {:else}
-      <div
+      <!-- <div
         class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
         style={`color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
+      > -->
+      <div
+        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
+        style={`color: "var(--bg-ds-neutral-50)"`}
       >
         <p
           class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
@@ -464,21 +467,21 @@
       style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
     ></div>
     <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
+    <!-- {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+    {/each} -->
   </div>
 </div>
 

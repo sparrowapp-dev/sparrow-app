@@ -477,6 +477,191 @@ export class CollectionRepository {
     });
   };
 
+  public updateMockResponseRatiosInCollection = async (
+    collectionId: string,
+    requestId: string,
+    mockResponseRatios: Array<{ mockResponseId: string, responseWeightRatio: number }>
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+
+    if (!collection) {
+      console.error(`Collection not found: ${collectionId}`);
+      return;
+    }
+
+    const items = createDeepCopy(collection.items);
+
+    const updatedItems = items.map((request) => {
+      if (request.id === requestId) {
+        if (request.items && Array.isArray(request.items)) {
+          // Update each response that matches an ID in the mockResponseRatios array
+          request.items = request.items.map(item => {
+            const ratioUpdate = mockResponseRatios.find(
+              ratio => ratio.mockResponseId === item.id
+            );
+            if (ratioUpdate) {
+              return {
+                ...item,
+                mockRequestResponse: {
+                  ...(item.mockRequestResponse || {}),
+                  responseWeightRatio: ratioUpdate.responseWeightRatio
+                }
+              };
+            }
+
+            return item;
+          });
+        }
+      }
+      return request;
+    });
+
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  }
+
+  /**
+ * Updates mock response ratios in a folder
+ * @param collectionId - ID of the collection
+ * @param folderId - ID of the folder
+ * @param requestId - ID of the request
+ * @param mockResponseRatios - Array of mockResponseId and responseWeightRatio pairs
+ */
+  public updateMockResponseRatiosInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    mockResponseRatios: Array<{ mockResponseId: string, responseWeightRatio: number }>
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+
+    if (!collection) {
+      console.error(`Collection not found: ${collectionId}`);
+      return;
+    }
+    const items = createDeepCopy(collection.items);
+    const updatedItems = items.map((folder) => {
+      if (folder.id === folderId) {
+        if (folder.items && Array.isArray(folder.items)) {
+          folder.items = folder.items.map(request => {
+            if (request.id === requestId) {
+              if (request.items && Array.isArray(request.items)) {
+                request.items = request.items.map(item => {
+                  const ratioUpdate = mockResponseRatios.find(
+                    ratio => ratio.mockResponseId === item.id
+                  );
+                  if (ratioUpdate) {
+                    return {
+                      ...item,
+                      mockRequestResponse: {
+                        ...(item.mockRequestResponse || {}),
+                        responseWeightRatio: ratioUpdate.responseWeightRatio
+                      }
+                    };
+                  }
+                  return item;
+                });
+              }
+            }
+            return request;
+          });
+        }
+      }
+      return folder;
+    });
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  }
+
+  // Updates a mock response inside a request at the collection root
+  public updateMockResponseInCollection = async (
+    collectionId: string,
+    requestId: string,
+    mockResponseId: string,
+    updatedMockResponse: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+    const items = createDeepCopy(collection.items);
+
+    const updatedItems = items.map((request) => {
+      if (request.id === requestId) {
+        for (let i = 0; i < request.items.length; i++) {
+          if (request.items[i].id === mockResponseId) {
+            request.items[i] = {
+              ...request.items[i],
+              ...updatedMockResponse,
+              mockRequestResponse: {
+                ...(request.items[i].mockRequestResponse || {}),
+                ...(updatedMockResponse?.mockRequestResponse || {}),
+              },
+            };
+            break;
+          }
+        }
+      }
+      return request;
+    });
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
+  // Updates a mock response inside a request within a folder
+  public updateMockResponseInFolder = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+    mockResponseId: string,
+    updatedMockResponse: any,
+  ): Promise<void> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+    const items = createDeepCopy(collection.items);
+
+    const updatedItems = items.map((folder) => {
+      if (folder.id === folderId) {
+        folder.items?.forEach((request) => {
+          if (request.id === requestId) {
+            for (let i = 0; i < request.items.length; i++) {
+              if (request.items[i].id === mockResponseId) {
+                request.items[i] = {
+                  ...request.items[i],
+                  ...updatedMockResponse,
+                  mockRequestResponse: {
+                    ...(request.items[i].mockRequestResponse || {}),
+                    ...(updatedMockResponse?.mockRequestResponse || {}),
+                  },
+                };
+                break;
+              }
+            }
+          }
+        });
+      }
+      return folder;
+    });
+
+    await collection.incrementalModify((value) => {
+      value.items = [...updatedItems];
+      return value;
+    });
+  };
+
   public deleteSavedRequestInFolder = async (
     collectionId: string,
     folderId: string,
@@ -936,5 +1121,23 @@ export class CollectionRepository {
       );
 
     return node ?? null;
+  };
+
+  /* Remove collections by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter collections
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeCollectionsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb?.collection.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
   };
 }

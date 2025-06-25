@@ -7,6 +7,7 @@
     GraphIcon,
     SocketIcon,
     SocketIoIcon,
+    BotRegular,
   } from "@sparrow/library/icons";
   export let type: ItemType = ItemType.REQUEST;
   export let name = "";
@@ -27,7 +28,7 @@
       <p class="ellipsis mb-0">{name}</p>
     </div>
   </div>
-{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET || type === ItemType.SOCKET_IO || type === ItemType.GRAPHQL}
+{:else if type === ItemType.FOLDER || type === ItemType.COLLECTION || type === ItemType.WEB_SOCKET || type === ItemType.SOCKET_IO || type === ItemType.GRAPHQL || type === ItemType.AI_REQUEST}
   <div style="height:36px;" class="d-flex align-items-center">
     {#if type === ItemType.FOLDER}
       <div style="width: 40px;">
@@ -64,6 +65,10 @@
           width={"18px"}
           color={"var(--icon-danger-1100)"}
         />
+      </div>
+    {:else if type === ItemType.AI_REQUEST}
+      <div style="width: 40px;">
+        <BotRegular height={"14px"} width={"18px"} />
       </div>
     {/if}
     <span

@@ -767,7 +767,7 @@ class SocketIoExplorerPageViewModel {
         description: socketMetaData.description,
         type: CollectionItemTypeBaseEnum.SOCKETIO,
         socketio: unadaptedSocket,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

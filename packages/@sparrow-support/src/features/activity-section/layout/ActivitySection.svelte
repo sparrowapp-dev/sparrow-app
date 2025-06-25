@@ -2,9 +2,14 @@
   import { user } from "@app/store/auth.store";
   import {
     ActivityIcon,
+    ArrowUpRightRegular,
     BoxBarIcon,
+    BroadActivityFeedRegular,
+    ChatMultipleRegular,
     CommentIcon,
+    CommentRegular,
     CrossIcon,
+    DiversityRegular,
     LikeIcon,
     MessageIcon,
     PostIcon,
@@ -21,7 +26,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 
   import { FeedbackStatusType, FeedbackType } from "../../../types/feedback";
-  import { ImageModal, Tag } from "@sparrow/library/ui";
+  import { Button, ImageModal, Tag } from "@sparrow/library/ui";
 
   import { ActivityStatusType, ActivityType } from "../../../types/activity";
   import { Spinner } from "@sparrow/library/ui";
@@ -111,6 +116,10 @@
         userLikedPosts.length == 0 &&
         userComments.length == 0;
 
+      if (hasActivity) {
+        currentSort = "";
+      }
+
       applyAllFilters();
       loading = false;
     } catch (error) {
@@ -193,12 +202,15 @@
   };
 </script>
 
-<div class="container" style="padding: 20px;">
+<div style="padding: 20px; height: 100%;">
   <div class="mt-0">
-    <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
+    <p
+      class="text-ds-font-size-20 fw-semibold mb-2"
+      style="color: var(--text-ds-neutral-50);"
+    >
       My Activity
     </p>
-    <p class="text-ds-font-size-14" style="color: var(--text-secondary-50); ">
+    <p class="text-ds-font-size-14" style="color: var(--text-ds-neutral-400); ">
       Find all your posts, comments, and likes in one place and easily keep
       track of them.
     </p>
@@ -209,11 +221,10 @@
     style="justify-content: space-between;"
   >
     <div>
-      <div class={`d-flex  rounded py-1 px-2 mb-2`}>
+      <div class={`d-flex  rounded py-1 mb-2`}>
         <Search
           variant="primary"
           id="search-input"
-          customWidth={"300px"}
           placeholder="Search updates"
           bind:value={searchTerm}
           on:input={() => handleInputChange(searchTerm)}
@@ -230,7 +241,8 @@
             { name: "Bugs", id: ActivityType.BUG },
             { name: "All Categories", id: ActivityType.ALL_CATEGORIES },
           ]}
-          icon={CategoryIcon}
+          icon={DiversityRegular}
+          iconColor={"var(--icon-primary-300)"}
           onclick={(id = "") => {
             handleCategoryChange(id);
             MixpanelEvent(Events.Activity_Categories_Filter);
@@ -243,7 +255,7 @@
           borderActiveType={"none"}
           borderHighlight={"hover-active"}
           headerHighlight={"hover-active"}
-          headerHeight={"26px"}
+          headerHeight={"28px"}
           minBodyWidth={"150px"}
           minHeaderWidth={"150px"}
           maxHeaderWidth={"200px"}
@@ -254,6 +266,7 @@
           headerFontSize={"12px"}
           isDropIconFilled={true}
           position={"absolute"}
+          variant={"secondary"}
         />
       </div>
       <div>
@@ -273,7 +286,8 @@
           placeholderText="Status"
           zIndex={499}
           disabled={false}
-          icon={TableChart}
+          icon={BroadActivityFeedRegular}
+          iconColor={"var(--icon-primary-300)"}
           iconRequired={true}
           borderType={"none"}
           borderActiveType={"none"}
@@ -290,19 +304,24 @@
           headerFontSize={"12px"}
           isDropIconFilled={true}
           position={"absolute"}
+          variant={"secondary"}
         />
       </div>
     </div>
   </div>
 
   {#if !isPostopen}
-    <div class="post-list d-flex gap-4" style="margin-top: 50px">
-      <div style="width:129px;  ">
-        <div>
-          <SortIcon width={"12px"} height={"8px"} />
+    <div class="post-list d-flex gap-4" style="margin-top: 16px">
+      <div style="width:129px;  padding-left: 8px; margin-top: -2px;">
+        <div style="color: var(--text-ds-neutral-200)">
+          <SortIcon
+            width={"12px"}
+            height={"8px"}
+            color={"var(--text-ds-neutral-200)"}
+          />
           <span
-            class="text-ds-font-size-14 text-ds-font-weight-medium"
-            style="padding-left: 8px; padding-top:4px ; "
+            class="text-ds-font-size-12 text-ds-font-weight-medium"
+            style="padding-left: 4px; padding-top:4px ; "
           >
             Sort By</span
           >
@@ -319,12 +338,14 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "newest"}
           >
-            <div><span class="text-fs-13">Newest</span></div>
+            <div>
+              <span class="text-fs-12">Newest</span>
+            </div>
             <div class="tick-icon">
               <TickIcon
                 height={"12px"}
                 width={"12px"}
-                color={"var(--icon-primary-300)"}
+                color={"var(--text-ds-primary-300)"}
               />
             </div>
           </button>
@@ -337,12 +358,12 @@
             class="sort-buttons d-flex justify-content-between w-100"
             class:active={currentSort === "oldest"}
           >
-            <div><span class="text-ds-font-size-14">Oldest</span></div>
+            <div><span class="text-ds-font-size-12">Oldest</span></div>
             <div class="tick-icon">
               <TickIcon
                 height={"12px"}
                 width={"12px"}
-                color={"var(--icon-primary-300)"}
+                color={"var(--text-ds-primary-300)"}
               />
             </div>
           </button>
@@ -352,7 +373,7 @@
       {#if hasActivity}
         <div
           class="h-100 w-100 d-flex justify-content-center align-items-center"
-          style=";"
+          style="flex: 1; min-height: calc(100vh - 350px);"
         >
           <div
             class="d-flex"
@@ -360,8 +381,8 @@
           >
             <SparrowLogo />
             <p
-              class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-5"
-              style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
+              class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-4"
+              style="color: var(--text-ds-neutral-400);"
             >
               No activity yet. Start engaging to see it here
             </p>
@@ -371,7 +392,19 @@
         <div
           style="display: flex; justify-content: center; align-items: center; width: 100%; height: 50vh;"
         >
-          <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+          <Loader loaderSize={"20px"} loaderMessage="Loading..." />
+        </div>
+      {:else if searchTerm && filteredPosts.length === 0 && filteredComments.length === 0 && filteredLikedPosts.length === 0}
+        <div
+          class="h-100 w-100 d-flex justify-content-center align-items-center"
+          style="flex: 1;"
+        >
+          <p
+            class="mx-1 text-ds-font-size-14 text-ds-font-weight-medium mb-0 text-center mt-4"
+            style="color: var(--text-ds-neutral-400);"
+          >
+            No result found.
+          </p>
         </div>
       {:else}
         <div class="posts-comments">
@@ -379,7 +412,8 @@
           {#if activityStatusType === ActivityStatusType.POST || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
             <div>
               <h2
-                style=" font-size: 15px; color: #999999; margin-bottom: 12px;"
+                class="text-ds-font-size-16 text-secondary-100"
+                style="margin-bottom: 12px;"
               >
                 Feedbacks
               </h2>
@@ -388,7 +422,7 @@
                   {#each filteredPosts as post}
                     <div
                       class="mb-4"
-                      style=" display: flex; flex-direction: column; background-color: #151515; padding: 20px;  border-radius:2px;"
+                      style=" display: flex; flex-direction: column; background-color: var(--bg-ds-surface-700); padding: 20px; border-radius:6px;"
                     >
                       <div
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -405,6 +439,7 @@
                           >
                             {post?.title}
                           </div>
+
                           <div
                             style="height: 16px; display: flex; align-items: center;"
                           >
@@ -427,21 +462,18 @@
                       <div style="margin-top: 10px; flex: 1;">
                         <p
                           class="text-ds-font-size-14"
-                          style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
+                          style="color: var(--text-secondary-1000); margin: 0;"
                         >
                           {post?.details}
                         </p>
                       </div>
 
                       <div
-                        style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
+                        class="ms-1"
+                        style="display: flex; align-items: center; margin-top: 10px; gap:5px; color: var(--text-secondary-100);"
                       >
                         <span>
-                          <CommentIcon
-                            width={"15px"}
-                            height={"13.95px"}
-                            color={"var(--icon-secondary-950)"}
-                          />
+                          <CommentRegular />
                         </span>
                         <span class="text-ds-font-size-14"
                           >{post?.commentCount}</span
@@ -452,13 +484,12 @@
                 </ul>
               {:else}
                 <div
-                  class=""
+                  class="empty-activity"
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  <BoxBarIcon
-                    height={"30px"}
-                    width={"30px"}
-                    color={"var(--icon-primary-300)"}
+                  <ChatMultipleRegular
+                    size={"32px"}
+                    color={"var(--text-secondary-550)"}
                   />
 
                   <p
@@ -468,9 +499,8 @@
                     No feedback yet
                   </p>
                 </div>
-
-                <hr class="mt-4" style="" />
               {/if}
+              <hr class="mt-4" style="" />
             </div>
           {/if}
 
@@ -478,8 +508,8 @@
           {#if activityStatusType === ActivityStatusType.COMMENT || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
             <div class="comments mb-2">
               <h2
-                class="text-ds-font-size-14"
-                style=" color: #999999; margin-bottom: 12px;"
+                class="text-ds-font-size-16 text-secondary-100"
+                style="margin-bottom: 12px;"
               >
                 Comments
               </h2>
@@ -494,45 +524,43 @@
                     >
                       <Avatar
                         type="letter"
-                        size="large"
+                        size="small"
                         letter={comment?.author?.name?.charAt(0)}
-                        bgColor="var(--text-secondary-600)"
+                        bgColor="var(--bg-ds-surface-500)"
                       />
                       <div class="comment-content">
                         <div
-                          class="mt-1"
-                          style="display: flex; justify-content: space-between; align-items: start;"
+                          style="display: flex; justify-content: space-between; align-items: start; margin-top: 2px;"
                         >
                           <div class="w-100">
                             <div
-                              class="d-flex justify-content-between"
+                              class="d-flex gap-3"
                               style=" font-weight: 500; "
                             >
-                              <p class="mb-1 pb-0">{comment.author.name}</p>
+                              <p class="mb-1 pb-0 text-secondary-100">
+                                {comment.author.name}
+                              </p>
                               <div style="">
                                 {#if isHovering === comment.id}
-                                  <span
-                                    on:click={() => {
+                                  <Button
+                                    size="small"
+                                    type={"link-primary"}
+                                    title="Go to post"
+                                    onClick={() => {
                                       postId = comment?.post?.id;
                                       isPostopen = true;
                                       setPostId("feedback", comment?.post?.id);
                                       MixpanelEvent(Events.Activity_GoToPost);
                                     }}
-                                    class="go-to-post text-ds-font-size-12 text-ds-font-weight-regular"
-                                    style=" letter-spacing: 0.25px; "
-                                    >Go to post</span
-                                  >
-                                  <ArrowOutwardIcon
-                                    height={"10px"}
-                                    width={"10px"}
-                                    color={"white"}
+                                    endIcon={ArrowUpRightRegular}
+                                    buttonClassProp={"ps-0"}
                                   />
                                 {/if}
                               </div>
                             </div>
 
                             <div class="comment-text">
-                              <p class="mb-1" style="word-break: break-all; ">
+                              <p class="mb-0" style="word-break: break-all; ">
                                 {comment.value}
                               </p>
                             </div>
@@ -583,13 +611,12 @@
                 </ul>
               {:else}
                 <div
-                  class=""
+                  class="empty-activity"
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  <MessageIcon
-                    height={"30px"}
-                    width={"30px"}
-                    color={"var(--icon-primary-300)"}
+                  <ChatMultipleRegular
+                    size={"32px"}
+                    color={"var(--text-secondary-550)"}
                   />
 
                   <p
@@ -609,8 +636,8 @@
           {#if activityStatusType === ActivityStatusType.UPVOTED_POSTS || activityStatusType === ActivityStatusType.ALL_ACTIVITY}
             <div class="">
               <h2
-                class="text-ds-font-size-16"
-                style=" color: #999999; margin-bottom: 12px;"
+                class="text-ds-font-size-16 text-secondary-100"
+                style="margin-bottom: 12px;"
               >
                 Upvoted Posts
               </h2>
@@ -619,7 +646,7 @@
                   {#each filteredLikedPosts as { post }}
                     <div
                       class="mb-4"
-                      style="display: flex; flex-direction: column; background-color: #151515; padding: 15px; border-radius:2px; "
+                      style="display: flex; flex-direction: column; background-color: var(--bg-ds-surface-700); padding: 15px; border-radius:6px; "
                     >
                       <div
                         style="display: flex; justify-content: space-between; align-items: flex-start;"
@@ -658,21 +685,18 @@
                       <div style="margin-top: 10px; flex: 1;">
                         <p
                           class="text-ds-font-size-14"
-                          style="color: var(--text-secondary-1000); margin: 0; padding-top:10px;"
+                          style="color: var(--text-secondary-1000); margin: 0;"
                         >
                           {post?.details}
                         </p>
                       </div>
 
                       <div
-                        style="display: flex; align-items: center; margin-top: 10px; gap:5px;"
+                        class="ms-1"
+                        style="display: flex; align-items: center; margin-top: 10px; gap:5px; color: var(--text-secondary-100);"
                       >
                         <span>
-                          <CommentIcon
-                            width={"15px"}
-                            height={"13.95px"}
-                            color={"var(--icon-secondary-950)"}
-                          />
+                          <CommentRegular />
                         </span>
                         <span class="text-ds-font-size-14px"
                           >{post?.commentCount}</span
@@ -683,13 +707,12 @@
                 </ul>
               {:else}
                 <div
-                  class=""
+                  class="empty-activity"
                   style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
                 >
-                  <PostIcon
-                    height={"30px"}
-                    width={"30px"}
-                    color={"var(--icon-primary-300)"}
+                  <ChatMultipleRegular
+                    size={"32px"}
+                    color={"var(--text-secondary-550)"}
                   />
 
                   <p
@@ -752,13 +775,17 @@
   .title {
     font-size: 18px;
     font-weight: 500;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: var(--text-secondary-100);
   }
   .title:hover {
-    text-decoration: underline;
     cursor: pointer;
+    color: var(--text-ds-primary-300);
+  }
+
+  .title:active {
     color: var(--text-primary-300);
+    text-decoration: underline;
   }
 
   #search-input {
@@ -792,8 +819,8 @@
   }
 
   .comment:hover {
-    background-color: #1a1a1a;
-    border-radius: 2px;
+    background-color: var(--bg-ds-surface-700);
+    border-radius: 6px;
     cursor: pointer;
     transition: all;
     animation-duration: 1s;
@@ -804,7 +831,7 @@
     /* width: 100%; */
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    /* gap: 5px; */
   }
 
   .comment-text {
@@ -850,8 +877,6 @@
   }
 
   .comments h2 {
-    font-size: 15px;
-    color: #999999;
     font-weight: 500;
   }
 
@@ -914,7 +939,7 @@
   }
 
   .sort-buttons {
-    color: var(--text-secondary-550) !important;
+    color: var(--text-secondory-100) !important;
     background: none !important;
     outline: none !important;
     border: none !important;
@@ -922,11 +947,11 @@
   }
 
   .sort-buttons:hover {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   .sort-buttons:focus-within {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   .tick-icon {
@@ -935,10 +960,15 @@
 
   /* When a button has the 'active' class */
   .sort-buttons.active {
-    color: var(--text-primary-300) !important;
+    color: var(--text-ds-primary-300) !important;
   }
 
   .sort-buttons.active .tick-icon {
     display: revert;
+  }
+
+  .empty-activity {
+    margin-top: 36px;
+    margin-bottom: 36px;
   }
 </style>

@@ -16,6 +16,7 @@ import type {
 import {
   createDeepCopy,
   Debounce,
+  InitAiRequestTab,
   InitMockRequestTab,
   InitWebSocketTab,
   moveNavigation,
@@ -299,6 +300,7 @@ class FolderExplorerPage {
     let totalGraphQl = 0;
     let totalSocketIo = 0;
     let totalMockRequests = 0;
+    let totalAiRequests = 0;
     const folder = await this.getFolder(collection, this._tab.getValue().id);
     if (folder?.items) {
       folder.items.forEach((item: any) => {
@@ -312,6 +314,8 @@ class FolderExplorerPage {
           totalWebSocket++;
         } else if (item.type === ItemType.MOCK_REQUEST) {
           totalMockRequests++;
+        } else if (item.type === ItemType.AI_REQUEST) {
+          totalAiRequests++;
         }
       });
     }
@@ -321,6 +325,7 @@ class FolderExplorerPage {
       totalSocketIo,
       totalWebSocket,
       totalMockRequests,
+      totalAiRequests,
     };
   };
 
@@ -500,7 +505,7 @@ class FolderExplorerPage {
           description: "",
           mockRequest: {
             method: sampleRequest.getValue().property.mockRequest?.method,
-            url: collection?.mockCollectionUrl,
+            url: "",
           },
         },
       },
@@ -570,7 +575,7 @@ class FolderExplorerPage {
         folderId: explorer.id,
       });
       sampleRequest.updateIsSave(true);
-      sampleRequest.updateUrl(collection?.mockCollectionUrl);
+      // sampleRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleRequest.getValue());
 
       moveNavigation("right");
@@ -924,6 +929,135 @@ class FolderExplorerPage {
   };
 
   /**
+   * Handles creating a new request in a folder
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param explorer : - the folder in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateAiRequestInFolder = async (
+    workspaceId: string,
+    collection: CollectionBaseInterface,
+    explorer: CollectionItemBaseInterface,
+  ) => {
+    const aiRequest = new InitAiRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection.activeSync && explorer?.source === "USER") {
+      userSource = {
+        currentBranch: collection.currentBranch
+          ? collection.currentBranch
+          : collection.primaryBranch,
+        source: "USER",
+      };
+    }
+    const aiRequestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      folderId: explorer.id,
+      items: {
+        name: explorer.name,
+        type: ItemType.FOLDER,
+        id: explorer.id,
+        items: {
+          name: aiRequest.getValue().name,
+          type: aiRequest.getValue().type,
+          description: "",
+          aiRequest: {
+            aiModelProvider:
+              aiRequest.getValue().property.aiRequest?.aiModelProvider,
+            aiModelVariant:
+              aiRequest.getValue().property.aiRequest?.aiModelVariant,
+          },
+        },
+      },
+    };
+
+    await this.collectionRepository.addRequestInFolder(
+      aiRequestObj.collectionId,
+      aiRequestObj.folderId,
+      {
+        ...aiRequestObj.items.items,
+        id: aiRequest.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res = (await this.collectionRepository.readRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+      )) as CollectionItemBaseInterface;
+      res.id = uuidv4();
+      this.collectionRepository.updateRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+        res,
+      );
+
+      aiRequest.updateId(res.id);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      aiRequest.updateIsSave(true);
+      this.tabRepository.createTab(aiRequest.getValue());
+
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addAiRequestInCollection(
+      aiRequestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const request = response.data.data;
+
+      this.collectionRepository.updateRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+        request,
+      );
+
+      aiRequest.updateId(request.id);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: explorer.id,
+      });
+      aiRequest.updateIsSave(true);
+      this.tabRepository.createTab(aiRequest.getValue());
+
+      moveNavigation("right");
+      // MixpanelEvent(Events.CREATE_REQUEST, {
+      //   source: "Collection list",
+      // });
+      return;
+    } else {
+      this.collectionRepository.deleteRequestInFolder(
+        aiRequestObj.collectionId,
+        aiRequestObj.folderId,
+        aiRequest.getValue().id,
+      );
+    }
+  };
+
+  /**
    * Handle control of creating items
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
@@ -961,6 +1095,13 @@ class FolderExplorerPage {
         break;
       case "graphqlFolder":
         await this.handleCreateGraphqlInFolder(
+          args.workspaceId,
+          args.collection as CollectionBaseInterface,
+          args.folder as CollectionItemBaseInterface,
+        );
+        break;
+      case "aiRequestFolder":
+        await this.handleCreateAiRequestInFolder(
           args.workspaceId,
           args.collection as CollectionBaseInterface,
           args.folder as CollectionItemBaseInterface,

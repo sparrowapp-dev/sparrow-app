@@ -1,894 +1,101 @@
-import { AiModelProviderEnum, type AIModelVariant } from "./ai-request-base";
+import type { AiModelProviderEnum, AIModelVariant } from "./ai-request-base";
+import type { CollectionItemTypeBaseEnum } from "./collection-base";
+import type { CollectionSourceTypeDtoEnum } from "./collection-dto";
 
-// Disabling model specific features that are not supported 
-export const disabledModelFeatures = {
-  "System Prompt": ['o1', 'o1-mini'], // system prompt is not supported in o1 and o1-mini
-  "Configurations": [], // configurations are not supported in 
-  "Authorization": [], // Authorization is not supported in 
+export type AiRequestSourceDtoType = "SPEC" | "USER";
+
+export interface AiRequestKeyValueDtoInterface {
+  key: string;
+  value: string;
+  checked: boolean;
 }
 
-// Model configuration format for different AI model providers.
-// This format defines the structure and types of configuration 
-// options available for each model variant, and used to generate 
-// the configuration form in the UI.
-export const configFormat: {
-  [modelProvider in AiModelProviderEnum]?: {
-    [modelVariant in AIModelVariant]?: {
-      [configKey: string]: {
-        type: "number" | "boolean";
-        displayName: string;
-        description: string;
-        defaultValue: number | boolean;
-        min?: string;
-        max?: string;
-      };
+export enum AiRequestAuthModeDtoEnum {
+  NO_AUTH = "No Auth",
+  API_KEY = "API Key",
+  BEARER_TOKEN = "Bearer Token",
+  BASIC_AUTH = "Basic Auth",
+}
+
+export interface AiRequestAuthDtoInterface {
+  bearerToken?: string;
+  basicAuth?: {
+    username: string;
+    password: string;
+  };
+  apiKey?: {
+    authKey: string;
+    authValue: string | unknown;
+    addTo: AiRequestAddToDtoEnum;
+  };
+}
+
+export enum AiRequestAddToDtoEnum {
+  HEADER = "HEADER",
+  QUERY = "QUERY",
+}
+
+export interface AiRequestMetaDataDtoInterface {
+  aiModelProvider?: AiModelProviderEnum;
+  aiModelVariant?: AIModelVariant;
+  systemPrompt?: string;
+  auth?: AiRequestAuthDtoInterface;
+  selectedRequestAuthType?: AiRequestAuthModeDtoEnum;
+}
+
+export interface AiRequestCreateUpdateInCollectionPayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  source?: AiRequestSourceDtoType;
+
+  items?: {
+    id?: string;
+    name: string;
+    description?: string;
+    type: CollectionItemTypeBaseEnum.AI_REQUEST;
+    source?: CollectionSourceTypeDtoEnum;
+    aiRequest?: AiRequestMetaDataDtoInterface;
+    isDeleted?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
+  };
+
+  currentBranch?: string;
+}
+
+export interface AiRequestCreateUpdateInFolderPayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  source?: AiRequestSourceDtoType;
+  items?: {
+    name: string;
+    type: CollectionItemTypeBaseEnum.FOLDER;
+    id: string;
+    items?: {
+      id?: string;
+      name: string;
+      description?: string;
+      type: CollectionItemTypeBaseEnum.AI_REQUEST;
+      source?: CollectionSourceTypeDtoEnum;
+      aiRequest?: AiRequestMetaDataDtoInterface;
+      isDeleted?: boolean;
+      createdAt?: string;
+      updatedAt?: string;
+      createdBy?: string;
+      updatedBy?: string;
     };
   };
-} = {
-  openai: {
-    "gpt-4o": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "gpt-4": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "gpt-4.1": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "gpt-4-turbo": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "gpt-4.5-preview": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "16384",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "gpt-4o-mini": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "gpt-3.5-turbo": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "o1": {
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      }
-    },
-    "o1-mini": {
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      }
-    },
-    "o3-mini": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    }
-  },
+  currentBranch?: string;
+}
 
-  anthropic: {
-    "claude-3-5-sonnet-20241022": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls randomness in the response. Higher values make output more random.",
-        defaultValue: 0.7,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "The maximum number of tokens to generate in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-
-    "claude-3-5-haiku-20241022": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls randomness in the response. Higher values make output more random.",
-        defaultValue: 0.7,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "The maximum number of tokens to generate in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-
-    "claude-3-opus-20240229": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls randomness in the response. Higher values make output more random.",
-        defaultValue: 0.7,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "The maximum number of tokens to generate in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-
-    "claude-3-haiku-20240307": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls randomness in the response. Higher values make output more random.",
-        defaultValue: 0.7,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "The maximum number of tokens to generate in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-
-    // "Claude 3 Sonnet"
-    "claude-3-5-sonnet-20240620": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls randomness in the response. Higher values make output more random.",
-        defaultValue: 0.7,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "The maximum number of tokens to generate in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-  },
-
-  google: {
-    "gemini-1.5-flash": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls the randomness of the output. Higher values increase creativity.",
-        defaultValue: 0.9,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "2048",
-        displayName: "Max Output Tokens",
-        description:
-          "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-    "gemini-1.5-flash-8b": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls the randomness of the output. Higher values increase creativity.",
-        defaultValue: 0.9,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "2048",
-        displayName: "Max Output Tokens",
-        description:
-          "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-    },
-    "gemini-1.5-pro": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls the randomness of the output. Higher values increase creativity.",
-        defaultValue: 0.9,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "2048",
-        displayName: "Max Output Tokens",
-        description:
-          "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-      
-    },
-    "gemini-2.0-flash": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Controls the randomness of the output. Higher values increase creativity.",
-        defaultValue: 0.9,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "2048",
-        displayName: "Max Output Tokens",
-        description:
-          "The maximum number of tokens that can be generated in the response.",
-        defaultValue: 1024,
-      },
-      top_p: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Top P",
-        description:
-          "Controls the randomness of the LLM response.",
-        defaultValue: 0,
-      },
-      
-    },
-  },
-
-  deepseek: {
-    "deepseek-chat": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    },
-    "deepseek-reasoner": {
-      streamResponse: {
-        type: "boolean",
-        displayName: "Stream Response",
-        description: "Enables real-time output of the model's generated content.",
-        defaultValue: true,
-      },
-      jsonResponseFormat: {
-        type: "boolean",
-        displayName: "Response Format (JSON)",
-        description:
-          "Forces the model to adhere strictly to JSON formatting in its output.",
-        defaultValue: false,
-      },
-      temperature: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Temperature",
-        description:
-          "Adjusts the creativity level of the model's responses; higher values increase output variability.",
-        defaultValue: 1,
-      },
-      presencePenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Presence Penalty",
-        description:
-          "Controls the frequency with which the model introduces novel or unrelated topics.",
-        defaultValue: 0,
-      },
-      frequencyPenalty: {
-        type: "number",
-        min: "0",
-        max: "1",
-        displayName: "Frequency Penalty",
-        description:
-          "Manages the repetition of terms and phrases within the model's output.",
-        defaultValue: 0,
-      },
-      maxTokens: {
-        type: "number",
-        min: "-1",
-        max: "4096",
-        displayName: "Max Tokens",
-        description:
-          "Specifies the maximum length of the model's response in tokens.",
-        defaultValue: 1024,
-      },
-    }
-  },
-};
+export interface AiRequestDeletePayloadDtoInterface {
+  collectionId: string;
+  workspaceId: string;
+  folderId?: string;
+  source?: CollectionSourceTypeDtoEnum;
+  currentBranch?: string;
+}

@@ -10,6 +10,7 @@
     DeepseekVectorIcon,
     CheckMarkIcon,
   } from "@sparrow/library/icons";
+  import { Sleep } from "@sparrow/common/utils";
 
   // Types
   export let selectedModelProvider: string = "openai";
@@ -17,6 +18,7 @@
   export let isOpen: boolean = false;
   let isModelProviderChangeAlertPopupOpen = false;
   let nextModelSelectRequest;
+  let isProceedBtnLoading = false;
 
   // Props
   export let onSelect: (
@@ -76,7 +78,7 @@
       icon: GoogleVectorIcon,
       models: [
         { name: "Gemini 1.5 Flash", id: "gemini-1.5-flash" },
-        { name: "Gemini 1.5 Flash 8b", id: "gemini-1.5-flash-8b" },
+        { name: "Gemini 1.5 Flash 8B", id: "gemini-1.5-flash-8b" },
         { name: "Gemini 1.5 Pro", id: "gemini-1.5-pro" },
         { name: "Gemini 2.0 Flash", id: "gemini-2.0-flash" },
       ],
@@ -244,10 +246,14 @@
       textClassProp={"fs-6"}
       type={"primary"}
       customWidth={"95px"}
+      loader={isProceedBtnLoading}
       disable={false}
-      onClick={() => {
+      onClick={async () => {
+        isProceedBtnLoading = true;
         handleModelSelection(nextModelSelectRequest);
+        await new Sleep().setTime(1500).exec(); // Waiting to let dom and tab properties update
         isModelProviderChangeAlertPopupOpen = false;
+        isProceedBtnLoading = false;
       }}
     ></Button>
   </div>
@@ -277,6 +283,12 @@
 
   .model-card:hover {
     cursor: pointer;
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .model-card:active {
+    background-color: var(--bg-ds-surface-700);
+    /* transform: scale(1.01);  */
   }
 
   .checkmark-container {

@@ -205,12 +205,11 @@
   <Options
     xAxis={environmentTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      environmentTabWrapper.getBoundingClientRect().top + 20,
+      environmentTabWrapper.getBoundingClientRect().top - 5,
       environmentTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
     {menuItems}
-    {noOfColumns}
   />
 {/if}
 

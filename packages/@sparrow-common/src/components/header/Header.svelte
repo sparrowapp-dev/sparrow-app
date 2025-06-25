@@ -240,6 +240,7 @@
   };
   export let user;
   export let onLogout;
+  export let onAdminRedirect;
 
   import { profileTabIcon as profile } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
@@ -248,6 +249,7 @@
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
+  import { Platform } from "@sparrow/common/enums";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -313,8 +315,8 @@
 
   <div class="d-flex ms-2 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
-      {#if isWindows === false}
-        <WindowAction isWindows={false} />
+      {#if os === "macos"}
+        <WindowAction platform={Platform.MACOS} />
       {/if}
     {/if}
 
@@ -339,7 +341,11 @@
     <!-- <div >
       <WorkspaceRegular />
     </div> -->
-    <div class="no-drag" style="margin-left: 8px;" id="workspace-container">
+    <div
+      class="no-drag"
+      style="margin-left: 8px; margin-right:8px;"
+      id="workspace-container"
+    >
       {#if isGuestUser}
         <div style="display: flex;">
           <Select
@@ -480,7 +486,10 @@
 
   <div
     class="d-flex align-items-center no-drag"
-    style="position: relative; display:flex; gap: 16px;"
+    style="position: relative; display:flex; gap: 16px; margin-right: {isWebApp ||
+    !isWindows
+      ? '16px'
+      : '0px'}"
   >
     {#if isGuestUser && isLoginBannerActive === false && $policyConfig.enableLogin}
       <Tooltip
@@ -663,20 +672,21 @@
     {/if}
 
     {#if !isGuestUser}
-      <div class={"pe-1"}>
+      <div>
         <UserProfileModal
           {isGuestUser}
           item={sidebarModalItem}
           {onLogout}
+          {onAdminRedirect}
           bind:showProfileModal
         />
       </div>
     {/if}
 
     {#if isWebApp === false}
-      {#if isWindows}
+      {#if os === "windows" || os === "linux"}
         <div class="d-flex gap-3 no-drag">
-          <WindowAction isWindows={true} />
+          <WindowAction platform={Platform.WINDOWS} />
         </div>
       {/if}
     {/if}

@@ -33,6 +33,8 @@ import {
 import { WorkspaceTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { TeamService } from "@app/services/team.service";
+import { PlanRepository } from "@app/repositories/plan.repository";
+import { open } from "@tauri-apps/plugin-shell";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -45,6 +47,7 @@ export default class WorkspaceExplorerViewModel {
 
   private workspaceService = new WorkspaceService();
   private updatesService = new UpdatesService();
+  private planRepository = new PlanRepository();
   private teamService = new TeamService();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
@@ -324,10 +327,18 @@ export default class WorkspaceExplorerViewModel {
       const newTeam = response.data.data.users;
       this.workspaceRepository.addUserInWorkspace(_workspaceId, newTeam);
       notifications.success(
-        `Invite sent to ${_invitedUserCount} people for ${_workspaceName}.`,
+        `Invite sent to ${_invitedUserCount} ${
+          _invitedUserCount === 1 ? "person" : "people"
+        } for ${_workspaceName}.`,
       );
     } else {
-      notifications.error(`Failed to send invite. Please try again.`);
+      if (response?.message === "Plan limit reached") {
+        // notifications.error(
+        //   "You’ve reached the collaborator limit for your current plan. Upgrade to add more collaborators.",
+        // );
+      } else {
+        notifications.error(`Failed to send invite. Please try again.`);
+      }
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
@@ -599,5 +610,47 @@ export default class WorkspaceExplorerViewModel {
       await this.tabRepository.createTab(hubTab.getValue());
       moveNavigation("right");
     }
+  };
+  /**
+   * @description - This function will provide user Limits based on teamId.
+   */
+  public userPlanLimits = async (teamId: string) => {
+    const teamDetails = await this.teamRepository.getTeamDoc(teamId);
+    const currentPlan = teamDetails?.toMutableJSON().plan;
+    if (currentPlan) {
+      const planLimits = await this.planRepository.getPlan(
+        currentPlan?.id.toString(),
+      );
+      return planLimits?.toMutableJSON()?.limits;
+    }
+  };
+
+  /**
+   * @description - This function will send Email request to the Owner.
+   */
+  public requestToUpgradePlan = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const res = await this.teamService.requestOwnerToUpgradePlan(
+      teamId,
+      baseUrl,
+    );
+    if (res?.isSuccessful) {
+      notifications.success(
+        `Request is Sent Successfully to Owner for Upgrade Plan.`,
+      );
+    } else {
+      notifications.error(`Failed to Send Request for Upgrade Plan`);
+    }
+  };
+
+  /**
+   * @description - This function will redirect you to billing section.
+   */
+  public handleRedirectToAdminPanel = async (teamId: string) => {
+    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+  };
+
+  public handleContactSales = async () => {
+    await open(`${constants.MARKETING_URL}/pricing/`);
   };
 }

@@ -67,7 +67,8 @@ import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/coll
 import { parse, GraphQLError } from "graphql";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 import constants from "src/constants/constants";
-import * as Sentry from "@sentry/svelte";
+import { startLoading, stopLoading } from "@sparrow/common/store";
+
 class GraphqlExplorerViewModel {
   /**
    * Repository
@@ -535,7 +536,8 @@ class GraphqlExplorerViewModel {
   };
 
   private transformSchema = async (schemaData) => {
-    const types = schemaData.__schema.types;
+    if (!schemaData) throw new Error("Invalid Schema Data");
+    const types = schemaData?.__schema.types;
     const processedTypes = new Set();
     const maxItemLength = 15;
     const maxDepthLength = 8;
@@ -1006,11 +1008,14 @@ class GraphqlExplorerViewModel {
       // Create a map of secondItems for quick lookup by name
       const secondMap = new Map();
       for (const secondItem of secondItems) {
-        secondMap.set(secondItem.name, secondItem);
+        const compositeKey = `${secondItem.itemType}:${secondItem.name}`;
+        secondMap.set(compositeKey, secondItem);
       }
 
       for (const firstItem of firstItems) {
-        const secondItem = secondMap.get(firstItem.name);
+        const secondItem = secondMap.get(
+          firstItem.itemType + ":" + firstItem.name,
+        );
 
         // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
         if (firstItem.isSelected && !secondItem) {
@@ -1079,6 +1084,9 @@ class GraphqlExplorerViewModel {
     _environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
     isFailedNotificationVisible: boolean = true,
   ) => {
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+    startLoading(tabId + "fetchGraphqlSchema");
     const decodeData = this._decodeGraphql.init(
       this._tab.getValue().property?.graphql as GraphqlRequestTabInterface,
       _environmentVariables,
@@ -1173,12 +1181,13 @@ class GraphqlExplorerViewModel {
             progressiveTab,
           );
           notifications.success("Schema fetched successfully.");
+          stopLoading(tabId + "fetchGraphqlSchema");
         })
         .catch(async (error) => {
           console.error(error);
           const newProgressiveTab = createDeepCopy(this._tab.getValue());
           newProgressiveTab.property.graphql.state.isRequestSchemaFetched =
-            false;
+            true;
           this.tab = newProgressiveTab;
           await this.tabRepository.updateTab(
             newProgressiveTab.tabId,
@@ -1189,11 +1198,12 @@ class GraphqlExplorerViewModel {
               "Failed to fetch schema. Please check the URL and try again.",
             );
           }
+          stopLoading(tabId + "fetchGraphqlSchema");
         });
     } catch (error) {
       console.error(error);
       const newProgressiveTab = createDeepCopy(this._tab.getValue());
-      newProgressiveTab.property.graphql.state.isRequestSchemaFetched = false;
+      newProgressiveTab.property.graphql.state.isRequestSchemaFetched = true;
       this.tab = newProgressiveTab;
       await this.tabRepository.updateTab(
         newProgressiveTab.tabId,
@@ -1204,6 +1214,7 @@ class GraphqlExplorerViewModel {
           "Failed to fetch schema. Please check the URL and try again.",
         );
       }
+      stopLoading(tabId + "fetchGraphqlSchema");
     }
   };
 
@@ -1342,11 +1353,15 @@ class GraphqlExplorerViewModel {
     return mergeItems(realJson, schemaJson);
   };
 
-  public updateQueryAsPerSchema = async () => {
+  public updateQueryAsPerSchema = async (isCheckBoxChecked: boolean) => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
       let _query;
+      // Dont add default query in case checkbox is not ticked
+      if (!isCheckBoxChecked) {
+        return;
+      }
       if (
         progressiveTab.property.graphql.state.operationNavigation ===
         GraphqlRequestOperationTabEnum.QUERY
@@ -1404,11 +1419,12 @@ class GraphqlExplorerViewModel {
    * @param _headers - request headers
    */
   public updateSchema = async (_schema: string) => {
+    const isCheckBoxChecked = JSON.parse(_schema)?.isCheckBoxChecked;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    await this.updateQueryAsPerSchema();
+    await this.updateQueryAsPerSchema(isCheckBoxChecked);
     this.compareRequestWithServer();
   };
 
@@ -1987,8 +2003,10 @@ class GraphqlExplorerViewModel {
     MixpanelEvent(Events.Save_GraphQL_Request);
     const graphqlTabData = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = graphqlTabData.path as Path;
-
+    const tabId = graphqlTabData?.tabId;
+    startLoading(tabId);
     if (!workspaceId || !collectionId) {
+      stopLoading(tabId);
       return {
         status: "error",
         message: "request is not a part of any workspace or collection",
@@ -2018,7 +2036,7 @@ class GraphqlExplorerViewModel {
           auth: unadaptedRequest.auth,
           selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
         },
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
@@ -2042,6 +2060,7 @@ class GraphqlExplorerViewModel {
           guestGraphqlRequest,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: "",
@@ -2096,11 +2115,13 @@ class GraphqlExplorerViewModel {
           res.data.data,
         );
       }
+      stopLoading(tabId);
       return {
         status: "success",
         message: res.message,
       };
     } else {
+      stopLoading(tabId);
       return {
         status: "error",
         message: res.message,

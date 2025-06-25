@@ -80,6 +80,7 @@
     SettingsRegular,
     HistoryRegular,
     CircleSmallFilled,
+    BotRegular,
   } from "@sparrow/library/icons";
   import { Options } from "@sparrow/library/ui";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
@@ -98,6 +99,7 @@
   let webSocketCount = 0;
   let socketIoCount = 0;
   let mockRequestCount = 0;
+  let aiRequestCount = 0;
   let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
@@ -195,6 +197,7 @@
       deletedIds = [];
       requestCount = 0;
       mockRequestCount = 0;
+      aiRequestCount = 0;
       folderCount = 0;
       graphQLCount = 0;
       webSocketCount = 0;
@@ -220,6 +223,9 @@
             } else if (item.items[i].type === ItemType.MOCK_REQUEST) {
               mockRequestCount++;
               deletedIds.push(item.items[i].id);
+            } else if (item.items[i].type === ItemType.AI_REQUEST) {
+              aiRequestCount++;
+              deletedIds.push(item.items[i].id);
             }
           }
         } else if (item.type === ItemType.REQUEST) {
@@ -236,6 +242,9 @@
           deletedIds.push(item.id);
         } else if (item.type === ItemType.MOCK_REQUEST) {
           mockRequestCount++;
+          deletedIds.push(item.id);
+        } else if (item.type === ItemType.AI_REQUEST) {
+          aiRequestCount++;
           deletedIds.push(item.id);
         }
       });
@@ -433,6 +442,10 @@
         <span class="text-plusButton">{socketIoCount}</span>
         <p>Socket.IO</p>
       </div>
+      <div class="d-flex gap-1 text-ds-font-size-12">
+        <span class="text-plusButton">{aiRequestCount}</span>
+        <p>AI Request</p>
+      </div>
     {:else}
       <div class="d-flex gap-1 text-ds-font-size-12">
         <span class="text-plusButton">{mockRequestCount}</span>
@@ -479,7 +492,7 @@
       ? collectionTabWrapper.getBoundingClientRect().right - 115
       : collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top + 20,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -537,7 +550,6 @@
         hidden: false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -547,7 +559,7 @@
       ? collectionTabWrapper.getBoundingClientRect().right - 115
       : collectionTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top + 20,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -606,7 +618,6 @@
         hidden: false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -614,7 +625,7 @@
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right - 55}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top - 0,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
       collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={700}
@@ -679,8 +690,19 @@
         hidden: false,
         icon: GraphIcon,
       },
+      {
+        onClick: () => {
+          onItemCreated("aiRequestCollection", {
+            workspaceId: collection.workspaceId,
+            collection,
+          });
+        },
+        displayText: "Add AI Request",
+        disabled: false,
+        hidden: false,
+        icon: BotRegular,
+      },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -704,7 +726,9 @@
         ? 'main-collection-mock'
         : 'main-collection'} align-items-center bg-transparent border-0 gap:2px;"
     style="gap:4px;"
-    on:contextmenu|preventDefault={rightClickContextMenu}
+    on:contextmenu|preventDefault={isMockCollection
+      ? rightClickContextMenuMock
+      : rightClickContextMenu}
     on:click|preventDefault={() => {
       if (!isRenaming) {
         visibility = !visibility;
@@ -729,7 +753,20 @@
       startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
       onClick={(e) => {
         e.stopPropagation();
-        visibility = !visibility;
+        if (!isRenaming) {
+          visibility = !visibility;
+          if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
+            if (visibility) {
+              addCollectionItem(collection.id, "collection");
+              onItemOpened("collection", {
+                workspaceId: collection.workspaceId,
+                collection,
+              });
+            } else {
+              removeCollectionItem(collection.id);
+            }
+          }
+        }
       }}
     />
     {#if isRenaming}
@@ -1228,6 +1265,38 @@
               }}
             >
               <GraphIcon
+                height={"13px"}
+                width={"13px"}
+                color={"var(--request-arc)"}
+              />
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            title={collection?.activeSync
+              ? "Adding requests is disabled for active sync collections."
+              : `Add AI Request`}
+            placement={collection?.activeSync ? "top-left" : "bottom-center"}
+            distance={12}
+            zIndex={1000}
+          >
+            <div
+              class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
+              style="height: 24px; width: 24px;"
+              role="button"
+              on:click={() => {
+                if (!collection?.activeSync) {
+                  onItemCreated("aiRequestCollection", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                  });
+                  // MixpanelEvent(Events.Collection_GraphQL, {
+                  //   description: "Created GraphQL inside collection.",
+                  // });
+                }
+              }}
+            >
+              <BotRegular
                 height={"13px"}
                 width={"13px"}
                 color={"var(--request-arc)"}
