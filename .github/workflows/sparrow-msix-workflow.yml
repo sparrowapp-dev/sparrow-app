@@ -91,6 +91,13 @@ jobs:
 
           Write-Output "Replaced \${{ github.workspace }} with $escapedPath"
 
+      - name: Print last 6 lines of updated template
+        shell: powershell
+        run: |
+          $path = ".github\\workflows\\msix_packaging\\Sparrow_template_updated.xml"
+          
+          Write-Host "📄 Showing last 6 lines of $path:"
+          Get-Content $path | Select-Object -Last 6
 
 
       - name: Create output directories
@@ -104,6 +111,8 @@ jobs:
         run: |
             Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsBuildNumber
             Get-Location
+            dir
+            ls
 
       - name: Install MSIXPackagingDriver
         id: locate_tool
