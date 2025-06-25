@@ -199,6 +199,22 @@ jobs:
             exit 1
           }
 
+      - name: Locate signtool.exe
+        shell: powershell
+        run: |
+          Write-Host "🔍 Searching for signtool.exe..."
+
+          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+          if ($signTool) {
+            Write-Host "✅ Found signtool.exe at: $($signTool.FullName)"
+            echo "signtool_path=$($signTool.FullName)" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "❌ Could not find signtool.exe"
+            exit 1
+          }
+
+
       - name: Sign MSIX file
         shell: powershell
         run: |
