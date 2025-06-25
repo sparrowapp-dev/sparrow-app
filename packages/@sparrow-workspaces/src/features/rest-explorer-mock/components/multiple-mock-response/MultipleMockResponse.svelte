@@ -7,6 +7,7 @@
     CircleSmallFilled,
     CircleSmallRegular,
     AddRegular,
+    DocumentPercentRegular,
   } from "@sparrow/library/icons";
   import { Toggle } from "@sparrow/library/ui";
   import { getMethodStyle } from "@sparrow/common/utils";
@@ -23,6 +24,9 @@
   export let onHandleMockResponseState;
   export let onRenameMockResponse;
   export let onDeleteMockResponse;
+  export let isResponseRatioModalOpen;
+  export let isResponseStateModalOpen;
+  export let responseToToggle;
 
   let inputField: HTMLInputElement;
   let responseTabElements: HTMLElement[] = [];
@@ -94,7 +98,7 @@
     xAxis={responseTabElements[activeResponseIdx].getBoundingClientRect()
       .right - 30}
     yAxis={[
-      responseTabElements[activeResponseIdx].getBoundingClientRect().top - 0,
+      responseTabElements[activeResponseIdx].getBoundingClientRect().top - 5,
       responseTabElements[activeResponseIdx].getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -124,7 +128,6 @@
         disabled: false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 <div
@@ -143,7 +146,10 @@
         ? "DEL"
         : requestMethod?.toUpperCase()}
     </div>
-    <div class="api-name ellipsis" style="color:var(--bg-ds-neutral-50)">
+    <div
+      class=" ellipsis"
+      style="color:var(--bg-ds-neutral-50); max-width: 150px;"
+    >
       <p
         class="ellipsis m-0 p-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
       >
@@ -151,28 +157,50 @@
       </p>
     </div>
   </button>
-  <Tooltip
-    title={"Add Mock Response"}
-    placement={"top-center"}
-    distance={10}
-    show={true}
-    zIndex={701}
-  >
-    <span class="add-icon-container">
-      <Button
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-        disable={isResponseCreating}
-        onClick={async () => {
-          isResponseCreating = true;
-          await onCreateMockResponse();
-          isResponseCreating = false;
-        }}
-        startIcon={AddRegular}
-      />
-    </span>
-  </Tooltip>
+  <div class="d-flex" style="gap: 8px;">
+    <Tooltip
+      title={"Add Mock Response"}
+      placement={"top-center"}
+      distance={10}
+      show={true}
+      zIndex={701}
+    >
+      <span class="add-icon-container">
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          disable={isResponseCreating}
+          onClick={async () => {
+            isResponseCreating = true;
+            await onCreateMockResponse();
+            isResponseCreating = false;
+          }}
+          startIcon={AddRegular}
+        />
+      </span>
+    </Tooltip>
+    <Tooltip
+      title={"Set Response Ratios"}
+      placement={"top-center"}
+      distance={10}
+      show={true}
+      zIndex={701}
+    >
+      <span class="add-icon-container">
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          disable={false}
+          onClick={() => {
+            isResponseRatioModalOpen = true;
+          }}
+          startIcon={DocumentPercentRegular}
+        />
+      </span>
+    </Tooltip>
+  </div>
 </div>
 {#if mockResponses.length === 0}
   <div
@@ -263,44 +291,65 @@
               </p>
             </div>
           {/if}
+          <div
+            class="text-ds-font-weight-medium percentage-indicator"
+            style="color: var(--text-ds-neutral-200); font-size: 12px;"
+          >
+            {response?.mockRequestResponse?.responseWeightRatio}%
+          </div>
         </button>
         {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-          <Toggle
-            isActive={response.mockRequestResponse.isMockResponseActive}
-            label=""
-            fontSize="12px"
-            textColor="var(--text-ds-neutral-200)"
-            fontWeight="400"
-            onChange={() => {
-              onHandleMockResponseState(
-                response.id,
-                !response.mockRequestResponse.isMockResponseActive,
-              );
-            }}
-          />
-        {/if}
+          <div
+            class="hover-actions d-flex align-items-center {activeResponseIdx ===
+              idx && showMenu
+              ? 'menu-open'
+              : ''}"
+          >
+            <Toggle
+              isActive={response.mockRequestResponse.isMockResponseActive}
+              label=""
+              fontSize="12px"
+              textColor="var(--text-ds-neutral-200)"
+              fontWeight="400"
+              onChange={() => {
+                if (
+                  response?.mockRequestResponse?.isMockResponseActive &&
+                  response?.mockRequestResponse?.responseWeightRatio > 0
+                ) {
+                  isResponseStateModalOpen = true;
+                  responseToToggle = response;
+                } else {
+                  onHandleMockResponseState(
+                    response.id,
+                    !response.mockRequestResponse.isMockResponseActive,
+                  );
+                }
+              }}
+            />
 
-        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-          <div style="position: relative; display: flex; align-items: center;">
-            <Tooltip
-              title={"More"}
-              show={!showMenu}
-              placement={"bottom-center"}
+            <div
+              style="position: relative; display: flex; align-items: center;"
             >
-              <span class="threedot-icon-container d-flex">
-                <Button
-                  tabindex={-1}
-                  id={`${response.id}`}
-                  size="extra-small"
-                  customWidth={"24px"}
-                  type="teritiary-regular"
-                  startIcon={MoreHorizontalRegular}
-                  onClick={(e) => {
-                    rightClickContextMenu(e, idx);
-                  }}
-                />
-              </span>
-            </Tooltip>
+              <Tooltip
+                title={"More"}
+                show={!showMenu}
+                placement={"bottom-center"}
+              >
+                <span class="threedot-icon-container d-flex">
+                  <Button
+                    tabindex={-1}
+                    id={`${response.id}`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={MoreHorizontalRegular}
+                    onClick={(e) => {
+                      rightClickContextMenu(e, idx);
+                    }}
+                  />
+                </span>
+              </Tooltip>
+            </div>
           </div>
         {/if}
       </div>
@@ -356,7 +405,17 @@
       onClick={async () => {
         if (!responseToDelete) return;
         deleteLoader = true;
+
+        const deleteIndex = mockResponses.findIndex(
+          (r) => r.id === responseToDelete.id,
+        );
+        const totalResponses = mockResponses.length;
         await onDeleteMockResponse(responseToDelete.id);
+        if (totalResponses > 1) {
+          if (deleteIndex === totalResponses - 1) {
+            onSetActiveResponseIdx({ activeResponseIdx: deleteIndex - 1 });
+          }
+        }
         deleteLoader = false;
         isDeletePopup = false;
         responseToDelete = null;
@@ -366,6 +425,31 @@
 </Modal>
 
 <style>
+  .hover-actions {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    margin-left: auto;
+  }
+
+  .my-button:hover .hover-actions {
+    opacity: 1;
+    width: 68px;
+    overflow: visible;
+  }
+
+  .selected-response .hover-actions.menu-open {
+    opacity: 1;
+    width: 68px;
+    overflow: visible;
+  }
+  .percentage-indicator {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 35px;
+    text-align: right;
+  }
   .selected-response {
     background-color: var(--bg-ds-surface-400) !important;
     color: var(--text-ds-neutral-50) !important;
@@ -393,23 +477,21 @@
     height: 24px;
     line-height: 18px;
     font-weight: 500;
-    width: 150px;
+    max-width: calc(100% - 60px);
+    flex: 1;
+    min-width: 0;
     text-align: left;
     display: flex;
     align-items: center;
-
     padding: 2px 4px;
     caret-color: var(--bg-ds-primary-300);
   }
   .api-name:focus {
     border: 1px solid var(--bg-ds-primary-300) !important;
   }
-  .my-button:hover .threedot-icon-container {
-    visibility: visible;
-  }
 
   .threedot-icon-container {
-    visibility: hidden;
+    display: flex;
   }
 
   .threedot-active {
@@ -428,17 +510,17 @@
     color: var(--text-ds-neutral-50);
     border-radius: 4px;
   }
-  .btn-primary:hover .threedot-icon-container {
+  /* .btn-primary:hover .threedot-icon-container {
     visibility: visible;
-  }
+  } */
   .btn-primary:active {
     background-color: var(--bg-ds-surface-500);
     color: var(--text-ds-neutral-50);
     border-radius: 4px;
   }
-  .btn-primary:focus-visible .threedot-icon-container {
+  /* .btn-primary:focus-visible .threedot-icon-container {
     visibility: visible;
-  }
+  } */
   .btn-primary:focus-visible {
     border-radius: 4px;
     background-color: var(--bg-ds-surface-400);
@@ -464,5 +546,9 @@
   }
   .main-file {
     width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 4px;
   }
 </style>

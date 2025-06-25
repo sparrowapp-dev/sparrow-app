@@ -996,7 +996,7 @@ export class TeamExplorerPageViewModel {
       return response;
     } else {
       notifications.error(
-        `Failed to join the ${response?.data?.data.name} Hub. Please try again.`,
+        `Failed to join the Hub. Please try again.`,
       );
     }
   };
@@ -1006,7 +1006,13 @@ export class TeamExplorerPageViewModel {
     const response = await this.teamService.ignoreInvite(teamId, baseUrl);
     if (response.isSuccessful) {
       const teams = await this.teamRepository.getTeamsDocuments();
-      await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
+      const team0 = teams[0]?.toMutableJSON();
+      const team1 = teams[1]?.toMutableJSON();
+      if (team0?.teamId !== teamId) {
+        await this.teamRepository.setOpenTeam(team0.teamId);
+      } else if (team1) {
+        await this.teamRepository.setOpenTeam(team1.teamId);
+      }
       await this.teamRepository.removeTeam(teamId);
       notifications.success(
         `Invite ignored. The hub has been removed from your panel.`,

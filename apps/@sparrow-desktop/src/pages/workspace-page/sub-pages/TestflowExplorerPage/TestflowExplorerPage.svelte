@@ -264,6 +264,7 @@
     onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
+    {isGuestUser}
     isWebApp={false}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}

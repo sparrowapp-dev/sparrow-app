@@ -596,6 +596,7 @@ class RestExplorerViewModel {
           responseBodyLanguage: data.response.bodyLanguage,
           responseBodyFormatter: data.response.bodyFormatter,
         });
+        savedRequestTab.updateName(progressiveTab.name +` (${data.response.status.replace(/^\d+\s*/, "")})`);
         responseCode = data.response.status;
       }
       return restApiDataMap;
@@ -2841,7 +2842,7 @@ class RestExplorerViewModel {
       await this.updateRequestState({
         isDocAlreadyGenerated: true,
       });
-    } else if (response?.message === "Limit reached") {
+    } else if (response?.message === "Limit reached. Please try again later.") {
       notifications.error(
         "Failed to generate documentation. Your monthly AI usage limit is reached.",
       );

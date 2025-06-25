@@ -5838,6 +5838,7 @@ export default class CollectionsViewModel {
           args.collection as CollectionDto,
           args.folder as CollectionItemsDto,
         );
+        break;
       case "aiRequest":
         await this.createAiRequestNewTab();
         break;

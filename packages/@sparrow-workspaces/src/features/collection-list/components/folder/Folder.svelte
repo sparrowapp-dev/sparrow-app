@@ -324,7 +324,7 @@
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
-        folderTabWrapper.getBoundingClientRect().top - 0,
+        folderTabWrapper.getBoundingClientRect().top - 5,
         folderTabWrapper.getBoundingClientRect().bottom + 5,
       ]}
       zIndex={500}
@@ -456,7 +456,6 @@
               : true,
         },
       ]}
-      {noOfColumns}
     />
   {/if}
 

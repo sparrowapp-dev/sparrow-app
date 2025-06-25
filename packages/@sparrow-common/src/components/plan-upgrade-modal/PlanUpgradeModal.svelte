@@ -52,7 +52,7 @@
             bgColor={"var(--bg-ds-secondary-400)"}
           />
           <div class="flex-grow-1">
-            <div class="user-name">{`${userName} (You)`}</div>
+            <div class="user-name">{`${userName}`}</div>
             <div class="user-email">{userEmail}</div>
           </div>
           <div class="user-role text-center">{"Owner"}</div>

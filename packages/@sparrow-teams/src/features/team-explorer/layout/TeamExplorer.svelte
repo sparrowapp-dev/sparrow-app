@@ -362,7 +362,7 @@
 
               {#if openTeam?.toMutableJSON()?.plan?.name}
                 <div
-                  class="ms-2 d-flex align-items-center gap-1 mt-3 text-primary-400 cursor-pointer"
+                  class="ms-2 d-flex align-items-center gap-1 text-primary-400 cursor-pointer"
                   on:click={handleRedirectToAdmin}
                 >
                   <p class="text-fs-12 mb-0 pb-0">Launch Admin Panel</p>
@@ -572,6 +572,7 @@
                     }) || []}
                     {onSwitchWorkspace}
                     {onDeleteWorkspace}
+                    {selectedFilter}
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
                   />
@@ -732,7 +733,7 @@
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={openTeam?._data?.name?.split(" ")[0]}
-  userEmail={openTeam?._data?.users[0]?.email || ""}
+  userEmail={openTeam?._data?.users?.[0]?.email || ""}
   submitButtonName={planContent?.buttonName}
 />
 
@@ -754,7 +755,7 @@
     ? handleRedirectToAdminPanel
     : handleRequestOwner}
   userName={openTeam?._data?.name?.split(" ")[0]}
-  userEmail={openTeam?._data?.users[0]?.email || ""}
+  userEmail={openTeam?._data?.users?.[0]?.email || ""}
   submitButtonName={planContent?.buttonName}
 />
 
@@ -793,10 +794,10 @@
       brightness(103%) contrast(104%);
   }
   .team-title {
-    width: calc(100% - 370px);
+    width: calc(100% - 470px);
   }
   .heading {
-    max-width: calc(100% - 150px);
+    max-width: calc(100% - 250px);
   }
   .cursor-pointer {
     cursor: pointer;

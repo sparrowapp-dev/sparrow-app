@@ -88,6 +88,7 @@ export enum HttpRequestMockAddToBaseEnum {
 export interface HttpResponseMockBaseInterface {
   selectedResponseBodyType: HttpResponseMockBodyModeBaseEnum;
   isMockResponseActive: boolean;
+  responseWeightRatio?: number;
   responseBody?: string;
   responseStatus: string;
   responseDate: string;
