@@ -37,7 +37,6 @@
   export let activateGeneratePromptModal;
   export let isGuestUser: boolean;
   export let onUploadFiles;
-  export let onDeleteFiles;
 
   let scrollList: ScrollList;
 
@@ -128,8 +127,8 @@
       {onRenameConversation}
       {onDeleteConversation}
       {onClearConversation}
-      currentProvider = {$tab?.property?.aiRequest?.aiModelProvider}
-      currentModel = {$tab?.property?.aiRequest?.aiModelVariant}
+      currentProvider={$tab?.property?.aiRequest?.aiModelProvider}
+      currentModel={$tab?.property?.aiRequest?.aiModelVariant}
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       prompt={$tab?.property?.aiRequest?.ai?.prompt}
       chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
@@ -144,7 +143,6 @@
       bind:isConversationHistoryLoading
       {activateGeneratePromptModal}
       {onUploadFiles}
-      {onDeleteFiles}
     />
   </div>
 {/if}

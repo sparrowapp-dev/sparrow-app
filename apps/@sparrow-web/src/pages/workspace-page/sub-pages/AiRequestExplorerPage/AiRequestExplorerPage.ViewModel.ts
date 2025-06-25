@@ -589,20 +589,15 @@ class AiRequestExplorerViewModel {
     try {
       const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
       if (response.isSuccessful) {
-        console.log("response :>> ", response.data.data);
         return response.data.data;
       } else {
         notifications.error(`Failed to upload files. Please try again.`);
       }
-
-      console.log("file :>> ", filesToUpload)
     }
     catch (error) {
       console.error("Something went wrong while deleting the conversation. :>> ", error);
     }
   }
-
-  public handleDeleteFilesFromCloud = (filesToDelete: []) => { }
 
 
   /**

@@ -59,7 +59,6 @@ export class AiRequestService {
 
 
   public uploadRAGfiles = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, files: File[]) => {
-
     const formData = new FormData();
     files.forEach((file, index) => {
       formData.append("docs", file);
@@ -67,10 +66,8 @@ export class AiRequestService {
 
     formData.append("model", aiProvider);
     formData.append("authKey", providerAuthKey);
-
-    console.log("formdata :>> ", formData);
-
     const contentType: ContentTypeEnum = ContentTypeEnum["multipart/form-data"];
+
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/assistant`,
@@ -78,7 +75,7 @@ export class AiRequestService {
         body: formData,
         headers: {
           ...getAuthHeaders(),
-          // "Content-type": contentType // Don't set Content-Type manually for FormData - let the browser set it with boundary
+          // "Content-type": contentType // Not setting Content-Type manually for FormData - letting the browser set it with boundary
         },
       }
     );

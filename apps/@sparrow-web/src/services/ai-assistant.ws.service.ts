@@ -412,6 +412,14 @@ export class AiAssistantWebSocketService {
 
   }
 
+  private formatConversations = (rawConversations: any[], isJsonFormatEnabled: boolean): { role: 'user' | 'assistant'; content: string; }[] => {
+    return rawConversations
+      .filter(({ status }) => status !== false) // Exclude error messsages
+      .map(({ type, message }) => ({
+        role: type === 'Sender' ? 'user' : 'assistant',
+        content: isJsonFormatEnabled ? `${message} (Give Response In JSON Format)` : message,
+      }));
+  }
 
   /////////////////////////////////////////////////////////////////////////////
   //                      OpenAI Conversation Formatting
@@ -640,60 +648,6 @@ export class AiAssistantWebSocketService {
       return "";
     }
   }
-
-  private formatConversations = (rawConversations: any[], isJsonFormatEnabled: boolean): { role: 'user' | 'assistant'; content: string; }[] => {
-    return rawConversations
-      .filter(({ status }) => status !== false) // Exclude error messsages
-      .map(({ type, message }) => ({
-        role: type === 'Sender' ? 'user' : 'assistant',
-        content: isJsonFormatEnabled ? `${message} (Give Response In JSON Format)` : message,
-      }));
-  }
-
-
-  // private prepareOpenAIConversation = (
-  //   isContextOn: boolean,
-  //   userPrompt: string,
-  //   systemPrompt: string,
-  //   conversations: { role: 'user' | 'assistant' | 'system'; content: string | any[] }[],
-  //   fileAttachments: PromptFileAttachment[]
-  // ) => {
-  //   const systemPromptContext = { role: 'system', content: systemPrompt };
-
-  //   // Convert file attachments to OpenAI format
-  //   const fileContent = fileAttachments.map(file => ({
-  //     type: 'file',
-  //     file: {
-  //       file_id: file.fileId
-  //     }
-  //   }));
-
-  //   // Add user prompt as text type
-  //   const userContent: any[] = [...fileContent];
-
-  //   if (userPrompt?.trim()) {
-  //     userContent.push({
-  //       type: 'text',
-  //       text: userPrompt.trim()
-  //     });
-  //   }
-
-  //   const userMessage = {
-  //     role: 'user',
-  //     content: userContent.length === 1 && userContent[0].type === 'text'
-  //       ? userContent[0].text // fallback to plain string if only plain text
-  //       : userContent
-  //   };
-
-  //   if (isContextOn) {
-  //     const updatedConversations = [...conversations];
-  //     updatedConversations[updatedConversations.length - 1] = userMessage;
-  //     return [systemPromptContext, ...updatedConversations];
-  //     // return [systemPromptContext, ...conversations, userMessage];
-  //   }
-
-  //   return [systemPromptContext, userMessage];
-  // };
 
 
   /**

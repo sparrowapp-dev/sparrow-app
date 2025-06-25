@@ -210,5 +210,4 @@
   onGenerateAiPrompt={_viewModel.generateAiPrompt}
   onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
   onUploadFiles={_viewModel.handleUploadFilesToCloud}
-  onDeleteFiles={_viewModel.handleDeleteFilesFromCloud}
 />

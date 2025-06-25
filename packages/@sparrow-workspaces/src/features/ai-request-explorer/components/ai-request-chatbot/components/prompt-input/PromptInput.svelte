@@ -31,7 +31,6 @@
   export let onStopGeneratingAIResponse;
   export let activateGeneratePromptModal;
   export let isGuestUser;
-  export let onRemoveFile;
   export let onFileUpload; // Callback to handle cloud upload
   export let currentProvider: AiModelProviderEnum;
   export let currentModel: AIModelVariant;
@@ -218,9 +217,9 @@
     filesToUpload = filesToUpload.filter((f) => f.id !== fileId);
 
     // Call the parent component's remove handler with the actual fileId
-    if (fileToRemove?.fileId) {
-      onRemoveFile(fileToRemove.fileId);
-    }
+    // if (fileToRemove?.fileId) {
+    //   onRemoveFile(fileToRemove.fileId);
+    // }
   };
 
   // Dynamic tooltip text based on current file upload restrictions

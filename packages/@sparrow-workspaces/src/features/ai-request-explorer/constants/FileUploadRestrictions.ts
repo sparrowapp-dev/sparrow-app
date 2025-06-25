@@ -1,18 +1,6 @@
-export interface FileRestrictions {
-    supportedExtensions: string[];
-    maxFileSize: number; // in bytes
-    maxFiles: number;
-}
+import type { FileUploadRestrictions } from "../types";
 
-export interface ProviderRestrictions {
-    [modelName: string]: FileRestrictions;
-}
-
-export interface AllRestrictions {
-    [providerName: string]: ProviderRestrictions;
-}
-
-export const FILE_UPLOAD_RESTRICTIONS: AllRestrictions = {
+export const FILE_UPLOAD_RESTRICTIONS: FileUploadRestrictions = {
     openai: {
         // File upload only available for below mentioned models, for others its disabled right now.
         "gpt-4o": {
