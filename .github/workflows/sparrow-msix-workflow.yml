@@ -98,11 +98,18 @@ jobs:
         run: |
             New-Item -ItemType Directory -Force -Path "msix-output"
             Write-Output "Created msix-output directory"
+      
+      - name: Check Windows version
+        shell: powershell
+        run: |
+            Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsBuildNumber
 
       - name: Locate MSIXPackagingTool.exe
         id: locate_tool
         run: |
             MsixPackagingTool.exe --version
+            dism.exe /Online /add-capability /capabilityname:Msix.PackagingTool.Driver~~~~0.0.1.0
+
         shell: pwsh
 
       - name: Convert MSI to MSIX
