@@ -77,28 +77,45 @@ jobs:
             
             Write-Host "`n=== Installed Packages ==="
             winget list "MSIX Packaging Tool"
+            Write-Host "Current directory: $(Get-Location)"
+
+
+      - name: Print name and lcoation
+        shell: powershell
+        run: |
+          Write-Host "=== Current Working Directory ===" -ForegroundColor Green
+          Get-Location
+          
+          Write-Host "`n=== Current Directory Path ===" -ForegroundColor Green
+          $currentPath = (Get-Location).Path
+          Write-Host $currentPath
+          Write-Host "`n=== XML File Contents ===" -ForegroundColor Green
+          $xmlPath = ".github\workflows\msix_packaging\Sparrow_template.xml"
+          
+          if (Test-Path $xmlPath) {
+              Write-Host "Found XML file at: $xmlPath" -ForegroundColor Yellow
+              Write-Host "`n--- XML Content ---" -ForegroundColor Cyan
+              Get-Content $xmlPath -Raw
+          } else {
+              Write-Host "XML file not found at: $xmlPath" -ForegroundColor Red
+              Write-Host "`nLooking for .github directory..." -ForegroundColor Yellow
+              
+              if (Test-Path ".github") {
+                  Write-Host "Found .github directory. Contents:" -ForegroundColor Yellow
+                  Get-ChildItem ".github" -Recurse -Force | Select-Object FullName
+              } else {
+                  Write-Host ".github directory not found in current location" -ForegroundColor Red
+              }
+          }
 
       - name: Update template with actual workspace path
         shell: powershell
         run: |
-          $workspace = "${{ github.workspace }}"
-          $escapedPath = $workspace -replace '\\', '\\\\'
+          $workspace = "${{ github.workspace }}"          
 
           $template = Get-Content ".github\\workflows\\msix_packaging\\Sparrow_template.xml" -Raw
-          $template = $template -replace '\$\{\{ github\.workspace \}\}', $escapedPath
-
-          $template | Set-Content ".github\\workflows\\msix_packaging\\Sparrow_template_updated.xml"
-
-          Write-Output "Replaced \${{ github.workspace }} with $escapedPath"
-
-      - name: Print last 6 lines of updated template
-        shell: powershell
-        run: |
-          $path = ".github\\workflows\\msix_packaging\\Sparrow_template_updated.xml"
-          
-          Write-Host "Showing last 6 lines of $path:"
-          Get-Content $path | Select-Object -Last 6
-
+          $template = $template -replace '\$\{\{ github\.workspace \}\}', $workspace
+          Write-Output "Replaced \${{ github.workspace }} with $workspace"
 
       - name: Create output directories
         shell: powershell
