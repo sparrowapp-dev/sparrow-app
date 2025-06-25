@@ -78,19 +78,19 @@ jobs:
             Write-Host "`n=== Installed Packages ==="
             winget list "MSIX Packaging Tool"
 
-      - name: Update template with actual paths
+      - name: Update template with actual workspace path
         shell: powershell
         run: |
-            $workspacePath = "${{ github.workspace }}" -replace "\\", "\\"
-            $templateContent = Get-Content ".github\workflows\msix_packaging\Sparrow_template.xml" -Raw
-            
-            # Replace placeholders with actual paths
-            $templateContent = $templateContent -replace '\$\{\{ github\.workspace \}\}', $workspacePath
-            
-            # Create the updated template
-            $templateContent | Set-Content ".github\workflows\msix_packaging\Sparrow_template_updated.xml"
-            
-            Write-Output "Template updated with workspace path: $workspacePath"
+          $workspace = "${{ github.workspace }}"
+          $escapedPath = $workspace -replace '\\', '\\\\'
+
+          $template = Get-Content ".github\\workflows\\msix_packaging\\Sparrow_template.xml" -Raw
+          $template = $template -replace '\$\{\{ github\.workspace \}\}', $escapedPath
+
+          $template | Set-Content ".github\\workflows\\msix_packaging\\Sparrow_template_updated.xml"
+
+          Write-Output "Replaced \${{ github.workspace }} with $escapedPath"
+
 
 
       - name: Create output directories
@@ -103,8 +103,9 @@ jobs:
         shell: powershell
         run: |
             Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsBuildNumber
+            Get-Location
 
-      - name: Locate MSIXPackagingTool.exe
+      - name: Install MSIXPackagingDriver
         id: locate_tool
         run: |
             MsixPackagingTool.exe --version
