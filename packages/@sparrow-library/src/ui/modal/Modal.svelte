@@ -172,7 +172,7 @@
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
     padding: 30px 30px 20px 30px;
-    animation: smartFadeIn 240ms ease-out both;
+    animation: smartFadeIn 300ms ease-out both;
   }
   .sparrow-modal-heading {
     width: 400px;
