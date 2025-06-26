@@ -3511,7 +3511,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3532,7 +3532,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
