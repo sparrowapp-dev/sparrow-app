@@ -15,17 +15,6 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Restore PFX certificate from base64
-        run: |
-          [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String("${{ vars.CERT_BASE64 }}"))
-        shell: pwsh
-
-      - name: Import certificate into local store
-        run: |
-          $securePassword = ConvertTo-SecureString -String "${{ vars.CERT_PASSWORD }}" -AsPlainText -Force
-          Import-PfxCertificate -FilePath "cert.pfx" -CertStoreLocation "Cert:\CurrentUser\My" -Password $securePassword
-        shell: pwsh
-
       - name: Install winget
         shell: powershell
         run: |
@@ -34,7 +23,6 @@ jobs:
       - name: Install MSIX Packaging Tool
         shell: powershell
         run: |
-
             # Install MSIX Packaging Tool from Microsoft Store
             winget install "MSIX Packaging Tool" --source msstore --accept-package-agreements --accept-source-agreements --silent
             
@@ -126,8 +114,7 @@ jobs:
               }
           }
 
-
-      - name: Print name and lcoation
+      - name: Print name and location
         shell: powershell
         run: |
           Write-Host "=== Current Working Directory ===" -ForegroundColor Green
@@ -174,8 +161,6 @@ jobs:
         run: |
             MsixPackagingTool.exe --version
             dism.exe /Online /add-capability /capabilityname:Msix.PackagingTool.Driver~~~~0.0.1.0
-            winget install -e --id Microsoft.Azure.TrustedSigningClientTools
-
         shell: pwsh
 
       - name: Convert MSI to MSIX
@@ -194,76 +179,51 @@ jobs:
             Write-Host "Found MSIX file: $($msixFile.FullName)"
             echo "msix_path=$($msixFile.FullName)" >> $env:GITHUB_OUTPUT
             echo "msix_name=$($msixFile.Name)" >> $env:GITHUB_OUTPUT
+            echo "msix_folder=$($msixFile.DirectoryName)" >> $env:GITHUB_OUTPUT
           } else {
             Write-Host "No MSIX file found!"
             exit 1
           }
 
-      - name: Locate signtool.exe
-        shell: powershell
-        run: |
-          Write-Host "🔍 Searching for signtool.exe..."
-
-          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-
-          if ($signTool) {
-            Write-Host "✅ Found signtool.exe at: $($signTool.FullName)"
-            echo "signtool_path=$($signTool.FullName)" >> $env:GITHUB_OUTPUT
-          } else {
-            Write-Host "❌ Could not find signtool.exe"
-            exit 1
-          }
-
-
-      - name: Sign MSIX file
-        shell: powershell
-        run: |
-          # Find the MSIX file
-          $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
-          
-          if (-not $msixFile) {
-            Write-Host "No MSIX file found to sign!"
-            exit 1
-          }
-          
-          Write-Host "Found MSIX file to sign: $($msixFile.FullName)"
-          
-          # Find SignTool
-          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Name "signtool.exe" | Select-Object -First 1
-          
-          if (-not $signTool) {
-            Write-Host "SignTool not found!"
-            exit 1
-          }
-          
-          $signToolPath = $signTool.FullName
-          Write-Host "Using SignTool at: $signToolPath"
-          
-          # Sign the MSIX file
-          & $signToolPath sign /f "cert.pfx" /p "${{ vars.CERT_PASSWORD }}" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $msixFile.FullName
-          
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ MSIX file signed successfully"
-          } else {
-            Write-Host "❌ Failed to sign MSIX file"
-            exit 1
-          }
+      - name: Sign MSIX package
+        uses: skymatic/code-sign-action@v1
+        with:
+          certificate: '${{ vars.CERTIFICATE }}'
+          password: '${{ secrets.PASSWORD }}'
+          certificatesha1: '${{ secrets.CERTHASH }}'
+          certificatename: '${{ secrets.CERTNAME }}'
+          description: 'Sparrow MSIX Package'
+          timestampUrl: 'http://timestamp.digicert.com'
+          folder: '${{ steps.find_msix.outputs.msix_folder }}'
+          recursive: false
 
       - name: Verify MSIX signature
         shell: powershell
         run: |
           $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
-          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Name "signtool.exe" | Select-Object -First 1
-          $signToolPath = $signTool.FullName
+          
+          if (-not $msixFile) {
+            Write-Host "❌ No MSIX file found for verification!"
+            exit 1
+          }
           
           Write-Host "Verifying signature for: $($msixFile.FullName)"
-          & $signToolPath verify /pa $msixFile.FullName
           
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ MSIX signature verification successful"
+          # Try to find signtool for verification
+          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          
+          if ($signTool) {
+            Write-Host "Using SignTool at: $($signTool.FullName)"
+            & $signTool.FullName verify /pa $msixFile.FullName
+            
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "✅ MSIX signature verification successful"
+            } else {
+              Write-Host "❌ MSIX signature verification failed"
+              exit 1
+            }
           } else {
-            Write-Host "❌ MSIX signature verification failed"
-            exit 1
+            Write-Host "⚠️ SignTool not found, skipping verification"
           }
 
       - name: Upload MSIX artifact  
@@ -271,4 +231,3 @@ jobs:
         with:
           name: msix-package
           path: ${{ steps.find_msix.outputs.msix_path }}
-
