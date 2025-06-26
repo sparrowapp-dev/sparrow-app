@@ -4,7 +4,7 @@
   import { AddRegular } from "@sparrow/library/icons";
 
   let isAscending = false;
-
+  let isCreateProfileModalOpen = false;
   const tableHeaderContent = [
     "Name",
     "Description",
@@ -50,7 +50,9 @@
       disable={false}
       title={"Add Profile"}
       type={"outline-primary"}
-      onClick={() => {}}
+      onClick={() => {
+        isCreateProfileModalOpen = true;
+      }}
       size="medium"
       startIcon={AddRegular}
     />
@@ -94,14 +96,14 @@
   type={"dark"}
   width={"35%"}
   zIndex={1000}
-  isOpen={true}
+  isOpen={isCreateProfileModalOpen}
   handleModalState={(flag) => {
-    // isCreateTeamModalOpen = flag;
+    isCreateProfileModalOpen = flag;
   }}
 >
   <CreateAuthProfile
     handleModalState={(flag = false) => {
-      // isCreateTeamModalOpen = flag;
+      isCreateProfileModalOpen = flag;
     }}
     onCreateProfile={() => {}}
   />

@@ -24,8 +24,6 @@
     profileForm.authType.value = selectedRequestStateId;
   };
   const onUpdateRequestAuth = async (updatedAuthData) => {
-    // const updatedAuthType = updatedAuthData;
-    // console.log("changing auth values :>> ", updatedAuthType);
     profileForm.auth.values = {
       ...profileForm.auth.values,
       ...updatedAuthData,
