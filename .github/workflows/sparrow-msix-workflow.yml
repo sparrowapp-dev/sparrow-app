@@ -180,22 +180,81 @@ jobs:
             echo "msix_path=$($msixFile.FullName)" >> $env:GITHUB_OUTPUT
             echo "msix_name=$($msixFile.Name)" >> $env:GITHUB_OUTPUT
             echo "msix_folder=$($msixFile.DirectoryName)" >> $env:GITHUB_OUTPUT
+            
+            # Also output just the filename without extension for signing
+            $nameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msixFile.Name)
+            echo "msix_name_no_ext=$nameWithoutExt" >> $env:GITHUB_OUTPUT
           } else {
             Write-Host "No MSIX file found!"
             exit 1
           }
 
-      - name: Sign MSIX package
-        uses: skymatic/code-sign-action@v1
-        with:
-          certificate: '${{ vars.CERT_BASE64 }}'
-          password: '${{ vars.CERT_PASSWORD }}'
-          certificatesha1: '${{ vars.CERTHASH }}'
-          certificatename: '${{ vars.CERTNAME }}'
-          description: 'Sparrow MSIX Package'
-          timestampUrl: 'http://timestamp.digicert.com'
-          folder: '${{ steps.find_msix.outputs.msix_folder }}'
-          recursive: false
+      - name: Restore PFX certificate from base64
+        run: |
+          [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String("${{ secrets.CERTIFICATE }}"))
+        shell: pwsh
+
+      - name: Sign MSIX package manually
+        shell: powershell
+        run: |
+          # Find the MSIX file
+          $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
+          
+          if (-not $msixFile) {
+            Write-Host "❌ No MSIX file found to sign!"
+            exit 1
+          }
+          
+          Write-Host "Found MSIX file to sign: $($msixFile.FullName)"
+          
+          # Try multiple SignTool locations
+          $signToolPaths = @(
+            "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe",
+            "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+          )
+          
+          # Also search dynamically for Windows Kits SignTool
+          $dynamicPaths = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
+          if ($dynamicPaths) {
+            $signToolPaths += $dynamicPaths[0].FullName
+          }
+          
+          $signTool = $null
+          foreach ($path in $signToolPaths) {
+            if (Test-Path $path) {
+              $signTool = $path
+              Write-Host "✅ Found SignTool at: $signTool"
+              break
+            } else {
+              Write-Host "❌ SignTool not found at: $path"
+            }
+          }
+          
+          if (-not $signTool) {
+            Write-Host "❌ SignTool not found in any expected location!"
+            Write-Host "Available directories:"
+            Get-ChildItem "C:\Program Files (x86)\" -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*SDK*" -or $_.Name -like "*Windows*" } | Select-Object Name
+            exit 1
+          }
+          
+          # Set up certificate and signing parameters
+          $certificatePath = "cert.pfx"
+          $certificatePwd = '${{ secrets.PASSWORD }}'
+          $packageToSign = $msixFile.FullName
+          
+          Write-Host "Certificate Path: $certificatePath"
+          Write-Host "Package to Sign: $packageToSign"
+          Write-Host "Using SignTool: $signTool"
+          
+          # Sign using the Stack Overflow approach
+          & $signTool sign /fd sha256 /a /f $certificatePath /p $certificatePwd $packageToSign
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ MSIX file signed successfully"
+          } else {
+            Write-Host "❌ Failed to sign MSIX file (Exit code: $LASTEXITCODE)"
+            exit 1
+          }
 
       - name: Verify MSIX signature
         shell: powershell
