@@ -272,7 +272,7 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    } catch (error) { 
+    } catch (error) {
       notifications.error(
         "Failed to update the documentation. Please try again",
       );
@@ -701,7 +701,7 @@ class RestExplorerViewModel {
         description: socketMetaData.description,
         type: ItemType.WEB_SOCKET,
         websocket: unadaptedSocket,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

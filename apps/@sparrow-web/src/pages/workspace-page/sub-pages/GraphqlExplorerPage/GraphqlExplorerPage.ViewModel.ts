@@ -2036,7 +2036,7 @@ class GraphqlExplorerViewModel {
           auth: unadaptedRequest.auth,
           selectedGraphqlAuthType: unadaptedRequest.selectedGraphqlAuthType,
         },
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

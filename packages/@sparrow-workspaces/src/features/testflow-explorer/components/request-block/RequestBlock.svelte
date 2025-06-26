@@ -354,9 +354,9 @@
     >
       <span
         class="p-1 rounded-1 more-option-btn"
-        style={moreOptionsMenu
-          ? "background-color: var(--bg-ds-surface-400) !important;"
-          : ""}
+        style="cursor:pointer; {moreOptionsMenu
+          ? 'background-color: var(--bg-ds-surface-400) !important;'
+          : ''}"
       >
         <MoreHorizontalRegular
           size={"16px"}
@@ -544,7 +544,7 @@
   {#if !isDropHereVisible && isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
-        style="border-radius: 50%;"
+        style="border-radius: 50%; cursor:pointer;"
         on:click={() => {
           data.onClick(id);
           isAddBlockVisible = false;

@@ -100,7 +100,7 @@
         };
         findUserRole();
         currentTeam = await _viewModel.readTeam(currentTeamDetails.id);
-        currrentInvites = currentTeam._data.invites?.length || 0;
+        currrentInvites = currentTeam?._data?.invites?.length || 0;
         isSharedWorkspace = value._data.isShared;
         workspaceType = value._data?.workspaceType || "PRIVATE";
       }

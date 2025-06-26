@@ -146,6 +146,9 @@ const mockRequestResponseItems = {
   isMockResponseActive: {
     type: "boolean",
   },
+  responseWeightRatio: {
+    type: "number",
+  },
 };
 
 const itemsProperties = {
@@ -212,7 +215,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 6,
+  version: 7,
   properties: {
     collectionId: {
       type: "string",

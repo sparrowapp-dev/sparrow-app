@@ -1152,7 +1152,10 @@ class RestExplorerMockViewModel {
       return;
     }
     initRequestTab.updateBody(progressiveTab.property.mockRequest?.body);
-    initRequestTab.updateUrl(collectionData?.mockCollectionUrl + progressiveTab.property.mockRequest?.url);
+    initRequestTab.updateUrl(
+      collectionData?.mockCollectionUrl +
+        progressiveTab.property.mockRequest?.url,
+    );
     initRequestTab.updateName(progressiveTab.name);
     initRequestTab.updateDescription(progressiveTab.description);
     initRequestTab.updateMethod(progressiveTab.property.mockRequest?.method);
@@ -1497,7 +1500,7 @@ class RestExplorerMockViewModel {
         description: requestMetaData.description,
         type: "MOCK_REQUEST",
         mockRequest: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
@@ -1583,7 +1586,7 @@ class RestExplorerMockViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) {}
+  set collection(e) { }
 
   /**
    *
@@ -3039,6 +3042,7 @@ class RestExplorerMockViewModel {
             responseDate: "",
             selectedResponseBodyType: "",
             isMockResponseActive: false,
+            responseWeightRatio: 0,
           },
         },
       };
@@ -3082,6 +3086,8 @@ class RestExplorerMockViewModel {
               response.data.data.mockRequestResponse.isMockResponseActive,
             selectedResponseBodyType:
               response.data.data.mockRequestResponse.selectedResponseBodyType,
+            responseWeightRatio:
+              response.data.data.mockRequestResponse.responseWeightRatio,
           },
           source: response.data.data?.source,
           createdAt: response.data.data?.createdAt,
@@ -3137,6 +3143,7 @@ class RestExplorerMockViewModel {
       mockRequestId: progressiveTab.id,
       mockResponseId: mockResponseId,
       isMockResponseActive: isMockResponseActive,
+      responseWeightRatio: 0,
     };
 
     try {
@@ -3148,7 +3155,7 @@ class RestExplorerMockViewModel {
         );
       if (response?.isSuccessful) {
         if (progressiveTab.path.folderId) {
-          this.collectionRepository.updateSavedRequestInFolder(
+          this.collectionRepository.updateMockResponseInFolder(
             progressiveTab.path.collectionId,
             progressiveTab.path.folderId,
             progressiveTab.id,
@@ -3156,26 +3163,29 @@ class RestExplorerMockViewModel {
             {
               mockRequestResponse: {
                 isMockResponseActive: isMockResponseActive,
+                responseWeightRatio: 0,
               },
             },
           );
         } else {
-          this.collectionRepository.updateSavedRequestInCollection(
+          this.collectionRepository.updateMockResponseInCollection(
             progressiveTab.path.collectionId,
             progressiveTab.id,
             mockResponseId,
             {
               mockRequestResponse: {
                 isMockResponseActive: isMockResponseActive,
+                responseWeightRatio: 0,
               },
             },
           );
         }
-        debugger;
         progressiveTab.property?.mockRequest?.items?.forEach((item) => {
           if (item.id === mockResponseId) {
             item.mockRequestResponse.isMockResponseActive =
               isMockResponseActive;
+            item.mockRequestResponse.responseWeightRatio =
+              0;
           }
         });
         this.tab = progressiveTab;
@@ -3183,8 +3193,10 @@ class RestExplorerMockViewModel {
           progressiveTab.tabId,
           progressiveTab,
         );
-        return true;
-      } else {
+            return true; 
+      } else
+      
+      {
         return false;
       }
     } catch (error) {
@@ -3315,6 +3327,80 @@ class RestExplorerMockViewModel {
     } catch (error) {
       console.error("Error deleting mock response:", error);
       notifications.error("An error occurred while deleting mock response.");
+      return false;
+    }
+  };
+  /**
+   * Updates the weight ratios for mock responses in a collection
+   * @param mockResponseRatios - Array of response ratios to update
+   * @returns Promise resolving to true if successful, false otherwise
+   */
+  public updateResponseRatios = async (mockResponseRatios: Array<{ mockResponseId: string, responseWeightRatio: number }>) => {
+    try {
+      const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+      const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+
+      const updatePayload = {
+        collectionId: progressiveTab.path.collectionId,
+        workspaceId: progressiveTab.path.workspaceId,
+        mockRequestId: progressiveTab.id,
+        folderId: progressiveTab.path.folderId || "",
+        mockResponseRatios: mockResponseRatios
+      };
+
+      const response = await this.collectionService.updateMockResponseRatios(
+        updatePayload,
+        baseUrl
+      );
+
+      if (response?.isSuccessful) {
+
+        if (progressiveTab.path.folderId) {
+          this.collectionRepository.updateMockResponseRatiosInFolder(
+            progressiveTab.path.collectionId,
+            progressiveTab.path.folderId,
+            progressiveTab.id,
+            mockResponseRatios,
+          );
+        } else {
+          this.collectionRepository.updateMockResponseRatiosInCollection(
+            progressiveTab.path.collectionId,
+            progressiveTab.id,
+            mockResponseRatios,
+          );
+        }
+
+
+        if (progressiveTab.property?.mockRequest?.items) {
+          progressiveTab.property.mockRequest.items = progressiveTab.property.mockRequest.items.map(item => {
+            const ratioUpdate = mockResponseRatios.find(ratio => ratio.mockResponseId === item.id);
+            if (ratioUpdate) {
+              return {
+                ...item,
+                mockRequestResponse: {
+                  ...item.mockRequestResponse,
+                  responseWeightRatio: ratioUpdate.responseWeightRatio
+                }
+              };
+            }
+            return item;
+          });
+          this.tab = progressiveTab;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab
+          );
+        }
+
+        notifications.success("Response ratios updated successfully.");
+        return true;
+      } else {
+        notifications.error(response?.message || "Failed to update response ratios.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating mock response ratios:", error);
+      notifications.error("An error occurred while updating response ratios.");
       return false;
     }
   };

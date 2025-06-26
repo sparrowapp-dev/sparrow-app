@@ -1,7 +1,12 @@
 import { user } from "@app/store/auth.store";
 import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 import type { InviteBody } from "@sparrow/common/dto/team-dto";
-import { Events, UntrackedItems, WorkspaceRole } from "@sparrow/common/enums";
+import {
+  Events,
+  ResponseMessage,
+  UntrackedItems,
+  WorkspaceRole,
+} from "@sparrow/common/enums";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import type { WorkspaceDocument } from "../../database/database";
@@ -990,6 +995,8 @@ export class TeamExplorerPageViewModel {
       this.teamRepository.modifyTeam(teamId, response.data.data);
       notifications.success(`Invite resent successfully.`);
       return response;
+    } else if (response?.data?.message === ResponseMessage.INVITE_DECLINED) {
+      notifications.error(`The invite has been declined by Collaborate.`);
     } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
@@ -1021,9 +1028,7 @@ export class TeamExplorerPageViewModel {
       );
       return response;
     } else {
-      notifications.error(
-        `Failed to join the Hub. Please try again.`,
-      );
+      notifications.error(`Failed to join the Hub. Please try again.`);
     }
   };
 
@@ -1032,7 +1037,13 @@ export class TeamExplorerPageViewModel {
     const response = await this.teamService.ignoreInvite(teamId, baseUrl);
     if (response.isSuccessful) {
       const teams = await this.teamRepository.getTeamsDocuments();
-      await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
+      const team0 = teams[0]?.toMutableJSON();
+      const team1 = teams[1]?.toMutableJSON();
+      if (team0?.teamId !== teamId) {
+        await this.teamRepository.setOpenTeam(team0.teamId);
+      } else if (team1) {
+        await this.teamRepository.setOpenTeam(team1.teamId);
+      }
       await this.teamRepository.removeTeam(teamId);
       notifications.success(
         `Invite ignored. The hub has been removed from your panel.`,

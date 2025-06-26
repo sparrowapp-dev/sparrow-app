@@ -942,7 +942,7 @@ class AiRequestExplorerViewModel {
         description: requestMetaData.description,
         type: "AI_REQUEST",
         aiRequest: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
