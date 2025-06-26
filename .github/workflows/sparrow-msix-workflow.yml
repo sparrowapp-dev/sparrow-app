@@ -188,10 +188,10 @@ jobs:
       - name: Sign MSIX package
         uses: skymatic/code-sign-action@v1
         with:
-          certificate: '${{ vars.CERTIFICATE }}'
-          password: '${{ secrets.PASSWORD }}'
-          certificatesha1: '${{ secrets.CERTHASH }}'
-          certificatename: '${{ secrets.CERTNAME }}'
+          certificate: '${{ vars.CERT_BASE64 }}'
+          password: '${{ vars.CERT_PASSWORD }}'
+          certificatesha1: '${{ vars.CERTHASH }}'
+          certificatename: '${{ vars.CERTNAME }}'
           description: 'Sparrow MSIX Package'
           timestampUrl: 'http://timestamp.digicert.com'
           folder: '${{ steps.find_msix.outputs.msix_folder }}'
