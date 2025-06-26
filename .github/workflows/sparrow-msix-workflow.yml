@@ -346,8 +346,8 @@ jobs:
           
           Write-Host "Verifying signature for: $($msixFile.FullName)"
           
-          # Try to find signtool for verification
-          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          # Find x64 SignTool specifically (same as used for signing)
+          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           
           if ($signTool) {
             Write-Host "Using SignTool at: $($signTool.FullName)"
@@ -357,11 +357,10 @@ jobs:
               Write-Host "✅ MSIX signature verification successful"
             } else {
               Write-Host "❌ MSIX signature verification failed"
-              # Don't exit here - verification might fail even with valid signature due to trust issues
               Write-Host "⚠️ Continuing despite verification failure (common in CI environments)"
             }
           } else {
-            Write-Host "⚠️ SignTool not found, skipping verification"
+            Write-Host "⚠️ x64 SignTool not found, skipping verification"
           }
 
       - name: Upload MSIX artifact  
