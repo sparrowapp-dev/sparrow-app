@@ -226,66 +226,15 @@ export class DashboardViewModel {
         data.push(item);
       }
 
-      const planResponse = await this.planService.getPlansByIds(userPlans);
-
-      if (planResponse.isSuccessful && planResponse.data.data) {
-        const parsedPlans = [];
-        for (const planData of planResponse.data.data) {
-          const rawData = planData;
-          if (!rawData?._id) continue;
-          const planDetails = {
-            planId: rawData._id,
-            name: rawData.name,
-            description: rawData.description,
-            active: rawData.active,
-            limits: {
-              workspacesPerHub: {
-                area: rawData.limits.workspacesPerHub.area,
-                value: rawData.limits.workspacesPerHub.value,
-              },
-              testflowPerWorkspace: {
-                area: rawData.limits.testflowPerWorkspace.area,
-                value: rawData.limits.testflowPerWorkspace.value,
-              },
-              usersPerHub: {
-                area: rawData.limits.usersPerHub.area,
-                value: rawData.limits.usersPerHub.value,
-              },
-              blocksPerTestflow: {
-                area: rawData.limits.blocksPerTestflow.area,
-                value: rawData.limits.blocksPerTestflow.value,
-              },
-              selectiveTestflowRun: {
-                area: rawData.limits.selectiveTestflowRun.area,
-                active: rawData.limits.selectiveTestflowRun.active,
-              },
-              activeSync: {
-                area: rawData.limits.activeSync.area,
-                active: rawData.limits.activeSync.active,
-              },
-              testflowRunHistory: {
-                area: rawData.limits.testflowRunHistory.area,
-                value: rawData.limits.testflowRunHistory.value,
-              },
-            },
-            createdAt: rawData.createdAt,
-            updatedAt: rawData.updatedAt,
-            createdBy: rawData.createdBy,
-            updatedBy: rawData.updatedBy,
-          };
-          parsedPlans.push(planDetails);
-        }
-        await this.planRepository.upsertMany(parsedPlans);
-        await this.teamRepository.bulkInsertData(data);
-        await this.teamRepository.deleteOrphanTeams(
-          data.map((_team) => {
-            return _team.teamId;
-          }),
-        );
-        if (!isAnyTeamsOpen) {
-          this.teamRepository.setOpenTeam(data[0].teamId);
-          return;
-        }
+      await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
       }
 
     }
@@ -1333,12 +1282,9 @@ export class DashboardViewModel {
 
   public userPlanLimits = async (teamId: string) => {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
-    const currentPlan = teamDetails?._data?.plan;
+    const currentPlan = teamDetails?.toMutableJSON()?.plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?._data?.limits;
+      return currentPlan?.limits;
     }
   };
 

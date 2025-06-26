@@ -8,7 +8,7 @@ export const teamSchemaLiteral = {
   title: "team",
   primaryKey: "teamId",
   type: "object",
-  version: 6,
+  version: 7,
   properties: {
     teamId: {
       type: "string",
@@ -92,12 +92,113 @@ export const teamSchemaLiteral = {
     plan: {
       type: "object",
       properties: {
-        id: {
-          type: "string",
-        },
-        name: {
-          type: "string",
-        },
+          id: {
+            type: "string",
+            maxLength: 100,
+          },
+          name: {
+            type: "string",
+          },
+          description: {
+            type: "string",
+          },
+          active: {
+            type: "boolean",
+          },
+          limits: {
+            type: "object",
+            properties: {
+              workspacesPerHub: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "number",
+                  },
+                },
+              },
+              testflowPerWorkspace: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "number",
+                  },
+                },
+              },
+              blocksPerTestflow: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "number",
+                  },
+                },
+              },
+              usersPerHub: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "number",
+                  },
+                },
+              },
+              selectiveTestflowRun: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  active: {
+                    type: "boolean",
+                  },
+                },
+              },
+              activeSync: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  active: {
+                    type: "boolean",
+                  },
+                },
+              },
+              testflowRunHistory: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "number",
+                  },
+                },
+              },
+            },
+          },
+          createdAt: {
+            type: "string",
+          },
+          updatedAt: {
+            type: "string",
+          },
+          createdBy: {
+            type: "string",
+          },
+          updatedBy: {
+            type: "string"
+          }
       },
       required: ["id", "name"],
     },
