@@ -191,7 +191,7 @@ jobs:
 
       - name: Restore PFX certificate from base64
         run: |
-          [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String("${{ secrets.CERTIFICATE }}"))
+          [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String("${{ vars.CERT_BASE64 }}"))
         shell: pwsh
 
       - name: Sign MSIX package manually
@@ -239,7 +239,7 @@ jobs:
           
           # Set up certificate and signing parameters
           $certificatePath = "cert.pfx"
-          $certificatePwd = '${{ secrets.PASSWORD }}'
+          $certificatePwd = '${{ vars.CERT_PASSWORD }}'
           $packageToSign = $msixFile.FullName
           
           Write-Host "Certificate Path: $certificatePath"
@@ -247,7 +247,7 @@ jobs:
           Write-Host "Using SignTool: $signTool"
           
           # Sign using the Stack Overflow approach
-          & $signTool sign /fd sha256 /a /f $certificatePath /p $certificatePwd $packageToSign
+          $signTool sign /fd sha256 /a /f $certificatePath /p $certificatePwd $packageToSign
           
           if ($LASTEXITCODE -eq 0) {
             Write-Host "✅ MSIX file signed successfully"
