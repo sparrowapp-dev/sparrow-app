@@ -123,7 +123,7 @@ jobs:
         run: |
           $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiFileName"
           
           $body = @{
             "type" = "message"
@@ -141,7 +141,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: development"
+                      "text" = "Branch: production"
                       "wrap" = $true
                     }
                     @{
@@ -170,7 +170,7 @@ jobs:
 
   release_linux:
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
     needs: release_macos
 
     env:
@@ -218,7 +218,7 @@ jobs:
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
-          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
