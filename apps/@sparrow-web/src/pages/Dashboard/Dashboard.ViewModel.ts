@@ -31,6 +31,7 @@ import { FeatureSwitchRepository } from "../../repositories/feature-switch.repos
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import {
+  AiRequestTabAdapter,
   CollectionTabAdapter,
   GraphqlTabAdapter,
   RequestMockTabAdapter,
@@ -739,6 +740,17 @@ export class DashboardViewModel {
         await this.tabRepository.createTab(adaptedSocketIo, workspaceId);
         break;
       }
+      case "AI_REQUEST": {
+        const aiRequestTabAdapter = new AiRequestTabAdapter();
+        const adaptedAiRequest = aiRequestTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedAiRequest, workspaceId);
+        break;
+      }
       case "MOCK_REQUEST": {
         const mockRequestTabAdapter = new RequestMockTabAdapter();
         const adaptedMockRequest = mockRequestTabAdapter.adapt(
@@ -892,6 +904,8 @@ export class DashboardViewModel {
         return tree.request?.url || "";
       case ItemType.MOCK_REQUEST:
         return tree.mockRequest?.url || "";
+      case ItemType.AI_REQUEST:
+        return tree.aiRequest?.url || "";
       default:
         return "";
     }
@@ -950,7 +964,8 @@ export class DashboardViewModel {
         tree.type === ItemType.MOCK_REQUEST ||
         tree.type === ItemType.GRAPHQL ||
         tree.type === ItemType.SOCKET_IO ||
-        tree.type === ItemType.WEB_SOCKET
+        tree.type === ItemType.WEB_SOCKET ||
+        tree.type === ItemType.AI_REQUEST
       ) {
         const currentFolderDetails =
           tree.folderId && tree.folderName
@@ -1004,6 +1019,7 @@ export class DashboardViewModel {
           ItemType.GRAPHQL,
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
+          ItemType.AI_REQUEST,
         ]).includes(tree.type)
       ) {
         collection.push({
@@ -1121,6 +1137,7 @@ export class DashboardViewModel {
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
           ItemType.GRAPHQL,
+          ItemType.AI_REQUEST,
         ].includes(node.type)
           ? { id: path[path.length - 1]?.id, name: path[path.length - 1]?.name }
           : {},
@@ -1135,6 +1152,7 @@ export class DashboardViewModel {
         case ItemType.WEB_SOCKET:
         case ItemType.MOCK_REQUEST:
         case ItemType.GRAPHQL:
+        case ItemType.AI_REQUEST:
           requests.push(itemData);
           break;
         case ItemType.WORKSPACE:
