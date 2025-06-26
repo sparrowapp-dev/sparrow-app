@@ -438,10 +438,7 @@ export class TestflowExplorerPageViewModel {
         name: "guestUser",
       });
       if (!guestUser) {
-        const planRxDoc = await this.planRepository.getPlan(
-          teamObject.plan?.id as string,
-        );
-        const planObject = planRxDoc?.toMutableJSON();
+        const planObject = teamObject.plan;
         if (!planObject?.limits?.selectiveTestflowRun?.active) {
           // notifications.error(
           //   "Failed to run from here. please upgrade your plan.",
@@ -470,10 +467,7 @@ export class TestflowExplorerPageViewModel {
         name: "guestUser",
       });
       if (!guestUser) {
-        const planRxDoc = await this.planRepository.getPlan(
-          teamObject.plan?.id as string,
-        );
-        const planObject = planRxDoc?.toMutableJSON();
+        const planObject = teamObject.plan;
         if (!planObject?.limits?.selectiveTestflowRun?.active) {
           // notifications.error(
           //   "Failed to run till here. please upgrade your plan.",
@@ -1720,14 +1714,9 @@ export class TestflowExplorerPageViewModel {
     const response = await this.workspaceRepository.getActiveWorkspaceDoc();
     const teamId = response?._data?.team?.teamId || "";
     const teamData = await this.teamRepository.getTeamDoc(teamId);
-    let teamPlanId;
-    teamPlanId = teamData?._data?.plan?.id;
-    let userPlan;
-    if (teamPlanId) {
-      userPlan = await this.planRepository.getPlan(teamPlanId);
-    }
-    if (userPlan) {
-      return userPlan?.toMutableJSON().limits;
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.plan?.limits;
     }
   };
 
@@ -1748,10 +1737,7 @@ export class TestflowExplorerPageViewModel {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
     const currentPlan = teamDetails?.toMutableJSON().plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?.toMutableJSON()?.limits;
+      return currentPlan?.limits;
     }
   };
 
