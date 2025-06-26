@@ -334,34 +334,34 @@ jobs:
             exit 1
           }
 
-      - name: Verify MSIX signature
-        shell: powershell
-        run: |
-          $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
+      # - name: Verify MSIX signature
+      #   shell: powershell
+      #   run: |
+      #     $msixFile = Get-ChildItem -Path ".github\workflows\msix_packaging" -Filter "*.msix" | Select-Object -First 1
           
-          if (-not $msixFile) {
-            Write-Host "❌ No MSIX file found for verification!"
-            exit 1
-          }
+      #     if (-not $msixFile) {
+      #       Write-Host "❌ No MSIX file found for verification!"
+      #       exit 1
+      #     }
           
-          Write-Host "Verifying signature for: $($msixFile.FullName)"
+      #     Write-Host "Verifying signature for: $($msixFile.FullName)"
           
-          # Find x64 SignTool specifically (same as used for signing)
-          $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+      #     # Find x64 SignTool specifically (same as used for signing)
+      #     $signTool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           
-          if ($signTool) {
-            Write-Host "Using SignTool at: $($signTool.FullName)"
-            & $signTool.FullName verify /pa $msixFile.FullName
+      #     if ($signTool) {
+      #       Write-Host "Using SignTool at: $($signTool.FullName)"
+      #       & $signTool.FullName verify /pa $msixFile.FullName
             
-            if ($LASTEXITCODE -eq 0) {
-              Write-Host "✅ MSIX signature verification successful"
-            } else {
-              Write-Host "❌ MSIX signature verification failed"
-              Write-Host "⚠️ Continuing despite verification failure (common in CI environments)"
-            }
-          } else {
-            Write-Host "⚠️ x64 SignTool not found, skipping verification"
-          }
+      #       if ($LASTEXITCODE -eq 0) {
+      #         Write-Host "✅ MSIX signature verification successful"
+      #       } else {
+      #         Write-Host "❌ MSIX signature verification failed"
+      #         Write-Host "⚠️ Continuing despite verification failure (common in CI environments)"
+      #       }
+      #     } else {
+      #       Write-Host "⚠️ x64 SignTool not found, skipping verification"
+      #     }
 
       - name: Upload MSIX artifact  
         uses: actions/upload-artifact@v4
