@@ -577,7 +577,7 @@ export class TestflowExplorerPageViewModel {
         );
         const start = Date.now();
 
-        try {
+       try {
           const response = await makeHttpRequestV2(
             decodeData[0],
             decodeData[1],
@@ -587,6 +587,7 @@ export class TestflowExplorerPageViewModel {
             selectedAgent,
             signal,
           );
+          debugger;
           const end = Date.now();
           const duration = end - start;
 
@@ -596,145 +597,139 @@ export class TestflowExplorerPageViewModel {
             );
             if (existingTestFlowData) {
               let resData: TFHistoryAPIResponseStoreType;
-              // if (response.isSuccessful) {
-              const byteLength = new TextEncoder().encode(
-                JSON.stringify(response),
-              ).length;
-              const responseSizeKB = byteLength / 1024;
-              const responseData: TFAPIResponseType = response.data;
-              const responseBody = responseData.body;
-              const formattedHeaders = Object.entries(
-                response?.data?.headers || {},
-              ).map(([key, value]) => ({
-                key,
-                value,
-              })) as TFKeyValueStoreType[];
-              const responseStatus = response?.data?.status;
-              resData = {
-                body: responseBody,
-                headers: formattedHeaders,
-                status: responseStatus,
-                time: duration,
-                size: responseSizeKB,
-                responseContentType:
-                  this._decodeRequest.setResponseContentType(formattedHeaders),
-              };
+              if (response.isSuccessful) {
+                const byteLength = new TextEncoder().encode(
+                  JSON.stringify(response),
+                ).length;
+                const responseSizeKB = byteLength / 1024;
+                const responseData: TFAPIResponseType = response.data;
+                const responseBody = responseData.body;
+                const formattedHeaders = Object.entries(
+                  response?.data?.headers || {},
+                ).map(([key, value]) => ({
+                  key,
+                  value,
+                })) as TFKeyValueStoreType[];
+                const responseStatus = response?.data?.status;
+                resData = {
+                  body: responseBody,
+                  headers: formattedHeaders,
+                  status: responseStatus,
+                  time: duration,
+                  size: responseSizeKB,
+                  responseContentType:
+                    this._decodeRequest.setResponseContentType(
+                      formattedHeaders,
+                    ),
+                };
 
-              if (
-                Number(resData.status.split(" ")[0]) >= 200 &&
-                Number(resData.status.split(" ")[0]) < 300
-              ) {
-                successRequests++;
-              } else {
-                failedRequests++;
+                if (
+                  Number(resData.status.split(" ")[0]) >= 200 &&
+                  Number(resData.status.split(" ")[0]) < 300
+                ) {
+                  successRequests++;
+                } else {
+                  failedRequests++;
+                }
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: resData.status,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
+
+                
+              const responseHeader = this._decodeRequest.setResponseContentType(
+                formattedHeaders,
+              );
+
+              const reqParam = {};
+              const params = new URL(decodeData[0]).searchParams;
+
+
+              for (const [key, value] of params.entries()) {
+                reqParam[key] = value;
               }
-              totalTime += duration;
-              const req = {
-                method: request?.request?.method as string,
-                name: request?.name as string,
-                status: resData.status,
-                time: new ParseTime().convertMilliseconds(duration),
-              };
-              history.requests.push(req);
-              // } else {
-              //   resData = {
-              //     body: "",
-              //     headers: [],
-              //     status: ResponseStatusCode.ERROR,
-              //     time: duration,
-              //     size: 0,
-              //   };
-              //   failedRequests++;
-              //   totalTime += duration;
-              //   const req = {
-              //     method: request?.request?.method as string,
-              //     name: request?.name as string,
-              //     status: ResponseStatusCode.ERROR,
-              //     time: new ParseTime().convertMilliseconds(duration),
-              //   };
-              //   history.requests.push(req);
-              // }
+
+                const headersObject = Object.fromEntries(
+                  JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
+                );
+
+
+                let reqBody;
+                if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
+                  try{
+                    reqBody = JSON.parse(decodeData[3]);
+                  }
+                  catch(e){
+                    reqBody = {};
+                  }
+                }
+                else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
+                  const formDataObject = Object.fromEntries(
+                    JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
+                  );
+                  reqBody = formDataObject || {}
+                }
+                else{
+                  reqBody = decodeData[3];
+                }
+                requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+                requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+                  response: {
+                    body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
+                    headers: response?.data?.headers
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body:reqBody,
+                    parameters:reqParam || {}
+                  }
+                }
+              } else {
+                resData = {
+                  body: response.message,
+                  headers: [],
+                  status: ResponseStatusCode.ERROR,
+                  time: duration,
+                  size: 0,
+                };
+                failedRequests++;
+                totalTime += duration;
+                const req = {
+                  method: request?.request?.method as string,
+                  name: request?.name as string,
+                  status: ResponseStatusCode.ERROR,
+                  time: new ParseTime().convertMilliseconds(duration),
+                };
+                history.requests.push(req);
+              }
               existingTestFlowData.nodes.push({
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
               });
 
-              const responseHeader =
-                this._decodeRequest.setResponseContentType(formattedHeaders);
 
-              const reqParam = {};
-              const params = new URL(decodeData[0]).searchParams;
-
-              for (const [key, value] of params.entries()) {
-                reqParam[key] = value;
-              }
-
-              const headersObject = Object.fromEntries(
-                JSON.parse(decodeData[2]).map(({ key, value }) => [key, value]),
-              );
-
-              let reqBody;
-              if (decodeData[4] === "application/json") {
-                // tried to handle js but that is treated as text/plain, skipping that for now
-                try {
-                  reqBody = JSON.parse(decodeData[3]);
-                } catch (e) {
-                  reqBody = {};
-                }
-              } else if (
-                decodeData[4] === "multipart/form-data" ||
-                decodeData[4] === "application/x-www-form-urlencoded"
-              ) {
-                const formDataObject = Object.fromEntries(
-                  JSON.parse(decodeData[3]).map(({ key, value }) => [
-                    key,
-                    value,
-                  ]),
-                );
-                reqBody = formDataObject || {};
-              } else {
-                reqBody = decodeData[3];
-              }
-              requestChainResponse[
-                "$$" +
-                  element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
-              ] = {
-                response: {
-                  body:
-                    responseHeader === "JSON"
-                      ? JSON.parse(resData.body)
-                      : resData.body,
-                  headers: response?.data?.headers,
-                },
-                request: {
-                  headers: headersObject || {},
-                  body: reqBody,
-                  parameters: reqParam || {},
-                },
-              };
-              requestChainResponse[
-                "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
-              ] = {
-                response: {
-                  body:
-                    responseHeader === "JSON"
-                      ? JSON.parse(resData.body)
-                      : resData.body,
-                  headers: response?.data?.headers,
-                },
-                request: {
-                  headers: headersObject || {},
-                  body: reqBody,
-                  parameters: reqParam || {},
-                },
-              };
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
           });
-        } catch (error) {
+        } catch (error) { 
+          console.error(error);
           if (error?.name === "AbortError") {
             break;
           }
@@ -757,34 +752,29 @@ export class TestflowExplorerPageViewModel {
                 request: adaptedRequest,
               });
 
-              requestChainResponse[
-                "$$" +
-                  element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
-              ] = {
+              requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
                 response: {
                   body: {},
-                  headers: {},
+                  headers:{}
                 },
                 request: {
-                  headers: {},
-                  body: {},
-                  parameters: {},
-                },
-              };
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
 
-              requestChainResponse[
-                "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
-              ] = {
+              requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
                 response: {
                   body: {},
-                  headers: {},
+                  headers:{}
                 },
                 request: {
-                  headers: {},
-                  body: {},
-                  parameters: {},
-                },
-              };
+                    headers:{},
+                    body:{},
+                    parameters:{}
+                }
+              }
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
@@ -977,7 +967,6 @@ export class TestflowExplorerPageViewModel {
 
     const start = Date.now();
     let resData: TFHistoryAPIResponseStoreType;
-    let status: string;
     let duration = 0;
 
     try {
@@ -1013,14 +1002,13 @@ export class TestflowExplorerPageViewModel {
         };
       } else {
         resData = {
-          body: "",
+          body: response.message,
           headers: [],
           status: ResponseStatusCode.ERROR,
           time: duration,
           size: 0,
         };
       }
-      status = resData.status;
     } catch (error) {
       resData = {
         body: "",
@@ -1029,7 +1017,6 @@ export class TestflowExplorerPageViewModel {
         time: 0,
         size: 0,
       };
-      status = ResponseStatusCode.ERROR;
     }
 
     // Update testFlowDataStore with this single result

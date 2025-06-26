@@ -393,7 +393,7 @@
               <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
             {/if}
             {#if !responseLoader && selectedNodeResponse?.response?.status === ResponseStatusCode.ERROR}
-              <ResponseErrorScreen />
+              <ResponseErrorScreen response={selectedNodeResponse?.response} />
             {:else if !responseLoader && selectedNodeResponse?.response?.status}
               <div class="d-flex flex-column" style="height: 100%;">
                 <div class="d-flex" style="margin-bottom: 12px;">

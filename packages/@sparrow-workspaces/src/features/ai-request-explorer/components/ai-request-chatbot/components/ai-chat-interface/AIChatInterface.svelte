@@ -61,6 +61,9 @@
   export let isConversationHistoryPanelOpen = false;
   export let isConversationHistoryLoading = false;
   export let isGuestUser: boolean;
+  export let onUploadFiles;
+  export let currentProvider;
+  export let currentModel;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -580,6 +583,7 @@
                           : false}
                         {isResponseGenerating}
                         {handleApplyChangeOnAISuggestion}
+                        attachedFilesWithMsg={chat.attachedFiles}
                       />
                     </div>
                   {/each}
@@ -607,6 +611,9 @@
           placeholder={"Write a prompt or generate one from generate prompt."}
           {sendPrompt}
           {isGuestUser}
+          onFileUpload={onUploadFiles}
+          {currentProvider}
+          {currentModel}
         />
       </div>
     </div>

@@ -199,3 +199,13 @@ export enum ModelVariantIdNameMapping {
     "gemini-1.5-pro" = "Gemini 1.5 Pro",
     "gemini-2.0-flash" = "Gemini 2.0 Flash",
 }
+
+export interface PromptFileAttachment {
+    id: string;
+    name: string;
+    type: string;
+    size: number;
+    isUploading?: boolean;
+    url: string;
+    fileId: string;
+}

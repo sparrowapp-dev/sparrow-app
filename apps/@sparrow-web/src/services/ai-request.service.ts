@@ -1,6 +1,7 @@
 import constants from "src/constants/constants";
 import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
-import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
+import type { AiModelProviderEnum, AIModelVariant } from "@sparrow/common/types/workspace/ai-request-base";
+import { ContentTypeEnum } from "@sparrow/common/enums";
 
 export class AiRequestService {
   private apiUrl: string = constants.API_URL;
@@ -56,6 +57,31 @@ export class AiRequestService {
   };
 
 
+
+  public uploadRAGfiles = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file, index) => {
+      formData.append("docs", file);
+    });
+
+    formData.append("model", aiProvider);
+    formData.append("authKey", providerAuthKey);
+    const contentType: ContentTypeEnum = ContentTypeEnum["multipart/form-data"];
+
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/assistant`,
+      {
+        body: formData,
+        headers: {
+          ...getAuthHeaders(),
+          // "Content-type": contentType // Not setting Content-Type manually for FormData - letting the browser set it with boundary
+        },
+      }
+    );
+
+    return response;
+  };
 
 
 }
