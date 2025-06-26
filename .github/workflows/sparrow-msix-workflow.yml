@@ -246,13 +246,30 @@ jobs:
           Write-Host "Package to Sign: $packageToSign"
           Write-Host "Using SignTool: $signTool"
           
-          # Sign using the Stack Overflow approach
-          $signTool sign /fd sha256 /a /f $certificatePath /p $certificatePwd $packageToSign
+          # Sign using the Stack Overflow approach with proper syntax
+          Write-Host "Executing signing command..."
+          
+          # Try with explicit parameter array for better control
+          $signArgs = @(
+            'sign',
+            '/fd', 'sha256',
+            '/a',
+            '/f', $certificatePath,
+            '/p', $certificatePwd,
+            $packageToSign
+          )
+          
+          Write-Host "Command: $signTool $($signArgs -join ' ')"
+          
+          & $signTool @signArgs
           
           if ($LASTEXITCODE -eq 0) {
             Write-Host "✅ MSIX file signed successfully"
           } else {
             Write-Host "❌ Failed to sign MSIX file (Exit code: $LASTEXITCODE)"
+            
+            # Debug: Show the exact command that was attempted
+            Write-Host "Full command attempted: $signTool $($signArgs -join ' ')"
             exit 1
           }
 
