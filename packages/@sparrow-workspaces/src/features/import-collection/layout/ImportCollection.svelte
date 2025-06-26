@@ -89,12 +89,8 @@
       if (importData.includes("api.postman.com")) {
         const postmanResponse = await onGetOapiTextFromURL(importData);
         if (postmanResponse?.data?.status === ResponseStatusCode.OK) {
-          const res = await onValidateOapiText(postmanResponse);
-          isValidPostmanCollectionURL;
-          if (res?.isSuccessful) {
             isValidPostmanCollectionURL = true;
             postmanCollectionJson = postmanResponse.data.body;
-          }
         }
       } else if (
         importData.includes("://127.0.0.1") ||
