@@ -35,32 +35,32 @@ export const FILE_UPLOAD_RESTRICTIONS: FileUploadRestrictions = {
         }
     },
     anthropic: {
-        "claude-3-5-sonnet-20241022": {
-            supportedExtensions: ["txt", "pdf", "jpg", "jpeg", "png"],
-            maxFileSize: 5 * 1024 * 1024,
-            maxFiles: 5
-        },
-        "claude-3-5-haiku-20241022": {
-            supportedExtensions: ["txt", "pdf", "jpg", "jpeg", "png"],
-            maxFileSize: 5 * 1024 * 1024,
-            maxFiles: 5
-        },
-        "claude-3-opus-20240229": {
-            supportedExtensions: ["jpg", "jpeg", "png"],
-            maxFileSize: 5 * 1024 * 1024,
-            maxFiles: 5
-        },
-        "claude-3-haiku-20240307": {
-            supportedExtensions: ["jpg", "jpeg", "png"],
-            maxFileSize: 5 * 1024 * 1024,
-            maxFiles: 5
-        },
-        // "Claude 3 Sonnet"
-        "claude-3-5-sonnet-20240620": {
-            supportedExtensions: ["txt", "pdf", "jpg", "jpeg", "png"],
-            maxFileSize: 5 * 1024 * 1024,
-            maxFiles: 5
-        },
+        // "claude-3-5-sonnet-20241022": {
+        //     supportedExtensions: ["txt", "pdf", "jpg", "jpeg", "png"],
+        //     maxFileSize: 5 * 1024 * 1024,
+        //     maxFiles: 5
+        // },
+        // "claude-3-5-haiku-20241022": {
+        //     supportedExtensions: ["txt", "pdf", "jpg", "jpeg", "png"],
+        //     maxFileSize: 5 * 1024 * 1024,
+        //     maxFiles: 5
+        // },
+        // "claude-3-opus-20240229": {
+        //     supportedExtensions: ["jpg", "jpeg", "png"],
+        //     maxFileSize: 5 * 1024 * 1024,
+        //     maxFiles: 5
+        // },
+        // "claude-3-haiku-20240307": {
+        //     supportedExtensions: ["jpg", "jpeg", "png"],
+        //     maxFileSize: 5 * 1024 * 1024,
+        //     maxFiles: 5
+        // },
+        // // "Claude 3 Sonnet"
+        // "claude-3-5-sonnet-20240620": {
+        //     supportedExtensions: ["txt", "pdf", "jpg", "jpeg", "png"],
+        //     maxFileSize: 5 * 1024 * 1024,
+        //     maxFiles: 5
+        // },
     },
     deepseek: {
         // Currently no file upload support for DeepSeek models
