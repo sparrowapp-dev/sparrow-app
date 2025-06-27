@@ -627,12 +627,15 @@
 {#if isGlobalSearchOpen && !hideGlobalSearch}
   <div
     class="global-search-overlay"
-    transition:fade={{ duration: 300 }}
+    style=" background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);"
+    transition:fade={{ duration: 200 }}
     on:mousedown|self={closeGlobalSearch}
   >
     <div
       class="global-search-container"
-      transition:fade={{ duration: 300, delay: 150 }}
+      transition:fade={{ duration: 200, delay: 50 }}
     >
       <GlobalSearch
         {isGuestUser}
@@ -654,10 +657,7 @@
     </div>
   </div>
 {/if}
-<div
-  class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
-  style="height: 100vh;"
->
+<div class="dashboard d-flex flex-column" style="height: 100vh;">
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
