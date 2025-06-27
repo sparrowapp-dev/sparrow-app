@@ -18,8 +18,8 @@
   } from "@sparrow/library/icons";
   import SuggestionTags from "../components/SuggestionTags/SuggestionTags.svelte";
   import RecentItems from "../components/RecentItems/RecentItems.svelte";
-  import { OSDetector } from "@sparrow/common/utils";
-  import * as Sentry from "@sentry/svelte";
+  import { Debounce, OSDetector } from "@sparrow/common/utils";
+  import { afterUpdate } from "svelte";
 
   export let closeGlobalSearch;
   export let workspaceDocuments;
@@ -64,6 +64,10 @@
     filteredEnvironments = environment;
   };
 
+  const debouncedHandleSearch = new Debounce().debounce(
+    handleSearch as any,
+    400,
+  );
   const decidingKey = () => {
     const os = new OSDetector();
     if (os.getOS() == "macos") {
@@ -125,11 +129,44 @@
       console.error("Error fetching workspace details:", error);
     }
   });
+
+  let animatedWrapper: HTMLDivElement;
+  let previousHeight = 0;
+
+  afterUpdate(() => {
+    if (!animatedWrapper) return;
+
+    const newHeight = animatedWrapper.scrollHeight;
+
+    if (previousHeight !== newHeight) {
+      animatedWrapper.style.transition = "height 300ms ease-in-out";
+      animatedWrapper.style.height = previousHeight + "px";
+
+      // Force reflow to apply the initial height before transition
+      void animatedWrapper.offsetHeight;
+
+      animatedWrapper.style.height = newHeight + "px";
+
+      // After animation, reset height to auto to allow future natural growth
+      setTimeout(() => {
+        if (animatedWrapper) {
+          animatedWrapper.style.height = "auto";
+        }
+      }, 250);
+
+      previousHeight = newHeight;
+    }
+  });
 </script>
 
-<div class="search-container">
+<div bind:this={animatedWrapper} class="search-container">
   {#if !hideGlobalSearch}
-    <SearchBar bind:searchQuery {handleSearch} bind:searchBarRef {osKeyName} />
+    <SearchBar
+      bind:searchQuery
+      handleSearch={debouncedHandleSearch}
+      bind:searchBarRef
+      {osKeyName}
+    />
     <div class="suggestions-container">
       <SuggestionTags {suggestions} bind:selectedType bind:searchBarRef />
       <RecentItems
@@ -171,6 +208,16 @@
     flex-direction: column;
     overflow: hidden;
     background-color: var(--bg-ds-surface-700);
+
+    /* New styles for opacity transition */
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in-out 0.1s forwards; /* 300ms duration, 100ms delay */
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
   }
   .suggestions-container {
     background: var(--bg-ds-surface-700);
