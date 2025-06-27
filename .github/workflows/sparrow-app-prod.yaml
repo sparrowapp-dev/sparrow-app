@@ -141,7 +141,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: production"
+                      "text" = "Branch: main"
                       "wrap" = $true
                     }
                     @{
