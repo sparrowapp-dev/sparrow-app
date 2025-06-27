@@ -20,6 +20,7 @@
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { Tooltip } from "@sparrow/library/ui";
   import { isExpandEnvironment } from "../../../stores/recent-left-panel";
+  import { slide } from "svelte/transition";
 
   /**
    * current workspace
@@ -240,11 +241,11 @@
 
   {#if $isExpandEnvironment}
     <div
-      style="flex: 1; height: 32px; background-color: {ActiveTab ===
-      'enviroment'
+      transition:slide={{ duration: 250 }}
+      style="background-color: {ActiveTab === 'enviroment'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
-      class="overflow-auto"
+      class="overflow-auto position-relative d-flex flex-column me-0 py-1"
       bind:this={scrollDiv}
     >
       {#if filteredGlobalEnvironment?.length}
