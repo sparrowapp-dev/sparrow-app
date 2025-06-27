@@ -938,8 +938,6 @@ export class TeamExplorerPageViewModel {
           _invitedUserCount === 1 ? "person" : "people"
         } for ${_workspaceName}.`,
       );
-    } else {
-      notifications.error(`Failed to send invite. Please try again.`);
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
@@ -1028,10 +1026,7 @@ export class TeamExplorerPageViewModel {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
     const currentPlan = teamDetails?.toMutableJSON().plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?.toMutableJSON()?.limits;
+      return currentPlan?.limits;
     }
   };
 
