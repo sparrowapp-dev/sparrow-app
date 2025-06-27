@@ -31,6 +31,7 @@ import { FeatureSwitchRepository } from "../../repositories/feature-switch.repos
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { v4 as uuidv4 } from "uuid";
 import {
+  AiRequestTabAdapter,
   CollectionTabAdapter,
   GraphqlTabAdapter,
   RequestMockTabAdapter,
@@ -225,66 +226,15 @@ export class DashboardViewModel {
         data.push(item);
       }
 
-      const planResponse = await this.planService.getPlansByIds(userPlans);
-
-      if (planResponse.isSuccessful && planResponse.data.data) {
-        const parsedPlans = [];
-        for (const planData of planResponse.data.data) {
-          const rawData = planData;
-          if (!rawData?._id) continue;
-          const planDetails = {
-            planId: rawData._id,
-            name: rawData.name,
-            description: rawData.description,
-            active: rawData.active,
-            limits: {
-              workspacesPerHub: {
-                area: rawData.limits.workspacesPerHub.area,
-                value: rawData.limits.workspacesPerHub.value,
-              },
-              testflowPerWorkspace: {
-                area: rawData.limits.testflowPerWorkspace.area,
-                value: rawData.limits.testflowPerWorkspace.value,
-              },
-              usersPerHub: {
-                area: rawData.limits.usersPerHub.area,
-                value: rawData.limits.usersPerHub.value,
-              },
-              blocksPerTestflow: {
-                area: rawData.limits.blocksPerTestflow.area,
-                value: rawData.limits.blocksPerTestflow.value,
-              },
-              selectiveTestflowRun: {
-                area: rawData.limits.selectiveTestflowRun.area,
-                active: rawData.limits.selectiveTestflowRun.active,
-              },
-              activeSync: {
-                area: rawData.limits.activeSync.area,
-                active: rawData.limits.activeSync.active,
-              },
-              testflowRunHistory: {
-                area: rawData.limits.testflowRunHistory.area,
-                value: rawData.limits.testflowRunHistory.value,
-              },
-            },
-            createdAt: rawData.createdAt,
-            updatedAt: rawData.updatedAt,
-            createdBy: rawData.createdBy,
-            updatedBy: rawData.updatedBy,
-          };
-          parsedPlans.push(planDetails);
-        }
-        await this.planRepository.upsertMany(parsedPlans);
-        await this.teamRepository.bulkInsertData(data);
-        await this.teamRepository.deleteOrphanTeams(
-          data.map((_team) => {
-            return _team.teamId;
-          }),
-        );
-        if (!isAnyTeamsOpen) {
-          this.teamRepository.setOpenTeam(data[0].teamId);
-          return;
-        }
+      await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
       }
 
     }
@@ -739,6 +689,17 @@ export class DashboardViewModel {
         await this.tabRepository.createTab(adaptedSocketIo, workspaceId);
         break;
       }
+      case "AI_REQUEST": {
+        const aiRequestTabAdapter = new AiRequestTabAdapter();
+        const adaptedAiRequest = aiRequestTabAdapter.adapt(
+          workspaceId,
+          collectionId,
+          folderId,
+          tree,
+        );
+        await this.tabRepository.createTab(adaptedAiRequest, workspaceId);
+        break;
+      }
       case "MOCK_REQUEST": {
         const mockRequestTabAdapter = new RequestMockTabAdapter();
         const adaptedMockRequest = mockRequestTabAdapter.adapt(
@@ -892,6 +853,8 @@ export class DashboardViewModel {
         return tree.request?.url || "";
       case ItemType.MOCK_REQUEST:
         return tree.mockRequest?.url || "";
+      case ItemType.AI_REQUEST:
+        return tree.aiRequest?.url || "";
       default:
         return "";
     }
@@ -950,7 +913,8 @@ export class DashboardViewModel {
         tree.type === ItemType.MOCK_REQUEST ||
         tree.type === ItemType.GRAPHQL ||
         tree.type === ItemType.SOCKET_IO ||
-        tree.type === ItemType.WEB_SOCKET
+        tree.type === ItemType.WEB_SOCKET ||
+        tree.type === ItemType.AI_REQUEST
       ) {
         const currentFolderDetails =
           tree.folderId && tree.folderName
@@ -1004,6 +968,7 @@ export class DashboardViewModel {
           ItemType.GRAPHQL,
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
+          ItemType.AI_REQUEST,
         ]).includes(tree.type)
       ) {
         collection.push({
@@ -1121,6 +1086,7 @@ export class DashboardViewModel {
           ItemType.SOCKET_IO,
           ItemType.WEB_SOCKET,
           ItemType.GRAPHQL,
+          ItemType.AI_REQUEST,
         ].includes(node.type)
           ? { id: path[path.length - 1]?.id, name: path[path.length - 1]?.name }
           : {},
@@ -1135,6 +1101,7 @@ export class DashboardViewModel {
         case ItemType.WEB_SOCKET:
         case ItemType.MOCK_REQUEST:
         case ItemType.GRAPHQL:
+        case ItemType.AI_REQUEST:
           requests.push(itemData);
           break;
         case ItemType.WORKSPACE:
@@ -1315,12 +1282,9 @@ export class DashboardViewModel {
 
   public userPlanLimits = async (teamId: string) => {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
-    const currentPlan = teamDetails?._data?.plan;
+    const currentPlan = teamDetails?.toMutableJSON()?.plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?._data?.limits;
+      return currentPlan?.limits;
     }
   };
 

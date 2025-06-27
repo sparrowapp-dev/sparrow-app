@@ -76,31 +76,28 @@
     const inputValue = event.detail;
     const originalValue = inputValue.toString();
 
-    // Check if input contains non-numeric characters (except for allowed ones)
-    const containsInvalidChars = /[^0-9.-]/.test(originalValue);
+    // Check if input contains anything other than digits
+    const containsInvalidChars = /[^0-9]/.test(originalValue);
 
-    // Only allow numeric input with decimal point
-    const numericValue = originalValue.replace(/[^0-9.-]/g, "");
+    // Only allow positive integer input
+    const numericValue = originalValue.replace(/[^0-9]/g, "");
 
     // Set error state if user entered invalid characters
     if (containsInvalidChars) {
       hasNonNumericInput = true;
       isError = true;
-      errorMessage = "Please enter numbers only";
+      errorMessage = "Please enter positive numbers only";
+
+      value = numericValue;
+      dispatch("input", value);
+      return;
     } else {
       hasNonNumericInput = false;
       isError = false;
       errorMessage = "";
     }
 
-    // Handle the case when user enters "-" at the beginning
-    if (numericValue === "-") {
-      value = numericValue;
-      dispatch("input", numericValue);
-      return;
-    }
-
-    const parsedValue = parseFloat(numericValue);
+    const parsedValue = parseInt(numericValue, 10);
 
     if (isNaN(parsedValue)) {
       value = "";
@@ -135,31 +132,21 @@
 
     let numericValue = parseFloat(inputValue);
 
-    if (isNaN(numericValue)) {
-      // Input has non-numeric content
+    // Check if value exceeds maximum on blur
+    if (max !== null && numericValue > max) {
+      numericValue = max;
+      errorMessage = `Value cannot exceed ${max}`;
       isError = true;
-      hasNonNumericInput = true;
-      errorMessage = "Please enter a valid number";
-      // Don't update to 0, keep the current input for user to correct
-      dispatch("blur", value);
-      return;
+    } else if (min !== null && numericValue < min) {
+      numericValue = min;
+      errorMessage = `Value cannot be less than ${min}`;
+      isError = true;
     } else {
-      // Check if value exceeds maximum on blur
-      if (max !== null && numericValue > max) {
-        numericValue = max;
-        errorMessage = `Value cannot exceed ${max}`;
-        isError = true;
-      } else if (min !== null && numericValue < min) {
-        numericValue = min;
-        errorMessage = `Value cannot be less than ${min}`;
-        isError = true;
-      } else {
-        isError = false;
-        hasNonNumericInput = false;
-        errorMessage = "";
-      }
-      updateValue(numericValue);
+      isError = false;
+      hasNonNumericInput = false;
+      errorMessage = "";
     }
+    updateValue(numericValue);
 
     dispatch("blur", value);
   };

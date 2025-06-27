@@ -1,7 +1,12 @@
 <script lang="ts">
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { getMethodStyle } from "@sparrow/common/utils";
-  import { GraphIcon, SocketIcon, SocketIoIcon } from "@sparrow/library/icons";
+  import {
+    BotRegular,
+    GraphIcon,
+    SocketIcon,
+    SocketIoIcon,
+  } from "@sparrow/library/icons";
   import { onMount } from "svelte";
   export let api: any;
   export let data: any;
@@ -55,6 +60,14 @@
           height={"14px"}
           width={"14px"}
           color={"var(--icon-ds-accent-400)"}
+        />
+      </span>
+    {:else if api?.type === TabTypeEnum.AI_REQUEST}
+      <span style="display: flex; align-items:flex-start;">
+        <BotRegular
+          height={"14px"}
+          width={"14px"}
+          color={"var(--icon-ds-secondary-200)"}
         />
       </span>
     {/if}

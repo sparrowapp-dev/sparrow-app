@@ -38,6 +38,7 @@
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import { FileItem } from "../../..";
 
   export let message: string;
   export let messageId: string;
@@ -55,6 +56,7 @@
 
   export let onClickCodeBlockPreview;
   export let handleApplyChangeOnAISuggestion;
+  export let attachedFilesWithMsg;
   let showTickIcon: boolean = false;
 
   /**
@@ -520,6 +522,15 @@
         responseType={"Sender"}
       />
 
+      {#if attachedFilesWithMsg && attachedFilesWithMsg.length}
+        <div
+          class="attached-files-container d-flex flex-wrap align-items-end justify-content-end p-1 gap-1 w-100"
+        >
+          {#each attachedFilesWithMsg as attachedFile}
+            <FileItem file={attachedFile} />
+          {/each}
+        </div>
+      {/if}
       <p
         class=" px-3 text-fs-12"
         style="background-color: var(--bg-ds-surface-500); 

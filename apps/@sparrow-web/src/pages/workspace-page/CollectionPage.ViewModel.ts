@@ -8223,10 +8223,7 @@ export default class CollectionsViewModel {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
     const currentPlan = teamDetails?.toMutableJSON().plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?.toMutableJSON()?.limits;
+      return currentPlan?.limits;
     }
   };
 

@@ -13,6 +13,7 @@
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import type { PromptFileAttachment } from "@sparrow/common/types/workspace/ai-request-base";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -35,10 +36,14 @@
   export let isConversationHistoryLoading: boolean;
   export let activateGeneratePromptModal;
   export let isGuestUser: boolean;
+  export let onUploadFiles;
 
   let scrollList: ScrollList;
 
-  const sendPrompt = async (text: string) => {
+  const sendPrompt = async (
+    text: string,
+    attachedFiles: PromptFileAttachment[],
+  ) => {
     if (text) {
       const isAutoClearEnabled =
         $tab?.property?.aiRequest?.state?.isChatAutoClearActive || false;
@@ -53,6 +58,7 @@
               status: true,
               modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
               modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+              attachedFiles,
             },
           ]
         : [
@@ -66,13 +72,14 @@
               status: true,
               modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
               modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+              attachedFiles,
             },
           ];
       onUpdateAiConversation(updatedConverstaion);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
-      const response = await onGenerateAiResponse(text, "", "");
+      const response = await onGenerateAiResponse(text, attachedFiles);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
@@ -120,6 +127,8 @@
       {onRenameConversation}
       {onDeleteConversation}
       {onClearConversation}
+      currentProvider={$tab?.property?.aiRequest?.aiModelProvider}
+      currentModel={$tab?.property?.aiRequest?.aiModelVariant}
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       prompt={$tab?.property?.aiRequest?.ai?.prompt}
       chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
@@ -133,6 +142,7 @@
       bind:isConversationHistoryPanelOpen
       bind:isConversationHistoryLoading
       {activateGeneratePromptModal}
+      {onUploadFiles}
     />
   </div>
 {/if}
