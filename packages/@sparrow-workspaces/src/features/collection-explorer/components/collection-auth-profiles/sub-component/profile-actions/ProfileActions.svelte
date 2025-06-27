@@ -2,7 +2,7 @@
   /**
    * Components
    */
-  import { Button } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
 
   /**
    * Types
@@ -49,14 +49,27 @@
       profileForm.name.isTouched = true;
       if (!profileForm.name.value || profileForm.name.invalid) return;
       teamUnderSubmission = true;
-      const response = await onCreateProfile(
-        profileForm.name.value,
-        profileForm.description.value,
-        profileForm.auth,
-      );
+      console.log("submitting :>> ", profileForm);
+      const response = await onCreateProfile({
+        name: profileForm.name.value,
+        description: profileForm.description.value,
+        authType: profileForm.authType.value,
+        auth: profileForm.auth.values,
+        defaultKey: false,
+      });
       teamUnderSubmission = false;
       if (response.isSuccessful) {
         handleModalState(false);
+      } else {
+        if (response.message.includes("unique name")) {
+          profileForm.name.invalid = true;
+        } else {
+          notifications.error(
+            response.message
+              ? response.message
+              : "Something went wrong, please try again!",
+          );
+        }
       }
     }}
   />

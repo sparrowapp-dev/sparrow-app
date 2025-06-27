@@ -124,6 +124,7 @@
   export let onItemCreated;
   export let onUpdateRunningState;
   export let userRole;
+  export let onCreateAuthProfile;
 
   /**
    * Local variables
@@ -352,6 +353,12 @@
     isMockRunning = !isMockRunning;
   };
   export let currentWorkspace;
+
+  const handleOnCreateAuthProfile = async (authProfileData) => {
+    console.log("In handleOnCreateAuthProfile() :>> ", authProfileData);
+    const response = await onCreateAuthProfile(collection, authProfileData);
+    return response;
+  };
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -982,7 +989,11 @@
           {onUpdateEnvironment}
           {environmentVariables}
         /> -->
-        <CollectionAuthProfiles />
+        <CollectionAuthProfiles
+          onCreateAuthProfile={handleOnCreateAuthProfile}
+          onDelete={() => {}}
+          onUpdate={() => {}}
+        />
       {/if}
     {/if}
   </div>

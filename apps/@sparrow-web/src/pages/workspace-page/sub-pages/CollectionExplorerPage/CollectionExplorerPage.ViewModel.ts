@@ -149,47 +149,47 @@ class CollectionExplorerPage {
       result = false;
     }
     // auth key
-    else if (
-      collectionTab.property.collection?.auth.apiKey.authKey !==
-      progressiveTab.property.collection.auth.apiKey.authKey
-    ) {
-      result = false;
-    }
-    // auth value
-    else if (
-      collectionTab.property.collection?.auth?.apiKey?.authValue !==
-      progressiveTab.property.collection.auth.apiKey.authValue
-    ) {
-      result = false;
-    }
-    // addTo
-    else if (
-      collectionTab.property.collection?.auth?.apiKey?.addTo !==
-      progressiveTab.property.collection.auth.apiKey.addTo
-    ) {
-      result = false;
-    }
-    // username
-    else if (
-      collectionTab.property.collection?.auth?.basicAuth?.username !==
-      progressiveTab.property.collection.auth.basicAuth.username
-    ) {
-      result = false;
-    }
-    // password
-    else if (
-      collectionTab.property.collection?.auth?.basicAuth?.password !==
-      progressiveTab.property.collection.auth.basicAuth.password
-    ) {
-      result = false;
-    }
-    // bearer tokem
-    else if (
-      collectionTab.property.collection?.auth?.bearerToken !==
-      progressiveTab.property.collection.auth.bearerToken
-    ) {
-      result = false;
-    }
+    // else if (
+    //   collectionTab.property.collection?.auth.apiKey.authKey !==
+    //   progressiveTab.property.collection.auth.apiKey.authKey
+    // ) {
+    //   result = false;
+    // }
+    // // auth value
+    // else if (
+    //   collectionTab.property.collection?.auth?.apiKey?.authValue !==
+    //   progressiveTab.property.collection.auth.apiKey.authValue
+    // ) {
+    //   result = false;
+    // }
+    // // addTo
+    // else if (
+    //   collectionTab.property.collection?.auth?.apiKey?.addTo !==
+    //   progressiveTab.property.collection.auth.apiKey.addTo
+    // ) {
+    //   result = false;
+    // }
+    // // username
+    // else if (
+    //   collectionTab.property.collection?.auth?.basicAuth?.username !==
+    //   progressiveTab.property.collection.auth.basicAuth.username
+    // ) {
+    //   result = false;
+    // }
+    // // password
+    // else if (
+    //   collectionTab.property.collection?.auth?.basicAuth?.password !==
+    //   progressiveTab.property.collection.auth.basicAuth.password
+    // ) {
+    //   result = false;
+    // }
+    // // bearer tokem
+    // else if (
+    //   collectionTab.property.collection?.auth?.bearerToken !==
+    //   progressiveTab.property.collection.auth.bearerToken
+    // ) {
+    //   result = false;
+    // }
     // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
@@ -786,11 +786,10 @@ class CollectionExplorerPage {
       "Nov",
       "Dec",
     ];
-    const lastUpdated: string = `${
-      monthNamesAbbreviated[new Date(collection?.updatedAt).getMonth()]
-    } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
-      collection?.updatedAt,
-    ).getFullYear()}`;
+    const lastUpdated: string = `${monthNamesAbbreviated[new Date(collection?.updatedAt).getMonth()]
+      } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
+        collection?.updatedAt,
+      ).getFullYear()}`;
     let totalRequests = 0;
     let totalFolders = 0;
     let totalWebSocket = 0;
@@ -1598,20 +1597,20 @@ class CollectionExplorerPage {
   ) => {
     const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
     const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch: _collection.activeSync
-          ? _collection.currentBranch
-          : undefined,
-        source: _collection.activeSync ? "USER" : undefined,
-        items: {
-          name: socketIoTab.getValue().name,
-          type: CollectionItemTypeBaseEnum.SOCKETIO,
-          description: "",
-          socketio: {},
-        },
-      };
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync
+        ? _collection.currentBranch
+        : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: socketIoTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.SOCKETIO,
+        description: "",
+        socketio: {},
+      },
+    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1683,20 +1682,20 @@ class CollectionExplorerPage {
   ) => {
     const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
     const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch: _collection.activeSync
-          ? _collection.currentBranch
-          : undefined,
-        source: _collection.activeSync ? "USER" : undefined,
-        items: {
-          name: graphqlTab.getValue().name,
-          type: CollectionItemTypeBaseEnum.GRAPHQL,
-          description: "",
-          graphql: {},
-        },
-      };
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync
+        ? _collection.currentBranch
+        : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: graphqlTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        description: "",
+        graphql: {},
+      },
+    };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1867,6 +1866,165 @@ class CollectionExplorerPage {
       notifications.error("Failed to update running state. Please try again.");
     }
   };
+
+  // handleCreateGraphqlInCollection
+  public handleCreateAuthProfile = async (_collection: CollectionDto, payload) => {
+
+    // console.log("In handleCreateAuthProfile() :>> ")
+    // console.log("Coll :>> ", _collection)
+    // console.log("pld :>> ", payload)
+
+    // return;
+    // const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+    const AuthProfilePayload =
+    {
+      collectionId: _collection.collectionId,
+      workspaceId: _collection.workspaceId,
+      // currentBranch: _collection.activeSync ? _collection.currentBranch : undefined,
+      // source: _collection.activeSync ? "USER" : undefined,
+      auth: [
+        {
+          ...payload,
+
+          // ToDo: The below props should come from backend
+          createdAt: "2025-06-27T10:00:00Z",
+          updatedAt: "2025-06-27T12:00:00Z",
+          createdBy: "685a8dd65c6db380e82bdf55",
+          updatedBy: "685a8e305c6db380e82bdf59"
+        }
+      ],
+    };
+
+    console.log("final payload :>> ", AuthProfilePayload);
+
+    // ToDo: handle for guest user also
+    // let isGuestUser;
+    // isGuestUserActive.subscribe((value) => {
+    //   isGuestUser = value;
+    // });
+
+    // if (isGuestUser === true) {
+    //   await this.collectionRepository.addRequestOrFolderInCollection(
+    //     _collection.id as string,
+    //     {
+    //       ...graphqlOfCollectionPayload.items,
+    //       id: graphqlTab.getValue().id,
+    //     },
+    //   );
+    //   graphqlTab.updatePath({
+    //     workspaceId: _workspaceId,
+    //     collectionId: _collection.id,
+    //     folderId: "",
+    //   });
+    //   graphqlTab.updateIsSave(true);
+    //   await this.tabRepository.createTab(graphqlTab.getValue());
+    //   moveNavigation("right");
+    //   return;
+    // }
+
+    const baseUrl = await this.constructBaseUrl("685a8e305c6db380e82bdf5c");
+    const response = await this.collectionService.addAuthProfile(
+      _collection.collectionId as string,
+      _collection.workspaceId as string,
+      AuthProfilePayload,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      console.log("In Coll.VM -> handleCreateAuthProfile() :>> isSuccessful :>> ", res);
+
+      await this.collectionRepository.addAuthProfile(
+        _collection.id as string,
+        {
+          ...res,
+        },
+      );
+    } else {
+      console.log("In Coll.VM -> handleCreateAuthProfile() :>> !isSuccessful :>> ", response)
+      // this.collectionRepository.deleteAuthProfile(
+      //   _collection.id,
+      //   graphqlTab.getValue().id,
+      // );
+      // notifications.error(response.message);
+    }
+
+    return response;
+  }
+  public handleUpdateAuthProfile = async (_workspaceId: string, _collection: CollectionDto) => {
+    const authProfilePayload =
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync ? _collection.currentBranch : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: graphqlTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        description: "",
+        graphql: {},
+      },
+    };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...graphqlOfCollectionPayload.items,
+          id: graphqlTab.getValue().id,
+        },
+      );
+      graphqlTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      graphqlTab.updateIsSave(true);
+      await this.tabRepository.createTab(graphqlTab.getValue());
+      moveNavigation("right");
+      return;
+    }
+
+    const baseUrl = await this.constructBaseUrl(_workspaceId);
+    const response = await this.collectionService.addGraphqlInCollection(
+      graphqlOfCollectionPayload,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      await this.collectionRepository.addRequestOrFolderInCollection(
+        _collection.id as string,
+        {
+          ...res,
+        },
+      );
+
+      graphqlTab.updateId(res.id as string);
+      graphqlTab.updatePath({
+        workspaceId: _workspaceId,
+        collectionId: _collection.id,
+        folderId: "",
+      });
+      graphqlTab.updateIsSave(true);
+
+      this.tabRepository.createTab(graphqlTab.getValue());
+      moveNavigation("right");
+
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        _collection.id,
+        graphqlTab.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  }
+  public handleRemoveAuthProfile = async () => { }
 }
 
 export default CollectionExplorerPage;

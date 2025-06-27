@@ -950,4 +950,57 @@ export class CollectionService {
     );
     return response;
   };
+
+
+
+  ///////////////////////////////////////////////////////////////////
+  //                      Auth Profiles
+  ///////////////////////////////////////////////////////////////////
+  public fetchAuthProfiles = async (collectionId: string, workspaceId: string, baseUrl: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/auth-profiles/${collectionId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+
+
+  public addAuthProfile = async (
+    collectionId: string,
+    workspaceId: string,
+    updatedPayload, // ToDo: Add proper type here
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      {
+        body: updatedPayload,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public updateAuthProfile = async (
+    _authProfile,
+    _baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${_baseUrl}/api/collection/update-auth-profiles`,
+      {
+        body: _authProfile,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+
 }

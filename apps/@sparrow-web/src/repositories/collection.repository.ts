@@ -7,7 +7,7 @@ import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
-  constructor() {}
+  constructor() { }
 
   /**
    * @description
@@ -1140,4 +1140,57 @@ export class CollectionRepository {
       })
       .remove();
   };
+
+
+  // For Auth Profiles
+  /**
+   * @description
+   * Creates an API request or folder within a collection.
+   */
+  // public addRequestOrFolderInCollection = async (
+  public addAuthProfile = async (
+    collectionId: string,
+    newAuthProfileItems: any, // Add a proper type here
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    await collection.incrementalPatch({
+      auth: [...collection.auth, newAuthProfileItems],
+      selectedAuthType:
+        newAuthProfileItems.defaultKey
+          ? newAuthProfileItems.name
+          : collection.selectedAuthType,
+    });
+  };
+
+  public deleteAuthProfile = async (
+    collectionId: string,
+    deleteId: string,
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    const updatedItems = collection.toJSON().auth.filter((element) => {
+      if (element.authId !== deleteId) {
+        return true;
+      }
+      return false;
+    });
+    collection.incrementalModify((value) => {
+      value.auth = [...updatedItems];
+      return value;
+    });
+  };
+
+
+
 }

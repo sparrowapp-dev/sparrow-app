@@ -3,6 +3,8 @@
   import { Table, Row, CreateAuthProfile } from "./sub-component";
   import { AddRegular } from "@sparrow/library/icons";
 
+  export let onCreateAuthProfile;
+
   let isAscending = false;
   let isCreateProfileModalOpen = false;
   const tableHeaderContent = [
@@ -105,7 +107,7 @@
     handleModalState={(flag = false) => {
       isCreateProfileModalOpen = flag;
     }}
-    onCreateProfile={() => {}}
+    onCreateProfile={onCreateAuthProfile}
   />
 </Modal>
 

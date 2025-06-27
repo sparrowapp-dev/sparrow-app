@@ -212,4 +212,5 @@
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
   onUpdateRunningState={_viewModel.handleMockCollectionState}
   currentWorkspace={currentWorkspace}
+  onCreateAuthProfile={_viewModel.handleCreateAuthProfile}
 />

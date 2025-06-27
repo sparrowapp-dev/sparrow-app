@@ -57,8 +57,6 @@
       },
     },
   };
-
-  $: console.log("updated Profile form :>> ", profileForm);
 </script>
 
 <section>
