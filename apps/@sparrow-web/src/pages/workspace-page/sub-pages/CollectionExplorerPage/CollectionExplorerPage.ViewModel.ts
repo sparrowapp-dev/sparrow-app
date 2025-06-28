@@ -1867,28 +1867,32 @@ class CollectionExplorerPage {
     }
   };
 
+  // Auth Profile
   // handleCreateGraphqlInCollection
   public handleCreateAuthProfile = async (_collection: CollectionDto, payload) => {
+    console.log("_col :>> ", _collection)
 
-    // console.log("In handleCreateAuthProfile() :>> ")
-    // console.log("Coll :>> ", _collection)
-    // console.log("pld :>> ", payload)
-
-    // return;
-    // const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+    let userSource = {};
+    if (_collection?.activeSync) {
+      userSource = {
+        currentBranch: _collection?.currentBranch
+          ? _collection?.currentBranch
+          : _collection?.primaryBranch,
+        source: "USER",
+      };
+    }
     const AuthProfilePayload =
     {
       collectionId: _collection.collectionId,
       workspaceId: _collection.workspaceId,
-      // currentBranch: _collection.activeSync ? _collection.currentBranch : undefined,
-      // source: _collection.activeSync ? "USER" : undefined,
+      ...userSource,
       auth: [
         {
           ...payload,
 
-          // ToDo: The below props should come from backend
-          createdAt: "2025-06-27T10:00:00Z",
-          updatedAt: "2025-06-27T12:00:00Z",
+          // ToDo: These props should handled by backend
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           createdBy: "685a8dd65c6db380e82bdf55",
           updatedBy: "685a8e305c6db380e82bdf59"
         }
@@ -1922,7 +1926,7 @@ class CollectionExplorerPage {
     //   return;
     // }
 
-    const baseUrl = await this.constructBaseUrl("685a8e305c6db380e82bdf5c");
+    const baseUrl = await this.constructBaseUrl(_collection.collectionId as string);
     const response = await this.collectionService.addAuthProfile(
       _collection.collectionId as string,
       _collection.workspaceId as string,
@@ -1933,7 +1937,7 @@ class CollectionExplorerPage {
       const res = response.data.data;
       console.log("In Coll.VM -> handleCreateAuthProfile() :>> isSuccessful :>> ", res);
 
-      await this.collectionRepository.addAuthProfile(
+      await this.collectionRepository.addAuthProfile( // update fn. updateCollectionData here 
         _collection.id as string,
         {
           ...res,

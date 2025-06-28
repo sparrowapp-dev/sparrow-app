@@ -5,6 +5,7 @@ import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
+import { map } from "rxjs/operators";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
   constructor() { }
@@ -1143,6 +1144,24 @@ export class CollectionRepository {
 
 
   // For Auth Profiles
+  public getCollectionById = (
+    collectionId: string,
+    workspaceId: string
+  ): Observable<any[]> => {
+    return RxDB.getInstance().rxdb.collection
+      .findOne({
+        selector: {
+          collectionId,
+          // workspaceId
+        }
+      })
+      .$
+    // .pipe(
+    //   map((collection) => collection?.auth || []) // Safely extract `auth` array
+    // );
+  };
+
+
   /**
    * @description
    * Creates an API request or folder within a collection.
@@ -1150,7 +1169,7 @@ export class CollectionRepository {
   // public addRequestOrFolderInCollection = async (
   public addAuthProfile = async (
     collectionId: string,
-    newAuthProfileItems: any, // Add a proper type here
+    newAuthProfileItems: any, // ToDo: Add a proper type here
   ) => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
@@ -1160,11 +1179,11 @@ export class CollectionRepository {
       })
       .exec();
     await collection.incrementalPatch({
-      auth: [...collection.auth, newAuthProfileItems],
-      selectedAuthType:
-        newAuthProfileItems.defaultKey
-          ? newAuthProfileItems.name
-          : collection.selectedAuthType,
+      auth: newAuthProfileItems?.auth,
+      // selectedAuthType:
+      //   newAuthProfileItems.defaultKey
+      //     ? newAuthProfileItems.name
+      //     : collection.selectedAuthType,
     });
   };
 

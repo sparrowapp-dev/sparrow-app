@@ -13,21 +13,93 @@
    * Exports
    */
   export let profileForm: ProfileForm;
-  export let onCreateProfile;
-  export let handleModalState;
+  export let onCreateProfile: (data: any) => Promise<any>;
+  export let onUpdateProfile:
+    | ((authId: string, data: any) => Promise<any>)
+    | null = null;
+  export let handleModalState: (flag: boolean) => void;
+  export let isEditMode = false;
+  export let authId: string | null = null;
 
   /**
    * Data
    */
-  let teamUnderSubmission: boolean = false;
+  let isFormSubmitting: boolean = false;
+
+  // Methods
+  const validateForm = () => {
+    profileForm.name.isTouched = true;
+    profileForm.description.isTouched = true;
+    profileForm.authType.isTouched = true;
+    profileForm.auth.isTouched = true;
+
+    if (!profileForm.name.value || profileForm.name.invalid) return false;
+    if (profileForm.authType.value === "select") return false;
+
+    // Validate auth fields based on auth type
+    if (profileForm.authType.value === "Bearer Token") {
+      if (!profileForm.auth.values.bearerToken) return false;
+    } else if (profileForm.authType.value === "Basic Auth") {
+      if (
+        !profileForm.auth.values.basicAuth.username ||
+        !profileForm.auth.values.basicAuth.password
+      )
+        return false;
+    } else if (profileForm.authType.value === "API Key") {
+      if (
+        !profileForm.auth.values.apiKey.authKey ||
+        !profileForm.auth.values.apiKey.authValue
+      )
+        return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    isFormSubmitting = true;
+
+    const profileData = {
+      name: profileForm.name.value,
+      description: profileForm.description.value,
+      authType: profileForm.authType.value,
+      auth: profileForm.auth.values,
+      defaultKey: false,
+    };
+
+    console.log("submitting :>> ", profileForm);
+
+    let response;
+    if (isEditMode && onUpdateProfile && authId) {
+      response = await onUpdateProfile(authId, profileData);
+    } else if (!isEditMode && onCreateProfile) {
+      response = await onCreateProfile(profileData);
+    }
+
+    isFormSubmitting = false;
+
+    if (response?.isSuccessful) {
+      handleModalState(false);
+    } else {
+      if (response?.message?.includes("unique name")) {
+        profileForm.name.invalid = true;
+      } else {
+        notifications.error(
+          response?.message
+            ? response.message
+            : "Something went wrong, please try again!",
+        );
+      }
+    }
+  };
 </script>
 
 <div class="sparrow-modal-footer d-flex justify-content-end mt-3">
-  <!-- 
-    -- Cancel Button 
-  -->
+  <!-- Cancel Button -->
   <Button
-    disable={teamUnderSubmission}
+    disable={isFormSubmitting}
     title={`Cancel`}
     type="secondary"
     buttonClassProp={`me-2`}
@@ -36,41 +108,13 @@
     }}
   />
 
-  <!-- 
-    -- Submit Button 
-  -->
+  <!-- Submit Button -->
   <Button
-    title={"Add Profile"}
+    title={isEditMode ? "Update Profile" : "Add Profile"}
     type="primary"
-    disable={teamUnderSubmission}
-    loader={teamUnderSubmission}
-    buttonClassProp={`me-1`}
-    onClick={async () => {
-      profileForm.name.isTouched = true;
-      if (!profileForm.name.value || profileForm.name.invalid) return;
-      teamUnderSubmission = true;
-      console.log("submitting :>> ", profileForm);
-      const response = await onCreateProfile({
-        name: profileForm.name.value,
-        description: profileForm.description.value,
-        authType: profileForm.authType.value,
-        auth: profileForm.auth.values,
-        defaultKey: false,
-      });
-      teamUnderSubmission = false;
-      if (response.isSuccessful) {
-        handleModalState(false);
-      } else {
-        if (response.message.includes("unique name")) {
-          profileForm.name.invalid = true;
-        } else {
-          notifications.error(
-            response.message
-              ? response.message
-              : "Something went wrong, please try again!",
-          );
-        }
-      }
-    }}
+    disable={isFormSubmitting}
+    loader={isFormSubmitting}
+    buttonClassProp="me-1"
+    onClick={handleSubmit}
   />
 </div>

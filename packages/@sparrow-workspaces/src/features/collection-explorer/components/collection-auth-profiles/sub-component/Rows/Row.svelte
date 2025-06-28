@@ -42,6 +42,39 @@
   function closeRightClickContextMenu() {
     showMenu = false;
   }
+
+  function formatDateToReadable(dateStr) {
+    const date = new Date(dateStr);
+
+    const day = date.getUTCDate();
+    const daySuffix = getDaySuffix(day);
+    const month = date.toLocaleString("en-US", {
+      month: "long",
+      timeZone: "UTC",
+    });
+    const year = date.getUTCFullYear();
+
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12; // Convert to 12-hour format
+
+    return `${day.toString().padStart(2, "0")}${daySuffix} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
+  }
+
+  function getDaySuffix(day) {
+    if (day >= 11 && day <= 13) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  }
 </script>
 
 {#if showMenu}
@@ -54,7 +87,7 @@
     menuItems={[
       {
         onClick: () => {
-          onEditAuthProfile(list._id);
+          onEditAuthProfile(list);
         },
         displayText: "Edit Auth Profile",
         disabled: false,
@@ -62,7 +95,7 @@
       },
       {
         onClick: () => {
-          onDeleteAuthProfile(list._id);
+          onDeleteAuthProfile(list.authId);
         },
         displayText: "Delete",
         disabled: false,
@@ -115,7 +148,7 @@
     }}
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 px-2"
   >
-    {list?.auth?.authType}
+    {list?.authType}
   </td>
 
   <td
@@ -125,7 +158,7 @@
     }}
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 px-2"
   >
-    {list?.createdAt}
+    {formatDateToReadable(list.createdAt)}
   </td>
 
   <td

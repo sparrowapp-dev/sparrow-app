@@ -977,7 +977,7 @@ export class CollectionService {
   ) => {
     const response = await makeRequest(
       "PUT",
-      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`, // ToDo: there should be seprate api for creating profiles/like apis (items field in db)
       {
         body: updatedPayload,
         headers: getAuthHeaders(),

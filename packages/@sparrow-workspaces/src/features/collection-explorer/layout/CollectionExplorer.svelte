@@ -146,6 +146,14 @@
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
   let isCollectionSyncing = false;
+  let authProfilesList = []; // ToDo: Give a type here
+
+  $: {
+    authProfilesList = collection?.auth || [];
+    if (collection) {
+      console.log("**** Auth Profile ***** :>> ", collection.auth);
+    }
+  }
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -990,6 +998,7 @@
           {environmentVariables}
         /> -->
         <CollectionAuthProfiles
+          {authProfilesList}
           onCreateAuthProfile={handleOnCreateAuthProfile}
           onDelete={() => {}}
           onUpdate={() => {}}
