@@ -16,7 +16,7 @@
   });
 </script>
 
-<section class="px-3 pb-3">
+<section class="px-2 pb-3">
   <button
     id="isExpandLoginButton"
     class="d-flex align-items-center rounded-1 me-0 mb-0 p-2"

@@ -226,6 +226,9 @@ const mockRequestResponseItems = {
   isMockResponseActive: {
     type: "boolean",
   },
+  responseWeightRatio: {
+    type: "number",
+  },
 };
 
 const websocketItems = {
@@ -372,7 +375,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 15,
+  version: 16,
   properties: {
     collectionId: {
       type: "string",

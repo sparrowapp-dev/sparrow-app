@@ -400,7 +400,10 @@ async fn make_request_v2(
     request: &str,
 ) -> Result<String, std::io::Error> {
     // Create a client
-    let client = Client::new();
+    let client = reqwest::Client::builder()
+    .danger_accept_invalid_certs(true)
+    .build()
+    .unwrap();
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
@@ -1190,7 +1193,10 @@ async fn send_graphql_request(
     variables: Option<String>,
 ) -> Result<String, String> {
     // Initialize an HTTP client for making requests.
-    let client = Client::new();
+    let client = reqwest::Client::builder()
+    .danger_accept_invalid_certs(true)
+    .build()
+    .unwrap();
 
     // Deserialize the JSON string `headers` into a Vec of key-value pairs.
     // Each key-value pair is represented by the KeyValue struct.

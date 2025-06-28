@@ -8,6 +8,7 @@
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { Button, List, Options } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
+  import { slide } from "svelte/transition";
   import type {
     CollectionDocument,
     EnvironmentDocument,
@@ -248,8 +249,8 @@
   <Options
     xAxis={collectionTabWrapper.getBoundingClientRect().right + 5}
     yAxis={[
-      collectionTabWrapper.getBoundingClientRect().top - 0,
-      collectionTabWrapper.getBoundingClientRect().bottom + 2,
+      collectionTabWrapper.getBoundingClientRect().top - 5,
+      collectionTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={701}
     menuItems={[
@@ -282,7 +283,6 @@
         hidden: isGuestUser ? true : false,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -411,6 +411,7 @@
 
     {#if $isExpandCollection}
       <div
+        transition:slide={{ duration: 250 }}
         class="overflow-auto position-relative d-flex flex-column me-0 py-1"
         style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
       >

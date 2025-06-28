@@ -105,34 +105,179 @@ jobs:
       #     secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
       #     platforms: 'windows'
 
+      # - name: sign msi
+      #   run: |
+      #     $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+      #     $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+      #     $bundlePath = "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+      #     Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
+      #     & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
+      #   shell: pwsh
       - name: sign msi
         run: |
+          # Create self-signed certificate
           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+          
+          # Convert password to secure string
           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          $bundlePath = "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          
+          # Find the actual bundle path dynamically (check both D: and C: drives)
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  Write-Host "Found bundle path: $bundlePath"
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "Could not find bundle directory in any of the expected locations"
+          }
+          
+          # Export certificate with password parameter (THIS WAS MISSING)
           Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
+          
+          # Verify the certificate file was created
+          if (-not (Test-Path "$bundlePath\Certificate.pfx")) {
+              throw "Certificate file was not created successfully"
+          }
+          
+          Write-Host "Certificate exported successfully to: $bundlePath\Certificate.pfx"
+          
+          # Find and sign MSI files individually
+          $msiFiles = Get-ChildItem "$bundlePath\msi\*.msi" -ErrorAction SilentlyContinue
+          if ($msiFiles) {
+              Write-Host "Found $($msiFiles.Count) MSI file(s) to sign"
+              foreach ($file in $msiFiles) {
+                  Write-Host "Signing MSI: $($file.Name)"
+                  $result = & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
+                  } else {
+                      Write-Error "Failed to sign $($file.Name): $result"
+                  }
+              }
+          } else {
+              Write-Warning "No MSI files found in $bundlePath\msi\"
+          }
+          
+          # Find and sign EXE files individually
+          $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
+          if ($exeFiles) {
+              Write-Host "Found $($exeFiles.Count) EXE file(s) to sign"
+              foreach ($file in $exeFiles) {
+                  Write-Host "Signing EXE: $($file.Name)"
+                  $result = & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
+                  } else {
+                      Write-Error "Failed to sign $($file.Name): $result"
+                  }
+              }
+          } else {
+              Write-Warning "No EXE files found in $bundlePath\nsis\"
+          }
+          
+          # Debug: List all files in the bundle directory
+          Write-Host "`nBundle directory contents:"
+          Get-ChildItem $bundlePath -Recurse | ForEach-Object {
+              Write-Host "  $($_.FullName)"
+          }
         shell: pwsh
-
-      - name: AWS CLI
-        uses: chrislennon/action-aws-cli@v1.1
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: latest
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Upload files to S3
         run: |
-          aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
+          # Find the actual bundle path dynamically
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  Write-Host "Found bundle path: $bundlePath"
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "Could not find bundle directory for S3 upload"
+          }
+          
+          # Check if msi directory exists
+          $msiPath = "$bundlePath\msi"
+          if (-not (Test-Path $msiPath)) {
+              throw "MSI directory not found at: $msiPath"
+          }
+          
+          # List files before upload for debugging
+          Write-Host "Files in MSI directory:"
+          Get-ChildItem $msiPath | ForEach-Object {
+              Write-Host "  $($_.Name) - $($_.Length) bytes"
+          }
+          
+          # Test AWS connectivity
+          Write-Host "Testing AWS connectivity..."
+          aws sts get-caller-identity
+          
+          # Upload to S3
+          Write-Host "Starting S3 upload..."
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+          
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "S3 upload completed successfully" -ForegroundColor Green
+          } else {
+              throw "S3 upload failed with exit code: $LASTEXITCODE"
+          }
+        shell: pwsh
+
       - name: Post Windows Build Links to Teams
         run: |
-          $msiFile = Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+          # Find the actual bundle path dynamically
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "Could not find bundle directory for Teams notification"
+          }
+          
+          # Find MSI file
+          $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Select-Object -First 1
+          
+          if (-not $msiFile) {
+              throw "No MSI file found in $bundlePath\msi\"
+          }
+          
           $msiFileName = $msiFile.Name
           $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          
+          Write-Host "MSI file found: $msiFileName"
+          Write-Host "Download URL: $msiUrl"
           
           $body = @{
             "type" = "message"
@@ -176,6 +321,108 @@ jobs:
           
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
+
+      # - name: AWS CLI
+      #   uses: chrislennon/action-aws-cli@v1.1
+      #   with:
+      #     version: latest
+      #     aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # - name: Upload files to S3
+      #   run: |
+      #     aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      # #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Upload files to S3
+      #   run: |
+      #     # Find the actual bundle path dynamically
+      #     $possiblePaths = @(
+      #         "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+      #         "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+      #     )
+          
+      #     $bundlePath = $null
+      #     foreach ($path in $possiblePaths) {
+      #         if (Test-Path $path) {
+      #             $bundlePath = $path
+      #             Write-Host "Found bundle path: $bundlePath"
+      #             break
+      #         }
+      #     }
+          
+      #     if (-not $bundlePath) {
+      #         throw "Could not find bundle directory for S3 upload"
+      #     }
+          
+      #     # Check if msi directory exists
+      #     $msiPath = "$bundlePath\msi"
+      #     if (-not (Test-Path $msiPath)) {
+      #         throw "MSI directory not found at: $msiPath"
+      #     }
+          
+      #     # List files before upload for debugging
+      #     Write-Host "Files in MSI directory:"
+      #     Get-ChildItem $msiPath | ForEach-Object {
+      #         Write-Host "  $($_.Name) - $($_.Length) bytes"
+      #     }
+          
+      #     # Upload to S3
+      #     aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
+      #   shell: pwsh
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      # - name: Post Windows Build Links to Teams
+      #   run: |
+      #     $msiFile = Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
+      #     $msiFileName = $msiFile.Name
+      #     $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          
+      #     $body = @{
+      #       "type" = "message"
+      #       "attachments" = @(
+      #         @{
+      #           "contentType" = "application/vnd.microsoft.card.adaptive"
+      #           "content" = @{
+      #             "type" = "AdaptiveCard"
+      #             "body" = @(
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = "🚀 New Windows Build Available"
+      #                 "weight" = "bolder"
+      #                 "size" = "large"
+      #               }
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = "Branch: development"
+      #                 "wrap" = $true
+      #               }
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = "Download Link:"
+      #                 "wrap" = $true
+      #               }
+      #               @{
+      #                 "type" = "TextBlock"
+      #                 "text" = $msiUrl
+      #                 "color" = "accent"
+      #                 "wrap" = $true
+      #               }
+      #             )
+      #             "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+      #             "version" = "1.2"
+      #           }
+      #         }
+      #       )
+      #     }
+          
+      #     $jsonBody = $body | ConvertTo-Json -Depth 10
+          
+      #     Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+      #   shell: pwsh
 
   release_macos:
     runs-on: macos-latest

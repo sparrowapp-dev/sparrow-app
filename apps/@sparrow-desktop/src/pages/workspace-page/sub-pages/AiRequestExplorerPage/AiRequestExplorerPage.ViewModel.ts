@@ -1,11 +1,17 @@
 // ---- Utils
-import { createDeepCopy, InitAiRequestTab, MarkdownFormatter, moveNavigation, Sleep } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  InitAiRequestTab,
+  MarkdownFormatter,
+  moveNavigation,
+  Sleep,
+} from "@sparrow/common/utils";
 
 // ---- DB
 import type {
   TabDocument,
   WorkspaceDocument,
-  CollectionDocument
+  CollectionDocument,
 } from "../../../../database/database";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
@@ -42,33 +48,42 @@ import { isGuestUserActive } from "@app/store/auth.store";
 import { v4 as uuidv4 } from "uuid";
 import { AiAssistantService } from "../../../../services/ai-assistant.service";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
-import { AiRequestExplorerDataStore, type AiRequestExplorerData } from "@sparrow/workspaces/features/ai-request-explorer/store";
+import {
+  AiRequestExplorerDataStore,
+  type AiRequestExplorerData,
+} from "@sparrow/workspaces/features/ai-request-explorer/store";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum, OpenAIModelEnum, type modelsConfigType } from "@sparrow/common/types/workspace/ai-request-base";
-import { configFormat, disabledModelFeatures } from "@sparrow/workspaces/features/ai-request-explorer/constants";
+import {
+  AiModelProviderEnum,
+  OpenAIModelEnum,
+  type modelsConfigType, type PromptFileAttachment,
+} from "@sparrow/common/types/workspace/ai-request-base";
+import {
+  configFormat,
+  disabledModelFeatures,
+} from "@sparrow/workspaces/features/ai-request-explorer/constants";
 import {
   startLoading,
   stopLoading,
 } from "../../../../../../../packages/@sparrow-common/src/store";
-import {
-  Events,
-  ItemType,
-} from "@sparrow/common/enums";
+import { Events, ItemType } from "@sparrow/common/enums";
 import { CollectionService } from "../../../../services/collection.service";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 import {
   CollectionItemTypeBaseEnum,
   type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
-import type { AiRequestCreateUpdateInCollectionPayloadDtoInterface, AiRequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/ai-request-dto";
+import type {
+  AiRequestCreateUpdateInCollectionPayloadDtoInterface,
+  AiRequestCreateUpdateInFolderPayloadDtoInterface,
+} from "@sparrow/common/types/workspace/ai-request-dto";
 import { AiRequestTabAdapter, CollectionTabAdapter } from "@app/adapter";
 import { AiRequestRepository } from "../../../../repositories/ai-request.repository";
 import { type StatePartial as AiStateParital } from "@sparrow/common/types/workspace/ai-request-tab";
 import { AiRequestService } from "../../../../services/ai-request.service";
-
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -78,7 +93,7 @@ class AiRequestExplorerViewModel {
   private guestUserRepository = new GuestUserRepository();
   private aiRequestRepository = new AiRequestRepository();
   private tabRepository = new TabRepository();
-  private compareArray = new CompareArray
+  private compareArray = new CompareArray();
 
   // Services
   private environmentService = new EnvironmentService();
@@ -134,10 +149,10 @@ class AiRequestExplorerViewModel {
   };
 
   /**
- * Compares the current request tab with the server version and updates the saved status accordingly.
- * This method is debounced to reduce the number of server requests.
- * @return A promise that resolves when the comparison is complete.
- */
+   * Compares the current request tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
   private compareRequestWithServerDebounced = async () => {
     let result = true;
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
@@ -159,7 +174,6 @@ class AiRequestExplorerViewModel {
     }
 
     if (!requestServer) result = false;
-
     // description
     else if (requestServer.description !== progressiveTab.description) {
       result = false;
@@ -170,13 +184,15 @@ class AiRequestExplorerViewModel {
     }
     // aiModelProvider
     else if (
-      requestServer.aiRequest.aiModelProvider !== progressiveTab.property.aiRequest.aiModelProvider
+      requestServer.aiRequest.aiModelProvider !==
+      progressiveTab.property.aiRequest.aiModelProvider
     ) {
       result = false;
     }
     // aiModelVariant
     else if (
-      requestServer.aiRequest.aiModelVariant !== progressiveTab.property.aiRequest.aiModelVariant
+      requestServer.aiRequest.aiModelVariant !==
+      progressiveTab.property.aiRequest.aiModelVariant
     ) {
       result = false;
     }
@@ -261,78 +277,102 @@ class AiRequestExplorerViewModel {
 
   public fetchConversations = async () => {
     let isGuestUser = await this.getGuestUser();
-    if(isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey = componentData.property.aiRequest.auth.apiKey.authValue;
+    const providerAuthKey =
+      componentData.property.aiRequest.auth.apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
-      console.error("Failed due to missing provider and authKey before fetching conversations.");
+      console.error(
+        "Failed due to missing provider and authKey before fetching conversations.",
+      );
       return;
     }
 
     try {
-      const conversationFetchResult = await this.aiRequestService.fetchConversationsByApiKey(provider, providerAuthKey);
+      const conversationFetchResult =
+        await this.aiRequestService.fetchConversationsByApiKey(
+          provider,
+          providerAuthKey,
+        );
       if (conversationFetchResult.isSuccessful) {
         // Store the fetched conversations in the repository
-        const res = await this.aiRequestRepository.addConversation(provider, providerAuthKey, conversationFetchResult.data.data);
+        const res = await this.aiRequestRepository.addConversation(
+          provider,
+          providerAuthKey,
+          conversationFetchResult.data.data,
+        );
         return res;
-      } else { console.error("Conversation fetch failed:"); return; }
+      } else {
+        console.error("Conversation fetch failed:");
+        return;
+      }
     } catch (error) {
       console.error("Error while fetching conversations :>> ", error);
     }
-  }
+  };
 
   /**
-   * Get list of conversations based on specific apikey 
+   * Get list of conversations based on specific apikey
    * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
    */
   public getConversationsList = () => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey =
+      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
-      console.error("Failed fetching conversations due to missing provider and authKey detials.");
+      console.error(
+        "Failed fetching conversations due to missing provider and authKey detials.",
+      );
       return;
     }
-    const response = this.aiRequestRepository.getConversationsByApiKeyAndProvider(provider, providerAuthKey);
+    const response =
+      this.aiRequestRepository.getConversationsByApiKeyAndProvider(
+        provider,
+        providerAuthKey,
+      );
     return response;
   };
-
 
   public getFormattedTime = () => {
     const now = new Date();
     const hours = now.getHours();
     const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = (hours % 12 || 12).toString().padStart(2, '0');
-    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = (hours % 12 || 12).toString().padStart(2, "0");
+    const formattedMinutes = minutes.toString().padStart(2, "0");
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
   public getLocalDate = () => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;  // e.g. "2025-06-10"
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const day = now.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`; // e.g. "2025-06-10"
   };
 
   public saveConversationHistory = async () => {
     let isGuestUser = await this.getGuestUser();
-    if(isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
     const user = getClientUser();
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const conversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-    const conversationId = componentData?.property?.aiRequest?.ai?.conversationId;
-    const conversationTitle = componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const conversations =
+      componentData?.property?.aiRequest?.ai?.conversations || [];
+    const conversationId =
+      componentData?.property?.aiRequest?.ai?.conversationId;
+    const conversationTitle =
+      componentData?.property?.aiRequest?.ai?.conversationTitle;
+    const providerAuthKey =
+      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -341,11 +381,15 @@ class AiRequestExplorerViewModel {
     }
 
     try {
-      const { inputTokens, outputTokens } = conversations.reduce((acc, item) => {
-        if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
-        if (item.type === "Receiver") acc.outputTokens += item.outputTokens || 0;
-        return acc;
-      }, { inputTokens: 0, outputTokens: 0 });
+      const { inputTokens, outputTokens } = conversations.reduce(
+        (acc, item) => {
+          if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
+          if (item.type === "Receiver")
+            acc.outputTokens += item.outputTokens || 0;
+          return acc;
+        },
+        { inputTokens: 0, outputTokens: 0 },
+      );
 
       const commonFields = {
         title: conversationTitle,
@@ -355,11 +399,13 @@ class AiRequestExplorerViewModel {
         time: this.getFormattedTime(),
         conversation: conversations,
         authoredBy: isGuestUser ? "Guest User" : user.name,
-        updatedBy: isGuestUser ? "Guest User" : {
-          name: user.name,
-          email: user.email,
-          id: user.id,
-        }
+        updatedBy: isGuestUser
+          ? "Guest User"
+          : {
+              name: user.name,
+              email: user.email,
+              id: user.id,
+            },
       };
 
       if (!conversationId) {
@@ -368,29 +414,46 @@ class AiRequestExplorerViewModel {
           apiKey: providerAuthKey,
           data: {
             ...commonFields,
-            createdBy: isGuestUser ? "Guest User" : {
-              name: user.name,
-              email: user.email,
-              id: user.id,
-            }
-          }
+            createdBy: isGuestUser
+              ? "Guest User"
+              : {
+                  name: user.name,
+                  email: user.email,
+                  id: user.id,
+                },
+          },
         };
 
-        const response = await this.aiRequestService.addNewConversation(payload);
+        const response =
+          await this.aiRequestService.addNewConversation(payload);
         const newConversationId = response.data.data;
         this.updateAiRequestConversationId(newConversationId);
 
-        if (response.isSuccessful) { await this.fetchConversations(); }
-        else { console.error("Failed to save conversation. Please try again. ", response); }
+        if (response.isSuccessful) {
+          await this.fetchConversations();
+        } else {
+          console.error(
+            "Failed to save conversation. Please try again. ",
+            response,
+          );
+        }
       } else {
         // Limit conversations for updates
         const limitedConversations = this.limitConversations(conversations, 30);
         // Recalculate tokens for limited conversations
-        const { inputTokens: limitedInputTokens, outputTokens: limitedOutputTokens } = limitedConversations.reduce((acc, item) => {
-          if (item.type === "Sender") acc.inputTokens += item.inputTokens || 0;
-          if (item.type === "Receiver") acc.outputTokens += item.outputTokens || 0;
-          return acc;
-        }, { inputTokens: 0, outputTokens: 0 });
+        const {
+          inputTokens: limitedInputTokens,
+          outputTokens: limitedOutputTokens,
+        } = limitedConversations.reduce(
+          (acc, item) => {
+            if (item.type === "Sender")
+              acc.inputTokens += item.inputTokens || 0;
+            if (item.type === "Receiver")
+              acc.outputTokens += item.outputTokens || 0;
+            return acc;
+          },
+          { inputTokens: 0, outputTokens: 0 },
+        );
 
         const payload = {
           provider,
@@ -401,20 +464,29 @@ class AiRequestExplorerViewModel {
             conversation: limitedConversations,
             inputTokens: limitedInputTokens,
             outputTokens: limitedOutputTokens,
-          }
+          },
         };
 
-        const response = await this.aiRequestService.updateConversation(payload);
-        if (response.isSuccessful) { await this.fetchConversations(); }
-        else { console.error("Something went wrong while updating conversation. ", response); }
+        const response =
+          await this.aiRequestService.updateConversation(payload);
+        if (response.isSuccessful) {
+          await this.fetchConversations();
+        } else {
+          console.error(
+            "Something went wrong while updating conversation. ",
+            response,
+          );
+        }
       }
-    } catch (error) { console.error("Error while saving conversation history :>> ", error); }
-  }
+    } catch (error) {
+      console.error("Error while saving conversation history :>> ", error);
+    }
+  };
 
   // Function to limit conversations to last N Receiver types with their Senders
   public limitConversations = (conversations, maxReceivers = 30) => {
     if (conversations.length === 0) return conversations;
-    
+
     // Find all Receiver message indices
     const receiverIndices = [];
     conversations.forEach((conv, index) => {
@@ -422,15 +494,15 @@ class AiRequestExplorerViewModel {
         receiverIndices.push(index);
       }
     });
-    
+
     // If we have maxReceivers or fewer Receivers, return all conversations
     if (receiverIndices.length <= maxReceivers) {
       return conversations;
     }
-    
+
     // Get the index of the (n-maxReceivers)th Receiver from the end
     const startReceiverIndex = receiverIndices[receiverIndices.length - maxReceivers];
-    
+
     // Find the first Sender before this Receiver (if any) to maintain conversation context
     let startIndex = startReceiverIndex;
     for (let i = startReceiverIndex - 1; i >= 0; i--) {
@@ -440,16 +512,19 @@ class AiRequestExplorerViewModel {
         break;
       }
     }
-    
+
     // Return conversations from startIndex to end
     return conversations.slice(startIndex);
   };
 
-  public handleRenameConversationTitle = async (conversationId: string, newConversationTitle: string) => {
+  public handleRenameConversationTitle = async (
+    conversationId: string,
+    newConversationTitle: string,
+  ) => {
     const guestUser = await this.guestUserRepository.findOne({
-        name: "guestUser",
+      name: "guestUser",
     });
-    
+
     // If conversationId is null, then change title of current tab itself, no need to change in db
     if (!conversationId || guestUser) {
       await this.updateAiRequestConversationTitle(newConversationTitle);
@@ -460,8 +535,10 @@ class AiRequestExplorerViewModel {
     const user = getClientUser();
 
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const currTabConversationId =
+      componentData?.property?.aiRequest?.ai?.conversationId;
+    const providerAuthKey =
+      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -478,8 +555,7 @@ class AiRequestExplorerViewModel {
           time: this.getFormattedTime(),
           date: this.getLocalDate(),
           authoredBy: user.name,
-
-        }
+        },
       };
 
       const response = await this.aiRequestService.updateConversation(payload);
@@ -491,31 +567,38 @@ class AiRequestExplorerViewModel {
         // notifications.success("Conversation title updated successfully.");
         await this.fetchConversations(); // Fetch to udpate the states in local db
       } else {
-        notifications.error("Failed to update conversation title. Please try again.");
+        notifications.error(
+          "Failed to update conversation title. Please try again.",
+        );
       }
-
-    }
-    catch (error) {
+    } catch (error) {
       console.log("Something went wrong while updating title :>> ", error);
     }
-  }
+  };
 
-  public handleDeleteConversation = async (conversationId: string, conversationTitle: string) => {
+  public handleDeleteConversation = async (
+    conversationId: string,
+    conversationTitle: string,
+  ) => {
     let isGuestUser = await this.getGuestUser();
-    if(isGuestUser) {
+    if  (isGuestUser) {
       return; // Not storing conversation for guest users
     }
-    
+
     // If conversationId is null, then change title of current tab itself, no need to change in db
     if (!conversationId) {
-      console.error("Failed to delete conversation, due to missing Conversation ID.")
+      console.error(
+        "Failed to delete conversation, due to missing Conversation ID.",
+      );
       return;
     }
 
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const currTabConversationId = componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const currTabConversationId =
+      componentData?.property?.aiRequest?.ai?.conversationId;
+    const providerAuthKey =
+      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -523,18 +606,56 @@ class AiRequestExplorerViewModel {
     }
 
     try {
-      const response = await this.aiRequestService.deleteConversation(provider, providerAuthKey, conversationId);
+      const response = await this.aiRequestService.deleteConversation(
+        provider,
+        providerAuthKey,
+        conversationId,
+      );
 
       if (response.isSuccessful) {
         if (conversationId === currTabConversationId) {
           this.handleStartNewConversation();
         }
         await this.fetchConversations(); // Fetch to udpate the states in local db
-        notifications.success(`Conversation  “${conversationTitle}” deleted successfully.`);
+        notifications.success(
+          `Conversation  “${conversationTitle}” deleted successfully.`,
+        );
       } else {
-        notifications.error(`Failed to delete conversation ${conversationTitle}. Please try again.`);
+        notifications.error(
+          `Failed to delete conversation ${conversationTitle}. Please try again.`,
+        );
       }
+    } catch (error) {
+      console.error(
+        "Something went wrong while deleting the conversation. :>> ",
+        error,
+      );
+    }
+  }
 
+  /**
+   * 
+   * @param filesToUpload takes the file obj to upload on azure and model's context
+   * @returns Array of objects containing uploaded file urls and fileIds by models context set
+   */
+  public handleUploadFilesToCloud = async (filesToUpload: []) => {
+    const componentData = this._tab.getValue();
+    const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+
+    // Don't allow file uploads when auth key is not present.
+    if (!provider || !providerAuthKey) {
+      console.error("Missing provider or authKey.");
+      return Promise.reject("API key missing. Please authenticate before uploading the files.");
+    }
+
+    try {
+      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
+      if (response.isSuccessful) {
+        return response.data.data;
+      } else {
+        notifications.error(`Failed to upload files. Please try again.`);
+      }
     }
     catch (error) {
       console.error("Something went wrong while deleting the conversation. :>> ", error);
@@ -568,7 +689,7 @@ class AiRequestExplorerViewModel {
   get collection() {
     return this.collectionRepository.getCollection();
   }
-  set collection(e) { }
+  set collection(e) {}
 
   /**
    *
@@ -884,7 +1005,7 @@ class AiRequestExplorerViewModel {
         description: requestMetaData.description,
         type: "AI_REQUEST",
         aiRequest: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
@@ -913,13 +1034,19 @@ class AiRequestExplorerViewModel {
     }
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const res = await this.collectionService.updateAiRequestInCollection(_id, {
-      collectionId: collectionId,
-      workspaceId: workspaceId,
-      ...folderSource,
-      ...userSource,
-      items: itemSource,
-    } as | AiRequestCreateUpdateInCollectionPayloadDtoInterface | AiRequestCreateUpdateInFolderPayloadDtoInterface, baseUrl);
+    const res = await this.collectionService.updateAiRequestInCollection(
+      _id,
+      {
+        collectionId: collectionId,
+        workspaceId: workspaceId,
+        ...folderSource,
+        ...userSource,
+        items: itemSource,
+      } as
+        | AiRequestCreateUpdateInCollectionPayloadDtoInterface
+        | AiRequestCreateUpdateInFolderPayloadDtoInterface,
+      baseUrl,
+    );
 
     if (res.isSuccessful) {
       const progressiveTab = this._tab.getValue();
@@ -954,15 +1081,14 @@ class AiRequestExplorerViewModel {
     }
   };
 
-
   /**
-  *
-  * @param _workspaceMeta - workspace meta data
-  * @param path - request stack path
-  * @param tabName - request name
-  * @param description - request description
-  * @param type - save over all request or description only
-  */
+   *
+   * @param _workspaceMeta - workspace meta data
+   * @param path - request stack path
+   * @param tabName - request name
+   * @param description - request description
+   * @param type - save over all request or description only
+   */
   public saveAsRequest = async (
     _workspaceMeta: {
       id: string;
@@ -1036,7 +1162,6 @@ class AiRequestExplorerViewModel {
               progressiveTab.tabId,
               progressiveTab,
             );
-
           } else {
             /**
              * Create new copy of the existing request
@@ -1045,7 +1170,9 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateName(req.name);
             initAiRequestTab.updateDescription(req.description);
             initAiRequestTab.updatePath(expectedPath);
-            initAiRequestTab.updateAIModelProvider(req.aiRequest.aiModelProvider);
+            initAiRequestTab.updateAIModelProvider(
+              req.aiRequest.aiModelProvider,
+            );
             initAiRequestTab.updateAIModelVariant(req.aiRequest.aiModelVariant);
             initAiRequestTab.updateAISystemPrompt(req.aiRequest.systemPrompt);
             initAiRequestTab.updateAuth(req.aiRequest.auth);
@@ -1106,7 +1233,6 @@ class AiRequestExplorerViewModel {
               progressiveTab.tabId,
               progressiveTab,
             );
-
           } else {
             /**
              * Create new copy of the existing request
@@ -1118,9 +1244,15 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateName(res.data.data.name);
             initAiRequestTab.updateDescription(res.data.data.description);
             initAiRequestTab.updatePath(expectedPath);
-            initAiRequestTab.updateAIModelProvider(res.data.data.aiRequest.aiModelProvider);
-            initAiRequestTab.updateAIModelVariant(res.data.data.aiRequest.aiModelVariant);
-            initAiRequestTab.updateAISystemPrompt(res.data.data.aiRequest.systemPrompt);
+            initAiRequestTab.updateAIModelProvider(
+              res.data.data.aiRequest.aiModelProvider,
+            );
+            initAiRequestTab.updateAIModelVariant(
+              res.data.data.aiRequest.aiModelVariant,
+            );
+            initAiRequestTab.updateAISystemPrompt(
+              res.data.data.aiRequest.systemPrompt,
+            );
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
@@ -1178,13 +1310,14 @@ class AiRequestExplorerViewModel {
               progressiveTab.tabId,
               progressiveTab,
             );
-
           } else {
             const initAiRequestTab = new InitAiRequestTab(req.id, "UNTRACKED-");
             initAiRequestTab.updateName(req.name);
             initAiRequestTab.updateDescription(req.description);
             initAiRequestTab.updatePath(expectedPath);
-            initAiRequestTab.updateAIModelProvider(req.aiRequest.aiModelProvider);
+            initAiRequestTab.updateAIModelProvider(
+              req.aiRequest.aiModelProvider,
+            );
             initAiRequestTab.updateAIModelVariant(req.aiRequest.aiModelVariant);
             initAiRequestTab.updateAISystemPrompt(req.aiRequest.systemPrompt);
             initAiRequestTab.updateAuth(req.aiRequest.auth);
@@ -1244,7 +1377,6 @@ class AiRequestExplorerViewModel {
             progressiveTab.isSaved = true;
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-
           } else {
             const initAiRequestTab = new InitAiRequestTab(
               res.data.data.id,
@@ -1253,9 +1385,15 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateName(res.data.data.name);
             initAiRequestTab.updateDescription(res.data.data.description);
             initAiRequestTab.updatePath(expectedPath);
-            initAiRequestTab.updateAIModelProvider(res.data.data.aiRequest.aiModelProvider);
-            initAiRequestTab.updateAIModelVariant(res.data.data.aiRequest.aiModelVariant);
-            initAiRequestTab.updateAISystemPrompt(res.data.data.aiRequest.systemPrompt);
+            initAiRequestTab.updateAIModelProvider(
+              res.data.data.aiRequest.aiModelProvider,
+            );
+            initAiRequestTab.updateAIModelVariant(
+              res.data.data.aiRequest.aiModelVariant,
+            );
+            initAiRequestTab.updateAISystemPrompt(
+              res.data.data.aiRequest.systemPrompt,
+            );
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
             moveNavigation("right");
@@ -1277,7 +1415,6 @@ class AiRequestExplorerViewModel {
       // MixpanelEvent(Events.SAVE_API_REQUEST);
     }
   };
-
 
   /**
    *
@@ -1492,7 +1629,6 @@ class AiRequestExplorerViewModel {
     }
   };
 
-
   /**
    * Handles collection rename
    * @param collection - collction to rename
@@ -1637,7 +1773,6 @@ class AiRequestExplorerViewModel {
     return updatedText;
   };
 
-
   //////////////////////////////////////////////////////////////////////////////
   //                 AI Request Tab Data Update Methods
   //////////////////////////////////////////////////////////////////////////////
@@ -1658,7 +1793,6 @@ class AiRequestExplorerViewModel {
     }
     this.compareRequestWithServer();
   };
-
 
   /**
    *
@@ -1715,7 +1849,6 @@ class AiRequestExplorerViewModel {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
-
   };
 
   /**
@@ -1770,7 +1903,9 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-  public updateAiRequestConversationTitle = async (_conversationTitle: string) => {
+  public updateAiRequestConversationTitle = async (
+    _conversationTitle: string,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationTitle = _conversationTitle;
     this.tab = progressiveTab;
@@ -1799,7 +1934,7 @@ class AiRequestExplorerViewModel {
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
     // notifications.success("Chat cleared successfully.")
-  }
+  };
 
   public handleStartNewConversation = async () => {
     this.updateRequestState({ isChatbotConversationLoading: true });
@@ -1807,9 +1942,13 @@ class AiRequestExplorerViewModel {
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
     // notifications.success("Created new conversation.");
-  }
+  };
 
-  public switchConversation = async (_conversationId: string, _conversationTitle: string, _conversations: Conversation[]) => {
+  public switchConversation = async (
+    _conversationId: string,
+    _conversationTitle: string,
+    _conversations: Conversation[],
+  ) => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
@@ -1820,7 +1959,7 @@ class AiRequestExplorerViewModel {
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
     // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
-  }
+  };
 
   /**
    *
@@ -1907,7 +2046,10 @@ class AiRequestExplorerViewModel {
     } else console.error("chunk not found!");
   }
 
-  public updateAiConfigurations = async (model: AiModelProviderEnum, _configUpdates: modelsConfigType) => {
+  public updateAiConfigurations = async (
+    model: AiModelProviderEnum,
+    _configUpdates: modelsConfigType,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
     this.tab = progressiveTab;
@@ -1926,7 +2068,7 @@ class AiRequestExplorerViewModel {
    * Generates the AI Response from server with websocket communication protocol
    * @param Prompt - Prompt from the user
    */
-  public generateAIResponseWS = async (prompt = "") => {
+  public generateAIResponseWS = async (prompt = "", fileAttachments: PromptFileAttachment[]) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const tabId = componentData.tabId;
@@ -1935,27 +2077,32 @@ class AiRequestExplorerViewModel {
     const authKey = componentData.property.aiRequest.auth.apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
-    const isChatAutoClearActive = componentData.property.aiRequest.state.isChatAutoClearActive;
-    const isJsonFormatConfigAvailable = configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
-    const isJsonFormatEnabed = isJsonFormatConfigAvailable ? (currConfigurations[modelProvider].jsonResponseFormat || false) : false;
+    const isChatAutoClearActive =
+      componentData.property.aiRequest.state.isChatAutoClearActive;
+    const isJsonFormatConfigAvailable =
+      configFormat[modelProvider][modelVariant]["jsonResponseFormat"];
+    const isJsonFormatEnabed = isJsonFormatConfigAvailable
+      ? currConfigurations[modelProvider].jsonResponseFormat || false
+      : false;
 
     let finalSP = null;
     if (systemPrompt.length) {
       const SPDatas = JSON.parse(systemPrompt);
-      if (SPDatas.length) finalSP = SPDatas.map(obj => obj.data.text).join("");
+      if (SPDatas.length)
+        finalSP = SPDatas.map((obj) => obj.data.text).join("");
     }
 
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
-    let formattedConversations: { role: 'user' | 'assistant'; content: string; }[] = []; // Sending the chat history for context
-    if (!isChatAutoClearActive) {
-      const rawConversations = componentData?.property?.aiRequest?.ai?.conversations || [];
-      formattedConversations = rawConversations
-        .filter(({ status }) => status !== false) // Exclude items with status === false
-        .map(({ type, message }) => ({
-          role: type === 'Sender' ? 'user' : 'assistant',
-          content: isJsonFormatEnabed ? `${message} (Give Response In JSON Format)` : message,
-        }));
-    }
+
+    const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
+      modelProvider,
+      prompt,
+      finalSP || "Answer my queries.",
+      !isChatAutoClearActive,
+      componentData?.property?.aiRequest?.ai?.conversations || [],
+      isJsonFormatEnabed,
+      fileAttachments
+    );
 
     const modelSpecificConfig: modelsConfigType = {};
     const allowedConfigs = configFormat[modelProvider][modelVariant];
@@ -1963,17 +2110,14 @@ class AiRequestExplorerViewModel {
       modelSpecificConfig[key] = currConfigurations[modelProvider][key];
     });
 
-    const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
-      modelProvider,
-      prompt,
-      finalSP || "Answer my queries.",
-      !isChatAutoClearActive,
-      formattedConversations
-    );
-
     const aiRequestData = {
       feature: "llm-evaluation",
-      userInput: (modelProvider === AiModelProviderEnum.Google || (modelProvider === AiModelProviderEnum.OpenAI && modelVariant === OpenAIModelEnum.GPT_o1_Mini)) ? prompt : userInputConvo,
+      userInput:
+        modelProvider === AiModelProviderEnum.Google ||
+        (modelProvider === AiModelProviderEnum.OpenAI &&
+          modelVariant === OpenAIModelEnum.GPT_o1_Mini)
+          ? prompt
+          : userInputConvo,
       authKey: authKey.authValue,
       configs: modelSpecificConfig,
       model: modelProvider || "openai",
@@ -1984,14 +2128,15 @@ class AiRequestExplorerViewModel {
       ...(modelProvider === AiModelProviderEnum.Google && {
         conversation: isChatAutoClearActive ? "" : userInputConvo,
       }),
-    }
+    };
 
     try {
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
 
-      const socketResponse = await this.aiAssistentWebSocketService.sendAiRequest(aiRequestData);
+      const socketResponse =
+        await this.aiAssistentWebSocketService.sendAiRequest(aiRequestData);
 
       if (!socketResponse) {
         throw new Error("Something went wrong. Please try again");
@@ -2033,7 +2178,6 @@ class AiRequestExplorerViewModel {
           case `assistant-response_${componentData.tabId}`:
             // Handle special error messages
             if (response.event === "error" && response.message) {
-
               // After getting error response remove all listeners
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
@@ -2042,15 +2186,18 @@ class AiRequestExplorerViewModel {
               let errorMessage: string;
 
               if (response.message.includes("Limit Reached")) {
-                errorMessage = "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+                errorMessage =
+                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
-                errorMessage = "Some issue occurred from server while processing your request, please try again.";
+                errorMessage =
+                  "Some issue occurred from server while processing your request, please try again.";
               } else {
                 errorMessage = response.message; // Use the actual error message from the response
               }
 
               await this.updateRequestAIConversation([
-                ...(componentData?.property?.aiRequest?.ai?.conversations || []),
+                ...(componentData?.property?.aiRequest?.ai?.conversations ||
+                  []),
                 {
                   message: errorMessage,
                   messageId: uuidv4(),
@@ -2064,7 +2211,7 @@ class AiRequestExplorerViewModel {
                   statusCode: response?.statusCode,
                   time: response?.timeTaken?.replace("ms", "") || 0,
                   modelProvider,
-                  modelVariant
+                  modelVariant,
                 },
               ]);
               await this.updateRequestState({
@@ -2081,7 +2228,7 @@ class AiRequestExplorerViewModel {
                   statusCode: response?.statusCode || 400,
                   time: response?.timeTaken?.replace("ms", "") || 0,
                   modelProvider,
-                  modelVariant
+                  modelVariant,
                 },
               };
 
@@ -2089,7 +2236,6 @@ class AiRequestExplorerViewModel {
                 map.set(tabId, newData);
                 return new Map(map); // Return a new Map to trigger reactivity
               });
-
 
               return;
             }
@@ -2119,7 +2265,7 @@ class AiRequestExplorerViewModel {
                       isDisliked: false,
                       status: true,
                       modelProvider,
-                      modelVariant
+                      modelVariant,
                     },
                   ]);
                   messageCreated = true;
@@ -2137,21 +2283,20 @@ class AiRequestExplorerViewModel {
 
               // Handle end of stream
               else if (stream_status === STREAMING_STATES.END) {
-
                 // Extract response metrics
                 const responseMetrics = {
                   statusCode: response.statusCode,
                   inputTokens: response.inputTokens,
                   outputTokens: response.outputTokens,
                   totalTokens: response.totalTokens,
-                  time: parseInt(response.timeTaken.replace("ms", ""))
+                  time: parseInt(response.timeTaken.replace("ms", "")),
                 };
 
                 // Store in AiRequestExplorerDataStore
                 const newData: AiRequestExplorerData = {
                   response: {
                     messageId: responseMessageId, // Use the same message ID for consistency
-                    ...responseMetrics
+                    ...responseMetrics,
                   },
                 };
 
@@ -2160,11 +2305,11 @@ class AiRequestExplorerViewModel {
                   return new Map(map); // Return a new Map to trigger reactivity
                 });
 
-
                 // Storing respose metrices in chat converstaion data
                 // Update the conversation messages with metrics
                 const componentData = this._tab.getValue();
-                const conversations = componentData?.property?.aiRequest.ai?.conversations || [];
+                const conversations =
+                  componentData?.property?.aiRequest.ai?.conversations || [];
 
                 // Find indices for both the AI response and the preceding user message
                 let aiResponseIndex = -1;
@@ -2187,19 +2332,23 @@ class AiRequestExplorerViewModel {
                     inputTokens: responseMetrics.inputTokens,
                     outputTokens: responseMetrics.outputTokens,
                     totalTokens: responseMetrics.totalTokens,
-                    time: responseMetrics.time
+                    time: responseMetrics.time,
                   };
 
                   // Also update the preceding user message (Sender) if it exists
                   // User message will be the one directly before this AI response
-                  if (aiResponseIndex > 0 && updatedConversations[aiResponseIndex - 1].type === MessageTypeEnum.SENDER) {
+                  if (
+                    aiResponseIndex > 0 &&
+                    updatedConversations[aiResponseIndex - 1].type ===
+                      MessageTypeEnum.SENDER
+                  ) {
                     updatedConversations[aiResponseIndex - 1] = {
                       ...updatedConversations[aiResponseIndex - 1],
                       statusCode: responseMetrics.statusCode,
                       inputTokens: responseMetrics.inputTokens,
                       outputTokens: responseMetrics.outputTokens,
                       totalTokens: responseMetrics.inputTokens,
-                      time: responseMetrics.time
+                      time: responseMetrics.time,
                     };
                   }
 
@@ -2207,7 +2356,6 @@ class AiRequestExplorerViewModel {
                   await this.updateRequestAIConversation(updatedConversations);
                   this.saveConversationHistory();
                 }
-
 
                 // Cleanup listeners as stream is complete
                 events.forEach((event) =>
@@ -2285,16 +2433,16 @@ class AiRequestExplorerViewModel {
     }
   };
 
-    public updateUserPrompt = async (userInput: string) => {
+  public updateUserPrompt = async (userInput: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.prompt = userInput;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-  }
+  };
 
   public generateAiPrompt = async (
     target: "UserPrompt" | "SystemPrompt",
-    prompt = ""
+    prompt = "",
   ): Promise<{
     successStatus: boolean;
     message: string;
@@ -2309,7 +2457,7 @@ class AiRequestExplorerViewModel {
     const response = await this.aiAssistentService.generateUserOrSystemPrompts({
       userInput: prompt,
       emailId: getClientUser().email,
-      teamId: teamId
+      teamId: teamId,
     });
 
     if (response.isSuccessful) {
@@ -2347,14 +2495,18 @@ class AiRequestExplorerViewModel {
 
     return {
       successStatus: false,
-      message: response?.data?.message || "Something went wrong. Please try again",
+      message:
+        response?.data?.message || "Something went wrong. Please try again",
       aiGeneratedPrompt: "",
       isLimitReached: false,
       target,
     };
   };
 
-  public handleInsertAiPrompt = async (target: "UserPrompt" | "SystemPrompt", response: string) => {
+  public handleInsertAiPrompt = async (
+    target: "UserPrompt" | "SystemPrompt",
+    response: string,
+  ) => {
     if (target === "UserPrompt") {
       await this.updateUserPrompt(response);
     } else if (target === "SystemPrompt") {
@@ -2366,7 +2518,7 @@ class AiRequestExplorerViewModel {
       await this.updateRequestState({ isSaveDescriptionInProgress: false });
     }
     return response;
-  }
+  };
 
   /**
    * Toggles the like or dislike status of a chat message.
@@ -2395,7 +2547,6 @@ class AiRequestExplorerViewModel {
     this.updateRequestAIConversation(convo);
   };
   // AI WebSocket - End
-
 }
 
 export default AiRequestExplorerViewModel;
