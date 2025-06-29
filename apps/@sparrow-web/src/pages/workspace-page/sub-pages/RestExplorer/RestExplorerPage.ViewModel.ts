@@ -66,6 +66,7 @@ import {
   RequestDataTypeEnum,
   ResponseFormatterEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
+  type HttpRequestCollectionLevelAuthProfileTabInterface,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -142,6 +143,10 @@ class RestExplorerViewModel {
     Partial<HttpRequestCollectionLevelAuthTabInterface>
   >({});
 
+  private _collectionAuthProfile = new BehaviorSubject<
+    Partial<HttpRequestCollectionLevelAuthProfileTabInterface>
+  >({});
+
   private fetchCollection = async (_collectionId: string) => {
     const collectionRx =
       await this.collectionRepository.readCollection(_collectionId);
@@ -151,6 +156,9 @@ class RestExplorerViewModel {
         auth: collectionDoc?.auth,
         collectionAuthNavigation: collectionDoc?.selectedAuthType,
       } as HttpRequestCollectionLevelAuthTabInterface;
+
+      // Auth Profile
+      // this._collectionAuthProfile = 
     } else {
       this.collectionAuth = {
         auth: {
@@ -168,6 +176,9 @@ class RestExplorerViewModel {
         collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
       };
     }
+
+    console.log("this L:>> ", this.collectionAuth)
+
   };
 
   public constructor(doc: TabDocument) {
@@ -178,8 +189,11 @@ class RestExplorerViewModel {
         delete t.index;
         t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
+
         await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
+        console.log("valu doc> ", doc)
+        console.log("valu :L> ", this._collectionAuth.getValue())
         if (
           m.property.request?.state.requestAuthNavigation ===
           HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -204,6 +218,7 @@ class RestExplorerViewModel {
             this._tab.getValue().property.request?.auth,
           ).getValue();
         }
+
       }, 0);
     }
   }
@@ -314,6 +329,11 @@ class RestExplorerViewModel {
     } else if (
       requestServer.request.selectedRequestAuthType !==
       progressiveTab.property.request.state.requestAuthNavigation
+    ) {
+      result = false;
+    } else if (
+      requestServer.request.selectedRequestAuthProfileId !==
+      progressiveTab.property.request.state.selectedRequestAuthProfileId
     ) {
       result = false;
     }
@@ -1499,7 +1519,7 @@ class RestExplorerViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) {}
+  set collection(e) { }
 
   /**
    *

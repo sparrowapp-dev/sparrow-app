@@ -285,7 +285,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 13,
+  version: 14,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -517,6 +517,9 @@ export const tabSchemaLiteral = {
                 isDocGenerating: {
                   type: "boolean",
                 },
+                selectedRequestAuthProfileId: {
+                  type: "string"
+                }
               },
             },
             auth: {

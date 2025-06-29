@@ -89,6 +89,11 @@ export interface RequestAuthNavigationWrapper {
 export interface RequestNavigationWrapper {
   requestNavigation: RequestSectionEnum;
 }
+
+export interface RequestAuthProfileNavigationWrapper {
+  selectedRequestAuthProfileId: "None" | string;
+}
+
 export interface ResponseNavigationWrapper {
   responseNavigation: ResponseSectionEnum;
 }
@@ -240,6 +245,16 @@ export interface HttpRequestCollectionAuthNavigationTabInterface {
 
 export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestCollectionAuthNavigationTabInterface { }
 
+// For Auth Profile
+export interface HttpRequestSlectedAuthTypeInProfileTabInterface {
+  selectAuthTypeInProfile: CollectionAuthTypeBaseEnum
+}
+
+export interface HttpRequestCollectionAuthProfileIdTabInterface {
+  authId: string
+}
+export interface HttpRequestCollectionLevelAuthProfileTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestSlectedAuthTypeInProfileTabInterface, HttpRequestCollectionAuthProfileIdTabInterface { }
+
 
 export interface State
   extends RequestBodyLanguageWrapper,
@@ -262,7 +277,8 @@ export interface State
   IsChatbotSuggestionsActive,
   IsDocGenerating,
   IsDocAlreadyGenerated,
-  IsChatbotGeneratingResponse { }
+  IsChatbotGeneratingResponse,
+  RequestAuthProfileNavigationWrapper { }
 
 export interface StatePartial
   extends Partial<RequestBodyLanguageWrapper>,
@@ -285,7 +301,8 @@ export interface StatePartial
   Partial<IsChatbotSuggestionsActive>,
   Partial<IsChatbotGeneratingResponse>,
   Partial<IsDocAlreadyGenerated>,
-  Partial<IsDocGenerating> { }
+  Partial<IsDocGenerating>,
+  Partial<RequestAuthProfileNavigationWrapper> { }
 
 export interface StateWrapper {
   state: State;
@@ -335,7 +352,7 @@ export interface Ai
   extends PromptWrapper,
   ConversationsWrapper,
   ThreadIdWrapper,
-    AIModelNameWrapper { }
+  AIModelNameWrapper { }
 export interface AiWrapper {
   ai: Ai;
 }

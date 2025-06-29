@@ -314,7 +314,13 @@ export class RxDB {
               // };
             }
             return oldDoc;
-          }
+          },
+          14: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.request) {
+              oldDoc.property.request.state.selectedRequestAuthProfileId = "None"
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
