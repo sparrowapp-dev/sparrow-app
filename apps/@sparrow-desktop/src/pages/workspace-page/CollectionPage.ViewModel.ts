@@ -6245,6 +6245,22 @@ export default class CollectionsViewModel {
     }
   };
 
+  public importPostmanCollection = async (
+    currentWorkspaceId: string,
+    postmanCollectionJson: string,
+  ) => {
+    // Create a Blob from the JSON string
+    const blob = new Blob([postmanCollectionJson], {
+      type: "application/json",
+    });
+    // Create a File object (filename can be anything, e.g., "collection.json")
+    const file = new File([blob], "collection.json", {
+      type: "application/json",
+    });
+
+    return await this.collectionFileUpload(currentWorkspaceId, file, "POSTMAN");
+  };
+
   public importCollectionURL = async (
     currentWorkspaceId: string,
     requestBody: ImportBodyUrl,

@@ -1253,6 +1253,19 @@
       }
       return response;
     }}
+    onImportPostmanCollection={async (currentWorkspaceId, postmanCollectionJson) => {
+      debugger
+      const response = await _viewModel.importPostmanCollection(
+        currentWorkspaceId,
+        postmanCollectionJson,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
     onImportCollectionURL={async (
       currentWorkspaceId,
       requestBody,
