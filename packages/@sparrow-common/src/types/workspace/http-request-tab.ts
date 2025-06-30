@@ -247,7 +247,7 @@ export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestC
 
 // For Auth Profile
 export interface HttpRequestSlectedAuthTypeInProfileTabInterface {
-  selectAuthTypeInProfile: CollectionAuthTypeBaseEnum
+  authType: CollectionAuthTypeBaseEnum
 }
 
 export interface HttpRequestCollectionAuthProfileIdTabInterface {

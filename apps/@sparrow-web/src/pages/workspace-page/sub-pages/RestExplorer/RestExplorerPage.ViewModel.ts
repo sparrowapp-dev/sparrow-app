@@ -157,8 +157,7 @@ class RestExplorerViewModel {
         collectionAuthNavigation: collectionDoc?.selectedAuthType,
       } as HttpRequestCollectionLevelAuthTabInterface;
 
-      // Auth Profile
-      // this._collectionAuthProfile = 
+      console.log("this llll:>> ", this.collectionAuth)
     } else {
       this.collectionAuth = {
         auth: {
@@ -177,8 +176,7 @@ class RestExplorerViewModel {
       };
     }
 
-    console.log("this L:>> ", this.collectionAuth)
-
+    return collectionDoc;
   };
 
   public constructor(doc: TabDocument) {
@@ -190,10 +188,9 @@ class RestExplorerViewModel {
         t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
 
-        await this.fetchCollection(t.path.collectionId as string);
+        const collectionDoc = await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
-        console.log("valu doc> ", doc)
-        console.log("valu :L> ", this._collectionAuth.getValue())
+
         if (
           m.property.request?.state.requestAuthNavigation ===
           HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -217,6 +214,24 @@ class RestExplorerViewModel {
             this._tab.getValue().property.request?.state.requestAuthNavigation,
             this._tab.getValue().property.request?.auth,
           ).getValue();
+        }
+
+
+        if (m.property.request?.state.requestAuthNavigation ===
+          HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
+          const authProfilesList = collectionDoc?.auth || [];
+          const selectedProfileId = m.property.request?.state?.selectedRequestAuthProfileId;
+          const selectedProfile = authProfilesList.find(
+            (profile) => profile.authId === selectedProfileId,
+          );
+
+          this.collectionAuthProfile = {
+            auth: selectedProfile?.auth,
+            authId: selectedProfileId,
+            authType: selectedProfile?.authType
+          }
+
+          console.log("this._coll :>> ", this.collectionAuthProfile);
         }
 
       }, 0);
@@ -261,6 +276,19 @@ class RestExplorerViewModel {
     value: HttpRequestCollectionLevelAuthTabInterface,
   ) {
     this._collectionAuth.next(value);
+  }
+
+  // Auth Profile
+  public get collectionAuthProfile(): Observable<
+    Partial<HttpRequestCollectionLevelAuthProfileTabInterface>
+  > {
+    return this._collectionAuthProfile.asObservable();
+  }
+
+  private set collectionAuthProfile(
+    value: HttpRequestCollectionLevelAuthProfileTabInterface,
+  ) {
+    this._collectionAuthProfile.next(value);
   }
 
   public get authHeader(): Observable<{
