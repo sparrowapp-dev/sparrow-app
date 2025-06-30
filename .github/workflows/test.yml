@@ -1,4 +1,4 @@
-name: Development release
+name: Development Test Mac release
 
 on:
   push:
@@ -39,11 +39,9 @@ env:
   CI: false
 
 jobs:
-
   release_macos:
     runs-on: macos-latest
     environment: development
-    needs: release_win
 
     steps:
       - name: Checkout Repository
