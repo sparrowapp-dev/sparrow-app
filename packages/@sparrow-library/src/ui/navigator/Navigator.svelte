@@ -8,6 +8,7 @@
   let leftSliderDistance = 0;
   let sliderWidth = 0;
   let tabElements: { [key: string]: HTMLButtonElement | undefined } = {};
+  let isSliderVisible = false;
 
   const handleClick = (id: string) => {
     const tab = tabElements[id];
@@ -35,6 +36,7 @@
       }
     }
     handleClick(currentTabId);
+    isSliderVisible = true;
   });
 
   // Add reactive statement to watch currentTabId changes
@@ -82,7 +84,7 @@
       </button>
     {/each}
   </div>
-  {#if !allDisableState && type != "segmentedTab"}
+  {#if !allDisableState && type != "segmentedTab" && isSliderVisible}
     <div
       class="slider"
       style="left: {leftSliderDistance + 1}px; width:{sliderWidth - 1.5}px"
