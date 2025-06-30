@@ -1,0 +1,173 @@
+name: Development release
+
+on:
+  push:
+    branches:
+      - build/app-store-build
+  workflow_dispatch:
+
+env:
+  VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
+  VITE_MIX_PANEL_TOKEN: ${{ vars.VITE_MIX_PANEL_TOKEN }}
+  VITE_ENABLE_MIX_PANEL: ${{ vars.VITE_ENABLE_MIX_PANEL_DEV }}
+  VITE_API_TIMEOUT: ${{ vars.VITE_API_TIMEOUT }}
+  VITE_SPARROW_SUPPORT_EMAIL: ${{ vars.VITE_SPARROW_SUPPORT_EMAIL }}
+  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL_DEV }}
+  VITE_SPARROW_GITHUB: ${{ vars.VITE_SPARROW_GITHUB }}
+  VITE_SPARROW_DOWNLOAD_LINK: ${{ vars.VITE_SPARROW_DOWNLOAD_LINK }}
+  VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+  VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
+  VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
+  VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
+  VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
+  VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
+  VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
+  VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
+  VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
+  VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
+  VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
+  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
+  VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
+  VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
+  VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
+  VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+  VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
+  VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
+  VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
+  VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CI: false
+
+jobs:
+
+  release_macos:
+    runs-on: macos-latest
+    environment: development
+    needs: release_win
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust 1.82.0
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.8"
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          yarn install
+          yarn desktop-build
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: false
+          
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
+      #     platforms: 'macos'
+
+      # - name: Extract and Store Tauri Signatures
+      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
+      #   with:
+      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
+      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
+      #     kubernetes-namespace: 'sparrow-dev'
+      #     secret-name: 'sparrow-api-secret'
+      #     secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
+      #     platforms: 'macos'
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+          aws --version
+
+      - name: Upload & download File to S3
+        run: |
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Post macOS Build Links to Teams
+        run: |
+          DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
+          DMG_FILENAME=$(basename "$DMG_FILE")
+          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
+          
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+              \"attachments\": [
+                {
+                  \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                  \"content\": {
+                    \"type\": \"AdaptiveCard\",
+                    \"body\": [
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"🍎 New macOS Build Available\",
+                        \"weight\": \"bolder\",
+                        \"size\": \"large\"
+                      },
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"Branch: development\",
+                        \"wrap\": true
+                      },
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"Download Link:\",
+                        \"wrap\": true
+                      },
+                      {
+                        \"type\": \"TextBlock\",
+                        \"text\": \"$DMG_URL\",
+                        \"color\": \"accent\",
+                        \"wrap\": true
+                      }
+                    ],
+                    \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                    \"version\": \"1.2\"
+                  }
+                }
+              ]
+            }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
