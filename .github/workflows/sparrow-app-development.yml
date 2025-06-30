@@ -682,11 +682,49 @@ jobs:
           SOURCE_DIR: gh-pages
           DEST_DIR: linux 
 
-      - name: Notify Teams Channel
+      - name: Post Linux Debian Repo Link to Teams
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
-          curl -H 'Content-Type: application/json' \
-            -d '{
-              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
-            }' \
-            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-        
+          REPO_URL="https://${AWS_S3_BUCKET}.s3-website-${AWS_REGION}.amazonaws.com"
+          
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"🐧 New Debian Build Available\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"The latest Debian packages have been uploaded to the repository.\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Repository URL:\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"$REPO_URL\",
+                      \"color\": \"accent\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\"
+                }
+              }
+            ]
+          }" "$TEAMS_WEBHOOK_URL"
+        shell: bash
