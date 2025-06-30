@@ -230,8 +230,8 @@ jobs:
           
           # Upload to S3
           Write-Host "Starting S3 upload..."
-          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-          
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev/windows --exclude "*" --include "*.zip" --include "*.msi"
+
           if ($LASTEXITCODE -eq 0) {
               Write-Host "S3 upload completed successfully" -ForegroundColor Green
           } else {
@@ -267,7 +267,7 @@ jobs:
           }
           
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/windows/$msiFileName"
           
           Write-Host "MSI file found: $msiFileName"
           Write-Host "Download URL: $msiUrl"
@@ -378,28 +378,29 @@ jobs:
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
 
+      - name: Set build datetime
+        run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
       - name: Upload & download File to S3
         run: |
-          DATETIME=$(date +"%Y%m%d-%H%M%S")
           DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
           DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
           DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
-          DMG_SUFFIXED_FILE="$DMG_SRC_DIR/${DMG_BASENAME}_$DATETIME.dmg"
+          DMG_SUFFIXED_FILE="$DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
           cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
-          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/macos --recursive --exclude "*" --include "*.gz"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Post macOS Build Links to Teams
         run: |
-          DATETIME=$(date +"%Y%m%d-%H%M%S")
           DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
           DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
           DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
-          DMG_SUFFIXED_FILENAME="${DMG_BASENAME}_$DATETIME.dmg"
-          DMG_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/$DMG_SUFFIXED_FILENAME"
+          DMG_SUFFIXED_FILENAME="${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          DMG_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$DMG_SUFFIXED_FILENAME"
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
               \"attachments\": [
@@ -438,7 +439,7 @@ jobs:
               ]
             }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
         shell: bash
-  
+
   release_linux:
     runs-on: ubuntu-latest
     environment: development
