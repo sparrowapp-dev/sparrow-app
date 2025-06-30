@@ -2107,15 +2107,7 @@ class AiRequestExplorerViewModel {
                   await this.updateRequestAIConversation([
                   ...(componentData?.property?.aiRequest?.ai?.conversations || []),
                   {
-                    message: "You've reached the message limit for this conversation. Start a new conversation to continue exploring! " + errorMessage
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    ,
+                    message: "You've reached the message limit for this conversation. Start a new conversation to continue exploring! " + errorMessage,
                     messageId: uuidv4(),
                     type: MessageTypeEnum.RECEIVER,
                     isLiked: false,
