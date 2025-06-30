@@ -336,15 +336,21 @@ jobs:
         with:
           node-version: "20.8"
 
-      - name: Update Info.plist Bundle Identifier
-        run: |
-          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
-
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
           newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Remove App Store specific properties
+        run: |
+          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
+          sed -i '' '/"macOS": {/,/},/ {
+              /"entitlements":.*/d
+              /"minimumSystemVersion":.*/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
       - name: Increase Yarn network timeout
