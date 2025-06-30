@@ -27,6 +27,7 @@
     SidebarItemPositionBaseEnum,
     type SidebarItemBaseAllIconInterface,
   } from "../../../types/sidebar/sidebar-base";
+  import { planBannerisOpen } from "../../../store";
 
   export let sidebarItems: SidebarItemBaseInterface[] = [];
   const SidebarImageItem: SidebarItemBaseAllIconInterface[] = [];
@@ -127,6 +128,10 @@
       logPositions(id);
     }
   };
+
+  $: if ($planBannerisOpen) {
+    window.addEventListener("resize", handleResize);
+  }
 </script>
 
 <div class={`sidebar ${componentClass}`}>
