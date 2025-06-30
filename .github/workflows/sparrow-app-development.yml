@@ -267,7 +267,7 @@ jobs:
           }
           
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/$msiFileName"
           
           Write-Host "MSI file found: $msiFileName"
           Write-Host "Download URL: $msiUrl"
@@ -314,6 +314,7 @@ jobs:
           
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
+  
   release_macos:
     runs-on: macos-latest
     environment: development
@@ -437,6 +438,7 @@ jobs:
               ]
             }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
         shell: bash
+  
   release_linux:
     runs-on: ubuntu-latest
     environment: development
