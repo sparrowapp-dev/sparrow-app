@@ -119,18 +119,26 @@ jobs:
 
       - name: Upload & download File to S3
         run: |
+          DATETIME=$(date +"%Y%m%d-%H%M%S")
+          DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$DMG_SRC_DIR/${DMG_BASENAME}_$DATETIME.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Post macOS Build Links to Teams
         run: |
-          DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
-          DMG_FILENAME=$(basename "$DMG_FILE")
-          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
-          
+          DATETIME=$(date +"%Y%m%d-%H%M%S")
+          DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILENAME="${DMG_BASENAME}_$DATETIME.dmg"
+          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_SUFFIXED_FILENAME"
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
               \"attachments\": [
