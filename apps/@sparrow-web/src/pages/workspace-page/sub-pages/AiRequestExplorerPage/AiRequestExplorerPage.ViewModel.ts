@@ -1874,10 +1874,12 @@ class AiRequestExplorerViewModel {
   }
 
   public handleStartNewConversation = async () => {
+    console.log("camer here ")
     this.updateRequestState({ isChatbotConversationLoading: true });
     await this.switchConversation("", "New Conversation", []);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
     // notifications.success("Created new conversation.");
   }
 
@@ -1891,6 +1893,8 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
+
     // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
   }
 
@@ -2094,7 +2098,45 @@ class AiRequestExplorerViewModel {
                 errorMessage = "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage = "Some issue occurred from server while processing your request, please try again.";
-              } else {
+              } else if (response.message.includes("exceeds the maximum limit") 
+                // ||  response.message.includes("exceeds the limit")
+            ) {
+                errorMessage = response.message; // Use the actual error message from the response
+
+                setTimeout(async () => {
+                  await this.updateRequestAIConversation([
+                  ...(componentData?.property?.aiRequest?.ai?.conversations || []),
+                  {
+                    message: "You've reached the message limit for this conversation. Start a new conversation to continue exploring! " + errorMessage
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    ,
+                    messageId: uuidv4(),
+                    type: MessageTypeEnum.RECEIVER,
+                    isLiked: false,
+                    isDisliked: false,
+                    status: false,
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    totalTokens: 0,
+                    statusCode: response?.statusCode,
+                    time: response?.timeTaken?.replace("ms", "") || 0,
+                    modelProvider,
+                    modelVariant
+                  },
+                  ]);
+                  await this.updateRequestState({
+                    isChatbotPromptBoxActive: false,
+                  });
+                }, 1000);
+                
+              } 
+              else {
                 errorMessage = response.message; // Use the actual error message from the response
               }
 
