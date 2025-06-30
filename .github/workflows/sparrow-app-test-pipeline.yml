@@ -382,8 +382,10 @@ jobs:
           aws --version
 
       - name: Upload & download File to S3
+        id: upload_s3
         run: |
           echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+          echo "build_datetime=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT 
           DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
           DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
           DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
@@ -400,7 +402,7 @@ jobs:
           DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
           DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
           DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
-          DMG_SUFFIXED_FILENAME="${DMG_BASENAME}_${BUILD_DATETIME}.dmg"
+          DMG_SUFFIXED_FILENAME="${DMG_BASENAME}_${{ steps.upload_s3.outputs.build_datetime }}.dmg"
           DMG_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/$DMG_SUFFIXED_FILENAME"
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
