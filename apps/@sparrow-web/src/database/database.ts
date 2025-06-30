@@ -126,7 +126,7 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 export class RxDB {
   private static instance: RxDB | null = null;
   public rxdb: DatabaseType | null = null;
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): RxDB {
     if (!RxDB.instance?.rxdb) {
@@ -302,6 +302,22 @@ export class RxDB {
                 false;
               oldDoc.property.aiRequest.state.isConversationHistoryLoading =
                 false;
+            }
+            return oldDoc;
+          },
+          13: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.collection) {
+              oldDoc.property.collection.auth = []
+              // oldDoc.property.collection.state = {
+              //   collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+              //   collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
+              // };
+            }
+            return oldDoc;
+          },
+          14: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.request) {
+              oldDoc.property.request.state.selectedRequestAuthProfileId = "None"
             }
             return oldDoc;
           },

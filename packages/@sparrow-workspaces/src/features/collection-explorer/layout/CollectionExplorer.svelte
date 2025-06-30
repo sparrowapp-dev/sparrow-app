@@ -72,7 +72,11 @@
   // import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
   // import type { CollectionDocument, TabDocument } from "@app/database/database";
   // import { WorkspaceRole } from "@sparrow/common/enums";
-  import { CollectionAuth, CollectionNavigator } from "../components";
+  import {
+    CollectionAuth,
+    CollectionAuthProfiles,
+    CollectionNavigator,
+  } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
   import {
     Button,
@@ -120,6 +124,7 @@
   export let onItemCreated;
   export let onUpdateRunningState;
   export let userRole;
+  export let onCreateAuthProfile;
 
   /**
    * Local variables
@@ -141,6 +146,14 @@
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
   let isCollectionSyncing = false;
+  let authProfilesList = []; // ToDo: Give a type here
+
+  $: {
+    authProfilesList = collection?.auth || [];
+    if (collection) {
+      console.log("**** Auth Profile ***** :>> ", collection.auth);
+    }
+  }
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -348,6 +361,12 @@
     isMockRunning = !isMockRunning;
   };
   export let currentWorkspace;
+
+  const handleOnCreateAuthProfile = async (authProfileData) => {
+    console.log("In handleOnCreateAuthProfile() :>> ", authProfileData);
+    const response = await onCreateAuthProfile(collection, authProfileData);
+    return response;
+  };
 </script>
 
 <div class="main-container d-flex h-100" style="overflow:auto;">
@@ -772,8 +791,8 @@
                   ? 'input-outline'
                   : ''} w-100 p-2"
                 placeholder={isSharedWorkspace
-                ? "No description added."
-                : "Add Description"}
+                  ? "No description added."
+                  : "Add Description"}
                 on:input={handleInputDescription}
                 style="background-color: {isSharedWorkspace
                   ? 'var(--bg-ds-surface-900)'
@@ -969,7 +988,7 @@
           </div>
         </div>
       {:else}
-        <CollectionAuth
+        <!-- <CollectionAuth
           auth={$tab?.property?.collection?.auth}
           requestStateAuth={$tab?.property?.collection?.state
             ?.collectionAuthNavigation}
@@ -977,6 +996,12 @@
           onUpdateRequestState={onUpdateCollectionState}
           {onUpdateEnvironment}
           {environmentVariables}
+        /> -->
+        <CollectionAuthProfiles
+          {authProfilesList}
+          onCreateAuthProfile={handleOnCreateAuthProfile}
+          onDelete={() => {}}
+          onUpdate={() => {}}
         />
       {/if}
     {/if}
