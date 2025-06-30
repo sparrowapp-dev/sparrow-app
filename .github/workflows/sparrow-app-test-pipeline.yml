@@ -75,6 +75,15 @@ jobs:
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
+      - name: Remove macOS properties from tauri.conf.json
+        run: |
+          sed -i '' '/"macOS": {/,/},/ {
+              /"entitlements":.*/d
+              /"minimumSystemVersion":.*/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
