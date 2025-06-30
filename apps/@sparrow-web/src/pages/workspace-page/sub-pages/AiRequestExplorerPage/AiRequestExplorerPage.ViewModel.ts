@@ -2101,36 +2101,10 @@ class AiRequestExplorerViewModel {
               } else if (response.message.includes("exceeds the maximum limit") 
                 // ||  response.message.includes("exceeds the limit")
             ) {
-                errorMessage = response.message; // Use the actual error message from the response
-
-                setTimeout(async () => {
-                  await this.updateRequestAIConversation([
-                  ...(componentData?.property?.aiRequest?.ai?.conversations || []),
-                  {
-                    message: "You've reached the message limit for this conversation. Start a new conversation to continue exploring! " + errorMessage,
-                    messageId: uuidv4(),
-                    type: MessageTypeEnum.RECEIVER,
-                    isLiked: false,
-                    isDisliked: false,
-                    status: false,
-                    inputTokens: 0,
-                    outputTokens: 0,
-                    totalTokens: 0,
-                    statusCode: response?.statusCode,
-                    time: response?.timeTaken?.replace("ms", "") || 0,
-                    modelProvider,
-                    modelVariant
-                  },
-                  ]);
-                  await this.updateRequestState({
-                    isChatbotPromptBoxActive: false,
-                  });
-                }, 1000);
-                
+                errorMessage = "You've reached the message limit for this conversation. Start a new conversation to continue exploring! "; 
+                await this.updateRequestState({ isChatbotPromptBoxActive: false });
               } 
-              else {
-                errorMessage = response.message; // Use the actual error message from the response
-              }
+              else { errorMessage = response.message; } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations || []),

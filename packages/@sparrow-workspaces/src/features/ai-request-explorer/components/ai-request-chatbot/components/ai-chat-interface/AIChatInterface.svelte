@@ -444,6 +444,9 @@
                         onUpdateRequestState({
                           isChatAutoClearActive: event?.target.checked,
                         });
+                        onUpdateRequestState({
+                          isChatbotPromptBoxActive: true,
+                        });
                         if (conversations?.length) {
                           chatContainer.scrollTo({
                             top: 0,
