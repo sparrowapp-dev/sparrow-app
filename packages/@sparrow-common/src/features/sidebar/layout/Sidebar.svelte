@@ -130,7 +130,7 @@
   };
 
   $: if ($planBannerisOpen) {
-    window.addEventListener("resize", handleResize);
+    handleResize();
   }
 </script>
 
