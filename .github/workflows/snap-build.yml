@@ -42,6 +42,12 @@ jobs:
           deb_file=$(ls sparrow_*.deb | head -n 1)
           mv "$deb_file" sparrow.deb
 
+      - name: Set Version and Generate snapcraft.yaml
+        run: |
+          export SPARROW_VERSION=$(dpkg-deb -f sparrow.deb Version)
+          echo "Using Sparrow version: $SPARROW_VERSION"
+          envsubst < snapcraft.yaml.in > snapcraft.yaml
+
       - name: Build Snap from DEB
         run: |
           sudo snapcraft --destructive-mode
