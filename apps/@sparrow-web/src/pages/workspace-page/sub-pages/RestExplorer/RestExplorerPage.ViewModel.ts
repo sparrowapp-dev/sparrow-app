@@ -618,6 +618,7 @@ class RestExplorerViewModel {
           responseBodyLanguage: data.response.bodyLanguage,
           responseBodyFormatter: data?.response?.bodyFormatter,
         });
+        savedRequestTab.updateName(progressiveTab.name +` (${data.response.status.replace(/^\d+\s*/, "")})`);
         responseCode = data.response.status;
       }
       return restApiDataMap;
@@ -1438,7 +1439,7 @@ class RestExplorerViewModel {
         description: requestMetaData.description,
         type: "REQUEST",
         request: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

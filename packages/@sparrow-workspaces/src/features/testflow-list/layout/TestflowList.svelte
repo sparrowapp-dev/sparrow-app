@@ -19,6 +19,7 @@
 
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { slide } from "svelte/transition";
 
   import {
     isTestFlowTourGuideOpen,
@@ -225,10 +226,11 @@
 
   {#if $isExpandTestflow}
     <div
-      style="flex: 1; height: 32px; background-color: {ActiveTab === 'testflow'
+      transition:slide={{ duration: 250 }}
+      style="background-color: {ActiveTab === 'testflow'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
-      class="overflow-auto h-100"
+      class="overflow-auto position-relative d-flex flex-column me-0 py-1"
       bind:this={scrollDiv}
     >
       <!-- 

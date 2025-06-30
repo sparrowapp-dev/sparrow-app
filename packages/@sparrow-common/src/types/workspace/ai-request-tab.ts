@@ -2,7 +2,8 @@ import {
     AiRequestAuthTypeBaseEnum,
     AiModelProviderEnum,
     type AIModelVariant,
-    type AiConfigurations
+    type AiConfigurations,
+    type PromptFileAttachment
 } from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
@@ -162,13 +163,17 @@ export interface StatusWrapper {
     status: boolean;
 }
 
+export interface FileAttachmentsWrapper {
+    fileAttachments: PromptFileAttachment[]
+}
+
 export interface Conversation
     extends TypeWrapper,
     MessageIdWrapper,
     MessageWrapper,
     IsLikedWrapper,
     IsDislikedWrapper,
-    StatusWrapper { }
+    StatusWrapper, FileAttachmentsWrapper { }
 
 export interface ConversationsWrapper {
     conversations: Conversation[];

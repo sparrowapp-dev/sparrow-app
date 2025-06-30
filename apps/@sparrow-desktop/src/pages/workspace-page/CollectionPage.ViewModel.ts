@@ -45,7 +45,7 @@ import {
 } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation } from "@sparrow/common/utils/navigation";
+import { moveNavigation, scrollToTab } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -1594,6 +1594,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     let userSource = {};
     if (collection?.activeSync) {
       userSource = {
@@ -1614,6 +1618,7 @@ export default class CollectionsViewModel {
         request: {
           method: request?.getValue().property?.request?.method,
         } as RequestDto,
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
       },
     };
     await this.collectionRepository.addRequestOrFolderInCollection(
@@ -1623,10 +1628,6 @@ export default class CollectionsViewModel {
         id: request.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res =
@@ -1721,6 +1722,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     let userSource = {};
     if (collection?.activeSync) {
       userSource = {
@@ -1742,6 +1747,7 @@ export default class CollectionsViewModel {
           method: mockRequest?.getValue().property?.mockRequest?.method,
           url: "",
         },
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
       },
     };
     await this.collectionRepository.addRequestOrFolderInCollection(
@@ -1751,10 +1757,6 @@ export default class CollectionsViewModel {
         id: mockRequest.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res =
@@ -1850,6 +1852,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
     let userSource = {};
     if (collection?.activeSync) {
@@ -1874,6 +1880,7 @@ export default class CollectionsViewModel {
           aiModelVariant:
             aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
         } as AiRequestBaseInterface,
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
       },
     };
 
@@ -1884,10 +1891,6 @@ export default class CollectionsViewModel {
         id: aiRequest.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res =
@@ -1968,6 +1971,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
     let userSource = {};
     if (collection?.activeSync) {
@@ -1987,6 +1994,7 @@ export default class CollectionsViewModel {
         type: websocket.getValue().type,
         description: "",
         websocket: {},
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
       },
     };
     await this.collectionRepository.addRequestOrFolderInCollection(
@@ -1996,10 +2004,6 @@ export default class CollectionsViewModel {
         id: websocket.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res =
@@ -2077,6 +2081,10 @@ export default class CollectionsViewModel {
     _collection: CollectionDto,
   ) => {
     const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
       {
         collectionId: _collection.id,
@@ -2090,13 +2098,9 @@ export default class CollectionsViewModel {
           type: CollectionItemTypeBaseEnum.SOCKETIO,
           description: "",
           socketio: {},
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       };
-
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestOrFolderInCollection(
@@ -2168,6 +2172,10 @@ export default class CollectionsViewModel {
     _collection: CollectionDto,
   ) => {
     const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
       {
         collectionId: _collection.id,
@@ -2181,13 +2189,9 @@ export default class CollectionsViewModel {
           type: CollectionItemTypeBaseEnum.GRAPHQL,
           description: "",
           graphql: {},
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       };
-
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestOrFolderInCollection(
@@ -2260,7 +2264,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
-
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     let userSource = {};
     if (collection.activeSync && explorer?.source === "USER") {
       userSource = {
@@ -2286,6 +2293,7 @@ export default class CollectionsViewModel {
           request: {
             method: sampleRequest.getValue().property.request?.method,
           } as RequestDto,
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       },
     };
@@ -2298,10 +2306,6 @@ export default class CollectionsViewModel {
         id: sampleRequest.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res = (await this.collectionRepository.readRequestInFolder(
@@ -2386,7 +2390,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
-
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     let userSource = {};
     if (collection.activeSync && explorer?.source === "USER") {
       userSource = {
@@ -2413,6 +2420,7 @@ export default class CollectionsViewModel {
             method: sampleMockRequest.getValue().property.mockRequest?.method,
             url: "",
           } as RequestDto,
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       },
     };
@@ -2425,10 +2433,6 @@ export default class CollectionsViewModel {
         id: sampleMockRequest.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res = (await this.collectionRepository.readRequestInFolder(
@@ -2514,7 +2518,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
-
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     let userSource = {};
     if (collection.activeSync && explorer?.source === "USER") {
       userSource = {
@@ -2543,6 +2550,7 @@ export default class CollectionsViewModel {
             aiModelVariant:
               aiRequest.getValue().property.aiRequest?.aiModelVariant,
           } as AiRequestBaseInterface,
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       },
     };
@@ -2555,10 +2563,6 @@ export default class CollectionsViewModel {
         id: aiRequest.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res = (await this.collectionRepository.readRequestInFolder(
@@ -2642,7 +2646,10 @@ export default class CollectionsViewModel {
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
     );
-
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     let userSource = {};
     if (collection.activeSync && explorer?.source === "USER") {
       userSource = {
@@ -2667,6 +2674,7 @@ export default class CollectionsViewModel {
           description: "",
           websocket: {},
         },
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
       },
     };
 
@@ -2678,10 +2686,6 @@ export default class CollectionsViewModel {
         id: websocket.getValue().id,
       },
     );
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       const res = (await this.collectionRepository.readRequestInFolder(
@@ -2762,7 +2766,10 @@ export default class CollectionsViewModel {
     _folder: CollectionItemsDto,
   ) => {
     const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
-
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
       {
         collectionId: _collection.id,
@@ -2786,13 +2793,9 @@ export default class CollectionsViewModel {
             description: "",
             socketio: {},
           },
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       };
-
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestInFolder(
@@ -2871,7 +2874,10 @@ export default class CollectionsViewModel {
     _folder: CollectionItemsDto,
   ) => {
     const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
-
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
     const graphqlInFolderPayload: GraphqlRequestCreateUpdateInFolderPayloadDtoInterface =
       {
         collectionId: _collection.id,
@@ -2895,13 +2901,9 @@ export default class CollectionsViewModel {
             description: "",
             graphql: {},
           },
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
       };
-
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestInFolder(
@@ -2980,6 +2982,7 @@ export default class CollectionsViewModel {
       description: "",
       type: ItemType.FOLDER,
       items: [],
+      updatedAt: new Date().toISOString(),
     };
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -3263,7 +3266,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(request.id);
   };
 
   /**
@@ -3306,7 +3309,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(request.id);
   };
 
   /**
@@ -3331,7 +3334,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(_savedRequest.id);
   };
 
   /**
@@ -3354,7 +3357,7 @@ export default class CollectionsViewModel {
     );
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab(_graphql.id);
   };
 
   /**
@@ -3377,7 +3380,7 @@ export default class CollectionsViewModel {
     );
     adaptedSocket.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocket);
-    moveNavigation("right");
+    scrollToTab(websocket.id);
   };
 
   /**
@@ -3425,7 +3428,7 @@ export default class CollectionsViewModel {
     );
     adaptedSocketIo.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedSocketIo);
-    moveNavigation("right");
+    scrollToTab(_socketIo.id);
   };
 
   public handleOpenFolder = (
@@ -3439,7 +3442,7 @@ export default class CollectionsViewModel {
       folder,
     );
     this.handleCreateTab(folderTab);
-    moveNavigation("right");
+    scrollToTab(folder.id);
   };
 
   public handleOpenCollection = (
@@ -3454,7 +3457,7 @@ export default class CollectionsViewModel {
     );
     collectionTabAdapter.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(collectionTabAdapter);
-    moveNavigation("right");
+    scrollToTab(collection.id);
   };
 
   public handleOpenMockHistory = (
@@ -3466,7 +3469,7 @@ export default class CollectionsViewModel {
       collection.id,
     );
     this.handleCreateTab(mockHistroyTab);
-    moveNavigation("right");
+    scrollToTab(mockHistroyTab.id);
   };
 
   /**
@@ -3511,7 +3514,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3532,7 +3535,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3652,7 +3655,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           aiRequest.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(aiRequest.id, {
           name: newRequestName,
@@ -3673,7 +3676,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           aiRequest.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(aiRequest.id, {
           name: newRequestName,
@@ -3795,7 +3798,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3816,7 +3819,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           request.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(request.id, {
           name: newRequestName,
@@ -3933,7 +3936,7 @@ export default class CollectionsViewModel {
           collection.id,
           request.id,
           requestResponse.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         await this.updateTab(requestResponse.id, {
           name: newRequestName,
@@ -3947,7 +3950,7 @@ export default class CollectionsViewModel {
           folder.id,
           request.id,
           requestResponse.id,
-          { name: newRequestName },
+          { name: newRequestName, updatedAt: new Date().toISOString() },
         );
         await this.updateTab(requestResponse.id, {
           name: newRequestName,
@@ -4063,7 +4066,7 @@ export default class CollectionsViewModel {
         await this.collectionRepository.updateRequestOrFolderInCollection(
           collection.id,
           websocket.id,
-          { name: newWebSocketName },
+          { name: newWebSocketName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(websocket.id, {
           name: newWebSocketName,
@@ -4083,7 +4086,7 @@ export default class CollectionsViewModel {
           collection.id,
           folder.id,
           websocket.id,
-          { name: newWebSocketName },
+          { name: newWebSocketName, updatedAt: new Date().toISOString() },
         );
         this.updateTab(websocket.id, {
           name: newWebSocketName,
@@ -4191,10 +4194,14 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newSocketIoName;
         }
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestOrFolderInCollection(
           _collection.id,
           _socketIo.id,
-          response,
+          newResponse,
         );
         this.updateTab(_socketIo.id, {
           name: _newSocketIoName,
@@ -4213,11 +4220,15 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newSocketIoName;
         }
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestInFolder(
           _collection.id,
           _folder.id,
           _socketIo.id,
-          response,
+          newResponse,
         );
         this.updateTab(_socketIo.id, {
           name: _newSocketIoName,
@@ -4364,10 +4375,14 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newGraphqlName;
         }
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestOrFolderInCollection(
           _collection.id,
           _graphql.id,
-          response,
+          newResponse,
         );
         this.updateTab(_graphql.id, {
           name: _newGraphqlName,
@@ -4386,11 +4401,15 @@ export default class CollectionsViewModel {
         if (response) {
           response.name = _newGraphqlName;
         }
+        const newResponse = {
+          ...response,
+          updatedAt: new Date().toISOString(),
+        };
         await this.collectionRepository.updateRequestInFolder(
           _collection.id,
           _folder.id,
           _graphql.id,
-          response,
+          newResponse,
         );
         this.updateTab(_graphql.id, {
           name: _newGraphqlName,
@@ -8148,10 +8167,7 @@ export default class CollectionsViewModel {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
     const currentPlan = teamDetails?.toMutableJSON().plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?.toMutableJSON()?.limits;
+      return currentPlan?.limits;
     }
   };
 

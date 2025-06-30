@@ -885,6 +885,7 @@ export class RestExplorerSavedViewModel {
             requestResponse: {
               selectedResponseBodyType: responeBodyType,
             },
+            updatedAt: new Date().toISOString(),
           },
         );
       } else {
@@ -897,6 +898,7 @@ export class RestExplorerSavedViewModel {
             requestResponse: {
               selectedResponseBodyType: responeBodyType,
             },
+            updatedAt: new Date().toISOString(),
           },
         );
       }
