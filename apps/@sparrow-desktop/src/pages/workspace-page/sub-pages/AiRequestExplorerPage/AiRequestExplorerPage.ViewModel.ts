@@ -1941,7 +1941,7 @@ class AiRequestExplorerViewModel {
     await this.switchConversation("", "New Conversation", []);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    // notifications.success("Created new conversation.");
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
   };
 
   public switchConversation = async (
@@ -1958,7 +1958,7 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
   };
 
   /**
@@ -2191,9 +2191,12 @@ class AiRequestExplorerViewModel {
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
-              } else {
-                errorMessage = response.message; // Use the actual error message from the response
-              }
+              } else if (response.message.includes("exceeds the maximum limit") || 
+                  response.message.includes("Total file size exceeds the limit") ) 
+              {
+                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
+                await this.updateRequestState({ isChatbotPromptBoxActive: false });
+              } else { errorMessage = response.message; } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations ||
