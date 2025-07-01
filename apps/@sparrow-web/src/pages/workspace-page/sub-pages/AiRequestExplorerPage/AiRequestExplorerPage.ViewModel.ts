@@ -2097,15 +2097,12 @@ class AiRequestExplorerViewModel {
                 errorMessage = "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage = "Some issue occurred from server while processing your request, please try again.";
-              } else if (response.message.includes("exceeds the maximum limit") 
+              } else if (response.message.includes("exceeds the maximum limit") || 
+                  response.message.includes("Total file size exceeds the limit")
             ) {
-                errorMessage = "You've reached the message limit for this conversation. Start a new conversation to continue exploring! "; 
+                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
                 await this.updateRequestState({ isChatbotPromptBoxActive: false });
               } 
-              else if (response.message.includes("Total file size exceeds the limit")) {
-                errorMessage = response.message + ". Start a new conversation to continue exploring!"; 
-                await this.updateRequestState({ isChatbotPromptBoxActive: false });
-              }
               else { errorMessage = response.message; } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
