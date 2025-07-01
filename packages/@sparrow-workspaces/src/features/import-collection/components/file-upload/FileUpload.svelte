@@ -172,7 +172,7 @@
   {/if}
 </div>
 <div>
-  <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+  <p class="sparrow-fs-12" style="color:var(--text-secondary-1000)">
     Please upload your Postman collections in v2.1 specification. Currently, we
     don't support Postman Collection v2.0, and importing this version might
     result in some data loss.
