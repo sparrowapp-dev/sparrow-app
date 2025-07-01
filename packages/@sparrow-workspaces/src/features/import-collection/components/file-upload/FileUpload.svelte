@@ -1,150 +1,189 @@
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
+  import {
+    validateClientJSON,
+    validateClientXML,
+  } from "@sparrow/common/utils/importCollectionValidations";
   import { Button } from "@sparrow/library/ui";
-  import { FileUpload, TextUpload } from "../components";
-  import { InfoIcon } from "@sparrow/library/icons";
+
+  import { Drop } from "../../components";
 
   export let currentWorkspaceId;
   export let onCloseModal;
-  export let onItemCreated;
-  export let collectionList;
 
-  export let onGetOapiTextFromURL; // Sends http request to the URL and get the (JSON / XML) text of Oapi                               (1)
-
-  export let onValidateOapiText; // Sends the (JSON / XML) text to the server (checks format and syntax) and returns true or false      (2)
   export let onValidateOapiFile; // Sends the (JSON / XML) file to the server (checks format and syntax) and returns true or false      (2)
 
-  export let onImportOapiText; // Sends the (JSON / XML) text to backend and create a collection                                        (3)
   export let onImportOapiFile; // Sends the (JSON / XML) file to backend and create a collection                                        (3)
 
-  export let isActiveSyncRequired;
-  export let isActiveSyncPlanModalOpen;
-
   let isInputDataTouched = false;
-  let importType: string = "text";
 
-  let isInfoIconHovered = false;
-
-  const handleMouseEnter = () => {
-    isInfoIconHovered = true;
+  let uploadCollection = {
+    file: {
+      value: [],
+      invalid: false,
+      showFileSizeError: false,
+      showFileTypeError: false,
+      showFileSyntaxError: false,
+    },
+  };
+  let uploadFileType = "";
+  let isValidateFileLoading = false;
+  let isValidFile = false;
+  const validateFileUpload = async (
+    _fileUploadData: string,
+  ): Promise<boolean> => {
+    isValidateFileLoading = true;
+    isValidFile = false;
+    if (
+      validateClientJSON(_fileUploadData) ||
+      validateClientXML(_fileUploadData)
+    ) {
+      const response = await onValidateOapiFile(_fileUploadData);
+      if (response.isSuccessful) {
+        uploadFileType = response.data.type;
+        isValidateFileLoading = false;
+        isValidFile = true;
+        uploadCollection.file.invalid = false;
+        return true;
+      } else {
+        uploadCollection.file.invalid = true;
+        uploadCollection.file.showFileSyntaxError = true;
+        uploadCollection.file.showFileSizeError = false;
+        uploadCollection.file.showFileTypeError = false;
+        uploadCollection.file.value = [];
+        isValidFile = false;
+        isValidateFileLoading = false;
+        return false;
+      }
+    }
+    uploadCollection.file.invalid = true;
+    uploadCollection.file.value = [];
+    isValidFile = false;
+    isValidateFileLoading = false;
+    return false;
   };
 
-  const handleMouseLeave = () => {
-    isInfoIconHovered = false;
+  const handleFileInputChange = async (
+    e: any,
+    maxSize: number,
+    supportedFileTypes: string[],
+  ) => {
+    isInputDataTouched = true;
+    const targetFile = e?.target?.files || e?.dataTransfer?.files;
+
+    if (targetFile && targetFile[0].size > maxSize * 1024) {
+      uploadCollection.file.showFileSizeError = true;
+      uploadCollection.file.invalid = true;
+      return;
+    }
+    const fileType = `.${(targetFile && targetFile[0]?.name)
+      .split(".")
+      .pop()
+      .toLowerCase()}`;
+    if (!supportedFileTypes.includes(fileType)) {
+      uploadCollection.file.showFileTypeError = true;
+      uploadCollection.file.invalid = true;
+      return;
+    }
+    uploadCollection.file.showFileSizeError = false;
+    uploadCollection.file.showFileTypeError = false;
+    uploadCollection.file.showFileSyntaxError = false;
+    uploadCollection.file.invalid = false;
+    uploadCollection.file.value = targetFile && targetFile[0];
+
+    // Read the file content
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const fileContent = event.target?.result;
+      await validateFileUpload(fileContent);
+    };
+    reader.readAsText(targetFile ? targetFile[0] : "");
+  };
+
+  const handleLogoReset = (e: any) => {
+    uploadCollection.file.value = [];
+    isValidFile = false;
+  };
+
+  const handleFileUpload = async (file: Request) => {
+    if (file) {
+      const response = await onImportOapiFile(
+        currentWorkspaceId,
+        file,
+        uploadFileType,
+      );
+      if (response.isSuccessful) {
+        onCloseModal();
+      }
+    }
+  };
+
+  let isFileImportCollectionLoading = false;
+
+  const handleFileImportCollection = async () => {
+    isFileImportCollectionLoading = true;
+    await handleFileUpload(uploadCollection?.file?.value);
+    isFileImportCollectionLoading = false;
+    return;
   };
 </script>
 
-<div class="d-flex pt-3">
-  <div class="form-check import-type-inp">
-    <input
-      class="form-check-input"
-      type="radio"
-      name="flexRadioDefault"
-      id="flexRadioDefault1"
-      value="text"
-      bind:group={importType}
-      on:click={() => {
-        isInputDataTouched = false;
-      }}
-    />
-    <label class="form-check-label text-fs-14" for="flexRadioDefault1">
-      Paste Text
-    </label>
-  </div>
-  <div class="form-check import-type-inp">
-    <input
-      class="form-check-input"
-      type="radio"
-      name="flexRadioDefault"
-      id="flexRadioDefault2"
-      value="file"
-      bind:group={importType}
-      on:click={() => {
-        isInputDataTouched = false;
-      }}
-    />
-    <label class="form-check-label text-fs-14" for="flexRadioDefault2">
-      Upload File
-    </label>
-  </div>
-  {#if importType === "file"}
-    <div
-      class="info-icon"
-      style="margin-left: auto;"
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-    >
-      <InfoIcon
-        height={"17px"}
-        width={"17px"}
-        color={isInfoIconHovered
-          ? "var(--icon-primary-300)"
-          : "var(--icon-secondary-100)"}
-      />
-      {#if isInfoIconHovered}
-        <div class="tooltip">
-          Nested folders display is not supported.<br />
-          They will be flattened during import.
-          <div class="tooltip-arrow"></div>
-        </div>
-      {/if}
-    </div>
-  {/if}
-</div>
-<br />
-
-<div class="d-flex flex-column align-items-center justify-content-end rounded">
-  <div
-    class="w-100"
-    style="display: {importType === 'text' ? 'block' : 'none'};"
-  >
-    <TextUpload
-      {currentWorkspaceId}
-      {onCloseModal}
-      {onGetOapiTextFromURL}
-      {onValidateOapiText}
-      {onImportOapiText}
-      {isActiveSyncRequired}
-      bind:isActiveSyncPlanModalOpen
-    />
-  </div>
-
-  <div
-    class="w-100"
-    style="display: {importType === 'file' ? 'block' : 'none'};"
-  >
-    <FileUpload
-      {currentWorkspaceId}
-      {onCloseModal}
-      {onValidateOapiFile}
-      {onImportOapiFile}
-    />
-  </div>
-
-  <p class="importData-whiteColor my-3 sparrow-fs-14 fw-light">OR</p>
-  <Button
-    title={"Create Empty Collection"}
-    size={"large"}
-    onClick={() => {
-      onItemCreated("collection", {
-        workspaceId: currentWorkspaceId,
-        collection: collectionList,
-      });
-      onCloseModal();
-    }}
-    type={"primary"}
-    customWidth={"100%"}
-  />
-</div>
-<div style="margin-top: 20px; justify-content:center" class="d-flex">
-  <p
-    class="text-ds-font-size-12 text-ds-font-weight-medium text-ds-line-height-150"
-    style="color: var(--text-ds-neutral-300); text-align: center;"
-  >
-    For active sync, only swagger or localhost links are supported. Uploading
-    files or pasting OpenAPI JSON text will create a normal collection.
+<div class="w-100">
+  <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+    Upload files in YAML/JSON format, or JSON files exported from Postman (v2.1)
   </p>
 </div>
+<div class="w-100">
+  <Drop
+    value={uploadCollection.file.value}
+    maxFileSize={10000}
+    onChange={handleFileInputChange}
+    resetValue={handleLogoReset}
+    inputId="upload-collection-file-input"
+    inputPlaceholder="Drag and Drop or"
+    supportedFileTypes={[".yaml", ".json"]}
+    isError={uploadCollection.file.invalid && isInputDataTouched}
+    title={"Drag & drop your YAML/JSON or Postman (v2.1) JSON file or"}
+  />
+</div>
+<div>
+  {#if isInputDataTouched && uploadCollection.file.invalid && uploadCollection.file.showFileSizeError}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      File size exceed, Plese upload a file less than 10 MB.
+    </p>
+  {:else if isInputDataTouched && uploadCollection.file.invalid && uploadCollection.file.showFileTypeError}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      Invalid file format. Please upload a YAML/JSON (OAS) or Postman v2.1 file
+      format.
+    </p>
+  {:else if isInputDataTouched && uploadCollection.file.invalid && uploadCollection.file.showFileSyntaxError}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      We have identified that the file you have uploaded is not written in
+      OpenAPI Specification (OAS). Please visit
+      https://swagger.io/specification/ for more information on OAS.
+    </p>
+  {:else if isInputDataTouched && uploadCollection.file.invalid}
+    <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
+      Please upload a file to import collection.
+    </p>
+  {/if}
+</div>
+<div>
+  <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
+    Please upload your Postman collections in v2.1 specification. Currently, we
+    don't support Postman Collection v2.0, and importing this version might
+    result in some data loss.
+  </p>
+</div>
+
+<Button
+  title={"Import Collection"}
+  onClick={handleFileImportCollection}
+  type="primary"
+  disable={!(isValidFile && !isValidateFileLoading)}
+  loader={isFileImportCollectionLoading}
+  customWidth={"100%"}
+  size={"large"}
+/>
 
 <style lang="scss">
   .text-area::placeholder {
@@ -259,29 +298,6 @@
     border: 2px solid red;
   }
 
-  .btn-close1 {
-    background-color: var(--background-color);
-  }
-
-  .btn-close1:hover {
-    background-color: var(--background-dropdown);
-  }
-
-  .btn-close1:active {
-    background-color: var(--background-dropdown);
-  }
-  .btn-primary {
-    background-color: var(--bg-primary-300);
-  }
-  .btn-primary:hover {
-    background-color: var(--bg-primary-400);
-  }
-  .btn-primary:active {
-    background-color: var(--bg-primary-600);
-  }
-  .btn-disabled {
-    background-color: var(--button-disabled);
-  }
   .learn-active-link {
     color: var(--primary-btn-color) !important;
     text-decoration: none;
