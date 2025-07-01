@@ -1077,8 +1077,8 @@
                         <WorkspaceDefault
                           {currentWorkspace}
                           {handleCreateEnvironment}
-                          onCreateTestflow={() => {
-                            handleCreateTestflowCheck();
+                          onCreateTestflow={async () => {
+                            await handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
