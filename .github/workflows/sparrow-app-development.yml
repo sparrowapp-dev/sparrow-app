@@ -95,24 +95,6 @@ jobs:
         with:
           version: 'latest'    
 
-      # - name: Extract and Store Tauri Signatures
-      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-      #   with:
-      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-      #     kubernetes-namespace: 'sparrow-dev'
-      #     secret-name: 'sparrow-api-secret'
-      #     secret-key-prefix: 'WINDOWS_APP_SIGNATURE'
-      #     platforms: 'windows'
-
-      # - name: sign msi
-      #   run: |
-      #     $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-      #     $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-      #     $bundlePath = "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
-      #     Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
-      #     & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$bundlePath\msi\*.msi" "$bundlePath\nsis\*.exe"
-      #   shell: pwsh
       - name: sign msi
         run: |
           # Create self-signed certificate
@@ -225,6 +207,17 @@ jobs:
               throw "MSI directory not found at: $msiPath"
           }
           
+          # Get current date-time in format YYYYMMDD_HHMMSS
+          $dateTimeStamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          
+          # Rename MSI files with timestamp before uploading
+          Get-ChildItem "$msiPath\*.msi" | ForEach-Object {
+              $newName = $_.BaseName + "_" + $dateTimeStamp + $_.Extension
+              $newPath = Join-Path -Path $msiPath -ChildPath $newName
+              Rename-Item -Path $_.FullName -NewName $newName
+              Write-Host "Renamed $($_.Name) to $newName"
+          }
+          
           # List files before upload for debugging
           Write-Host "Files in MSI directory:"
           Get-ChildItem $msiPath | ForEach-Object {
@@ -237,8 +230,8 @@ jobs:
           
           # Upload to S3
           Write-Host "Starting S3 upload..."
-          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-          
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev/windows --exclude "*" --include "*.zip" --include "*.msi"
+
           if ($LASTEXITCODE -eq 0) {
               Write-Host "S3 upload completed successfully" -ForegroundColor Green
           } else {
@@ -266,15 +259,15 @@ jobs:
               throw "Could not find bundle directory for Teams notification"
           }
           
-          # Find MSI file
-          $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Select-Object -First 1
+          # Find the most recent MSI file (now with timestamp in name)
+          $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           
           if (-not $msiFile) {
               throw "No MSI file found in $bundlePath\msi\"
           }
           
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/windows/$msiFileName"
           
           Write-Host "MSI file found: $msiFileName"
           Write-Host "Download URL: $msiUrl"
@@ -321,109 +314,7 @@ jobs:
           
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
-
-      # - name: AWS CLI
-      #   uses: chrislennon/action-aws-cli@v1.1
-      #   with:
-      #     version: latest
-      #     aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # - name: Upload files to S3
-      #   run: |
-      #     aws s3 sync C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      # #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # - name: Upload files to S3
-      #   run: |
-      #     # Find the actual bundle path dynamically
-      #     $possiblePaths = @(
-      #         "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
-      #         "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
-      #     )
-          
-      #     $bundlePath = $null
-      #     foreach ($path in $possiblePaths) {
-      #         if (Test-Path $path) {
-      #             $bundlePath = $path
-      #             Write-Host "Found bundle path: $bundlePath"
-      #             break
-      #         }
-      #     }
-          
-      #     if (-not $bundlePath) {
-      #         throw "Could not find bundle directory for S3 upload"
-      #     }
-          
-      #     # Check if msi directory exists
-      #     $msiPath = "$bundlePath\msi"
-      #     if (-not (Test-Path $msiPath)) {
-      #         throw "MSI directory not found at: $msiPath"
-      #     }
-          
-      #     # List files before upload for debugging
-      #     Write-Host "Files in MSI directory:"
-      #     Get-ChildItem $msiPath | ForEach-Object {
-      #         Write-Host "  $($_.Name) - $($_.Length) bytes"
-      #     }
-          
-      #     # Upload to S3
-      #     aws s3 sync "$msiPath" s3://sparrow-release-assests-dev --exclude "*" --include "*.zip" --include "*.msi"
-      #   shell: pwsh
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
-      # - name: Post Windows Build Links to Teams
-      #   run: |
-      #     $msiFile = Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
-      #     $msiFileName = $msiFile.Name
-      #     $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
-          
-      #     $body = @{
-      #       "type" = "message"
-      #       "attachments" = @(
-      #         @{
-      #           "contentType" = "application/vnd.microsoft.card.adaptive"
-      #           "content" = @{
-      #             "type" = "AdaptiveCard"
-      #             "body" = @(
-      #               @{
-      #                 "type" = "TextBlock"
-      #                 "text" = "🚀 New Windows Build Available"
-      #                 "weight" = "bolder"
-      #                 "size" = "large"
-      #               }
-      #               @{
-      #                 "type" = "TextBlock"
-      #                 "text" = "Branch: development"
-      #                 "wrap" = $true
-      #               }
-      #               @{
-      #                 "type" = "TextBlock"
-      #                 "text" = "Download Link:"
-      #                 "wrap" = $true
-      #               }
-      #               @{
-      #                 "type" = "TextBlock"
-      #                 "text" = $msiUrl
-      #                 "color" = "accent"
-      #                 "wrap" = $true
-      #               }
-      #             )
-      #             "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
-      #             "version" = "1.2"
-      #           }
-      #         }
-      #       )
-      #     }
-          
-      #     $jsonBody = $body | ConvertTo-Json -Depth 10
-          
-      #     Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
-      #   shell: pwsh
-
+  
   release_macos:
     runs-on: macos-latest
     environment: development
@@ -452,6 +343,16 @@ jobs:
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
+      - name: Remove App Store specific properties
+        run: |
+          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
+          sed -i '' '/"macOS": {/,/},/ {
+              /"entitlements":.*/d
+              /"minimumSystemVersion":.*/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
@@ -477,46 +378,35 @@ jobs:
         with:
           version: 'latest'
 
-      # - name: Extract and Store Tauri Signatures
-      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-      #   with:
-      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-      #     kubernetes-namespace: 'sparrow-dev'
-      #     secret-name: 'sparrow-api-secret'
-      #     secret-key-prefix: 'MAC_APPLE_SILICON_APP_SIGNATURE'
-      #     platforms: 'macos'
-
-      # - name: Extract and Store Tauri Signatures
-      #   uses: punitkashyup/tauri-signature-to-k8s-secret@v1.0.8
-      #   with:
-      #     tauri-bundle-path: 'apps/@sparrow-desktop/src-tauri/target/debug/bundle'
-      #     kubernetes-config: ${{ secrets.KUBE_CONFIG }}
-      #     kubernetes-namespace: 'sparrow-dev'
-      #     secret-name: 'sparrow-api-secret'
-      #     secret-key-prefix: 'MAC_INTEL_APP_SIGNATURE'
-      #     platforms: 'macos'
-
       - name: Install AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
 
+      - name: Set build datetime
+        run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
       - name: Upload & download File to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.gz"
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-dev --recursive --exclude "*" --include "*.dmg"
+          DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/macos --recursive --exclude "*" --include "*.gz"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Post macOS Build Links to Teams
         run: |
-          DMG_FILE=$(ls /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
-          DMG_FILENAME=$(basename "$DMG_FILE")
-          DMG_URL="https://sparrow-release-assests-dev.s3.amazonaws.com/$DMG_FILENAME"
-          
+          DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILENAME="${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          DMG_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$DMG_SUFFIXED_FILENAME"
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
               \"attachments\": [
@@ -556,142 +446,10 @@ jobs:
             }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
         shell: bash
 
-  release_mac_app_store:
-    runs-on: macos-latest
-    environment: development
-    needs: release_macos
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Install Rust 1.82.0
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          rustup install 1.82.0
-          rustup default 1.82.0
-          rustup target add x86_64-apple-darwin
-
-      - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20.8"
-
-      # Commenting this out as it is not needed for the App Store build as updates will be handled by the App Store
-      # - name: Update updater endpoint in tauri.conf.json file
-      #   run: |
-      #     content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
-      #     newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
-      #     echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
-      #   shell: bash
-
-      - name: Increase Yarn network timeout
-        run: yarn config set network-timeout 600000
-
-      - name: Import Apple Certificates
-        env:
-          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
-          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        run: |
-          # Create and unlock keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
-
-          # Import certificates
-          echo "$MAC_INSTALLER_CERT" | base64 --decode > InstallerCert.p12
-          security import InstallerCert.p12 \
-            -k build.keychain \
-            -P "$MAC_INSTALLER_CERT_PASSWORD" \
-            -T /usr/bin/codesign \
-            -T /usr/bin/productbuild
-
-          # Configure keychain permissions
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-
-          # Verify installation
-          security find-identity -v -p codesigning build.keychain
-
-      - name: Extract Certificate IDs
-        id: extract-cert-ids
-        run: |
-          # Extract Apple Distribution (codesigning) ID
-          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
-          if [ -z "$CODESIGN_ID" ]; then
-            echo "::error::Apple Distribution certificate not found in keychain"
-            exit 1
-          fi
-          echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
-
-          # Extract 3rd Party Installer ID (must search all identities)
-          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
-          if [ -z "$INSTALLER_ID" ]; then
-            echo "::error::Installer certificate not found in keychain"
-            exit 1
-          fi
-          echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
-
-          echo "Using codesign identity: $CODESIGN_ID"
-          echo "Using installer identity: $INSTALLER_ID"
-
-      - name: Build Tauri App
-        run: |
-          yarn cache clean
-          yarn install
-          yarn workspace @sparrow/desktop tauri build
-        env:
-          APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          CI: false
-
-      - name: Create signed .pkg for App Store
-        run: |
-          APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
-          
-          if [ ! -d "$BUNDLE_PATH" ]; then
-            echo "::error::App bundle not found at $BUNDLE_PATH"
-            exit 1
-          fi
-
-          # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
-          productbuild \
-            --component "$BUNDLE_PATH" /Applications \
-            --sign "$INSTALLER_ID" \
-            "$PKG_PATH"
-
-          if [ ! -f "$PKG_PATH" ]; then
-            echo "::error::Failed to create package at $PKG_PATH"
-            exit 1
-          fi
-        env:
-          INSTALLER_ID: ${{ env.INSTALLER_ID }}
-
-      - name: Upload to App Store Connect
-        env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-
-          xcrun altool --upload-app -f "$PKG_PATH" -t macos \
-          --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-          --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
-          --verbose
-
   release_linux:
     runs-on: ubuntu-latest
     environment: development
-    needs: release_mac_app_store
+    needs: release_macos
 
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -818,7 +576,7 @@ jobs:
         env:
           AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
           AWS_REGION: ${{ vars.AWS_REGION }}
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL_LINUX }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
           REPO_URL="https://${AWS_S3_BUCKET}.s3-website-${AWS_REGION}.amazonaws.com"
           
@@ -832,7 +590,7 @@ jobs:
                   \"body\": [
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"🐧 Debian Repository Updated\",
+                      \"text\": \"🐧 New Debian Build Available\",
                       \"weight\": \"bolder\",
                       \"size\": \"large\"
                     },
