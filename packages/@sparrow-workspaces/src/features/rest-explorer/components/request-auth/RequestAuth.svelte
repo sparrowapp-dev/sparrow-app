@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
+  import {
+    ApiKey,
+    AuthProfile,
+    BasicAuth,
+    BearerToken,
+    NoAuth,
+  } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
@@ -17,6 +23,7 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
+
   const handlecollection_restapi_auth_changed = ({
     requestAuthNavigation,
   }: {
@@ -57,6 +64,10 @@
               {
                 name: "Basic Auth",
                 id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
+              },
+              {
+                name: "Authentication Profiles",
+                id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
               },
             ]}
             zIndex={499}
@@ -143,6 +154,41 @@
           style="color:var(--text-ds-neutral-400); max-width:600px;"
         >
           The authorization setting is inherited from the collection '<span
+            style="color:var(--text-ds-neutral-100)"
+            >{collection?.name || "Collection Not Found"}</span
+          >'. To make changes,
+        </p>
+        <p class="d-flex">
+          <span
+            class="pt-1 text-fs-12 me-1"
+            style="color:var(--text-ds-neutral-400)"
+          >
+            navigate to
+          </span>
+          <Button
+            type={"link-primary"}
+            onClick={() => {
+              onOpenCollection();
+            }}
+            title={collection?.name?.length > 25
+              ? collection?.name?.slice(0, 25) + "..."
+              : collection?.name || "Collection Not Found"}
+            size={"small"}
+            endIcon={OpenRegular}
+          />
+        </p>
+      {/if}
+    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES}
+      <AuthProfile
+        callback={onUpdateRequestState}
+        authProfilesList={collection?.auth}
+      />
+      {#if collection}
+        <p
+          class="text-fs-12 mb-1"
+          style="color:var(--text-ds-neutral-400); max-width:600px;"
+        >
+          The authorization profile is inherited from the collection '<span
             style="color:var(--text-ds-neutral-100)"
             >{collection?.name || "Collection Not Found"}</span
           >'. To make changes,
