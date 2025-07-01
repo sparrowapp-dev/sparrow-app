@@ -670,6 +670,9 @@
         });
         handleClosePopupBackdrop(false);
         await onClearConversation();
+        onUpdateRequestState({
+          isChatbotPromptBoxActive: true,
+        });
         notifications.success("Chat history cleared successfully.");
       }}
     ></Button>

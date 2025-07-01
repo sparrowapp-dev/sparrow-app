@@ -1874,7 +1874,6 @@ class AiRequestExplorerViewModel {
   }
 
   public handleStartNewConversation = async () => {
-    console.log("camer here ")
     this.updateRequestState({ isChatbotConversationLoading: true });
     await this.switchConversation("", "New Conversation", []);
     await new Sleep().setTime(2000).exec();
@@ -2099,11 +2098,14 @@ class AiRequestExplorerViewModel {
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage = "Some issue occurred from server while processing your request, please try again.";
               } else if (response.message.includes("exceeds the maximum limit") 
-                // ||  response.message.includes("exceeds the limit")
             ) {
                 errorMessage = "You've reached the message limit for this conversation. Start a new conversation to continue exploring! "; 
                 await this.updateRequestState({ isChatbotPromptBoxActive: false });
               } 
+              else if (response.message.includes("Total file size exceeds the limit")) {
+                errorMessage = response.message + ". Start a new conversation to continue exploring!"; 
+                await this.updateRequestState({ isChatbotPromptBoxActive: false });
+              }
               else { errorMessage = response.message; } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
