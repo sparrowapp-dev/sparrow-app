@@ -271,15 +271,16 @@
   title="Import Collection"
   onClick={handleTextImportCollection}
   type="primary"
-  disable={!(
-    ((isValidClientURL && isValidServerURL && isInputDataTouched) ||
-      (isValidClientXML && isValidServerXML && isInputDataTouched) ||
-      (isValidClientDeployedURL &&
-        isValidServerDeployedURL &&
-        isInputDataTouched) ||
-      (isValidClientJSON && isValidServerJSON && isInputDataTouched)) &&
-    !isValidateTextLoading
-  )}
+  disable={isTextImportCollectionLoading ||
+    !(
+      ((isValidClientURL && isValidServerURL && isInputDataTouched) ||
+        (isValidClientXML && isValidServerXML && isInputDataTouched) ||
+        (isValidClientDeployedURL &&
+          isValidServerDeployedURL &&
+          isInputDataTouched) ||
+        (isValidClientJSON && isValidServerJSON && isInputDataTouched)) &&
+      !isValidateTextLoading
+    )}
   loader={isTextImportCollectionLoading}
   customWidth={"100%"}
   size={"large"}

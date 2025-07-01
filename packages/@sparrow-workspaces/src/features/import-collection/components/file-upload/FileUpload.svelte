@@ -6,6 +6,7 @@
   import { Button } from "@sparrow/library/ui";
 
   import { Drop } from "../../components";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let currentWorkspaceId;
   export let onCloseModal;
@@ -105,6 +106,7 @@
   };
 
   const handleFileUpload = async (file: Request) => {
+    isFileImportCollectionLoading = true;
     if (file) {
       const response = await onImportOapiFile(
         currentWorkspaceId,
@@ -113,16 +115,18 @@
       );
       if (response.isSuccessful) {
         onCloseModal();
+        await new Sleep().setTime(200).exec();
+        isFileImportCollectionLoading = false;
+        return;
       }
     }
+    isFileImportCollectionLoading = false;
   };
 
   let isFileImportCollectionLoading = false;
 
   const handleFileImportCollection = async () => {
-    isFileImportCollectionLoading = true;
     await handleFileUpload(uploadCollection?.file?.value);
-    isFileImportCollectionLoading = false;
     return;
   };
 </script>
@@ -179,7 +183,8 @@
   title={"Import Collection"}
   onClick={handleFileImportCollection}
   type="primary"
-  disable={!(isValidFile && !isValidateFileLoading)}
+  disable={isFileImportCollectionLoading ||
+    !(isValidFile && !isValidateFileLoading)}
   loader={isFileImportCollectionLoading}
   customWidth={"100%"}
   size={"large"}
