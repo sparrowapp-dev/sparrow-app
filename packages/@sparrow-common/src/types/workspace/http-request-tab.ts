@@ -243,7 +243,7 @@ export interface HttpRequestCollectionAuthNavigationTabInterface {
   collectionAuthNavigation: CollectionAuthTypeBaseEnum
 }
 
-export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestCollectionAuthNavigationTabInterface { }
+export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestCollectionAuthNavigationTabInterface, HttpRequestCollectionAuthProfileIdTabInterface { }
 
 // For Auth Profile
 export interface HttpRequestSlectedAuthTypeInProfileTabInterface {

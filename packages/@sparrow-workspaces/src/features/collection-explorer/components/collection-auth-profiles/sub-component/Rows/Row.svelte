@@ -79,7 +79,7 @@
 
 {#if showMenu}
   <Options
-    xAxis={workspaceTabWrapper.getBoundingClientRect().right + 40}
+    xAxis={workspaceTabWrapper.getBoundingClientRect().right - 160}
     yAxis={[
       workspaceTabWrapper.getBoundingClientRect().top - 0,
       workspaceTabWrapper.getBoundingClientRect().bottom + 5,
