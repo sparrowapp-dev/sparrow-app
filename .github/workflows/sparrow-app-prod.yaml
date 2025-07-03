@@ -321,13 +321,7 @@ jobs:
           gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
 
           cd ..
-          mv publishDir gh-pages
-
-      - name: Upload gh-pages artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: gh-pages
-          path: gh-pages
+          mv publishDir deb-build
 
       - name: Upload to S3 bucket
         uses: jakejarvis/s3-sync-action@master
@@ -338,7 +332,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_DIR: gh-pages
+          SOURCE_DIR: deb-build
           DEST_DIR: ${{ vars.LINUX_DIR }} 
 
       - name: Notify Teams Channel
