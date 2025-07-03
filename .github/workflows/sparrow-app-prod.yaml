@@ -101,20 +101,15 @@ jobs:
 
       - name: Setup DigiCert ONE Signing
         run: |
-          # Download and install DigiCert ONE tools
-          Invoke-WebRequest -Uri "https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download" -OutFile "smtools-windows-x64.msi"
-          msiexec /i smtools-windows-x64.msi /quiet /qn
+          # Install Chocolatey if not present
+          if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          }
           
-          # Set up environment variables for DigiCert ONE
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> $env:GITHUB_ENV
-          echo "SM_CLIENT_CERT_FILE=D:\Certificate_pkcs12.p12" >> $env:GITHUB_ENV
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> $env:GITHUB_ENV
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> $env:GITHUB_ENV
-          echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> $env:GITHUB_ENV
-          
-          # Download client certificate
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > D:\Certificate_pkcs12.p12
-        shell: powershell
+          # Install DigiCert tools via Chocolatey
+          choco install digicert-smtools -y
 
       - name: Setup Certificate
         run: |
