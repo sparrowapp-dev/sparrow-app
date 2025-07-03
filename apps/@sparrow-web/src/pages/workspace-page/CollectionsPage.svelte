@@ -617,8 +617,7 @@
         isInitialDataLoading = true;
         activeTab = undefined;
 
-        const id = value?._id;
-        if (id && shouldRunThrottled(value?._id)) {
+        if (value?._id && shouldRunThrottled(value?._id)) {
           handleRefreshApicalls(value?._id);
         } else {
           console.error(`Throttled for ${value?._id}`);

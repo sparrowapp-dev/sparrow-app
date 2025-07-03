@@ -47,70 +47,81 @@ export class EnvironmentViewModel {
    * @returns
    */
   public refreshEnvironment = async (
-    workspaceId: string,
-  ): Promise<{
-    environmentTabsToBeDeleted?: string[];
-  }> => {
-    const guestUser = await this.guestUserRepository.findOne({
-      name: "guestUser",
-    });
-    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
-    if (isGuestUser) {
-      return {};
-    }
-    const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData =
-      await this.workspaceRepository.readWorkspace(workspaceId);
-    let response;
-    if (
-      workspaceData &&
-      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
-      workspaceData.isShared
-    ) {
-      response = await this.environmentService.fetchAllPublicEnvironments(
-        workspaceId,
-        constants.API_URL,
-      );
-    } else {
-      response = await this.environmentService.fetchAllEnvironments(
-        workspaceId,
-        baseUrl,
-      );
-    }
+  workspaceId: string,
+): Promise<{
+  environmentTabsToBeDeleted?: string[];
+}> => {
+  const guestUser = await this.guestUserRepository.findOne({
+    name: "guestUser",
+  });
 
-    if (response?.isSuccessful && response?.data?.data) {
-      const environments = response.data.data;
-      await this.environmentRepository.refreshEnvironment(
-        environments?.map(async(_environment: any) => {
-          await tick();
-          const environment = createDeepCopy(_environment);
-          environment["id"] = environment._id;
-          environment["workspaceId"] = workspaceId;
-          delete environment._id;
-          return environment;
-        }),
-      );
-      await this.environmentRepository.deleteOrphanEnvironments(
-        workspaceId,
-        environments?.map(async(_environment: any) => {
-          await tick();
-          return _environment._id;
-        }),
-      );
-      const environmentTabsToBeDeleted =
-        await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
-          workspaceId,
-          environments?.map(async(_environment: any) => {
-            await tick();
-            return _environment._id;
-          }),
-        );
-      return {
-        environmentTabsToBeDeleted,
-      };
-    }
+  const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+  if (isGuestUser) {
     return {};
-  };
+  }
+
+  const baseUrl = await this.constructBaseUrl(workspaceId);
+  const workspaceData =
+    await this.workspaceRepository.readWorkspace(workspaceId);
+
+  let response;
+  if (
+    workspaceData &&
+    workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+    workspaceData.isShared
+  ) {
+    response = await this.environmentService.fetchAllPublicEnvironments(
+      workspaceId,
+      constants.API_URL,
+    );
+  } else {
+    response = await this.environmentService.fetchAllEnvironments(
+      workspaceId,
+      baseUrl,
+    );
+  }
+
+  if (response?.isSuccessful && response?.data?.data) {
+    const environments = response.data.data;
+
+    const processedEnvironments = await Promise.all(
+      environments.map(async (_environment: any) => {
+        await tick();
+        const environment = createDeepCopy(_environment);
+        environment["id"] = environment._id;
+        environment["workspaceId"] = workspaceId;
+        delete environment._id;
+        return environment;
+      })
+    );
+
+    await this.environmentRepository.refreshEnvironment(processedEnvironments);
+
+    const environmentIds = await Promise.all(
+      environments.map(async (_environment: any) => {
+        await tick();
+        return _environment._id;
+      })
+    );
+
+    await this.environmentRepository.deleteOrphanEnvironments(
+      workspaceId,
+      environmentIds
+    );
+
+    const environmentTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
+        workspaceId,
+        environmentIds
+      );
+
+    return {
+      environmentTabsToBeDeleted,
+    };
+  }
+
+  return {};
+};
 
   /**
    * @description - deletes environment tab

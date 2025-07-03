@@ -9,6 +9,7 @@
     LayerRegular,
     GlobeRegular,
   } from "@sparrow/library/icons";
+  import VirtualScroll from "svelte-virtual-scroll-list";
   import { Button, List } from "@sparrow/library/ui";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import {
@@ -21,7 +22,7 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { isExpandEnvironment } from "../../../stores/recent-left-panel";
   import { slide } from "svelte/transition";
-  import VirtualList from "@sveltejs/svelte-virtual-list";
+  import { onMount } from "svelte";
 
   /**
    * current workspace
@@ -164,11 +165,30 @@
   }
 
   let isNewEnvironmentCreating = false;
+
+  let vsHeight = 0;
+  let vsContainer: HTMLDivElement;
+
+  function updateVsHeight() {
+    const headerHeight = 32; // adjust this based on your actual header height
+    const extraPadding = 16; // any extra margins/paddings
+    vsHeight =
+      window.innerHeight -
+      vsContainer.getBoundingClientRect().top -
+      extraPadding;
+  }
+
+  onMount(() => {
+    updateVsHeight();
+    window.addEventListener("resize", updateVsHeight);
+    return () => window.removeEventListener("resize", updateVsHeight);
+  });
 </script>
 
 <div
-  class={`d-flex flex-column  h-100     pt-0 px-1`}
+  class={`d-flex flex-column h-100 pt-0 px-1`}
   style="font-weight: 500;"
+  bind:this={vsContainer}
   id="Environment-container"
 >
   <div
@@ -250,7 +270,7 @@
       bind:this={scrollDiv}
     >
       {#if filteredGlobalEnvironment?.length}
-        <div class="mb-0 env-Global">
+        <!-- <div class="mb-0 env-Global">
           <p
             tabindex="0"
             role="button"
@@ -283,8 +303,8 @@
               >{globalEnvironment[0]?.name}
             </span>
           </p>
-        </div>
-        <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" />
+        </div> -->
+        <!-- <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" /> -->
       {/if}
       {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData && !currentWorkspace?.isShared}
         <div class={`pb-2 px-1`}>
@@ -312,7 +332,7 @@
         </div>
       {/if}
 
-      <div class="position-relative">
+      <div class="position-relative h-100 vs">
         {#if filteredLocalEnvironment?.length}
           <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
           <div
@@ -321,16 +341,54 @@
               ? 'var(--bg-ds-neutral-500)'
               : 'var(--bg-ds-surface-100)'}"
           ></div>
-          <VirtualList
-            items={filteredLocalEnvironment}
-            height="100%"
-            rowHeight={50}
-            let:visibleItems
-          >
-            {#each visibleItems as env (env._id)}
+          <div style="height: {vsHeight - 170}px;">
+            <VirtualScroll data={filteredLocalEnvironment} key="id" let:data>
+              <div slot="header">
+                <div class="mb-0 env-Global">
+                  <p
+                    tabindex="0"
+                    role="button"
+                    class={`fw-normal env-item text-fs-12 border-radius-2  ${
+                      globalEnvironment[0]?.id === activeTabId && "active"
+                    }`}
+                    style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
+                    on:click={() => {
+                      onOpenGlobalEnvironment(globalEnvironment[0]);
+                    }}
+                  >
+                    <span
+                      class="icon-default"
+                      style="width: 24px; height:24px; margin-right:4px;"
+                    >
+                    </span>
+                    <span class="icon-default">
+                      <GlobeRegular
+                        size="16px"
+                        color="var(--icon-ds-neutral-300)"
+                      />
+                    </span>
+
+                    <span
+                      class="box-line1"
+                      style="background-color: {isExpandEnviromentLine
+                        ? 'var(--bg-ds-neutral-500)'
+                        : 'var(--bg-ds-surface-100)'}"
+                    ></span>
+                    <span
+                      class=""
+                      style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
+                      >{globalEnvironment[0]?.name}
+                    </span>
+                  </p>
+                </div>
+                <hr
+                  class="m-0 me-1 mt-1 mb-1"
+                  style="margin-left: 2rem !important"
+                />
+              </div>
               <ListItem
                 bind:loggedUserRoleInWorkspace
-                {env}
+                env={data}
                 {currentWorkspace}
                 {onDeleteEnvironment}
                 {onUpdateEnvironment}
@@ -338,8 +396,8 @@
                 {onSelectEnvironment}
                 {activeTabId}
               />
-            {/each}
-          </VirtualList>
+            </VirtualScroll>
+          </div>
         {/if}
       </div>
       {#if !filteredGlobalEnvironment?.length && !filteredLocalEnvironment?.length && searchData}

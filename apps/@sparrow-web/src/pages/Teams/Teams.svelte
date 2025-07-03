@@ -63,6 +63,7 @@
   import { WelcomePopUpWeb } from "@sparrow/common/components";
   import type { GithubRepoDocType } from "src/models/github-repo.model";
   import { DownloadApp } from "@sparrow/common/features";
+  import { shouldRunThrottled } from "@sparrow/common/store";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -77,8 +78,14 @@
   });
 
   onMount(async () => {
-    _viewModel.refreshTeams(userId);
-    _viewModel.refreshWorkspaces(userId);
+    if (userId && shouldRunThrottled(userId)) {
+      await Promise.all([
+        _viewModel.refreshTeams(userId),
+        _viewModel.refreshWorkspaces(userId),
+      ]);
+    } else {
+      console.error(`Throttled for ${userId}`);
+    }
 
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
