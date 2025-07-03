@@ -126,7 +126,6 @@
     data: addUsersInWorkspacePayload,
     invitedUserCount: number,
   ) => {
-    console.log("we are hitting this ------------>", data, invitedUserCount);
     invitedCount = invitedUserCount;
     const response = await _viewModel.inviteUserToWorkspace(
       workspaceId,
