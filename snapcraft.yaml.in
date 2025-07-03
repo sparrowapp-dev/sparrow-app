@@ -3,7 +3,7 @@ title: sparrow-app
 base: core24
 version: '${SPARROW_VERSION}'
 
-summary: An API management platform that streamlines software development lifecycle.
+summary: An API management platform that streamlines software development.
 description: |
   Sparrow is a modern API management platform designed to simplify and accelerate the software development lifecycle. It enables teams to manage APIs more efficiently through features like request handling, environment configuration, collection management, and access control across workspaces. Ideal for developers, QA engineers, and cross-functional teams, Sparrow fosters collaboration by allowing multiple teams to work together seamlessly. It addresses common pain points such as scattered API documentation, inefficient testing workflows, and limited team coordination by providing a centralized, user-friendly platform for all API-related tasks.
 grade: stable
