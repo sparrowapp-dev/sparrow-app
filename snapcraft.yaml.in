@@ -1,0 +1,83 @@
+name: sparrow-app
+title: sparrow-app
+base: core24
+version: '${SPARROW_VERSION}'
+
+summary: An API management platform that streamlines the software development lifecycle. # 79 char long summary
+description: |
+  Sparrow is a modern API management platform designed to simplify and accelerate the software development lifecycle. It enables teams to manage APIs more efficiently through features like request handling, environment configuration, collection management, and access control across workspaces. Ideal for developers, QA engineers, and cross-functional teams, Sparrow fosters collaboration by allowing multiple teams to work together seamlessly. It addresses common pain points such as scattered API documentation, inefficient testing workflows, and limited team coordination by providing a centralized, user-friendly platform for all API-related tasks.
+grade: stable
+confinement: strict
+
+layout:
+  /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+
+apps:
+  sparrow:
+    command: usr/bin/sparrow
+    desktop: usr/share/applications/sparrow.desktop
+    extensions: [gnome]
+    plugs:
+      - network
+      - network-status
+      - single-instance-plug # add this if you're using the single-instance plugin
+    slots:
+      - single-instance # add this if you're using the single-instance plugin
+
+# Add these lines only if you're using the single-instance plugin
+# Check https://v2.tauri.app/plugin/single-instance/ for details
+slots:
+ single-instance:
+   interface: dbus
+   bus: session
+   name: org.dev_sparrowapp_desktop.SingleInstance # Remember to change net_mydomain_MyApp to your app ID with "_" instead of "." and "-"
+
+plugs:
+  single-instance-plug:
+    interface: dbus
+    bus: session
+    name: org.dev_sparrowapp_desktop.SingleInstance
+
+parts:
+  sparrow:
+    plugin: dump
+    build-snaps:
+      - node/20/stable
+      - rustup/latest/stable
+    source: .
+    build-packages:
+      - libwebkit2gtk-4.1-dev
+      - build-essential
+      - curl
+      - wget
+      - file
+      - libxdo-dev
+      - libssl-dev
+      - libayatana-appindicator3-dev
+      - librsvg2-dev
+      - dpkg
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libayatana-appindicator3-1
+    override-build: |
+      set -eu
+      mkdir -p $SNAP_USER_COMMON/.cache
+
+      # Download the latest .deb file
+      SPARROW_VERSION=2.25.0
+      DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/pool/stable/main/binary-amd64/sparrow.deb"
+
+      # curl -L -o sparrow.deb "$DEB_URL"
+      # wget --timeout=30 --tries=3 -O sparrow.deb "$DEB_URL"
+      # cp $CRAFT_PROJECT_DIR/sparrow.deb sparrow.deb
+
+      # Extract the .deb file
+      dpkg -x sparrow.deb $SNAPCRAFT_PART_INSTALL/
+
+      # Fix the desktop file icon path
+      # sed -i -e "s|Icon=sparrow|Icon=/usr/share/icons/hicolor/32x32/apps/sparrow.png|g" $SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop
+      if [ -f "$SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop" ]; then
+      sed -i 's|Icon=sparrow|Icon=/usr/share/icons/hicolor/32x32/apps/sparrow.png|' \
+          "$SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop"
+      fi

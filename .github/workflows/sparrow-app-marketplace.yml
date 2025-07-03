@@ -1,0 +1,293 @@
+name: Marketplace release 
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+env:
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+
+jobs:
+  build-snap:
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+
+      - name: Check Snapcraft Credentials
+        run: |
+          snapcraft whoami
+
+      - name: Set up Sparrow APT Repo
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/sparrow-repo-key.gpg | sudo tee /etc/apt/keyrings/sparrow.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/sparrow.asc] https://sparrow-assest.s3.us-east-1.amazonaws.com/linux stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
+          sudo apt-get update
+
+      - name: Download Latest Sparrow DEB
+        run: |
+          apt download sparrow
+          deb_file=$(ls sparrow_*.deb | head -n 1)
+          mv "$deb_file" sparrow.deb
+
+      - name: Set Version and Generate snapcraft.yaml
+        run: |
+          export SPARROW_VERSION=$(dpkg-deb -f sparrow.deb Version)
+          echo "Using Sparrow version: $SPARROW_VERSION"
+          envsubst < snapcraft.yaml.in > snapcraft.yaml
+
+      - name: Build Snap from DEB
+        run: |
+          sudo snapcraft --destructive-mode
+
+      - name: Upload Snap to Snap Store
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n 1)
+          echo "Uploading the $SNAP_FILE to $SNAP_CHANNEL"
+          snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
+
+      - name: Post Linux Snap Store Link to Teams
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+          SNAP_STORE_URL: ${{ secrets.SNAP_STORE_URL }}
+        run: |
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"📦 New Linux Snap Store Build Available\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\",
+                      \"color\": \"good\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"A new Linux snap package has been uploaded to the Snap Store:\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Channel: $SNAP_CHANNEL\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Snap Store URL:\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"$SNAP_STORE_URL\",
+                      \"color\": \"accent\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\",
+                  \"msteams\": {
+                    \"width\": \"Full\"
+                  }
+                }
+              }
+            ]
+          }" "$TEAMS_WEBHOOK_URL"
+        shell: bash
+
+  release_mac_app_store:
+    runs-on: macos-latest
+    environment: production
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust 1.82.0
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.8"
+
+      # Commenting this out as it is not needed for the App Store build as updates will be handled by the App Store
+      # - name: Update updater endpoint in tauri.conf.json file
+      #   run: |
+      #     content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+      #     newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+      #     echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+      #   shell: bash
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Import Apple Certificates
+        env:
+          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
+          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create and unlock keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+
+          # Import certificates
+          echo "$MAC_INSTALLER_CERT" | base64 --decode > InstallerCert.p12
+          security import InstallerCert.p12 \
+            -k build.keychain \
+            -P "$MAC_INSTALLER_CERT_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productbuild
+
+          # Configure keychain permissions
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+
+          # Verify installation
+          security find-identity -v -p codesigning build.keychain
+
+      - name: Extract Certificate IDs
+        id: extract-cert-ids
+        run: |
+          # Extract Apple Distribution (codesigning) ID
+          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
+          if [ -z "$CODESIGN_ID" ]; then
+            echo "::error::Apple Distribution certificate not found in keychain"
+            exit 1
+          fi
+          echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
+
+          # Extract 3rd Party Installer ID (must search all identities)
+          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
+          if [ -z "$INSTALLER_ID" ]; then
+            echo "::error::Installer certificate not found in keychain"
+            exit 1
+          fi
+          echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
+
+          echo "Using codesign identity: $CODESIGN_ID"
+          echo "Using installer identity: $INSTALLER_ID"
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          yarn install
+          yarn workspace @sparrow/desktop tauri build
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          CI: false
+
+      - name: Create signed .pkg for App Store
+        run: |
+          APP_NAME="Sparrow"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
+          
+          if [ ! -d "$BUNDLE_PATH" ]; then
+            echo "::error::App bundle not found at $BUNDLE_PATH"
+            exit 1
+          fi
+
+          # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
+          productbuild \
+            --component "$BUNDLE_PATH" /Applications \
+            --sign "$INSTALLER_ID" \
+            "$PKG_PATH"
+
+          if [ ! -f "$PKG_PATH" ]; then
+            echo "::error::Failed to create package at $PKG_PATH"
+            exit 1
+          fi
+        env:
+          INSTALLER_ID: ${{ env.INSTALLER_ID }}
+
+      - name: Upload to App Store Connect
+        env:
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+          xcrun altool --upload-app -f "$PKG_PATH" -t macos \
+          --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+          --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
+          --verbose
+      
+      - name: Post Mac App Store TestFlight Link to Teams
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+          TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}
+        run: |
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"📲 New Mac App Store TestFlight Build Available\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\",
+                      \"color\": \"good\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"A new macOS app store build is available for testing in TestFlight:\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"TestFlight URL:\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"$TESTFLIGHT_URL\",
+                      \"color\": \"accent\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\",
+                  \"msteams\": {
+                    \"width\": \"Full\"
+                  }
+                }
+              }
+            ]
+          }" "$TEAMS_WEBHOOK_URL"
+        shell: bash
+  
+
+    
