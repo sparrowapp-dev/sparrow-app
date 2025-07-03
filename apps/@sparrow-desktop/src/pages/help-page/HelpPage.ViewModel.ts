@@ -452,7 +452,7 @@ class HelpPageViewModel {
     let userResponse = await this.cannyService.retrieveUser(userInfo?.email);
 
     // If user does not exist, create a new user
-    if (!userResponse?.data) {
+    if (!userResponse?.isSuccessful) {
       userResponse = await this.cannyService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
@@ -533,7 +533,7 @@ class HelpPageViewModel {
     let userResponse = await this.cannyService.retrieveUser(userInfo.email);
 
     // If user does not exist, create a new user
-    if (!userResponse?.data) {
+    if (!userResponse?.isSuccessful) {
       userResponse = await this.cannyService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
@@ -560,7 +560,7 @@ class HelpPageViewModel {
       userInfo = value;
     });
     let userResponse = await this.cannyService.retrieveUser(userInfo.email);
-    if (!userResponse?.data) {
+    if (!userResponse?.isSuccessful) {
       userResponse = await this.cannyService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
@@ -591,7 +591,7 @@ class HelpPageViewModel {
     let userResponse = await this.cannyService.retrieveUser(userInfo.email);
 
     // If user does not exist, create a new user
-    if (!userResponse?.data) {
+    if (!userResponse?.isSuccessful) {
       userResponse = await this.cannyService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
