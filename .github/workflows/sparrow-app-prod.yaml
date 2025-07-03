@@ -99,38 +99,37 @@ jobs:
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
-      - name: Setup DigiCert ONE Signing
+      - name: Set up certificate
         run: |
-          # Install Chocolatey if not present
-          if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
-            Set-ExecutionPolicy Bypass -Scope Process -Force
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-          }
-          
-          # Install DigiCert tools via Chocolatey
-          choco install digicert-smtools -y
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+        shell: bash
 
-      - name: Setup Certificate
+      - name: Set variables
+        id: variables
         run: |
-          # Test the connection and get certificate info
-          & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" healthcheck
-          & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" windows certsync
-        shell: powershell
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Install DigiCert Client tools
+        id: digicert-code-signing
+        uses: digicert/ssm-code-signing@v1.0.0
 
       - name: Sign MSI files
         run: |
-          # Sign all MSI files
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
-            & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" sign --fingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH --input $_.FullName --verbose
+            Write-Host "Signing MSI: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
           }
         shell: powershell
 
       - name: Sign EXE files
         run: |
-          # Sign all EXE files
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
-            & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" sign --fingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH --input $_.FullName --verbose
+            Write-Host "Signing EXE: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
           }
         shell: powershell
 
