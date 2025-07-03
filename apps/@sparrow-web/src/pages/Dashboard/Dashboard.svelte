@@ -120,7 +120,6 @@
           teamName: OwnerDetails?.name,
           teamEmail: OwnerDetails?.email,
         };
-        planBannerisOpen.set(false);
         handlegetWorkspaceCount(currentTeamId);
         handleLimits(currentTeamId);
         const envIdInitiatedToWorkspace =
@@ -534,7 +533,6 @@
   const handleRedirectToAdminPanel = async () => {
     await _viewModel.handleRedirectToAdminPanel(currentTeamId);
     upgradePlanModalWorkspace = true;
-    planBannerisOpen.set(false);
   };
 
   const handleRedirectToAdmin = async () => {
