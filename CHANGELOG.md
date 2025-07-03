@@ -1,3 +1,11 @@
+## [2.27.1](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.27.0...v2.27.1) (2025-07-03)
+
+
+### Bug Fixes
+
+* update path variable for copying .deb file in snapcraft configuration ([c083003](https://github.com/sparrowapp-dev/sparrow-app/commit/c083003e19757d201b4ba204e0476f97f5fb8a48))
+* update URLs for Sparrow APT repo and .deb file in workflow configurations ([767b63c](https://github.com/sparrowapp-dev/sparrow-app/commit/767b63c2b355a3fe1fa4ef2854926d84732423db))
+
 # [2.27.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.26.0...v2.27.0) (2025-07-03)
 
 
