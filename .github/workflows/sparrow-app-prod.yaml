@@ -327,12 +327,11 @@ jobs:
         with:
           args: --delete
         env:
-          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET: sparrow-release-assests-prod
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_REGION: us-west-1
           SOURCE_DIR: deb-build
-          DEST_DIR: ${{ vars.LINUX_DIR }} 
 
       - name: Notify Teams Channel
         run: |
@@ -429,7 +428,7 @@ jobs:
           mkdir msi_files
           mkdir deb_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
-          aws s3 cp s3://sparrow-release-assests-prod/${{ vars.LINUX_DIR }}/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
+          aws s3 cp s3://sparrow-release-assests-prod/ deb_files/ --recursive --exclude "*" --include "*.deb"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
