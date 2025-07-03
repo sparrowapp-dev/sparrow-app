@@ -130,6 +130,12 @@ jobs:
         with:
           node-version: "20.8"
 
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
       # Commenting this out as it is not needed for the App Store build as updates will be handled by the App Store
       # - name: Update updater endpoint in tauri.conf.json file
       #   run: |
