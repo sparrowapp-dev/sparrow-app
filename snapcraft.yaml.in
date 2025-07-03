@@ -69,7 +69,7 @@ parts:
       DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/pool/stable/main/binary-amd64/sparrow.deb"
 
       # Copy the deb file from the workspace root (downloaded by CI)
-      cp $CRAFT_PROJECT_DIR/sparrow.deb sparrow.deb
+      cp $SNAPCRAFT_PROJECT_DIR/sparrow.deb sparrow.deb
 
       # Extract the .deb file
       dpkg -x sparrow.deb $SNAPCRAFT_PART_INSTALL/
