@@ -105,7 +105,7 @@ jobs:
         shell: bash
 
       - name: Set variables
-        id: variables
+        id: digicert-variables
         run: |
           echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
           echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
@@ -113,23 +113,108 @@ jobs:
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
         shell: bash
 
+      - name: Setup Android SDK (for DigiCert action compatibility)
+        run: |
+          # Create minimal Android SDK structure to satisfy DigiCert action requirements
+          $androidSdkPath = "C:\Android\android-sdk"
+          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+          
+          Write-Host "Creating Android SDK directory structure..."
+          New-Item -ItemType Directory -Path $buildToolsPath -Force
+          
+          # Create dummy files that the DigiCert action expects to find
+          Write-Host "Creating required Android build tool files..."
+          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
+          
+          # Set Android environment variables
+          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
+          
+          Write-Host "Android SDK structure created successfully at: $buildToolsPath"
+          
+          # Verify the structure
+          Get-ChildItem -Path $buildToolsPath -Force
+        shell: powershell
+
       - name: Install DigiCert Client tools
         id: digicert-code-signing
         uses: digicert/ssm-code-signing@v1.0.0
 
+      - name: Verify DigiCert tools installation
+        run: |
+          # Check if smctl is available in PATH or find it manually
+          try {
+            $smctlVersion = smctl --version
+            Write-Host "smctl is available in PATH: $smctlVersion"
+          } catch {
+            Write-Host "smctl not in PATH, searching for installation..."
+            
+            # Common installation paths
+            $possiblePaths = @(
+              "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
+              "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
+              "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smctl.exe"
+            )
+            
+            foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                Write-Host "Found smctl at: $path"
+                $env:SMCTL_PATH = $path
+                break
+              }
+            }
+          }
+          
+          # Test connectivity
+          if ($env:SMCTL_PATH) {
+            & $env:SMCTL_PATH healthcheck
+          } else {
+            smctl healthcheck
+          }
+        shell: powershell
+
       - name: Sign MSI files
         run: |
+          # Use smctl to sign MSI files
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
             Write-Host "Signing MSI: $($_.Name)"
-            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+            
+            if ($env:SMCTL_PATH) {
+              & $env:SMCTL_PATH sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+            } else {
+              smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+            }
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to sign $($_.Name)"
+              exit 1
+            } else {
+              Write-Host "Successfully signed: $($_.Name)"
+            }
           }
         shell: powershell
 
       - name: Sign EXE files
         run: |
+          # Use smctl to sign EXE files
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
             Write-Host "Signing EXE: $($_.Name)"
-            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+            
+            if ($env:SMCTL_PATH) {
+              & $env:SMCTL_PATH sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+            } else {
+              smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+            }
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to sign $($_.Name)"
+              exit 1
+            } else {
+              Write-Host "Successfully signed: $($_.Name)"
+            }
           }
         shell: powershell
 
