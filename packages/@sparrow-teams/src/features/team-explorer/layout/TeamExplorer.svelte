@@ -133,7 +133,7 @@
   export let contactOwner;
   export let handleRedirectAdminPanel;
   export let handleContactSales;
-  export let invitedUserCount;
+  export let invitedCount;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -744,7 +744,7 @@
   description={planContent?.description}
   planType="Collaborators"
   planLimitValue={userLimits?.usersPerHub?.value || 5}
-  currentPlanValue={invitedUserCount +
+  currentPlanValue={invitedCount +
     (openTeam?._data?.invites?.length || 0) +
     (openTeam?._data?.users?.length || 0) -
     1}

@@ -55,7 +55,7 @@
 
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
-  let invitedUserCount = 0;
+  let invitedCount = 0;
   let isGuestUser;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
@@ -90,7 +90,7 @@
     inviteBody: InviteBody,
     userId: string,
   ) => {
-    invitedUserCount = inviteBody?.users.length;
+    invitedCount = inviteBody?.users.length;
     const response = await _viewModel.handleTeamInvite(
       teamId,
       teamName,
@@ -130,6 +130,7 @@
     data: addUsersInWorkspacePayload,
     invitedUserCount: number,
   ) => {
+    invitedCount = invitedUserCount;
     const response = await _viewModel.inviteUserToWorkspace(
       workspaceId,
       workspaceName,
@@ -151,7 +152,7 @@
   bind:isLeaveTeamModelOpen
   bind:upgradePlanModalInvite
   bind:upgradePlanModal
-  bind:invitedUserCount
+  bind:invitedCount
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
