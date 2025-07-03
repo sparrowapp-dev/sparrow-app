@@ -41,8 +41,34 @@ filesToUpdate.forEach(filePath => {
       const jsonData = JSON.parse(content);
       
       // Update version if it exists and is different
+      let fileUpdated = false;
+      
       if (jsonData.version && jsonData.version !== version) {
         jsonData.version = version;
+        fileUpdated = true;
+      }
+      
+      // Update semantic-release asset labels that contain version numbers
+      if (jsonData.release && jsonData.release.plugins) {
+        const githubPlugin = jsonData.release.plugins.find(plugin => 
+          Array.isArray(plugin) && plugin[0] === '@semantic-release/github'
+        );
+        
+        if (githubPlugin && githubPlugin[1] && githubPlugin[1].assets) {
+          githubPlugin[1].assets.forEach(asset => {
+            if (asset.label) {
+              // Update labels that contain version patterns like "Sparrow_2.26.0.dmg"
+              const updatedLabel = asset.label.replace(/\d+\.\d+\.\d+/g, version);
+              if (asset.label !== updatedLabel) {
+                asset.label = updatedLabel;
+                fileUpdated = true;
+              }
+            }
+          });
+        }
+      }
+      
+      if (fileUpdated) {
         fs.writeFileSync(fullPath, JSON.stringify(jsonData, null, 2) + '\n');
         console.log(`✅ Updated: ${filePath}`);
         updatedFiles++;
