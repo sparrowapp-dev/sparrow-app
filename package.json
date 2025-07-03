@@ -190,6 +190,10 @@
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
               "label": "Sparrow.app.tar.gz"
+            },
+            {
+              "path": "deb_files/*.deb",
+              "label": "sparrow_2.26.0_amd64.deb"
             }
           ]
         }
