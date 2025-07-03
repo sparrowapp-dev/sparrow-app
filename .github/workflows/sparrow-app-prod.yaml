@@ -428,7 +428,7 @@ jobs:
           mkdir msi_files
           mkdir deb_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
-          aws s3 cp s3://sparrow-release-assests-prod/ deb_files/ --recursive --exclude "*" --include "*.deb"
+          aws s3 cp s3://sparrow-release-assests-prod/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
