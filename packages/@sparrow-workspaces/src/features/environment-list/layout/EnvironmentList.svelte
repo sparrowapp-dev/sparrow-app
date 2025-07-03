@@ -21,6 +21,7 @@
   import { Tooltip } from "@sparrow/library/ui";
   import { isExpandEnvironment } from "../../../stores/recent-left-panel";
   import { slide } from "svelte/transition";
+  import VirtualList from "@sveltejs/svelte-virtual-list";
 
   /**
    * current workspace
@@ -320,14 +321,13 @@
               ? 'var(--bg-ds-neutral-500)'
               : 'var(--bg-ds-surface-100)'}"
           ></div>
-          <List
-            bind:scrollList
-            height={"auto"}
-            overflowY={"auto"}
-            classProps={"pe-0"}
-            style={"flex:1;"}
+          <VirtualList
+            items={filteredLocalEnvironment}
+            height="100%"
+            rowHeight={50}
+            let:visibleItems
           >
-            {#each filteredLocalEnvironment as env}
+            {#each visibleItems as env (env._id)}
               <ListItem
                 bind:loggedUserRoleInWorkspace
                 {env}
@@ -339,7 +339,7 @@
                 {activeTabId}
               />
             {/each}
-          </List>
+          </VirtualList>
         {/if}
       </div>
       {#if !filteredGlobalEnvironment?.length && !filteredLocalEnvironment?.length && searchData}

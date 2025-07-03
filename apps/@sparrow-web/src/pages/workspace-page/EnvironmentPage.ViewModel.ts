@@ -14,6 +14,7 @@ import { TabRepository } from "../../repositories/tab.repository";
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import constants from "src/constants/constants";
+import { tick } from "svelte";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -80,7 +81,8 @@ export class EnvironmentViewModel {
     if (response?.isSuccessful && response?.data?.data) {
       const environments = response.data.data;
       await this.environmentRepository.refreshEnvironment(
-        environments?.map((_environment: any) => {
+        environments?.map(async(_environment: any) => {
+          await tick();
           const environment = createDeepCopy(_environment);
           environment["id"] = environment._id;
           environment["workspaceId"] = workspaceId;
@@ -90,14 +92,16 @@ export class EnvironmentViewModel {
       );
       await this.environmentRepository.deleteOrphanEnvironments(
         workspaceId,
-        environments?.map((_environment: any) => {
+        environments?.map(async(_environment: any) => {
+          await tick();
           return _environment._id;
         }),
       );
       const environmentTabsToBeDeleted =
         await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
           workspaceId,
-          environments?.map((_environment: any) => {
+          environments?.map(async(_environment: any) => {
+            await tick();
             return _environment._id;
           }),
         );

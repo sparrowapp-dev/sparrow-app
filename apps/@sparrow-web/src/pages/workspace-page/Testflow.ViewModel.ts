@@ -19,6 +19,7 @@ import {
 import constants from "src/constants/constants";
 import { TestflowTabAdapter } from "src/adapter";
 import { WorkspaceType } from "@sparrow/common/enums";
+import { tick } from "svelte";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -365,7 +366,8 @@ export class TestflowViewModel {
     if (response?.isSuccessful && response?.data?.data) {
       const testflows = response.data.data;
       await this.testflowRepository.refreshTestflow(
-        testflows?.map((_testflow: any) => {
+        testflows?.map(async(_testflow: any) => {
+          await tick();
           const testflow = createDeepCopy(_testflow);
           testflow["workspaceId"] = workspaceId;
           return testflow;
@@ -373,14 +375,16 @@ export class TestflowViewModel {
       );
       await this.testflowRepository.deleteOrphanTestflows(
         workspaceId,
-        testflows?.map((_testflow: any) => {
+        testflows?.map(async(_testflow: any) => {
+          await tick();
           return _testflow._id;
         }),
       );
       const testflowTabsToBeDeleted =
         await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
           workspaceId,
-          testflows?.map((_testflow: any) => {
+          testflows?.map(async(_testflow: any) => {
+            await tick();
             return _testflow._id;
           }),
         );

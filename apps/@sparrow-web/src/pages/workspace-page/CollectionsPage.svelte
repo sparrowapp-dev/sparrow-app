@@ -15,7 +15,7 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "@app/constants";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, tick } from "svelte";
   // ---- Components
   import {
     RestExplorerPage,
@@ -99,6 +99,7 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { ResponseMessage } from "@sparrow/common/enums";
+  import { shouldRunThrottled } from "@sparrow/common/store";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -147,13 +148,13 @@
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-  environments.subscribe((value) => {
+  const environmentSubscriber = environments.subscribe((value) => {
     if (value) {
       environmentsValues = value;
     }
   });
 
-  currentWorkspace.subscribe((value) => {
+  const currentWorkspaceSubscriber = currentWorkspace.subscribe((value) => {
     if (value) {
       currentWOrkspaceValue = value;
     }
@@ -220,11 +221,11 @@
     scrollList("bottom");
   }
 
-  isGuestUserActive.subscribe((value) => {
+  const isGuestUserSubscriber = isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
   });
 
-  user.subscribe((value) => {
+  const userSubscriber = user.subscribe((value) => {
     userId = value?._id;
   });
 
@@ -567,7 +568,7 @@
         _viewModel2.refreshEnvironment(workspaceId),
         _viewModel3.refreshTestflow(workspaceId),
       ]);
-
+      await tick();
       const collectionTabsToBeDeleted =
         fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
       const environmentTabsToBeDeleted =
@@ -601,19 +602,28 @@
 
   let isInitialDataLoading = true;
 
+  const userValidationStoreSubscriber = userValidationStore.subscribe(
+    (validation) => {
+      if (!validation.isValid) {
+        isAccessDeniedModalOpen = true;
+        isWelcomePopupOpen = false;
+      }
+    },
+  );
+
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
         isInitialDataLoading = true;
         activeTab = undefined;
-        handleRefreshApicalls(value?._id);
 
-        userValidationStore.subscribe((validation) => {
-          if (!validation.isValid) {
-            isAccessDeniedModalOpen = true;
-            isWelcomePopupOpen = false;
-          }
-        });
+        const id = value?._id;
+        if (id && shouldRunThrottled(value?._id)) {
+          handleRefreshApicalls(value?._id);
+        } else {
+          console.error(`Throttled for ${value?._id}`);
+        }
+
         teamDetails = {
           teamId: value?._data?.team?.teamId || "",
           teamName: value?._data?.team?.teamName || "",
@@ -660,7 +670,8 @@
 
   let isWelcomePopupOpen = false;
   let isTourGuideOpen = false;
-  isUserFirstSignUp.subscribe((value) => {
+
+  const isUserFirstSignUpSubscriber = isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
       isExpandCollection.set(value);
@@ -671,6 +682,13 @@
 
   onDestroy(() => {
     cw.unsubscribe();
+    userValidationStoreSubscriber();
+    environmentSubscriber.unsubscribe();
+    currentWorkspaceSubscriber.unsubscribe();
+    isGuestUserSubscriber();
+    userSubscriber();
+    collectionListSubscriber.unsubscribe();
+    isUserFirstSignUpSubscriber();
   });
 
   let isLaunchAppModalOpen = false;
@@ -700,7 +718,7 @@
       }
     }, 500);
   };
-  collectionList.subscribe((collections) => {
+  const collectionListSubscriber = collectionList.subscribe((collections) => {
     let count = 0;
     collections.forEach((collection) => {
       const collectionData = collection.toMutableJSON();

@@ -30,7 +30,7 @@
     CollectionIcon,
     StackRegular,
   } from "@sparrow/library/icons";
-  import { createDeepCopy } from "@sparrow/common/utils";
+  import { createDeepCopy, Debounce } from "@sparrow/common/utils";
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
@@ -110,7 +110,7 @@
     if (activeTabType !== "Collection") {
       handleTabUpdate("");
     }
-    if (collectionFilter.find((item) => item?._data?.id === activeTabId)) {
+    if (collectionFilter?.find((item) => item?._data?.id === activeTabId)) {
       isExpandCollectionLine = true;
     } else {
       isExpandCollectionLine = false;
@@ -121,11 +121,6 @@
 
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId;
-  currentWorkspace.subscribe((value) => {
-    if (value?._data) {
-      currentWorkspaceId = value._data._id;
-    }
-  });
 
   let isHovered = false;
   let collectionActive = false;
@@ -171,7 +166,7 @@
   const searchCollection: (
     searchText: string,
     collectionData: any[],
-  ) => void = (searchText, collectionData) => {
+  ) => void = (searchText = "", collectionData = []) => {
     let response = [];
     for (let i = 0; i < collectionData.length; i++) {
       const res = searchCollectionHelper(searchText, collectionData[i]);
@@ -184,35 +179,46 @@
   /**
    * Handle searching and filtering
    */
-  const handleSearch = () => {
-    collectionFilter = searchCollection(searchData, collectionListDocument);
-  };
-  $: {
-    if (currentWorkspace) {
-      currentWorkspace.subscribe((value) => {
-        activeWorkspace = value;
-        isSharedWorkspace = value?.isShared || false;
-        collectionListDocument = collectionListDocument?.filter(
-          (value) => value.workspaceId === activeWorkspace?._id,
-        );
-      });
+
+  const currentWorkspaceSubscriber = currentWorkspace.subscribe((value) => {
+    if (value) {
+      currentWorkspaceId = value._data._id;
+      activeWorkspace = value;
+      isSharedWorkspace = value?.isShared || false;
+      collectionListDocument = collectionListDocument?.filter(
+        (value) => value.workspaceId === activeWorkspace?._id,
+      );
     }
-  }
+  });
+
+  const debouncedSearchCollection = new Debounce().debounce(
+    (_search = "", _collections = []) => {
+      collectionFilter = searchCollection(_search, _collections);
+    },
+    500,
+  );
+
   $: {
-    if (collectionList) {
-      collectionList.subscribe((value) => {
-        collectionListDocument = value;
-        collectionListDocument = collectionListDocument?.filter(
-          (value) =>
-            value.workspaceId === activeWorkspace?._id &&
-            !(value?.activeSync && activeWorkspace?.isShared),
-        );
-        collectionFilter = searchCollection(searchData, collectionListDocument);
-      });
+    if (searchData) {
+      debouncedSearchCollection(searchData, collectionListDocument);
     }
   }
 
-  onDestroy(() => {});
+  const collectionListSubscriber = collectionList.subscribe((value) => {
+    if (value) {
+      collectionListDocument = value;
+      collectionListDocument = collectionListDocument?.filter(
+        (value) =>
+          value.workspaceId === activeWorkspace?._id &&
+          !(value?.activeSync && activeWorkspace?.isShared),
+      );
+    }
+  });
+
+  onDestroy(() => {
+    collectionListSubscriber.unsubscribe();
+    currentWorkspaceSubscriber.unsubscribe();
+  });
 
   const handleMouseOver = () => {
     isHovered = true;
@@ -425,14 +431,14 @@
         {/if}
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
-            {#if collectionFilter.length > 0}
+            {#if collectionFilter?.length > 0}
               <List
                 bind:scrollList
                 height={"auto"}
                 overflowY={"auto"}
                 classProps={"pe-0"}
               >
-                {#each collectionFilter as col}
+                {#each collectionFilter as col (col.id)}
                   <Collection
                     isMockCollection={col?.collectionType ===
                       CollectionTypeBaseEnum.MOCK}

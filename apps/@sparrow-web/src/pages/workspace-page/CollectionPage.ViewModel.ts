@@ -154,6 +154,7 @@ import type {
 import { TeamRepository } from "src/repositories/team.repository";
 import { TeamService } from "src/services/team.service";
 import { PlanRepository } from "src/repositories/plan.repository";
+import { tick } from "svelte";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -203,10 +204,11 @@ export default class CollectionsViewModel {
      * @param _collectionItemIds - Blank list that should be manipulated by this function as a result.
      * @returns List of COllection item Ids.
      */
-    const getCollectionItemIds = (
+    const getCollectionItemIds = async(
       _collectionItem: any,
       _collectionItemIds: string[],
-    ): void => {
+    ): Promise<void> => {
+      await tick();
       if (!_collectionItem?.type) {
         // Collection - object do not have type and holds _id.
         _collectionItemIds.push(_collectionItem._id);
@@ -242,7 +244,8 @@ export default class CollectionsViewModel {
       const collections = res.data.data;
       await this.collectionRepository.bulkInsertData(
         workspaceId,
-        collections?.map((_collection: any) => {
+        collections?.map(async(_collection: any) => {
+          await tick();
           const collection = createDeepCopy(_collection);
           collection["workspaceId"] = workspaceId;
           collection["id"] = _collection._id;
@@ -253,10 +256,12 @@ export default class CollectionsViewModel {
       );
       await this.collectionRepository.deleteOrphanCollections(
         workspaceId,
-        collections?.map((_collection: any) => {
+        collections?.map(async(_collection: any) => {
+          await tick();
           return _collection._id;
         }),
       );
+      await tick();
       const collectionItemIds: string[] = [];
       for (let i = 0; i < collections.length; i++) {
         getCollectionItemIds(collections[i], collectionItemIds);
@@ -267,7 +272,7 @@ export default class CollectionsViewModel {
           workspaceId,
           collectionItemIds as string[],
         );
-
+      await tick();
       return {
         collectionItemTabsToBeDeleted,
       };

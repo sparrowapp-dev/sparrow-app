@@ -44,7 +44,7 @@
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
@@ -70,7 +70,7 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let userId = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -106,7 +106,7 @@
   }
 
   let isWelcomePopupOpen = false;
-  isUserFirstSignUp.subscribe((value) => {
+  const isUserFirstSignUpSubscriber = isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
     }
@@ -139,13 +139,19 @@
   };
 
   let openTeamData: TeamDocType;
-  openTeam.subscribe((_team) => {
+  const openTeamSubscriber = openTeam.subscribe((_team) => {
     if (_team) {
       const teamJSON = _team?.toMutableJSON();
       setTimeout(() => {
         openTeamData = teamJSON;
       }, 0);
     }
+  });
+
+  onDestroy(() => {
+    openTeamSubscriber.unsubscribe();
+    userSubscriber();
+    isUserFirstSignUpSubscriber();
   });
 
   let isPopupOpen = false;
