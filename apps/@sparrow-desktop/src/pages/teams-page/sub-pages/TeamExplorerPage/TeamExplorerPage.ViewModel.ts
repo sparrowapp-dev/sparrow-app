@@ -3,6 +3,7 @@ import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 import type { InviteBody } from "@sparrow/common/dto/team-dto";
 import {
   Events,
+  ResponseMessage,
   UntrackedItems,
   WorkspaceRole,
   WorkspaceType,
@@ -937,8 +938,6 @@ export class TeamExplorerPageViewModel {
           _invitedUserCount === 1 ? "person" : "people"
         } for ${_workspaceName}.`,
       );
-    } else {
-      notifications.error(`Failed to send invite. Please try again.`);
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
@@ -964,6 +963,8 @@ export class TeamExplorerPageViewModel {
       this.teamRepository.modifyTeam(teamId, response.data.data);
       notifications.success(`Invite resent successfully.`);
       return response;
+    } else if (response?.data?.message === ResponseMessage.INVITE_DECLINED) {
+      notifications.error(`The invite has been declined by Collaborator.`);
     } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
@@ -995,9 +996,7 @@ export class TeamExplorerPageViewModel {
       );
       return response;
     } else {
-      notifications.error(
-        `Failed to join the Hub. Please try again.`,
-      );
+      notifications.error(`Failed to join the Hub. Please try again.`);
     }
   };
 
@@ -1006,7 +1005,13 @@ export class TeamExplorerPageViewModel {
     const response = await this.teamService.ignoreInvite(teamId, baseUrl);
     if (response.isSuccessful) {
       const teams = await this.teamRepository.getTeamsDocuments();
-      await this.teamRepository.setOpenTeam(teams[0].toMutableJSON().teamId);
+      const team0 = teams[0]?.toMutableJSON();
+      const team1 = teams[1]?.toMutableJSON();
+      if (team0?.teamId !== teamId) {
+        await this.teamRepository.setOpenTeam(team0.teamId);
+      } else if (team1) {
+        await this.teamRepository.setOpenTeam(team1.teamId);
+      }
       await this.teamRepository.removeTeam(teamId);
       notifications.success(
         `Invite ignored. The hub has been removed from your panel.`,
@@ -1021,10 +1026,7 @@ export class TeamExplorerPageViewModel {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
     const currentPlan = teamDetails?.toMutableJSON().plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?.toMutableJSON()?.limits;
+      return currentPlan?.limits;
     }
   };
 

@@ -78,6 +78,9 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
+      - name: Sync version across all files
+        run: yarn sync-version
+
       - name: Build Tauri App
         run: |
           yarn cache clean
@@ -96,13 +99,60 @@ jobs:
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
-      - name: sign msi
+      - name: Setup DigiCert ONE Signing
         run: |
-          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          # Download and install DigiCert ONE tools
+          Invoke-WebRequest -Uri "https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download" -OutFile "smtools-windows-x64.msi"
+          msiexec /i smtools-windows-x64.msi /quiet /qn
+          
+          # Set up environment variables for DigiCert ONE
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> $env:GITHUB_ENV
+          echo "SM_CLIENT_CERT_FILE=D:\Certificate_pkcs12.p12" >> $env:GITHUB_ENV
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> $env:GITHUB_ENV
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> $env:GITHUB_ENV
+          echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> $env:GITHUB_ENV
+          
+          # Download client certificate
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > D:\Certificate_pkcs12.p12
+        shell: powershell
+
+      - name: Setup Certificate
+        run: |
+          # Test the connection and get certificate info
+          & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" healthcheck
+          & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" windows certsync
+        shell: powershell
+
+      - name: Sign MSI files
+        run: |
+          # Sign all MSI files
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
+            & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" sign --fingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH --input $_.FullName --verbose
+          }
+        shell: powershell
+
+      - name: Sign EXE files
+        run: |
+          # Sign all EXE files
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            & "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe" sign --fingerprint $env:SM_CODE_SIGNING_CERT_SHA1_HASH --input $_.FullName --verbose
+          }
+        shell: powershell
+
+      - name: Verify Signatures
+        run: |
+          # Verify MSI signatures
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
+            Write-Host "Verifying signature for: $($_.Name)"
+            Get-AuthenticodeSignature $_.FullName | Format-List
+          }
+          
+          # Verify EXE signatures
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            Write-Host "Verifying signature for: $($_.Name)"
+            Get-AuthenticodeSignature $_.FullName | Format-List
+          }
+        shell: powershell
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -123,7 +173,7 @@ jobs:
         run: |
           $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiFileName"
           
           $body = @{
             "type" = "message"
@@ -141,7 +191,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: development"
+                      "text" = "Branch: main"
                       "wrap" = $true
                     }
                     @{
@@ -164,9 +214,140 @@ jobs:
           }
           
           $jsonBody = $body | ConvertTo-Json -Depth 10
-          
+
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
+
+  release_linux:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: release_macos
+
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      CI: false
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Rust 1.82.0
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.82.0
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config libssl-dev libcairo2-dev \
+            libwebkit2gtk-4.1-dev build-essential \
+            curl wget file libxdo-dev \
+            libayatana-appindicator3-dev librsvg2-dev \
+            gnupg software-properties-common tree
+
+      - name: Setup Node.js 22
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+
+      - name: Install Yarn (Ubuntu 24.04 compatible)
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/yarn.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install -y yarn
+
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Build Tauri app
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn workspace @sparrow/desktop tauri build --bundles deb 
+          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
+
+      - name: Generate DEB metadata
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        run: |
+          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
+          cd ../../../../../../publishDir
+          mkdir -p dists/stable/main/binary-amd64/
+          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
+      - name: Prepare publish directory
+        run: |
+          cd publishDir
+          cat > apt-release.conf <<EOF
+          APT::FTPArchive::Release {
+            Origin "Sparrow";
+            Label "Sparrow";
+            Suite "stable";
+            Codename "stable";
+            Architectures "amd64";
+            Components "main";
+            Description "Sparrow Debian Repository";
+          };
+          EOF
+
+          cd dists/stable
+          apt-ftparchive -c ../../apt-release.conf release . > Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
+
+          cd ../../
+          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
+
+          cd ..
+          mv publishDir deb-build
+
+      - name: Upload to S3 bucket
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          SOURCE_DIR: deb-build
+          DEST_DIR: ${{ vars.LINUX_DIR }} 
+
+      - name: Notify Teams Channel
+        run: |
+          curl -H 'Content-Type: application/json' \
+            -d '{
+              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+            }' \
+            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}      
 
   release_macos:
     runs-on: macos-latest
@@ -188,6 +369,12 @@ jobs:
         with:
           node-version: "20.8"
 
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
@@ -195,6 +382,16 @@ jobs:
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
+      - name: Remove App Store specific properties
+        run: |
+          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
+          sed -i '' '/"macOS": {/,/},/ {
+              /"entitlements":.*/d
+              /"minimumSystemVersion":.*/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+        
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
@@ -232,10 +429,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Post macOS Build Links to Teams
+      - name: Download Windows and Linux artifacts
         run: |
           mkdir msi_files
+          mkdir deb_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
+          aws s3 cp s3://${{ vars.AWS_S3_BUCKET }}/${{ vars.LINUX_DIR }}/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

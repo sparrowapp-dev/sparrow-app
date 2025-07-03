@@ -5,6 +5,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
+  import { slide } from "svelte/transition";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   // ---- Helper functions
@@ -247,7 +248,7 @@
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().top - 5,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -292,7 +293,6 @@
             : true,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -452,35 +452,38 @@
     {/if}
   {/if}
 </div>
-<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div
-    class="sub-files position-relative"
-    style="background-color: {api.id === activeTabId
-      ? 'var(--bg-ds-surface-600)'
-      : 'transparent'};"
-  >
+
+{#if expand}
+  <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
     <div
-      class="box-line"
-      style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
-    ></div>
-    <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
+      class="sub-files position-relative"
+      style="background-color: {api.id === activeTabId
+        ? 'var(--bg-ds-surface-600)'
+        : 'transparent'};"
+    >
+      <div
+        class="box-line"
+        style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
+      ></div>
+      <!-- {#if } -->
+      {#each api?.items || [] as exp}
+        <div>
+          <SavedRequest
+            {userRole}
+            api={exp}
+            request={api}
+            {onItemRenamed}
+            {onItemDeleted}
+            {onItemOpened}
+            {folder}
+            {collection}
+            {activeTabId}
+          />
+        </div>
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss">
   .delete-ticker {

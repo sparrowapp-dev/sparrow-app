@@ -130,7 +130,8 @@
     onDragStart(index);
   }}
   tabindex="0"
-  class=" badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
+  class="badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
+  id={tab.id}
   style="width: {tabWidth}px;  margin-left:{index === 0 ? '4px' : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
@@ -142,7 +143,7 @@
     <Options
       isTabMenu={true}
       xAxis={mouseX}
-      yAxis={[mouseY, mouseY + 20]}
+      yAxis={[mouseY, mouseY]}
       zIndex={500}
       menuItems={[
         {
@@ -198,7 +199,6 @@
           icon: CopyRegular,
         },
       ]}
-      {noOfColumns}
     />
   {/if}
 

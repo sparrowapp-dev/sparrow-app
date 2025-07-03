@@ -61,6 +61,10 @@
   export let isConversationHistoryPanelOpen = false;
   export let isConversationHistoryLoading = false;
   export let isGuestUser: boolean;
+  export let onUploadFiles;
+  export let currentProvider;
+  export let currentModel;
+  export let isPromptBoxActive = false;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -440,6 +444,9 @@
                         onUpdateRequestState({
                           isChatAutoClearActive: event?.target.checked,
                         });
+                        onUpdateRequestState({
+                          isChatbotPromptBoxActive: true,
+                        });
                         if (conversations?.length) {
                           chatContainer.scrollTo({
                             top: 0,
@@ -485,6 +492,9 @@
                     onClick={async () => {
                       // Create new conversation with empty id and conversation array
                       onSwitchConversation("", "New Conversation", []);
+                      onUpdateRequestState({
+                        isChatbotPromptBoxActive: true,
+                      });
                     }}
                   />
                 </Tooltip>
@@ -580,6 +590,7 @@
                           : false}
                         {isResponseGenerating}
                         {handleApplyChangeOnAISuggestion}
+                        attachedFilesWithMsg={chat.attachedFiles}
                       />
                     </div>
                   {/each}
@@ -607,6 +618,10 @@
           placeholder={"Write a prompt or generate one from generate prompt."}
           {sendPrompt}
           {isGuestUser}
+          onFileUpload={onUploadFiles}
+          {currentProvider}
+          {currentModel}
+          disabled={!isPromptBoxActive}
         />
       </div>
     </div>
@@ -655,6 +670,9 @@
         });
         handleClosePopupBackdrop(false);
         await onClearConversation();
+        onUpdateRequestState({
+          isChatbotPromptBoxActive: true,
+        });
         notifications.success("Chat history cleared successfully.");
       }}
     ></Button>

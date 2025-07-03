@@ -18,6 +18,7 @@
         ItemType.WEB_SOCKET,
         ItemType.SOCKET_IO,
         ItemType.GRAPHQL,
+        ItemType.AI_REQUEST,
       ].includes(tab.type),
     )
     ?.sort((a, b) => new Date(b.time) - new Date(a.time)) // Sort descending by time

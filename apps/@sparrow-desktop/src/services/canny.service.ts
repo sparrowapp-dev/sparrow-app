@@ -88,7 +88,7 @@ export class CannyIoService {
   public createUser = async (body: object) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/users/find_or_create`,
+      `${this.apiUrl}/users/create_or_update`,
       {
         body: {
           apiKey: this.apiKey,

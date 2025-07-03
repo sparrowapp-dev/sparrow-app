@@ -700,7 +700,7 @@ class RestExplorerViewModel {
         description: socketMetaData.description,
         type: ItemType.WEB_SOCKET,
         websocket: unadaptedSocket,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
