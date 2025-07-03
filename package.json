@@ -49,6 +49,7 @@
     "common-pretty": "yarn workspace @sparrow/common pretty",
     "marketplace-lint": "yarn workspace @sparrow/marketplace lint",
     "marketplace-pretty": "yarn workspace @sparrow/marketplace pretty",
+    "sync-version": "node scripts/sync-version.js",
     "postinstall": "husky install"
   },
   "dependencies": {
