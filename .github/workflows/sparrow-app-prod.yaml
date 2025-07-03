@@ -215,7 +215,6 @@ jobs:
   release_linux:
     runs-on: ubuntu-latest
     environment: production
-    needs: release_macos
 
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -346,7 +345,9 @@ jobs:
   release_macos:
     runs-on: macos-latest
     environment: production
-    needs: release_win
+    needs:
+    - release_win
+    - release_linux
 
     steps:
       - name: Checkout Repository
@@ -428,7 +429,7 @@ jobs:
           mkdir msi_files
           mkdir deb_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
-          aws s3 cp s3://${{ vars.AWS_S3_BUCKET }}/${{ vars.LINUX_DIR }}/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
+          aws s3 cp s3://sparrow-release-assests-prod/${{ vars.LINUX_DIR }}/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
