@@ -1,7 +1,10 @@
 name: Marketplace release 
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Production Desktop App Release"]
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch:
@@ -12,6 +15,7 @@ jobs:
   build-snap:
     runs-on: ubuntu-latest
     environment: production
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     env:
       SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
@@ -113,6 +117,7 @@ jobs:
   release_mac_app_store:
     runs-on: macos-latest
     environment: production
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Checkout Repository
