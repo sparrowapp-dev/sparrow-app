@@ -102,18 +102,11 @@ jobs:
             --tsaurl http://timestamp.digicert.com `
             "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
 
-      - name: Verify Signature
+      - name: Verify MSI Signature
+        shell: pwsh
         run: |
-          $files = @(
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
-          )
-          
-          foreach ($file in (Get-ChildItem $files)) {
-            $sig = Get-AuthenticodeSignature $file
-            Write-Host "Verifying $($file.Name)..."
-            if ($sig.Status -ne 'Valid') {
-              Write-Host "❌ $($file.Name) FAILED (Status: $($sig.Status))"
-              exit 1
-            }
-            Write-Host "✅ $($file.Name) is properly signed."
+          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
+          if ($sig.Status -ne 'Valid') {
+            throw "Signature invalid: $($sig.Status)"
           }
+          Write-Host "✅ MSI successfully signed and valid."
