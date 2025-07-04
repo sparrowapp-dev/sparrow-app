@@ -58,12 +58,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
+          
       - name: Install Jsign
         run: |
           mkdir C:\jsign
           curl -L https://github.com/ebourg/jsign/releases/download/7.0/jsign-7.0.jar -o C:\jsign\jsign-7.0.jar
-          echo "C:\jsign" | Out-File -Append -FilePath $env:GITHUB_ENV
+          echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_PATH
+          echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_ENV
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
