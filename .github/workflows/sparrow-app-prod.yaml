@@ -113,7 +113,7 @@ jobs:
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
           echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> "$GITHUB_ENV"
         shell: bash
-      
+
       # Setup Android SDK (required by DigiCert action for compatibility)
       - name: Setup Android SDK (for DigiCert action compatibility)
         run: |
@@ -234,17 +234,45 @@ jobs:
             Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
             try {
-              & $smctlPath sign --fingerprint $certHash --input $file.FullName
+              # Capture both stdout and stderr
+              Write-Host "Command: & `"$smctlPath`" sign --fingerprint $certHash --input `"$($file.FullName)`"" -ForegroundColor Gray
               
-              if ($LASTEXITCODE -eq 0) {
-                Write-Host "✅ Successfully signed: $($file.Name)" -ForegroundColor Green
+              $signResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName 2>&1
+              $exitCode = $LASTEXITCODE
+              
+              Write-Host "Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
+              Write-Host "Output: $signResult" -ForegroundColor White
+              
+              if ($exitCode -eq 0) {
+                Write-Host "✅ smctl reported success for: $($file.Name)" -ForegroundColor Green
+                
+                # Wait a moment for file system to update
+                Start-Sleep -Seconds 2
                 
                 # Verify signature using PowerShell
                 $signature = Get-AuthenticodeSignature $file.FullName
-                Write-Host "Signature status: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Yellow" })
+                Write-Host "Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
+                
+                if ($signature.Status -eq "Valid") {
+                  Write-Host "✅ File is properly signed: $($file.Name)" -ForegroundColor Green
+                } else {
+                  Write-Host "❌ File is NOT properly signed despite smctl success: $($file.Name)" -ForegroundColor Red
+                  Write-Host "This might indicate a certificate or timestamp issue" -ForegroundColor Yellow
+                  
+                  # Try with different timestamp servers
+                  Write-Host "Attempting with alternative signing method..." -ForegroundColor Yellow
+                  $retryResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName --timestamp-server "http://timestamp.digicert.com" 2>&1
+                  
+                  if ($LASTEXITCODE -eq 0) {
+                    Start-Sleep -Seconds 2
+                    $retrySignature = Get-AuthenticodeSignature $file.FullName
+                    Write-Host "Retry signature status: $($retrySignature.Status)" -ForegroundColor $(if ($retrySignature.Status -eq "Valid") { "Green" } else { "Red" })
+                  }
+                }
                 
               } else {
-                Write-Host "❌ Failed to sign $($file.Name) - Exit code: $LASTEXITCODE" -ForegroundColor Red
+                Write-Host "❌ smctl failed to sign $($file.Name) - Exit code: $exitCode" -ForegroundColor Red
+                Write-Host "Error output: $signResult" -ForegroundColor Red
                 exit 1
               }
             } catch {
@@ -267,17 +295,45 @@ jobs:
             Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
             try {
-              & $smctlPath sign --fingerprint $certHash --input $file.FullName
+              # Capture both stdout and stderr
+              Write-Host "Command: & `"$smctlPath`" sign --fingerprint $certHash --input `"$($file.FullName)`"" -ForegroundColor Gray
               
-              if ($LASTEXITCODE -eq 0) {
-                Write-Host "✅ Successfully signed: $($file.Name)" -ForegroundColor Green
+              $signResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName 2>&1
+              $exitCode = $LASTEXITCODE
+              
+              Write-Host "Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
+              Write-Host "Output: $signResult" -ForegroundColor White
+              
+              if ($exitCode -eq 0) {
+                Write-Host "✅ smctl reported success for: $($file.Name)" -ForegroundColor Green
+                
+                # Wait a moment for file system to update
+                Start-Sleep -Seconds 2
                 
                 # Verify signature using PowerShell
                 $signature = Get-AuthenticodeSignature $file.FullName
-                Write-Host "Signature status: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Yellow" })
+                Write-Host "Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
+                
+                if ($signature.Status -eq "Valid") {
+                  Write-Host "✅ File is properly signed: $($file.Name)" -ForegroundColor Green
+                } else {
+                  Write-Host "❌ File is NOT properly signed despite smctl success: $($file.Name)" -ForegroundColor Red
+                  Write-Host "This might indicate a certificate or timestamp issue" -ForegroundColor Yellow
+                  
+                  # Try with different timestamp servers
+                  Write-Host "Attempting with alternative signing method..." -ForegroundColor Yellow
+                  $retryResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName --timestamp-server "http://timestamp.digicert.com" 2>&1
+                  
+                  if ($LASTEXITCODE -eq 0) {
+                    Start-Sleep -Seconds 2
+                    $retrySignature = Get-AuthenticodeSignature $file.FullName
+                    Write-Host "Retry signature status: $($retrySignature.Status)" -ForegroundColor $(if ($retrySignature.Status -eq "Valid") { "Green" } else { "Red" })
+                  }
+                }
                 
               } else {
-                Write-Host "❌ Failed to sign $($file.Name) - Exit code: $LASTEXITCODE" -ForegroundColor Red
+                Write-Host "❌ smctl failed to sign $($file.Name) - Exit code: $exitCode" -ForegroundColor Red
+                Write-Host "Error output: $signResult" -ForegroundColor Red
                 exit 1
               }
             } catch {
