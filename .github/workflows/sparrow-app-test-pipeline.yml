@@ -145,7 +145,9 @@ jobs:
         run: |
           $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
-            /fd sha256 /td sha256 /tr http://timestamp.digicert.com /td sha256 `
+            /tr http://timestamp.digicert.com `
+            /td sha256 `
+            /fd sha256 `
             /sha1 $certThumb `
             "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
 
