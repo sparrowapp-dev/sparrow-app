@@ -52,22 +52,52 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Ensure prebuilt files are fetched
-          
-      # --- SKIP BUILD STEPS ---
-      # Remove all Node.js/Rust/Tauri build steps
 
-      # --- USE PRE-BUILT FILES ---
-      - name: Copy Pre-built MSI/EXE to Target Directory
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.8"
+
+      - name: Install Windows SDK
+        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
+        shell: powershell
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+
+      - name: Install Rust 1.82.0
         run: |
-          # Create the same directory structure Tauri would use
-          mkdir -p D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\
-          mkdir -p D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\
-          
-          # Copy pre-built files (adjust names as needed)
-          cp prebuilt/unsigned/*.msi D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi/
-          cp prebuilt/unsigned/*.exe D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis/
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
+          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+        shell: pwsh
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn desktop-build
+          # yarn tauri build --debug
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
       # --- SIGNING STEPS after tauri build ---
       - name: Set up DigiCert certificate
