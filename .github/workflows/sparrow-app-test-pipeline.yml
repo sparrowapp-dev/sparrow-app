@@ -90,7 +90,7 @@ jobs:
           
       - name: Sign MSI Files with DigiCert
         run: |
-          java -jar C:\jsign\jsign-7.0.jar --keystore /d/Certificate_pkcs12.p12 --storepass ${{ secrets.SM_CLIENT_CERT_PASSWORD }} --storetype PKCS12 --alias sparrow --tsaurl http://timestamp.digicert.com --input D:/a/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow_2.26.0_x64_en-US.msi
+          java -jar C:\jsign\jsign-7.0.jar --keystore /d/Certificate_pkcs12.p12 --storepass ${{ secrets.SM_CLIENT_CERT_PASSWORD }} --storetype PKCS12 --alias sparrow --tsaurl http://timestamp.digicert.com --file D:/a/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow_2.26.0_x64_en-US.msi
 
       - name: Verify Signature
         run: |
