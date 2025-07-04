@@ -111,6 +111,30 @@ jobs:
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
         shell: bash
 
+      # Setup Android SDK (required by DigiCert action for compatibility)
+      - name: Setup Android SDK (for DigiCert action compatibility)
+        run: |
+          # Create minimal Android SDK structure to satisfy DigiCert action requirements
+          $androidSdkPath = "C:\Android\android-sdk"
+          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+          
+          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
+          New-Item -ItemType Directory -Path $buildToolsPath -Force
+          
+          # Create dummy files that the DigiCert action expects to find
+          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
+          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
+          
+          # Set Android environment variables
+          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
+          
+          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
+        shell: powershell
+        
       # 1. Install SMCTL & client libraries instantly
       - name: Install DigiCert Software Trust Manager Tools
         uses: digicert/ssm-code-signing@v1.0.0
