@@ -98,7 +98,7 @@ jobs:
             --keystore D:\Certificate_pkcs12.p12 `
             --storepass "${{ secrets.SM_CLIENT_CERT_PASSWORD }}" `
             --storetype PKCS12 `
-            --alias ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} `
+            --alias "private key for pkcs12 certificate" `
             --tsaurl http://timestamp.digicert.com `
             "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
 
