@@ -62,11 +62,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           
-      - name: Install Jsign
-        run: |
-          mkdir C:\jsign
-          curl -L https://github.com/ebourg/jsign/releases/download/7.0/jsign-7.0.jar -o C:\jsign\jsign-7.0.jar
-          echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_PATH
+      # - name: Install Jsign
+      #   run: |
+      #     mkdir C:\jsign
+      #     curl -L https://github.com/ebourg/jsign/releases/download/7.0/jsign-7.0.jar -o C:\jsign\jsign-7.0.jar
+      #     echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_PATH
 
       # --- SKIP BUILD STEPS ---
       # Remove all Node.js/Rust/Tauri build steps
@@ -111,20 +111,18 @@ jobs:
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
         shell: bash
 
-      - name: Setup KeyLocker Client Tools
-        shell: bash
-        run: |
-          curl -L "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download" \
-            -H "x-api-key: $SM_API_KEY" \
-            -o Keylockertools.msi
-          msiexec /i Keylockertools.msi /quiet /qn
+      # 1. Install SMCTL & client libraries instantly
+      - name: Install DigiCert Software Trust Manager Tools
+        uses: digicert/ssm-code-signing@v1.0.0
 
+      # 2. List all available KeyLocker keypair aliases
       - name: List KeyLocker KeyPairs
         shell: pwsh
         run: |
           Write-Host "🔎 Available KeyPair Aliases:"
           smctl keypair ls
 
+      # 3. Extract the first alias into KEYPAIR_ALIAS
       - name: Extract first KeyPair alias
         id: extract_alias
         shell: pwsh
