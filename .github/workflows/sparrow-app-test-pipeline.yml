@@ -54,20 +54,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Ensure prebuilt files are fetched
-
-      # --- SETUP (Keep these) ---
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
           
-      # - name: Install Jsign
-      #   run: |
-      #     mkdir C:\jsign
-      #     curl -L https://github.com/ebourg/jsign/releases/download/7.0/jsign-7.0.jar -o C:\jsign\jsign-7.0.jar
-      #     echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_PATH
-
       # --- SKIP BUILD STEPS ---
       # Remove all Node.js/Rust/Tauri build steps
 
@@ -82,34 +69,13 @@ jobs:
           cp prebuilt/unsigned/*.msi D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi/
           cp prebuilt/unsigned/*.exe D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis/
 
-      # --- SIGNING STEPS (Keep these) ---
+      # --- SIGNING STEPS after tauri build ---
       - name: Set up DigiCert certificate
         shell: pwsh
         run: |
           Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
           $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
           [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
-          
-      # - name: Sign MSI with Jsign
-      #   shell: pwsh
-      #   run: |
-      #     # Sign using the PKCS#12 keystore
-      #     java -jar C:\jsign\jsign-7.0.jar `
-      #       --keystore D:\Certificate_pkcs12.p12 `
-      #       --storepass "${{ secrets.SM_CLIENT_CERT_PASSWORD }}" `
-      #       --storetype PKCS12 `
-      #       --alias "private key for pkcs12 certificate" `
-      #       --tsaurl http://timestamp.digicert.com `
-      #       "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
-
-      - name: Set variables
-        id: variables
-        run: |
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
-        shell: bash
 
       # Setup Android SDK (required by DigiCert action for compatibility)
       - name: Setup Android SDK (for DigiCert action compatibility)
@@ -174,13 +140,34 @@ jobs:
             /td sha256 `
             /fd sha256 `
             /sha1 $certThumb `
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+
+      - name: Sign EXE with SignTool
+        shell: pwsh
+        run: |
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            /sm /s My `
+            /tr http://timestamp.digicert.com `
+            /td sha256 `
+            /fd sha256 `
+            /sha1 $certThumb `
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.exe"
 
       - name: Verify MSI Signature
         shell: pwsh
         run: |
-          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
+          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
           if ($sig.Status -ne 'Valid') {
             throw "Signature invalid: $($sig.Status)"
           }
           Write-Host "✅ MSI successfully signed and valid."
+
+      - name: Verify EXE Signature
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.exe"
+          if ($sig.Status -ne 'Valid') {
+            throw "Signature invalid: $($sig.Status)"
+          }
+          Write-Host "✅ EXE successfully signed and valid."
