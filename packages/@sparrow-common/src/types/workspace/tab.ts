@@ -98,6 +98,10 @@ export interface PathWrapper {
   path: Path;
 }
 
+export interface LabelWrapper {
+  label: string;
+}
+
 export interface Property
   extends Partial<RequestWrapper>,
     Partial<FolderWrapper>,
@@ -132,4 +136,5 @@ export interface Tab
     TimestampWrapper,
     TypeWrapper,
     PersistenceWrapper,
+    LabelWrapper,
     PropertyWrapper {}

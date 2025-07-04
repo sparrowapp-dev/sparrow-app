@@ -1460,6 +1460,9 @@ class CollectionExplorerPage {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      if (collection?.collectionType === CollectionTypeBaseEnum.MOCK) {
+        sampleFolder.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
 
       this.tabRepository.createTab(sampleFolder.getValue());
       moveNavigation("right");
