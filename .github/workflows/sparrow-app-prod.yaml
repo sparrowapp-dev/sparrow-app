@@ -223,19 +223,38 @@ jobs:
         run: |
           $smctlPath = $env:SMCTL_PATH
           $certHash = $env:SM_CODE_SIGNING_CERT_SHA1_HASH
+          $pkcs11Config = $env:PKCS11_CONFIG
           
           Write-Host "=== Signing MSI Files ===" -ForegroundColor Cyan
           Write-Host "Using smctl: $smctlPath" -ForegroundColor Yellow
           Write-Host "Certificate hash: $certHash" -ForegroundColor Yellow
+          Write-Host "PKCS11 config: $pkcs11Config" -ForegroundColor Yellow
           
-          # First, let's check what signing options are available
-          Write-Host "`nChecking smctl sign help..." -ForegroundColor Yellow
-          try {
-            $helpResult = & $smctlPath sign --help 2>&1
-            Write-Host "Sign help output:" -ForegroundColor Gray
-            Write-Host $helpResult -ForegroundColor White
-          } catch {
-            Write-Host "Could not get sign help: $($_.Exception.Message)" -ForegroundColor Yellow
+          # Check if PKCS11 config file exists
+          if ($pkcs11Config -and (Test-Path $pkcs11Config)) {
+            Write-Host "✅ PKCS11 config file found" -ForegroundColor Green
+          } else {
+            Write-Host "❌ PKCS11 config file not found or not set" -ForegroundColor Red
+            Write-Host "Looking for PKCS11 config in standard locations..." -ForegroundColor Yellow
+            
+            $possibleConfigs = @(
+              "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\pkcs11properties.cfg",
+              "$env:TEMP\smtools-windows-x64\pkcs11properties.cfg"
+            )
+            
+            foreach ($config in $possibleConfigs) {
+              Write-Host "Checking: $config" -ForegroundColor Gray
+              if (Test-Path $config) {
+                $pkcs11Config = $config
+                Write-Host "✅ Found PKCS11 config: $config" -ForegroundColor Green
+                break
+              }
+            }
+          }
+          
+          if (-not $pkcs11Config -or -not (Test-Path $pkcs11Config)) {
+            Write-Host "❌ Cannot find PKCS11 configuration file" -ForegroundColor Red
+            exit 1
           }
           
           $msiFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
@@ -243,27 +262,31 @@ jobs:
           foreach ($file in $msiFiles) {
             Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
-            # Try different signing parameter combinations
+            # Try different signing parameter combinations with PKCS11 config
             $signingMethods = @(
                 @{
-                    Name = "Basic fingerprint signing"
-                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName)
+                    Name = "Fingerprint with PKCS11 config"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "Signing with certificate name"
-                    Command = @("sign", "--certificate", "sparrow", "--input", $file.FullName)
+                    Name = "Fingerprint with PKCS11 config and verbose"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
                 },
                 @{
-                    Name = "Signing with github certificate"
-                    Command = @("sign", "--certificate", "github", "--input", $file.FullName)
+                    Name = "Keypair alias with sparrow"
+                    Command = @("sign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "Hash algorithm specified"
-                    Command = @("sign", "--fingerprint", $certHash, "--hash-alg", "SHA256", "--input", $file.FullName)
+                    Name = "Keypair alias with github"
+                    Command = @("sign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "With verbose output"
-                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName, "--verbose")
+                    Name = "With digest algorithm"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--digalg", "SHA256", "--input", $file.FullName)
+                },
+                @{
+                    Name = "With signature algorithm"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--sigalg", "SHA256withRSA", "--input", $file.FullName)
                 }
             )
             
@@ -281,9 +304,9 @@ jobs:
                     Write-Host "  Output: $signResult" -ForegroundColor White
                     
                     # Check if the output indicates success (regardless of exit code)
-                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR"
+                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR" -and $signResult -notmatch "SignTool Error"
                     
-                    if ($actualSuccess) {
+                    if ($actualSuccess -and $exitCode -eq 0) {
                         Write-Host "  ✅ Command output indicates success" -ForegroundColor Green
                         
                         # Wait and verify signature
@@ -293,11 +316,14 @@ jobs:
                         
                         if ($signature.Status -eq "Valid") {
                             Write-Host "  ✅ File is properly signed: $($file.Name)" -ForegroundColor Green
+                            if ($signature.SignerCertificate) {
+                              Write-Host "  Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
+                            }
                             $signSuccess = $true
                             break
                         }
                     } else {
-                        Write-Host "  ❌ Command output indicates failure" -ForegroundColor Red
+                        Write-Host "  ❌ Command failed or output indicates failure" -ForegroundColor Red
                     }
                     
                 } catch {
@@ -316,35 +342,55 @@ jobs:
         run: |
           $smctlPath = $env:SMCTL_PATH
           $certHash = $env:SM_CODE_SIGNING_CERT_SHA1_HASH
+          $pkcs11Config = $env:PKCS11_CONFIG
           
           Write-Host "=== Signing EXE Files ===" -ForegroundColor Cyan
+          
+          # Use the same PKCS11 config as MSI signing
+          if (-not $pkcs11Config -or -not (Test-Path $pkcs11Config)) {
+            $possibleConfigs = @(
+              "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\pkcs11properties.cfg",
+              "$env:TEMP\smtools-windows-x64\pkcs11properties.cfg"
+            )
+            
+            foreach ($config in $possibleConfigs) {
+              if (Test-Path $config) {
+                $pkcs11Config = $config
+                break
+              }
+            }
+          }
           
           $exeFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
           
           foreach ($file in $exeFiles) {
             Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
-            # Try different signing parameter combinations
+            # Try different signing parameter combinations with PKCS11 config
             $signingMethods = @(
                 @{
-                    Name = "Basic fingerprint signing"
-                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName)
+                    Name = "Fingerprint with PKCS11 config"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "Signing with certificate name"
-                    Command = @("sign", "--certificate", "sparrow", "--input", $file.FullName)
+                    Name = "Fingerprint with PKCS11 config and verbose"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
                 },
                 @{
-                    Name = "Signing with github certificate"
-                    Command = @("sign", "--certificate", "github", "--input", $file.FullName)
+                    Name = "Keypair alias with sparrow"
+                    Command = @("sign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "Hash algorithm specified"
-                    Command = @("sign", "--fingerprint", $certHash, "--hash-alg", "SHA256", "--input", $file.FullName)
+                    Name = "Keypair alias with github"
+                    Command = @("sign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "With verbose output"
-                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName, "--verbose")
+                    Name = "With digest algorithm"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--digalg", "SHA256", "--input", $file.FullName)
+                },
+                @{
+                    Name = "With signature algorithm"
+                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--sigalg", "SHA256withRSA", "--input", $file.FullName)
                 }
             )
             
@@ -362,9 +408,9 @@ jobs:
                     Write-Host "  Output: $signResult" -ForegroundColor White
                     
                     # Check if the output indicates success (regardless of exit code)
-                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR"
+                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR" -and $signResult -notmatch "SignTool Error"
                     
-                    if ($actualSuccess) {
+                    if ($actualSuccess -and $exitCode -eq 0) {
                         Write-Host "  ✅ Command output indicates success" -ForegroundColor Green
                         
                         # Wait and verify signature
@@ -374,11 +420,14 @@ jobs:
                         
                         if ($signature.Status -eq "Valid") {
                             Write-Host "  ✅ File is properly signed: $($file.Name)" -ForegroundColor Green
+                            if ($signature.SignerCertificate) {
+                              Write-Host "  Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
+                            }
                             $signSuccess = $true
                             break
                         }
                     } else {
-                        Write-Host "  ❌ Command output indicates failure" -ForegroundColor Red
+                        Write-Host "  ❌ Command failed or output indicates failure" -ForegroundColor Red
                     }
                     
                 } catch {
