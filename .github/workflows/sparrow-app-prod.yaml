@@ -100,18 +100,20 @@ jobs:
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
       # Set up DigiCert certificate for cloud signing
-      - name: Set up DigiCert certificate 
-        run: | 
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12 
-        shell: bash 
+      - name: Set up DigiCert certificate
+        shell: pwsh
+        run: |
+          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
+          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
       
-      - name: Set DigiCert environment variables 
-        run: | 
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV" 
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV" 
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV" 
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
-          echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> "$GITHUB_ENV"
         shell: bash
 
       # Setup Android SDK (required by DigiCert action for compatibility)
@@ -141,347 +143,44 @@ jobs:
       # Install DigiCert Signing Manager Tools
       - name: Install DigiCert Signing Manager Tools
         uses: digicert/ssm-code-signing@v1.0.0
-
-      - name: Verify DigiCert tools installation
+        
+      - name: Extract first KeyPair alias
+        id: extract_alias
+        shell: pwsh
         run: |
-          Write-Host "=== DigiCert Tools Verification ===" -ForegroundColor Cyan
-          
-          # The DigiCert action installs tools to a temp directory
-          $tempDir = $env:TEMP
-          $smctlPaths = @(
-            "$tempDir\smtools-windows-x64\smctl.exe",
-            "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smctl.exe",
-            "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
-            "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
-          )
-          
-          $smctlPath = ""
-          foreach ($path in $smctlPaths) {
-            Write-Host "Checking: $path" -ForegroundColor Gray
-            if (Test-Path $path) {
-              $smctlPath = $path
-              Write-Host "✅ Found smctl at: $path" -ForegroundColor Green
-              break
-            }
-          }
-          
-          if (-not $smctlPath) {
-            # Try to find via Get-Command
-            try {
-              $cmd = Get-Command smctl -ErrorAction SilentlyContinue
-              if ($cmd) {
-                $smctlPath = $cmd.Source
-                Write-Host "✅ Found smctl in PATH: $smctlPath" -ForegroundColor Green
-              }
-            } catch {}
-          }
-          
-          if ($smctlPath) {
-            echo "SMCTL_PATH=$smctlPath" >> $env:GITHUB_ENV
-            
-            # Test smctl functionality
-            Write-Host "`nTesting smctl..." -ForegroundColor Yellow
-            Write-Host "Command: & `"$smctlPath`" healthcheck" -ForegroundColor Gray
-            
-            try {
-              $healthResult = & $smctlPath healthcheck 2>&1
-              Write-Host "Exit code: $LASTEXITCODE" -ForegroundColor $(if ($LASTEXITCODE -eq 0) { "Green" } else { "Red" })
-              Write-Host "Output: $healthResult" -ForegroundColor White
-              
-              if ($LASTEXITCODE -eq 0) {
-                Write-Host "✅ smctl healthcheck passed" -ForegroundColor Green
-              } else {
-                Write-Host "❌ smctl healthcheck failed" -ForegroundColor Red
-                Write-Host "This might be expected if environment variables aren't fully configured yet" -ForegroundColor Yellow
-              }
-            } catch {
-              Write-Host "❌ Error running smctl: $($_.Exception.Message)" -ForegroundColor Red
-            }
-            
-            # Also try version command
-            Write-Host "`nTesting smctl version..." -ForegroundColor Yellow
-            try {
-              $versionResult = & $smctlPath --version 2>&1
-              Write-Host "Version output: $versionResult" -ForegroundColor White
-            } catch {
-              Write-Host "Version check failed: $($_.Exception.Message)" -ForegroundColor Yellow
-            }
-            
-          } else {
-            Write-Host "❌ smctl not found in any expected location" -ForegroundColor Red
-            Write-Host "Available files in temp directory:" -ForegroundColor Yellow
-            if (Test-Path "$tempDir\smtools-windows-x64") {
-              Get-ChildItem "$tempDir\smtools-windows-x64" | ForEach-Object {
-                Write-Host "  $($_.Name)" -ForegroundColor Gray
-              }
-            }
-            exit 1
-          }
-        shell: powershell
-
-      - name: Sign MSI files with DigiCert
+          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
+          $alias = ($line -split '\s{2,}')[2]
+          Write-Host "✅ Using alias: $alias"
+          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+      
+      - name: Sync Certificate into Windows Store
+        shell: pwsh
         run: |
-          $smctlPath = $env:SMCTL_PATH
-          $certHash = $env:SM_CODE_SIGNING_CERT_SHA1_HASH
-          $pkcs11Config = $env:PKCS11_CONFIG
-          
-          Write-Host "=== Signing MSI Files ===" -ForegroundColor Cyan
-          Write-Host "Using smctl: $smctlPath" -ForegroundColor Yellow
-          Write-Host "Certificate hash: $certHash" -ForegroundColor Yellow
-          Write-Host "PKCS11 config: $pkcs11Config" -ForegroundColor Yellow
-          
-          # Check if PKCS11 config file exists
-          if ($pkcs11Config -and (Test-Path $pkcs11Config)) {
-            Write-Host "✅ PKCS11 config file found" -ForegroundColor Green
-          } else {
-            Write-Host "❌ PKCS11 config file not found or not set" -ForegroundColor Red
-            Write-Host "Looking for PKCS11 config in standard locations..." -ForegroundColor Yellow
-            
-            $possibleConfigs = @(
-              "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\pkcs11properties.cfg",
-              "$env:TEMP\smtools-windows-x64\pkcs11properties.cfg"
-            )
-            
-            foreach ($config in $possibleConfigs) {
-              Write-Host "Checking: $config" -ForegroundColor Gray
-              if (Test-Path $config) {
-                $pkcs11Config = $config
-                Write-Host "✅ Found PKCS11 config: $config" -ForegroundColor Green
-                break
-              }
-            }
-          }
-          
-          if (-not $pkcs11Config -or -not (Test-Path $pkcs11Config)) {
-            Write-Host "❌ Cannot find PKCS11 configuration file" -ForegroundColor Red
-            exit 1
-          }
-          
-          $msiFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
-          
-          foreach ($file in $msiFiles) {
-            Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
-            
-            # Try different signing parameter combinations with PKCS11 config
-            $signingMethods = @(
-                @{
-                    Name = "JSSign tool with fingerprint"
-                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "JSSign tool with keypair alias sparrow"
-                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "JSSign tool with keypair alias github"
-                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "JSSign with verbose output"
-                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
-                },
-                @{
-                    Name = "Direct PKCS11 module with fingerprint"
-                    Command = @("sign", "--fingerprint", $certHash, "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
-                },
-                @{
-                    Name = "Direct PKCS11 module with keypair sparrow"
-                    Command = @("sign", "--keypair-alias", "sparrow", "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
-                },
-                @{
-                    Name = "Fingerprint with PKCS11 config (original)"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "Keypair alias with sparrow (original)"
-                    Command = @("sign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                }
-            )
-            
-            $signSuccess = $false
-            
-            foreach ($method in $signingMethods) {
-                Write-Host "`n  Trying: $($method.Name)" -ForegroundColor Yellow
-                Write-Host "  Command: smctl $($method.Command -join ' ')" -ForegroundColor Gray
-                
-                try {
-                    $signResult = & $smctlPath $method.Command 2>&1
-                    $exitCode = $LASTEXITCODE
-                    
-                    Write-Host "  Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
-                    Write-Host "  Output: $signResult" -ForegroundColor White
-                    
-                    # Check if the output indicates success (regardless of exit code)
-                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR" -and $signResult -notmatch "SignTool Error"
-                    
-                    if ($actualSuccess -and $exitCode -eq 0) {
-                        Write-Host "  ✅ Command output indicates success" -ForegroundColor Green
-                        
-                        # Wait and verify signature
-                        Start-Sleep -Seconds 3
-                        $signature = Get-AuthenticodeSignature $file.FullName
-                        Write-Host "  Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
-                        
-                        if ($signature.Status -eq "Valid") {
-                            Write-Host "  ✅ File is properly signed: $($file.Name)" -ForegroundColor Green
-                            if ($signature.SignerCertificate) {
-                              Write-Host "  Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
-                            }
-                            $signSuccess = $true
-                            break
-                        }
-                    } else {
-                        Write-Host "  ❌ Command failed or output indicates failure" -ForegroundColor Red
-                    }
-                    
-                } catch {
-                    Write-Host "  ❌ Exception: $($_.Exception.Message)" -ForegroundColor Red
-                }
-            }
-            
-            if (-not $signSuccess) {
-                Write-Host "❌ Failed to sign $($file.Name) with any method" -ForegroundColor Red
-                exit 1
-            }
-          }
-        shell: powershell
-
-      - name: Sign EXE files with DigiCert
+          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
+          smctl windows certsync `
+            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
+            --store=system
+      
+      - name: Sign MSI with SignTool
+        shell: pwsh
         run: |
-          $smctlPath = $env:SMCTL_PATH
-          $certHash = $env:SM_CODE_SIGNING_CERT_SHA1_HASH
-          $pkcs11Config = $env:PKCS11_CONFIG
-          
-          Write-Host "=== Signing EXE Files ===" -ForegroundColor Cyan
-          
-          # Use the same PKCS11 config as MSI signing
-          if (-not $pkcs11Config -or -not (Test-Path $pkcs11Config)) {
-            $possibleConfigs = @(
-              "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\pkcs11properties.cfg",
-              "$env:TEMP\smtools-windows-x64\pkcs11properties.cfg"
-            )
-            
-            foreach ($config in $possibleConfigs) {
-              if (Test-Path $config) {
-                $pkcs11Config = $config
-                break
-              }
-            }
-          }
-          
-          $exeFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
-          
-          foreach ($file in $exeFiles) {
-            Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
-            
-            # Try different signing parameter combinations with PKCS11 config
-            $signingMethods = @(
-                @{
-                    Name = "JSSign tool with fingerprint"
-                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "JSSign tool with keypair alias sparrow"
-                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "JSSign tool with keypair alias github"
-                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "JSSign with verbose output"
-                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
-                },
-                @{
-                    Name = "Direct PKCS11 module with fingerprint"
-                    Command = @("sign", "--fingerprint", $certHash, "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
-                },
-                @{
-                    Name = "Direct PKCS11 module with keypair sparrow"
-                    Command = @("sign", "--keypair-alias", "sparrow", "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
-                },
-                @{
-                    Name = "Fingerprint with PKCS11 config (original)"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "Keypair alias with sparrow (original)"
-                    Command = @("sign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                }
-            )
-            
-            $signSuccess = $false
-            
-            foreach ($method in $signingMethods) {
-                Write-Host "`n  Trying: $($method.Name)" -ForegroundColor Yellow
-                Write-Host "  Command: smctl $($method.Command -join ' ')" -ForegroundColor Gray
-                
-                try {
-                    $signResult = & $smctlPath $method.Command 2>&1
-                    $exitCode = $LASTEXITCODE
-                    
-                    Write-Host "  Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
-                    Write-Host "  Output: $signResult" -ForegroundColor White
-                    
-                    # Check if the output indicates success (regardless of exit code)
-                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR" -and $signResult -notmatch "SignTool Error"
-                    
-                    if ($actualSuccess -and $exitCode -eq 0) {
-                        Write-Host "  ✅ Command output indicates success" -ForegroundColor Green
-                        
-                        # Wait and verify signature
-                        Start-Sleep -Seconds 3
-                        $signature = Get-AuthenticodeSignature $file.FullName
-                        Write-Host "  Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
-                        
-                        if ($signature.Status -eq "Valid") {
-                            Write-Host "  ✅ File is properly signed: $($file.Name)" -ForegroundColor Green
-                            if ($signature.SignerCertificate) {
-                              Write-Host "  Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
-                            }
-                            $signSuccess = $true
-                            break
-                        }
-                    } else {
-                        Write-Host "  ❌ Command failed or output indicates failure" -ForegroundColor Red
-                    }
-                    
-                } catch {
-                    Write-Host "  ❌ Exception: $($_.Exception.Message)" -ForegroundColor Red
-                }
-            }
-            
-            if (-not $signSuccess) {
-                Write-Host "❌ Failed to sign $($file.Name) with any method" -ForegroundColor Red
-                exit 1
-            }
-          }
-        shell: powershell
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            /sm /s My `
+            /tr http://timestamp.digicert.com `
+            /td sha256 `
+            /fd sha256 `
+            /sha1 $certThumb `
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
 
-      - name: Final signature verification
+      - name: Verify MSI Signature
+        shell: pwsh
         run: |
-          Write-Host "=== Final Signature Verification ===" -ForegroundColor Cyan
-          
-          Write-Host "`nMSI Files:" -ForegroundColor Yellow
-          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
-            $signature = Get-AuthenticodeSignature $_.FullName
-            $statusColor = if ($signature.Status -eq "Valid") { "Green" } else { "Red" }
-            Write-Host "  $($_.Name): $($signature.Status)" -ForegroundColor $statusColor
-            if ($signature.SignerCertificate) {
-              Write-Host "    Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
-            }
+          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
+          if ($sig.Status -ne 'Valid') {
+            throw "Signature invalid: $($sig.Status)"
           }
-          
-          Write-Host "`nEXE Files:" -ForegroundColor Yellow
-          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
-            $signature = Get-AuthenticodeSignature $_.FullName
-            $statusColor = if ($signature.Status -eq "Valid") { "Green" } else { "Red" }
-            Write-Host "  $($_.Name): $($signature.Status)" -ForegroundColor $statusColor
-            if ($signature.SignerCertificate) {
-              Write-Host "    Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
-            }
-          }
-        shell: powershell
+          Write-Host "✅ MSI successfully signed and valid."
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
