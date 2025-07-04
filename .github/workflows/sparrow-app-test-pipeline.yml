@@ -191,7 +191,7 @@ jobs:
             /td sha256 `
             /fd sha256 `
             /sha1 $certThumb `
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.exe"
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
 
       - name: Verify MSI Signature
         shell: pwsh
@@ -205,7 +205,7 @@ jobs:
       - name: Verify EXE Signature
         shell: pwsh
         run: |
-          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.exe"
+          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
           if ($sig.Status -ne 'Valid') {
             throw "Signature invalid: $($sig.Status)"
           }
