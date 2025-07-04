@@ -90,16 +90,65 @@ jobs:
           $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
           [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
           
-      - name: Sign MSI with Jsign
+      # - name: Sign MSI with Jsign
+      #   shell: pwsh
+      #   run: |
+      #     # Sign using the PKCS#12 keystore
+      #     java -jar C:\jsign\jsign-7.0.jar `
+      #       --keystore D:\Certificate_pkcs12.p12 `
+      #       --storepass "${{ secrets.SM_CLIENT_CERT_PASSWORD }}" `
+      #       --storetype PKCS12 `
+      #       --alias "private key for pkcs12 certificate" `
+      #       --tsaurl http://timestamp.digicert.com `
+      #       "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
+
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Setup KeyLocker Client Tools
+        shell: bash
+        run: |
+          curl -L "https://one.digicert.com/signingmanager/api-ui/v1/releases/Keylockertools-windows-x64.msi/download" \
+            -H "x-api-key: $SM_API_KEY" \
+            -o Keylockertools.msi
+          msiexec /i Keylockertools.msi /quiet /qn
+
+      - name: List KeyLocker KeyPairs
         shell: pwsh
         run: |
-          # Sign using the PKCS#12 keystore
-          java -jar C:\jsign\jsign-7.0.jar `
-            --keystore D:\Certificate_pkcs12.p12 `
-            --storepass "${{ secrets.SM_CLIENT_CERT_PASSWORD }}" `
-            --storetype PKCS12 `
-            --alias "private key for pkcs12 certificate" `
-            --tsaurl http://timestamp.digicert.com `
+          Write-Host "🔎 Available KeyPair Aliases:"
+          smctl keypair ls
+
+      - name: Extract first KeyPair alias
+        id: extract_alias
+        shell: pwsh
+        run: |
+          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
+          $alias = ($line -split '\s{2,}')[2]
+          Write-Host "✅ Using alias: $alias"
+          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+
+      - name: Sync Certificate into Windows Store
+        shell: pwsh
+        run: |
+          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
+          smctl windows certsync `
+            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
+            --store=system
+
+      - name: Sign MSI with SignTool
+        shell: pwsh
+        run: |
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            /fd sha256 /td sha256 /tr http://timestamp.digicert.com /td sha256 `
+            /sha1 $certThumb `
             "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
 
       - name: Verify MSI Signature
