@@ -113,6 +113,30 @@ jobs:
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
           echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> "$GITHUB_ENV"
         shell: bash
+      
+      # Setup Android SDK (required by DigiCert action for compatibility)
+      - name: Setup Android SDK (for DigiCert action compatibility)
+        run: |
+          # Create minimal Android SDK structure to satisfy DigiCert action requirements
+          $androidSdkPath = "C:\Android\android-sdk"
+          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+          
+          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
+          New-Item -ItemType Directory -Path $buildToolsPath -Force
+          
+          # Create dummy files that the DigiCert action expects to find
+          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
+          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
+          
+          # Set Android environment variables
+          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
+          
+          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
+        shell: powershell
 
       # Install DigiCert Signing Manager Tools
       - name: Install DigiCert Signing Manager Tools
@@ -122,18 +146,21 @@ jobs:
         run: |
           Write-Host "=== DigiCert Tools Verification ===" -ForegroundColor Cyan
           
-          # Find smctl executable
+          # The DigiCert action installs tools to a temp directory
+          $tempDir = $env:TEMP
           $smctlPaths = @(
+            "$tempDir\smtools-windows-x64\smctl.exe",
+            "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smctl.exe",
             "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
-            "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
-            "$env:TEMP\smtools-windows-x64\smctl.exe"
+            "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
           )
           
           $smctlPath = ""
           foreach ($path in $smctlPaths) {
+            Write-Host "Checking: $path" -ForegroundColor Gray
             if (Test-Path $path) {
               $smctlPath = $path
-              Write-Host "Found smctl at: $path" -ForegroundColor Green
+              Write-Host "✅ Found smctl at: $path" -ForegroundColor Green
               break
             }
           }
@@ -144,7 +171,7 @@ jobs:
               $cmd = Get-Command smctl -ErrorAction SilentlyContinue
               if ($cmd) {
                 $smctlPath = $cmd.Source
-                Write-Host "Found smctl in PATH: $smctlPath" -ForegroundColor Green
+                Write-Host "✅ Found smctl in PATH: $smctlPath" -ForegroundColor Green
               }
             } catch {}
           }
@@ -154,18 +181,40 @@ jobs:
             
             # Test smctl functionality
             Write-Host "`nTesting smctl..." -ForegroundColor Yellow
+            Write-Host "Command: & `"$smctlPath`" healthcheck" -ForegroundColor Gray
+            
             try {
-              & $smctlPath healthcheck
+              $healthResult = & $smctlPath healthcheck 2>&1
+              Write-Host "Exit code: $LASTEXITCODE" -ForegroundColor $(if ($LASTEXITCODE -eq 0) { "Green" } else { "Red" })
+              Write-Host "Output: $healthResult" -ForegroundColor White
+              
               if ($LASTEXITCODE -eq 0) {
                 Write-Host "✅ smctl healthcheck passed" -ForegroundColor Green
               } else {
                 Write-Host "❌ smctl healthcheck failed" -ForegroundColor Red
+                Write-Host "This might be expected if environment variables aren't fully configured yet" -ForegroundColor Yellow
               }
             } catch {
               Write-Host "❌ Error running smctl: $($_.Exception.Message)" -ForegroundColor Red
             }
+            
+            # Also try version command
+            Write-Host "`nTesting smctl version..." -ForegroundColor Yellow
+            try {
+              $versionResult = & $smctlPath --version 2>&1
+              Write-Host "Version output: $versionResult" -ForegroundColor White
+            } catch {
+              Write-Host "Version check failed: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+            
           } else {
-            Write-Host "❌ smctl not found" -ForegroundColor Red
+            Write-Host "❌ smctl not found in any expected location" -ForegroundColor Red
+            Write-Host "Available files in temp directory:" -ForegroundColor Yellow
+            if (Test-Path "$tempDir\smtools-windows-x64") {
+              Get-ChildItem "$tempDir\smtools-windows-x64" | ForEach-Object {
+                Write-Host "  $($_.Name)" -ForegroundColor Gray
+              }
+            }
             exit 1
           }
         shell: powershell
