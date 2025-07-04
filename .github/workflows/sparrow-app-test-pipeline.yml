@@ -52,7 +52,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Ensure prebuilt files are fetched
 
+      # --- SETUP (Keep these) ---
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -64,191 +67,51 @@ jobs:
           mkdir C:\jsign
           curl -L https://github.com/ebourg/jsign/releases/download/7.0/jsign-7.0.jar -o C:\jsign\jsign-7.0.jar
           echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_PATH
-          echo "JIGN_PATH=C:\jsign" | Out-File -Append -FilePath $env:GITHUB_ENV
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "20.8"
+      # --- SKIP BUILD STEPS ---
+      # Remove all Node.js/Rust/Tauri build steps
 
-      - name: Install Windows SDK
-        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
-        shell: powershell
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1
-
-      - name: Install Rust 1.82.0
+      # --- USE PRE-BUILT FILES ---
+      - name: Copy Pre-built MSI/EXE to Target Directory
         run: |
-          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
-          .\rustup-init.exe -y
-          rustup install 1.82.0
-          rustup default 1.82.0
-      - name: Update updater endpoint in tauri.conf.json file
-        run: |
-          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
-          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
-        shell: pwsh
+          # Create the same directory structure Tauri would use
+          mkdir -p D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\
+          mkdir -p D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\
+          
+          # Copy pre-built files (adjust names as needed)
+          cp prebuilt/unsigned/*.msi D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi/
+          cp prebuilt/unsigned/*.exe D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis/
 
-      - name: Increase Yarn network timeout
-        run: yarn config set network-timeout 600000
-
-      - name: Sync version across all files
-        run: yarn sync-version
-
-      - name: Build Tauri App
-        run: |
-          yarn cache clean
-          npm install -g pnpm
-          yarn install
-          yarn desktop-build
-          # yarn tauri build --debug
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-
-      - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-
-      - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
-
-      # Set up DigiCert certificate for cloud signing
+      # --- SIGNING STEPS (Keep these) ---
       - name: Set up DigiCert certificate 
         run: | 
           echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12 
         shell: bash 
-      
-      - name: Set DigiCert environment variables 
-        run: | 
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV" 
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV" 
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV" 
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
-          echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> "$GITHUB_ENV"
-        shell: bash
-
-      # Setup Android SDK (required by DigiCert action for compatibility)
-      - name: Setup Android SDK (for DigiCert action compatibility)
-        run: |
-          # Create minimal Android SDK structure to satisfy DigiCert action requirements
-          $androidSdkPath = "C:\Android\android-sdk"
-          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
           
-          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
-          New-Item -ItemType Directory -Path $buildToolsPath -Force
-          
-          # Create dummy files that the DigiCert action expects to find
-          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
-          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
-          
-          # Set Android environment variables
-          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
-          
-          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
-        shell: powershell
-
-      # Install DigiCert Signing Manager Tools
-      - name: Install DigiCert Signing Manager Tools
-        uses: digicert/ssm-code-signing@v1.0.0
-
-      - name: Verify DigiCert tools installation
-        run: |
-          Write-Host "=== DigiCert Tools Verification ===" -ForegroundColor Cyan
-          
-          # The DigiCert action installs tools to a temp directory
-          $tempDir = $env:TEMP
-          $smctlPaths = @(
-            "$tempDir\smtools-windows-x64\smctl.exe",
-            "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smctl.exe",
-            "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
-            "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe"
-          )
-          
-          $smctlPath = ""
-          foreach ($path in $smctlPaths) {
-            Write-Host "Checking: $path" -ForegroundColor Gray
-            if (Test-Path $path) {
-              $smctlPath = $path
-              Write-Host "✅ Found smctl at: $path" -ForegroundColor Green
-              break
-            }
-          }
-          
-          if (-not $smctlPath) {
-            # Try to find via Get-Command
-            try {
-              $cmd = Get-Command smctl -ErrorAction SilentlyContinue
-              if ($cmd) {
-                $smctlPath = $cmd.Source
-                Write-Host "✅ Found smctl in PATH: $smctlPath" -ForegroundColor Green
-              }
-            } catch {}
-          }
-          
-          if ($smctlPath) {
-            echo "SMCTL_PATH=$smctlPath" >> $env:GITHUB_ENV
-            
-            # Test smctl functionality
-            Write-Host "`nTesting smctl..." -ForegroundColor Yellow
-            Write-Host "Command: & `"$smctlPath`" healthcheck" -ForegroundColor Gray
-            
-            try {
-              $healthResult = & $smctlPath healthcheck 2>&1
-              Write-Host "Exit code: $LASTEXITCODE" -ForegroundColor $(if ($LASTEXITCODE -eq 0) { "Green" } else { "Red" })
-              Write-Host "Output: $healthResult" -ForegroundColor White
-              
-              if ($LASTEXITCODE -eq 0) {
-                Write-Host "✅ smctl healthcheck passed" -ForegroundColor Green
-              } else {
-                Write-Host "❌ smctl healthcheck failed" -ForegroundColor Red
-                Write-Host "This might be expected if environment variables aren't fully configured yet" -ForegroundColor Yellow
-              }
-            } catch {
-              Write-Host "❌ Error running smctl: $($_.Exception.Message)" -ForegroundColor Red
-            }
-            
-            # Also try version command
-            Write-Host "`nTesting smctl version..." -ForegroundColor Yellow
-            try {
-              $versionResult = & $smctlPath --version 2>&1
-              Write-Host "Version output: $versionResult" -ForegroundColor White
-            } catch {
-              Write-Host "Version check failed: $($_.Exception.Message)" -ForegroundColor Yellow
-            }
-            
-          } else {
-            Write-Host "❌ smctl not found in any expected location" -ForegroundColor Red
-            Write-Host "Available files in temp directory:" -ForegroundColor Yellow
-            if (Test-Path "$tempDir\smtools-windows-x64") {
-              Get-ChildItem "$tempDir\smtools-windows-x64" | ForEach-Object {
-                Write-Host "  $($_.Name)" -ForegroundColor Gray
-              }
-            }
-            exit 1
-          }
-        shell: powershell
-
       - name: Sign MSI Files with DigiCert
         run: |
           $storepass = "${{ secrets.SM_API_KEY }}|C:\Certificate_pkcs12.p12|${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
-          java -jar C:\jsign\jsign-7.0.jar --storetype DIGICERTONE --storepass $storepass --alias ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.27.0_x64_en-US.msi
+          java -jar C:\jsign\jsign-7.0.jar \
+            --storetype DIGICERTONE \
+            --storepass "$storepass" \
+            --alias "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" \
+            --tsmode RFC3161 \
+            --tsaurl http://timestamp.digicert.com \
+            D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi
 
       - name: Verify Signature
         run: |
-          $msiFile = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.27.0_x64_en-US.msi"
-          $signature = Get-AuthenticodeSignature $msiFile
-          if ($signature.Status -eq 'Valid') {
-            Write-Host "✅ File is properly signed."
-          } else {
-            Write-Host "❌ Signature verification failed."
-            exit 1
+          $files = @(
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi",
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
+          )
+          
+          foreach ($file in (Get-ChildItem $files)) {
+            $sig = Get-AuthenticodeSignature $file
+            Write-Host "Verifying $($file.Name)..."
+            if ($sig.Status -ne 'Valid') {
+              Write-Host "❌ $($file.Name) FAILED (Status: $($sig.Status))"
+              exit 1
+            }
+            Write-Host "✅ $($file.Name) is properly signed."
           }
