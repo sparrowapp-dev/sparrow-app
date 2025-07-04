@@ -83,14 +83,24 @@ jobs:
           cp prebuilt/unsigned/*.exe D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis/
 
       # --- SIGNING STEPS (Keep these) ---
-      - name: Set up DigiCert certificate 
-        run: | 
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12 
-        shell: bash 
-          
-      - name: Sign MSI Files with DigiCert
+      - name: Set up DigiCert certificate
+        shell: pwsh
         run: |
-          java -jar C:\jsign\jsign-7.0.jar --keystore /d/Certificate_pkcs12.p12 --storepass ${{ secrets.SM_CLIENT_CERT_PASSWORD }} --storetype PKCS12 --alias sparrow --tsaurl http://timestamp.digicert.com D:/a/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow_2.26.0_x64_en-US.msi
+          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
+          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+          
+      - name: Sign MSI with Jsign
+        shell: pwsh
+        run: |
+          # Sign using the PKCS#12 keystore
+          java -jar C:\jsign\jsign-7.0.jar `
+            --keystore D:\Certificate_pkcs12.p12 `
+            --storepass "${{ secrets.SM_CLIENT_CERT_PASSWORD }}" `
+            --storetype PKCS12 `
+            --alias ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} `
+            --tsaurl http://timestamp.digicert.com `
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
 
       - name: Verify Signature
         run: |
