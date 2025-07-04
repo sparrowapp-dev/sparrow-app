@@ -265,28 +265,36 @@ jobs:
             # Try different signing parameter combinations with PKCS11 config
             $signingMethods = @(
                 @{
-                    Name = "Fingerprint with PKCS11 config"
+                    Name = "JSSign tool with fingerprint"
+                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
+                },
+                @{
+                    Name = "JSSign tool with keypair alias sparrow"
+                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
+                },
+                @{
+                    Name = "JSSign tool with keypair alias github"
+                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
+                },
+                @{
+                    Name = "JSSign with verbose output"
+                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
+                },
+                @{
+                    Name = "Direct PKCS11 module with fingerprint"
+                    Command = @("sign", "--fingerprint", $certHash, "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Direct PKCS11 module with keypair sparrow"
+                    Command = @("sign", "--keypair-alias", "sparrow", "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Fingerprint with PKCS11 config (original)"
                     Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "Fingerprint with PKCS11 config and verbose"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
-                },
-                @{
-                    Name = "Keypair alias with sparrow"
+                    Name = "Keypair alias with sparrow (original)"
                     Command = @("sign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "Keypair alias with github"
-                    Command = @("sign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "With digest algorithm"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--digalg", "SHA256", "--input", $file.FullName)
-                },
-                @{
-                    Name = "With signature algorithm"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--sigalg", "SHA256withRSA", "--input", $file.FullName)
                 }
             )
             
@@ -369,28 +377,36 @@ jobs:
             # Try different signing parameter combinations with PKCS11 config
             $signingMethods = @(
                 @{
-                    Name = "Fingerprint with PKCS11 config"
+                    Name = "JSSign tool with fingerprint"
+                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
+                },
+                @{
+                    Name = "JSSign tool with keypair alias sparrow"
+                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
+                },
+                @{
+                    Name = "JSSign tool with keypair alias github"
+                    Command = @("sign", "--tool", "jsign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
+                },
+                @{
+                    Name = "JSSign with verbose output"
+                    Command = @("sign", "--tool", "jsign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
+                },
+                @{
+                    Name = "Direct PKCS11 module with fingerprint"
+                    Command = @("sign", "--fingerprint", $certHash, "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Direct PKCS11 module with keypair sparrow"
+                    Command = @("sign", "--keypair-alias", "sparrow", "--pkcs11-module", "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smpkcs11.dll", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Fingerprint with PKCS11 config (original)"
                     Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName)
                 },
                 @{
-                    Name = "Fingerprint with PKCS11 config and verbose"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--input", $file.FullName, "--verbose")
-                },
-                @{
-                    Name = "Keypair alias with sparrow"
+                    Name = "Keypair alias with sparrow (original)"
                     Command = @("sign", "--keypair-alias", "sparrow", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "Keypair alias with github"
-                    Command = @("sign", "--keypair-alias", "github", "--config-file", $pkcs11Config, "--input", $file.FullName)
-                },
-                @{
-                    Name = "With digest algorithm"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--digalg", "SHA256", "--input", $file.FullName)
-                },
-                @{
-                    Name = "With signature algorithm"
-                    Command = @("sign", "--fingerprint", $certHash, "--config-file", $pkcs11Config, "--sigalg", "SHA256withRSA", "--input", $file.FullName)
                 }
             )
             
