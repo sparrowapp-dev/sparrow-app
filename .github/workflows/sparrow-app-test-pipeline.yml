@@ -61,6 +61,7 @@ jobs:
 
       - name: Install Jsign
         run: |
+          mkdir C:\jsign
           curl -L https://github.com/ebourg/jsign/releases/download/7.0/jsign-7.0.jar -o C:\jsign\jsign-7.0.jar
           echo "C:\jsign" | Out-File -Append -FilePath $env:GITHUB_ENV
 
