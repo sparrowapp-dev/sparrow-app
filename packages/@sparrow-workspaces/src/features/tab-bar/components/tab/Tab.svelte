@@ -39,6 +39,7 @@
   import { Badge, Spinner, Options, Dropdown, Tag } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   // ----
 
   // ------ Props ------
@@ -221,7 +222,11 @@
     <button
       tabindex="-1"
       class="position-relative p-0 border-0 ellipsis"
-      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ? '60%' : '100%'};
+      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ||
+      (tab?.type === TabTypeEnum.FOLDER &&
+        tab?.label === CollectionTypeBaseEnum.MOCK)
+        ? '60%'
+        : '100%'};
         text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if loader}
@@ -344,7 +349,7 @@
         {tab.name}
       </span>
     </button>
-    {#if tab?.type === TabTypeEnum.MOCK_REQUEST}
+    {#if tab?.type === TabTypeEnum.MOCK_REQUEST || (tab?.type === TabTypeEnum.FOLDER && tab?.label === CollectionTypeBaseEnum.MOCK)}
       <Tag type={"green"} text={"Mock"} />
     {/if}
     <div style="align-items:center; justify-content:center;">
