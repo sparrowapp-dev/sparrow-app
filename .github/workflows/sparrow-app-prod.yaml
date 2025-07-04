@@ -228,56 +228,86 @@ jobs:
           Write-Host "Using smctl: $smctlPath" -ForegroundColor Yellow
           Write-Host "Certificate hash: $certHash" -ForegroundColor Yellow
           
+          # First, let's check what signing options are available
+          Write-Host "`nChecking smctl sign help..." -ForegroundColor Yellow
+          try {
+            $helpResult = & $smctlPath sign --help 2>&1
+            Write-Host "Sign help output:" -ForegroundColor Gray
+            Write-Host $helpResult -ForegroundColor White
+          } catch {
+            Write-Host "Could not get sign help: $($_.Exception.Message)" -ForegroundColor Yellow
+          }
+          
           $msiFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
           
           foreach ($file in $msiFiles) {
             Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
-            try {
-              # Capture both stdout and stderr
-              Write-Host "Command: & `"$smctlPath`" sign --fingerprint $certHash --input `"$($file.FullName)`"" -ForegroundColor Gray
-              
-              $signResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName 2>&1
-              $exitCode = $LASTEXITCODE
-              
-              Write-Host "Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
-              Write-Host "Output: $signResult" -ForegroundColor White
-              
-              if ($exitCode -eq 0) {
-                Write-Host "✅ smctl reported success for: $($file.Name)" -ForegroundColor Green
-                
-                # Wait a moment for file system to update
-                Start-Sleep -Seconds 2
-                
-                # Verify signature using PowerShell
-                $signature = Get-AuthenticodeSignature $file.FullName
-                Write-Host "Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
-                
-                if ($signature.Status -eq "Valid") {
-                  Write-Host "✅ File is properly signed: $($file.Name)" -ForegroundColor Green
-                } else {
-                  Write-Host "❌ File is NOT properly signed despite smctl success: $($file.Name)" -ForegroundColor Red
-                  Write-Host "This might indicate a certificate or timestamp issue" -ForegroundColor Yellow
-                  
-                  # Try with different timestamp servers
-                  Write-Host "Attempting with alternative signing method..." -ForegroundColor Yellow
-                  $retryResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName --timestamp-server "http://timestamp.digicert.com" 2>&1
-                  
-                  if ($LASTEXITCODE -eq 0) {
-                    Start-Sleep -Seconds 2
-                    $retrySignature = Get-AuthenticodeSignature $file.FullName
-                    Write-Host "Retry signature status: $($retrySignature.Status)" -ForegroundColor $(if ($retrySignature.Status -eq "Valid") { "Green" } else { "Red" })
-                  }
+            # Try different signing parameter combinations
+            $signingMethods = @(
+                @{
+                    Name = "Basic fingerprint signing"
+                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName)
+                },
+                @{
+                    Name = "Signing with certificate name"
+                    Command = @("sign", "--certificate", "sparrow", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Signing with github certificate"
+                    Command = @("sign", "--certificate", "github", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Hash algorithm specified"
+                    Command = @("sign", "--fingerprint", $certHash, "--hash-alg", "SHA256", "--input", $file.FullName)
+                },
+                @{
+                    Name = "With verbose output"
+                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName, "--verbose")
                 }
+            )
+            
+            $signSuccess = $false
+            
+            foreach ($method in $signingMethods) {
+                Write-Host "`n  Trying: $($method.Name)" -ForegroundColor Yellow
+                Write-Host "  Command: smctl $($method.Command -join ' ')" -ForegroundColor Gray
                 
-              } else {
-                Write-Host "❌ smctl failed to sign $($file.Name) - Exit code: $exitCode" -ForegroundColor Red
-                Write-Host "Error output: $signResult" -ForegroundColor Red
+                try {
+                    $signResult = & $smctlPath $method.Command 2>&1
+                    $exitCode = $LASTEXITCODE
+                    
+                    Write-Host "  Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
+                    Write-Host "  Output: $signResult" -ForegroundColor White
+                    
+                    # Check if the output indicates success (regardless of exit code)
+                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR"
+                    
+                    if ($actualSuccess) {
+                        Write-Host "  ✅ Command output indicates success" -ForegroundColor Green
+                        
+                        # Wait and verify signature
+                        Start-Sleep -Seconds 3
+                        $signature = Get-AuthenticodeSignature $file.FullName
+                        Write-Host "  Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
+                        
+                        if ($signature.Status -eq "Valid") {
+                            Write-Host "  ✅ File is properly signed: $($file.Name)" -ForegroundColor Green
+                            $signSuccess = $true
+                            break
+                        }
+                    } else {
+                        Write-Host "  ❌ Command output indicates failure" -ForegroundColor Red
+                    }
+                    
+                } catch {
+                    Write-Host "  ❌ Exception: $($_.Exception.Message)" -ForegroundColor Red
+                }
+            }
+            
+            if (-not $signSuccess) {
+                Write-Host "❌ Failed to sign $($file.Name) with any method" -ForegroundColor Red
                 exit 1
-              }
-            } catch {
-              Write-Host "❌ Exception while signing $($file.Name): $($_.Exception.Message)" -ForegroundColor Red
-              exit 1
             }
           }
         shell: powershell
@@ -294,51 +324,71 @@ jobs:
           foreach ($file in $exeFiles) {
             Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
-            try {
-              # Capture both stdout and stderr
-              Write-Host "Command: & `"$smctlPath`" sign --fingerprint $certHash --input `"$($file.FullName)`"" -ForegroundColor Gray
-              
-              $signResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName 2>&1
-              $exitCode = $LASTEXITCODE
-              
-              Write-Host "Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
-              Write-Host "Output: $signResult" -ForegroundColor White
-              
-              if ($exitCode -eq 0) {
-                Write-Host "✅ smctl reported success for: $($file.Name)" -ForegroundColor Green
-                
-                # Wait a moment for file system to update
-                Start-Sleep -Seconds 2
-                
-                # Verify signature using PowerShell
-                $signature = Get-AuthenticodeSignature $file.FullName
-                Write-Host "Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
-                
-                if ($signature.Status -eq "Valid") {
-                  Write-Host "✅ File is properly signed: $($file.Name)" -ForegroundColor Green
-                } else {
-                  Write-Host "❌ File is NOT properly signed despite smctl success: $($file.Name)" -ForegroundColor Red
-                  Write-Host "This might indicate a certificate or timestamp issue" -ForegroundColor Yellow
-                  
-                  # Try with different timestamp servers
-                  Write-Host "Attempting with alternative signing method..." -ForegroundColor Yellow
-                  $retryResult = & $smctlPath sign --fingerprint $certHash --input $file.FullName --timestamp-server "http://timestamp.digicert.com" 2>&1
-                  
-                  if ($LASTEXITCODE -eq 0) {
-                    Start-Sleep -Seconds 2
-                    $retrySignature = Get-AuthenticodeSignature $file.FullName
-                    Write-Host "Retry signature status: $($retrySignature.Status)" -ForegroundColor $(if ($retrySignature.Status -eq "Valid") { "Green" } else { "Red" })
-                  }
+            # Try different signing parameter combinations
+            $signingMethods = @(
+                @{
+                    Name = "Basic fingerprint signing"
+                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName)
+                },
+                @{
+                    Name = "Signing with certificate name"
+                    Command = @("sign", "--certificate", "sparrow", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Signing with github certificate"
+                    Command = @("sign", "--certificate", "github", "--input", $file.FullName)
+                },
+                @{
+                    Name = "Hash algorithm specified"
+                    Command = @("sign", "--fingerprint", $certHash, "--hash-alg", "SHA256", "--input", $file.FullName)
+                },
+                @{
+                    Name = "With verbose output"
+                    Command = @("sign", "--fingerprint", $certHash, "--input", $file.FullName, "--verbose")
                 }
+            )
+            
+            $signSuccess = $false
+            
+            foreach ($method in $signingMethods) {
+                Write-Host "`n  Trying: $($method.Name)" -ForegroundColor Yellow
+                Write-Host "  Command: smctl $($method.Command -join ' ')" -ForegroundColor Gray
                 
-              } else {
-                Write-Host "❌ smctl failed to sign $($file.Name) - Exit code: $exitCode" -ForegroundColor Red
-                Write-Host "Error output: $signResult" -ForegroundColor Red
+                try {
+                    $signResult = & $smctlPath $method.Command 2>&1
+                    $exitCode = $LASTEXITCODE
+                    
+                    Write-Host "  Exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
+                    Write-Host "  Output: $signResult" -ForegroundColor White
+                    
+                    # Check if the output indicates success (regardless of exit code)
+                    $actualSuccess = $signResult -notmatch "FAILED" -and $signResult -notmatch "ERROR"
+                    
+                    if ($actualSuccess) {
+                        Write-Host "  ✅ Command output indicates success" -ForegroundColor Green
+                        
+                        # Wait and verify signature
+                        Start-Sleep -Seconds 3
+                        $signature = Get-AuthenticodeSignature $file.FullName
+                        Write-Host "  Signature verification: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Red" })
+                        
+                        if ($signature.Status -eq "Valid") {
+                            Write-Host "  ✅ File is properly signed: $($file.Name)" -ForegroundColor Green
+                            $signSuccess = $true
+                            break
+                        }
+                    } else {
+                        Write-Host "  ❌ Command output indicates failure" -ForegroundColor Red
+                    }
+                    
+                } catch {
+                    Write-Host "  ❌ Exception: $($_.Exception.Message)" -ForegroundColor Red
+                }
+            }
+            
+            if (-not $signSuccess) {
+                Write-Host "❌ Failed to sign $($file.Name) with any method" -ForegroundColor Red
                 exit 1
-              }
-            } catch {
-              Write-Host "❌ Exception while signing $($file.Name): $($_.Exception.Message)" -ForegroundColor Red
-              exit 1
             }
           }
         shell: powershell
