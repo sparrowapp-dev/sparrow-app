@@ -99,137 +99,167 @@ jobs:
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
-      - name: Set up certificate
-        run: |
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
-        shell: bash
-
-      - name: Set variables
-        id: digicert-variables
-        run: |
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+      # Set up DigiCert certificate for cloud signing
+      - name: Set up DigiCert certificate 
+        run: | 
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12 
+        shell: bash 
+      
+      - name: Set DigiCert environment variables 
+        run: | 
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV" 
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV" 
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV" 
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "SM_CODE_SIGNING_CERT_SHA1_HASH=${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" >> "$GITHUB_ENV"
         shell: bash
 
-      - name: Setup Android SDK (for DigiCert action compatibility)
-        run: |
-          # Create minimal Android SDK structure to satisfy DigiCert action requirements
-          $androidSdkPath = "C:\Android\android-sdk"
-          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
-          
-          Write-Host "Creating Android SDK directory structure..."
-          New-Item -ItemType Directory -Path $buildToolsPath -Force
-          
-          # Create dummy files that the DigiCert action expects to find
-          Write-Host "Creating required Android build tool files..."
-          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
-          
-          # Set Android environment variables
-          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
-          
-          Write-Host "Android SDK structure created successfully at: $buildToolsPath"
-          
-          # Verify the structure
-          Get-ChildItem -Path $buildToolsPath -Force
-        shell: powershell
-
-      - name: Install DigiCert Client tools
-        id: digicert-code-signing
+      # Install DigiCert Signing Manager Tools
+      - name: Install DigiCert Signing Manager Tools
         uses: digicert/ssm-code-signing@v1.0.0
 
       - name: Verify DigiCert tools installation
         run: |
-          # Check if smctl is available in PATH or find it manually
-          try {
-            $smctlVersion = smctl --version
-            Write-Host "smctl is available in PATH: $smctlVersion"
-          } catch {
-            Write-Host "smctl not in PATH, searching for installation..."
-            
-            # Common installation paths
-            $possiblePaths = @(
-              "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
-              "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
-              "C:\Users\RUNNER~1\AppData\Local\Temp\smtools-windows-x64\smctl.exe"
-            )
-            
-            foreach ($path in $possiblePaths) {
-              if (Test-Path $path) {
-                Write-Host "Found smctl at: $path"
-                $env:SMCTL_PATH = $path
-                break
+          Write-Host "=== DigiCert Tools Verification ===" -ForegroundColor Cyan
+          
+          # Find smctl executable
+          $smctlPaths = @(
+            "C:\Program Files\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
+            "C:\Program Files (x86)\DigiCert\DigiCert One Signing Manager Tools\smctl.exe",
+            "$env:TEMP\smtools-windows-x64\smctl.exe"
+          )
+          
+          $smctlPath = ""
+          foreach ($path in $smctlPaths) {
+            if (Test-Path $path) {
+              $smctlPath = $path
+              Write-Host "Found smctl at: $path" -ForegroundColor Green
+              break
+            }
+          }
+          
+          if (-not $smctlPath) {
+            # Try to find via Get-Command
+            try {
+              $cmd = Get-Command smctl -ErrorAction SilentlyContinue
+              if ($cmd) {
+                $smctlPath = $cmd.Source
+                Write-Host "Found smctl in PATH: $smctlPath" -ForegroundColor Green
               }
-            }
+            } catch {}
           }
           
-          # Test connectivity
-          if ($env:SMCTL_PATH) {
-            & $env:SMCTL_PATH healthcheck
+          if ($smctlPath) {
+            echo "SMCTL_PATH=$smctlPath" >> $env:GITHUB_ENV
+            
+            # Test smctl functionality
+            Write-Host "`nTesting smctl..." -ForegroundColor Yellow
+            try {
+              & $smctlPath healthcheck
+              if ($LASTEXITCODE -eq 0) {
+                Write-Host "✅ smctl healthcheck passed" -ForegroundColor Green
+              } else {
+                Write-Host "❌ smctl healthcheck failed" -ForegroundColor Red
+              }
+            } catch {
+              Write-Host "❌ Error running smctl: $($_.Exception.Message)" -ForegroundColor Red
+            }
           } else {
-            smctl healthcheck
+            Write-Host "❌ smctl not found" -ForegroundColor Red
+            exit 1
           }
         shell: powershell
 
-      - name: Sign MSI files
+      - name: Sign MSI files with DigiCert
         run: |
-          # Use smctl to sign MSI files
-          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
-            Write-Host "Signing MSI: $($_.Name)"
+          $smctlPath = $env:SMCTL_PATH
+          $certHash = $env:SM_CODE_SIGNING_CERT_SHA1_HASH
+          
+          Write-Host "=== Signing MSI Files ===" -ForegroundColor Cyan
+          Write-Host "Using smctl: $smctlPath" -ForegroundColor Yellow
+          Write-Host "Certificate hash: $certHash" -ForegroundColor Yellow
+          
+          $msiFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          
+          foreach ($file in $msiFiles) {
+            Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
-            if ($env:SMCTL_PATH) {
-              & $env:SMCTL_PATH sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
-            } else {
-              smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
-            }
-            
-            if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to sign $($_.Name)"
+            try {
+              & $smctlPath sign --fingerprint $certHash --input $file.FullName
+              
+              if ($LASTEXITCODE -eq 0) {
+                Write-Host "✅ Successfully signed: $($file.Name)" -ForegroundColor Green
+                
+                # Verify signature using PowerShell
+                $signature = Get-AuthenticodeSignature $file.FullName
+                Write-Host "Signature status: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Yellow" })
+                
+              } else {
+                Write-Host "❌ Failed to sign $($file.Name) - Exit code: $LASTEXITCODE" -ForegroundColor Red
+                exit 1
+              }
+            } catch {
+              Write-Host "❌ Exception while signing $($file.Name): $($_.Exception.Message)" -ForegroundColor Red
               exit 1
-            } else {
-              Write-Host "Successfully signed: $($_.Name)"
             }
           }
         shell: powershell
 
-      - name: Sign EXE files
+      - name: Sign EXE files with DigiCert
         run: |
-          # Use smctl to sign EXE files
-          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
-            Write-Host "Signing EXE: $($_.Name)"
+          $smctlPath = $env:SMCTL_PATH
+          $certHash = $env:SM_CODE_SIGNING_CERT_SHA1_HASH
+          
+          Write-Host "=== Signing EXE Files ===" -ForegroundColor Cyan
+          
+          $exeFiles = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
+          
+          foreach ($file in $exeFiles) {
+            Write-Host "`nSigning: $($file.Name)" -ForegroundColor Yellow
             
-            if ($env:SMCTL_PATH) {
-              & $env:SMCTL_PATH sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
-            } else {
-              smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
-            }
-            
-            if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to sign $($_.Name)"
+            try {
+              & $smctlPath sign --fingerprint $certHash --input $file.FullName
+              
+              if ($LASTEXITCODE -eq 0) {
+                Write-Host "✅ Successfully signed: $($file.Name)" -ForegroundColor Green
+                
+                # Verify signature using PowerShell
+                $signature = Get-AuthenticodeSignature $file.FullName
+                Write-Host "Signature status: $($signature.Status)" -ForegroundColor $(if ($signature.Status -eq "Valid") { "Green" } else { "Yellow" })
+                
+              } else {
+                Write-Host "❌ Failed to sign $($file.Name) - Exit code: $LASTEXITCODE" -ForegroundColor Red
+                exit 1
+              }
+            } catch {
+              Write-Host "❌ Exception while signing $($file.Name): $($_.Exception.Message)" -ForegroundColor Red
               exit 1
-            } else {
-              Write-Host "Successfully signed: $($_.Name)"
             }
           }
         shell: powershell
 
-      - name: Verify Signatures
+      - name: Final signature verification
         run: |
-          # Verify MSI signatures
+          Write-Host "=== Final Signature Verification ===" -ForegroundColor Cyan
+          
+          Write-Host "`nMSI Files:" -ForegroundColor Yellow
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
-            Write-Host "Verifying signature for: $($_.Name)"
-            Get-AuthenticodeSignature $_.FullName | Format-List
+            $signature = Get-AuthenticodeSignature $_.FullName
+            $statusColor = if ($signature.Status -eq "Valid") { "Green" } else { "Red" }
+            Write-Host "  $($_.Name): $($signature.Status)" -ForegroundColor $statusColor
+            if ($signature.SignerCertificate) {
+              Write-Host "    Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
+            }
           }
           
-          # Verify EXE signatures
+          Write-Host "`nEXE Files:" -ForegroundColor Yellow
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
-            Write-Host "Verifying signature for: $($_.Name)"
-            Get-AuthenticodeSignature $_.FullName | Format-List
+            $signature = Get-AuthenticodeSignature $_.FullName
+            $statusColor = if ($signature.Status -eq "Valid") { "Green" } else { "Red" }
+            Write-Host "  $($_.Name): $($signature.Status)" -ForegroundColor $statusColor
+            if ($signature.SignerCertificate) {
+              Write-Host "    Signer: $($signature.SignerCertificate.Subject)" -ForegroundColor Gray
+            }
           }
         shell: powershell
 
