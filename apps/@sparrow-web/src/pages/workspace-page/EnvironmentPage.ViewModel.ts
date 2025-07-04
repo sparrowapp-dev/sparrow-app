@@ -47,67 +47,65 @@ export class EnvironmentViewModel {
    * @returns
    */
   public refreshEnvironment = async (
-  workspaceId: string,
-): Promise<{
-  environmentTabsToBeDeleted?: string[];
-}> => {
-  const guestUser = await this.guestUserRepository.findOne({
-    name: "guestUser",
-  });
+    workspaceId: string
+  ): Promise<{
+    environmentTabsToBeDeleted?: string[];
+  }> => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
 
-  const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
-  if (isGuestUser) {
-    return {};
-  }
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return {};
+    }
 
-  const baseUrl = await this.constructBaseUrl(workspaceId);
-  const workspaceData =
-    await this.workspaceRepository.readWorkspace(workspaceId);
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
 
-  let response;
-  if (
-    workspaceData &&
-    workspaceData.workspaceType === WorkspaceType.PUBLIC &&
-    workspaceData.isShared
-  ) {
-    response = await this.environmentService.fetchAllPublicEnvironments(
-      workspaceId,
-      constants.API_URL,
-    );
-  } else {
-    response = await this.environmentService.fetchAllEnvironments(
-      workspaceId,
-      baseUrl,
-    );
-  }
+    let response;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      response = await this.environmentService.fetchAllPublicEnvironments(
+        workspaceId,
+        constants.API_URL
+      );
+    } else {
+      response = await this.environmentService.fetchAllEnvironments(
+        workspaceId,
+        baseUrl
+      );
+    }
 
-  if (response?.isSuccessful && response?.data?.data) {
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return {};
+    }
+
     const environments = response.data.data;
+    const processedEnvironments: any[] = [];
+    const environmentIds: string[] = [];
 
-    const processedEnvironments = await Promise.all(
-      environments.map(async (_environment: any) => {
-        await tick();
-        const environment = createDeepCopy(_environment);
-        environment["id"] = environment._id;
-        environment["workspaceId"] = workspaceId;
+    const chunkSize = 100;
+
+    for (let i = 0; i < environments.length; i += chunkSize) {
+      const chunk = environments.slice(i, i + chunkSize);
+      for (const env of chunk) {
+        const environment = createDeepCopy(env);
+        environment.id = env._id;
+        environment.workspaceId = workspaceId;
         delete environment._id;
-        return environment;
-      })
-    );
+
+        processedEnvironments.push(environment);
+        environmentIds.push(env._id);
+      }
+      await new Promise((res) => setTimeout(res)); // Yield to browser
+    }
 
     await this.environmentRepository.refreshEnvironment(processedEnvironments);
-
-    const environmentIds = await Promise.all(
-      environments.map(async (_environment: any) => {
-        await tick();
-        return _environment._id;
-      })
-    );
-
-    await this.environmentRepository.deleteOrphanEnvironments(
-      workspaceId,
-      environmentIds
-    );
+    await this.environmentRepository.deleteOrphanEnvironments(workspaceId, environmentIds);
 
     const environmentTabsToBeDeleted =
       await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
@@ -115,13 +113,9 @@ export class EnvironmentViewModel {
         environmentIds
       );
 
-    return {
-      environmentTabsToBeDeleted,
-    };
-  }
+    return { environmentTabsToBeDeleted };
+  };
 
-  return {};
-};
 
   /**
    * @description - deletes environment tab

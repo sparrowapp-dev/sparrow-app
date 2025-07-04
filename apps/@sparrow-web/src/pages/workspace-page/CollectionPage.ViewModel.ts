@@ -192,41 +192,39 @@ export default class CollectionsViewModel {
    * @param workspaceId - id of current workspace
    */
   public fetchCollections = async (
-    workspaceId: string,
+    workspaceId: string
   ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
     const isGuestUser = await this.getGuestUserState();
     if (!workspaceId || isGuestUser) {
       return {};
     }
-    /**
-     * Iterates throught the Collection and return all the Collection item Ids - COllection, Folder, Http Request, WebSocket Request.
-     * @param _collectionItem - Collection or Collection item (Folder, Http Request, WebSocket Request).
-     * @param _collectionItemIds - Blank list that should be manipulated by this function as a result.
-     * @returns List of COllection item Ids.
-     */
-    const getCollectionItemIds = async(
-      _collectionItem: any,
-      _collectionItemIds: string[],
-    ): Promise<void> => {
-      await tick();
-      if (!_collectionItem?.type) {
-        // Collection - object do not have type and holds _id.
-        _collectionItemIds.push(_collectionItem._id);
-      } else {
-        // Folder, Http Request, WebSocket Request - object that holds id.
-        _collectionItemIds.push(_collectionItem.id);
-      }
 
-      // Recursively search through the Collection item structure
-      for (let j = 0; j < _collectionItem?.items?.length; j++) {
-        getCollectionItemIds(_collectionItem.items[j], _collectionItemIds);
+    const getCollectionItemIds = (
+      collectionItem: any,
+      collectedIds: string[]
+    ): void => {
+      const stack = [collectionItem];
+      while (stack.length > 0) {
+        const item = stack.pop();
+        if (!item) continue;
+
+        if (!item.type) {
+          // Collection
+          collectedIds.push(item._id);
+        } else {
+          // Folder, Http Request, WebSocket Request
+          collectedIds.push(item.id);
+        }
+
+        if (Array.isArray(item.items)) {
+          stack.push(...item.items);
+        }
       }
-      return;
     };
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData =
-      await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+
     let res;
     if (
       workspaceData &&
@@ -235,51 +233,55 @@ export default class CollectionsViewModel {
     ) {
       res = await this.collectionService.fetchPublicCollection(
         workspaceId,
-        constants.API_URL,
+        constants.API_URL
       );
     } else {
       res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
     }
-    if (res?.isSuccessful && res?.data?.data) {
-      const collections = res.data.data;
-      await this.collectionRepository.bulkInsertData(
-        workspaceId,
-        collections?.map(async(_collection: any) => {
-          await tick();
-          const collection = createDeepCopy(_collection);
-          collection["workspaceId"] = workspaceId;
-          collection["id"] = _collection._id;
-          if (!collection?.description) collection.description = "";
-          delete collection._id;
-          return collection;
-        }),
-      );
-      await this.collectionRepository.deleteOrphanCollections(
-        workspaceId,
-        collections?.map(async(_collection: any) => {
-          await tick();
-          return _collection._id;
-        }),
-      );
-      await tick();
-      const collectionItemIds: string[] = [];
-      for (let i = 0; i < collections.length; i++) {
-        getCollectionItemIds(collections[i], collectionItemIds);
-      }
 
-      const collectionItemTabsToBeDeleted =
-        await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
-          workspaceId,
-          collectionItemIds as string[],
-        );
-      await tick();
-      return {
-        collectionItemTabsToBeDeleted,
-      };
+    if (!res?.isSuccessful || !res?.data?.data) {
+      return {};
     }
 
-    return {};
+    const collections = res.data.data;
+    const processedCollections: any[] = [];
+    const collectionIds: string[] = [];
+
+    const chunkSize = 100;
+    for (let i = 0; i < collections.length; i += chunkSize) {
+      const chunk = collections.slice(i, i + chunkSize);
+      for (const col of chunk) {
+        const collection = createDeepCopy(col);
+        collection.workspaceId = workspaceId;
+        collection.id = col._id;
+        if (!collection.description) collection.description = "";
+        delete collection._id;
+
+        processedCollections.push(collection);
+        collectionIds.push(col._id);
+      }
+      await new Promise((res) => setTimeout(res)); // yield to UI
+    }
+
+    await this.collectionRepository.bulkInsertData(workspaceId, processedCollections);
+    await this.collectionRepository.deleteOrphanCollections(workspaceId, collectionIds);
+
+    const collectionItemIds: string[] = [];
+    for (const collection of collections) {
+      getCollectionItemIds(collection, collectionItemIds);
+    }
+
+    const collectionItemTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+        workspaceId,
+        collectionItemIds
+      );
+
+    return {
+      collectionItemTabsToBeDeleted,
+    };
   };
+
 
   public deleteTabsWithTabIdInAWorkspace = (
     _workspaceId: string,

@@ -117,6 +117,35 @@
   let isSyncing = false;
   let showMockMenu: boolean = false;
 
+  let visibleExplorers = [];
+  const renderBatchSize = 10;
+
+  function waitNextFrames(frameCount = 1): Promise<void> {
+    return new Promise((resolve) => {
+      function next(n: number) {
+        if (n <= 0) return resolve();
+        requestAnimationFrame(() => next(n - 1));
+      }
+      next(frameCount);
+    });
+  }
+
+  async function renderExplorersInBatches(items: any[], batchSize = 10) {
+    visibleExplorers = [];
+
+    for (let i = 0; i < items.length; i += batchSize) {
+      visibleExplorers = [
+        ...visibleExplorers,
+        ...items.slice(i, i + batchSize),
+      ];
+      await waitNextFrames(10); // let UI update
+    }
+  }
+
+  $: if (visibility && collection?.items?.length) {
+    renderExplorersInBatches(collection.items, renderBatchSize);
+  }
+
   /**
    * Handle position of the context menu
    */
@@ -250,6 +279,68 @@
         }
       });
       deletedIds.push(collection.id);
+    }
+  }
+
+  $: {
+    if (isCollectionPopup) {
+      if (collection) {
+        deletedIds = [];
+        requestCount = 0;
+        mockRequestCount = 0;
+        aiRequestCount = 0;
+        folderCount = 0;
+        graphQLCount = 0;
+        webSocketCount = 0;
+        socketIoCount = 0;
+        collection?.items?.forEach((item: any) => {
+          if (item.type === ItemType.FOLDER) {
+            deletedIds.push(item.id);
+            folderCount++;
+
+            for (let i = 0; i < item.items.length; i++) {
+              if (item.items[i].type === ItemType.REQUEST) {
+                requestCount++;
+                deletedIds.push(item.items[i].id);
+              } else if (item.items[i].type === ItemType.GRAPHQL) {
+                graphQLCount++;
+                deletedIds.push(item.items[i].id);
+              } else if (item.items[i].type === ItemType.WEB_SOCKET) {
+                webSocketCount++;
+                deletedIds.push(item.items[i].id);
+              } else if (item.items[i].type === ItemType.SOCKET_IO) {
+                socketIoCount++;
+                deletedIds.push(item.items[i].id);
+              } else if (item.items[i].type === ItemType.MOCK_REQUEST) {
+                mockRequestCount++;
+                deletedIds.push(item.items[i].id);
+              } else if (item.items[i].type === ItemType.AI_REQUEST) {
+                aiRequestCount++;
+                deletedIds.push(item.items[i].id);
+              }
+            }
+          } else if (item.type === ItemType.REQUEST) {
+            requestCount++;
+            deletedIds.push(item.id);
+          } else if (item.type === ItemType.GRAPHQL) {
+            graphQLCount++;
+            deletedIds.push(item.id);
+          } else if (item.type === ItemType.SOCKET_IO) {
+            socketIoCount++;
+            deletedIds.push(item.id);
+          } else if (item.type === ItemType.WEB_SOCKET) {
+            webSocketCount++;
+            deletedIds.push(item.id);
+          } else if (item.type === ItemType.MOCK_REQUEST) {
+            mockRequestCount++;
+            deletedIds.push(item.id);
+          } else if (item.type === ItemType.AI_REQUEST) {
+            aiRequestCount++;
+            deletedIds.push(item.id);
+          }
+        });
+        deletedIds.push(collection.id);
+      }
     }
   }
 
@@ -1101,7 +1192,7 @@
                 </div>
               </div>
             {/if}
-            {#each collection.items as explorer}
+            {#each visibleExplorers as explorer}
               <Folder
                 {isMockCollection}
                 {userRole}

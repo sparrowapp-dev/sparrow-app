@@ -20,7 +20,7 @@
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import {
     AddRegular,
     AngleLeftIcon,
@@ -107,6 +107,34 @@
   let isSharedWorkspace = false;
   // export let handleExpandCollectionLine;
 
+  let visibleCollections: CollectionDocument[] = [];
+
+  function waitNextFrames(frameCount = 1): Promise<void> {
+    return new Promise((resolve) => {
+      function next(n: number) {
+        if (n <= 0) return resolve();
+        requestAnimationFrame(() => next(n - 1));
+      }
+      next(frameCount);
+    });
+  }
+
+  async function renderInBatches(data: CollectionDocument[], batchSize = 20) {
+    visibleCollections = [];
+    let currentBatch: CollectionDocument[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+      currentBatch.push(data[i]);
+
+      if (currentBatch.length === batchSize || i === data.length - 1) {
+        visibleCollections = [...visibleCollections, ...currentBatch];
+        currentBatch = [];
+
+        // await new Promise(requestAnimationFrame);
+        await waitNextFrames(10);
+      }
+    }
+  }
   $: {
     if (activeTabType !== "Collection") {
       handleTabUpdate("");
@@ -193,8 +221,9 @@
   });
 
   const debouncedSearchCollection = new Debounce().debounce(
-    (_search = "", _collections = []) => {
+    async (_search = "", _collections = []) => {
       collectionFilter = searchCollection(_search, _collections);
+      await renderInBatches(collectionFilter);
     },
     500,
   );
@@ -205,14 +234,19 @@
     }
   }
 
-  const collectionListSubscriber = collectionList.subscribe((value) => {
+  const collectionListSubscriber = collectionList.subscribe(async (value) => {
     if (value) {
       collectionListDocument = value;
-      collectionListDocument = collectionListDocument?.filter(
-        (value) =>
-          value.workspaceId === activeWorkspace?._id &&
-          !(value?.activeSync && activeWorkspace?.isShared),
-      );
+      collectionListDocument = collectionListDocument
+        .map((value) => {
+          return value.toMutableJSON();
+        })
+        ?.filter(
+          (value) =>
+            value.workspaceId === activeWorkspace?._id &&
+            !(value?.activeSync && activeWorkspace?.isShared),
+        );
+      await renderInBatches(collectionListDocument);
     }
   });
 
@@ -432,7 +466,7 @@
         {/if}
         {#if collectionListDocument?.length > 0}
           {#if searchData.length > 0}
-            {#if collectionFilter?.length > 0}
+            {#if visibleCollections?.length > 0}
               <List
                 bind:scrollList
                 height={"auto"}
@@ -515,8 +549,8 @@
               overflowY={"auto"}
               classProps={"pe-0"}
             >
-              <!-- {#each collectionListDocument as col}
-                {#if !(col?.toMutableJSON()?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
+              {#each visibleCollections as col}
+                {#if !(col?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
                   <Collection
                     bind:userRole
                     {isSharedWorkspace}
@@ -529,7 +563,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={col?.toMutableJSON()}
+                    collection={col}
                     {activeTabId}
                     bind:isFirstCollectionExpand
                     {isWebApp}
@@ -540,9 +574,9 @@
                     {isGuestUser}
                   />
                 {/if}
-              {/each} -->
-              <div style="height: {300}px;">
-                <VirtualScroll data={collectionListDocument} key="id" let:data>
+              {/each}
+              <!-- <div style="height: {300}px;"> -->
+              <!-- <VirtualScroll data={visibleCollections} key="id" let:data>
                   <Collection
                     bind:userRole
                     {isSharedWorkspace}
@@ -555,7 +589,7 @@
                     {userRoleInWorkspace}
                     {activeTabPath}
                     {activeTabType}
-                    collection={data?.toMutableJSON()}
+                    collection={data}
                     {activeTabId}
                     bind:isFirstCollectionExpand
                     {isWebApp}
@@ -565,55 +599,55 @@
                     {onCreateMockCollection}
                     {isGuestUser}
                   />
-                </VirtualScroll>
-                {#if !collectionListDocument?.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
-                  <EmptyCollection
-                    bind:userRole
-                    isCollectionEmpty={!collectionListDocument?.some(
-                      (col) =>
-                        col?.collectionType !== CollectionTypeBaseEnum.MOCK,
-                    )}
-                    {onItemCreated}
-                    {collectionList}
-                    {userRoleInWorkspace}
-                    {currentWorkspace}
-                    handleCreateApiRequest={() => onItemCreated("request", {})}
-                    onImportCollectionPopup={showImportCollectionPopup}
-                    isAddCollectionDisabled={isGuestUser}
-                    onImportCurlPopup={showImportCurlPopup}
-                    {isGuestUser}
-                  />
-                {/if}
-                {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
-                  <hr style="margin: 2px 0 2px 2rem;" />
-                  {#each collectionListDocument as col}
-                    {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
-                      <Collection
-                        isMockCollection={true}
-                        bind:userRole
-                        {isSharedWorkspace}
-                        {onItemCreated}
-                        {onItemDeleted}
-                        {onItemRenamed}
-                        {onItemOpened}
-                        {onBranchSwitched}
-                        {onRefetchCollection}
-                        {userRoleInWorkspace}
-                        {activeTabPath}
-                        {activeTabType}
-                        collection={col?.toMutableJSON()}
-                        {activeTabId}
-                        bind:isFirstCollectionExpand
-                        {isWebApp}
-                        {onCompareCollection}
-                        {onSyncCollection}
-                        {onUpdateRunningState}
-                      />
-                    {/if}
-                  {/each}
-                {/if}
-              </div></List
-            >
+                </VirtualScroll> -->
+              {#if !visibleCollections?.some((col) => col?.collectionType !== CollectionTypeBaseEnum.MOCK)}
+                <EmptyCollection
+                  bind:userRole
+                  isCollectionEmpty={!collectionListDocument?.some(
+                    (col) =>
+                      col?.collectionType !== CollectionTypeBaseEnum.MOCK,
+                  )}
+                  {onItemCreated}
+                  {collectionList}
+                  {userRoleInWorkspace}
+                  {currentWorkspace}
+                  handleCreateApiRequest={() => onItemCreated("request", {})}
+                  onImportCollectionPopup={showImportCollectionPopup}
+                  isAddCollectionDisabled={isGuestUser}
+                  onImportCurlPopup={showImportCurlPopup}
+                  {isGuestUser}
+                />
+              {/if}
+              {#if visibleCollections?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+                <hr style="margin: 2px 0 2px 2rem;" />
+                {#each visibleCollections as col}
+                  {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
+                    <Collection
+                      isMockCollection={true}
+                      bind:userRole
+                      {isSharedWorkspace}
+                      {onItemCreated}
+                      {onItemDeleted}
+                      {onItemRenamed}
+                      {onItemOpened}
+                      {onBranchSwitched}
+                      {onRefetchCollection}
+                      {userRoleInWorkspace}
+                      {activeTabPath}
+                      {activeTabType}
+                      collection={col}
+                      {activeTabId}
+                      bind:isFirstCollectionExpand
+                      {isWebApp}
+                      {onCompareCollection}
+                      {onSyncCollection}
+                      {onUpdateRunningState}
+                    />
+                  {/if}
+                {/each}
+              {/if}
+              <!-- </div> -->
+            </List>
           {/if}
         {:else}
           {#if searchData.length === 0}
@@ -641,7 +675,7 @@
           {/if}
         {/if}
       </div>
-      {#if !collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK) && !isGuestUser}
+      {#if !visibleCollections?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK) && !isGuestUser}
         <hr style="margin: 0.5rem; margin-left: 2rem !important;" />
         <EmptyCollection
           bind:userRole

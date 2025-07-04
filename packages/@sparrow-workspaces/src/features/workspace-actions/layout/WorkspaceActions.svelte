@@ -25,7 +25,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import {
     CollectionIcon,
     DoubleArrowIcon,
@@ -156,6 +156,23 @@
   export let onCompareCollection;
   export let onSyncCollection;
   export let onUpdateRunningState;
+
+  let collectionListMounted = false;
+  function delayFrames(count: number): Promise<void> {
+    return new Promise((resolve) => {
+      function nextFrame(n: number) {
+        if (n <= 0) return resolve();
+        requestAnimationFrame(() => nextFrame(n - 1));
+      }
+      nextFrame(count);
+    });
+  }
+
+  onMount(async () => {
+    await tick(); // let Svelte bind DOM
+    await delayFrames(10); // wait for 2 frames
+    collectionListMounted = true;
+  });
 
   let showfilterDropdown: boolean = false;
   let searchData: string = "";
@@ -745,37 +762,39 @@
         class="ps-1"
         style=" overflow:auto; {$isExpandCollection ? 'flex:2;' : ''}"
       >
-        <CollectionList
-          bind:scrollList
-          bind:userRole
-          bind:isFirstCollectionExpand
-          {onRefetchCollection}
-          {showImportCurlPopup}
-          {collectionList}
-          {isGuestUser}
-          {currentWorkspace}
-          {userRoleInWorkspace}
-          {activeTabPath}
-          {activeTabId}
-          {activeTabType}
-          {showImportCollectionPopup}
-          {onItemCreated}
-          {onItemDeleted}
-          {onItemRenamed}
-          {onItemOpened}
-          {onBranchSwitched}
-          {searchData}
-          {toggleExpandCollection}
-          {isExpandCollectionLine}
-          {handleExpandCollectionLine}
-          {isWebApp}
-          {ActiveTab}
-          {handleTabUpdate}
-          {onCompareCollection}
-          {onSyncCollection}
-          {onUpdateRunningState}
-          {onCreateMockCollection}
-        />
+        {#if collectionListMounted}
+          <CollectionList
+            bind:scrollList
+            bind:userRole
+            bind:isFirstCollectionExpand
+            {onRefetchCollection}
+            {showImportCurlPopup}
+            {collectionList}
+            {isGuestUser}
+            {currentWorkspace}
+            {userRoleInWorkspace}
+            {activeTabPath}
+            {activeTabId}
+            {activeTabType}
+            {showImportCollectionPopup}
+            {onItemCreated}
+            {onItemDeleted}
+            {onItemRenamed}
+            {onItemOpened}
+            {onBranchSwitched}
+            {searchData}
+            {toggleExpandCollection}
+            {isExpandCollectionLine}
+            {handleExpandCollectionLine}
+            {isWebApp}
+            {ActiveTab}
+            {handleTabUpdate}
+            {onCompareCollection}
+            {onSyncCollection}
+            {onUpdateRunningState}
+            {onCreateMockCollection}
+          />
+        {/if}
       </div>
 
       <hr class="my-1 ms-1 me-1" />

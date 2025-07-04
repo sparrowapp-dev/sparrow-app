@@ -332,20 +332,22 @@ export class TestflowViewModel {
    * @returns
    */
   public refreshTestflow = async (
-    workspaceId: string,
+    workspaceId: string
   ): Promise<{
     testflowTabsToBeDeleted?: string[];
   }> => {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
+
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       return {};
     }
+
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData =
-      await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+
     let response;
     if (
       workspaceData &&
@@ -354,46 +356,45 @@ export class TestflowViewModel {
     ) {
       response = await this.testflowService.fetchAllPublicTestflow(
         workspaceId,
-        constants.API_URL,
+        constants.API_URL
       );
     } else {
-      response = await this.testflowService.fetchAllTestflow(
-        workspaceId,
-        baseUrl,
-      );
+      response = await this.testflowService.fetchAllTestflow(workspaceId, baseUrl);
     }
 
-    if (response?.isSuccessful && response?.data?.data) {
-      const testflows = response.data.data;
-      await this.testflowRepository.refreshTestflow(
-        testflows?.map(async(_testflow: any) => {
-          await tick();
-          const testflow = createDeepCopy(_testflow);
-          testflow["workspaceId"] = workspaceId;
-          return testflow;
-        }),
-      );
-      await this.testflowRepository.deleteOrphanTestflows(
-        workspaceId,
-        testflows?.map(async(_testflow: any) => {
-          await tick();
-          return _testflow._id;
-        }),
-      );
-      const testflowTabsToBeDeleted =
-        await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
-          workspaceId,
-          testflows?.map(async(_testflow: any) => {
-            await tick();
-            return _testflow._id;
-          }),
-        );
-      return {
-        testflowTabsToBeDeleted,
-      };
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return {};
     }
-    return {};
+
+    const testflows = response.data.data;
+    const testflowsWithWorkspaceId: any[] = [];
+    const testflowIds: string[] = [];
+
+    // ✅ Process in chunks to avoid blocking UI
+    const chunkSize = 100;
+    for (let i = 0; i < testflows.length; i += chunkSize) {
+      const chunk = testflows.slice(i, i + chunkSize);
+      for (const tf of chunk) {
+        const copy = createDeepCopy(tf);
+        copy.workspaceId = workspaceId;
+        testflowsWithWorkspaceId.push(copy);
+        testflowIds.push(tf._id);
+      }
+      await new Promise((res) => setTimeout(res)); // Yield to UI
+    }
+
+    await this.testflowRepository.refreshTestflow(testflowsWithWorkspaceId);
+    await this.testflowRepository.deleteOrphanTestflows(workspaceId, testflowIds);
+
+    const testflowTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
+        workspaceId,
+        testflowIds
+      );
+
+    return { testflowTabsToBeDeleted };
   };
+
 
   /**
    * @description - saves testflow to the mongo server
