@@ -41,7 +41,7 @@
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   let userRole = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -70,7 +70,7 @@
     });
   };
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value?._data) {
         currentWorkspace = {
@@ -86,7 +86,7 @@
   );
   let isWorkspaceOpen = false;
 
-  activeTeam.subscribe((value) => {
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
@@ -174,7 +174,9 @@
   }
 
   onDestroy(() => {
-    activeWorkspaceSubscribe.unsubscribe();
+    activeWorkspaceSubscriber.unsubscribe();
+    activeTeamSubscriber.unsubscribe();
+    userSubscriber();
   });
 
   const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
