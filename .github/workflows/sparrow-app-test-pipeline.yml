@@ -90,20 +90,12 @@ jobs:
           
       - name: Sign MSI Files with DigiCert
         run: |
-          $storepass = "${{ secrets.SM_API_KEY }}|C:\Certificate_pkcs12.p12|${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
-          java -jar C:\jsign\jsign-7.0.jar \
-            --storetype DIGICERTONE \
-            --storepass "$storepass" \
-            --alias "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}" \
-            --tsmode RFC3161 \
-            --tsaurl http://timestamp.digicert.com \
-            D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi
+          java -jar /c/jsign/jsign-7.0.jar --keystore /d/Certificate_pkcs12.p12 --storepass ${{ secrets.SM_CLIENT_CERT_PASSWORD }} --storetype PKCS12 --alias sparrow --tsaurl http://timestamp.digicert.com --input D:/a/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow_2.26.0_x64_en-US.msi
 
       - name: Verify Signature
         run: |
           $files = @(
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi",
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe"
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
           )
           
           foreach ($file in (Get-ChildItem $files)) {
