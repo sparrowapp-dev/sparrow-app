@@ -66,14 +66,15 @@
       description: profileForm.description.value,
       authType: profileForm.authType.value,
       auth: profileForm.auth.values,
+      authId: profileForm.authId,
       defaultKey: false,
     };
 
     console.log("submitting :>> ", profileForm);
 
     let response;
-    if (isEditMode && onUpdateProfile && authId) {
-      response = await onUpdateProfile(authId, profileData);
+    if (isEditMode && onUpdateProfile && profileForm.authId) {
+      response = await onUpdateProfile(profileForm.authId, profileData);
     } else if (!isEditMode && onCreateProfile) {
       response = await onCreateProfile(profileData);
     }

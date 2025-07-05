@@ -95,7 +95,7 @@
       },
       {
         onClick: () => {
-          onDeleteAuthProfile(list.authId);
+          onDeleteAuthProfile(list);
         },
         displayText: "Delete",
         disabled: false,

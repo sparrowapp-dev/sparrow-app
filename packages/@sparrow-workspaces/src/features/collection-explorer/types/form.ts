@@ -14,6 +14,7 @@ export interface ProfileForm {
         isTouched: boolean;
         invalid: boolean;
     }
+    authId?: string;
     auth: {
         isTouched: boolean;
         invalid: boolean;

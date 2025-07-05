@@ -125,6 +125,8 @@
   export let onUpdateRunningState;
   export let userRole;
   export let onCreateAuthProfile;
+  export let onUpdateAuthProfile;
+  export let onDeleteAuthProfile;
 
   /**
    * Local variables
@@ -362,9 +364,26 @@
   };
   export let currentWorkspace;
 
+  // ToDo: Add types for the parameters
   const handleOnCreateAuthProfile = async (authProfileData) => {
-    console.log("In handleOnCreateAuthProfile() :>> ", authProfileData);
     const response = await onCreateAuthProfile(collection, authProfileData);
+    return response;
+  };
+
+  // ToDo: Add types for the parameters
+  const handleOnUpdateAuthProfile = async (
+    authId: string,
+    updatedAuthProfileData,
+  ) => {
+    const response = await onUpdateAuthProfile(
+      collection,
+      authId,
+      updatedAuthProfileData,
+    );
+    return response;
+  };
+  const handleOnDeleteAuthProfile = async (authId: string) => {
+    const response = await onDeleteAuthProfile(collection, authId);
     return response;
   };
 </script>
@@ -1000,8 +1019,8 @@
         <CollectionAuthProfiles
           {authProfilesList}
           onCreateAuthProfile={handleOnCreateAuthProfile}
-          onDelete={() => {}}
-          onUpdate={() => {}}
+          onUpdateAuthProfile={handleOnUpdateAuthProfile}
+          onDeleteAuthProfile={handleOnDeleteAuthProfile}
         />
       {/if}
     {/if}

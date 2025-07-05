@@ -1169,7 +1169,7 @@ export class CollectionRepository {
   // public addRequestOrFolderInCollection = async (
   public addAuthProfile = async (
     collectionId: string,
-    newAuthProfileItems: any, // ToDo: Add a proper type here
+    newAuthProfileItem: any, // ToDo: Add a proper type here
   ) => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
@@ -1179,11 +1179,39 @@ export class CollectionRepository {
       })
       .exec();
     await collection.incrementalPatch({
-      auth: newAuthProfileItems?.auth,
+      auth: [...collection.auth, newAuthProfileItem],
       // selectedAuthType:
       //   newAuthProfileItems.defaultKey
       //     ? newAuthProfileItems.name
       //     : collection.selectedAuthType,
+    });
+  };
+
+  public updateAuthProfile = async (
+    collectionId: string,
+    uuid: string,
+    newAuthProfileItem: any, // ToDo: Add a proper type here
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+
+    const updatedAuths = collection.toJSON().auth.map((element) => {
+      if (element.authId.toString() === uuid) {
+        element = {
+          ...element,
+          ...newAuthProfileItem,
+        };
+      }
+      return element;
+    });
+    await collection.incrementalModify((value) => {
+      value.auth = [...updatedAuths];
+      return value;
     });
   };
 
@@ -1198,14 +1226,14 @@ export class CollectionRepository {
         },
       })
       .exec();
-    const updatedItems = collection.toJSON().auth.filter((element) => {
+    const updatedAuths = collection.toJSON().auth.filter((element) => {
       if (element.authId !== deleteId) {
         return true;
       }
       return false;
     });
     collection.incrementalModify((value) => {
-      value.auth = [...updatedItems];
+      value.auth = [...updatedAuths];
       return value;
     });
   };

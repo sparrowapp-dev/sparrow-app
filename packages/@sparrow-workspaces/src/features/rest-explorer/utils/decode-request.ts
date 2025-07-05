@@ -108,7 +108,8 @@ class DecodeRequest {
       key: string;
       value: string;
     };
-    if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    // if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if (request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
       authHeader = new ReduceAuthParameter(_collectionAuth.collectionAuthNavigation, _collectionAuth.auth).getValue();
     }else{
      authHeader = new ReduceAuthParameter(request.state.requestAuthNavigation, request.auth).getValue();
@@ -156,7 +157,8 @@ class DecodeRequest {
   ): string => {
     let auth;
     // inject environment variable to basic auth before encryption
-    if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    // if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if (request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
       auth = createDeepCopy(_collectionAuth.auth)
     }   
     else{
@@ -176,7 +178,8 @@ class DecodeRequest {
       key: string;
       value: string;
     };
-    if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    // if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if (request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
       authHeader = new ReduceAuthHeader(_collectionAuth.collectionAuthNavigation, auth).getValue();
     }else{
      authHeader = new ReduceAuthHeader(request.state.requestAuthNavigation, auth).getValue();

@@ -16,6 +16,14 @@
   let filterText = "";
   let authProfileFormData = null;
   let isEditMode = false;
+  let isWebEnvironment = true;
+  let isAdminOrOwner = true; // ToDo: Replace with actual logic to determine if the user is admin or owner
+  let openInDesktop = false;
+
+  // For delete auth profile popup
+  let authProfileToDelete = null;
+  let authProfileDeleteLoader = false;
+  let isDeleteAuthProfilePopupOpen = false;
 
   const tableHeaderContent = [
     "Name",
@@ -60,9 +68,9 @@
     isCreateProfileModalOpen = true;
   };
 
-  const handleOnClickDeleteProfile = async (authProfileId: string) => {
-    console.log("in delete profile fn:>> ", authProfileId);
-    // onDeleteAuthProfile(authProfileId);
+  const handleOnClickDeleteProfile = async (authProfile: string) => {
+    isDeleteAuthProfilePopupOpen = true;
+    authProfileToDelete = authProfile;
   };
 
   const handleOnClickCreateProfile = () => {
@@ -155,6 +163,64 @@
     profileData={authProfileFormData}
     {isEditMode}
   />
+</Modal>
+
+<Modal
+  title={"Delete Auth Profile?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeleteAuthProfilePopupOpen}
+  handleModalState={() => {
+    isDeleteAuthProfilePopupOpen = false;
+    authProfileDeleteLoader = false;
+    authProfileToDelete = null;
+  }}
+>
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
+    <p>
+      This action will permanently delete the <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        "{authProfileToDelete?.name}"
+      </span> auth profile. Are you sure you want to proceed?
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+  >
+    <Button
+      disable={authProfileDeleteLoader}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isDeleteAuthProfilePopupOpen = false;
+        authProfileDeleteLoader = false;
+        authProfileToDelete = null;
+      }}
+    />
+
+    <Button
+      disable={authProfileDeleteLoader}
+      title={"Delete"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"danger"}
+      loader={authProfileDeleteLoader}
+      onClick={async () => {
+        await onDeleteAuthProfile(authProfileToDelete.authId);
+        authProfileDeleteLoader = false;
+        isDeleteAuthProfilePopupOpen = false;
+        authProfileToDelete = null;
+      }}
+    />
+  </div>
 </Modal>
 
 <style>

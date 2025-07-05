@@ -1869,8 +1869,12 @@ class CollectionExplorerPage {
 
   // Auth Profile
   // handleCreateGraphqlInCollection
-  public handleCreateAuthProfile = async (_collection: CollectionDto, payload) => {
-    console.log("_col :>> ", _collection)
+  public handleCreateAuthProfile = async (
+    _collection: CollectionDto,
+    _authProfilePayload
+  ) => {
+
+    _authProfilePayload.authId = UntrackedItems.UNTRACKED + uuidv4()
 
     let userSource = {};
     if (_collection?.activeSync) {
@@ -1881,25 +1885,25 @@ class CollectionExplorerPage {
         source: "USER",
       };
     }
-    const AuthProfilePayload =
+
+    const authProfileObj =
     {
-      collectionId: _collection.collectionId,
+      collectionId: _collection.id,
       workspaceId: _collection.workspaceId,
       ...userSource,
       auth: [
         {
-          ...payload,
-
-          // ToDo: These props should handled by backend
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          createdBy: "685a8dd65c6db380e82bdf55",
-          updatedBy: "685a8e305c6db380e82bdf59"
+          ..._authProfilePayload,
         }
       ],
     };
 
-    console.log("final payload :>> ", AuthProfilePayload);
+    await this.collectionRepository.addAuthProfile( // update fn. updateCollectionData here 
+      _collection.id as string,
+      {
+        ...authProfileObj.auth[0],
+      },
+    );
 
     // ToDo: handle for guest user also
     // let isGuestUser;
@@ -1908,127 +1912,134 @@ class CollectionExplorerPage {
     // });
 
     // if (isGuestUser === true) {
-    //   await this.collectionRepository.addRequestOrFolderInCollection(
-    //     _collection.id as string,
-    //     {
-    //       ...graphqlOfCollectionPayload.items,
-    //       id: graphqlTab.getValue().id,
-    //     },
-    //   );
-    //   graphqlTab.updatePath({
-    //     workspaceId: _workspaceId,
-    //     collectionId: _collection.id,
-    //     folderId: "",
-    //   });
-    //   graphqlTab.updateIsSave(true);
-    //   await this.tabRepository.createTab(graphqlTab.getValue());
-    //   moveNavigation("right");
     //   return;
     // }
 
-    const baseUrl = await this.constructBaseUrl(_collection.collectionId as string);
+    const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
     const response = await this.collectionService.addAuthProfile(
-      _collection.collectionId as string,
-      _collection.workspaceId as string,
-      AuthProfilePayload,
       baseUrl,
+      authProfileObj,
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      console.log("In Coll.VM -> handleCreateAuthProfile() :>> isSuccessful :>> ", res);
-
-      await this.collectionRepository.addAuthProfile( // update fn. updateCollectionData here 
+      await this.collectionRepository.updateAuthProfile( // update fn. updateCollectionData here 
         _collection.id as string,
-        {
-          ...res,
-        },
+        _authProfilePayload.authId,
+        res,
       );
+      notifications.success("Auth profile created successfully.");
     } else {
-      console.log("In Coll.VM -> handleCreateAuthProfile() :>> !isSuccessful :>> ", response)
-      // this.collectionRepository.deleteAuthProfile(
-      //   _collection.id,
-      //   graphqlTab.getValue().id,
-      // );
-      // notifications.error(response.message);
+      await this.collectionRepository.deleteAuthProfile(
+        _collection.id,
+        _authProfilePayload.authId,
+      );
+      console.error(response.message)
+      notifications.error("Failed to create authentication profile.");
     }
 
     return response;
   }
-  public handleUpdateAuthProfile = async (_workspaceId: string, _collection: CollectionDto) => {
-    const authProfilePayload =
+
+  public handleUpdateAuthProfile = async (
+    _collection: CollectionDto,
+    _authProfileId: string,
+    _updatedAuthProfilePayload // ToDo: add type
+  ) => {
+
+    let userSource = {};
+    if (_collection?.activeSync) {
+      userSource = {
+        currentBranch: _collection?.currentBranch
+          ? _collection?.currentBranch
+          : _collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+
+    const updatedAuthProfileObj =
     {
       collectionId: _collection.id,
-      workspaceId: _workspaceId,
-      currentBranch: _collection.activeSync ? _collection.currentBranch : undefined,
-      source: _collection.activeSync ? "USER" : undefined,
-      items: {
-        name: graphqlTab.getValue().name,
-        type: CollectionItemTypeBaseEnum.GRAPHQL,
-        description: "",
-        graphql: {},
-      },
+      workspaceId: _collection.workspaceId,
+      ...userSource,
+      ..._updatedAuthProfilePayload,
     };
 
-    let isGuestUser;
-    isGuestUserActive.subscribe((value) => {
-      isGuestUser = value;
-    });
+    // let isGuestUser;
+    // isGuestUserActive.subscribe((value) => {
+    //   isGuestUser = value;
+    // });
 
-    if (isGuestUser === true) {
-      await this.collectionRepository.addRequestOrFolderInCollection(
-        _collection.id as string,
-        {
-          ...graphqlOfCollectionPayload.items,
-          id: graphqlTab.getValue().id,
-        },
-      );
-      graphqlTab.updatePath({
-        workspaceId: _workspaceId,
-        collectionId: _collection.id,
-        folderId: "",
-      });
-      graphqlTab.updateIsSave(true);
-      await this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
-      return;
-    }
+    // if (isGuestUser === true) {
+    //   return;
+    // }
 
-    const baseUrl = await this.constructBaseUrl(_workspaceId);
-    const response = await this.collectionService.addGraphqlInCollection(
-      graphqlOfCollectionPayload,
+    const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
+    const response = await this.collectionService.updateAuthProfile(
       baseUrl,
+      _authProfileId,
+      updatedAuthProfileObj,
     );
-    if (response.isSuccessful && response.data.data) {
+    if (response.isSuccessful) {
       const res = response.data.data;
-
-      await this.collectionRepository.addRequestOrFolderInCollection(
+      await this.collectionRepository.updateAuthProfile(
         _collection.id as string,
-        {
-          ...res,
-        },
+        _authProfileId,
+        res,
       );
-
-      graphqlTab.updateId(res.id as string);
-      graphqlTab.updatePath({
-        workspaceId: _workspaceId,
-        collectionId: _collection.id,
-        folderId: "",
-      });
-      graphqlTab.updateIsSave(true);
-
-      this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
-
-      return;
+      notifications.success("Auth profile updated successfully.");
     } else {
-      this.collectionRepository.deleteRequestOrFolderInCollection(
-        _collection.id,
-        graphqlTab.getValue().id,
-      );
-      notifications.error(response.message);
+      console.error(response.message)
+      notifications.error("Failed to update authentication profile.");
     }
+
+    return response;
   }
-  public handleRemoveAuthProfile = async () => { }
+
+  public handleDeleteAuthProfile = async (
+    collection: CollectionDto,
+    authId: string
+  ) => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    const authProfileObj = {
+      collectionId: collection.id,
+      workspaceId: collection.workspaceId,
+      ...userSource,
+      authId: authId,
+    };
+
+    // let isGuestUser;
+    // isGuestUserActive.subscribe((value) => {
+    //   isGuestUser = value;
+    // });
+
+    // if (isGuestUser === true) {}
+
+    const baseUrl = await this.constructBaseUrl(collection.workspaceId);
+    const response = await this.collectionService.deleteAuthProfile(
+      baseUrl,
+      authId,
+      authProfileObj,
+    );
+
+    if (response.isSuccessful) {
+      await this.collectionRepository.deleteAuthProfile(
+        collection.id,
+        authId,
+      );
+      notifications.success("Authentication profile deleted successfully.");
+    }
+    else {
+      console.error(response.message);
+      notifications.error("Failed to delete authentication profile.");
+    }
+    return response;
+  }
 }
 
 export default CollectionExplorerPage;

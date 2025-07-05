@@ -970,14 +970,12 @@ export class CollectionService {
 
 
   public addAuthProfile = async (
-    collectionId: string,
-    workspaceId: string,
-    updatedPayload, // ToDo: Add proper type here
     baseUrl: string,
+    updatedPayload, // ToDo: Add proper type here
   ) => {
     const response = await makeRequest(
-      "PUT",
-      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`, // ToDo: there should be seprate api for creating profiles/like apis (items field in db)
+      "PUT", // ToDo: Change to POST from backend
+      `${baseUrl}/api/collection/add-auth-profiles`,
       {
         body: updatedPayload,
         headers: getAuthHeaders(),
@@ -988,19 +986,37 @@ export class CollectionService {
   };
 
   public updateAuthProfile = async (
-    _authProfile,
     _baseUrl: string,
+    authProfileId: string,
+    _updateedAuthProfilePayload, // ToDo: Add proper type here
   ) => {
     const response = await makeRequest(
       "PUT",
+      // `${_baseUrl}/api/collection/update-auth-profiles/${authProfileId}`,
       `${_baseUrl}/api/collection/update-auth-profiles`,
       {
-        body: _authProfile,
+        body: _updateedAuthProfilePayload,
         headers: getAuthHeaders(),
       },
     );
     return response;
   };
 
+  public deleteAuthProfile = async (
+    _baseUrl: string,
+    _authProfileId: string,
+    _authProfileDeletionPayload // ToDo: Add proper type here
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      // `${_baseUrl}/api/collection/delete-auth-profiles/${authProfileId}`,
+      `${_baseUrl}/api/collection/delete-auth-profiles`,
+      {
+        body: _authProfileDeletionPayload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 
 }

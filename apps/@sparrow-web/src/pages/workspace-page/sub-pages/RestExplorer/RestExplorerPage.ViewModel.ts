@@ -149,13 +149,12 @@ class RestExplorerViewModel {
     const collectionDoc = collectionRx?.toMutableJSON();
 
     if (collectionDoc?.auth.length) {
+      // Put default selected auth profile as initial value
       this.collectionAuth = {
         auth: collectionDoc?.auth[0].auth,
         collectionAuthNavigation: collectionDoc?.auth[0].authType,
         authId: collectionDoc?.auth[0].authId,
       } as HttpRequestCollectionLevelAuthTabInterface;
-
-      console.log("this llll:>> ", this._collectionAuth.getValue())
     } else {
       this.collectionAuth = {
         auth: {
@@ -897,7 +896,7 @@ class RestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state.requestAuthNavigation) {
+    if (_state.requestAuthNavigation || _state.selectedRequestAuthProfileId) {
 
       // if (
       //   _state.requestAuthNavigation ===
@@ -917,7 +916,32 @@ class RestExplorerViewModel {
             .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
           this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
         ).getValue();
-      } else {
+      } else if (_state.selectedRequestAuthProfileId) {
+        const m = this._tab.getValue() as Tab;
+        const collectionDoc = await this.fetchCollection(m.path.collectionId as string);
+
+        const authProfilesList = collectionDoc?.auth || []; // ToDo: make sure auth array will not be empty, atleast a sample profile should be there
+        const selectedProfileId = m.property.request?.state?.selectedRequestAuthProfileId;
+        const selectedProfile = authProfilesList.find((pf) => pf.authId === selectedProfileId);
+
+        this.collectionAuth = {
+          auth: selectedProfile?.auth,
+          authId: selectedProfileId,
+          collectionAuthNavigation: selectedProfile?.authType
+        }
+        console.log("here 2 :>> ", this._collectionAuth.getValue());
+        this.authHeader = new ReduceAuthHeader(
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
+        ).getValue();
+        this.authParameter = new ReduceAuthParameter(
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
+        ).getValue();
+      }
+      else {
         this.authHeader = new ReduceAuthHeader(
           progressiveTab.property.request.state.requestAuthNavigation,
           progressiveTab.property.request.auth,

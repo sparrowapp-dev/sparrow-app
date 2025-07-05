@@ -68,6 +68,7 @@
     profileForm.name.value = data.name || "";
     profileForm.description.value = data.description || "";
     profileForm.authType.value = data.authType || "select";
+    profileForm.authId = data.authId;
 
     if (data.auth) {
       profileForm.auth.values = {
@@ -135,5 +136,11 @@
   <ProfileName bind:profileForm />
   <ProfileDescription bind:profileForm />
   <ProfileAuthSector bind:profileForm />
-  <ProfileActions bind:profileForm {onCreateProfile} {handleModalState} />
+  <ProfileActions
+    bind:profileForm
+    {isEditMode}
+    {onCreateProfile}
+    {onUpdateProfile}
+    {handleModalState}
+  />
 </section>
