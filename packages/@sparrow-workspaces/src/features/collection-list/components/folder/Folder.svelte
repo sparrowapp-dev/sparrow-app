@@ -139,8 +139,11 @@
     for (let i = 0; i < items.length; i += batchSize) {
       const nextBatch = items.slice(i, i + batchSize);
       visibleItems = [...visibleItems, ...nextBatch];
-      // await new Promise(requestAnimationFrame);
-      await waitNextFrames(10);
+      if (searchData) {
+        await waitNextFrames(100); // let UI update
+      } else {
+        await waitNextFrames(10); // let UI update
+      }
     }
   }
 

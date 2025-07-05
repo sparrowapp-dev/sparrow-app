@@ -155,45 +155,44 @@
 
   let scrollDiv;
 
-  function scrollToBottom() {
-    if (scrollDiv) {
-      scrollDiv.scrollTo({
-        top: scrollDiv.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }
+  // function scrollToBottom() {
+  //   if (scrollDiv) {
+  //     scrollDiv.scrollTo({
+  //       top: scrollDiv.scrollHeight,
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // }
 
   let isNewEnvironmentCreating = false;
 
-  let vsHeight = 0;
-  let vsContainer: HTMLDivElement;
+  let virtualScrollEl: HTMLDivElement;
 
-  function updateVsHeight() {
-    const headerHeight = 32; // adjust this based on your actual header height
-    const extraPadding = 16; // any extra margins/paddings
-    vsHeight =
-      window.innerHeight -
-      vsContainer.getBoundingClientRect().top -
-      extraPadding;
-  }
-
-  onMount(() => {
-    updateVsHeight();
-    window.addEventListener("resize", updateVsHeight);
-    return () => window.removeEventListener("resize", updateVsHeight);
-  });
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      if (virtualScrollEl) {
+        const scrollRoot = virtualScrollEl.querySelector(
+          ".virtual-scroll-root",
+        ) as HTMLElement;
+        if (scrollRoot) {
+          scrollRoot.scrollTo({
+            top: scrollRoot.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }
+    });
+  };
 </script>
 
 <div
-  class={`d-flex flex-column h-100 pt-0 px-1`}
+  class={`d-flex flex-column h-100 pt-0 px-1 overflow-auto`}
   style="font-weight: 500;"
-  bind:this={vsContainer}
   id="Environment-container"
 >
   <div
     tabindex="0"
-    class=" env-sidebar d-flex align-items-center border-radius-2 me-0 mb-0 pe-2"
+    class=" env-sidebar d-flex align-items-center border-radius-2 py-2 me-0 mb-0 pe-2"
     style="cursor:pointer; justify-content: space-between; height:32px ;gap:4px;"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
@@ -266,74 +265,11 @@
       style="background-color: {ActiveTab === 'enviroment'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
-      class="overflow-auto position-relative d-flex flex-column me-0 py-1"
+      class="overflow-auto position-relative d-flex flex-column me-0 py-0"
       bind:this={scrollDiv}
     >
-      {#if filteredGlobalEnvironment?.length}
-        <!-- <div class="mb-0 env-Global">
-          <p
-            tabindex="0"
-            role="button"
-            class={`fw-normal env-item text-fs-12 border-radius-2  ${
-              globalEnvironment[0]?.id === activeTabId && "active"
-            }`}
-            style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
-            on:click={() => {
-              onOpenGlobalEnvironment(globalEnvironment[0]);
-            }}
-          >
-            <span
-              class="icon-default"
-              style="width: 24px; height:24px; margin-right:4px;"
-            >
-            </span>
-            <span class="icon-default">
-              <GlobeRegular size="16px" color="var(--icon-ds-neutral-300)" />
-            </span>
-
-            <span
-              class="box-line1"
-              style="background-color: {isExpandEnviromentLine
-                ? 'var(--bg-ds-neutral-500)'
-                : 'var(--bg-ds-surface-100)'}"
-            ></span>
-            <span
-              class=""
-              style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
-              >{globalEnvironment[0]?.name}
-            </span>
-          </p>
-        </div> -->
-        <!-- <hr class="m-0 me-1 mt-1 mb-1" style="margin-left: 2rem !important" /> -->
-      {/if}
-      {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData && !currentWorkspace?.isShared}
-        <div class={`pb-2 px-1`}>
-          <p
-            class={`add-env-desc-text mt-2 mb-3 text-fs-12 mb-0 fw-normal text-center`}
-            style="color: var(--text-secondary-50)"
-          >
-            Add Environments in your Workspace for precise API testing with
-            relevant resources and constraints.
-          </p>
-          <Button
-            title="Add Environment"
-            startIcon={AddRegular}
-            type="secondary"
-            size="small"
-            customWidth="100%"
-            disabled={loggedUserRoleInWorkspace ===
-              WorkspaceRole.WORKSPACE_VIEWER}
-            onClick={() => {
-              onCreateEnvironment(localEnvironment);
-            }}
-          >
-            startIcon = {AddRegular}
-          </Button>
-        </div>
-      {/if}
-
-      <div class="position-relative h-100 vs">
-        {#if filteredLocalEnvironment?.length}
+      {#if filteredLocalEnvironment?.length || filteredGlobalEnvironment?.length}
+        <div class="position-relative h-100">
           <!-- <div class="mb-1 mt-0 ms-5 me-2" style="height: 1px; background-color:white"></div> -->
           <div
             class="box-line"
@@ -341,50 +277,48 @@
               ? 'var(--bg-ds-neutral-500)'
               : 'var(--bg-ds-surface-100)'}"
           ></div>
-          <div style="height: {vsHeight - 170}px;">
+          <div bind:this={virtualScrollEl} style="height: 100%;">
             <VirtualScroll data={filteredLocalEnvironment} key="id" let:data>
               <div slot="header">
-                <div class="mb-0 env-Global">
-                  <p
-                    tabindex="0"
-                    role="button"
-                    class={`fw-normal env-item text-fs-12 border-radius-2  ${
-                      globalEnvironment[0]?.id === activeTabId && "active"
-                    }`}
-                    style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
-                    on:click={() => {
-                      onOpenGlobalEnvironment(globalEnvironment[0]);
-                    }}
-                  >
-                    <span
-                      class="icon-default"
-                      style="width: 24px; height:24px; margin-right:4px;"
+                {#if filteredGlobalEnvironment?.length}
+                  <div class="mb-0 env-Global">
+                    <p
+                      tabindex="0"
+                      role="button"
+                      class={`fw-normal env-item text-fs-12 border-radius-2  ${
+                        globalEnvironment[0]?.id === activeTabId && "active"
+                      }`}
+                      style="height: 32px; display:flex; align-items:center; padding-left:18px; margin-bottom:2px; position:relative; gap:0px;"
+                      on:click={() => {
+                        onOpenGlobalEnvironment(globalEnvironment[0]);
+                      }}
                     >
-                    </span>
-                    <span class="icon-default">
-                      <GlobeRegular
-                        size="16px"
-                        color="var(--icon-ds-neutral-300)"
-                      />
-                    </span>
+                      <span
+                        class="icon-default"
+                        style="width: 24px; height:24px; margin-right:4px;"
+                      >
+                      </span>
+                      <span class="icon-default">
+                        <GlobeRegular
+                          size="16px"
+                          color="var(--icon-ds-neutral-300)"
+                        />
+                      </span>
 
-                    <span
-                      class="box-line1"
-                      style="background-color: {isExpandEnviromentLine
-                        ? 'var(--bg-ds-neutral-500)'
-                        : 'var(--bg-ds-surface-100)'}"
-                    ></span>
-                    <span
-                      class=""
-                      style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
-                      >{globalEnvironment[0]?.name}
-                    </span>
-                  </p>
-                </div>
-                <hr
-                  class="m-0 me-1 mt-1 mb-1"
-                  style="margin-left: 2rem !important"
-                />
+                      <span
+                        class=""
+                        style="color:var(--bg-ds-neutral-200); padding: 2px 4px;"
+                        >{globalEnvironment[0]?.name}
+                      </span>
+                    </p>
+                  </div>
+                {/if}
+                {#if (filteredGlobalEnvironment?.length && filteredLocalEnvironment?.length) || !searchData}
+                  <hr
+                    class="m-0 me-1 mt-1 mb-1"
+                    style="margin-left: 2rem !important"
+                  />
+                {/if}
               </div>
               <ListItem
                 bind:loggedUserRoleInWorkspace
@@ -396,17 +330,45 @@
                 {onSelectEnvironment}
                 {activeTabId}
               />
+              <div slot="footer">
+                {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData && !currentWorkspace?.isShared}
+                  <div class={`pb-2 ps-5 pe-1`}>
+                    <p
+                      class={`add-env-desc-text mt-2 mb-3 text-fs-12 mb-0 fw-normal text-center`}
+                      style="color: var(--text-secondary-50)"
+                    >
+                      Add Environments in your Workspace for precise API testing
+                      with relevant resources and constraints.
+                    </p>
+                    <Button
+                      title="Add Environment"
+                      startIcon={AddRegular}
+                      type="secondary"
+                      size="small"
+                      customWidth="100%"
+                      disabled={loggedUserRoleInWorkspace ===
+                        WorkspaceRole.WORKSPACE_VIEWER}
+                      onClick={() => {
+                        onCreateEnvironment(localEnvironment);
+                      }}
+                    >
+                      startIcon = {AddRegular}
+                    </Button>
+                  </div>
+                {/if}
+              </div>
             </VirtualScroll>
           </div>
-        {/if}
-      </div>
-      {#if !filteredGlobalEnvironment?.length && !filteredLocalEnvironment?.length && searchData}
-        <p
-          class="mx-1 mb-2 mt-1 text-fs-12 mb-0 text-center"
-          style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
-        >
-          It seems we couldn't find the result matching your search query.
-        </p>
+        </div>
+      {:else if searchData}
+        <div class="pb-2 px-2 h-100 overflow-auto">
+          <p
+            class="mb-0 text-fs-12 mb-0 text-center"
+            style="color: var(--text-secondary-550);  font-weight:300; letter-spacing: 0.5px;"
+          >
+            It seems we couldn't find the result matching your search query.
+          </p>
+        </div>
       {/if}
     </div>
   {/if}

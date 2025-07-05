@@ -138,7 +138,11 @@
         ...visibleExplorers,
         ...items.slice(i, i + batchSize),
       ];
-      await waitNextFrames(10); // let UI update
+      if (searchData) {
+        await waitNextFrames(100); // let UI update
+      } else {
+        await waitNextFrames(10); // let UI update
+      }
     }
   }
 
@@ -222,63 +226,6 @@
       if (activeTabPath.collectionId === collection.id) {
         visibility = true;
       }
-    }
-    if (collection) {
-      deletedIds = [];
-      requestCount = 0;
-      mockRequestCount = 0;
-      aiRequestCount = 0;
-      folderCount = 0;
-      graphQLCount = 0;
-      webSocketCount = 0;
-      socketIoCount = 0;
-      collection?.items?.forEach((item: any) => {
-        if (item.type === ItemType.FOLDER) {
-          deletedIds.push(item.id);
-          folderCount++;
-
-          for (let i = 0; i < item.items.length; i++) {
-            if (item.items[i].type === ItemType.REQUEST) {
-              requestCount++;
-              deletedIds.push(item.items[i].id);
-            } else if (item.items[i].type === ItemType.GRAPHQL) {
-              graphQLCount++;
-              deletedIds.push(item.items[i].id);
-            } else if (item.items[i].type === ItemType.WEB_SOCKET) {
-              webSocketCount++;
-              deletedIds.push(item.items[i].id);
-            } else if (item.items[i].type === ItemType.SOCKET_IO) {
-              socketIoCount++;
-              deletedIds.push(item.items[i].id);
-            } else if (item.items[i].type === ItemType.MOCK_REQUEST) {
-              mockRequestCount++;
-              deletedIds.push(item.items[i].id);
-            } else if (item.items[i].type === ItemType.AI_REQUEST) {
-              aiRequestCount++;
-              deletedIds.push(item.items[i].id);
-            }
-          }
-        } else if (item.type === ItemType.REQUEST) {
-          requestCount++;
-          deletedIds.push(item.id);
-        } else if (item.type === ItemType.GRAPHQL) {
-          graphQLCount++;
-          deletedIds.push(item.id);
-        } else if (item.type === ItemType.SOCKET_IO) {
-          socketIoCount++;
-          deletedIds.push(item.id);
-        } else if (item.type === ItemType.WEB_SOCKET) {
-          webSocketCount++;
-          deletedIds.push(item.id);
-        } else if (item.type === ItemType.MOCK_REQUEST) {
-          mockRequestCount++;
-          deletedIds.push(item.id);
-        } else if (item.type === ItemType.AI_REQUEST) {
-          aiRequestCount++;
-          deletedIds.push(item.id);
-        }
-      });
-      deletedIds.push(collection.id);
     }
   }
 
@@ -813,7 +760,7 @@
 {/if}
 
 <div use:inview={options} on:inview_change={handleChange}>
-  {#if isInView}
+  {#if true}
     <div
       tabindex="0"
       bind:this={collectionTabWrapper}

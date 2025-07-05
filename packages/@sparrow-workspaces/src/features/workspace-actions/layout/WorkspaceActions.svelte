@@ -762,7 +762,7 @@
         class="ps-1"
         style=" overflow:auto; {$isExpandCollection ? 'flex:2;' : ''}"
       >
-        {#if collectionListMounted}
+        {#if true}
           <CollectionList
             bind:scrollList
             bind:userRole
