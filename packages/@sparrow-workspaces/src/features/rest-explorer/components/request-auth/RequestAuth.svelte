@@ -12,8 +12,8 @@
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Button } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
-
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
   export let auth;
   export let environmentVariables;
   export let requestStateAuth;
@@ -71,6 +71,7 @@
               {
                 name: "Auth Profiles",
                 id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
+                disabled: !collection?.auth?.length,
               },
             ]}
             zIndex={499}
