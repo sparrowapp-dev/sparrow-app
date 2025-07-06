@@ -1,5 +1,10 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
+  import {
+    ApiKeyAuthTag,
+    BearerTokenAuthTag,
+    BasicAuthTag,
+  } from "@sparrow/library/icons";
 
   // ToDo: Move these types to another file for better organization
   // Type definitions for better type safety
@@ -19,8 +24,14 @@
     name: string;
     id: string;
     hide?: boolean;
+    icons?: any;
   }
 
+  const authTagIcons = {
+    "API Key": ApiKeyAuthTag,
+    "Bearer Token": BearerTokenAuthTag,
+    "Basic Auth": BasicAuthTag,
+  };
   // Props with proper typing
   export let callback;
   export let authProfilesList: AuthProfile[] = [];
@@ -50,6 +61,8 @@
       .map((profile) => ({
         name: profile.name,
         id: profile.authId,
+        icon: authTagIcons[profile.authType] || null,
+        authType: profile.authType,
       }));
 
     return [defaultOption, ...validProfiles];
@@ -80,7 +93,7 @@
 
 <div class="auth-profile-selector">
   <div class="auth-profile-label">
-    <p class="label-text">Authentication Profile</p>
+    <p class="label-text">Select Authentication Profile</p>
     <div class="select-container">
       <Select
         id="auth-profile-list"
@@ -94,6 +107,7 @@
         position={"absolute"}
         minHeaderWidth={"100%"}
         size={"medium"}
+        maxBodyHeight={"150px"}
       />
 
       <!-- Show count of available profiles -->

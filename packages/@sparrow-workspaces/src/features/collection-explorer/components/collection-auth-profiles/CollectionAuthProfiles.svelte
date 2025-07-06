@@ -1,24 +1,32 @@
 <script lang="ts">
   import { Button, Modal } from "@sparrow/library/ui";
   import { Table, Row, CreateAuthProfile } from "./sub-component";
-  import { AddRegular } from "@sparrow/library/icons";
+  import { AddRegular, PersonKeyRegular } from "@sparrow/library/icons";
+  import {
+    DoubleLeftIcon,
+    DoubleRightIcon,
+    LeftIcon,
+    RightIcon,
+  } from "@sparrow/library/assets";
 
   export let authProfilesList;
   export let onCreateAuthProfile;
   export let onUpdateAuthProfile;
   export let onDeleteAuthProfile;
 
-  let isAscending = false;
-  let isCreateProfileModalOpen = false;
-  let noOfProfilesListPerPage: number = 10;
-  let currPage = 1;
-  let currentSortField = "updatedAt";
-  let filterText = "";
-  let authProfileFormData = null;
   let isEditMode = false;
-  let isWebEnvironment = true;
-  let isAdminOrOwner = true; // ToDo: Replace with actual logic to determine if the user is admin or owner
+  let authProfileFormData = null; // ToDo: Add proper type for auth profile data
+  let isCreateProfileModalOpen = false;
+
   let openInDesktop = false;
+  let isAdminOrOwner = true; // ToDo: Replace with actual logic to determine if the user is admin or owner
+  let isWebEnvironment = true;
+
+  let currPage = 1;
+  let filterText = "";
+  let isAscending = false;
+  let currentSortField = "updatedAt";
+  let noOfProfilesListPerPage: number = 6;
 
   // For delete auth profile popup
   let authProfileToDelete = null;
@@ -36,12 +44,12 @@
   ];
 
   function handleSortToggle(field) {
-    // if (currentSortField === field) {
-    //   isAscending = !isAscending;
-    // } else {
-    //   currentSortField = field;
-    //   isAscending = true;
-    // }
+    if (currentSortField === field) {
+      isAscending = !isAscending;
+    } else {
+      currentSortField = field;
+      isAscending = true;
+    }
   }
 
   $: sortedData = authProfilesList
@@ -142,9 +150,134 @@
             -->
       </tbody>
     </Table>
+
+    <!-- No Profile Available View -->
+    {#if authProfilesList.length === 0}
+      <hr style="margin: 0; height: 0.2px;" />
+      <div class="container">
+        <div class="pb-2">
+          <PersonKeyRegular size="50px" color="var(--icon-ds-surface-50)" />
+        </div>
+        <p
+          class="text-ds-font-size-14 text-ds-font-weight-medium text-ds-line-height-143 m-0"
+          style="color:var(--text-ds-neutral-400);"
+        >
+          No Auth Profile is created yet.
+        </p>
+        <p
+          class="text-ds-font-size-14 text-ds-font-weight-medium text-ds-line-height-143"
+          style="color:var(--text-ds-neutral-400);"
+        >
+          Click <strong style="color:var(--text-ds-neutral-300);"
+            >"Add Profile"</strong
+          > button to create authentication profile.
+        </p>
+      </div>
+    {/if}
   </div>
+
+  <!-- Pagination Bar -->
+  {#if authProfilesList
+    .slice()
+    .reverse()
+    .filter((item) => item.name
+        .toLowerCase()
+        .startsWith(filterText.toLowerCase()))
+    .slice((currPage - 1) * noOfProfilesListPerPage, currPage * noOfProfilesListPerPage).length > 0}
+    <table class="bottom-0" style="width: 53%;">
+      <tfoot>
+        <tr class="d-flex justify-content-between">
+          <th class="tab-head" style=""
+            >Showing {(currPage - 1) * noOfProfilesListPerPage + 1} - {Math.min(
+              currPage * noOfProfilesListPerPage,
+              authProfilesList?.filter((item) =>
+                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+              ).length,
+            )} of {authProfilesList?.filter((item) =>
+              item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+            ).length}
+          </th>
+          <th class="tab-head tab-change" style="">
+            <button
+              on:click={() => (currPage = 1)}
+              class="bg-transparent border-0"
+            >
+              <DoubleLeftIcon
+                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+              /></button
+            >
+            <button
+              on:click={() => {
+                if (currPage > 1) currPage -= 1;
+              }}
+              class="bg-transparent border-0"
+            >
+              <LeftIcon
+                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+              /></button
+            >
+            <button
+              on:click={() => {
+                if (
+                  currPage <
+                  Math.ceil(
+                    authProfilesList?.filter((item) =>
+                      item.name
+                        .toLowerCase()
+                        .startsWith(filterText.toLowerCase()),
+                    ).length / noOfProfilesListPerPage,
+                  )
+                )
+                  currPage += 1;
+              }}
+              class="bg-transparent border-0"
+            >
+              <RightIcon
+                color={currPage ===
+                Math.ceil(
+                  authProfilesList?.filter((item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                  ).length / noOfProfilesListPerPage,
+                )
+                  ? "var(--border-secondary-200)"
+                  : "white"}
+              /></button
+            >
+            <button
+              on:click={() =>
+                (currPage = Math.ceil(
+                  authProfilesList?.filter((item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                  ).length / noOfProfilesListPerPage,
+                ))}
+              class="bg-transparent border-0"
+            >
+              <DoubleRightIcon
+                color={currPage ===
+                Math.ceil(
+                  authProfilesList?.filter((item) =>
+                    item.name
+                      .toLowerCase()
+                      .startsWith(filterText.toLowerCase()),
+                  ).length / noOfProfilesListPerPage,
+                )
+                  ? "var(--border-secondary-200)"
+                  : "white"}
+              /></button
+            >
+          </th>
+          <!-- <th class="tab-head px-0 ms-0"></th> -->
+        </tr>
+      </tfoot>
+    </table>
+  {/if}
 </div>
 
+<!-- Auth Prfile Form Popup -->
 <Modal
   title={isEditMode
     ? "Edit Authentication Profile"
@@ -165,6 +298,7 @@
   />
 </Modal>
 
+<!-- Delete Auth Prfile Popup -->
 <Modal
   title={"Delete Auth Profile?"}
   type={"danger"}
@@ -224,4 +358,38 @@
 </Modal>
 
 <style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 80%;
+    padding: 130px 35px 24px;
+  }
+  .not-found-text {
+    color: var(--text-secondary-200);
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+  }
+
+  .tab-data {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+    background-color: transparent;
+  }
+  .tab-head {
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+    color: var(--text-secondary-200);
+    background-color: transparent;
+  }
+  .tab-change {
+    margin-left: 203px;
+  }
+  table {
+    background-color: transparent;
+  }
 </style>

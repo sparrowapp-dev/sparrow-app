@@ -53,6 +53,8 @@
               {
                 name: "Inherit Auth",
                 id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,
+                disabled: true,
+                hide: true,
               },
               {
                 name: "API Key",
@@ -67,7 +69,7 @@
                 id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
               },
               {
-                name: "Authentication Profiles",
+                name: "Auth Profiles",
                 id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
               },
             ]}
@@ -93,7 +95,7 @@
       The auth header will be automatically generated when you send the request.
     </p>
   </div>
-  <section class="w-100" style="flex:1; overflow:auto;">
+  <section class="w-100" style="flex:1; overflow:hidden;">
     {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.API_KEY}

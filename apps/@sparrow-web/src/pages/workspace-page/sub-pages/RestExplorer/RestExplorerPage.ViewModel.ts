@@ -149,13 +149,19 @@ class RestExplorerViewModel {
     const collectionDoc = collectionRx?.toMutableJSON();
 
     if (collectionDoc?.auth.length) {
-      // Put default selected auth profile as initial value
+      const defaultAuthProfileId = collectionDoc?.selectedAuthType; // ToDo: change its name to defaultAuthProfileId in BE and FE
+      const authProfilesList = collectionDoc?.auth || [];
+      const authProfile = authProfilesList.find((pf) => pf.authId === defaultAuthProfileId);
+
+      // Set default selected auth profile as initial value
       this.collectionAuth = {
-        auth: collectionDoc?.auth[0].auth,
-        collectionAuthNavigation: collectionDoc?.auth[0].authType,
-        authId: collectionDoc?.auth[0].authId,
+        auth: authProfile.auth,
+        collectionAuthNavigation: authProfile.authType,
+        authId: authProfile.authId,
       } as HttpRequestCollectionLevelAuthTabInterface;
+
     } else {
+      // ToDo: do we need to set default auth profile here, can be eliminated?
       this.collectionAuth = {
         auth: {
           bearerToken: "",
@@ -213,7 +219,6 @@ class RestExplorerViewModel {
         //   ).getValue();
         // }
 
-        console.log("in const :>>>>> ")
         if (m.property.request?.state.requestAuthNavigation ===
           HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
           const authProfilesList = collectionDoc?.auth || []; // ToDo: make sure auth array will not be empty, atleast a sample profile should be there
@@ -896,7 +901,7 @@ class RestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state.requestAuthNavigation || _state.selectedRequestAuthProfileId) {
+    if (_state.requestAuthNavigation) {
 
       // if (
       //   _state.requestAuthNavigation ===
@@ -926,7 +931,7 @@ class RestExplorerViewModel {
 
         this.collectionAuth = {
           auth: selectedProfile?.auth,
-          authId: selectedProfileId,
+          authId: selectedProfileId as string,
           collectionAuthNavigation: selectedProfile?.authType
         }
         console.log("here 2 :>> ", this._collectionAuth.getValue());
@@ -1093,13 +1098,11 @@ class RestExplorerViewModel {
     });
     const start = Date.now();
 
-    console.log("in sendReq :>> ", this._collectionAuth.getValue())
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
       environmentVariables.filtered,
       this._collectionAuth.getValue(),
     );
-    console.log("in decodedData :>> ", decodeData)
 
     const selectedAgent = localStorage.getItem(
       "selectedAgent",
@@ -1709,8 +1712,8 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
 
+            // ToDo: do fixes for guest user auth profile
             // if (
             //   progressiveTab.property.request?.state.requestAuthNavigation ===
             //   HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -1732,6 +1735,7 @@ class RestExplorerViewModel {
               //     .auth as CollectionAuthBaseInterface,
               // ).getValue();
 
+              const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
               const authProfilesList = collectionDoc?.auth || []; // ToDo: make sure auth array will not be empty, atleast a sample profile should be there
               const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
               const selectedProfile = authProfilesList.find((pf) => pf.authId === selectedProfileId);
@@ -1825,7 +1829,6 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
 
             // if (
             //   progressiveTab.property.request?.state.requestAuthNavigation ===
@@ -1848,6 +1851,7 @@ class RestExplorerViewModel {
               //     .auth as CollectionAuthBaseInterface,
               // ).getValue();
 
+              const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
               const authProfilesList = collectionDoc?.auth || []; // ToDo: make sure auth array will not be empty, atleast a sample profile should be there
               const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
               const selectedProfile = authProfilesList.find((pf) => pf.authId === selectedProfileId);
@@ -1943,7 +1947,6 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
 
             // if (
             //   progressiveTab.property.request?.state.requestAuthNavigation ===
@@ -1966,6 +1969,7 @@ class RestExplorerViewModel {
               //     .auth as CollectionAuthBaseInterface,
               // ).getValue();
 
+              const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
               const authProfilesList = collectionDoc?.auth || []; // ToDo: make sure auth array will not be empty, atleast a sample profile should be there
               const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
               const selectedProfile = authProfilesList.find((pf) => pf.authId === selectedProfileId);
@@ -2055,7 +2059,6 @@ class RestExplorerViewModel {
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
 
             // if (
             //   progressiveTab.property.request?.state.requestAuthNavigation ===
@@ -2078,6 +2081,7 @@ class RestExplorerViewModel {
               //     .auth as CollectionAuthBaseInterface,
               // ).getValue();
 
+              const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
               const authProfilesList = collectionDoc?.auth || []; // ToDo: make sure auth array will not be empty, atleast a sample profile should be there
               const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
               const selectedProfile = authProfilesList.find((pf) => pf.authId === selectedProfileId);
