@@ -23,6 +23,7 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
+  export let requestStateAuthProfile;
 
   const handlecollection_restapi_auth_changed = ({
     requestAuthNavigation,
@@ -180,6 +181,7 @@
       {/if}
     {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES}
       <AuthProfile
+        currSelectedAuthProfileId={requestStateAuthProfile}
         callback={onUpdateRequestState}
         authProfilesList={collection?.auth}
       />

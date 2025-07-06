@@ -103,6 +103,9 @@ export class RequestTabAdapter {
       case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
         requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
         break;
+      case HttpRequestAuthTypeBaseEnum.AUTH_PROFILES:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.AUTH_PROFILES;
+        break;
     }
     return requestAuthNavigation;
   };

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Select } from "@sparrow/library/forms";
 
+  // ToDo: Move these types to another file for better organization
   // Type definitions for better type safety
   interface AuthProfile {
     name: string;
@@ -23,7 +24,7 @@
   // Props with proper typing
   export let callback;
   export let authProfilesList: AuthProfile[] = [];
-  export let selectedProfileId: string = "None";
+  export let currSelectedAuthProfileId: string = "None";
   export let disabled: boolean = false;
   export let placeholder: string = "Select Authentication Profile";
 
@@ -66,13 +67,11 @@
     );
 
     if (selectedProfile) {
-      // const authType = selectedProfile.authType;
-      // const auth = selectedProfile.auth;
-      selectedProfileId = selectedId;
+      currSelectedAuthProfileId = selectedId;
       console.log("slected :>> ", {
-        selectedRequestAuthProfileId: selectedProfileId,
+        selectedRequestAuthProfileId: currSelectedAuthProfileId,
       });
-      callback({ selectedRequestAuthProfileId: selectedProfileId });
+      callback({ selectedRequestAuthProfileId: currSelectedAuthProfileId });
     } else {
       console.warn(`Auth profile with ID ${selectedId} not found`);
     }
@@ -87,7 +86,7 @@
         id="auth-profile-list"
         data={menuItems}
         zIndex={499}
-        titleId={selectedProfileId}
+        titleId={currSelectedAuthProfileId}
         onclick={handleAuthChange}
         disabled={disabled || menuItems.length <= 1}
         menuItem={"v2"}

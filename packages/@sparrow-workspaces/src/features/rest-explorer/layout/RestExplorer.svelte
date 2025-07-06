@@ -709,6 +709,8 @@
                         <RequestAuth
                           requestStateAuth={$tab.property.request.state
                             .requestAuthNavigation}
+                          requestStateAuthProfile={$tab.property.request.state
+                            .selectedRequestAuthProfileId}
                           {onUpdateRequestState}
                           auth={$tab.property.request.auth}
                           collectionAuth={$collectionAuth}

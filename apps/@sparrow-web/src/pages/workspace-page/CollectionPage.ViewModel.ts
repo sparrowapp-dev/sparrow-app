@@ -45,7 +45,7 @@ import {
 } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation,scrollToTab } from "@sparrow/common/utils/navigation";
+import { moveNavigation, scrollToTab } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -174,7 +174,7 @@ export default class CollectionsViewModel {
   private movedTabStartIndex = 0;
   private movedTabEndIndex = 0;
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Get the guest user state
@@ -1461,7 +1461,7 @@ export default class CollectionsViewModel {
       } else {
         notifications.error(
           response.message ??
-            "Failed to create mock collection. Please try again.",
+          "Failed to create mock collection. Please try again.",
         );
       }
     } else {
@@ -2098,21 +2098,21 @@ export default class CollectionsViewModel {
       isGuestUser = value;
     });
     const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch: _collection.activeSync
-          ? _collection.currentBranch
-          : undefined,
-        source: _collection.activeSync ? "USER" : undefined,
-        items: {
-          name: socketIoTab.getValue().name,
-          type: CollectionItemTypeBaseEnum.SOCKETIO,
-          description: "",
-          socketio: {},
-          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
-        },
-      };
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync
+        ? _collection.currentBranch
+        : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: socketIoTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.SOCKETIO,
+        description: "",
+        socketio: {},
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
+      },
+    };
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestOrFolderInCollection(
@@ -2189,21 +2189,21 @@ export default class CollectionsViewModel {
       isGuestUser = value;
     });
     const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch: _collection.activeSync
-          ? _collection.currentBranch
-          : undefined,
-        source: _collection.activeSync ? "USER" : undefined,
-        items: {
-          name: graphqlTab.getValue().name,
-          type: CollectionItemTypeBaseEnum.GRAPHQL,
-          description: "",
-          graphql: {},
-          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
-        },
-      };
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch: _collection.activeSync
+        ? _collection.currentBranch
+        : undefined,
+      source: _collection.activeSync ? "USER" : undefined,
+      items: {
+        name: graphqlTab.getValue().name,
+        type: CollectionItemTypeBaseEnum.GRAPHQL,
+        description: "",
+        graphql: {},
+        ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
+      },
+    };
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestOrFolderInCollection(
@@ -2786,31 +2786,31 @@ export default class CollectionsViewModel {
     });
 
     const socketIoInFolderPayload: SocketIORequestCreateUpdateInFolderPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch:
-          _collection.activeSync && _folder.source === "USER"
-            ? _collection.currentBranch
-            : undefined,
-        source:
-          _collection.activeSync && _folder.source === "USER"
-            ? _folder.source
-            : undefined,
-        folderId: _folder.id,
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch:
+        _collection.activeSync && _folder.source === "USER"
+          ? _collection.currentBranch
+          : undefined,
+      source:
+        _collection.activeSync && _folder.source === "USER"
+          ? _folder.source
+          : undefined,
+      folderId: _folder.id,
+      items: {
+        name: _folder.name,
+        type: CollectionItemTypeBaseEnum.FOLDER,
+        id: _folder.id,
         items: {
-          name: _folder.name,
-          type: CollectionItemTypeBaseEnum.FOLDER,
-          id: _folder.id,
-          items: {
-            name: socketIoTab.getValue().name,
-            type: CollectionItemTypeBaseEnum.SOCKETIO,
-            description: "",
-            socketio: {},
-            ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
-          },
+          name: socketIoTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.SOCKETIO,
+          description: "",
+          socketio: {},
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
-      };
+      },
+    };
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestInFolder(
@@ -2895,31 +2895,31 @@ export default class CollectionsViewModel {
     });
 
     const graphqlInFolderPayload: GraphqlRequestCreateUpdateInFolderPayloadDtoInterface =
-      {
-        collectionId: _collection.id,
-        workspaceId: _workspaceId,
-        currentBranch:
-          _collection.activeSync && _folder.source === "USER"
-            ? _collection.currentBranch
-            : undefined,
-        source:
-          _collection.activeSync && _folder.source === "USER"
-            ? _folder.source
-            : undefined,
-        folderId: _folder.id,
+    {
+      collectionId: _collection.id,
+      workspaceId: _workspaceId,
+      currentBranch:
+        _collection.activeSync && _folder.source === "USER"
+          ? _collection.currentBranch
+          : undefined,
+      source:
+        _collection.activeSync && _folder.source === "USER"
+          ? _folder.source
+          : undefined,
+      folderId: _folder.id,
+      items: {
+        name: _folder.name,
+        type: CollectionItemTypeBaseEnum.FOLDER,
+        id: _folder.id,
         items: {
-          name: _folder.name,
-          type: CollectionItemTypeBaseEnum.FOLDER,
-          id: _folder.id,
-          items: {
-            name: graphqlTab.getValue().name,
-            type: CollectionItemTypeBaseEnum.GRAPHQL,
-            description: "",
-            graphql: {},
-            ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
-          },
+          name: graphqlTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
+          description: "",
+          graphql: {},
+          ...(isGuestUser ? { updatedAt: new Date().toISOString() } : {}),
         },
-      };
+      },
+    };
 
     if (isGuestUser === true) {
       await this.collectionRepository.addRequestInFolder(
@@ -6895,8 +6895,8 @@ export default class CollectionsViewModel {
         ...userSource,
         items: itemSource,
       } as
-        | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
-        | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
+      | SocketIORequestCreateUpdateInCollectionPayloadDtoInterface
+      | SocketIORequestCreateUpdateInFolderPayloadDtoInterface,
       baseUrl,
     );
 
