@@ -635,17 +635,21 @@
               />
             </Dropdown>
           </div>
-          <Button
-            disable={$tab?.isSaved || !isCollectionEditable
-              ? true
-              : false || isSharedWorkspace}
-            startIcon={SaveRegular}
-            type={"secondary"}
-            onClick={() => {
-              onSaveCollection();
-              handlecollection_collection_saved({ name: "Collection Saved" });
-            }}
-          />
+
+          <!-- Show save button only for overview tab, not for collection auth -->
+          {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
+            <Button
+              disable={$tab?.isSaved || !isCollectionEditable
+                ? true
+                : false || isSharedWorkspace}
+              startIcon={SaveRegular}
+              type={"secondary"}
+              onClick={() => {
+                onSaveCollection();
+                handlecollection_collection_saved({ name: "Collection Saved" });
+              }}
+            />
+          {/if}
         </div>
       {/if}
     </div>
@@ -1021,6 +1025,7 @@
           onCreateAuthProfile={handleOnCreateAuthProfile}
           onUpdateAuthProfile={handleOnUpdateAuthProfile}
           onDeleteAuthProfile={handleOnDeleteAuthProfile}
+          onUpdateRequestState={onUpdateCollectionState}
         />
       {/if}
     {/if}

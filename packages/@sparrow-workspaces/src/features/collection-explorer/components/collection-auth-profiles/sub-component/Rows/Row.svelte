@@ -17,15 +17,19 @@
   } from "@sparrow/library/icons";
 
   export let list;
+  export let listIndex: number = 1;
   export let activeTeam;
   export let onOpenCollection: (id: string) => void;
   export let calculateTimeDifferenceInDays: (
     date1: Date,
     date2: Date,
   ) => string;
-  export let isAdminOrOwner: boolean;
+  export let selectedDefaultKey: string = "";
   export let onEditAuthProfile: (workspace: any) => void;
   export let onDeleteAuthProfile: (workspace: any) => void;
+  export let onDefaultKeyChange: (authId: string) => void;
+
+  export let isAdminOrOwner: boolean;
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
 
@@ -75,6 +79,13 @@
         return "th";
     }
   }
+
+  // Handle radio button change
+  const handleRadioChange = () => {
+    if (onDefaultKeyChange) {
+      onDefaultKeyChange(list.authId, list);
+    }
+  };
 </script>
 
 {#if showMenu}
@@ -125,8 +136,10 @@
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-start py-2 overflow-hidden ellipsis"
   >
     {list?.name}
-    {#if list?.isDefault}
-      <Tag text={"Default Key"} type={"green"} endIcon={""} />
+    {#if list?.defaultKey}
+      <div class="mt-1">
+        <Tag text={"Default Key"} type={"green"} endIcon={""} />
+      </div>
     {/if}
   </td>
 
@@ -170,14 +183,14 @@
   >
     <div class="radio text-fs-12 d-flex align-items-center">
       <RadioButton
-        id="radio-1"
-        name="radio"
-        value={true}
-        handleChange={() => {}}
+        id={`radio-${list.authId}`}
+        name="defaultAuthProfile"
+        value={list.authId}
+        group={selectedDefaultKey}
+        handleChange={handleRadioChange}
         labelText=""
         buttonSize="medium"
       />
-      <!-- group={apiData.addTo} -->
     </div>
   </td>
 

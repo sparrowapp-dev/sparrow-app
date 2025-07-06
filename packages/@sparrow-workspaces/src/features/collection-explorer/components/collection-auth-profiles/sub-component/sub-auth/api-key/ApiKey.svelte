@@ -15,16 +15,16 @@
 
   const handleOptionChange = (event: any) => {
     apiData.addTo = event.target.value;
-    callback({ apiKey: apiData });
+    handleAuthChange();
   };
 </script>
 
 <div>
-  <p style="color:var(  --text-ds-neutral-200)" class="text-fs-12 fw-bold mb-1">
+  <p style="color:var(--text-ds-neutral-200)" class="text-fs-12 fw-bold mb-1">
     Add API Key to
   </p>
 </div>
-<div class="d-flex gap-3 liiiliii">
+<div class="d-flex gap-3">
   <div class="radio text-fs-12 d-flex align-items-center">
     <RadioButton
       id="radio-1"

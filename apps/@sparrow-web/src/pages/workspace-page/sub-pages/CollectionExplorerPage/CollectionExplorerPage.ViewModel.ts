@@ -1986,7 +1986,9 @@ class CollectionExplorerPage {
         _authProfileId,
         res,
       );
-      notifications.success("Auth profile updated successfully.");
+
+      // Don't show success notification if its a defaultkey is update request
+      if (!_updatedAuthProfilePayload.defaultKey) notifications.success("Auth profile updated successfully.");
     } else {
       console.error(response.message)
       notifications.error("Failed to update authentication profile.");

@@ -1201,6 +1201,12 @@ export class CollectionRepository {
       .exec();
 
     const updatedAuths = collection.toJSON().auth.map((element) => {
+
+      // If the new auth profile is set as default, unset the previous default
+      if (element.defaultKey && newAuthProfileItem.defaultKey && element.authId.toString() !== uuid) {
+        element.defaultKey = false; // Unset previous default
+      }
+
       if (element.authId.toString() === uuid) {
         element = {
           ...element,

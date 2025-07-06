@@ -13,6 +13,7 @@
   export let onCreateAuthProfile;
   export let onUpdateAuthProfile;
   export let onDeleteAuthProfile;
+  export let onUpdateRequestState;
 
   let isEditMode = false;
   let authProfileFormData = null; // ToDo: Add proper type for auth profile data
@@ -25,7 +26,7 @@
   let currPage = 1;
   let filterText = "";
   let isAscending = false;
-  let currentSortField = "updatedAt";
+  let currentSortField = "createdAt"; // Default sort field
   let noOfProfilesListPerPage: number = 6;
 
   // For delete auth profile popup
@@ -87,6 +88,26 @@
     isCreateProfileModalOpen = true;
   };
 
+  // Add state to track selected default key
+  let selectedDefaultKey = "";
+
+  // Initialize selectedDefaultKey with the currently default auth profile
+  $: if (filteredAndSortedData && !selectedDefaultKey) {
+    const defaultAuth = filteredAndSortedData.find((item) => item.defaultKey);
+    if (defaultAuth) {
+      selectedDefaultKey = defaultAuth.authId;
+    }
+  }
+
+  // Handle default key change
+  const handleDefaultKeyChange = (authId, authProfile) => {
+    selectedDefaultKey = authId;
+    console.log("Selected Default Key:", selectedDefaultKey, authProfile);
+    authProfile.defaultKey = true; // Mark the selected item as default
+    // onUpdateRequestState({ selectedAuthType: authId });
+    onUpdateAuthProfile(authId, authProfile);
+  };
+
   const handleModalClose = (flag) => {
     isCreateProfileModalOpen = flag;
     if (!flag) {
@@ -133,21 +154,13 @@
         {#each filteredAndSortedData as list, index}
           <Row
             {list}
+            listIndex={index}
+            {selectedDefaultKey}
+            onDefaultKeyChange={handleDefaultKeyChange}
             onEditAuthProfile={handleOnClickEditProfile}
             onDeleteAuthProfile={handleOnClickDeleteProfile}
           />
         {/each}
-        <!-- 
-            {onAddMember}
-            activeTeam={openTeam}
-            onOpenCollection={onSwitchWorkspace}
-            {calculateTimeDifferenceInDays}
-            {isAdminOrOwner}
-            {onEditAuthProfile}
-            {onDeleteAuthProfile}
-            {openInDesktop}
-            {isWebEnvironment} 
-            -->
       </tbody>
     </Table>
 
