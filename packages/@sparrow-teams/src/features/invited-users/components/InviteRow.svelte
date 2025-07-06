@@ -63,10 +63,8 @@
     isNearBottom = viewportHeight - buttonRect.bottom < 150 ? true : false;
 
     pos = {
-      x: buttonRect.left - 142 + (buttonRect.width / 2),
-      y:
-        buttonRect.top +
-        2*buttonRect.height + -buttonRect.height,
+      x: buttonRect.left - 142 + buttonRect.width / 2,
+      y: buttonRect.top + 2 * buttonRect.height + -buttonRect.height,
     };
 
     showMenu = true;
@@ -97,7 +95,7 @@
   id={rowId}
   tabindex="0"
   class="position-relative invite-row-item cursor-pointer ellipsis"
-  style="width:100%"
+  style="width:100%; height:50px;"
 >
   <td
     class="tab-data text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular rounded-start py-2 overflow-hidden ellipsis"

@@ -19,22 +19,103 @@
   const tableHeaderContent = ["Users", "", "", "", "Roles", "Actions"];
 </script>
 
-<div class="h-100 d-flex flex-column">
-  <div
-    class="table-container sparrow-thin-scrollbar overflow-y-auto"
-    style="flex:1; overflow:auto;"
-  >
+<div class="h-100 w-100 d-flex flex-column">
+  <div class="table-container w-100 h-100 sparrow-thin-scrollbar overflow-auto">
     {#if invites.length > 0}
       <Table
-        tableClassProps="table p-0 table-responsive w-100"
-        tableStyleProp="max-height: 100%;width:100%"
+        tableClassProps="d-flex flex-column table p-0 mb-0 table-responsive w-100"
+        tableStyleProp="height: 100%; width:100%"
         dataSearch="true"
-        tableHeaderClassProp="position-sticky top-0 z-2"
+        tableHeaderClassProp="z-2"
         tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);"
         headerObject={tableHeaderContent}
       >
-        <tbody class="overflow-y-auto position-relative z-0">
+        <tbody
+          class="w-100 overflow-auto position-relative z-0"
+          style="flex:1;"
+        >
           {#each invites as list, index}
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
+            <InviteRow
+              user={list?.email}
+              role={list?.role}
+              {index}
+              {onWithDrawInvite}
+              {onResendInvite}
+              {openTeam}
+              {userId}
+            />
             <InviteRow
               user={list?.email}
               role={list?.role}

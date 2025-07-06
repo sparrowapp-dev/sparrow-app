@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { SearchIcon } from "@sparrow/library/assets";
-  import { CrossIcon } from "@sparrow/library/icons";
   import { Member } from "../components";
   import { Search } from "@sparrow/library/forms";
+  import VirtualScroll from "svelte-virtual-scroll-list";
   export let openTeam;
   export let workspaces = [];
 
@@ -36,32 +35,31 @@
 
   let filterText: string = "";
 
-  const handleEraseSearch = () => {
-    filterText = "";
-  };
   let filteredUser = [];
-  const calculateFilteredUser = () => {
-    filteredUser = openTeam?.users?.filter((elem) => {
-      if (
-        elem.name.toLowerCase().includes(filterText.toLowerCase()) ||
-        elem.role.toLowerCase().includes(filterText.toLowerCase()) ||
-        elem.email.toLowerCase().includes(filterText.toLowerCase())
-      ) {
-        return true;
-      } else return false;
-    });
+  const calculateFilteredUser = (
+    _openTeam,
+    _filterText: string = "",
+    _userId: string,
+  ) => {
+    filteredUser = (_openTeam?.users ?? [])
+      .filter((elem) => {
+        const search = _filterText.toLowerCase();
+        return (
+          elem.name.toLowerCase().includes(search) ||
+          elem.role.toLowerCase().includes(search) ||
+          elem.email.toLowerCase().includes(search)
+        );
+      })
+      .sort((a, b) => {
+        if (a.id === _userId) return -1;
+        if (b.id === _userId) return 1;
+        return 0;
+      });
   };
+
   $: {
-    if (openTeam) {
-      calculateFilteredUser();
-    }
-  }
-  $: {
-    if (filterText) {
-      calculateFilteredUser();
-    }
-    if (!filterText) {
-      calculateFilteredUser();
+    if (openTeam || filterText || userId) {
+      calculateFilteredUser(openTeam, filterText, userId);
     }
   }
 </script>
@@ -72,7 +70,7 @@
       <div>
         <Search
           variant="primary"
-          size="medium"
+          size="small"
           id="search-input-team-member"
           placeholder="Search people in {openTeam?.name}"
           bind:value={filterText}
@@ -82,49 +80,33 @@
     </div>
   </section>
   <section style="flex:1; overflow:auto;">
-    {#if filteredUser}
-      {#each filteredUser as user}
-        {#if user.id === userId}
-          <Member
-            owner={true}
-            {user}
-            {userType}
-            {openTeam}
-            workspaces={workspaces.filter((elem) => {
-              return elem?.team?.teamId === openTeam?.teamId;
-            })}
-            {userId}
-            {onRemoveMembersAtTeam}
-            {onDemoteToMemberAtTeam}
-            {onPromoteToAdminAtTeam}
-            {onPromoteToOwnerAtTeam}
-            {onRemoveUserFromWorkspace}
-            {onChangeUserRoleAtWorkspace}
-          />
-          <hr />
-        {/if}
-      {/each}
-      {#each filteredUser as user}
-        {#if user.id !== userId}
-          <Member
-            {user}
-            {userType}
-            {openTeam}
-            workspaces={workspaces.filter((elem) => {
-              return elem?.team?.teamId === openTeam?.teamId;
-            })}
-            {userId}
-            {onRemoveMembersAtTeam}
-            {onDemoteToMemberAtTeam}
-            {onPromoteToAdminAtTeam}
-            {onPromoteToOwnerAtTeam}
-            {onRemoveUserFromWorkspace}
-            {onChangeUserRoleAtWorkspace}
-          />
-        {/if}
-      {/each}
-    {/if}
-    {#if !filteredUser?.length}
+    {#if filteredUser?.length}
+      <div style="height: 100%;">
+        <VirtualScroll data={filteredUser} key="id" let:data>
+          <div>
+            <Member
+              owner={data.id === userId}
+              user={data}
+              {userType}
+              {openTeam}
+              workspaces={workspaces.filter((elem) => {
+                return elem?.team?.teamId === openTeam?.teamId;
+              })}
+              {userId}
+              {onRemoveMembersAtTeam}
+              {onDemoteToMemberAtTeam}
+              {onPromoteToAdminAtTeam}
+              {onPromoteToOwnerAtTeam}
+              {onRemoveUserFromWorkspace}
+              {onChangeUserRoleAtWorkspace}
+            />
+            {#if data.id === userId}
+              <hr />
+            {/if}
+          </div>
+        </VirtualScroll>
+      </div>
+    {:else if filterText}
       <p class="not-found-text mt-3">No result found.</p>
     {/if}
   </section>
