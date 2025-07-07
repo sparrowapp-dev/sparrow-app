@@ -74,7 +74,7 @@
           id="search-input-team-member"
           placeholder="Search people in {openTeam?.name}"
           bind:value={filterText}
-          customWidth={"450px"}
+          customWidth={"320px"}
         />
       </div>
     </div>

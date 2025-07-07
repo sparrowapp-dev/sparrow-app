@@ -315,7 +315,7 @@
     try {
       updater = await check();
       if (updater?.available) {
-        notifications.warning("Update Available");
+        // notifications.warning("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
