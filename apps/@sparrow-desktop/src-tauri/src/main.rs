@@ -988,7 +988,7 @@ async fn connect_socket_io(
                 SocketIoPayload::Binary(bin_data) => {
                     json!({
                         "event": event.as_str(),
-                        "message": bin_data.to_vec()
+                        "message": bin_data
                     })
                 }
             };

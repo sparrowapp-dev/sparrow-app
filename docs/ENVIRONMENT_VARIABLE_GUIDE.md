@@ -1,6 +1,6 @@
 # Environment Variables Guide
 
-This guide provides an overview of the environment variables used in the Sparrow application, including MongoDB, Sparrow-API, and Sparrow-Auth configurations. Each section is categorized for clarity.
+This guide provides an overview of the environment variables used in the Sparrow application, including MongoDB, Kafka, Sparrow-API, and Sparrow-Auth configurations. Each section is categorized for clarity.
 
 ### Important points to note:
 
@@ -52,6 +52,12 @@ These variables configure the Sparrow API server.
 | Variable Name | Description             | Default Value                                |
 | ------------- | ----------------------- | -------------------------------------------- |
 | `DB_URL`      | MongoDB connection URL. | `mongodb://sparowapp:sparrow123@mongo:27017` |
+
+### **Kafka Broker Settings**
+
+| Variable Name  | Description           | Default Value |
+| -------------- | --------------------- | ------------- |
+| `KAFKA_BROKER` | Kafka broker address. | `kafka:9094`  |
 
 ### **Optional Settings**
 
