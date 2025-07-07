@@ -3442,6 +3442,7 @@ export default class CollectionsViewModel {
       workspaceId,
       collection.id,
       folder,
+      collection.collectionType,
     );
     this.handleCreateTab(folderTab);
     scrollToTab(folder.id);
