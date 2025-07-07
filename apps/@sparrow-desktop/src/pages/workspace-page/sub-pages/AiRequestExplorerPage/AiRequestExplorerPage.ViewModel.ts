@@ -640,7 +640,9 @@ class AiRequestExplorerViewModel {
    */
   public handleUploadFilesToCloud = async (filesToUpload: []) => {
     const componentData = this._tab.getValue();
+    console.log("CompeonetData: ", componentData)
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
@@ -650,15 +652,16 @@ class AiRequestExplorerViewModel {
     }
 
     try {
-      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
+      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, providerModel, filesToUpload);
       if (response.isSuccessful) {
         return response.data.data;
       } else {
-        notifications.error(`Failed to upload files. Please try again.`);
+        const errorMsg = response?.message || response?.data?.message || 'Failed to upload files. Please try again.';
+        notifications.error(errorMsg);
       }
     }
     catch (error) {
-      console.error("Something went wrong while deleting the conversation. :>> ", error);
+      console.error("Something went wrong while uploading files. :>> ", error);
     }
   }
 

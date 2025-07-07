@@ -56,13 +56,14 @@ export class AiRequestService {
         return response;
     };
 
-    public uploadRAGfiles = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, files: File[]) => {
+    public uploadRAGfiles = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, providerModel: string, files: File[]) => {
         const formData = new FormData();
         files.forEach((file, index) => {
             formData.append("docs", file);
         });
         formData.append("model", aiProvider);
         formData.append("authKey", providerAuthKey);
+        formData.append("modelVersion", providerModel)
         const contentType: ContentTypeEnum = ContentTypeEnum["multipart/form-data"];
 
         const response = await makeRequest(
