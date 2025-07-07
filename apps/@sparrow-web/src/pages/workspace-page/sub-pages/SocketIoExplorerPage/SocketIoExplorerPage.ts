@@ -322,7 +322,7 @@ class SocketIoExplorerPageViewModel {
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    } catch (error) { 
+    } catch (error) {
       notifications.error(
         "Failed to update the documentation. Please try again",
       );
@@ -764,7 +764,7 @@ class SocketIoExplorerPageViewModel {
         description: socketMetaData.description,
         type: CollectionItemTypeBaseEnum.SOCKETIO,
         socketio: unadaptedSocket,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

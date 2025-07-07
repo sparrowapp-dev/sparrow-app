@@ -1500,7 +1500,7 @@ class RestExplorerMockViewModel {
         description: requestMetaData.description,
         type: "MOCK_REQUEST",
         mockRequest: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

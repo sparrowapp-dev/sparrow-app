@@ -305,6 +305,12 @@ export class RxDB {
             }
             return oldDoc;
           },
+          13: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.isChatbotPromptBoxActive = true;
+            }
+            return oldDoc;
+          }
         },
       },
       collection: {
@@ -349,6 +355,9 @@ export class RxDB {
             return oldDoc;
           },
           3: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },

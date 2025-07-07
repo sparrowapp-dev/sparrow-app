@@ -147,6 +147,7 @@
               variant="primary"
               size="medium"
               isError={exceededLimit && lastModifiedIndex === index}
+              showErrorMessage={!exceededLimit || lastModifiedIndex !== index}
             />
 
             {#if exceededLimit && lastModifiedIndex === index}

@@ -961,8 +961,6 @@ export class TeamExplorerPageViewModel {
           _invitedUserCount === 1 ? "person" : "people"
         } for ${_workspaceName}.`,
       );
-    } else {
-      notifications.error(`Failed to sent invite. Please try again.`);
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
       MixpanelEvent(Events.Invite_To_Workspace_Viewer, {
@@ -996,7 +994,7 @@ export class TeamExplorerPageViewModel {
       notifications.success(`Invite resent successfully.`);
       return response;
     } else if (response?.data?.message === ResponseMessage.INVITE_DECLINED) {
-      notifications.error(`The invite has been declined by Collaborate.`);
+      notifications.error(`The invite has been declined by Collaborator.`);
     } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
@@ -1056,12 +1054,9 @@ export class TeamExplorerPageViewModel {
 
   public userPlanLimits = async (teamId: string) => {
     const teamDetails = await this.teamRepository.getTeamDoc(teamId);
-    const currentPlan = teamDetails?._data?.plan;
+    const currentPlan = teamDetails?.toMutableJSON()?.plan;
     if (currentPlan) {
-      const planLimits = await this.planRepository.getPlan(
-        currentPlan?.id.toString(),
-      );
-      return planLimits?._data?.limits;
+      return currentPlan?.limits;
     }
   };
 

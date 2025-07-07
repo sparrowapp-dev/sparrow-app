@@ -14,14 +14,14 @@ export const moveNavigation = (direction: string) => {
     let count = 0;
     let scroll = setInterval(() => {
       count++;
-      if (count === 5){
-        clearInterval(scroll)
-      } 
+      if (count === 5) {
+        clearInterval(scroll);
+      }
       navigation?.scrollTo({
-        left : navigation.scrollWidth,
-        behavior : "smooth",
-      })
-    }, 50)
+        left: navigation.scrollWidth,
+        behavior: "smooth",
+      });
+    }, 50);
   }
 };
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -48,3 +48,18 @@ const sideScroll = (
   }, speed);
 };
 
+/**
+ * Scrolls the tab bar so that the tab with the given request id is visible.
+ * @param requestId The id of the request tab to scroll into view.
+ */
+export const scrollToTab = (requestId: string) => {
+  const navigation = document.getElementById("tab-scroller");
+  const tabElement = document.getElementById(requestId);
+  if (navigation && tabElement) {
+    tabElement.scrollIntoView({
+      behavior: "smooth",
+      inline: "nearest",
+      block: "nearest",
+    });
+  }
+};

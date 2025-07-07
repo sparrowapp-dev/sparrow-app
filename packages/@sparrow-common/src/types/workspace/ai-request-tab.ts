@@ -2,7 +2,8 @@ import {
     AiRequestAuthTypeBaseEnum,
     AiModelProviderEnum,
     type AIModelVariant,
-    type AiConfigurations
+    type AiConfigurations,
+    type PromptFileAttachment
 } from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
@@ -58,6 +59,10 @@ export interface IsSaveRequestInProgressWrapper {
 
 export interface IsChatbotActive {
     isChatbotActive: boolean;
+}
+
+export interface IsChatbotPromptBoxActiveWrapper {
+    isChatbotPromptBoxActive: boolean;
 }
 
 export interface IsChatAutoClearActive {
@@ -162,13 +167,17 @@ export interface StatusWrapper {
     status: boolean;
 }
 
+export interface FileAttachmentsWrapper {
+    fileAttachments: PromptFileAttachment[]
+}
+
 export interface Conversation
     extends TypeWrapper,
     MessageIdWrapper,
     MessageWrapper,
     IsLikedWrapper,
     IsDislikedWrapper,
-    StatusWrapper { }
+    StatusWrapper, FileAttachmentsWrapper { }
 
 export interface ConversationsWrapper {
     conversations: Conversation[];
@@ -248,7 +257,8 @@ export interface State
     IsChatbotGeneratingResponse,
     IsChatbotConversationLoading,
     IsConversationHistoryPanelOpen,
-    IsConversationHistoryLoading { }
+    IsConversationHistoryLoading,
+    IsChatbotPromptBoxActiveWrapper { }
 
 export interface StatePartial
     extends
@@ -265,4 +275,5 @@ export interface StatePartial
     Partial<IsChatbotGeneratingResponse>,
     Partial<IsChatbotConversationLoading>,
     Partial<IsConversationHistoryPanelOpen>,
-    Partial<IsConversationHistoryLoading> { }
+    Partial<IsConversationHistoryLoading>,
+    Partial<IsChatbotPromptBoxActiveWrapper> { }
