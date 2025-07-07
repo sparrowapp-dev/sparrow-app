@@ -1,3 +1,19 @@
+## [2.27.1](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.27.0...v2.27.1) (2025-07-07)
+
+
+### Bug Fixes
+
+* add Android SDK setup for DigiCert action compatibility and enhance smctl verification ([4a4aaaf](https://github.com/sparrowapp-dev/sparrow-app/commit/4a4aaaf0903eb42944191b91aaa4cfb2d0eaa6ed))
+* enhance code signing process with SignTool and improve error handling ([f8075ac](https://github.com/sparrowapp-dev/sparrow-app/commit/f8075ac2659968d02bceaf960523ff6fffa4568e))
+* enhance MSI and EXE signing process with improved file discovery and validation ([f4e63af](https://github.com/sparrowapp-dev/sparrow-app/commit/f4e63af42f1aaacc2ea65bbf5bec36eb66924c74))
+* enhance signing process with PKCS11 configuration support and improved error handling ([495cd2a](https://github.com/sparrowapp-dev/sparrow-app/commit/495cd2a96aecdff7da9aa89cd979dc75686db1f2))
+* enhance smctl signing process with improved error handling and logging ([4ee84d0](https://github.com/sparrowapp-dev/sparrow-app/commit/4ee84d019cae3eefdb22e591f6c3df133c245f0f))
+* improve smctl signing process with enhanced error handling and multiple signing method attempts ([48d1dc5](https://github.com/sparrowapp-dev/sparrow-app/commit/48d1dc5e93a2a0815c65c678b157cb62c6ab50ef))
+* update DigiCert setup in workflow to use PowerShell and enhance signing process with alias extraction ([17fefd4](https://github.com/sparrowapp-dev/sparrow-app/commit/17fefd444089d52685304b286051b06d2c487dc9))
+* update path variable for copying .deb file in snapcraft configuration ([c083003](https://github.com/sparrowapp-dev/sparrow-app/commit/c083003e19757d201b4ba204e0476f97f5fb8a48))
+* update signing methods in workflow to use JSSign tool and improve parameter handling ([5da2a8d](https://github.com/sparrowapp-dev/sparrow-app/commit/5da2a8daacd41280230100896b5fa5e95f22352c))
+* update URLs for Sparrow APT repo and .deb file in workflow configurations ([767b63c](https://github.com/sparrowapp-dev/sparrow-app/commit/767b63c2b355a3fe1fa4ef2854926d84732423db))
+
 ## [2.27.1](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.27.0...v2.27.1) (2025-07-03)
 
 
