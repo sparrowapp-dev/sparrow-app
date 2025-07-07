@@ -34,7 +34,7 @@
   export let isWebEnvironment: boolean;
 
   let showMenu = false;
-  let noOfColumns = 160;
+  let noOfColumns = 180;
   let workspaceTabWrapper: HTMLElement;
 
   const rightClickContextMenu = (e: MouseEvent) => {
@@ -109,7 +109,7 @@
           onDeleteAuthProfile(list);
         },
         displayText: "Delete",
-        disabled: false,
+        disabled: list.defaultKey,
         icon: DeleteRegular,
       },
     ]}

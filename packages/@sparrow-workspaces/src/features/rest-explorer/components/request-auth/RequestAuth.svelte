@@ -10,7 +10,7 @@
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
@@ -36,6 +36,22 @@
       destination: requestAuthNavigation,
     });
   };
+
+  $: {
+    if (collection?.auth) {
+      const authProfile = collection?.auth.find(
+        (profile) => profile.authId === requestStateAuthProfile,
+      );
+      if (!authProfile) {
+        onUpdateRequestState({
+          selectedRequestAuthProfileId: collection.selectedAuthType,
+        });
+        notifications.warning(
+          "Selected auth profile was deleted. Resetting to default.",
+        );
+      }
+    }
+  }
 </script>
 
 <div class="d-flex flex-column w-100 h-100">

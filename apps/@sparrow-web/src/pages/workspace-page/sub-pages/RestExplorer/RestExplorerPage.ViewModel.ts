@@ -194,30 +194,12 @@ class RestExplorerViewModel {
         const collectionDoc = await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
 
-        // if (
-        //   m.property.request?.state.requestAuthNavigation ===
-        //   HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
-        // ) {
-        //   this.authHeader = new ReduceAuthHeader(
-        //     this._collectionAuth.getValue()
-        //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-        //     this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
-        //   ).getValue();
-        //   this.authParameter = new ReduceAuthParameter(
-        //     this._collectionAuth.getValue()
-        //       .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
-        //     this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
-        //   ).getValue();
-        // } else {
-        //   this.authHeader = new ReduceAuthHeader(
-        //     this._tab.getValue().property.request?.state.requestAuthNavigation,
-        //     this._tab.getValue().property.request?.auth,
-        //   ).getValue();
-        //   this.authParameter = new ReduceAuthParameter(
-        //     this._tab.getValue().property.request?.state.requestAuthNavigation,
-        //     this._tab.getValue().property.request?.auth,
-        //   ).getValue();
-        // }
+        console.log("selectedRequestAuthProfileId:>> ", m.property.request?.state?.selectedRequestAuthProfileId);
+        if (!m.property.request?.state?.selectedRequestAuthProfileId) {
+          console.log("Setting default auth profile id!");
+          const defaultAuthProfileId = collectionDoc?.selectedAuthType;
+          this.updateRequestState({ selectedRequestAuthProfileId: defaultAuthProfileId });
+        }
 
         if (m.property.request?.state.requestAuthNavigation ===
           HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
@@ -901,12 +883,9 @@ class RestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_state.requestAuthNavigation) {
+    console.log("in updateRequestState :>> ", _state);
+    if (_state.requestAuthNavigation || _state.selectedRequestAuthProfileId) {
 
-      // if (
-      //   _state.requestAuthNavigation ===
-      //   HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
-      // ) {
       if (
         _state.requestAuthNavigation ===
         HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
