@@ -1,8 +1,11 @@
 <script lang="ts">
   import {
+    CrossIcon,
     DismissRegular,
     QuestionCircleRegular,
   } from "@sparrow/library/icons";
+
+  import { fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
   import { Button } from "../button";
@@ -41,6 +44,7 @@
     }
   }
 
+  // Cleanup listener when the component is destroyed
   onDestroy(() => {
     document.removeEventListener("keydown", trapTab);
   });
@@ -50,8 +54,13 @@
   <div
     class="sparrow-modal-bg-overlay"
     style={`z-index: ${zIndex} !important`}
+    transition:fade={{ delay: 0, duration: 200 }}
   />
-  <div class="sparrow-modal-container" style={`z-index: ${zIndex + 1};`}>
+  <div
+    class="sparrow-modal-container"
+    style={`z-index: ${zIndex + 1};`}
+    transition:fade={{ delay: 50, duration: 200 }}
+  >
     <div
       on:click={canClose ? handleModalState(false) : null}
       class="sparrow-modal-container-firstChild"
@@ -118,26 +127,13 @@
 {/if}
 
 <style lang="scss">
-  @keyframes smartFadeIn {
-    0% {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
+  .sparrow-modal-container-firstChild {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
-
-  @keyframes fadeOverlayIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
   .sparrow-modal-bg-overlay {
     position: fixed;
     top: 0;
@@ -147,32 +143,27 @@
     background: var(--background-hover);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    animation: fadeOverlayIn 120ms ease-out both;
-    animation-delay: 1ms;
   }
+
   .sparrow-modal-container {
     position: fixed;
-    top: 0;
-    left: 0;
+    height: auto;
     right: 0;
     bottom: 0;
+    top: 0;
+    left: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 6px;
   }
-  .sparrow-modal-container-firstChild {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
+
   .sparrow-modal-container-data {
-    position: relative;
+    height: auto;
     background-color: var(--bg-ds-surface-600);
     border-radius: 8px;
     padding: 30px 30px 20px 30px;
-    animation: smartFadeIn 240ms ease-out both;
+    position: relative;
   }
   .sparrow-modal-heading {
     width: 400px;

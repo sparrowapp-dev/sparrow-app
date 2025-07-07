@@ -1878,6 +1878,7 @@ class AiRequestExplorerViewModel {
     await this.switchConversation("", "New Conversation", []);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
     // notifications.success("Created new conversation.");
   }
 
@@ -1891,6 +1892,8 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
+
     // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
   }
 
@@ -2094,9 +2097,13 @@ class AiRequestExplorerViewModel {
                 errorMessage = "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage = "Some issue occurred from server while processing your request, please try again.";
-              } else {
-                errorMessage = response.message; // Use the actual error message from the response
-              }
+              } else if (response.message.includes("exceeds the maximum limit") || 
+                  response.message.includes("Total file size exceeds the limit")
+            ) {
+                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
+                await this.updateRequestState({ isChatbotPromptBoxActive: false });
+              } 
+              else { errorMessage = response.message; } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations || []),

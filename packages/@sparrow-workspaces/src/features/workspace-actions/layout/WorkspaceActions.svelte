@@ -60,7 +60,10 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
-  import { LaunchDesktop } from "@sparrow/common/components";
+  import {
+    GithubStarRedirect,
+    LaunchDesktop,
+  } from "@sparrow/common/components";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import {
     ArrowRightIcon,
@@ -919,34 +922,10 @@
       style="z-index: 4;"
     >
       <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
-        <div
-          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
-            ? 'bg-secondary-600'
-            : ''}"
-          role="button"
-          on:mouseenter={() => {
-            isGithubStarHover = true;
-          }}
-          on:mouseleave={() => {
-            isGithubStarHover = false;
-          }}
-          on:click={navigateToGithub}
-        >
-          <GithubIcon
-            height={"18px"}
-            width={"18px"}
-            color={isGithubStarHover
-              ? "var(--bg-secondary-100)"
-              : "var(--bg-secondary-200)"}
-          />
-          <span
-            class="ps-2 text-fs-14 {isGithubStarHover
-              ? 'text-secondary-100'
-              : 'text-secondary-200'}"
-          >
-            {githubRepo?.stargazers_count || ""}
-          </span>
-        </div>
+        <GithubStarRedirect
+          onClick={navigateToGithub}
+          count={githubRepo?.stargazers_count || ""}
+        />
       </Tooltip>
 
       <div class="d-flex align-items-center">

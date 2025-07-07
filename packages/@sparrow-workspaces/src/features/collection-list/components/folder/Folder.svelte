@@ -17,7 +17,7 @@
   } from "@sparrow/library/icons";
 
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-
+  import { slide } from "svelte/transition";
   // ---- Components
   import {
     Spinner,
@@ -621,46 +621,47 @@
           </Tooltip>
         {/if}
       </div>
-      <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div
-          class="sub-files position-relative"
-          style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
-        >
-          {#if explorer?.items?.length > 0}
-            <div
-              class="box-line"
-              style="background-color: {verticalFolderLine
-                ? 'var(--bg-ds-neutral-500)'
-                : 'var(--bg-ds-surface-100)'}"
-            ></div>
-          {/if}
-          {#each explorer?.items || [] as exp}
-            <svelte:self
-              {userRole}
-              {isSharedWorkspace}
-              {onItemCreated}
-              {onItemDeleted}
-              {onItemRenamed}
-              {onItemOpened}
-              {activeTabType}
-              {collection}
-              {userRoleInWorkspace}
-              {activeTabPath}
-              explorer={exp}
-              folder={explorer}
-              {activeTabId}
-              {isWebApp}
-            />
-          {/each}
-          {#if !explorer?.items?.length}
-            <p
-              class="text-ds-font-size-12 my-2 text-secondary-300"
-              style="padding-left: 90px;"
-            >
-              This folder is empty
-            </p>
-          {/if}
-          <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
+      {#if expand}
+        <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
+          <div
+            class="sub-files position-relative"
+            style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+          >
+            {#if explorer?.items?.length > 0}
+              <div
+                class="box-line"
+                style="background-color: {verticalFolderLine
+                  ? 'var(--bg-ds-neutral-500)'
+                  : 'var(--bg-ds-surface-100)'}"
+              ></div>
+            {/if}
+            {#each explorer?.items || [] as exp}
+              <svelte:self
+                {userRole}
+                {isSharedWorkspace}
+                {onItemCreated}
+                {onItemDeleted}
+                {onItemRenamed}
+                {onItemOpened}
+                {activeTabType}
+                {collection}
+                {userRoleInWorkspace}
+                {activeTabPath}
+                explorer={exp}
+                folder={explorer}
+                {activeTabId}
+                {isWebApp}
+              />
+            {/each}
+            {#if !explorer?.items?.length}
+              <p
+                class="text-ds-font-size-12 my-2 text-secondary-300"
+                style="padding-left: 90px;"
+              >
+                This folder is empty
+              </p>
+            {/if}
+            <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
                 classProp="mt-2 mb-2 ms-0"
@@ -688,8 +689,9 @@
               </Tooltip>
             </div>
           {/if} -->
+          </div>
         </div>
-      </div>
+      {/if}
     {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
       <div style={`cursor: pointer; `}>
         <Request

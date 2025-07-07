@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.sparrow.app</string>
+	<string>dev.sparrowapp.desktop</string>
 	<key>CFBundleName</key>
 	<string>Sparrow</string>
 	<key>CFBundleSpokenName</key>
@@ -18,7 +18,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.sparrow.app</string>
+			<string>dev.sparrowapp.desktop</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>sparrow</string>
@@ -29,5 +29,9 @@
 	<string>icon.icns</string>
 	<key>NSPrefPaneIconLabel</key>
 	<string>Sparrow</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+  	<false/>
+	<key>LSApplicationCategoryType</key>
+    <string>public.app-category.developer-tools</string>
 </dict>
 </plist>
