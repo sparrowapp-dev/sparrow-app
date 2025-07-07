@@ -198,7 +198,7 @@
       title={`Add ${TFDefaultEnum.NAME}`}
       placement={"bottom-center"}
       distance={13}
-      show={isHovered}
+      show={isHovered && !isNewTestflowCreating}
       zIndex={701}
     >
       <span

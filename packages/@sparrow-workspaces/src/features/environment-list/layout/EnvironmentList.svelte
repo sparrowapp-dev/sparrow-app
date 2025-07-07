@@ -215,7 +215,7 @@
         title={"Add Environment"}
         placement={"bottom-center"}
         distance={13}
-        show={isHovered}
+        show={isHovered && !isNewEnvironmentCreating}
         zIndex={701}
       >
         <span class="add-icon-container d-flex">
