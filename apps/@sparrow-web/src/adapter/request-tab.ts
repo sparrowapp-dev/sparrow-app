@@ -14,9 +14,9 @@ import { HttpRequestAuthTypeBaseEnum, HttpRequestContentTypeBaseEnum } from "@sp
  * @class - this class makes request tab compatible with backend server
  */
 export class RequestTabAdapter {
-  constructor() { }
+  constructor() {}
 
-  private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum): HttpRequestContentTypeBaseEnum => {
+  private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : HttpRequestContentTypeBaseEnum => {
     let contentType = HttpRequestContentTypeBaseEnum["text/plain"];
     switch (bodyType) {
       case RequestDatasetEnum.NONE:
@@ -46,7 +46,7 @@ export class RequestTabAdapter {
     }
     return contentType;
   };
-
+  
   private setBodyType = (header: string) => {
     let requestBodyNavigation = RequestDatasetEnum.RAW;
     let requestBodyLanguage = RequestDataTypeEnum.TEXT;
@@ -84,8 +84,8 @@ export class RequestTabAdapter {
     }
     return { requestBodyLanguage, requestBodyNavigation };
   };
-
-  private setAuthType = (auth: HttpRequestAuthTypeBaseEnum): HttpRequestAuthTypeBaseEnum => {
+  
+  private setAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
     let requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
     switch (auth) {
       case HttpRequestAuthTypeBaseEnum.NO_AUTH:
@@ -109,8 +109,8 @@ export class RequestTabAdapter {
     }
     return requestAuthNavigation;
   };
-
-  private unsetAuthType = (auth: HttpRequestAuthTypeBaseEnum): HttpRequestAuthTypeBaseEnum => {
+  
+  private unsetAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
     let authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
     switch (auth) {
       case HttpRequestAuthTypeBaseEnum.NO_AUTH:
@@ -131,7 +131,6 @@ export class RequestTabAdapter {
       case HttpRequestAuthTypeBaseEnum.AUTH_PROFILES:
         authType = HttpRequestAuthTypeBaseEnum.AUTH_PROFILES;
         break;
-
     }
     return authType;
   };
@@ -238,22 +237,22 @@ export class RequestTabAdapter {
     requestTab = createDeepCopy(requestTab);
     const bodyType =
       requestTab.property.request?.state.requestBodyNavigation ===
-        RequestDatasetEnum.RAW
+      RequestDatasetEnum.RAW
         ? requestTab.property.request?.state.requestBodyLanguage
         : requestTab.property.request?.state.requestBodyNavigation;
     // parsing form data
-    const textFormData: {
+    const textFormData : {
       key: string;
       value: string;
       checked: boolean;
     }[] = [];
-    const fileFormData: {
+    const fileFormData : {
       key: string;
       value: string;
       checked: boolean;
       base: string;
     }[] = [];
-
+    
     requestTab.property.request?.body.formdata.map((pair) => {
       if (pair.type == "text") {
         textFormData.push({
@@ -274,9 +273,9 @@ export class RequestTabAdapter {
       method: requestTab.property.request?.method,
       url: requestTab.property.request?.url,
       body: {
-        raw: requestTab.property.request?.body.raw,
-        urlencoded: requestTab.property.request?.body.urlencoded,
-        formdata: {
+        raw : requestTab.property.request?.body.raw,
+        urlencoded : requestTab.property.request?.body.urlencoded,
+        formdata : {
           text: textFormData,
           file: fileFormData,
         }

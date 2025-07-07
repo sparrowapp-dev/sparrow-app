@@ -37,14 +37,15 @@
     });
   };
 
+  // Setting default auth profile if the selected one is deleted from the collection
   $: {
-    if (collection?.auth) {
-      const authProfile = collection?.auth.find(
+    if (collection?.authProfiles) {
+      const authProfile = collection?.authProfiles.find(
         (profile) => profile.authId === requestStateAuthProfile,
       );
       if (!authProfile) {
         onUpdateRequestState({
-          selectedRequestAuthProfileId: collection.selectedAuthType,
+          selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile,
         });
         notifications.warning(
           "Selected auth profile was deleted. Resetting to default.",
@@ -69,8 +70,6 @@
               {
                 name: "Inherit Auth",
                 id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,
-                disabled: true,
-                hide: true,
               },
               {
                 name: "API Key",
@@ -87,7 +86,7 @@
               {
                 name: "Auth Profiles",
                 id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
-                disabled: !collection?.auth?.length,
+                disabled: !collection?.authProfiles?.length,
               },
             ]}
             zIndex={499}
@@ -202,7 +201,7 @@
       <AuthProfile
         currSelectedAuthProfileId={requestStateAuthProfile}
         callback={onUpdateRequestState}
-        authProfilesList={collection?.auth}
+        authProfilesList={collection?.authProfiles}
       />
       {#if collection}
         <p

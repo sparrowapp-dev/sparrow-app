@@ -2,7 +2,8 @@ import type { CollectionAddToBaseEnum, CollectionAuthTypeBaseEnum } from "./coll
 
 export enum CollectionNavigationTabEnum {
   OVERVIEW = "Overview",
-  AUTH = "Auth"
+  AUTH = "Auth",
+  AUTH_PROFILES = "Auth Profiles",
 }
 export interface AuthWrapper {
   auth: Auth;
@@ -17,7 +18,7 @@ export interface UsernameWrapper {
 export interface PasswordWrapper {
   password: string;
 }
-export interface BasicAuth extends UsernameWrapper, PasswordWrapper {}
+export interface BasicAuth extends UsernameWrapper, PasswordWrapper { }
 export interface BasicAuthWrapper {
   basicAuth: BasicAuth;
 }
@@ -32,35 +33,35 @@ export interface AddtoWrapper {
 }
 export interface ApiKey
   extends AuthKeyWrapper,
-    AuthValueWrapper,
-    AddtoWrapper {}
+  AuthValueWrapper,
+  AddtoWrapper { }
 export interface ApiKeyWrapper {
   apiKey: ApiKey;
 }
 export interface Auth
   extends BearerTokenWrapper,
-    BasicAuthWrapper,
-    ApiKeyWrapper {}
+  BasicAuthWrapper,
+  ApiKeyWrapper { }
 
 export interface CollectionAuthNavigationWrapper {
-    collectionAuthNavigation: CollectionAuthTypeBaseEnum;
+  collectionAuthNavigation: CollectionAuthTypeBaseEnum;
 }
 export interface CollectionNavigationWrapper {
   collectionNavigation: CollectionNavigationTabEnum;
 }
 export interface State
   extends
-    CollectionAuthNavigationWrapper, CollectionNavigationWrapper {} 
-    
+  CollectionAuthNavigationWrapper, CollectionNavigationWrapper { }
+
 export interface StateWrapper {
   state: State;
 }
-export interface Collection extends AuthWrapper, StateWrapper {}
+export interface Collection extends AuthWrapper, StateWrapper { }
 export interface CollectionWrapper {
   collection: Collection;
 }
 
-export interface Property extends CollectionWrapper {}
+export interface Property extends CollectionWrapper { }
 
 export interface PropertyWrapper {
   property: Property;

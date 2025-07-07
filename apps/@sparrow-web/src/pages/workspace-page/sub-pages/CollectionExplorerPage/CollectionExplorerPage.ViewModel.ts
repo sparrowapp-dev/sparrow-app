@@ -149,47 +149,47 @@ class CollectionExplorerPage {
       result = false;
     }
     // auth key
-    // else if (
-    //   collectionTab.property.collection?.auth.apiKey.authKey !==
-    //   progressiveTab.property.collection.auth.apiKey.authKey
-    // ) {
-    //   result = false;
-    // }
-    // // auth value
-    // else if (
-    //   collectionTab.property.collection?.auth?.apiKey?.authValue !==
-    //   progressiveTab.property.collection.auth.apiKey.authValue
-    // ) {
-    //   result = false;
-    // }
-    // // addTo
-    // else if (
-    //   collectionTab.property.collection?.auth?.apiKey?.addTo !==
-    //   progressiveTab.property.collection.auth.apiKey.addTo
-    // ) {
-    //   result = false;
-    // }
-    // // username
-    // else if (
-    //   collectionTab.property.collection?.auth?.basicAuth?.username !==
-    //   progressiveTab.property.collection.auth.basicAuth.username
-    // ) {
-    //   result = false;
-    // }
-    // // password
-    // else if (
-    //   collectionTab.property.collection?.auth?.basicAuth?.password !==
-    //   progressiveTab.property.collection.auth.basicAuth.password
-    // ) {
-    //   result = false;
-    // }
-    // // bearer tokem
-    // else if (
-    //   collectionTab.property.collection?.auth?.bearerToken !==
-    //   progressiveTab.property.collection.auth.bearerToken
-    // ) {
-    //   result = false;
-    // }
+    else if (
+      collectionTab.property.collection?.auth.apiKey.authKey !==
+      progressiveTab.property.collection.auth.apiKey.authKey
+    ) {
+      result = false;
+    }
+    // auth value
+    else if (
+      collectionTab.property.collection?.auth?.apiKey?.authValue !==
+      progressiveTab.property.collection.auth.apiKey.authValue
+    ) {
+      result = false;
+    }
+    // addTo
+    else if (
+      collectionTab.property.collection?.auth?.apiKey?.addTo !==
+      progressiveTab.property.collection.auth.apiKey.addTo
+    ) {
+      result = false;
+    }
+    // username
+    else if (
+      collectionTab.property.collection?.auth?.basicAuth?.username !==
+      progressiveTab.property.collection.auth.basicAuth.username
+    ) {
+      result = false;
+    }
+    // password
+    else if (
+      collectionTab.property.collection?.auth?.basicAuth?.password !==
+      progressiveTab.property.collection.auth.basicAuth.password
+    ) {
+      result = false;
+    }
+    // bearer tokem
+    else if (
+      collectionTab.property.collection?.auth?.bearerToken !==
+      progressiveTab.property.collection.auth.bearerToken
+    ) {
+      result = false;
+    }
     // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
@@ -1868,14 +1868,11 @@ class CollectionExplorerPage {
   };
 
   // Auth Profile
-  // handleCreateGraphqlInCollection
   public handleCreateAuthProfile = async (
     _collection: CollectionDto,
     _authProfilePayload
   ) => {
-
     _authProfilePayload.authId = UntrackedItems.UNTRACKED + uuidv4()
-
     let userSource = {};
     if (_collection?.activeSync) {
       userSource = {

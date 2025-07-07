@@ -151,9 +151,9 @@
   let authProfilesList = []; // ToDo: Give a type here
 
   $: {
-    authProfilesList = collection?.auth || [];
+    authProfilesList = collection?.authProfiles || [];
     if (collection) {
-      console.log("**** Auth Profile ***** :>> ", collection.auth);
+      console.log("**** Auth Profile ***** :>> ", collection.authProfiles);
     }
   }
 
@@ -364,13 +364,12 @@
   };
   export let currentWorkspace;
 
+  // Auth Profile wrapper functions/handlers
   // ToDo: Add types for the parameters
   const handleOnCreateAuthProfile = async (authProfileData) => {
     const response = await onCreateAuthProfile(collection, authProfileData);
     return response;
   };
-
-  // ToDo: Add types for the parameters
   const handleOnUpdateAuthProfile = async (
     authId: string,
     updatedAuthProfileData,
@@ -637,7 +636,7 @@
           </div>
 
           <!-- Show save button only for overview tab, not for collection auth -->
-          {#if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.OVERVIEW}
+          {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
             <Button
               disable={$tab?.isSaved || !isCollectionEditable
                 ? true
@@ -1010,8 +1009,8 @@
             />
           </div>
         </div>
-      {:else}
-        <!-- <CollectionAuth
+      {:else if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.AUTH}
+        <CollectionAuth
           auth={$tab?.property?.collection?.auth}
           requestStateAuth={$tab?.property?.collection?.state
             ?.collectionAuthNavigation}
@@ -1019,7 +1018,8 @@
           onUpdateRequestState={onUpdateCollectionState}
           {onUpdateEnvironment}
           {environmentVariables}
-        /> -->
+        />
+      {:else}
         <CollectionAuthProfiles
           {authProfilesList}
           onCreateAuthProfile={handleOnCreateAuthProfile}

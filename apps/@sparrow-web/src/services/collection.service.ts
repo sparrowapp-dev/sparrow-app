@@ -956,19 +956,6 @@ export class CollectionService {
   ///////////////////////////////////////////////////////////////////
   //                      Auth Profiles
   ///////////////////////////////////////////////////////////////////
-  public fetchAuthProfiles = async (collectionId: string, workspaceId: string, baseUrl: string) => {
-    const response = await makeRequest(
-      "GET",
-      `${baseUrl}/api/collection/auth-profiles/${collectionId}`,
-      {
-        headers: getAuthHeaders(),
-      },
-    );
-    return response;
-  };
-
-
-
   public addAuthProfile = async (
     baseUrl: string,
     updatedPayload, // ToDo: Add proper type here

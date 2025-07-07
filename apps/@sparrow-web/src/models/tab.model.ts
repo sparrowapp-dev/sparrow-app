@@ -232,7 +232,6 @@ const requestItems = {
   },
 };
 
-// For Auth Profiles  items
 export const authProfileItemProperties = {
   authId: { type: "number" },
   name: { type: "string" },
@@ -271,8 +270,8 @@ export const authProfileItemProperties = {
   createdBy: { type: "string" },
   updatedBy: { type: "string" }
 }
-// For Auth Profiles (Need a better name at root level, change form Backend)
-export const auth = {
+
+export const authProfiles = {
   type: "array",
   default: [],
   items: {
@@ -285,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 14,
+  version: 13,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -861,40 +860,40 @@ export const tabSchemaLiteral = {
         collection: {
           type: "object",
           properties: {
-            // auth: {
-            //   type: "object",
-            //   properties: {
-            //     bearerToken: {
-            //       type: "string",
-            //     },
-            //     basicAuth: {
-            //       type: "object",
-            //       properties: {
-            //         username: {
-            //           type: "string",
-            //         },
-            //         password: {
-            //           type: "string",
-            //         },
-            //       },
-            //     },
-            //     apiKey: {
-            //       type: "object",
-            //       properties: {
-            //         authKey: {
-            //           type: "string",
-            //         },
-            //         authValue: {
-            //           type: "string",
-            //         },
-            //         addTo: {
-            //           type: "string",
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
-            auth,
+            auth: {
+              type: "object",
+              properties: {
+                bearerToken: {
+                  type: "string",
+                },
+                basicAuth: {
+                  type: "object",
+                  properties: {
+                    username: {
+                      type: "string",
+                    },
+                    password: {
+                      type: "string",
+                    },
+                  },
+                },
+                apiKey: {
+                  type: "object",
+                  properties: {
+                    authKey: {
+                      type: "string",
+                    },
+                    authValue: {
+                      type: "string",
+                    },
+                    addTo: {
+                      type: "string",
+                    },
+                  },
+                },
+              },
+            },
+            authProfiles,
             state: {
               type: "object",
               properties: {

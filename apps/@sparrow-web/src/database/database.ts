@@ -306,18 +306,8 @@ export class RxDB {
             return oldDoc;
           },
           13: function (oldDoc: TabDocument) {
-            if (oldDoc?.property?.collection) {
-              oldDoc.property.collection.auth = []
-              // oldDoc.property.collection.state = {
-              //   collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
-              //   collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
-              // };
-            }
-            return oldDoc;
-          },
-          14: function (oldDoc: TabDocument) {
             if (oldDoc?.property?.request) {
-              oldDoc.property.request.state.selectedRequestAuthProfileId = "None"
+              oldDoc.property.request.state.selectedRequestAuthProfileId = ""
             }
             return oldDoc;
           },

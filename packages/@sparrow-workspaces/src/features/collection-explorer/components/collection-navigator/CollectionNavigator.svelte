@@ -25,6 +25,11 @@
         id: CollectionNavigationTabEnum.AUTH,
         count: 0,
       },
+      {
+        name: "Auth Profiles",
+        id: CollectionNavigationTabEnum.AUTH_PROFILES,
+        count: 0,
+      },
     ];
   };
 

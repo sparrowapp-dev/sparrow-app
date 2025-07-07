@@ -91,7 +91,7 @@ export interface RequestNavigationWrapper {
 }
 
 export interface RequestAuthProfileNavigationWrapper {
-  selectedRequestAuthProfileId: "None" | string;
+  selectedRequestAuthProfileId: string;
 }
 
 export interface ResponseNavigationWrapper {
@@ -243,17 +243,18 @@ export interface HttpRequestCollectionAuthNavigationTabInterface {
   collectionAuthNavigation: CollectionAuthTypeBaseEnum
 }
 
-export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestCollectionAuthNavigationTabInterface, HttpRequestCollectionAuthProfileIdTabInterface { }
+export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestCollectionAuthNavigationTabInterface { }
 
-// For Auth Profile
-export interface HttpRequestSlectedAuthTypeInProfileTabInterface {
+export interface HttpRequestCollectionLevelAuthProfileTabInterface extends HttpRequestCollectionAuthProfileTabInterface, HttpRequestSlectedAuthTypeInProfileInterface, HttpRequestCollectionAuthProfileIdInterface { }
+export interface HttpRequestCollectionAuthProfileTabInterface {
+  auth: CollectionAuthBaseInterface
+}
+export interface HttpRequestSlectedAuthTypeInProfileInterface {
   authType: CollectionAuthTypeBaseEnum
 }
-
-export interface HttpRequestCollectionAuthProfileIdTabInterface {
+export interface HttpRequestCollectionAuthProfileIdInterface {
   authId: string
 }
-export interface HttpRequestCollectionLevelAuthProfileTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestSlectedAuthTypeInProfileTabInterface, HttpRequestCollectionAuthProfileIdTabInterface { }
 
 
 export interface State

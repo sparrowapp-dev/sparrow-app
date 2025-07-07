@@ -5,7 +5,6 @@ import { createDeepCopy } from "@sparrow/common/utils/conversion.helper";
 import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
-import { map } from "rxjs/operators";
 import * as Sentry from "@sentry/svelte";
 export class CollectionRepository {
   constructor() { }
@@ -1144,24 +1143,6 @@ export class CollectionRepository {
 
 
   // For Auth Profiles
-  public getCollectionById = (
-    collectionId: string,
-    workspaceId: string
-  ): Observable<any[]> => {
-    return RxDB.getInstance().rxdb.collection
-      .findOne({
-        selector: {
-          collectionId,
-          // workspaceId
-        }
-      })
-      .$
-    // .pipe(
-    //   map((collection) => collection?.auth || []) // Safely extract `auth` array
-    // );
-  };
-
-
   /**
    * @description
    * Creates an API request or folder within a collection.
@@ -1179,7 +1160,7 @@ export class CollectionRepository {
       })
       .exec();
     await collection.incrementalPatch({
-      auth: [...collection.auth, newAuthProfileItem],
+      authProfiles: [...collection?.authProfiles, newAuthProfileItem],
       // selectedAuthType:
       //   newAuthProfileItems.defaultKey
       //     ? newAuthProfileItems.name
@@ -1200,7 +1181,7 @@ export class CollectionRepository {
       })
       .exec();
 
-    const updatedAuths = collection.toJSON().auth.map((element) => {
+    const updatedAuths = collection.toJSON().authProfiles.map((element) => {
 
       // If the new auth profile is set as default, unset the previous default
       if (element.defaultKey && newAuthProfileItem.defaultKey && element.authId.toString() !== uuid) {
@@ -1216,7 +1197,7 @@ export class CollectionRepository {
       return element;
     });
     await collection.incrementalModify((value) => {
-      value.auth = [...updatedAuths];
+      value.authProfiles = [...updatedAuths];
       return value;
     });
   };
@@ -1232,14 +1213,14 @@ export class CollectionRepository {
         },
       })
       .exec();
-    const updatedAuths = collection.toJSON().auth.filter((element) => {
+    const updatedAuths = collection.toJSON().authProfiles.filter((element) => {
       if (element.authId !== deleteId) {
         return true;
       }
       return false;
     });
     collection.incrementalModify((value) => {
-      value.auth = [...updatedAuths];
+      value.authProfiles = [...updatedAuths];
       return value;
     });
   };
