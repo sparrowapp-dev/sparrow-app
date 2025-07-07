@@ -161,26 +161,112 @@ jobs:
             --keypair-alias="$($env:KEYPAIR_ALIAS)" `
             --store=system
       
-      - name: Sign MSI with SignTool
+      - name: Find and Sign MSI files
         shell: pwsh
         run: |
           $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
-            /sm /s My `
-            /tr http://timestamp.digicert.com `
-            /td sha256 `
-            /fd sha256 `
-            /sha1 $certThumb `
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
+          $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          
+          # List all files in the bundle directory for debugging
+          Write-Host "🔍 Contents of bundle directory:"
+          Get-ChildItem -Path $bundlePath -Recurse | Format-Table Name, FullName
+          
+          # Find all MSI files
+          $msiFiles = Get-ChildItem -Path $bundlePath -Filter "*.msi"
+          
+          if ($msiFiles.Count -eq 0) {
+            Write-Host "❌ No MSI files found in $bundlePath"
+            Write-Host "🔍 Checking parent directories..."
+            Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target" -Recurse -Filter "*.msi" | ForEach-Object {
+              Write-Host "Found MSI: $($_.FullName)"
+            }
+            exit 1
+          }
+          
+          # Sign each MSI file found
+          foreach ($msiFile in $msiFiles) {
+            Write-Host "🔐 Signing: $($msiFile.FullName)"
+            
+            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+              /sm /s My `
+              /tr http://timestamp.digicert.com `
+              /td sha256 `
+              /fd sha256 `
+              /sha1 $certThumb `
+              "$($msiFile.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($msiFile.Name)"
+              exit 1
+            }
+            
+            Write-Host "✅ Successfully signed $($msiFile.Name)"
+          }
 
-      - name: Verify MSI Signature
+      - name: Find and Sign EXE files  
         shell: pwsh
         run: |
-          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\Sparrow_2.26.0_x64_en-US.msi"
-          if ($sig.Status -ne 'Valid') {
-            throw "Signature invalid: $($sig.Status)"
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis"
+          
+          # Find all EXE files in NSIS bundle
+          $exeFiles = Get-ChildItem -Path $bundlePath -Filter "*.exe"
+          
+          if ($exeFiles.Count -eq 0) {
+            Write-Host "❌ No EXE files found in $bundlePath"
+            exit 1
           }
-          Write-Host "✅ MSI successfully signed and valid."
+          
+          # Sign each EXE file found
+          foreach ($exeFile in $exeFiles) {
+            Write-Host "🔐 Signing: $($exeFile.FullName)"
+            
+            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+              /sm /s My `
+              /tr http://timestamp.digicert.com `
+              /td sha256 `
+              /fd sha256 `
+              /sha1 $certThumb `
+              "$($exeFile.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($exeFile.Name)"
+              exit 1
+            }
+            
+            Write-Host "✅ Successfully signed $($exeFile.Name)"
+          }
+
+      - name: Verify All Signatures
+        shell: pwsh
+        run: |
+          $bundlePaths = @(
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi",
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis"
+          )
+          
+          $allValid = $true
+          
+          foreach ($path in $bundlePaths) {
+            $files = Get-ChildItem -Path $path -Include "*.msi", "*.exe" -Recurse
+            
+            foreach ($file in $files) {
+              $sig = Get-AuthenticodeSignature $file.FullName
+              
+              if ($sig.Status -ne 'Valid') {
+                Write-Host "❌ Invalid signature on $($file.Name): $($sig.Status)"
+                $allValid = $false
+              } else {
+                Write-Host "✅ Valid signature on $($file.Name)"
+              }
+            }
+          }
+          
+          if (-not $allValid) {
+            throw "One or more files have invalid signatures"
+          }
+          
+          Write-Host "🎉 All files successfully signed and verified"
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
