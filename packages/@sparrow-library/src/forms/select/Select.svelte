@@ -532,35 +532,37 @@
 
   <div
     bind:this={selectBodyWrapper}
-    class="select-data {position === 'fixed'
-      ? 'position-fixed'
-      : 'position-absolute'} {selectBodyBackgroundClass} border-radius-2 {selectBodyBackgroundShadow}
-    {isOpen ? 'visible' : 'invisible'}"
-    style="
-    {isOpen
-      ? 'opacity: 1; transform: scale(1);'
-      : 'opacity: 0; transform: scale(0.8);'}
-    min-width:{minBodyWidth}; 
-    left: {position === 'fixed'
-      ? bodyAlignment === 'right'
-        ? `${bodyLeftDistance}px;`
-        : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`
-      : bodyAlignment === 'right'
-        ? '0px;'
-        : 'auto;'} 
-    top: {position === 'fixed'
-      ? `${bodyTopDistance}px;`
-      : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
-    right: {position === 'fixed'
-      ? bodyAlignment === 'right'
-        ? `${bodyRightDistance}px;`
-        : 'auto;'
-      : bodyAlignment === 'right'
-        ? '0px;'
-        : '0px;'} 
-    z-index:{zIndex}; 
+    class={`select-data ${position === "fixed" ? "position-fixed" : "position-absolute"}
+    ${selectBodyBackgroundClass} border-radius-2 ${selectBodyBackgroundShadow}
+    ${isOpen ? "visible" : "invisible"}`}
+    style={`
+    min-width: ${minBodyWidth};
+    left: ${
+      position === "fixed"
+        ? bodyAlignment === "right"
+          ? `${bodyLeftDistance}px`
+          : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px`
+        : bodyAlignment === "right"
+          ? "0px"
+          : "auto"
+    };
+    top: ${
+      position === "fixed"
+        ? `${bodyTopDistance}px`
+        : `${Number(headerHeight.replace(/\D/g, "")) + 5}px`
+    };
+    right: ${
+      position === "fixed"
+        ? bodyAlignment === "right"
+          ? `${bodyRightDistance}px`
+          : "auto"
+        : bodyAlignment === "right"
+          ? "0px"
+          : "0px"
+    };
+    z-index: ${zIndex};
     padding: 8px 6px;
-    "
+  `}
   >
     <div
       on:click={() => {
@@ -930,5 +932,25 @@
 
   .select-body-shadow {
     box-shadow: inset 0px 16px 32px 0px rgba(0, 0, 0, 0.3);
+  }
+  .select-data {
+    opacity: 0;
+    transform: translateY(6px);
+    will-change: opacity, transform;
+    overflow: hidden;
+  }
+  .select-data.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 200ms ease-in,
+      transform 200ms ease-in;
+  }
+  .select-data.invisible {
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out;
   }
 </style>
