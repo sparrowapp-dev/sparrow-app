@@ -120,36 +120,36 @@
   let verticalFolderLine = false;
   export let isMockCollection = false;
 
-  let visibleItems = [];
-  let renderBatchSize = 10;
+  // let visibleItems = [];
+  // let renderBatchSize = 10;
 
-  function waitNextFrames(frameCount = 1): Promise<void> {
-    return new Promise((resolve) => {
-      function next(n: number) {
-        if (n <= 0) return resolve();
-        requestAnimationFrame(() => next(n - 1));
-      }
-      next(frameCount);
-    });
-  }
+  // function waitNextFrames(frameCount = 1): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     function next(n: number) {
+  //       if (n <= 0) return resolve();
+  //       requestAnimationFrame(() => next(n - 1));
+  //     }
+  //     next(frameCount);
+  //   });
+  // }
 
-  async function renderInBatches(items: any[], batchSize = 10) {
-    visibleItems = [];
+  // async function renderInBatches(items: any[], batchSize = 10) {
+  //   visibleItems = [];
 
-    for (let i = 0; i < items.length; i += batchSize) {
-      const nextBatch = items.slice(i, i + batchSize);
-      visibleItems = [...visibleItems, ...nextBatch];
-      if (searchData) {
-        await waitNextFrames(100); // let UI update
-      } else {
-        await waitNextFrames(10); // let UI update
-      }
-    }
-  }
+  //   for (let i = 0; i < items.length; i += batchSize) {
+  //     const nextBatch = items.slice(i, i + batchSize);
+  //     visibleItems = [...visibleItems, ...nextBatch];
+  //     if (searchData) {
+  //       await waitNextFrames(100); // let UI update
+  //     } else {
+  //       await waitNextFrames(10); // let UI update
+  //     }
+  //   }
+  // }
 
-  $: if (expand && explorer?.items?.length) {
-    renderInBatches(explorer.items, renderBatchSize);
-  }
+  // $: if (expand && explorer?.items?.length) {
+  //   renderInBatches(explorer.items, renderBatchSize);
+  // }
 
   $: {
     if (explorer.type === "FOLDER") {
@@ -283,232 +283,234 @@
   on:click={handleSelectClick}
   on:contextmenu|preventDefault={handleSelectClick}
 />
-<div>
-  <Modal
-    title={isMockCollection ? "Delete Folder" : "Delete Folder?"}
-    type={"danger"}
-    width={"35%"}
-    zIndex={1000}
-    isOpen={isFolderPopup}
-    handleModalState={(flag = false) => (isFolderPopup = flag)}
-  >
-    <div
-      class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium {isMockCollection
-        ? 'mt-2'
-        : ''}"
-    >
-      <p class="mb-0">
-        Are you sure you want to delete this Folder? Everything in <span
-          class="text-ds-font-weight-semi-bold"
-          style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
-        >
-        will be removed.
-      </p>
-    </div>
-    <div class="d-flex gap-3 text-ds-font-size-12">
-      <div class="d-flex gap-1 {isMockCollection ? 'align-items-center' : ''}">
-        <span class="text-plusButton {isMockCollection ? 'fs-5' : ''}"
-          >{isMockCollection ? mockRequestCount : requestCount}</span
-        >
-        <p style="font-size: 12px;" class="mb-0">
-          {HttpRequestDefaultNameBaseEnum.NAME}
-        </p>
-      </div>
-      {#if !isMockCollection}
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{graghQlCount}</span>
-          <p>GraphQL</p>
-        </div>
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{webSocketCount}</span>
-          <p>WebSocket</p>
-        </div>
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{socketIoCount}</span>
-          <p>Socket.IO</p>
-        </div>
-      {/if}
-    </div>
-    <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded {isMockCollection
-        ? 'mt-3'
-        : ''}"
-    >
-      <Button
-        disable={deleteLoader}
-        title={"Cancel"}
-        textStyleProp={"font-size: var(--base-text)"}
-        type={"secondary"}
-        loader={false}
-        onClick={() => {
-          isFolderPopup = false;
-        }}
-      />
-
-      <Button
-        disable={deleteLoader}
-        title={"Delete"}
-        textStyleProp={"font-size: var(--base-text)"}
-        loaderSize={18}
+<div use:inview={options} on:inview_change={handleChange}>
+  {#if isInView}
+    <div>
+      <Modal
+        title={isMockCollection ? "Delete Folder" : "Delete Folder?"}
         type={"danger"}
-        loader={deleteLoader}
-        onClick={() => {
-          deleteLoader = true;
-          onItemDeleted("folder", {
-            workspaceId: collection.workspaceId,
-            collection,
-            folder: explorer,
-            requestIds,
-          });
-          deleteLoader = false;
-          isFolderPopup = false;
-        }}
-      />
-    </div></Modal
-  >
+        width={"35%"}
+        zIndex={1000}
+        isOpen={isFolderPopup}
+        handleModalState={(flag = false) => (isFolderPopup = flag)}
+      >
+        <div
+          class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium {isMockCollection
+            ? 'mt-2'
+            : ''}"
+        >
+          <p class="mb-0">
+            Are you sure you want to delete this Folder? Everything in <span
+              class="text-ds-font-weight-semi-bold"
+              style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
+            >
+            will be removed.
+          </p>
+        </div>
+        <div class="d-flex gap-3 text-ds-font-size-12">
+          <div
+            class="d-flex gap-1 {isMockCollection ? 'align-items-center' : ''}"
+          >
+            <span class="text-plusButton {isMockCollection ? 'fs-5' : ''}"
+              >{isMockCollection ? mockRequestCount : requestCount}</span
+            >
+            <p style="font-size: 12px;" class="mb-0">
+              {HttpRequestDefaultNameBaseEnum.NAME}
+            </p>
+          </div>
+          {#if !isMockCollection}
+            <div class="d-flex gap-1">
+              <span class="text-plusButton">{graghQlCount}</span>
+              <p>GraphQL</p>
+            </div>
+            <div class="d-flex gap-1">
+              <span class="text-plusButton">{webSocketCount}</span>
+              <p>WebSocket</p>
+            </div>
+            <div class="d-flex gap-1">
+              <span class="text-plusButton">{socketIoCount}</span>
+              <p>Socket.IO</p>
+            </div>
+          {/if}
+        </div>
+        <div
+          class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded {isMockCollection
+            ? 'mt-3'
+            : ''}"
+        >
+          <Button
+            disable={deleteLoader}
+            title={"Cancel"}
+            textStyleProp={"font-size: var(--base-text)"}
+            type={"secondary"}
+            loader={false}
+            onClick={() => {
+              isFolderPopup = false;
+            }}
+          />
 
-  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-    <Options
-      xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
-      yAxis={[
-        folderTabWrapper.getBoundingClientRect().top - 5,
-        folderTabWrapper.getBoundingClientRect().bottom + 5,
-      ]}
-      zIndex={500}
-      menuItems={[
-        {
-          onClick: () => {
-            expand = true;
-            if (expand) {
-              onItemOpened("folder", {
+          <Button
+            disable={deleteLoader}
+            title={"Delete"}
+            textStyleProp={"font-size: var(--base-text)"}
+            loaderSize={18}
+            type={"danger"}
+            loader={deleteLoader}
+            onClick={() => {
+              deleteLoader = true;
+              onItemDeleted("folder", {
                 workspaceId: collection.workspaceId,
                 collection,
                 folder: explorer,
+                requestIds,
               });
-            }
-          },
-          displayText: "Open Folder",
-          disabled: false,
-          hidden: false,
-        },
-        {
-          onClick: () => {
-            expand = false;
-            isRenaming = true;
-          },
-          displayText: "Rename Folder",
-          disabled: false,
-          // hidden:
-          //   !collection.activeSync ||
-          //   (explorer?.source === "USER" && collection.activeSync)
-          //     ? false
-          //     : true,
-          hidden: false,
-        },
-        {
-          onClick: () => {
-            onItemCreated("requestFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("websocketFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: "Add WebSocket",
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("socketioFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("graphqlFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("aiRequestFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add AI Request`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            isFolderPopup = true;
-          },
-          displayText: "Delete",
-          disabled: false,
-          hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
-              ? false
-              : true,
-        },
-      ]}
-    />
-  {/if}
+              deleteLoader = false;
+              isFolderPopup = false;
+            }}
+          />
+        </div></Modal
+      >
 
-  {#if explorer}
-    <div use:inview={options} on:inview_change={handleChange}>
-      {#if isInView}
+      {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+        <Options
+          xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
+          yAxis={[
+            folderTabWrapper.getBoundingClientRect().top - 5,
+            folderTabWrapper.getBoundingClientRect().bottom + 5,
+          ]}
+          zIndex={500}
+          menuItems={[
+            {
+              onClick: () => {
+                expand = true;
+                if (expand) {
+                  onItemOpened("folder", {
+                    workspaceId: collection.workspaceId,
+                    collection,
+                    folder: explorer,
+                  });
+                }
+              },
+              displayText: "Open Folder",
+              disabled: false,
+              hidden: false,
+            },
+            {
+              onClick: () => {
+                expand = false;
+                isRenaming = true;
+              },
+              displayText: "Rename Folder",
+              disabled: false,
+              // hidden:
+              //   !collection.activeSync ||
+              //   (explorer?.source === "USER" && collection.activeSync)
+              //     ? false
+              //     : true,
+              hidden: false,
+            },
+            {
+              onClick: () => {
+                onItemCreated("requestFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("websocketFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: "Add WebSocket",
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("socketioFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("graphqlFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("aiRequestFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add AI Request`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                isFolderPopup = true;
+              },
+              displayText: "Delete",
+              disabled: false,
+              hidden:
+                !collection.activeSync ||
+                (explorer?.source === "USER" && collection.activeSync)
+                  ? false
+                  : true,
+            },
+          ]}
+        />
+      {/if}
+
+      {#if explorer}
         {#if explorer.type === "FOLDER"}
           <div
             tabindex="0"
@@ -684,7 +686,7 @@
                 class="sub-files position-relative"
                 style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
               >
-                {#if visibleItems?.length > 0}
+                {#if explorer?.items?.length > 0}
                   <div
                     class="box-line"
                     style="background-color: {verticalFolderLine
@@ -692,7 +694,7 @@
                       : 'var(--bg-ds-surface-100)'}"
                   ></div>
                 {/if}
-                {#each visibleItems || [] as exp}
+                {#each explorer?.items || [] as exp}
                   <svelte:self
                     {userRole}
                     {isSharedWorkspace}
@@ -710,7 +712,7 @@
                     {isWebApp}
                   />
                 {/each}
-                {#if !visibleItems?.length}
+                {#if !explorer?.items?.length}
                   <p
                     class="text-ds-font-size-12 my-2 text-secondary-300"
                     style="padding-left: 90px;"

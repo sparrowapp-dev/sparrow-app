@@ -117,38 +117,38 @@
   let isSyncing = false;
   let showMockMenu: boolean = false;
 
-  let visibleExplorers = [];
-  const renderBatchSize = 10;
+  // let visibleExplorers = [];
+  // const renderBatchSize = 10;
 
-  function waitNextFrames(frameCount = 1): Promise<void> {
-    return new Promise((resolve) => {
-      function next(n: number) {
-        if (n <= 0) return resolve();
-        requestAnimationFrame(() => next(n - 1));
-      }
-      next(frameCount);
-    });
-  }
+  // function waitNextFrames(frameCount = 1): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     function next(n: number) {
+  //       if (n <= 0) return resolve();
+  //       requestAnimationFrame(() => next(n - 1));
+  //     }
+  //     next(frameCount);
+  //   });
+  // }
 
-  async function renderExplorersInBatches(items: any[], batchSize = 10) {
-    visibleExplorers = [];
+  // async function renderExplorersInBatches(items: any[], batchSize = 10) {
+  //   visibleExplorers = [];
 
-    for (let i = 0; i < items.length; i += batchSize) {
-      visibleExplorers = [
-        ...visibleExplorers,
-        ...items.slice(i, i + batchSize),
-      ];
-      if (searchData) {
-        await waitNextFrames(100); // let UI update
-      } else {
-        await waitNextFrames(10); // let UI update
-      }
-    }
-  }
+  //   for (let i = 0; i < items.length; i += batchSize) {
+  //     visibleExplorers = [
+  //       ...visibleExplorers,
+  //       ...items.slice(i, i + batchSize),
+  //     ];
+  //     if (searchData) {
+  //       await waitNextFrames(100); // let UI update
+  //     } else {
+  //       await waitNextFrames(10); // let UI update
+  //     }
+  //   }
+  // }
 
-  $: if (visibility && collection?.items?.length) {
-    renderExplorersInBatches(collection.items, renderBatchSize);
-  }
+  // $: if (visibility && collection?.items?.length) {
+  //   renderExplorersInBatches(collection.items, renderBatchSize);
+  // }
 
   /**
    * Handle position of the context menu
@@ -1139,7 +1139,7 @@
                 </div>
               </div>
             {/if}
-            {#each visibleExplorers as explorer}
+            {#each collection?.items as explorer}
               <Folder
                 {isMockCollection}
                 {userRole}

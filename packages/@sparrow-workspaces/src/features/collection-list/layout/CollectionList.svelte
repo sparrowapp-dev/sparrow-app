@@ -107,34 +107,34 @@
   let isSharedWorkspace = false;
   // export let handleExpandCollectionLine;
 
-  let visibleCollections: CollectionDocument[] = [];
+  // let visibleCollections: CollectionDocument[] = [];
 
-  function waitNextFrames(frameCount = 1): Promise<void> {
-    return new Promise((resolve) => {
-      function next(n: number) {
-        if (n <= 0) return resolve();
-        requestAnimationFrame(() => next(n - 1));
-      }
-      next(frameCount);
-    });
-  }
+  // function waitNextFrames(frameCount = 1): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     function next(n: number) {
+  //       if (n <= 0) return resolve();
+  //       requestAnimationFrame(() => next(n - 1));
+  //     }
+  //     next(frameCount);
+  //   });
+  // }
 
-  async function renderInBatches(data: CollectionDocument[], batchSize = 20) {
-    visibleCollections = [];
-    let currentBatch: CollectionDocument[] = [];
+  // async function renderInBatches(data: CollectionDocument[], batchSize = 20) {
+  //   visibleCollections = [];
+  //   let currentBatch: CollectionDocument[] = [];
 
-    for (let i = 0; i < data.length; i++) {
-      currentBatch.push(data[i]);
+  //   for (let i = 0; i < data.length; i++) {
+  //     currentBatch.push(data[i]);
 
-      if (currentBatch.length === batchSize || i === data.length - 1) {
-        visibleCollections = [...visibleCollections, ...currentBatch];
-        currentBatch = [];
+  //     if (currentBatch.length === batchSize || i === data.length - 1) {
+  //       visibleCollections = [...visibleCollections, ...currentBatch];
+  //       currentBatch = [];
 
-        // await new Promise(requestAnimationFrame);
-        await waitNextFrames(10);
-      }
-    }
-  }
+  //       // await new Promise(requestAnimationFrame);
+  //       await waitNextFrames(10);
+  //     }
+  //   }
+  // }
   $: {
     if (activeTabType !== "Collection") {
       handleTabUpdate("");
@@ -233,15 +233,15 @@
     }
   }
 
-  $: {
-    if ($isExpandCollection) {
-      if (searchData) {
-        renderInBatches(collectionFilter);
-      } else {
-        renderInBatches(collectionListDocument);
-      }
-    }
-  }
+  // $: {
+  //   if ($isExpandCollection) {
+  //     if (searchData) {
+  //       renderInBatches(collectionFilter);
+  //     } else {
+  //       renderInBatches(collectionListDocument);
+  //     }
+  //   }
+  // }
 
   const collectionListSubscriber = collectionList.subscribe(async (value) => {
     if (value) {
@@ -460,7 +460,7 @@
       class="overflow-auto position-relative d-flex flex-column me-0 py-1"
       style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
     >
-      {#if visibleCollections?.length > 0 && searchData.length === 0}
+      {#if collectionListDocument?.length > 0 && searchData.length === 0}
         <div
           class="box-line"
           style="background-color: {isExpandCollectionLine
@@ -468,7 +468,7 @@
             : 'var(--bg-ds-surface-100)'}"
         ></div>
       {/if}
-      {#if visibleCollections?.length > 0}
+      {#if collectionListDocument?.length > 0}
         <List
           bind:scrollList
           height={"auto"}
@@ -502,7 +502,7 @@
             />
           </VirtualScroll>
           </div> -->
-          {#each visibleCollections as col}
+          {#each collectionListDocument as col}
             {#if !(col?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
               <Collection
                 bind:userRole
@@ -529,9 +529,9 @@
               />
             {/if}
           {/each}
-          {#if visibleCollections?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+          {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
             <hr style="margin: 2px 0 2px 2rem;" />
-            {#each visibleCollections as col}
+            {#each collectionListDocument as col}
               {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
                 <Collection
                   isMockCollection={true}
