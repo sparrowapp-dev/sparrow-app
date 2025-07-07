@@ -640,7 +640,6 @@ class AiRequestExplorerViewModel {
    */
   public handleUploadFilesToCloud = async (filesToUpload: []) => {
     const componentData = this._tab.getValue();
-    console.log("CompeonetData: ", componentData)
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
