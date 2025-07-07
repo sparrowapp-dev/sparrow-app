@@ -194,36 +194,33 @@
       </span>
     </div>
 
-    <div
-      on:click|stopPropagation={async (e) => {
-        isNewTestflowCreating = true;
-        await handleCreateTestflow(e);
-        isNewTestflowCreating = false;
-      }}
+    <Tooltip
+      title={`Add ${TFDefaultEnum.NAME}`}
+      placement={"bottom-center"}
+      distance={13}
+      show={isHovered}
+      zIndex={701}
     >
-      <Tooltip
-        title={`Add ${TFDefaultEnum.NAME}`}
-        placement={"bottom-center"}
-        distance={13}
-        show={isHovered && !isNewTestflowCreating}
-        zIndex={701}
+      <span
+        class="{loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER ||
+        currentWorkspace?.isShared
+          ? 'd-none'
+          : ''} add-icon-container d-flex"
       >
-        <span
-          class="{loggedUserRoleInWorkspace ===
-            WorkspaceRole.WORKSPACE_VIEWER || currentWorkspace?.isShared
-            ? 'd-none'
-            : ''} add-icon-container d-flex"
-        >
-          <Button
-            size="extra-small"
-            customWidth={"24px"}
-            type="teritiary-regular"
-            startIcon={AddRegular}
-            disable={isNewTestflowCreating}
-          />
-        </span>
-      </Tooltip>
-    </div>
+        <Button
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={AddRegular}
+          disable={isNewTestflowCreating}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleCreateTestflow(e);
+          }}
+        />
+      </span>
+    </Tooltip>
   </div>
 
   {#if $isExpandTestflow}

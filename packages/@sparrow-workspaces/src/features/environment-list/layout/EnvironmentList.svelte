@@ -210,35 +210,32 @@
         </p>
       </span>
     </div>
-    <div
-      on:click|stopPropagation={async (e) => {
-        isNewEnvironmentCreating = true;
-        await handleCreateEnvironment(e);
-        isNewEnvironmentCreating = false;
-      }}
-    >
-      {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
-        <Tooltip
-          title={"Add Environment"}
-          placement={"bottom-center"}
-          distance={13}
-          show={isHovered && !isNewEnvironmentCreating}
-          zIndex={701}
-        >
-          <span class="add-icon-container d-flex">
-            <Button
-              disabled={loggedUserRoleInWorkspace ===
-                WorkspaceRole.WORKSPACE_VIEWER}
-              size="extra-small"
-              customWidth={"24px"}
-              type="teritiary-regular"
-              disable={isNewEnvironmentCreating}
-              startIcon={AddRegular}
-            />
-          </span>
-        </Tooltip>
-      {/if}
-    </div>
+    {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
+      <Tooltip
+        title={"Add Environment"}
+        placement={"bottom-center"}
+        distance={13}
+        show={isHovered}
+        zIndex={701}
+      >
+        <span class="add-icon-container d-flex">
+          <Button
+            disabled={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            disable={isNewEnvironmentCreating}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCreateEnvironment(e);
+            }}
+            startIcon={AddRegular}
+          />
+        </span>
+      </Tooltip>
+    {/if}
   </div>
 
   {#if $isExpandEnvironment}
