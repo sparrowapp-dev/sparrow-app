@@ -227,10 +227,17 @@
             type="teritiary-regular"
             disable={isNewEnvironmentCreating}
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
               handleCreateEnvironment(e);
             }}
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              isNewEnvironmentCreating = true;
+              await handleCreateEnvironment(e);
+              isNewEnvironmentCreating = false;
+            }}
+
             startIcon={AddRegular}
           />
         </span>

@@ -213,10 +213,12 @@
           type="teritiary-regular"
           startIcon={AddRegular}
           disable={isNewTestflowCreating}
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            handleCreateTestflow(e);
+            isNewTestflowCreating = true;
+            await handleCreateTestflow(e);
+            isNewTestflowCreating = false;
           }}
         />
       </span>
