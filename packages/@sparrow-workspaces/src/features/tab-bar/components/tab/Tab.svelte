@@ -30,6 +30,7 @@
     BotRegular,
     HistoryRegular,
     HistoryIcon2,
+    DatabaseStackRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -257,11 +258,15 @@
         >
       {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
-          <img
-            src={Collection}
-            alt="book"
-            style="width: 19px;heigh:19px;margin-right:5px;"
-          />
+          {#if tab?.label === CollectionTypeBaseEnum.MOCK}
+            <DatabaseStackRegular height="14px" width="10px" />
+          {:else}
+            <img
+              src={Collection}
+              alt="book"
+              style="width: 19px; height:19px; margin-right:5px;"
+            />
+          {/if}
         </span>
       {:else if tab.type === TabTypeEnum.HUB}
         <span>
