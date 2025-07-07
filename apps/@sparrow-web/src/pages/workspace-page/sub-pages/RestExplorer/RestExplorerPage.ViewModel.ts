@@ -900,9 +900,8 @@ class RestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    console.log("in updateRequestState :>> ", _state);
-    if (_state.requestAuthNavigation || _state.selectedRequestAuthProfileId) {
 
+    if (_state.requestAuthNavigation || _state.selectedRequestAuthProfileId) {
       if (
         _state.requestAuthNavigation ===
         HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
