@@ -226,10 +226,6 @@
             customWidth={"24px"}
             type="teritiary-regular"
             disable={isNewEnvironmentCreating}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCreateEnvironment(e);
-            }}
             onClick={async (e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -237,7 +233,6 @@
               await handleCreateEnvironment(e);
               isNewEnvironmentCreating = false;
             }}
-
             startIcon={AddRegular}
           />
         </span>
