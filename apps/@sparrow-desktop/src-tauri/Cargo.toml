@@ -1,6 +1,6 @@
 [package]
 name = "sparrow-app"
-version = "0.0.0"
+version = "2.27.0"
 description = "Sparrow"
 authors = ["sparrow"]
 repository = "https://github.com/sparrowapp-dev/sparrow-app"
