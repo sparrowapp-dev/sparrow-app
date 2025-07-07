@@ -214,6 +214,7 @@
           startIcon={AddRegular}
           disable={isNewTestflowCreating}
           onClick={async (e) => {
+            e.preventDefault();
             e.stopPropagation();
             isNewTestflowCreating = true;
             await handleCreateTestflow(e);
