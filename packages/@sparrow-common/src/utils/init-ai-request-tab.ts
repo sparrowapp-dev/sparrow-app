@@ -102,7 +102,8 @@ class InitAiRequestTab {
                         isChatbotGeneratingResponse: false,
                         isChatbotConversationLoading: false,
                         isConversationHistoryPanelOpen: false,
-                        isConversationHistoryLoading: false
+                        isConversationHistoryLoading: false,
+                        isChatbotPromptBoxActive: false, 
                     },
                 },
             },

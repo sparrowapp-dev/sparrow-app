@@ -236,7 +236,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 12,
+  version: 13,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1440,6 +1440,9 @@ export const tabSchemaLiteral = {
                 isConversationHistoryLoading: {
                   type: "boolean",
                 },
+                isChatbotPromptBoxActive: {
+                  type: "boolean"
+                }
               },
             },
             auth: {

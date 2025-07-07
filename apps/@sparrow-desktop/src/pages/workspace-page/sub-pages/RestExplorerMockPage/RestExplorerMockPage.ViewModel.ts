@@ -1149,7 +1149,10 @@ class RestExplorerMockViewModel {
       progressiveTab.path.workspaceId,
     );
     initRequestTab.updateBody(progressiveTab.property.mockRequest?.body);
-    initRequestTab.updateUrl(collectionData?.mockCollectionUrl + progressiveTab.property.mockRequest?.url);
+    initRequestTab.updateUrl(
+      collectionData?.mockCollectionUrl +
+        progressiveTab.property.mockRequest?.url,
+    );
     initRequestTab.updateName(progressiveTab.name);
     initRequestTab.updateDescription(progressiveTab.description);
     initRequestTab.updateMethod(progressiveTab.property.mockRequest?.method);
@@ -1494,7 +1497,7 @@ class RestExplorerMockViewModel {
         description: requestMetaData.description,
         type: "MOCK_REQUEST",
         mockRequest: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 

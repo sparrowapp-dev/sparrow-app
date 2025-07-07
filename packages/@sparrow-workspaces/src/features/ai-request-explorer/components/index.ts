@@ -9,4 +9,5 @@ export { default as AiConfigs } from "./ai-config-selection/AiConfigurations.sve
 export { default as ConversationHistoryItem } from "./chat-conversations/ConversationHistoryItem.svelte";
 export { default as GeneratePromptModal } from "./generate-prompt/GeneratePrompt.svelte"
 export { default as GetCode } from "./get-code/GetCodeModal.svelte";
+export { default as FileItem } from "./file-upload/FileItem.svelte";
 export { ChatBot } from "./ai-request-chatbot";
