@@ -1826,6 +1826,9 @@ export default class CollectionsViewModel {
       });
       // mockRequest.updateUrl(collection?.mockCollectionUrl);
       mockRequest.updateIsSave(true);
+      if ((collection.collectionType = CollectionTypeBaseEnum.MOCK)) {
+        mockRequest.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
       // this.handleOpenRequest(
       //   workspaceId,
       //   collection,
@@ -2498,6 +2501,9 @@ export default class CollectionsViewModel {
         folderId: explorer.id,
       });
       sampleMockRequest.updateIsSave(true);
+      if ((collection.collectionType = CollectionTypeBaseEnum.MOCK)) {
+        sampleMockRequest.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
       // sampleMockRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleMockRequest.getValue());
 

@@ -1232,6 +1232,9 @@ class CollectionExplorerPage {
         folderId: "",
       });
       request.updateIsSave(true);
+      if ((collection.collectionType = CollectionTypeBaseEnum.MOCK)) {
+        request.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
       // request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");

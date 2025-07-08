@@ -354,8 +354,8 @@
         {tab.name}
       </span>
     </button>
-    {#if tab?.type === TabTypeEnum.MOCK_REQUEST || (tab?.type === TabTypeEnum.FOLDER && tab?.label === CollectionTypeBaseEnum.MOCK)}
-      <Tag type={"green"} text={"Mock"} />
+    {#if tab?.label}
+      <Tag type={"green"} text={label} />
     {/if}
     <div style="align-items:center; justify-content:center;">
       {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.AI_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
