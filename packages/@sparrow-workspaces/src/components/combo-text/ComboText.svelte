@@ -20,7 +20,7 @@
 <div
   class="d-flex align-items-center justify-content-center gap-1 mb-2"
   transition:fly={{
-    x: 80,
+    x: 20,
     duration: isExpandShortcuts ? 480 : 360,
     easing: slowCurve,
   }}
