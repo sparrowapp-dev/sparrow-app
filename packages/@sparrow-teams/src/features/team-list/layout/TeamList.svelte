@@ -76,22 +76,24 @@
           }}
         >
           <div class=" d-flex w-100 overflow-hidden" style="gap: 4px;">
-            {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-              <div class="" style="height: 24px; width:24px;">
+            <div class="avatar-wrapper" style="margin-right: 4px;">
+              {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
+                <div class="" style="height: 24px; width:24px;">
+                  <Avatar
+                    type={"letter"}
+                    size={"extra-small"}
+                    letter={team.name[0]}
+                    bgColor={"var(--bg-ds-secondary-400)"}
+                  />
+                </div>
+              {:else}
                 <Avatar
-                  type={"letter"}
+                  type={"image"}
                   size={"extra-small"}
-                  letter={team.name[0]}
-                  bgColor={"var(--bg-ds-secondary-400)"}
+                  image={base64ToURL(team.logo)}
                 />
-              </div>
-            {:else}
-              <Avatar
-                type={"image"}
-                size={"extra-small"}
-                image={base64ToURL(team.logo)}
-              />
-            {/if}
+              {/if}
+            </div>
             <div class="d-flex align-items-center team-row-content">
               <p
                 class="team-name-ellipsis ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
@@ -246,5 +248,13 @@
     max-width: 120px;
     display: flex;
     align-items: center;
+  }
+  .avatar-wrapper {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>
