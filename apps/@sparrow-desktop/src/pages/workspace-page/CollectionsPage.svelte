@@ -1716,7 +1716,7 @@
         <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
           Need more details?
         </p>
-        <Tooltip title={"Coming Soon"} placement={"top-center"}>
+        <Tooltip title={"Coming Soon"} placement={"top-center"} distance={4}>
           <Button
             size="small"
             customWidth={"220px"}
