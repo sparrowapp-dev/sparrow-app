@@ -527,18 +527,21 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_DIR: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/
+          SOURCE_DIR: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/*.deb
           DEST_DIR: linux 
 
-      - name: Post Linux Debian Repo Link to Teams
+      - name: Post Linux Build Link to Teams
         env:
           AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
-          REPO_URL="https://${AWS_S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/linux/*.deb"
-          
-          
+          # Find the latest .deb file in the local build output
+          DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
+          DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
+          DEB_BASENAME=$(basename "$DEB_FILE")
+          DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/$DEB_BASENAME"
+
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
             \"attachments\": [
@@ -555,17 +558,17 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"The latest Debian packages have been uploaded to the repository.\",
+                      \"text\": \"Branch: development\",
                       \"wrap\": true
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Repository URL:\",
+                      \"text\": \"Download Link:\",
                       \"wrap\": true
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"$REPO_URL\",
+                      \"text\": \"$DEB_URL\",
                       \"color\": \"accent\",
                       \"wrap\": true
                     }
