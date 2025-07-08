@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+          ref: 'development'
 
       - name: Install Rust 1.82.0
         run: |
