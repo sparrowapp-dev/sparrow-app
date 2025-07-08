@@ -532,37 +532,33 @@
 
   <div
     bind:this={selectBodyWrapper}
-    class={`select-data ${position === "fixed" ? "position-fixed" : "position-absolute"}
-    ${selectBodyBackgroundClass} border-radius-2 ${selectBodyBackgroundShadow}
-    ${isOpen ? "visible" : "invisible"}`}
-    style={`
-    min-width: ${minBodyWidth};
-    left: ${
-      position === "fixed"
-        ? bodyAlignment === "right"
-          ? `${bodyLeftDistance}px`
-          : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px`
-        : bodyAlignment === "right"
-          ? "0px"
-          : "auto"
-    };
-    top: ${
-      position === "fixed"
-        ? `${bodyTopDistance}px`
-        : `${Number(headerHeight.replace(/\D/g, "")) + 5}px`
-    };
-    right: ${
-      position === "fixed"
-        ? bodyAlignment === "right"
-          ? `${bodyRightDistance}px`
-          : "auto"
-        : bodyAlignment === "right"
-          ? "0px"
-          : "0px"
-    };
-    z-index: ${zIndex};
+    class="select-data {position === 'fixed'
+      ? 'position-fixed'
+      : 'position-absolute'} {selectBodyBackgroundClass} border-radius-2 {selectBodyBackgroundShadow}
+    {isOpen ? 'visible' : 'invisible'}"
+    style="
+    {isOpen ? 'opacity: 1;' : 'opacity: 0;'}
+    min-width:{minBodyWidth}; 
+    left: {position === 'fixed'
+      ? bodyAlignment === 'right'
+        ? `${bodyLeftDistance}px;`
+        : `${bodyLeftDistance - (selectBodyWrapper?.offsetWidth || 0) + selectHeaderWrapper.offsetWidth}px;`
+      : bodyAlignment === 'right'
+        ? '0px;'
+        : 'auto;'} 
+    top: {position === 'fixed'
+      ? `${bodyTopDistance}px;`
+      : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
+    right: {position === 'fixed'
+      ? bodyAlignment === 'right'
+        ? `${bodyRightDistance}px;`
+        : 'auto;'
+      : bodyAlignment === 'right'
+        ? '0px;'
+        : '0px;'} 
+    z-index:{zIndex}; 
     padding: 8px 6px;
-  `}
+    "
   >
     <div
       on:click={() => {
