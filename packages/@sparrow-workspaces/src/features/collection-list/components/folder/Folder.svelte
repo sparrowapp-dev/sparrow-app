@@ -622,20 +622,29 @@
         {/if}
       </div>
       {#if expand}
-        <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
+        <div
+          transition:slide={{ duration: 250 }}
+          style="padding-left: 0; overflow: hidden;"
+        >
           <div
             class="sub-files position-relative"
-            style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+            style={`background-color: ${
+              explorer.id === activeTabId
+                ? "var(--bg-ds-surface-600)"
+                : "transparent"
+            };`}
           >
             {#if explorer?.items?.length > 0}
               <div
                 class="box-line"
-                style="background-color: {verticalFolderLine
-                  ? 'var(--bg-ds-neutral-500)'
-                  : 'var(--bg-ds-surface-100)'}"
+                style={`background-color: ${
+                  verticalFolderLine
+                    ? "var(--bg-ds-neutral-500)"
+                    : "var(--bg-ds-surface-100)"
+                };`}
               ></div>
             {/if}
-            {#each explorer?.items || [] as exp}
+            {#each explorer?.items || [] as exp (exp.id)}
               <svelte:self
                 {userRole}
                 {isSharedWorkspace}
