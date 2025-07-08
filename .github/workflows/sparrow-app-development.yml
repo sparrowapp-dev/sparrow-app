@@ -565,12 +565,13 @@ jobs:
                       \"type\": \"TextBlock\",
                       \"text\": \"Download Link:\",
                       \"wrap\": true
-                    },
+                    }
+                  ],
+                  \"actions\": [
                     {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"$DEB_URL\",
-                      \"color\": \"accent\",
-                      \"wrap\": true
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"Download .deb\",
+                      \"url\": \"$DEB_URL\"
                     }
                   ],
                   \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
