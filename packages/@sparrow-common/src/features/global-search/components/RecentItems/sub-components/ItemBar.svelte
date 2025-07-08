@@ -1,6 +1,6 @@
 <script lang="ts">
   import { FolderIcon } from "@sparrow/library/icons";
-
+  import { inview } from "svelte-inview";
   export let onClick = () => {};
   export let icon = FolderIcon;
   export let iconProps = {
@@ -60,40 +60,57 @@
 
     return result;
   }
+
+  let isInView: boolean = false;
+  let scrollDirection: any;
+  const options = {
+    rootMargin: "0px",
+    unobserveOnEnter: true,
+    threshold: 0.5,
+  };
+
+  const handleChange = ({ detail }: CustomEvent<any>) => {
+    isInView = detail.inView;
+    scrollDirection = detail?.scrollDirection?.vertical;
+  };
 </script>
 
-<div class="request-item" on:click={() => onClick(data)}>
-  <div class="request-method">
-    <svelte:component this={icon} {...iconProps} />
-  </div>
-  <div class="request-details">
-    <div class="request-header">
-      <span
-        class="request-title text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-      >
-        {#if data?.isTitleHighLightEnable && data?.charsToBeHightlighted && data?.name}
-          <!-- Highlight specific substring -->
-          {#each highlightSubstring(data.name, data.charsToBeHightlighted) as segment}
-            {#if segment.highlight}
-              <span class="highlight">{segment.text}</span>
+<div use:inview={options} on:inview_change={handleChange}>
+  {#if isInView}
+    <div class="request-item" on:click={() => onClick(data)}>
+      <div class="request-method">
+        <svelte:component this={icon} {...iconProps} />
+      </div>
+      <div class="request-details">
+        <div class="request-header">
+          <span
+            class="request-title text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+          >
+            {#if data?.isTitleHighLightEnable && data?.charsToBeHightlighted && data?.name}
+              <!-- Highlight specific substring -->
+              {#each highlightSubstring(data.name, data.charsToBeHightlighted) as segment}
+                {#if segment.highlight}
+                  <span class="highlight">{segment.text}</span>
+                {:else}
+                  {segment.text}
+                {/if}
+              {/each}
             {:else}
-              {segment.text}
+              {data?.name}
             {/if}
-          {/each}
-        {:else}
-          {data?.name}
-        {/if}
-      </span>
-      <span
-        class="request-path text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
-        >{data?.path}</span
-      >
+          </span>
+          <span
+            class="request-path text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+            >{data?.path}</span
+          >
+        </div>
+        <span
+          class="request-url text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
+          >{data.url || ""}</span
+        >
+      </div>
     </div>
-    <span
-      class="request-url text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular"
-      >{data.url || ""}</span
-    >
-  </div>
+  {/if}
 </div>
 
 <style>

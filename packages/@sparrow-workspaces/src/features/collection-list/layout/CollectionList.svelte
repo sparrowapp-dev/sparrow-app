@@ -230,6 +230,8 @@
   $: {
     if (searchData) {
       debouncedSearchCollection(searchData, collectionListDocument);
+    } else {
+      collectionFilter = collectionListDocument;
     }
   }
 
@@ -460,7 +462,7 @@
       class="overflow-auto position-relative d-flex flex-column me-0 py-1"
       style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
     >
-      {#if collectionListDocument?.length > 0 && searchData.length === 0}
+      {#if collectionFilter?.length > 0 && searchData.length === 0}
         <div
           class="box-line"
           style="background-color: {isExpandCollectionLine
@@ -468,7 +470,7 @@
             : 'var(--bg-ds-surface-100)'}"
         ></div>
       {/if}
-      {#if collectionListDocument?.length > 0}
+      {#if collectionFilter?.length > 0}
         <List
           bind:scrollList
           height={"auto"}
@@ -502,7 +504,7 @@
             />
           </VirtualScroll>
           </div> -->
-          {#each collectionListDocument as col}
+          {#each collectionFilter as col}
             {#if !(col?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
               <Collection
                 bind:userRole
@@ -529,9 +531,9 @@
               />
             {/if}
           {/each}
-          {#if collectionListDocument?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
+          {#if collectionFilter?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
             <hr style="margin: 2px 0 2px 2rem;" />
-            {#each collectionListDocument as col}
+            {#each collectionFilter as col}
               {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
                 <Collection
                   isMockCollection={true}
