@@ -45,7 +45,7 @@ import {
 } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation,scrollToTab } from "@sparrow/common/utils/navigation";
+import { moveNavigation, scrollToTab } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -6257,6 +6257,22 @@ export default class CollectionsViewModel {
     }
   };
 
+  public importPostmanCollection = async (
+    currentWorkspaceId: string,
+    postmanCollectionJson: string,
+  ) => {
+    // Create a Blob from the JSON string
+    const blob = new Blob([postmanCollectionJson], {
+      type: "application/json",
+    });
+    // Create a File object (filename can be anything, e.g., "collection.json")
+    const file = new File([blob], "collection.json", {
+      type: "application/json",
+    });
+
+    return await this.collectionFileUpload(currentWorkspaceId, file, "POSTMAN");
+  };
+
   public importCollectionURL = async (
     currentWorkspaceId: string,
     requestBody: ImportBodyUrl,
@@ -7438,7 +7454,7 @@ export default class CollectionsViewModel {
       "GET",
       JSON.stringify(headers),
       "",
-      "text/plain",
+      url.includes("api.postman.com") ? "" : "text/plain", // Postman Collection API breaks when Content Type is sent
       agent,
     );
     return response;
