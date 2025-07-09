@@ -785,6 +785,9 @@
           ? rightClickContextMenuMock
           : rightClickContextMenu}
         on:click|preventDefault={() => {
+          if (isFirstCollectionExpand) {
+            isFirstCollectionExpand = false;
+          }
           if (!isRenaming) {
             visibility = !visibility;
             if (!collection.id.includes(UntrackedItems.UNTRACKED)) {

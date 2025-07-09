@@ -179,6 +179,9 @@
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={() => {
+      if($isDefaultTourGuideOpen === true){
+        isDefaultTourGuideOpen.set(false)
+      }
       toggleExpandTestflow();
       handleTabUpdate("testflow");
     }}
