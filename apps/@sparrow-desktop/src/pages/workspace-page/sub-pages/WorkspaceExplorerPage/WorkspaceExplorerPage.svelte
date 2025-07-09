@@ -45,6 +45,7 @@
   let isFailedPublishedModalOpen = false;
   let upgradePlanModalInvite: boolean = false;
   let currrentInvites: number;
+  let invitedCount: number = 0;
 
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
@@ -126,6 +127,7 @@
     data: addUsersInWorkspacePayload,
     invitedUserCount: number,
   ) => {
+    invitedCount = invitedUserCount;
     const response = await _viewModel.inviteUserToWorkspace(
       workspaceId,
       workspaceName,
@@ -177,6 +179,7 @@
   bind:userRole
   bind:isShareModalOpen
   bind:upgradePlanModalInvite
+  bind:invitedCount
   tab={_viewModel.tab}
   {isSharedWorkspace}
   {workspaceUpdatesList}
