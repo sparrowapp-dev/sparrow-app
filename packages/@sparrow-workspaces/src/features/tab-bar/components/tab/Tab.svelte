@@ -354,7 +354,7 @@
         {tab.name}
       </span>
     </button>
-    {#if tab?.label}
+    {#if tab?.label && tab.type != TabTypeEnum.COLLECTION}
       <Tag type={"green"} text={tab.label} />
     {/if}
     <div style="align-items:center; justify-content:center;">
