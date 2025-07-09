@@ -1888,7 +1888,7 @@ class CollectionExplorerPage {
       collectionId: _collection.id,
       workspaceId: _collection.workspaceId,
       ...userSource,
-      auth: [
+      authProfiles: [
         {
           ..._authProfilePayload,
         }
@@ -1898,7 +1898,7 @@ class CollectionExplorerPage {
     await this.collectionRepository.addAuthProfile( // update fn. updateCollectionData here 
       _collection.id as string,
       {
-        ...authProfileObj.auth[0],
+        ..._authProfilePayload,
       },
     );
 
