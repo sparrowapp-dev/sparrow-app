@@ -225,6 +225,7 @@
         currentWorkspace?.isShared
           ? 'd-none'
           : ''} add-icon-container d-flex"
+        on:click|stopPropagation={() => {}}
       >
         <Button
           size="extra-small"
