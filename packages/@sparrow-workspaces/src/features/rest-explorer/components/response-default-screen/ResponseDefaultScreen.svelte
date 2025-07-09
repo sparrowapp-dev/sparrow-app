@@ -56,7 +56,7 @@
   <div>
     <div class={"d-flex flex-wrap justify-content-center mt-auto"}>
       {#each Object.entries(ctrlCommands) as [key, value]}
-        {#if key === "Save Request" || key === "Send Request" || isExpandShortcuts}
+        {#if key === "Save Request" || key === "New Request" || isExpandShortcuts}
           <!-- <span class="me-3"></span> -->
           <div class="px-3 flex items-center">
             <ComboText {key} {value} type="combo" bind:isExpandShortcuts />

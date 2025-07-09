@@ -8,17 +8,11 @@
   {#if keys.length > 0}
     {#each keys as key, index (key)}
       {#if key.toLowerCase() === "cmd"}
-        <span
-          class="key"
-          transition:fade={{ duration: 250, delay: index * 60 }}
-        >
+        <span class="key">
           <CommandKey />
         </span>
       {:else}
-        <span
-          class="key"
-          transition:fade={{ duration: 250, delay: index * 60 }}
-        >
+        <span class="key">
           {key}
         </span>
       {/if}
