@@ -350,7 +350,7 @@
   export let currentWorkspace;
 </script>
 
-<div class="main-container d-flex h-100" style="overflow:auto;">
+<div class="main-container d-flex h-100">
   <!-- <Modal
     title={"Switch Branch?"}
     type={"danger"}
@@ -391,10 +391,10 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-1 p-3"
+    class="my-collection d-flex flex-column w-100 z-1 p-3 h-100"
     style=" min-width: 450px"
   >
-    <div class="d-flex gap-2 mb-4">
+    <div class="d-flex gap-2 pb-4">
       <div class="d-flex flex-column flex-grow-1">
         <!-- <input
           type="text"
@@ -653,93 +653,96 @@
       </div>
     {/if} -->
     {#if collection?.collectionType === CollectionTypeBaseEnum.MOCK}
-      <div class="d-flex flex-column gap-3" style="height: 100%;">
-        <div class="mock-url-section d-flex flex-column">
-          <div
-            class="d-flex align-items-center justify-content-between"
-            style="width: 100%;"
-          >
-            <div class="">
-              <p class="text-ds-font-size-16" style="margin-bottom: 0px;">
-                Mock URL
-              </p>
-              <p
-                class="text-ds-font-size-12"
-                style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
-              >
-                Use this mock URL to test your requests without hitting the real
-                API.
-              </p>
-            </div>
-            <div class="d-flex gap-2 align-items-center">
-              <div class="d-flex justify-content-center">
-                <Tag
-                  size="medium"
-                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
-                  text={collection?.isMockCollectionRunning
-                    ? "Running"
-                    : "Inactive"}
-                />
-              </div>
-              <Button
-                size="small"
-                type={collection?.isMockCollectionRunning
-                  ? "danger"
-                  : "primary"}
-                title={collection?.isMockCollectionRunning
-                  ? "Stop Mock"
-                  : "Run Mock"}
-                onClick={() => {
-                  mockRunningStatus();
-                }}
-                startIcon={collection?.isMockCollectionRunning
-                  ? RecordStopRegular
-                  : PlayCircleRegular}
-                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                  isSharedWorkspace}
+      <div class="mock-url-section d-flex flex-column">
+        <div
+          class="d-flex align-items-center justify-content-between"
+          style="width: 100%;"
+        >
+          <div class="">
+            <p class="text-ds-font-size-16" style="margin-bottom: 0px;">
+              Mock URL
+            </p>
+            <p
+              class="text-ds-font-size-12"
+              style="color:var(--text-ds-neutral-300); margin-bottom: 0px;"
+            >
+              Use this mock URL to test your requests without hitting the real
+              API.
+            </p>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <div class="d-flex justify-content-center">
+              <Tag
+                size="medium"
+                type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                text={collection?.isMockCollectionRunning
+                  ? "Running"
+                  : "Inactive"}
               />
             </div>
-          </div>
-          <div class="d-flex">
-            <div
-              class="d-flex justify-content-center align-items-center px-2 py-1 text-ds-font-size-14"
-              style="
-    background-color: var(--bg-ds-surface-600);
-    border-radius: 4px;
-    gap: 16px;
-    margin-right: 8px;
-
-  "
-            >
-              <span
-                class="d-inline-block text-truncate"
-                style="max-width: 400px;"
-              >
-                {collection?.mockCollectionUrl}
-              </span>
-            </div>
             <Button
               size="small"
-              type={"outline-secondary"}
-              title="Copy"
+              type={collection?.isMockCollectionRunning ? "danger" : "primary"}
+              title={collection?.isMockCollectionRunning
+                ? "Stop Mock"
+                : "Run Mock"}
               onClick={() => {
-                navigator.clipboard.writeText(collection?.mockCollectionUrl);
-                notifications.success("Link copied to clipboard.");
+                mockRunningStatus();
               }}
-              startIcon={CopyRegular}
-            />
-            <Button
-              size="small"
-              type={"link-primary"}
-              title="Learn how to use mock URL"
-              onClick={() => {
-                onMockCollectionModelOpen(collection?.mockCollectionUrl);
-              }}
-              endIcon={OpenRegular}
+              startIcon={collection?.isMockCollectionRunning
+                ? RecordStopRegular
+                : PlayCircleRegular}
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                isSharedWorkspace}
             />
           </div>
         </div>
-        <div class="mock-url-section d-flex flex-column">
+        <div class="d-flex">
+          <div
+            class="d-flex justify-content-center align-items-center px-2 py-1 text-ds-font-size-14"
+            style="
+background-color: var(--bg-ds-surface-600);
+border-radius: 4px;
+gap: 16px;
+margin-right: 8px;
+
+"
+          >
+            <span
+              class="d-inline-block text-truncate"
+              style="max-width: 400px;"
+            >
+              {collection?.mockCollectionUrl}
+            </span>
+          </div>
+          <Button
+            size="small"
+            type={"outline-secondary"}
+            title="Copy"
+            onClick={() => {
+              navigator.clipboard.writeText(collection?.mockCollectionUrl);
+              notifications.success("Link copied to clipboard.");
+            }}
+            startIcon={CopyRegular}
+          />
+          <Button
+            size="small"
+            type={"link-primary"}
+            title="Learn how to use mock URL"
+            onClick={() => {
+              onMockCollectionModelOpen(collection?.mockCollectionUrl);
+            }}
+            endIcon={OpenRegular}
+          />
+        </div>
+      </div>
+      <br />
+      <!-- WRAPPER -->
+      <div class="d-flex flex-column gap-3 h-100" style="overflow:auto;">
+        <div
+          class="mock-url-section d-flex flex-column"
+          style="flex-basis:50%; overflow:auto;"
+        >
           <div class="d-flex align-items-center justify-content-between">
             <p class="text-ds-font-size-16" style="margin-bottom: 0px;">
               Overview
@@ -763,27 +766,33 @@
               </div>
             </div>
             <hr style="margin: 0.5rem 0;" />
-            <div class="d-flex align-items-start ps-0 h-100 z-0">
-              <textarea
-                disabled={!isCollectionEditable}
-                id="updateCollectionDescField"
-                value={$tab?.description || ""}
-                class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
-                  ? 'input-outline'
-                  : ''} w-100 p-2"
-                placeholder={isSharedWorkspace
+          </div>
+          <div
+            class="d-flex w-100 align-items-start ps-0 h-100 z-0 flex-1"
+            style="overflow:auto;"
+          >
+            <textarea
+              disabled={!isCollectionEditable}
+              id="updateCollectionDescField"
+              value={$tab?.description || ""}
+              class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
+                ? 'input-outline'
+                : ''} w-100 p-2"
+              placeholder={isSharedWorkspace
                 ? "No description added."
                 : "Add Description"}
-                on:input={handleInputDescription}
-                style="background-color: {isSharedWorkspace
-                  ? 'var(--bg-ds-surface-900)'
-                  : 'var(--bg-ds-surface-600)'};"
-              />
-            </div>
+              on:input={handleInputDescription}
+              style="background-color: {isSharedWorkspace
+                ? 'var(--bg-ds-surface-900)'
+                : 'var(--bg-ds-surface-600)'};"
+            />
           </div>
         </div>
         {#if !(isSharedWorkspace && currentWorkspace?.workspaceType === WorkspaceType.PUBLIC)}
-          <div class="d-flex gap-3" style="width: 100%; height: 100%;">
+          <div
+            class="d-flex gap-3"
+            style="width: 100%; flex-basis:50%;  overflow:auto;"
+          >
             <div class="mock-url-section d-flex flex-column" style="flex: 1;">
               <div
                 class="d-flex align-items-center justify-content-between"
@@ -839,8 +848,8 @@
                 </div>
               </div>
               <div
-                class="d-flex flex-column"
-                style="height: 100%; margin:auto; width: 100%;"
+                class="d-flex flex-column flex-1"
+                style="height: 100%; margin:auto; width: 100%; overflow:auto;"
               >
                 <div class="recent-requests-list custom-scrollbar">
                   {#if collection?.mockRequestHistory && collection.mockRequestHistory.length > 0}
@@ -1010,7 +1019,7 @@
     border: none;
     border-radius: 4px !important;
     color: var(--text-secondary-1000);
-    height: 168px;
+    height: 100%;
   }
   textarea::placeholder {
     color: var(--text-secondary-550);
@@ -1045,10 +1054,8 @@
   }
   .recent-requests-list {
     width: 100%;
-    max-height: 200px;
     overflow-y: auto;
     padding-right: 4px;
-    height: 100%;
   }
 
   .request-item {

@@ -2829,6 +2829,11 @@
   dependencies:
     import-meta-resolve "^4.1.0"
 
+"@sveltejs/svelte-virtual-list@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@sveltejs/svelte-virtual-list/-/svelte-virtual-list-3.0.1.tgz#3784d6426508836b4471bba8ba293430e73717d8"
+  integrity sha512-aF9TptS7NKKS7/TqpsxQBSDJ9Q0XBYzBehCeIC5DzdMEgrJZpIYao9LRLnyyo6SVodpapm2B7FE/Lj+FSA5/SQ==
+
 "@sveltejs/vite-plugin-svelte-inspector@^1.0.4":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte-inspector/-/vite-plugin-svelte-inspector-1.0.4.tgz#c99fcb73aaa845a3e2c0563409aeb3ee0b863add"
@@ -9428,6 +9433,16 @@ svelte-toasts@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/svelte-toasts/-/svelte-toasts-1.1.2.tgz#6ba590d27a9eb4cf164ea2efe5a5f1afac6de008"
   integrity sha512-m+yL4eEKXyJoyjTYaH1j1GFwF0Pi8YDqnVfwWPDmwi4712iZesv+TNCmToSNlav3R5Vkmc8ZBRkT8DOcu3sywQ==
+
+svelte-virtual-list@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/svelte-virtual-list/-/svelte-virtual-list-3.0.1.tgz#8e4fbd88462a8b2073312888831a375199e01f7b"
+  integrity sha512-e7e+jn8VDjmdD8A1oOVBWmUi7jg+uugmiihkK0Cuk35JeeCR8ja40/B6DpCTHJFsQAZg6EVPjetN2ibgr25YCA==
+
+svelte-virtual-scroll-list@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/svelte-virtual-scroll-list/-/svelte-virtual-scroll-list-1.3.0.tgz#66d72f18271d1b9baa911ebedcdcfa2ea0ebe6ca"
+  integrity sha512-rkU993mMsTboFRlygExhYeLJwysaFxyzfTsAfOtDklGIyd0wB31eZtYSAHAcz/WaZCEwjn+GKXfx5jM1xUv3GQ==
 
 svelte2tsx@^0.1.151:
   version "0.1.193"

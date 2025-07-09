@@ -529,81 +529,110 @@
   }
 </script>
 
-{#if $tab.tabId}
-  <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 p-3">
-      <!-- Request Name Header -->
-      <!-- 
+<!-- {#if $tab.tabId} -->
+<div class="d-flex rest-explorer-layout h-100">
+  <div class="w-100 d-flex flex-column h-100 p-3">
+    <!-- Request Name Header -->
+    <!-- 
         --
         -- Rest name header is set to display none 
         --
       -->
-      <div class="d-flex justify-content-between w-100 p-3 d-none">
-        <RequestName name={$tab.name} {onUpdateRequestName} />
+    <div class="d-flex justify-content-between w-100 p-3 d-none">
+      <RequestName name={$tab.name} {onUpdateRequestName} />
 
-        <div class="d-flex justify-content-between">
-          <Button
-            title="Save Request"
-            type={"secondary"}
-            loader={false}
-            buttonClassProp="ms-2"
-            buttonStartIcon={floppyDisk}
-            onClick={async () => {
-              const x = await onSaveRequest();
-              if (
-                x.status === "error" &&
-                x.message ===
-                  "request is not a part of any workspace or collection"
-              ) {
-                isExposeSaveAsRequest = true;
-              } else if (x.status === "success") {
-                notifications.success("API request saved successfully.");
-              }
-            }}
-          /> <span class="position-relative" style="width:35px;"> </span>
-          <Button
-            title="Share"
-            type={"secondary"}
-            buttonClassProp="ms-2"
-            onClick={() => {}}
-          />
-        </div>
+      <div class="d-flex justify-content-between">
+        <Button
+          title="Save Request"
+          type={"secondary"}
+          loader={false}
+          buttonClassProp="ms-2"
+          buttonStartIcon={floppyDisk}
+          onClick={async () => {
+            const x = await onSaveRequest();
+            if (
+              x.status === "error" &&
+              x.message ===
+                "request is not a part of any workspace or collection"
+            ) {
+              isExposeSaveAsRequest = true;
+            } else if (x.status === "success") {
+              notifications.success("API request saved successfully.");
+            }
+          }}
+        /> <span class="position-relative" style="width:35px;"> </span>
+        <Button
+          title="Share"
+          type={"secondary"}
+          buttonClassProp="ms-2"
+          onClick={() => {}}
+        />
       </div>
+    </div>
 
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSaveLoad={$loading}
-        isSave={$tab.isSaved}
-        bind:userRole
-        requestUrl={$tab.property.request?.url}
-        httpMethod={$tab.property.request?.method}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-        {isGuestUser}
-      />
+    <!-- HTTP URL Section -->
+    <HttpUrlSection
+      class=""
+      isSaveLoad={$loading}
+      isSave={$tab.isSaved}
+      bind:userRole
+      requestUrl={$tab.property?.request?.url}
+      httpMethod={$tab.property?.request?.method}
+      isSendRequestInProgress={storeData?.isSendRequestInProgress}
+      onSendButtonClicked={onSendRequest}
+      onCancelButtonClicked={onCancelRequest}
+      {onUpdateEnvironment}
+      {environmentVariables}
+      {onUpdateRequestUrl}
+      {onUpdateRequestMethod}
+      {toggleSaveRequest}
+      {onSaveRequest}
+      {isGuestUser}
+    />
 
-      {#if isPopoverContainer}
-        <div class="pt-2"></div>
-        <Popover
-          onClose={closeCollectionHelpText}
-          heading={`Welcome to Sparrow`}
-        >
-          <p class="mb-0 text-fs-12">
-            Your one-stop solution for API testing and management. Start
-            organizing your API requests into collections, utilize environment
-            variables, and streamline your development process. Get started now
-            by creating your first collection or exploring our features
-            <span
-              on:click={() => {
-                isGuidePopup = true;
+    {#if isPopoverContainer}
+      <div class="pt-2"></div>
+      <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
+        <p class="mb-0 text-fs-12">
+          Your one-stop solution for API testing and management. Start
+          organizing your API requests into collections, utilize environment
+          variables, and streamline your development process. Get started now by
+          creating your first collection or exploring our features
+          <span
+            on:click={() => {
+              isGuidePopup = true;
+            }}
+            class="link p-0 border-0"
+            style="font-size: 12px;"
+            >See how it works.
+          </span>
+        </p>
+      </Popover>
+      <div class="pt-2"></div>
+    {/if}
+    <div
+      bind:this={splitpaneContainer}
+      style="flex:1; overflow:auto; margin-top: 12px;"
+    >
+      <Splitpanes class="explorer-chatbot-splitter">
+        <Pane class="position-relative bg-transparent">
+          <!--Disabling the Quick Help feature, will be taken up in next release-->
+
+          {#if !isLoading}
+            <Splitpanes
+              class="rest-splitter w-100 h-100"
+              id={"rest-splitter"}
+              horizontal={$tabsSplitterDirection === "horizontal"
+                ? true
+                : false}
+              dblClickSplitter={false}
+              on:resize={(e) => {
+                onUpdateRequestState({
+                  requestLeftSplitterWidthPercentage: e.detail[0].size,
+                });
+                onUpdateRequestState({
+                  requestRightSplitterWidthPercentage: e.detail[1].size,
+                });
               }}
               class="link p-0 border-0"
               style="font-size: 12px;"
@@ -904,61 +933,62 @@
         </Motion>
       </div>
     </div>
-    <!--
+  </div>
+  <!--
       --
        -- Rest extension panel is set to display none 
       --
     -->
-    <div class="d-none">
-      <RestExtensionPanel
-        state={$tab.property.request?.state}
-        requestMethod={$tab.property.request?.method}
-        requestUrl={$tab.property.request?.url}
-        requestName={$tab.name}
-        requestDescription={$tab.description}
-        requestPath={$tab.path}
-        collections={$collections}
-        {onSaveRequest}
-        {readCollection}
-        {readWorkspace}
-        {onSaveAsRequest}
-        {onCreateFolder}
-        {onCreateCollection}
-        {onUpdateRequestState}
-        {onUpdateRequestDescription}
-        {readRequestOrFolderInCollection}
-      />
-    </div>
-  </div>
-  <Modal
-    title={"Save Request"}
-    type={"dark"}
-    width={"55%"}
-    zIndex={10000}
-    isOpen={isExposeSaveAsRequest}
-    handleModalState={(flag = false) => {
-      isExposeSaveAsRequest = flag;
-    }}
-  >
-    <SaveAsCollectionItem
-      onClick={(flag = false) => {
-        isExposeSaveAsRequest = flag;
-      }}
-      requestMethod={$tab.property.request?.method}
-      requestUrl={$tab.property.request?.url}
+  <div class="d-none">
+    <!-- <RestExtensionPanel
+      state={$tab.property?.request?.state}
+      requestMethod={$tab.property?.request?.method}
+      requestUrl={$tab.property?.request?.url}
       requestName={$tab.name}
       requestDescription={$tab.description}
       requestPath={$tab.path}
       collections={$collections}
+      {onSaveRequest}
+      {readCollection}
       {readWorkspace}
-      onSave={onSaveAsRequest}
+      {onSaveAsRequest}
       {onCreateFolder}
       {onCreateCollection}
-      {onRenameCollection}
-      {onRenameFolder}
-    />
-  </Modal>
-{/if}
+      {onUpdateRequestState}
+      {onUpdateRequestDescription}
+      {readRequestOrFolderInCollection}
+    /> -->
+  </div>
+</div>
+<Modal
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag = false) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsCollectionItem
+    onClick={(flag = false) => {
+      isExposeSaveAsRequest = flag;
+    }}
+    requestMethod={$tab.property?.request?.method}
+    requestUrl={$tab.property?.request?.url}
+    requestName={$tab.name}
+    requestDescription={$tab.description}
+    requestPath={$tab.path}
+    collections={$collections}
+    {readWorkspace}
+    onSave={onSaveAsRequest}
+    {onCreateFolder}
+    {onCreateCollection}
+    {onRenameCollection}
+    {onRenameFolder}
+  />
+</Modal>
+<!-- {/if} -->
 
 <Modal
   title={""}

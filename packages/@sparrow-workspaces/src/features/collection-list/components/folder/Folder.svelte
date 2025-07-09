@@ -50,6 +50,7 @@
   } from "../../../../stores/recent-left-panel";
   import MockRequest from "../mock-request/MockRequest.svelte";
   import AiRequest from "../ai-request/AiRequest.svelte";
+  import { inview } from "svelte-inview";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -119,6 +120,37 @@
   let verticalFolderLine = false;
   export let isMockCollection = false;
 
+  // let visibleItems = [];
+  // let renderBatchSize = 10;
+
+  // function waitNextFrames(frameCount = 1): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     function next(n: number) {
+  //       if (n <= 0) return resolve();
+  //       requestAnimationFrame(() => next(n - 1));
+  //     }
+  //     next(frameCount);
+  //   });
+  // }
+
+  // async function renderInBatches(items: any[], batchSize = 10) {
+  //   visibleItems = [];
+
+  //   for (let i = 0; i < items.length; i += batchSize) {
+  //     const nextBatch = items.slice(i, i + batchSize);
+  //     visibleItems = [...visibleItems, ...nextBatch];
+  //     if (searchData) {
+  //       await waitNextFrames(100); // let UI update
+  //     } else {
+  //       await waitNextFrames(10); // let UI update
+  //     }
+  //   }
+  // }
+
+  // $: if (expand && explorer?.items?.length) {
+  //   renderInBatches(explorer.items, renderBatchSize);
+  // }
+
   $: {
     if (explorer.type === "FOLDER") {
       if (explorer.items.find((item) => item.id === activeTabId)) {
@@ -129,15 +161,7 @@
     }
   }
 
-  $: {
-    if (searchData) {
-      expand = true;
-    }
-    // if (activeTabPath) {
-    // if (activeTabPath?.folderId === explorer.id) {
-    //   expand = true;
-    // }
-    // }
+  $: if (isFolderPopup) {
     if (explorer) {
       requestIds = [];
       requestCount = 0;
@@ -170,6 +194,16 @@
         });
       }
     }
+  }
+  $: {
+    if (searchData) {
+      expand = true;
+    }
+    // if (activeTabPath) {
+    // if (activeTabPath?.folderId === explorer.id) {
+    //   expand = true;
+    // }
+    // }
   }
 
   // const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -230,321 +264,344 @@
       expand = true;
     }
   }
+
+  let isInView: boolean = false;
+  let scrollDirection: ScrollDirection | any;
+  const options: Options = {
+    rootMargin: "0px",
+    unobserveOnEnter: true,
+    threshold: 0.5,
+  };
+
+  const handleChange = ({ detail }: CustomEvent<ObserverEventDetails>) => {
+    isInView = detail.inView;
+    scrollDirection = detail?.scrollDirection?.vertical;
+  };
 </script>
 
 <svelte:window
   on:click={handleSelectClick}
   on:contextmenu|preventDefault={handleSelectClick}
 />
-<div>
-  <Modal
-    title={isMockCollection ? "Delete Folder" : "Delete Folder?"}
-    type={"danger"}
-    width={"35%"}
-    zIndex={1000}
-    isOpen={isFolderPopup}
-    handleModalState={(flag = false) => (isFolderPopup = flag)}
-  >
-    <div
-      class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium {isMockCollection
-        ? 'mt-2'
-        : ''}"
-    >
-      <p class="mb-0">
-        Are you sure you want to delete this Folder? Everything in <span
-          class="text-ds-font-weight-semi-bold"
-          style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
-        >
-        will be removed.
-      </p>
-    </div>
-    <div class="d-flex gap-3 text-ds-font-size-12">
-      <div class="d-flex gap-1 {isMockCollection ? 'align-items-center' : ''}">
-        <span class="text-plusButton {isMockCollection ? 'fs-5' : ''}"
-          >{isMockCollection ? mockRequestCount : requestCount}</span
-        >
-        <p style="font-size: 12px;" class="mb-0">
-          {HttpRequestDefaultNameBaseEnum.NAME}
-        </p>
-      </div>
-      {#if !isMockCollection}
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{graghQlCount}</span>
-          <p>GraphQL</p>
-        </div>
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{webSocketCount}</span>
-          <p>WebSocket</p>
-        </div>
-        <div class="d-flex gap-1">
-          <span class="text-plusButton">{socketIoCount}</span>
-          <p>Socket.IO</p>
-        </div>
-      {/if}
-    </div>
-    <div
-      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded {isMockCollection
-        ? 'mt-3'
-        : ''}"
-    >
-      <Button
-        disable={deleteLoader}
-        title={"Cancel"}
-        textStyleProp={"font-size: var(--base-text)"}
-        type={"secondary"}
-        loader={false}
-        onClick={() => {
-          isFolderPopup = false;
-        }}
-      />
-
-      <Button
-        disable={deleteLoader}
-        title={"Delete"}
-        textStyleProp={"font-size: var(--base-text)"}
-        loaderSize={18}
+<div use:inview={options} on:inview_change={handleChange}>
+  {#if isInView}
+    <div>
+      <Modal
+        title={isMockCollection ? "Delete Folder" : "Delete Folder?"}
         type={"danger"}
-        loader={deleteLoader}
-        onClick={() => {
-          deleteLoader = true;
-          onItemDeleted("folder", {
-            workspaceId: collection.workspaceId,
-            collection,
-            folder: explorer,
-            requestIds,
-          });
-          deleteLoader = false;
-          isFolderPopup = false;
-        }}
-      />
-    </div></Modal
-  >
+        width={"35%"}
+        zIndex={1000}
+        isOpen={isFolderPopup}
+        handleModalState={(flag = false) => (isFolderPopup = flag)}
+      >
+        <div
+          class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium {isMockCollection
+            ? 'mt-2'
+            : ''}"
+        >
+          <p class="mb-0">
+            Are you sure you want to delete this Folder? Everything in <span
+              class="text-ds-font-weight-semi-bold"
+              style="color: var(--text-ds-neutral-50);">"{explorer.name}"</span
+            >
+            will be removed.
+          </p>
+        </div>
+        <div class="d-flex gap-3 text-ds-font-size-12">
+          <div
+            class="d-flex gap-1 {isMockCollection ? 'align-items-center' : ''}"
+          >
+            <span class="text-plusButton {isMockCollection ? 'fs-5' : ''}"
+              >{isMockCollection ? mockRequestCount : requestCount}</span
+            >
+            <p style="font-size: 12px;" class="mb-0">
+              {HttpRequestDefaultNameBaseEnum.NAME}
+            </p>
+          </div>
+          {#if !isMockCollection}
+            <div class="d-flex gap-1">
+              <span class="text-plusButton">{graghQlCount}</span>
+              <p>GraphQL</p>
+            </div>
+            <div class="d-flex gap-1">
+              <span class="text-plusButton">{webSocketCount}</span>
+              <p>WebSocket</p>
+            </div>
+            <div class="d-flex gap-1">
+              <span class="text-plusButton">{socketIoCount}</span>
+              <p>Socket.IO</p>
+            </div>
+          {/if}
+        </div>
+        <div
+          class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded {isMockCollection
+            ? 'mt-3'
+            : ''}"
+        >
+          <Button
+            disable={deleteLoader}
+            title={"Cancel"}
+            textStyleProp={"font-size: var(--base-text)"}
+            type={"secondary"}
+            loader={false}
+            onClick={() => {
+              isFolderPopup = false;
+            }}
+          />
 
-  {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-    <Options
-      xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
-      yAxis={[
-        folderTabWrapper.getBoundingClientRect().top - 5,
-        folderTabWrapper.getBoundingClientRect().bottom + 5,
-      ]}
-      zIndex={500}
-      menuItems={[
-        {
-          onClick: () => {
-            expand = true;
-            if (expand) {
-              onItemOpened("folder", {
+          <Button
+            disable={deleteLoader}
+            title={"Delete"}
+            textStyleProp={"font-size: var(--base-text)"}
+            loaderSize={18}
+            type={"danger"}
+            loader={deleteLoader}
+            onClick={() => {
+              deleteLoader = true;
+              onItemDeleted("folder", {
                 workspaceId: collection.workspaceId,
                 collection,
                 folder: explorer,
+                requestIds,
               });
-            }
-          },
-          displayText: "Open Folder",
-          disabled: false,
-          hidden: false,
-        },
-        {
-          onClick: () => {
-            expand = false;
-            isRenaming = true;
-          },
-          displayText: "Rename Folder",
-          disabled: false,
-          // hidden:
-          //   !collection.activeSync ||
-          //   (explorer?.source === "USER" && collection.activeSync)
-          //     ? false
-          //     : true,
-          hidden: false,
-        },
-        {
-          onClick: () => {
-            onItemCreated("requestFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("websocketFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: "Add WebSocket",
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("socketioFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("graphqlFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            onItemCreated("aiRequestFolder", {
-              workspaceId: collection.workspaceId,
-              collection,
-              folder: explorer,
-            });
-          },
-          displayText: `Add AI Request`,
-          disabled: false,
-          hidden:
-            !isMockCollection &&
-            (!collection.activeSync ||
-              (explorer?.source === "USER" && collection.activeSync))
-              ? false
-              : true,
-        },
-        {
-          onClick: () => {
-            isFolderPopup = true;
-          },
-          displayText: "Delete",
-          disabled: false,
-          hidden:
-            !collection.activeSync ||
-            (explorer?.source === "USER" && collection.activeSync)
-              ? false
-              : true,
-        },
-      ]}
-    />
-  {/if}
-
-  {#if explorer}
-    {#if explorer.type === "FOLDER"}
-      <div
-        tabindex="0"
-        bind:this={folderTabWrapper}
-        style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
-        activeTabId
-          ? '0px'
-          : '2px'} ; "
-        class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
-        activeTabId
-          ? 'active-folder-tab'
-          : ''}"
+              deleteLoader = false;
+              isFolderPopup = false;
+            }}
+          />
+        </div></Modal
       >
-        <button
-          tabindex="-1"
-          style=" height:32px; "
-          class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
-          on:contextmenu|preventDefault={rightClickContextMenu}
-          on:click|preventDefault={() => {
-            if (!isRenaming) {
-              if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-                expand = !expand;
+
+      {#if showMenu && userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+        <Options
+          xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
+          yAxis={[
+            folderTabWrapper.getBoundingClientRect().top - 5,
+            folderTabWrapper.getBoundingClientRect().bottom + 5,
+          ]}
+          zIndex={500}
+          menuItems={[
+            {
+              onClick: () => {
+                expand = true;
                 if (expand) {
-                  addCollectionItem(explorer.id, "Folder");
                   onItemOpened("folder", {
                     workspaceId: collection.workspaceId,
                     collection,
                     folder: explorer,
                   });
-                } else {
-                  removeCollectionItem(explorer.id);
                 }
-              }
-            }
-          }}
-        >
-          <span on:click={() => {}} style="  display: flex; margin-right:4px; ">
-            <Button
-              startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
-              size="extra-small"
-              customWidth={"24px"}
-              type="teritiary-regular"
-              onClick={(e) => {
-                e.stopPropagation();
-                expand = !expand;
-              }}
-            />
-          </span>
+              },
+              displayText: "Open Folder",
+              disabled: false,
+              hidden: false,
+            },
+            {
+              onClick: () => {
+                expand = false;
+                isRenaming = true;
+              },
+              displayText: "Rename Folder",
+              disabled: false,
+              // hidden:
+              //   !collection.activeSync ||
+              //   (explorer?.source === "USER" && collection.activeSync)
+              //     ? false
+              //     : true,
+              hidden: false,
+            },
+            {
+              onClick: () => {
+                onItemCreated("requestFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add ${HttpRequestDefaultNameBaseEnum.NAME}`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("websocketFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: "Add WebSocket",
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("socketioFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("graphqlFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                onItemCreated("aiRequestFolder", {
+                  workspaceId: collection.workspaceId,
+                  collection,
+                  folder: explorer,
+                });
+              },
+              displayText: `Add AI Request`,
+              disabled: false,
+              hidden:
+                !isMockCollection &&
+                (!collection.activeSync ||
+                  (explorer?.source === "USER" && collection.activeSync))
+                  ? false
+                  : true,
+            },
+            {
+              onClick: () => {
+                isFolderPopup = true;
+              },
+              displayText: "Delete",
+              disabled: false,
+              hidden:
+                !collection.activeSync ||
+                (explorer?.source === "USER" && collection.activeSync)
+                  ? false
+                  : true,
+            },
+          ]}
+        />
+      {/if}
 
-          {#if expand}
-            <div
-              style="height:24px; width:30px; padding:4px;"
-              class="d-flex align-items-center justify-content-end"
+      {#if explorer}
+        {#if explorer.type === "FOLDER"}
+          <div
+            tabindex="0"
+            bind:this={folderTabWrapper}
+            style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
+            activeTabId
+              ? '0px'
+              : '2px'} ; "
+            class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
+            activeTabId
+              ? 'active-folder-tab'
+              : ''}"
+          >
+            <button
+              tabindex="-1"
+              style=" height:32px; "
+              class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
+              on:contextmenu|preventDefault={rightClickContextMenu}
+              on:click|preventDefault={() => {
+                if (!isRenaming) {
+                  if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
+                    expand = !expand;
+                    if (expand) {
+                      addCollectionItem(explorer.id, "Folder");
+                      onItemOpened("folder", {
+                        workspaceId: collection.workspaceId,
+                        collection,
+                        folder: explorer,
+                      });
+                    } else {
+                      removeCollectionItem(explorer.id);
+                    }
+                  }
+                }
+              }}
             >
-              <FolderOpenRegular
-                size={"16px"}
-                color="var(--icon-ds-neutral-300)"
-              />
-            </div>
-          {:else}
-            <div
-              class="d-flex align-items-center justify-content-end"
-              style="height:24px; width:30px; padding:4px;"
-            >
-              <FolderRegular size={"16px"} color="var(--icon-ds-neutral-300)" />
-            </div>
-          {/if}
-          {#if isRenaming}
-            <input
-              class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-              id="renameInputFieldFolder"
-              type="text"
-              style=" padding-left:5px;  color : var(--text-ds-neutral-50); "
-              autofocus
-              maxlength={100}
-              value={explorer.name}
-              on:click|stopPropagation={() => {}}
-              on:input={handleRenameInput}
-              on:blur={onRenameBlur}
-              on:keydown={onRenameInputKeyPress}
-            />
-          {:else}
-            <div
-              class="folder-title d-flex align-items-center"
-              style="cursor:pointer; font-size:12px;
+              <span
+                on:click={() => {}}
+                style="  display: flex; margin-right:4px; "
+              >
+                <Button
+                  startIcon={!expand ? ChevronRightRegular : ChevronDownRegular}
+                  size="extra-small"
+                  customWidth={"24px"}
+                  type="teritiary-regular"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    expand = !expand;
+                  }}
+                />
+              </span>
+
+              {#if expand}
+                <div
+                  style="height:24px; width:30px; padding:4px;"
+                  class="d-flex align-items-center justify-content-end"
+                >
+                  <FolderOpenRegular
+                    size={"16px"}
+                    color="var(--icon-ds-neutral-300)"
+                  />
+                </div>
+              {:else}
+                <div
+                  class="d-flex align-items-center justify-content-end"
+                  style="height:24px; width:30px; padding:4px;"
+                >
+                  <FolderRegular
+                    size={"16px"}
+                    color="var(--icon-ds-neutral-300)"
+                  />
+                </div>
+              {/if}
+              {#if isRenaming}
+                <input
+                  class="py-0 renameInputFieldFolder w-100 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                  id="renameInputFieldFolder"
+                  type="text"
+                  style=" padding-left:5px;  color : var(--text-ds-neutral-50); "
+                  autofocus
+                  maxlength={100}
+                  value={explorer.name}
+                  on:click|stopPropagation={() => {}}
+                  on:input={handleRenameInput}
+                  on:blur={onRenameBlur}
+                  on:keydown={onRenameInputKeyPress}
+                />
+              {:else}
+                <div
+                  class="folder-title d-flex align-items-center"
+                  style="cursor:pointer; font-size:12px;
                       height: 32px;
                       font-weight:400;
                       margin-left:0px;
@@ -553,115 +610,117 @@
                       line-height:18px;
                       padding:2px 4px;
                       "
-            >
-              <p
-                class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                >
+                  <p
+                    class="ellipsis mb-0 text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
+                  >
+                    {explorer.name}
+                  </p>
+                </div>
+              {/if}
+            </button>
+
+            {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
+              <Spinner size={"15px"} />
+            {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+              {#if !collection?.activeSync}
+                <Tooltip
+                  title={isMockCollection
+                    ? "Add Mock REST API"
+                    : "Add REST API"}
+                  placement={"bottom-center"}
+                  zIndex={701}
+                  distance={13}
+                >
+                  <span class="threedot-icon-container d-flex">
+                    <Button
+                      size="extra-small"
+                      customWidth={"24px"}
+                      type="teritiary-regular"
+                      startIcon={ArrowSwapRegular}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        expand = true;
+                        if (isMockCollection) {
+                          onItemCreated("requestMockFolder", {
+                            workspaceId: collection.workspaceId,
+                            collection,
+                            folder: explorer,
+                          });
+                        } else {
+                          onItemCreated("requestFolder", {
+                            workspaceId: collection.workspaceId,
+                            collection,
+                            folder: explorer,
+                          });
+                        }
+                      }}
+                    />
+                  </span>
+                </Tooltip>
+              {/if}
+
+              <Tooltip
+                title={"More"}
+                placement={"bottom-center"}
+                zIndex={701}
+                distance={17}
+                show={!showMenu}
               >
-                {explorer.name}
-              </p>
-            </div>
-          {/if}
-        </button>
-
-        {#if explorer.id.includes(UntrackedItems.UNTRACKED)}
-          <Spinner size={"15px"} />
-        {:else if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-          {#if !collection?.activeSync}
-            <Tooltip
-              title={isMockCollection ? "Add Mock REST API" : "Add REST API"}
-              placement={"bottom-center"}
-              zIndex={701}
-              distance={13}
-            >
-              <span class="threedot-icon-container d-flex">
-                <Button
-                  size="extra-small"
-                  customWidth={"24px"}
-                  type="teritiary-regular"
-                  startIcon={ArrowSwapRegular}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    expand = true;
-                    if (isMockCollection) {
-                      onItemCreated("requestMockFolder", {
-                        workspaceId: collection.workspaceId,
-                        collection,
-                        folder: explorer,
-                      });
-                    } else {
-                      onItemCreated("requestFolder", {
-                        workspaceId: collection.workspaceId,
-                        collection,
-                        folder: explorer,
-                      });
-                    }
-                  }}
-                />
-              </span>
-            </Tooltip>
-          {/if}
-
-          <Tooltip
-            title={"More"}
-            placement={"bottom-center"}
-            zIndex={701}
-            distance={17}
-            show={!showMenu}
-          >
-            <span class="threedot-icon-container rounded d-flex">
-              <Button
-                id={`show-more-folder-${explorer.id}`}
-                size="extra-small"
-                customWidth={"24px"}
-                type="teritiary-regular"
-                startIcon={MoreHorizontalRegular}
-                onClick={rightClickContextMenu}
-              />
-            </span>
-          </Tooltip>
-        {/if}
-      </div>
-      {#if expand}
-        <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
-          <div
-            class="sub-files position-relative"
-            style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
-          >
-            {#if explorer?.items?.length > 0}
+                <span class="threedot-icon-container rounded d-flex">
+                  <Button
+                    id={`show-more-folder-${explorer.id}`}
+                    size="extra-small"
+                    customWidth={"24px"}
+                    type="teritiary-regular"
+                    startIcon={MoreHorizontalRegular}
+                    onClick={rightClickContextMenu}
+                  />
+                </span>
+              </Tooltip>
+            {/if}
+          </div>
+          {#if expand}
+            <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
               <div
-                class="box-line"
-                style="background-color: {verticalFolderLine
-                  ? 'var(--bg-ds-neutral-500)'
-                  : 'var(--bg-ds-surface-100)'}"
-              ></div>
-            {/if}
-            {#each explorer?.items || [] as exp}
-              <svelte:self
-                {userRole}
-                {isSharedWorkspace}
-                {onItemCreated}
-                {onItemDeleted}
-                {onItemRenamed}
-                {onItemOpened}
-                {activeTabType}
-                {collection}
-                {userRoleInWorkspace}
-                {activeTabPath}
-                explorer={exp}
-                folder={explorer}
-                {activeTabId}
-                {isWebApp}
-              />
-            {/each}
-            {#if !explorer?.items?.length}
-              <p
-                class="text-ds-font-size-12 my-2 text-secondary-300"
-                style="padding-left: 90px;"
+                class="sub-files position-relative"
+                style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
               >
-                This folder is empty
-              </p>
-            {/if}
-            <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
+                {#if explorer?.items?.length > 0}
+                  <div
+                    class="box-line"
+                    style="background-color: {verticalFolderLine
+                      ? 'var(--bg-ds-neutral-500)'
+                      : 'var(--bg-ds-surface-100)'}"
+                  ></div>
+                {/if}
+                {#each explorer?.items || [] as exp}
+                  <svelte:self
+                    {userRole}
+                    {isSharedWorkspace}
+                    {onItemCreated}
+                    {onItemDeleted}
+                    {onItemRenamed}
+                    {onItemOpened}
+                    {activeTabType}
+                    {collection}
+                    {userRoleInWorkspace}
+                    {activeTabPath}
+                    explorer={exp}
+                    folder={explorer}
+                    {activeTabId}
+                    {isWebApp}
+                  />
+                {/each}
+                {#if !explorer?.items?.length}
+                  <p
+                    class="text-ds-font-size-12 my-2 text-secondary-300"
+                    style="padding-left: 90px;"
+                  >
+                    This folder is empty
+                  </p>
+                {/if}
+                <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
             <div class="mt-2 mb-2 ms-0">
               <Tooltip
                 classProp="mt-2 mb-2 ms-0"
@@ -689,106 +748,108 @@
               </Tooltip>
             </div>
           {/if} -->
+              </div>
+            </div>
+          {/if}
+        {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
+          <div style={`cursor: pointer; `}>
+            <Request
+              {userRole}
+              {isSharedWorkspace}
+              api={explorer}
+              {onItemRenamed}
+              {onItemDeleted}
+              {onItemOpened}
+              {activeTabPath}
+              {searchData}
+              {activeTabType}
+              {folder}
+              {collection}
+              {activeTabId}
+              {isWebApp}
+            />
           </div>
-        </div>
+        {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
+          <div style="cursor:pointer;">
+            <WebSocket
+              {userRole}
+              {isSharedWorkspace}
+              api={explorer}
+              {onItemRenamed}
+              {onItemDeleted}
+              {onItemOpened}
+              {folder}
+              {collection}
+              {activeTabId}
+            />
+          </div>
+        {:else if explorer.type === CollectionItemTypeBaseEnum.SOCKETIO}
+          <div style="cursor:pointer;">
+            <SocketIo
+              {userRole}
+              {isSharedWorkspace}
+              socketIo={explorer}
+              {onItemRenamed}
+              {onItemDeleted}
+              {onItemOpened}
+              {folder}
+              {collection}
+              {activeTabId}
+            />
+          </div>
+        {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
+          <div style="cursor:pointer;">
+            <Graphql
+              {userRole}
+              {isSharedWorkspace}
+              graphql={explorer}
+              {onItemRenamed}
+              {onItemDeleted}
+              {onItemOpened}
+              {folder}
+              {collection}
+              {activeTabId}
+            />
+          </div>
+        {:else if explorer.type === CollectionItemTypeBaseEnum.MOCK_REQUEST}
+          <div style={`cursor: pointer; `}>
+            <MockRequest
+              {userRole}
+              {isSharedWorkspace}
+              api={explorer}
+              {onItemRenamed}
+              {onItemDeleted}
+              {onItemOpened}
+              {activeTabPath}
+              {searchData}
+              {activeTabType}
+              {folder}
+              {collection}
+              {activeTabId}
+              {isWebApp}
+            />
+          </div>
+        {:else if explorer.type === CollectionItemTypeBaseEnum.AI_REQUEST}
+          <div style={`cursor: pointer; `}>
+            <AiRequest
+              {userRole}
+              {isSharedWorkspace}
+              aiRequest={explorer}
+              {onItemRenamed}
+              {onItemDeleted}
+              {onItemOpened}
+              {activeTabPath}
+              {searchData}
+              {activeTabType}
+              {folder}
+              {collection}
+              {activeTabId}
+              {isWebApp}
+            />
+          </div>
+        {/if}
       {/if}
-    {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style={`cursor: pointer; `}>
-        <Request
-          {userRole}
-          {isSharedWorkspace}
-          api={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {activeTabPath}
-          {searchData}
-          {activeTabType}
-          {folder}
-          {collection}
-          {activeTabId}
-          {isWebApp}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
-      <div style="cursor:pointer;">
-        <WebSocket
-          {userRole}
-          {isSharedWorkspace}
-          api={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.SOCKETIO}
-      <div style="cursor:pointer;">
-        <SocketIo
-          {userRole}
-          {isSharedWorkspace}
-          socketIo={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
-      <div style="cursor:pointer;">
-        <Graphql
-          {userRole}
-          {isSharedWorkspace}
-          graphql={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.MOCK_REQUEST}
-      <div style={`cursor: pointer; `}>
-        <MockRequest
-          {userRole}
-          {isSharedWorkspace}
-          api={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {activeTabPath}
-          {searchData}
-          {activeTabType}
-          {folder}
-          {collection}
-          {activeTabId}
-          {isWebApp}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.AI_REQUEST}
-      <div style={`cursor: pointer; `}>
-        <AiRequest
-          {userRole}
-          {isSharedWorkspace}
-          aiRequest={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {activeTabPath}
-          {searchData}
-          {activeTabType}
-          {folder}
-          {collection}
-          {activeTabId}
-          {isWebApp}
-        />
-      </div>
-    {/if}
+    </div>
   {/if}
 </div>
 

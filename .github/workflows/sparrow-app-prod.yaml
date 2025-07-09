@@ -78,6 +78,9 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
+      - name: Sync version across all files
+        run: yarn sync-version
+
       - name: Build Tauri App
         run: |
           yarn cache clean
@@ -96,13 +99,54 @@ jobs:
       - name: nsis sig
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
 
-      - name: sign msi
+      - name: Set up certificate
         run: |
-          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-          $certPath = "Cert:\LocalMachine\My\$($cert.Thumbprint)"
-          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          Export-PfxCertificate -Cert $certPath -FilePath "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" -Password $password
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
+        shell: bash
+
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Install DigiCert Client tools
+        id: digicert-code-signing
+        uses: digicert/ssm-code-signing@v1.0.0
+
+      - name: Sign MSI files
+        run: |
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
+            Write-Host "Signing MSI: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+          }
+        shell: powershell
+
+      - name: Sign EXE files
+        run: |
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            Write-Host "Signing EXE: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+          }
+        shell: powershell
+
+      - name: Verify Signatures
+        run: |
+          # Verify MSI signatures
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
+            Write-Host "Verifying signature for: $($_.Name)"
+            Get-AuthenticodeSignature $_.FullName | Format-List
+          }
+          
+          # Verify EXE signatures
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            Write-Host "Verifying signature for: $($_.Name)"
+            Get-AuthenticodeSignature $_.FullName | Format-List
+          }
+        shell: powershell
 
       - name: Install AWS CLI
         uses: chrislennon/action-aws-cli@v1.1
@@ -123,7 +167,7 @@ jobs:
         run: |
           $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
           $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-dev.s3.amazonaws.com/$msiFileName"
+          $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiFileName"
           
           $body = @{
             "type" = "message"
@@ -141,7 +185,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: development"
+                      "text" = "Branch: main"
                       "wrap" = $true
                     }
                     @{
@@ -164,14 +208,145 @@ jobs:
           }
           
           $jsonBody = $body | ConvertTo-Json -Depth 10
-          
+
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
+
+  release_linux:
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      CI: false
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Rust 1.82.0
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.82.0
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config libssl-dev libcairo2-dev \
+            libwebkit2gtk-4.1-dev build-essential \
+            curl wget file libxdo-dev \
+            libayatana-appindicator3-dev librsvg2-dev \
+            gnupg software-properties-common tree
+
+      - name: Setup Node.js 22
+        run: |
+          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+
+      - name: Install Yarn (Ubuntu 24.04 compatible)
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/yarn.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt update
+          sudo apt install -y yarn
+
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Build Tauri app
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn workspace @sparrow/desktop tauri build --bundles deb 
+          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
+
+      - name: Generate DEB metadata
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        run: |
+          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
+          cd ../../../../../../publishDir
+          mkdir -p dists/stable/main/binary-amd64/
+          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
+      - name: Prepare publish directory
+        run: |
+          cd publishDir
+          cat > apt-release.conf <<EOF
+          APT::FTPArchive::Release {
+            Origin "Sparrow";
+            Label "Sparrow";
+            Suite "stable";
+            Codename "stable";
+            Architectures "amd64";
+            Components "main";
+            Description "Sparrow Debian Repository";
+          };
+          EOF
+
+          cd dists/stable
+          apt-ftparchive -c ../../apt-release.conf release . > Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
+
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
+
+          cd ../../
+          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
+
+          cd ..
+          mv publishDir deb-build
+
+      - name: Upload to S3 bucket
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: sparrow-release-assests-prod
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-west-1
+          SOURCE_DIR: deb-build
+
+      - name: Notify Teams Channel
+        run: |
+          curl -H 'Content-Type: application/json' \
+            -d '{
+              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
+            }' \
+            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}      
 
   release_macos:
     runs-on: macos-latest
     environment: production
-    needs: release_win
+    needs:
+    - release_win
+    - release_linux
 
     steps:
       - name: Checkout Repository
@@ -187,6 +362,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20.8"
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -242,10 +423,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Post macOS Build Links to Teams
+      - name: Download Windows and Linux artifacts
         run: |
           mkdir msi_files
+          mkdir deb_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
+          aws s3 cp s3://sparrow-release-assests-prod/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -258,183 +441,3 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-
-  release_mac_app_store:
-    runs-on: macos-latest
-    environment: development
-    needs: release_macos
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Install Rust 1.82.0
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          rustup install 1.82.0
-          rustup default 1.82.0
-          rustup target add x86_64-apple-darwin
-
-      - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
-        with:
-          node-version: "20.8"
-
-      # Commenting this out as it is not needed for the App Store build as updates will be handled by the App Store
-      # - name: Update updater endpoint in tauri.conf.json file
-      #   run: |
-      #     content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
-      #     newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
-      #     echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
-      #   shell: bash
-
-      - name: Increase Yarn network timeout
-        run: yarn config set network-timeout 600000
-
-      - name: Import Apple Certificates
-        env:
-          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
-          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        run: |
-          # Create and unlock keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
-
-          # Import certificates
-          echo "$MAC_INSTALLER_CERT" | base64 --decode > InstallerCert.p12
-          security import InstallerCert.p12 \
-            -k build.keychain \
-            -P "$MAC_INSTALLER_CERT_PASSWORD" \
-            -T /usr/bin/codesign \
-            -T /usr/bin/productbuild
-
-          # Configure keychain permissions
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-
-          # Verify installation
-          security find-identity -v -p codesigning build.keychain
-
-      - name: Extract Certificate IDs
-        id: extract-cert-ids
-        run: |
-          # Extract Apple Distribution (codesigning) ID
-          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
-          if [ -z "$CODESIGN_ID" ]; then
-            echo "::error::Apple Distribution certificate not found in keychain"
-            exit 1
-          fi
-          echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
-
-          # Extract 3rd Party Installer ID (must search all identities)
-          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
-          if [ -z "$INSTALLER_ID" ]; then
-            echo "::error::Installer certificate not found in keychain"
-            exit 1
-          fi
-          echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
-
-          echo "Using codesign identity: $CODESIGN_ID"
-          echo "Using installer identity: $INSTALLER_ID"
-
-      - name: Build Tauri App
-        run: |
-          yarn cache clean
-          yarn install
-          yarn workspace @sparrow/desktop tauri build
-        env:
-          APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          CI: false
-
-      - name: Create signed .pkg for App Store
-        run: |
-          APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
-          
-          if [ ! -d "$BUNDLE_PATH" ]; then
-            echo "::error::App bundle not found at $BUNDLE_PATH"
-            exit 1
-          fi
-
-          # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
-          productbuild \
-            --component "$BUNDLE_PATH" /Applications \
-            --sign "$INSTALLER_ID" \
-            "$PKG_PATH"
-
-          if [ ! -f "$PKG_PATH" ]; then
-            echo "::error::Failed to create package at $PKG_PATH"
-            exit 1
-          fi
-        env:
-          INSTALLER_ID: ${{ env.INSTALLER_ID }}
-
-      - name: Upload to App Store Connect
-        env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-          chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-
-          xcrun altool --upload-app -f "$PKG_PATH" -t macos \
-          --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-          --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
-          --verbose
-      
-      - name: Post Mac App Store TestFlight Link to Teams
-        env:
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-          TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}
-        run: |
-          curl -H "Content-Type: application/json" -d "{
-            \"type\": \"message\",
-            \"attachments\": [
-              {
-                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
-                \"content\": {
-                  \"type\": \"AdaptiveCard\",
-                  \"body\": [
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"📲 New Mac App Store TestFlight Build Available\",
-                      \"weight\": \"bolder\",
-                      \"size\": \"large\",
-                      \"color\": \"good\"
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"A new macOS app store build is available for testing in TestFlight:\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"TestFlight URL:\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"$TESTFLIGHT_URL\",
-                      \"color\": \"accent\",
-                      \"wrap\": true
-                    }
-                  ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
-                  \"version\": \"1.2\",
-                  \"msteams\": {
-                    \"width\": \"Full\"
-                  }
-                }
-              }
-            ]
-          }" "$TEAMS_WEBHOOK_URL"
-        shell: bash 

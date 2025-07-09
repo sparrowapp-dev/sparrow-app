@@ -7,7 +7,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import {
@@ -21,11 +21,9 @@
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
-  const _viewModel = new TestflowExplorerPageViewModel(tab);
-  let collectionList: Observable<CollectionDocument[]> =
-    _viewModel.getCollectionList();
+  let _viewModel;
+  let collectionList: Observable<CollectionDocument[]>;
 
-  let deleteNodeResponse = _viewModel.deleteNodesLessThanId;
   let userId = "";
   let userRole = "";
   let render = false;
@@ -46,8 +44,8 @@
   let selectiveRunModalOpen: boolean = false;
   let planLimitRunHistoryCount: number = 5;
 
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  let environments;
+  let activeWorkspace;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -98,14 +96,10 @@
     }
   };
 
-  const sub = _viewModel.tab.subscribe((val) => {
-    if (val?.tabId) {
-      render = true;
-    }
-  });
+  let sub;
 
   const handleBlockLimitTestflow = async () => {
-    const planlimits = await _viewModel.userLimitBlockPerTestflow();
+    const planlimits = await _viewModel?.userLimitBlockPerTestflow();
     if (planlimits) {
       planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
@@ -114,10 +108,10 @@
     }
   };
 
-  testFlowDataStore.subscribe((val) => {
-    if (val) {
-      testflowStore = val.get(tab?.tabId) as TFDataStoreType;
-    }
+  let testflowStoreMap;
+
+  $: {
+    testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -128,6 +122,12 @@
       isTestFlowEmpty = false;
     }
     handleBlockLimitTestflow();
+  }
+
+  testFlowDataStore.subscribe((_testflowStoreMap) => {
+    if (_testflowStoreMap) {
+      testflowStoreMap = _testflowStoreMap;
+    }
   });
 
   const userSubscriber = user.subscribe((value) => {
@@ -136,27 +136,7 @@
     }
   });
 
-  const activeWorkspaceSubscriber = activeWorkspace.subscribe((_workspace) => {
-    const workspaceDoc = _workspace?.toMutableJSON();
-
-    if (workspaceDoc) {
-      currentWorkspace = _workspace;
-      currentWorkspaceId = _workspace.get("_id");
-      environmentId = _workspace.get("environmentId");
-    }
-
-    if (workspaceDoc) {
-      workspaceDoc.users?.forEach((_user) => {
-        if (_user.id === userId) {
-          if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
-            isTestflowEditable = true;
-          } else {
-            isTestflowEditable = false;
-          }
-        }
-      });
-    }
-  });
+  let activeWorkspaceSubscriber;
 
   /**
    * Find the role of user in active workspace
@@ -173,30 +153,74 @@
   };
 
   onDestroy(() => {
-    sub.unsubscribe();
+    sub?.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
     userSubscriber();
   });
 
-  const renameWithTestFlowList = new Debounce().debounce(
-    _viewModel.updateNameWithTestFlowList as any,
-    1000,
-  );
+  let renameWithTestFlowList;
   const handleTestflowCount = async () => {
-    const data = await _viewModel.fetchCountofTestFlow();
+    const data = await _viewModel?.fetchCountofTestFlow();
     currentTestflowCount = data;
   };
 
   let prevTabName = "";
+  let prevTabId = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab?.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+
+          _viewModel = new TestflowExplorerPageViewModel(tab);
+          collectionList = _viewModel.getCollectionList();
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+
+          render = true;
+
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            (_workspace) => {
+              const workspaceDoc = _workspace?.toMutableJSON();
+
+              if (workspaceDoc) {
+                currentWorkspace = _workspace;
+                currentWorkspaceId = _workspace.get("_id");
+                environmentId = _workspace.get("environmentId");
+              }
+
+              if (workspaceDoc) {
+                workspaceDoc.users?.forEach((_user) => {
+                  if (_user.id === userId) {
+                    if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
+                      isTestflowEditable = true;
+                    } else {
+                      isTestflowEditable = false;
+                    }
+                  }
+                });
+              }
+            },
+          );
+
+          renameWithTestFlowList = new Debounce().debounce(
+            _viewModel.updateNameWithTestFlowList as any,
+            1000,
+          );
+          handleBlockLimitTestflow();
+        })();
+      } else if (tab?.name && prevTabName !== tab?.name) {
         renameWithTestFlowList(tab.name);
       }
-      prevTabName = tab.name;
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
       findUserRole();
     }
+  }
 
+  $: {
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
