@@ -3,7 +3,7 @@
   import { AISuggestionBox, PromptInput, ChatItem } from "../";
   import { AISparkle, CrossIcon } from "@sparrow/library/icons";
   import { SparkleFilled } from "@sparrow/common/icons";
-  import { cubicIn, cubicOut } from "svelte/easing";
+  import { cubicOut } from "svelte/easing";
   import { generatingImage } from "@sparrow/common/images";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
@@ -121,7 +121,7 @@
   <div class="ai-chat-panel h-100">
     <div
       class="d-flex flex-column h-100 chat-box"
-      in:fly={{ y: 50, duration: 300, easing: cubicIn }}
+      in:fly={{ y: 50, duration: 300, easing: cubicOut }}
       out:fly={{ y: 50, duration: 300, easing: cubicOut }}
     >
       <div style="flex:1; overflow:auto;">
@@ -130,6 +130,7 @@
             <div
               class="d-flex"
               style="justify-content: space-between; align-items:center"
+              in:fade={{ duration: 200 }}
             >
               <div class="">
                 <SparrowPrimaryIcon
