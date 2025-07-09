@@ -22,7 +22,7 @@
   export let tab: TabDocument;
 
   // ViewModel initialization
-  const _viewModel = new FolderExplorerPage(tab);
+  let _viewModel;
 
   let userId = "";
   let userRole = "";
@@ -30,14 +30,7 @@
   // Local variables
   let collection: CollectionDocument;
   let folder: Folder;
-
-  // Initialization of collection, folder and userRoleInWorkspace
-  onMount(async () => {
-    (await _viewModel.getCollectionList()).subscribe(async (collectionList) => {
-      collection = await _viewModel.getCollection(tab.path?.collectionId);
-      folder = await _viewModel.getFolder(collection, tab.id);
-    });
-  });
+  let prevTabId = "";
 
   user.subscribe((value) => {
     if (value) {
@@ -57,29 +50,45 @@
       }
     });
   };
-  onMount(() => {
-    findUserRole();
-  });
 
   let prevTabName = "";
 
-  /**
-   * produces delay to update name of a collection.
-   */
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList as any,
-    1000,
-  );
+  let renameWithCollectionList;
 
   /**
    * Reacts whenever the collection tab changes.
    */
   $: {
     if (tab) {
-      if (prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new FolderExplorerPage(tab);
+          (await _viewModel.getCollectionList()).subscribe(
+            async (collectionList) => {
+              collection = await _viewModel.getCollection(
+                tab.path?.collectionId,
+              );
+              folder = await _viewModel.getFolder(collection, tab.id);
+            },
+          );
+
+          /**
+           * produces delay to update name of a collection.
+           */
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList as any,
+            1000,
+          );
+          findUserRole();
+          prevTabId = tab?.tabId;
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
+        prevTabName = tab.name;
       }
-      prevTabName = tab.name;
     }
   }
 </script>

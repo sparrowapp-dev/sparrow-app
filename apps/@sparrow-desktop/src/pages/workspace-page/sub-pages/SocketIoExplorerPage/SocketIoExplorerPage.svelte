@@ -12,9 +12,9 @@
   import type { SocketIORequestOutputTabInterface } from "@sparrow/common/types/workspace/socket-io-request-tab";
   export let tab: TabDocument;
   let isLoginBannerActive = false;
-  const _viewModel = new SocketIoExplorerPageViewModel(tab);
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  let _viewModel;
+  let environments;
+  let activeWorkspace;
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
@@ -43,17 +43,43 @@
     });
   };
 
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList,
-    1000,
-  );
+  let renameWithCollectionList;
   let prevTabName = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new SocketIoExplorerPageViewModel(tab);
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+          activeWorkspaceSubscribe = activeWorkspace.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value;
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+                environmentId = activeWorkspaceRxDoc.get("environmentId");
+              }
+            },
+          );
+
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList,
+            1000,
+          );
+          const guestUser = await _viewModel.getGuestUser();
+          if (guestUser?.isBannerActive) {
+            isLoginBannerActive = guestUser?.isBannerActive;
+          }
+          prevTabId = tab?.tabId;
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
+        prevTabName = tab.name;
       }
-      prevTabName = tab.name;
       findUserRole();
     }
   }
@@ -62,17 +88,9 @@
   let environmentId: string = "";
   let currentWorkspaceId = "";
   let currentWorkspace;
+  let prevTabId = "";
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        environmentId = activeWorkspaceRxDoc.get("environmentId");
-      }
-    },
-  );
+  let activeWorkspaceSubscribe;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -124,16 +142,16 @@
       refreshEnvironment();
     }
   }
-  onMount(async () => {
-    const guestUser = await _viewModel.getGuestUser();
-    if (guestUser?.isBannerActive) {
-      isLoginBannerActive = guestUser?.isBannerActive;
-    }
-  });
 
   let socketIoData: SocketIORequestOutputTabInterface | undefined;
-  socketIoDataStore.subscribe((socketIoMap) => {
-    socketIoData = socketIoMap.get(tab?.tabId || "");
+  let socketIoMap;
+
+  $: {
+    socketIoData = socketIoMap?.get(tab?.tabId || "");
+  }
+
+  socketIoDataStore.subscribe((_socketIoMap) => {
+    socketIoMap = _socketIoMap;
   });
 </script>
 

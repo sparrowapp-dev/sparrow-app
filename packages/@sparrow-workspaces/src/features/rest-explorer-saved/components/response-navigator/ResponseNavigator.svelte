@@ -51,12 +51,12 @@
         >Status:</span
       >
       <span
-        style={Number(statusCodes.split(" ")[0]) >= 200 &&
-        Number(statusCodes.split(" ")[0]) < 300
+        style={Number(statusCodes?.split(" ")[0]) >= 200 &&
+        Number(statusCodes?.split(" ")[0]) < 300
           ? "color:var(--text-ds-success-300);"
           : "color:var(--text-ds-danger-300);"}
       >
-        {statusCodes}
+        {statusCodes || ""}
       </span>
     </div>
     <div>

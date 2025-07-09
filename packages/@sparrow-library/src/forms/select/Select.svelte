@@ -487,7 +487,7 @@
                 ? 'var(--text-ds-neutral-100)'
                 : 'var(--text-ds-neutral-400)'}"
             >
-              {placeholderText}
+              {placeholderText || ""}
             </span>
           {:else if isHeaderCombined}
             <div class="d-flex ellipsis select-combined-wrapper">
@@ -515,7 +515,7 @@
                 ? "opacity: 0.5 !important"
                 : ""}
             >
-              {selectedRequest?.name}
+              {selectedRequest?.name || ""}
             </span>
           {/if}
         </p>

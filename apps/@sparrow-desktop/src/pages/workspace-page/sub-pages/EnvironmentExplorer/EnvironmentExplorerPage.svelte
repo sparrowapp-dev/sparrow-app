@@ -9,14 +9,13 @@
    * environment opened tab object
    */
   export let tab;
-  const _viewModel = new EnvironmentExplorerViewModel(tab);
-  const renameWithEnvironmentList = new Debounce().debounce(
-    _viewModel.updateNameWithEnvironmentList,
-    1000,
-  );
+  let _viewModel;
+  let renameWithEnvironmentList;
 
   let userId = "";
   let userRole = "";
+
+  let prevTabId = "";
 
   user.subscribe((value) => {
     if (value) {
@@ -39,11 +38,22 @@
   let prevTabName = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
-        // _viewModel.updateNameWithEnvironmentList(tab.name);
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new EnvironmentExplorerViewModel(tab);
+          renameWithEnvironmentList = new Debounce().debounce(
+            _viewModel.updateNameWithEnvironmentList,
+            1000,
+          );
+          prevTabId = tab?.tabId;
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithEnvironmentList(tab.name);
+        prevTabName = tab.name;
       }
-      prevTabName = tab.name;
       findUserRole();
     }
   }
