@@ -1230,6 +1230,9 @@ class CollectionExplorerPage {
         folderId: "",
       });
       request.updateIsSave(true);
+      if ((collection.collectionType = CollectionTypeBaseEnum.MOCK)) {
+        request.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
       // request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
@@ -1460,6 +1463,9 @@ class CollectionExplorerPage {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      if (collection?.collectionType === CollectionTypeBaseEnum.MOCK) {
+        sampleFolder.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
 
       this.tabRepository.createTab(sampleFolder.getValue());
       moveNavigation("right");

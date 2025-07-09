@@ -310,7 +310,10 @@ export class RxDB {
               oldDoc.property.aiRequest.state.isChatbotPromptBoxActive = true;
             }
             return oldDoc;
-          }
+          },
+          14: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
