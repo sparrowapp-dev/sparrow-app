@@ -1,7 +1,7 @@
 import constants from "@app/constants/constants";
 import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 import { ContentTypeEnum } from "@sparrow/common/enums";
-import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
+import type { AiModelProviderEnum, AIModelVariant } from "@sparrow/common/types/workspace/ai-request-base";
 
 export class AiRequestService {
     private apiUrl: string = constants.API_URL;
@@ -56,7 +56,7 @@ export class AiRequestService {
         return response;
     };
 
-    public uploadRAGfiles = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, providerModel: string, files: File[]) => {
+    public uploadRAGfiles = async (aiProvider: AiModelProviderEnum, providerAuthKey: string, providerModel: AIModelVariant, files: File[]) => {
         const formData = new FormData();
         files.forEach((file, index) => {
             formData.append("docs", file);
