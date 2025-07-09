@@ -160,7 +160,6 @@
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={() => {
-      console.log("we are hitting the main -------------------one");
       toggleExpandTestflow();
       handleTabUpdate("testflow");
     }}
@@ -216,7 +215,6 @@
           startIcon={AddRegular}
           disable={isNewTestflowCreating}
           onClick={async (e) => {
-            console.log("-----------------------this normal");
             e.preventDefault();
             e.stopPropagation();
             isNewTestflowCreating = true;
