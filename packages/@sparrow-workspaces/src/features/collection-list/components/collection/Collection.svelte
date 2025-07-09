@@ -218,15 +218,23 @@
     // selectedMethodUnsubscibe();
   });
 
+  let prevActiveTabPath = "";
   $: {
     if (searchData) {
-      visibility = true;
+      // addCollectionItem(collection.id, "collection");
     }
-    if (activeTabPath) {
-      if (activeTabPath.collectionId === collection.id) {
-        visibility = true;
-      }
-    }
+    // if (activeTabPath) {
+    //   if ((prevActiveTabPath || "") !== (activeTabPath?.collectionId || "")) {
+    //     if (activeTabPath.collectionId === collection.id) {
+    //       setTimeout(() => {
+    //         if (!visibility) {
+    //           addCollectionItem(collection.id, "collection");
+    //         }
+    //       }, 3000);
+    //     }
+    //   }
+    //   prevActiveTabPath = activeTabPath.collectionId;
+    // }
   }
 
   $: {
@@ -305,8 +313,10 @@
   });
 
   $: {
-    if ($openedComponent.has(collection.id) || isFirstCollectionExpand) {
+    if ($openedComponent.has(collection.id)) {
       visibility = true;
+    } else {
+      visibility = false;
     }
   }
 
@@ -786,16 +796,15 @@
           : rightClickContextMenu}
         on:click|preventDefault={() => {
           if (!isRenaming) {
-            visibility = !visibility;
             if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
               if (visibility) {
+                removeCollectionItem(collection.id);
+              } else {
                 addCollectionItem(collection.id, "collection");
                 onItemOpened("collection", {
                   workspaceId: collection.workspaceId,
                   collection,
                 });
-              } else {
-                removeCollectionItem(collection.id);
               }
             }
           }
@@ -809,12 +818,11 @@
           onClick={(e) => {
             e.stopPropagation();
             if (!isRenaming) {
-              visibility = !visibility;
               if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
                 if (visibility) {
-                  addCollectionItem(collection.id, "collection");
-                } else {
                   removeCollectionItem(collection.id);
+                } else {
+                  addCollectionItem(collection.id, "collection");
                 }
               }
             }
@@ -1036,14 +1044,14 @@
           class=" ps-0 position-relative"
           style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
         >
-          {#if collection?.items?.length > 0}
+          <!-- {#if collection?.items?.length > 0}
             <div
               class="box-line"
               style="background-color: {verticalCollectionLine
                 ? 'var(--bg-ds-neutral-500)'
                 : 'var(--bg-ds-surface-100)'}"
             ></div>
-          {/if}
+          {/if} -->
           {#if isMockCollection}
             <div
               class="box-line"
@@ -1159,7 +1167,7 @@
               />
             {/each} -->
           </div>
-          <!-- {#if !collection?.items?.length}
+          {#if !collection?.items?.length}
             <p
               class="text-ds-font-size-12 ps-5 ms-2 my-{collection.id ===
               activeTabId
@@ -1170,9 +1178,9 @@
                 ? "This mock collection is empty."
                 : "This collection is empty."}
             </p>
-          {/if} -->
+          {/if}
 
-          <!-- <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
+          <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
             {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
               <Tooltip
                 title={collection?.activeSync
@@ -1380,7 +1388,7 @@
                 </Tooltip>
               {/if}
             {/if}
-          </div> -->
+          </div>
           <!-- {#if showFolderAPIButtons}
             <div class="mt-2 mb-2 d-flex">
               <Tooltip

@@ -502,7 +502,7 @@
         style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
         activeTabId
           ? '0px'
-          : '2px'} ; "
+          : '0px'} ; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -688,14 +688,14 @@
                     {isWebApp}
                   />
                 {/each} -->
-            <!-- {#if !explorer?.items?.length}
-                  <p
-                    class="text-ds-font-size-12 my-2 text-secondary-300"
-                    style="padding-left: 90px;"
-                  >
-                    This folder is empty
-                  </p>
-                {/if} -->
+            {#if !explorer?.items?.length}
+              <p
+                class="text-ds-font-size-12 mb-0 text-secondary-300"
+                style="padding-left: 90px;"
+              >
+                This folder is empty
+              </p>
+            {/if}
           </div>
         </div>
       {/if}

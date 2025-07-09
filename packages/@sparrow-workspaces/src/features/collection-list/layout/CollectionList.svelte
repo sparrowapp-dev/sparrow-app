@@ -255,15 +255,21 @@
     name: string;
     type: string;
     depth: number;
-    parentId?: string;
-    parentCollectionId: string;
-    parentCollectionName: string;
-    parentCollectionWorkspaceId: string;
-    parentCollectionActiveSync: boolean;
-    parentFolderName: string;
-    parentFolderId: string;
-    parentRequestId: string;
-    parentRequestName: string;
+    parentCollection: {
+      id: string;
+      name: string;
+      workspaceId: string;
+      activeSync: boolean;
+      collectionType: string;
+    };
+    parentFolder: {
+      id: string;
+      name: string;
+    };
+    parentRequest: {
+      id: string;
+      name: string;
+    };
     data: any;
   };
 
@@ -276,14 +282,15 @@
     const recurse = (
       items: any[],
       depth: number,
-      parentCollectionId: string,
-      parentCollectionName: string,
-      parentCollectionWorkspaceId: string,
-      parentCollectionActiveSync: boolean,
-      parentFolderId: string,
-      parentFolderName: string,
-      parentRequestId: string,
-      parentRequestName: string,
+      parentCollection: {
+        id: string;
+        name: string;
+        workspaceId: string;
+        activeSync: boolean;
+        collectionType: string;
+      },
+      parentFolder: { id: string; name: string },
+      parentRequest: { id: string; name: string },
     ) => {
       for (const item of items) {
         const flatItem: FlatItem = {
@@ -291,14 +298,9 @@
           name: item.name,
           type: item.type,
           depth,
-          parentCollectionId,
-          parentCollectionName,
-          parentCollectionWorkspaceId,
-          parentCollectionActiveSync,
-          parentFolderId,
-          parentFolderName,
-          parentRequestId,
-          parentRequestName,
+          parentCollection,
+          parentFolder,
+          parentRequest,
           data: item,
         };
 
@@ -311,28 +313,15 @@
             recurse(
               item.items,
               depth + 1,
-              parentCollectionId,
-              parentCollectionName,
-              parentCollectionWorkspaceId,
-              parentCollectionActiveSync,
-              item.id,
-              item.name,
-              "",
-              "",
+              parentCollection,
+              { id: item.id, name: item.name },
+              { id: "", name: "" },
             );
           } else if (item.type === "REQUEST") {
-            recurse(
-              item.items,
-              depth + 1,
-              parentCollectionId,
-              parentCollectionName,
-              parentCollectionWorkspaceId,
-              parentCollectionActiveSync,
-              parentFolderId,
-              parentFolderName,
-              item.id,
-              item.name,
-            );
+            recurse(item.items, depth + 1, parentCollection, parentFolder, {
+              id: item.id,
+              name: item.name,
+            });
           }
         }
       }
@@ -345,14 +334,15 @@
         name: collection.name,
         type: "COLLECTION",
         depth: 0,
-        parentCollectionId: "",
-        parentCollectionName: "",
-        parentCollectionWorkspaceId: "",
-        parentCollectionActiveSync: false,
-        parentFolderId: "",
-        parentFolderName: "",
-        parentRequestId: "",
-        parentRequestName: "",
+        parentCollection: {
+          id: "",
+          name: "",
+          workspaceId: "",
+          activeSync: false,
+          collectionType: "",
+        },
+        parentFolder: { id: "", name: "" },
+        parentRequest: { id: "", name: "" },
         data: collection,
       });
 
@@ -361,14 +351,15 @@
         recurse(
           collection.items || [],
           1,
-          collection.id,
-          collection.name,
-          collection.workspaceId,
-          collection.activeSync || false,
-          "",
-          "",
-          "",
-          "",
+          {
+            id: collection.id,
+            name: collection.name,
+            workspaceId: collection.workspaceId,
+            activeSync: collection.activeSync,
+            collectionType: collection.collectionType,
+          },
+          { id: "", name: "" },
+          { id: "", name: "" },
         );
       }
     }
@@ -405,6 +396,14 @@
       showAddItemMenu = false;
     }
   };
+  $: {
+    console.log(activeTabPath);
+    if (activeTabPath?.collectionId) {
+      addCollectionItem(activeTabPath.collectionId, "collection");
+    } else if (activeTabPath?.folderId) {
+      addCollectionItem(activeTabPath.folderId, "folder");
+    }
+  }
 </script>
 
 <svelte:window
@@ -575,7 +574,7 @@
   {#if $isExpandCollection}
     <div
       transition:slide={{ duration: 250 }}
-      class="overflow-auto position-relative d-flex flex-column me-0 py-1"
+      class="overflow-auto position-relative d-flex flex-column me-0"
       style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
     >
       {#if collectionFilter?.length > 0 && searchData.length === 0}
@@ -596,9 +595,12 @@
 
               {#if data.type === "COLLECTION"}
                 <Collection
+                  isMockCollection={data.data.collectionType ===
+                  CollectionTypeBaseEnum.MOCK
+                    ? true
+                    : false}
                   bind:userRole
                   {isSharedWorkspace}
-                  depth={data.depth}
                   {onItemCreated}
                   {onItemDeleted}
                   {onItemRenamed}
@@ -631,14 +633,14 @@
                   {searchData}
                   {activeTabType}
                   folder={{
-                    id: data.parentFolderId,
-                    name: data.parentFolderName,
+                    id: data.parentFolder.id,
+                    name: data.parentFolder.name,
                   }}
                   collection={{
-                    id: data.parentCollectionId,
-                    name: data.parentCollectionName,
-                    workspaceId: data.parentCollectionWorkspaceId,
-                    activeSync: data.parentCollectionActiveSync,
+                    id: data.parentCollection.id,
+                    name: data.parentCollection.name,
+                    workspaceId: data.parentCollection.workspaceId,
+                    activeSync: data.parentCollection.activeSync,
                   }}
                   {activeTabId}
                   {isWebApp}
@@ -653,14 +655,14 @@
                     {onItemDeleted}
                     {onItemOpened}
                     folder={{
-                      id: data.parentFolderId,
-                      name: data.parentFolderName,
+                      id: data.parentFolder.id,
+                      name: data.parentFolder.name,
                     }}
                     collection={{
-                      id: data.parentCollectionId,
-                      name: data.parentCollectionName,
-                      workspaceId: data.parentCollectionWorkspaceId,
-                      activeSync: data.parentCollectionActiveSync,
+                      id: data.parentCollection.id,
+                      name: data.parentCollection.name,
+                      workspaceId: data.parentCollection.workspaceId,
+                      activeSync: data.parentCollection.activeSync,
                     }}
                     {activeTabId}
                   />
@@ -675,14 +677,14 @@
                     {onItemDeleted}
                     {onItemOpened}
                     folder={{
-                      id: data.parentFolderId,
-                      name: data.parentFolderName,
+                      id: data.parentFolder.id,
+                      name: data.parentFolder.name,
                     }}
                     collection={{
-                      id: data.parentCollectionId,
-                      name: data.parentCollectionName,
-                      workspaceId: data.parentCollectionWorkspaceId,
-                      activeSync: data.parentCollectionActiveSync,
+                      id: data.parentCollection.id,
+                      name: data.parentCollection.name,
+                      workspaceId: data.parentCollection.workspaceId,
+                      activeSync: data.parentCollection.activeSync,
                     }}
                     {activeTabId}
                   />
@@ -697,14 +699,14 @@
                     {onItemDeleted}
                     {onItemOpened}
                     folder={{
-                      id: data.parentFolderId,
-                      name: data.parentFolderName,
+                      id: data.parentFolder.id,
+                      name: data.parentFolder.name,
                     }}
                     collection={{
-                      id: data.parentCollectionId,
-                      name: data.parentCollectionName,
-                      workspaceId: data.parentCollectionWorkspaceId,
-                      activeSync: data.parentCollectionActiveSync,
+                      id: data.parentCollection.id,
+                      name: data.parentCollection.name,
+                      workspaceId: data.parentCollection.workspaceId,
+                      activeSync: data.parentCollection.activeSync,
                     }}
                     {activeTabId}
                   />
@@ -722,14 +724,14 @@
                     {searchData}
                     {activeTabType}
                     folder={{
-                      id: data.parentFolderId,
-                      name: data.parentFolderName,
+                      id: data.parentFolder.id,
+                      name: data.parentFolder.name,
                     }}
                     collection={{
-                      id: data.parentCollectionId,
-                      name: data.parentCollectionName,
-                      workspaceId: data.parentCollectionWorkspaceId,
-                      activeSync: data.parentCollectionActiveSync,
+                      id: data.parentCollection.id,
+                      name: data.parentCollection.name,
+                      workspaceId: data.parentCollection.workspaceId,
+                      activeSync: data.parentCollection.activeSync,
                     }}
                     {activeTabId}
                     {isWebApp}
@@ -737,7 +739,10 @@
                 </div>
               {:else if data.type === CollectionItemTypeBaseEnum.FOLDER}
                 <Folder
-                  isMockCollection={false}
+                  isMockCollection={data.parentCollection.collectionType ===
+                  CollectionTypeBaseEnum.MOCK
+                    ? true
+                    : false}
                   {userRole}
                   {isSharedWorkspace}
                   {onItemCreated}
@@ -745,14 +750,14 @@
                   {onItemRenamed}
                   {onItemOpened}
                   collection={{
-                    id: data.parentCollectionId,
-                    name: data.parentCollectionName,
-                    workspaceId: data.parentCollectionWorkspaceId,
-                    activeSync: data.parentCollectionActiveSync,
+                    id: data.parentCollection.id,
+                    name: data.parentCollection.name,
+                    workspaceId: data.parentCollection.workspaceId,
+                    activeSync: data.parentCollection.activeSync,
                   }}
                   {userRoleInWorkspace}
                   {activeTabPath}
-                  explorer={data}
+                  explorer={data.data}
                   {activeTabType}
                   {activeTabId}
                   {searchData}
@@ -771,14 +776,14 @@
                     {searchData}
                     {activeTabType}
                     folder={{
-                      id: data.parentFolderId,
-                      name: data.parentFolderName,
+                      id: data.parentFolder.id,
+                      name: data.parentFolder.name,
                     }}
                     collection={{
-                      id: data.parentCollectionId,
-                      name: data.parentCollectionName,
-                      workspaceId: data.parentCollectionWorkspaceId,
-                      activeSync: data.parentCollectionActiveSync,
+                      id: data.parentCollection.id,
+                      name: data.parentCollection.name,
+                      workspaceId: data.parentCollection.workspaceId,
+                      activeSync: data.parentCollection.activeSync,
                     }}
                     {activeTabId}
                     {isWebApp}
@@ -789,21 +794,21 @@
                   {userRole}
                   api={data.data}
                   request={{
-                    id: data.parentRequestId,
-                    name: data.parentRequestName,
+                    id: data.parentRequest.id,
+                    name: data.parentRequest.name,
                   }}
                   {onItemRenamed}
                   {onItemDeleted}
                   {onItemOpened}
                   folder={{
-                    id: data.parentFolderId,
-                    name: data.parentFolderName,
+                    id: data.parentFolder.id,
+                    name: data.parentFolder.name,
                   }}
                   collection={{
-                    id: data.parentCollectionId,
-                    name: data.parentCollectionName,
-                    workspaceId: data.parentCollectionWorkspaceId,
-                    activeSync: data.parentCollectionActiveSync,
+                    id: data.parentCollection.id,
+                    name: data.parentCollection.name,
+                    workspaceId: data.parentCollection.workspaceId,
+                    activeSync: data.parentCollection.activeSync,
                   }}
                   {activeTabId}
                 />
