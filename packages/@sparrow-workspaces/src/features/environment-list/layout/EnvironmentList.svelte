@@ -227,6 +227,7 @@
             type="teritiary-regular"
             disable={isNewEnvironmentCreating}
             onClick={async (e) => {
+              e.preventDefault();
               e.stopPropagation();
               isNewEnvironmentCreating = true;
               await handleCreateEnvironment(e);

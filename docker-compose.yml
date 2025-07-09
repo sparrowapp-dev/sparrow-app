@@ -11,6 +11,21 @@ services:
     networks:
       - localnet
 
+  # Kafka
+  kafka:
+    image: bitnami/kafka:3.4.1
+    hostname: kafka
+    ports:
+      - "9092:9092" # Broker listener
+      - "9093:9093" # Controller listener
+      - "9094:9094" # External listener
+    volumes:
+      - "kafka_data:/bitnami"
+    env_file:
+      - .env.docker-setup
+    networks:
+      - localnet
+
   # Sparrow Api Server
   sparrow-api:
     image: sparrowapi/sparrow-api:7
@@ -23,6 +38,7 @@ services:
       - localnet
     depends_on:
       - mongo
+      - kafka
     env_file:
       - .env.docker-setup
 
@@ -39,6 +55,7 @@ services:
     depends_on:
       - sparrow-api
       - mongo
+      - kafka
     env_file:
       - .env.docker-setup
     command: >-
@@ -98,6 +115,7 @@ services:
       - sparrow-api
       - sparrow-auth
       - mongo
+      - kafka
 
   # Nginx Reverse Proxy with SSL
   nginx-proxy:
@@ -117,6 +135,10 @@ services:
       - sparrow-auth
       - sparrow-web
     restart: always
+
+volumes:
+  kafka_data:
+    driver: local
 
 networks:
   localnet:

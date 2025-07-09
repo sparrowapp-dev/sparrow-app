@@ -43,7 +43,6 @@
   },
   "bundle": {
     "licenseFile": "agpl-3.0.txt",
-    "createUpdaterArtifacts": true,
     "active": true,
     "icon": [
       "icons/32x32.png",
@@ -123,5 +122,5 @@
     }
   },
   "productName": "Sparrow",
-  "version": "2.27.0"
+  "version": "2.26.0"
 }

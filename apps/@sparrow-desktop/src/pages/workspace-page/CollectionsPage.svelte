@@ -1023,8 +1023,8 @@
                         <WorkspaceDefault
                           {currentWorkspace}
                           {handleCreateEnvironment}
-                          onCreateTestflow={() => {
-                            handleCreateTestflowCheck();
+                          onCreateTestflow={async () => {
+                            await handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
@@ -1245,6 +1245,19 @@
         currentWorkspaceId,
         file,
         type,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
+    onImportPostmanCollection={async (currentWorkspaceId, postmanCollectionJson) => {
+      debugger
+      const response = await _viewModel.importPostmanCollection(
+        currentWorkspaceId,
+        postmanCollectionJson,
       );
       if (response.isSuccessful) {
         setTimeout(() => {
