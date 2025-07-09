@@ -160,6 +160,7 @@
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={() => {
+      console.log("we are hitting the main -------------------one");
       toggleExpandTestflow();
       handleTabUpdate("testflow");
     }}
@@ -206,6 +207,7 @@
         currentWorkspace?.isShared
           ? 'd-none'
           : ''} add-icon-container d-flex"
+        on:click|stopPropagation={() => {}}
       >
         <Button
           size="extra-small"
@@ -214,6 +216,7 @@
           startIcon={AddRegular}
           disable={isNewTestflowCreating}
           onClick={async (e) => {
+            console.log("-----------------------this normal");
             e.preventDefault();
             e.stopPropagation();
             isNewTestflowCreating = true;

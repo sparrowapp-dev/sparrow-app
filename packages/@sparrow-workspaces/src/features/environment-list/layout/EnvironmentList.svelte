@@ -218,7 +218,10 @@
         show={isHovered && !isNewEnvironmentCreating}
         zIndex={701}
       >
-        <span class="add-icon-container d-flex">
+        <span
+          class="add-icon-container d-flex"
+          on:click|stopPropagation={() => {}}
+        >
           <Button
             disabled={loggedUserRoleInWorkspace ===
               WorkspaceRole.WORKSPACE_VIEWER}
