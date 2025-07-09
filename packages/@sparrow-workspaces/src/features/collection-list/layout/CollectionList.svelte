@@ -227,11 +227,14 @@
     500,
   );
 
+  let flatItems: any[] = [];
   $: {
     if (searchData) {
       debouncedSearchCollection(searchData, collectionListDocument);
     } else {
+      console.log(collectionListDocument);
       collectionFilter = collectionListDocument;
+      flatItems = flattenCollections(collectionListDocument || []);
     }
   }
 
@@ -259,6 +262,73 @@
         );
     }
   });
+
+  type FlatItem = {
+    id: string;
+    name: string;
+    type: string;
+    depth: number;
+    parentId?: string;
+    collectionId: string;
+    folderId: string;
+  };
+
+  function flattenCollections(collections: any[]): FlatItem[] {
+    const result: FlatItem[] = [];
+
+    const recurse = (
+      items: any[],
+      depth: number,
+      collectionId: string,
+      parentId?: string,
+      folderId: string = "",
+    ) => {
+      for (const item of items) {
+        result.push({
+          id: item.id,
+          name: item.name,
+          type: item.type,
+          depth,
+          parentId,
+          collectionId,
+          folderId,
+        });
+
+        if (item.type === "FOLDER" && item.items?.length) {
+          recurse(item.items, depth + 1, collectionId, item.id, item.id);
+        }
+
+        if (item.type === "REQUEST" && item.items?.length) {
+          for (const subItem of item.items) {
+            result.push({
+              id: subItem.id,
+              name: subItem.name,
+              type: subItem.type,
+              depth: depth + 1,
+              parentId: item.id,
+              collectionId,
+              folderId,
+            });
+          }
+        }
+      }
+    };
+
+    for (const collection of collections) {
+      result.push({
+        id: collection.id,
+        name: collection.name,
+        type: "COLLECTION",
+        depth: 0,
+        collectionId: collection.id,
+        folderId: "",
+      });
+
+      recurse(collection.items, 1, collection.id);
+    }
+
+    return result;
+  }
 
   onDestroy(() => {
     collectionListSubscriber.unsubscribe();
@@ -471,39 +541,26 @@
         ></div>
       {/if}
       {#if collectionFilter?.length > 0}
-        <List
+        <div style="height: 100%;">
+          <VirtualScroll data={flatItems} key="id" let:data>
+            <div class="item-container">
+              {#each Array(data.depth).fill(0) as _, i}
+                <div class="indent-line" style="left: {i * 20}px"></div>
+              {/each}
+
+              <div class="item" style="padding-left: {(data.depth + 1) * 20}px">
+                {data.name}
+                <span class="type">[{data.type}]</span>
+              </div>
+            </div>
+          </VirtualScroll>
+        </div>
+        <!-- <List
           bind:scrollList
           height={"auto"}
           overflowY={"auto"}
           classProps={"pe-0"}
         >
-          <!-- <div style="height: 100%;">
-          <VirtualScroll data={visibleCollections} key="id" let:data>
-            <Collection
-              bind:userRole
-              {isSharedWorkspace}
-              {onItemCreated}
-              {onItemDeleted}
-              {onItemRenamed}
-              {onItemOpened}
-              {onBranchSwitched}
-              {onRefetchCollection}
-              {userRoleInWorkspace}
-              {activeTabPath}
-              {activeTabType}
-              collection={data}
-              {activeTabId}
-              bind:isFirstCollectionExpand
-              {isWebApp}
-              {searchData}
-              {onCompareCollection}
-              {onSyncCollection}
-              {onUpdateRunningState}
-              {onCreateMockCollection}
-              {isGuestUser}
-            />
-          </VirtualScroll>
-          </div> -->
           {#each collectionFilter as col}
             {#if !(col?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
               <Collection
@@ -560,7 +617,7 @@
               {/if}
             {/each}
           {/if}
-        </List>
+        </List> -->
       {:else if searchData}
         <div class="pb-2 px-2 h-100 overflow-auto">
           <p
@@ -746,5 +803,32 @@
     /* background-color: var(--bg-ds-surface-100); */
     z-index: 10;
     /* height: 100px; */
+  }
+
+  .item-container {
+    position: relative;
+    height: 100%;
+  }
+
+  .indent-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ccc;
+  }
+
+  .item {
+    position: relative;
+    z-index: 1;
+    padding: 8px 12px;
+    font-family: sans-serif;
+    /* background: white; */
+  }
+
+  .type {
+    font-size: 0.75rem;
+    color: #888;
+    margin-left: 0.5rem;
   }
 </style>
