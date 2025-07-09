@@ -105,36 +105,8 @@
 
   let isExpandCollectionLine = false;
   let isSharedWorkspace = false;
-  // export let handleExpandCollectionLine;
+  export let handleExpandCollectionLine;
 
-  // let visibleCollections: CollectionDocument[] = [];
-
-  // function waitNextFrames(frameCount = 1): Promise<void> {
-  //   return new Promise((resolve) => {
-  //     function next(n: number) {
-  //       if (n <= 0) return resolve();
-  //       requestAnimationFrame(() => next(n - 1));
-  //     }
-  //     next(frameCount);
-  //   });
-  // }
-
-  // async function renderInBatches(data: CollectionDocument[], batchSize = 20) {
-  //   visibleCollections = [];
-  //   let currentBatch: CollectionDocument[] = [];
-
-  //   for (let i = 0; i < data.length; i++) {
-  //     currentBatch.push(data[i]);
-
-  //     if (currentBatch.length === batchSize || i === data.length - 1) {
-  //       visibleCollections = [...visibleCollections, ...currentBatch];
-  //       currentBatch = [];
-
-  //       // await new Promise(requestAnimationFrame);
-  //       await waitNextFrames(10);
-  //     }
-  //   }
-  // }
   $: {
     if (activeTabType !== "Collection") {
       handleTabUpdate("");
@@ -232,22 +204,14 @@
     if (searchData) {
       debouncedSearchCollection(searchData, collectionListDocument);
     } else {
-      console.log(collectionListDocument);
       collectionFilter = collectionListDocument;
       flatItems = flattenCollections(collectionListDocument || []);
     }
   }
 
-  // $: {
-  //   if ($isExpandCollection) {
-  //     if (searchData) {
-  //       renderInBatches(collectionFilter);
-  //     } else {
-  //       renderInBatches(collectionListDocument);
-  //     }
-  //   }
-  // }
-
+  $: {
+    console.log(flatItems);
+  }
   const collectionListSubscriber = collectionList.subscribe(async (value) => {
     if (value) {
       collectionListDocument = value;
@@ -269,8 +233,9 @@
     type: string;
     depth: number;
     parentId?: string;
-    collectionId: string;
-    folderId: string;
+    parentCollectionId: string;
+    parentFolderId: string;
+    parentRequestId: string;
   };
 
   function flattenCollections(collections: any[]): FlatItem[] {
@@ -279,9 +244,9 @@
     const recurse = (
       items: any[],
       depth: number,
-      collectionId: string,
-      parentId?: string,
-      folderId: string = "",
+      parentCollectionId: string = "",
+      parentFolderId: string = "",
+      parentRequestId: string = "",
     ) => {
       for (const item of items) {
         result.push({
@@ -289,13 +254,13 @@
           name: item.name,
           type: item.type,
           depth,
-          parentId,
-          collectionId,
-          folderId,
+          parentCollectionId,
+          parentFolderId,
+          parentRequestId,
         });
 
         if (item.type === "FOLDER" && item.items?.length) {
-          recurse(item.items, depth + 1, collectionId, item.id, item.id);
+          recurse(item.items, depth + 1, parentCollectionId, item.id);
         }
 
         if (item.type === "REQUEST" && item.items?.length) {
@@ -305,9 +270,9 @@
               name: subItem.name,
               type: subItem.type,
               depth: depth + 1,
-              parentId: item.id,
-              collectionId,
-              folderId,
+              parentCollectionId,
+              parentFolderId,
+              parentRequestId: item.id,
             });
           }
         }
@@ -320,8 +285,9 @@
         name: collection.name,
         type: "COLLECTION",
         depth: 0,
-        collectionId: collection.id,
-        folderId: "",
+        parentCollectionId: "",
+        parentFolderId: "",
+        parentRequestId: "",
       });
 
       recurse(collection.items, 1, collection.id);
@@ -555,69 +521,6 @@
             </div>
           </VirtualScroll>
         </div>
-        <!-- <List
-          bind:scrollList
-          height={"auto"}
-          overflowY={"auto"}
-          classProps={"pe-0"}
-        >
-          {#each collectionFilter as col}
-            {#if !(col?.activeSync && isSharedWorkspace) && col?.collectionType !== CollectionTypeBaseEnum.MOCK}
-              <Collection
-                bind:userRole
-                {isSharedWorkspace}
-                {onItemCreated}
-                {onItemDeleted}
-                {onItemRenamed}
-                {onItemOpened}
-                {onBranchSwitched}
-                {onRefetchCollection}
-                {userRoleInWorkspace}
-                {activeTabPath}
-                {activeTabType}
-                collection={col}
-                {activeTabId}
-                bind:isFirstCollectionExpand
-                {isWebApp}
-                {searchData}
-                {onCompareCollection}
-                {onSyncCollection}
-                {onUpdateRunningState}
-                {onCreateMockCollection}
-                {isGuestUser}
-              />
-            {/if}
-          {/each}
-          {#if collectionFilter?.some((col) => col?.collectionType === CollectionTypeBaseEnum.MOCK)}
-            <hr style="margin: 2px 0 2px 2rem;" />
-            {#each collectionFilter as col}
-              {#if col?.collectionType === CollectionTypeBaseEnum.MOCK}
-                <Collection
-                  isMockCollection={true}
-                  bind:userRole
-                  {isSharedWorkspace}
-                  {onItemCreated}
-                  {onItemDeleted}
-                  {onItemRenamed}
-                  {onItemOpened}
-                  {onBranchSwitched}
-                  {onRefetchCollection}
-                  {userRoleInWorkspace}
-                  {activeTabPath}
-                  {activeTabType}
-                  collection={col}
-                  {searchData}
-                  {activeTabId}
-                  bind:isFirstCollectionExpand
-                  {isWebApp}
-                  {onCompareCollection}
-                  {onSyncCollection}
-                  {onUpdateRunningState}
-                />
-              {/if}
-            {/each}
-          {/if}
-        </List> -->
       {:else if searchData}
         <div class="pb-2 px-2 h-100 overflow-auto">
           <p
