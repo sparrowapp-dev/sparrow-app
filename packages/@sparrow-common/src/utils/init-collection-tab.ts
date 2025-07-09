@@ -5,8 +5,15 @@ import {
   type Path,
 } from "@sparrow/common/types/workspace/tab";
 import type { Tab } from "../types/workspace/tab";
-import { CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import { CollectionNavigationTabEnum, type State, type Auth } from "../types/workspace/collection-tab";
+import {
+  CollectionAuthTypeBaseEnum,
+  CollectionRequestAddToBaseEnum,
+} from "../types/workspace/collection-base";
+import {
+  CollectionNavigationTabEnum,
+  type State,
+  type Auth,
+} from "../types/workspace/collection-tab";
 
 class InitCollectionTab {
   private _tab: Tab;
@@ -16,51 +23,50 @@ class InitCollectionTab {
    * @param _workspaceId - Workspace Id to which Collection belongs to
    */
   constructor(_id: string, _workspaceId: string) {
-   
-      this._tab = {
-        id: _id,
-        tabId: uuidv4(),
-        name: "New Collection",
-        type: TabTypeEnum.COLLECTION,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
-        description: "",
-        source: "USER",
-        activeSync: false,
-        property: {
-          collection: {
-            auth: {
-              bearerToken: "",
-              basicAuth: {
-                username: "",
-                password: "",
-              },
-              apiKey: {
-                authKey: "",
-                authValue: "",
-                addTo: CollectionRequestAddToBaseEnum.HEADER,
-              },
+    this._tab = {
+      id: _id,
+      tabId: uuidv4(),
+      name: "New Collection",
+      type: TabTypeEnum.COLLECTION,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
+      description: "",
+      source: "USER",
+      activeSync: false,
+      label: "",
+      property: {
+        collection: {
+          auth: {
+            bearerToken: "",
+            basicAuth: {
+              username: "",
+              password: "",
             },
-            state : {
-              collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
-              collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
-            }
+            apiKey: {
+              authKey: "",
+              authValue: "",
+              addTo: CollectionRequestAddToBaseEnum.HEADER,
+            },
+          },
+          state: {
+            collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+            collectionNavigation: CollectionNavigationTabEnum.OVERVIEW,
           },
         },
-        path: {
-          workspaceId: _workspaceId,
-          collectionId: "",
-          folderId: "",
-        },
-        isSaved: true,
-        index: 0,
-        isActive: true,
-        isDeleted: false,
-        timestamp: new Date().toString(),
-      };
-      if (!_id || !_workspaceId) {
-        console.error("invalid id or workspace id on create new tab request!");
-      } 
-    
+      },
+      path: {
+        workspaceId: _workspaceId,
+        collectionId: "",
+        folderId: "",
+      },
+      isSaved: true,
+      index: 0,
+      isActive: true,
+      isDeleted: false,
+      timestamp: new Date().toString(),
+    };
+    if (!_id || !_workspaceId) {
+      console.error("invalid id or workspace id on create new tab request!");
+    }
   }
   public getValue(): Tab {
     return this._tab;
@@ -99,6 +105,9 @@ class InitCollectionTab {
   }
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
+  }
+  public updateLabel(_label: string) {
+    this._tab.label = _label;
   }
 }
 

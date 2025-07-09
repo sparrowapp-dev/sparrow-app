@@ -16,44 +16,56 @@
   import constants from "../../../../constants/constants";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "@app/models/collection.model";
+
   export let tab;
   export let isTourGuideOpen = false;
+
+  let _viewModel;
   let isLoginBannerActive = false;
-  const _viewModel = new RestExplorerViewModel(tab);
-  const collectionObs = _viewModel.collectionSubscriber(tab.path.collectionId);
-
   let collection: CollectionDocType;
-  const collectionSubscriber = collectionObs.subscribe(
-    (data: RxDocument<CollectionDocument>) => {
-      collection = data?.toMutableJSON();
-    },
-  );
-
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
+  let prevTabName = "";
 
-  isGuestUserActive.subscribe((value) => {
+  let environmentVariables;
+  let environmentId: string;
+  let currentWorkspaceId = "";
+  let currentWorkspace;
+
+  let restExplorerData: restExplorerData | undefined;
+
+  let collectionObserver;
+  let environmentsObserver;
+  let activeWorkspaceObserver;
+
+  let webSocketMap;
+  let prevTabId = "";
+
+  let renameWithCollectionList;
+  let debouncedAPIUpdater;
+  let guestUser;
+
+  const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
+    (_webSocketMap) => {
+      webSocketMap = _webSocketMap;
+    },
+  );
+
+  const isGuestUserActiveSubscriber = isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
   });
 
-  user.subscribe((value) => {
+  const userSubscriber = user.subscribe((value) => {
     if (value) {
       userId = value._id;
     }
   });
 
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList as any,
-    1000,
-  );
-  const debouncedAPIUpdater = new Debounce().debounce(
-    _viewModel?.refreshTabData as any,
-    1000,
-  );
-  let prevTabName = "";
+  $: {
+    restExplorerData = webSocketMap?.get(tab?.tabId);
+  }
+
   /**
    * Find the role of user in active workspace
    */
@@ -67,40 +79,71 @@
       }
     });
   };
+
+  let activeWorkspaceSubscriber;
+  let collectionSubscriber;
+
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
-        renameWithCollectionList(tab.name);
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new RestExplorerViewModel(tab);
+          collectionObserver = _viewModel.collectionSubscriber(
+            tab.path.collectionId,
+          );
+          environmentsObserver = _viewModel.environments;
+          activeWorkspaceObserver = _viewModel.activeWorkspace;
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel?.updateNameWithCollectionList as any,
+            1000,
+          );
+          debouncedAPIUpdater = new Debounce().debounce(
+            _viewModel?.refreshTabData as any,
+            1000,
+          );
+          guestUser = await _viewModel.getGuestUser(); // <-- now valid inside async IIFE
+          if (guestUser?.isBannerActive) {
+            isLoginBannerActive = guestUser?.isBannerActive;
+          }
+          collectionSubscriber = collectionObserver?.subscribe(
+            (data: RxDocument<CollectionDocument>) => {
+              collection = data?.toMutableJSON();
+            },
+          );
+
+          activeWorkspaceSubscriber = activeWorkspaceObserver?.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value;
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+                environmentId = activeWorkspaceRxDoc.get("environmentId");
+              }
+            },
+          );
+        })();
+      } else {
+        if (tab?.name && prevTabName !== tab.name) {
+          renameWithCollectionList(tab.name);
+        }
       }
-      prevTabName = tab.name;
-      findUserRole();
       debouncedAPIUpdater(tab);
+      findUserRole();
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
     }
   }
-
-  let environmentVariables;
-  let environmentId: string;
-  let currentWorkspaceId = "";
-  let currentWorkspace;
-
-  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        environmentId = activeWorkspaceRxDoc.get("environmentId");
-      }
-    },
-  );
 
   /**
    * @description - refreshes the environment everytime workspace changes
    */
   const refreshEnvironment = () => {
-    if ($environments && currentWorkspaceId) {
-      if ($environments?.length > 0) {
-        const filteredEnv = $environments
+    if ($environmentsObserver && currentWorkspaceId) {
+      if ($environmentsObserver?.length > 0) {
+        const filteredEnv = $environmentsObserver
           .filter((elem) => {
             return elem.workspaceId === currentWorkspaceId;
           })
@@ -140,25 +183,17 @@
   };
 
   $: {
-    if (environmentId || $environments || currentWorkspaceId) {
+    if (environmentId || $environmentsObserver || currentWorkspaceId) {
       refreshEnvironment();
     }
   }
-  onMount(async () => {
-    const guestUser = await _viewModel.getGuestUser();
-    if (guestUser?.isBannerActive) {
-      isLoginBannerActive = guestUser?.isBannerActive;
-    }
-  });
-
-  let restExplorerData: restExplorerData | undefined;
-  restExplorerDataStore.subscribe((webSocketMap) => {
-    restExplorerData = webSocketMap.get(tab.tabId);
-  });
 
   onDestroy(() => {
-    collectionSubscriber.unsubscribe();
-    activeWorkspaceSubscriber.unsubscribe();
+    collectionSubscriber?.unsubscribe();
+    activeWorkspaceSubscriber?.unsubscribe();
+    restExplorerDataStoreSubscriber();
+    isGuestUserActiveSubscriber();
+    userSubscriber();
   });
 </script>
 

@@ -42,16 +42,21 @@
   import { GlobalSearch } from "@sparrow/common/features";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
-  import { planBannerisOpen } from "@sparrow/common/store";
+  import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
-  let userId;
+  let userId: string;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      // await _viewModel.refreshTeams(value._id);
-      // await _viewModel.refreshWorkspaces(value._id);
       userId = value?._id;
-      await _viewModel.refreshTeamsWorkspaces(value._id);
+      if (userId && shouldRunThrottled(userId)) {
+        await Promise.all([
+          _viewModel.refreshTeams(userId),
+          _viewModel.refreshWorkspaces(userId),
+        ]);
+      } else {
+        console.error(`Throttled for ${userId}`);
+      }
     }
   });
 

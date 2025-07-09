@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { Table } from "@sparrow/teams/components";
-  import { Rows } from "@sparrow/teams/components";
   import type { TeamDocument } from "@app/database/database";
   import InviteRow from "../components/InviteRow.svelte";
+  import VirtualScroll from "svelte-virtual-scroll-list";
   export let invites: [
     {
       name: string;
@@ -14,43 +13,38 @@
   export let openTeam: TeamDocument;
   export let onWithDrawInvite;
   export let onResendInvite;
-  export let userId: string;
 
   const tableHeaderContent = ["Users", "", "", "", "Roles", "Actions"];
 </script>
 
-<div class="h-100 d-flex flex-column">
-  <div
-    class="table-container sparrow-thin-scrollbar overflow-y-auto"
-    style="flex:1; overflow:auto;"
-  >
-    {#if invites.length > 0}
-      <Table
-        tableClassProps="table p-0 table-responsive w-100"
-        tableStyleProp="max-height: 100%;width:100%"
-        dataSearch="true"
-        tableHeaderClassProp="position-sticky top-0 z-2"
-        tableHeaderStyleProp="background-color: var(--bg-ds-surface-900);"
-        headerObject={tableHeaderContent}
-      >
-        <tbody class="overflow-y-auto position-relative z-0">
-          {#each invites as list, index}
+<div class="h-100 w-100 overflow-auto">
+  {#if invites.length > 0}
+    <div class="h-100 d-flex flex-column text-fs-12">
+      <div class={`d-flex pb-2 ps-2`}>
+        <div style="width:70%">Users</div>
+        <div style="width:20%">Roles</div>
+        <div class="d-flex justify-content-end pe-5" style="width:10%">
+          Actions
+        </div>
+      </div>
+      <div class="w-100 overflow-auto z-0" style="flex:1 !important;">
+        <div style="height: 100%;">
+          <VirtualScroll data={invites} key="email" let:data>
             <InviteRow
-              user={list?.email}
-              role={list?.role}
-              {index}
+              user={data?.email}
+              role={data?.role}
+              id={data?.id}
               {onWithDrawInvite}
               {onResendInvite}
               {openTeam}
-              {userId}
             />
-          {/each}
-        </tbody>
-      </Table>
-    {:else}
-      <div class="not-found-text">No result Found</div>
-    {/if}
-  </div>
+          </VirtualScroll>
+        </div>
+      </div>
+    </div>
+  {:else}
+    <div class="not-found-text">No result Found</div>
+  {/if}
 </div>
 
 <style>
