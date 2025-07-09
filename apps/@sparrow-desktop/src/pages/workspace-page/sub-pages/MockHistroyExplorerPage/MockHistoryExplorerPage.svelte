@@ -49,12 +49,11 @@
               );
             },
           );
-
-          prevTabId = tab?.tabId;
         })();
       } else if (tab?.name && prevTabName !== tab.name) {
-        prevTabName = tab.name;
       }
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
     }
   }
 </script>

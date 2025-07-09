@@ -124,16 +124,16 @@
               }
             },
           );
-          prevTabId = tab?.tabId;
         })();
       } else {
         if (tab?.name && prevTabName !== tab.name) {
           renameWithCollectionList(tab.name);
-          prevTabName = tab.name;
         }
-        debouncedAPIUpdater(tab);
-        findUserRole();
       }
+      debouncedAPIUpdater(tab);
+      findUserRole();
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
     }
   }
 

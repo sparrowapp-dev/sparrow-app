@@ -93,14 +93,13 @@
             _viewModel.updateNameWithCollectionList as any,
             1000,
           );
-
-          prevTabId = tab?.tabId;
         })();
       } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
-        prevTabName = tab.name;
       }
       findUserRole();
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
     }
   }
 

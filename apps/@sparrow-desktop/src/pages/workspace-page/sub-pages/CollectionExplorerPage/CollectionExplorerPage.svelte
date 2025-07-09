@@ -105,12 +105,12 @@
           );
           environments = _viewModel.environments;
           findUserRole();
-          prevTabId = tab?.tabId;
         })();
       } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
-        prevTabName = tab.name;
       }
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
     }
   }
 

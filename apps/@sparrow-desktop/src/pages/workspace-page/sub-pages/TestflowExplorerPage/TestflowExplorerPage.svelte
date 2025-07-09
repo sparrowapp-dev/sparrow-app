@@ -214,13 +214,12 @@
             1000,
           );
           handleBlockLimitTestflow();
-
-          prevTabId = tab?.tabId;
         })();
       } else if (tab?.name && prevTabName !== tab?.name) {
         renameWithTestFlowList(tab.name);
       }
-      prevTabName = tab.name;
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
       findUserRole();
     }
   }
