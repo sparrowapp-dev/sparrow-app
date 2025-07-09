@@ -982,7 +982,7 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <TestFlowExplorerPage
                           tab={$activeTab}
                           {teamDetails}

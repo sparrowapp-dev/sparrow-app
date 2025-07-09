@@ -7,7 +7,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import {
@@ -153,7 +153,7 @@
   };
 
   onDestroy(() => {
-    sub.unsubscribe();
+    sub?.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
     userSubscriber();
   });
@@ -179,11 +179,7 @@
           environments = _viewModel.environments;
           activeWorkspace = _viewModel.activeWorkspace;
 
-          sub = _viewModel.tab.subscribe((val) => {
-            if (val?.tabId) {
-              render = true;
-            }
-          });
+          render = true;
 
           activeWorkspaceSubscriber = activeWorkspace.subscribe(
             (_workspace) => {
