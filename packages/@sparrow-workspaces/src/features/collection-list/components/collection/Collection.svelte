@@ -1139,7 +1139,7 @@
                 </div>
               </div>
             {/if}
-            {#each collection?.items as explorer}
+            <!-- {#each collection?.items as explorer}
               <Folder
                 {isMockCollection}
                 {userRole}
@@ -1157,9 +1157,9 @@
                 {searchData}
                 {isWebApp}
               />
-            {/each}
+            {/each} -->
           </div>
-          {#if !collection?.items?.length}
+          <!-- {#if !collection?.items?.length}
             <p
               class="text-ds-font-size-12 ps-5 ms-2 my-{collection.id ===
               activeTabId
@@ -1170,9 +1170,9 @@
                 ? "This mock collection is empty."
                 : "This collection is empty."}
             </p>
-          {/if}
+          {/if} -->
 
-          <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
+          <!-- <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
             {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
               <Tooltip
                 title={collection?.activeSync
@@ -1380,7 +1380,7 @@
                 </Tooltip>
               {/if}
             {/if}
-          </div>
+          </div> -->
           <!-- {#if showFolderAPIButtons}
             <div class="mt-2 mb-2 d-flex">
               <Tooltip

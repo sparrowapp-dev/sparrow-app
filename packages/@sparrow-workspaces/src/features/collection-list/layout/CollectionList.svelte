@@ -1,5 +1,17 @@
 <script lang="ts">
-  import { Collection, EmptyCollection, SearchTree } from "../components";
+  import {
+    AiRequest,
+    Collection,
+    EmptyCollection,
+    Folder,
+    Graphql,
+    MockRequest,
+    Request,
+    SavedRequest,
+    SearchTree,
+    SocketIo,
+    WebSocket,
+  } from "../components";
   import {
     angleDownIcon,
     doubleAngleLeftIcon as doubleangleLeft,
@@ -35,8 +47,16 @@
 
   import { PlusIcon } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
-  import { isExpandCollection } from "../../../stores/recent-left-panel";
-  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    addCollectionItem,
+    isExpandCollection,
+    openedComponent,
+    removeCollectionItem,
+  } from "../../../stores/recent-left-panel";
+  import {
+    CollectionItemTypeBaseEnum,
+    CollectionTypeBaseEnum,
+  } from "@sparrow/common/types/workspace/collection-base";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -205,8 +225,11 @@
       debouncedSearchCollection(searchData, collectionListDocument);
     } else {
       collectionFilter = collectionListDocument;
-      flatItems = flattenCollections(collectionListDocument || []);
     }
+  }
+
+  $: {
+    flatItems = flattenCollections(collectionListDocument, $openedComponent);
   }
 
   $: {
@@ -234,63 +257,120 @@
     depth: number;
     parentId?: string;
     parentCollectionId: string;
+    parentCollectionName: string;
+    parentCollectionWorkspaceId: string;
+    parentCollectionActiveSync: boolean;
+    parentFolderName: string;
     parentFolderId: string;
     parentRequestId: string;
+    parentRequestName: string;
+    data: any;
   };
 
-  function flattenCollections(collections: any[]): FlatItem[] {
+  function flattenCollections(
+    collections: any[] = [],
+    openedItems: Map<string, string>,
+  ): FlatItem[] {
     const result: FlatItem[] = [];
 
     const recurse = (
       items: any[],
       depth: number,
-      parentCollectionId: string = "",
-      parentFolderId: string = "",
-      parentRequestId: string = "",
+      parentCollectionId: string,
+      parentCollectionName: string,
+      parentCollectionWorkspaceId: string,
+      parentCollectionActiveSync: boolean,
+      parentFolderId: string,
+      parentFolderName: string,
+      parentRequestId: string,
+      parentRequestName: string,
     ) => {
       for (const item of items) {
-        result.push({
+        const flatItem: FlatItem = {
           id: item.id,
           name: item.name,
           type: item.type,
           depth,
           parentCollectionId,
+          parentCollectionName,
+          parentCollectionWorkspaceId,
+          parentCollectionActiveSync,
           parentFolderId,
+          parentFolderName,
           parentRequestId,
-        });
+          parentRequestName,
+          data: item,
+        };
 
-        if (item.type === "FOLDER" && item.items?.length) {
-          recurse(item.items, depth + 1, parentCollectionId, item.id);
-        }
+        result.push(flatItem);
 
-        if (item.type === "REQUEST" && item.items?.length) {
-          for (const subItem of item.items) {
-            result.push({
-              id: subItem.id,
-              name: subItem.name,
-              type: subItem.type,
-              depth: depth + 1,
+        // If current item is expanded, recurse into its children
+        const isExpanded = openedItems.has(item.id);
+        if (isExpanded && item.items?.length) {
+          if (item.type === "FOLDER") {
+            recurse(
+              item.items,
+              depth + 1,
               parentCollectionId,
+              parentCollectionName,
+              parentCollectionWorkspaceId,
+              parentCollectionActiveSync,
+              item.id,
+              item.name,
+              "",
+              "",
+            );
+          } else if (item.type === "REQUEST") {
+            recurse(
+              item.items,
+              depth + 1,
+              parentCollectionId,
+              parentCollectionName,
+              parentCollectionWorkspaceId,
+              parentCollectionActiveSync,
               parentFolderId,
-              parentRequestId: item.id,
-            });
+              parentFolderName,
+              item.id,
+              item.name,
+            );
           }
         }
       }
     };
 
     for (const collection of collections) {
+      // Always show the collection root
       result.push({
         id: collection.id,
         name: collection.name,
         type: "COLLECTION",
         depth: 0,
         parentCollectionId: "",
+        parentCollectionName: "",
+        parentCollectionWorkspaceId: "",
+        parentCollectionActiveSync: false,
         parentFolderId: "",
+        parentFolderName: "",
         parentRequestId: "",
+        parentRequestName: "",
+        data: collection,
       });
 
-      recurse(collection.items, 1, collection.id);
+      // Recurse only if collection is expanded
+      if (openedItems.has(collection.id)) {
+        recurse(
+          collection.items || [],
+          1,
+          collection.id,
+          collection.name,
+          collection.workspaceId,
+          collection.activeSync || false,
+          "",
+          "",
+          "",
+          "",
+        );
+      }
     }
 
     return result;
@@ -511,13 +591,235 @@
           <VirtualScroll data={flatItems} key="id" let:data>
             <div class="item-container">
               {#each Array(data.depth).fill(0) as _, i}
-                <div class="indent-line" style="left: {i * 20}px"></div>
+                <!-- <div class="indent-line" style="left: {i * 20}px"></div> -->
               {/each}
 
-              <div class="item" style="padding-left: {(data.depth + 1) * 20}px">
+              {#if data.type === "COLLECTION"}
+                <Collection
+                  bind:userRole
+                  {isSharedWorkspace}
+                  depth={data.depth}
+                  {onItemCreated}
+                  {onItemDeleted}
+                  {onItemRenamed}
+                  {onItemOpened}
+                  {onBranchSwitched}
+                  {onRefetchCollection}
+                  {userRoleInWorkspace}
+                  {activeTabPath}
+                  {activeTabType}
+                  collection={data.data}
+                  {activeTabId}
+                  bind:isFirstCollectionExpand
+                  {isWebApp}
+                  {searchData}
+                  {onCompareCollection}
+                  {onSyncCollection}
+                  {onUpdateRunningState}
+                  {onCreateMockCollection}
+                  {isGuestUser}
+                />
+              {:else if data.type === CollectionItemTypeBaseEnum.REQUEST}
+                <Request
+                  {userRole}
+                  {isSharedWorkspace}
+                  api={data.data}
+                  {onItemRenamed}
+                  {onItemDeleted}
+                  {onItemOpened}
+                  {activeTabPath}
+                  {searchData}
+                  {activeTabType}
+                  folder={{
+                    id: data.parentFolderId,
+                    name: data.parentFolderName,
+                  }}
+                  collection={{
+                    id: data.parentCollectionId,
+                    name: data.parentCollectionName,
+                    workspaceId: data.parentCollectionWorkspaceId,
+                    activeSync: data.parentCollectionActiveSync,
+                  }}
+                  {activeTabId}
+                  {isWebApp}
+                />
+              {:else if data.type === CollectionItemTypeBaseEnum.WEBSOCKET}
+                <div style="cursor:pointer;">
+                  <WebSocket
+                    {userRole}
+                    {isSharedWorkspace}
+                    api={data.data}
+                    {onItemRenamed}
+                    {onItemDeleted}
+                    {onItemOpened}
+                    folder={{
+                      id: data.parentFolderId,
+                      name: data.parentFolderName,
+                    }}
+                    collection={{
+                      id: data.parentCollectionId,
+                      name: data.parentCollectionName,
+                      workspaceId: data.parentCollectionWorkspaceId,
+                      activeSync: data.parentCollectionActiveSync,
+                    }}
+                    {activeTabId}
+                  />
+                </div>
+              {:else if data.type === CollectionItemTypeBaseEnum.SOCKETIO}
+                <div style="cursor:pointer;">
+                  <SocketIo
+                    {userRole}
+                    {isSharedWorkspace}
+                    socketIo={data.data}
+                    {onItemRenamed}
+                    {onItemDeleted}
+                    {onItemOpened}
+                    folder={{
+                      id: data.parentFolderId,
+                      name: data.parentFolderName,
+                    }}
+                    collection={{
+                      id: data.parentCollectionId,
+                      name: data.parentCollectionName,
+                      workspaceId: data.parentCollectionWorkspaceId,
+                      activeSync: data.parentCollectionActiveSync,
+                    }}
+                    {activeTabId}
+                  />
+                </div>
+              {:else if data.type === CollectionItemTypeBaseEnum.GRAPHQL}
+                <div style="cursor:pointer;">
+                  <Graphql
+                    {userRole}
+                    {isSharedWorkspace}
+                    graphql={data.data}
+                    {onItemRenamed}
+                    {onItemDeleted}
+                    {onItemOpened}
+                    folder={{
+                      id: data.parentFolderId,
+                      name: data.parentFolderName,
+                    }}
+                    collection={{
+                      id: data.parentCollectionId,
+                      name: data.parentCollectionName,
+                      workspaceId: data.parentCollectionWorkspaceId,
+                      activeSync: data.parentCollectionActiveSync,
+                    }}
+                    {activeTabId}
+                  />
+                </div>
+              {:else if data.type === CollectionItemTypeBaseEnum.MOCK_REQUEST}
+                <div style={`cursor: pointer; `}>
+                  <MockRequest
+                    {userRole}
+                    {isSharedWorkspace}
+                    api={data.data}
+                    {onItemRenamed}
+                    {onItemDeleted}
+                    {onItemOpened}
+                    {activeTabPath}
+                    {searchData}
+                    {activeTabType}
+                    folder={{
+                      id: data.parentFolderId,
+                      name: data.parentFolderName,
+                    }}
+                    collection={{
+                      id: data.parentCollectionId,
+                      name: data.parentCollectionName,
+                      workspaceId: data.parentCollectionWorkspaceId,
+                      activeSync: data.parentCollectionActiveSync,
+                    }}
+                    {activeTabId}
+                    {isWebApp}
+                  />
+                </div>
+              {:else if data.type === CollectionItemTypeBaseEnum.FOLDER}
+                <Folder
+                  isMockCollection={false}
+                  {userRole}
+                  {isSharedWorkspace}
+                  {onItemCreated}
+                  {onItemDeleted}
+                  {onItemRenamed}
+                  {onItemOpened}
+                  collection={{
+                    id: data.parentCollectionId,
+                    name: data.parentCollectionName,
+                    workspaceId: data.parentCollectionWorkspaceId,
+                    activeSync: data.parentCollectionActiveSync,
+                  }}
+                  {userRoleInWorkspace}
+                  {activeTabPath}
+                  explorer={data}
+                  {activeTabType}
+                  {activeTabId}
+                  {searchData}
+                  {isWebApp}
+                />
+              {:else if data.type === CollectionItemTypeBaseEnum.AI_REQUEST}
+                <div style={`cursor: pointer; `}>
+                  <AiRequest
+                    {userRole}
+                    {isSharedWorkspace}
+                    aiRequest={data.data}
+                    {onItemRenamed}
+                    {onItemDeleted}
+                    {onItemOpened}
+                    {activeTabPath}
+                    {searchData}
+                    {activeTabType}
+                    folder={{
+                      id: data.parentFolderId,
+                      name: data.parentFolderName,
+                    }}
+                    collection={{
+                      id: data.parentCollectionId,
+                      name: data.parentCollectionName,
+                      workspaceId: data.parentCollectionWorkspaceId,
+                      activeSync: data.parentCollectionActiveSync,
+                    }}
+                    {activeTabId}
+                    {isWebApp}
+                  />
+                </div>
+              {:else if data.type === CollectionItemTypeBaseEnum.SAVED_REQUEST}
+                <SavedRequest
+                  {userRole}
+                  api={data.data}
+                  request={{
+                    id: data.parentRequestId,
+                    name: data.parentRequestName,
+                  }}
+                  {onItemRenamed}
+                  {onItemDeleted}
+                  {onItemOpened}
+                  folder={{
+                    id: data.parentFolderId,
+                    name: data.parentFolderName,
+                  }}
+                  collection={{
+                    id: data.parentCollectionId,
+                    name: data.parentCollectionName,
+                    workspaceId: data.parentCollectionWorkspaceId,
+                    activeSync: data.parentCollectionActiveSync,
+                  }}
+                  {activeTabId}
+                />
+              {:else}
+                <button
+                  on:click={() => {
+                    if ($openedComponent.has(data.id)) {
+                      removeCollectionItem(data.id);
+                    } else {
+                      addCollectionItem(data.id, data.type);
+                    }
+                  }}>{$openedComponent.has(data.id) ? "true" : "false"}</button
+                >
                 {data.name}
                 <span class="type">[{data.type}]</span>
-              </div>
+              {/if}
             </div>
           </VirtualScroll>
         </div>

@@ -466,7 +466,7 @@
         style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
       ></div>
       <!-- {#if } -->
-      {#each api?.items || [] as exp}
+      <!-- {#each api?.items || [] as exp}
         <div>
           <SavedRequest
             {userRole}
@@ -480,7 +480,7 @@
             {activeTabId}
           />
         </div>
-      {/each}
+      {/each} -->
     </div>
   </div>
 {/if}
