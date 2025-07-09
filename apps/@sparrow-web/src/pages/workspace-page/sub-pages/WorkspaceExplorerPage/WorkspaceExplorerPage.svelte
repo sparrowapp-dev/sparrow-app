@@ -58,7 +58,7 @@
   }
   let userId = "";
   let userRole = "";
-  user.subscribe((value) => {
+  const userSubscriber = user.subscribe((value) => {
     if (value) {
       userId = value._id;
     }
@@ -165,6 +165,7 @@
   // }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
+    userSubscriber();
   });
   onMount(async () => {
     await _viewModel.fetchWorkspaceUpdates(workspaceID);

@@ -46,20 +46,22 @@ export class EnvironmentViewModel {
    * @returns
    */
   public refreshEnvironment = async (
-    workspaceId: string,
+    workspaceId: string
   ): Promise<{
     environmentTabsToBeDeleted?: string[];
   }> => {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
+
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       return {};
     }
+
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData =
-      await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+
     let response;
     if (
       workspaceData &&
@@ -68,44 +70,49 @@ export class EnvironmentViewModel {
     ) {
       response = await this.environmentService.fetchAllPublicEnvironments(
         workspaceId,
-        constants.API_URL,
+        constants.API_URL
       );
     } else {
       response = await this.environmentService.fetchAllEnvironments(
         workspaceId,
-        baseUrl,
+        baseUrl
       );
     }
 
-    if (response?.isSuccessful && response?.data?.data) {
-      const environments = response.data.data;
-      await this.environmentRepository.refreshEnvironment(
-        environments?.map((_environment: any) => {
-          const environment = createDeepCopy(_environment);
-          environment["id"] = environment._id;
-          environment["workspaceId"] = workspaceId;
-          delete environment._id;
-          return environment;
-        }),
-      );
-      await this.environmentRepository.deleteOrphanEnvironments(
-        workspaceId,
-        environments?.map((_environment: any) => {
-          return _environment._id;
-        }),
-      );
-      const environmentTabsToBeDeleted =
-        await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
-          workspaceId,
-          environments?.map((_environment: any) => {
-            return _environment._id;
-          }),
-        );
-      return {
-        environmentTabsToBeDeleted,
-      };
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return {};
     }
-    return {};
+
+    const environments = response.data.data;
+    const processedEnvironments: any[] = [];
+    const environmentIds: string[] = [];
+
+    const chunkSize = 100;
+
+    for (let i = 0; i < environments.length; i += chunkSize) {
+      const chunk = environments.slice(i, i + chunkSize);
+      for (const env of chunk) {
+        const environment = createDeepCopy(env);
+        environment.id = env._id;
+        environment.workspaceId = workspaceId;
+        delete environment._id;
+
+        processedEnvironments.push(environment);
+        environmentIds.push(env._id);
+      }
+      await new Promise((res) => setTimeout(res)); // Yield to browser
+    }
+
+    await this.environmentRepository.refreshEnvironment(processedEnvironments);
+    await this.environmentRepository.deleteOrphanEnvironments(workspaceId, environmentIds);
+
+    const environmentTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
+        workspaceId,
+        environmentIds
+      );
+
+    return { environmentTabsToBeDeleted };
   };
 
   /**

@@ -7,7 +7,7 @@
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
   import { DeleteWorkspace } from "@sparrow/common/features";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
@@ -34,7 +34,7 @@
 
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -45,7 +45,7 @@
     users: [],
   };
 
-  activeTeam.subscribe((value) => {
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
@@ -140,6 +140,11 @@
     }
     return response;
   };
+
+  onDestroy(() => {
+    userSubscriber();
+    activeTeamSubscriber.unsubscribe();
+  });
 </script>
 
 <TeamExplorer
