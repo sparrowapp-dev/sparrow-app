@@ -246,6 +246,10 @@ export class TeamRepository {
         },
       })
       .exec();
+    const updatedWorkspaces = data.workspaces.map(({ id, ...rest }) => ({
+      workspaceId: id,
+      ...rest,
+    }));
     await team.incrementalModify((value) => {
       if (data.name || data.name === "") value.name = data.name;
       if (data.description || data.description === "")
@@ -253,7 +257,7 @@ export class TeamRepository {
       if (data.xUrl) value.xUrl = data.xUrl;
       if (data.githubUrl) value.githubUrl = data.githubUrl;
       if (data.linkedinUrl) value.linkedinUrl = data.linkedinUrl;
-      if (data.workspaces) value.workspaces = data.workspaces;
+      if (data.workspaces) value.workspaces = updatedWorkspaces;
       if (data.logo) value.logo = data.logo;
       if (data.users) value.users = data.users;
       if (data.owner) value.owner = data.owner;
