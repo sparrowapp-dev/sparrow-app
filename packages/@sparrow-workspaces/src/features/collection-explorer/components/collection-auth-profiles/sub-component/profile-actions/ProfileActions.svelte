@@ -67,7 +67,7 @@
       authType: profileForm.authType.value,
       auth: profileForm.auth.values,
       authId: profileForm.authId,
-      defaultKey: false,
+      defaultKey: profileForm.defaultKey,
     };
 
     console.log("submitting :>> ", profileForm);

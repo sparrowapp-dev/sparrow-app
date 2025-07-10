@@ -42,6 +42,7 @@
       isTouched: false,
       invalid: false,
     },
+    defaultKey: false,
     auth: {
       isTouched: false,
       invalid: false,
@@ -69,6 +70,7 @@
     profileForm.description.value = data.description || "";
     profileForm.authType.value = data.authType || "select";
     profileForm.authId = data.authId;
+    profileForm.defaultKey = data.defaultKey;
 
     if (data.auth) {
       profileForm.auth.values = {
@@ -103,6 +105,7 @@
         isTouched: false,
         invalid: false,
       },
+      defaultKey: false,
       auth: {
         isTouched: false,
         invalid: false,
