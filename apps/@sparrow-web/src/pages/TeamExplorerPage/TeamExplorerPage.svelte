@@ -227,7 +227,6 @@
     }
     return response;
   };
-
 </script>
 
 {#if isWorkspaceOpen}
