@@ -46,7 +46,7 @@ env:
 jobs:
   release_mac_app_store:
     runs-on: macos-latest
-    environment: development
+    environment: test
 
     steps:
       # - name: Checkout Repository
