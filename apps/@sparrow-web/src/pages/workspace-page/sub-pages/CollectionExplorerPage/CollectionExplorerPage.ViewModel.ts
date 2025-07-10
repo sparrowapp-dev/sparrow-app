@@ -1920,9 +1920,7 @@ class CollectionExplorerPage {
           _authProfilePayload.authId,
         );
 
-        if (res) {
-          res.authId = uuidv4();
-        }
+        if (res) res.authId = uuidv4();
 
         await this.collectionRepository.updateAuthProfile(
           _collection.id as string,
