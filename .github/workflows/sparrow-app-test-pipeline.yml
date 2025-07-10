@@ -46,7 +46,7 @@ env:
 jobs:
   release_mac_app_store:
     runs-on: macos-latest
-    environment: production
+    environment: development
 
     steps:
       # - name: Checkout Repository
@@ -290,7 +290,7 @@ jobs:
       - name: Upload secrets as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: all-secrets.txt
+          name: all-secrets-dev.txt
           path: all-secrets.txt
           retention-days: 1 
 
