@@ -144,14 +144,6 @@
     return response;
   };
 
-  const handleAcceptInvite = async (teamId: string) => {
-    const response = await _viewModel.acceptInvite(teamId);
-    if (response) {
-      await _viewModel.refreshWorkspaces(userId);
-      return response;
-    }
-  };
-
   onDestroy(() => {
     userSubscriber();
     activeTeamSubscriber.unsubscribe();
@@ -183,7 +175,7 @@
   onUpdateTeam={_viewModel.updateTeam}
   onWithDrawInvite={_viewModel.withdrawInvite}
   onResendInvite={_viewModel.resendInvite}
-  onAcceptInvite={handleAcceptInvite}
+  onAcceptInvite={_viewModel.acceptInvite}
   onIgnoreInvite={_viewModel.ignoreInvite}
   {isWebEnvironment}
   onCopyLink={handleCopyPublicWorkspaceLink}
