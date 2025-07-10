@@ -1913,7 +1913,7 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
 
-    if (isGuestUser === true) {
+    if (isGuestUser) {
       try {
         const res = await this.collectionRepository.readAuthProfilesInCollection(
           authProfileObj.collectionId as string,
@@ -1991,7 +1991,7 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
 
-    if (isGuestUser === true) {
+    if (isGuestUser) {
       try {
         const res = await this.collectionRepository.readAuthProfilesInCollection(
           updatedAuthProfileObj.collectionId as string,
@@ -2070,7 +2070,7 @@ class CollectionExplorerPage {
       isGuestUser = value;
     });
 
-    if (isGuestUser === true) {
+    if (isGuestUser) {
       try {
         await this.collectionRepository.deleteAuthProfile(
           collection.id,
