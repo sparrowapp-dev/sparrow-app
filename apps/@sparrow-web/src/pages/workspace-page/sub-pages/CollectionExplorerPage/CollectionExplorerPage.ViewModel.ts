@@ -1870,7 +1870,7 @@ class CollectionExplorerPage {
   // Auth Profile
   public handleCreateAuthProfile = async (
     _collection: CollectionDto,
-    _authProfilePayload
+    _authProfilePayload // ToDo: add type here
   ) => {
     _authProfilePayload.authId = UntrackedItems.UNTRACKED + uuidv4()
     let userSource = {};
@@ -1899,18 +1899,42 @@ class CollectionExplorerPage {
       _collection.id as string,
       {
         ..._authProfilePayload,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       },
     );
 
-    // ToDo: handle for guest user also
-    // let isGuestUser;
-    // isGuestUserActive.subscribe((value) => {
-    //   isGuestUser = value;
-    // });
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
-    // if (isGuestUser === true) {
-    //   return;
-    // }
+    if (isGuestUser === true) {
+      try {
+        const res = await this.collectionRepository.readAuthProfilesInCollection(
+          authProfileObj.collectionId as string,
+          _authProfilePayload.authId,
+        );
+
+        if (res) {
+          res.authId = uuidv4();
+        }
+
+        await this.collectionRepository.updateAuthProfile(
+          _collection.id as string,
+          _authProfilePayload.authId,
+          res,
+        );
+
+        notifications.success("Auth profile created successfully.");
+        console.log("res :>> ", res);
+        return { ...res, isSuccessful: true };
+      } catch (error) {
+        console.error("Error while handling guest auth profile:", error);
+        // notifications.error("Failed to create auth profile. Please try again.");
+        return null; // or handle differently as per your flow
+      }
+    }
 
     const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
     const response = await this.collectionService.addAuthProfile(
@@ -1961,14 +1985,42 @@ class CollectionExplorerPage {
       ..._updatedAuthProfilePayload,
     };
 
-    // let isGuestUser;
-    // isGuestUserActive.subscribe((value) => {
-    //   isGuestUser = value;
-    // });
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
-    // if (isGuestUser === true) {
-    //   return;
-    // }
+    if (isGuestUser === true) {
+      try {
+        const res = await this.collectionRepository.readAuthProfilesInCollection(
+          updatedAuthProfileObj.collectionId as string,
+          updatedAuthProfileObj.authId,
+        );
+
+        console.log("auth pro :>> ", _authProfileId)
+        console.log("in update res ;>> ", res, updatedAuthProfileObj);
+        await this.collectionRepository.updateAuthProfile(
+          _collection.id as string,
+          _authProfileId,
+          {
+            ..._updatedAuthProfilePayload,
+            updatedAt: new Date().toISOString(),
+          },
+        );
+
+        // Don't show success notification if it's a defaultKey update request
+        if (!_updatedAuthProfilePayload.defaultKey) {
+          notifications.success("Auth profile updated successfully.");
+        }
+
+        return { ...res, isSuccessful: true };
+      } catch (error) {
+        console.error("Error while updating guest auth profile:", error);
+        // notifications.error("Failed to update auth profile. Please try again.");
+        return null;
+      }
+    }
+
 
     const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
     const response = await this.collectionService.updateAuthProfile(
@@ -2012,12 +2064,26 @@ class CollectionExplorerPage {
       authId: authId,
     };
 
-    // let isGuestUser;
-    // isGuestUserActive.subscribe((value) => {
-    //   isGuestUser = value;
-    // });
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
 
-    // if (isGuestUser === true) {}
+    if (isGuestUser === true) {
+      try {
+        await this.collectionRepository.deleteAuthProfile(
+          collection.id,
+          authId,
+        );
+
+        notifications.success("Authentication profile deleted successfully.");
+        return;
+      } catch (error) {
+        console.error("Error while deleting guest auth profile:", error);
+        // notifications.error("Failed to delete auth profile. Please try again.");
+        return;
+      }
+    }
 
     const baseUrl = await this.constructBaseUrl(collection.workspaceId);
     const response = await this.collectionService.deleteAuthProfile(

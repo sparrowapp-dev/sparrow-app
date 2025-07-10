@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
+  import {
+    ApiKey,
+    BasicAuth,
+    BearerToken,
+    NoAuth,
+    AuthProfile,
+  } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
   import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
@@ -21,6 +27,7 @@
   export let collection;
   export let onOpenCollection;
   export let selectedModelProvider: AiModelProviderEnum;
+  export let requestStateAuthProfile;
 
   // Get instructions for the selected provider
   $: currentInstructions = ApiKeyInstructions[selectedModelProvider];
@@ -54,10 +61,6 @@
               //   name: "Inherit Auth",
               //   id: HttpRequestAuthTypeBaseEnum.INHERIT_AUTH,
               // },
-              {
-                name: "API Key",
-                id: HttpRequestAuthTypeBaseEnum.API_KEY,
-              },
               // {
               //   name: "Bearer Token",
               //   id: HttpRequestAuthTypeBaseEnum.BEARER_TOKEN,
@@ -66,6 +69,15 @@
               //   name: "Basic Auth",
               //   id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
               // },
+              {
+                name: "API Key",
+                id: HttpRequestAuthTypeBaseEnum.API_KEY,
+              },
+              {
+                name: "Auth Profiles",
+                id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
+                disabled: !collection?.authProfiles?.length,
+              },
             ]}
             zIndex={499}
             titleId={requestStateAuth}
@@ -188,6 +200,42 @@
           style="color:var(--text-ds-neutral-400); max-width:600px;"
         >
           The authorization setting is inherited from the collection '<span
+            style="color:var(--text-ds-neutral-100)"
+            >{collection?.name || "Collection Not Found"}</span
+          >'. To make changes,
+        </p>
+        <p class="d-flex">
+          <span
+            class="pt-1 text-fs-12 me-1"
+            style="color:var(--text-ds-neutral-400)"
+          >
+            navigate to
+          </span>
+          <Button
+            type={"link-primary"}
+            onClick={() => {
+              onOpenCollection();
+            }}
+            title={collection?.name?.length > 25
+              ? collection?.name?.slice(0, 25) + "..."
+              : collection?.name || "Collection Not Found"}
+            size={"small"}
+            endIcon={OpenRegular}
+          />
+        </p>
+      {/if}
+    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES}
+      <AuthProfile
+        currSelectedAuthProfileId={requestStateAuthProfile}
+        callback={onUpdateRequestState}
+        authProfilesList={collection?.authProfiles}
+      />
+      {#if collection}
+        <p
+          class="text-fs-12 mb-1"
+          style="color:var(--text-ds-neutral-400); max-width:600px;"
+        >
+          The authorization profile is inherited from the collection '<span
             style="color:var(--text-ds-neutral-100)"
             >{collection?.name || "Collection Not Found"}</span
           >'. To make changes,

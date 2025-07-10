@@ -132,7 +132,7 @@
     </div>
   {/if}
 
-  <div class="content-wrapper">
+  <div class="content-wrapper d-flex align-items-center">
     <p
       style="font-size: {fontSize}"
       class="m-0 p-0 ellipsis option-name {getTextColor(

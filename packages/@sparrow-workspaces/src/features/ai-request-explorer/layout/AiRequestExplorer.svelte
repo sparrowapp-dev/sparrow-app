@@ -28,19 +28,10 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { disabledModelFeatures, modelCodeTemplates } from "../constants";
-
-  import {
-    BotRegular,
-    SettingsRegular,
-    BotSparkleRegular,
-    DismissRegular,
-  } from "@sparrow/library/icons";
+  import { SettingsRegular, BotSparkleRegular } from "@sparrow/library/icons";
   import { SaveAsCollectionItem } from "../../save-as-request";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
-  import { Alert, Button, Modal, notifications } from "@sparrow/library/ui";
-  import { Textarea } from "@sparrow/library/forms";
-  import { Sleep } from "@sparrow/common/utils";
+  import { Modal } from "@sparrow/library/ui";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -284,6 +275,8 @@
                     <RequestAuth
                       requestStateAuth={$tab.property.aiRequest.state
                         .aiAuthNavigation}
+                      requestStateAuthProfile={$tab.property.aiRequest.state
+                        .selectedRequestAuthProfileId}
                       auth={$tab.property.aiRequest.auth}
                       selectedModelProvider={$tab.property.aiRequest
                         ?.aiModelProvider}

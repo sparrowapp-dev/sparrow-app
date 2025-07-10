@@ -57,6 +57,10 @@ export class CollectionRepository {
         value.localRepositoryPath = data.localRepositoryPath;
       if (data.mockRequestHistory)
         value.mockRequestHistory = data.mockRequestHistory;
+      if (data.authProfiles)
+        value.authProfiles = data.authProfiles;
+      if (data.defaultSelectedAuthProfile) value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
+
       return value;
     });
 
@@ -1143,11 +1147,36 @@ export class CollectionRepository {
 
 
   // For Auth Profiles
+
+  /**
+   * @description
+   * read auth profile within a collection.
+   */
+  public readAuthProfilesInCollection = async (
+    collectionId: string,
+    uuid: string,
+  ): Promise<CollectionItemsDto | undefined> => {
+    const collection = await RxDB.getInstance()
+      .rxdb.collection.findOne({
+        selector: {
+          id: collectionId,
+        },
+      })
+      .exec();
+    let response;
+    collection?.toJSON().authProfiles.forEach((element) => {
+      if (element.authId === uuid) {
+        response = element;
+        return;
+      }
+    });
+    return response;
+  };
+
   /**
    * @description
    * Creates an API request or folder within a collection.
    */
-  // public addRequestOrFolderInCollection = async (
   public addAuthProfile = async (
     collectionId: string,
     newAuthProfileItem: any, // ToDo: Add a proper type here

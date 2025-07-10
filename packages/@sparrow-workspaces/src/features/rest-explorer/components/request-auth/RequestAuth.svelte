@@ -39,17 +39,39 @@
 
   // Setting default auth profile if the selected one is deleted from the collection
   $: {
-    if (collection?.authProfiles) {
-      const authProfile = collection?.authProfiles.find(
-        (profile) => profile.authId === requestStateAuthProfile,
-      );
+    console.log(
+      "dd ;>> ",
+      requestStateAuth,
+      requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
+    );
+    if (
+      requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES &&
+      collection?.authProfiles
+    ) {
+      let authProfile;
+      let defaultAuthProfile;
+      // for (const profile of collection?.authProfiles || []) {
+      //   if (profile.authId === requestStateAuthProfile) {
+      //     authProfile = profile;
+      //   }
+      //   if (profile.defaultKey === true) {
+      //     defaultAuthProfile = profile;
+      //   }
+      //   if (authProfile && defaultAuthProfile) break;
+      // }
+
       if (!authProfile) {
         onUpdateRequestState({
-          selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile,
+          selectedRequestAuthProfileId:
+            collection.defaultSelectedAuthProfile || defaultAuthProfile,
         });
-        notifications.warning(
-          "Selected auth profile was deleted. Resetting to default.",
-        );
+
+        // If previous selected profiles didn't found
+        if (requestStateAuthProfile) {
+          notifications.warning(
+            "Selected auth profile not found. Resetting to default.",
+          );
+        }
       }
     }
   }

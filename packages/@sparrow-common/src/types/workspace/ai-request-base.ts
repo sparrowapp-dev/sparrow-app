@@ -1,4 +1,5 @@
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
+import type { CollectionAuthBaseInterface, CollectionAuthTypeBaseEnum } from "./collection-base";
 
 ///////////////////////////////////////////////////////////////
 //              AI Request Auth Base Interface
@@ -8,7 +9,8 @@ export enum AiRequestAuthTypeBaseEnum {
     API_KEY = "API Key",
     BEARER_TOKEN = "Bearer Token",
     BASIC_AUTH = "Basic Auth",
-    INHERIT_AUTH = "Inherit Auth"
+    INHERIT_AUTH = "Inherit Auth",
+    AUTH_PROFILES = "Authentication Profiles"
 }
 
 interface AiRequestBasicAuthBaseInterface {
@@ -157,6 +159,35 @@ export interface AiRequestBaseInterface {
     systemPrompt: systemPrompt;
     configurations: AiConfigurations;
 }
+
+
+export interface HttpRequestCollectionAuthTabInterface {
+    auth: CollectionAuthBaseInterface
+}
+
+export interface AiRequestCollectionAuthNavigationTabInterface {
+    collectionAuthNavigation: CollectionAuthTypeBaseEnum
+}
+
+export interface AiRequestCollectionAuthProfileTabInterface {
+    auth: CollectionAuthBaseInterface
+}
+export interface AiRequestSlectedAuthTypeInProfileInterface {
+    authType: CollectionAuthTypeBaseEnum
+}
+export interface AiRequestCollectionAuthProfileIdInterface {
+    authId: string
+}
+
+export interface AiRequestCollectionLevelAuthTabInterface
+    extends HttpRequestCollectionAuthTabInterface,
+    AiRequestCollectionAuthNavigationTabInterface { }
+
+export interface AiRequestCollectionLevelAuthProfileTabInterface
+    extends AiRequestCollectionAuthProfileTabInterface,
+    AiRequestSlectedAuthTypeInProfileInterface,
+    AiRequestCollectionAuthProfileIdInterface { }
+
 
 
 ///////////////////////////////////////////////////////////////

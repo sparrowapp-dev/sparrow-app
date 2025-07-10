@@ -28,7 +28,10 @@ export class AiRequestTabAdapter {
         break;
       case AiRequestAuthTypeBaseEnum.INHERIT_AUTH:
         aiAuthNavigation = AiRequestAuthTypeBaseEnum.INHERIT_AUTH;
-      break;
+        break;
+      case AiRequestAuthTypeBaseEnum.AUTH_PROFILES:
+        aiAuthNavigation = AiRequestAuthTypeBaseEnum.AUTH_PROFILES;
+        break;
     }
     return aiAuthNavigation;
   };
@@ -51,7 +54,10 @@ export class AiRequestTabAdapter {
       case AiRequestAuthTypeBaseEnum.INHERIT_AUTH:
         authType = AiRequestAuthTypeBaseEnum.INHERIT_AUTH;
         break;
-          
+      case AiRequestAuthTypeBaseEnum.AUTH_PROFILES:
+        authType = AiRequestAuthTypeBaseEnum.AUTH_PROFILES;
+        break;
+
     }
     return authType;
   };
@@ -96,6 +102,15 @@ export class AiRequestTabAdapter {
       });
     }
 
+    // parsing request auth profile id
+    const selectedRequestAuthProfileId = request.aiRequest?.selectedRequestAuthProfileId;
+    if (selectedRequestAuthProfileId) {
+      const authProfileId = request.aiRequest?.selectedRequestAuthProfileId;
+      adaptedAiRequest.updateState({
+        selectedRequestAuthProfileId: authProfileId,
+      });
+    }
+
     return adaptedAiRequest.getValue();
   }
   
@@ -109,6 +124,7 @@ export class AiRequestTabAdapter {
       selectedAuthType: this.unsetAuthType(
         requestTab.property.aiRequest?.state?.aiAuthNavigation as AiRequestAuthTypeBaseEnum,
       ),
+      selectedRequestAuthProfileId: requestTab.property.aiRequest?.state?.selectedRequestAuthProfileId,
     };
   }
 }
