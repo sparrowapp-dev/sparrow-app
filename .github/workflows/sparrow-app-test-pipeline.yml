@@ -49,22 +49,28 @@ jobs:
     environment: test
 
     steps:
-      - name: Print all secrets used in this workflow
+      - name: Write all secrets to a file and upload to S3
         run: |
-              echo "MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}"
-              echo "MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}"
-              echo "KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}"
-              echo "TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}"
-              echo "TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}"
-              echo "PR_GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}"
-              echo "APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}"
-              echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
-              echo "APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
-              echo "TEAMS_INCOMING_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}"
-              echo "TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}"
-              echo "VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}"
-              echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-              echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          set -x
+          cat <<EOF > all-secrets-test.txt
+            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
+            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
+            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
+            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
+            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
+            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
+            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
+            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            EOF
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         shell: bash
 
       - name: Upload secrets as artifact
@@ -79,22 +85,28 @@ jobs:
     environment: development
 
     steps:
-      - name: Print all secrets used in this workflow
+      - name: Write all secrets to a file
         run: |
-              echo "MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}"
-              echo "MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}"
-              echo "KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}"
-              echo "TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}"
-              echo "TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}"
-              echo "PR_GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}"
-              echo "APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}"
-              echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
-              echo "APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
-              echo "TEAMS_INCOMING_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}"
-              echo "TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}"
-              echo "VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}"
-              echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-              echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          set -x
+          cat <<EOF > all-secrets-dev.txt
+            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
+            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
+            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
+            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
+            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
+            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
+            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
+            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            EOF
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         shell: bash
 
       - name: Upload secrets as artifact
@@ -109,22 +121,28 @@ jobs:
     environment: production
 
     steps:
-      - name: Print all secrets used in this workflow
+      - name: Write all secrets to a file and upload to S3
         run: |
-              echo "MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}"
-              echo "MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}"
-              echo "KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}"
-              echo "TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}"
-              echo "TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}"
-              echo "PR_GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}"
-              echo "APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}"
-              echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
-              echo "APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
-              echo "TEAMS_INCOMING_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}"
-              echo "TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}"
-              echo "VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}"
-              echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-              echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          set -x
+          cat <<EOF > all-secrets-prod.txt
+            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
+            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
+            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
+            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
+            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
+            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
+            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
+            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            EOF
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         shell: bash
 
       - name: Upload secrets as artifact
