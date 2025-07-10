@@ -81,9 +81,6 @@
 
     if (selectedProfile) {
       currSelectedAuthProfileId = selectedId;
-      console.log("slected :>> ", {
-        selectedRequestAuthProfileId: currSelectedAuthProfileId,
-      });
       callback({ selectedRequestAuthProfileId: currSelectedAuthProfileId });
     } else {
       console.warn(`Auth profile with ID ${selectedId} not found`);

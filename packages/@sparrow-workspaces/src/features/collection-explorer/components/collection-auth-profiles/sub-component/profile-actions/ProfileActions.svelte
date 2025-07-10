@@ -70,8 +70,6 @@
       defaultKey: profileForm.defaultKey,
     };
 
-    console.log("submitting :>> ", profileForm);
-
     let response;
     if (isEditMode && onUpdateProfile && profileForm.authId) {
       response = await onUpdateProfile(profileForm.authId, profileData);

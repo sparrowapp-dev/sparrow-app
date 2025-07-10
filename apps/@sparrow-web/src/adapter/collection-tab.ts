@@ -26,7 +26,6 @@ export class CollectionTabAdapter {
     const collection = createDeepCopy(_collection);
     const adaptedCollection = new InitTab().collection(_collection.id, workspaceId);
 
-    console.log("adapted :>> ", adaptedCollection)
     adaptedCollection.updateName(collection.name);
     adaptedCollection.updateDescription(collection.description);
     adaptedCollection.updateAuth(collection.auth as Auth);

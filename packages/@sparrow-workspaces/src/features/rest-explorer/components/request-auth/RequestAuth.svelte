@@ -39,31 +39,22 @@
 
   // Setting default auth profile if the selected one is deleted from the collection
   $: {
-    console.log(
-      "dd ;>> ",
-      requestStateAuth,
-      requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
-    );
     if (
       requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES &&
       collection?.authProfiles
     ) {
-      let authProfile;
-      let defaultAuthProfile;
-      // for (const profile of collection?.authProfiles || []) {
-      //   if (profile.authId === requestStateAuthProfile) {
-      //     authProfile = profile;
-      //   }
-      //   if (profile.defaultKey === true) {
-      //     defaultAuthProfile = profile;
-      //   }
-      //   if (authProfile && defaultAuthProfile) break;
-      // }
+      const authProfile = collection?.authProfiles.find(
+        (profile) => profile.authId === requestStateAuthProfile,
+      );
+      // const defaultAuthProfile = collection?.authProfiles.find(
+      //   (profile) => profile.defaultKey,
+      // );
 
+      console.log("** Auto Selecting default key ** ;>> ", authProfile);
       if (!authProfile) {
         onUpdateRequestState({
-          selectedRequestAuthProfileId:
-            collection.defaultSelectedAuthProfile || defaultAuthProfile,
+          // selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile || defaultAuthProfile,
+          selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile,
         });
 
         // If previous selected profiles didn't found

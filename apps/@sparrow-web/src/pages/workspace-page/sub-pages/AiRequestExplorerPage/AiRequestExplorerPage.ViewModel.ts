@@ -170,9 +170,7 @@ class AiRequestExplorerViewModel {
         const collectionDoc = await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
 
-        console.log("selectedRequestAuthProfileId:>> ", m.property.aiRequest?.state?.selectedRequestAuthProfileId);
         if (!m.property.aiRequest?.state?.selectedRequestAuthProfileId) {
-          console.log("Setting default auth profile id!");
           const defaultAuthProfileId = collectionDoc?.defaultSelectedAuthProfile;
           this.updateRequestState({ selectedRequestAuthProfileId: defaultAuthProfileId });
         }
@@ -663,7 +661,7 @@ class AiRequestExplorerViewModel {
 
     }
     catch (error) {
-      console.log("Something went wrong while updating title :>> ", error);
+      console.error("Something went wrong while updating title :>> ", error);
     }
   }
 
@@ -2047,7 +2045,6 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
     if (_state.aiAuthNavigation || _state.selectedRequestAuthProfileId) {
-      console.log("Updating auth based on state change :>> ", _state);
       if (
         _state.aiAuthNavigation ===
         AiRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -2109,8 +2106,6 @@ class AiRequestExplorerViewModel {
           progressiveTab.property.aiRequest.auth,
         ).getValue();
       }
-
-      console.log("Updated auth header and parameter :>> ", this._authHeader.getValue(), this._authParameter.getValue());
     }
     this.compareRequestWithServer();
   };
