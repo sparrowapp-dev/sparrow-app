@@ -9,7 +9,6 @@
     MockRequest,
     Request,
     SavedRequest,
-    SearchTree,
     SocketIo,
     WebSocket,
   } from "../components";
@@ -29,7 +28,6 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import type {
-    Folder,
     Path,
     Request as RequestType,
   } from "@sparrow/common/interfaces/request.interface";
@@ -169,11 +167,13 @@
       for (let j = 0; j < tree.items.length; j++) {
         const res = searchCollectionHelper(searchText, tree.items[j]);
         if (res) {
+          addCollectionItem(res.id, res.type);
           response.push(res);
         }
       }
       if (response.length) {
         let item = createDeepCopy(tree);
+        addCollectionItem(item.id, item.type);
         item.items = response;
         return item;
       } else {
@@ -221,22 +221,26 @@
   );
 
   let flatItems: any[] = [];
-  $: {
-    if (searchData) {
-      debouncedSearchCollection(searchData, collectionListDocument);
-    } else {
-      collectionFilter = collectionListDocument;
-    }
+
+  // Only update collectionFilter when searchData or collectionListDocument changes
+  $: if (searchData && collectionListDocument) {
+    debouncedSearchCollection(searchData || "", collectionListDocument || []);
+  } else {
+    collectionFilter = [];
   }
 
-  let openedComponentMap;
-  openedComponent.subscribe((_openedComponentMap) => {
-    openedComponentMap = _openedComponentMap;
-    flatItems = flattenCollections(collectionListDocument, openedComponentMap);
-  });
-
+  // Only update flatItems when collectionFilter or collectionListDocument or openedComponentMap changes
   $: {
-    flatItems = flattenCollections(collectionListDocument, openedComponentMap);
+    if (searchData && collectionFilter.length > 0) {
+      flatItems = flattenCollections(collectionFilter || [], $openedComponent);
+    } else if (!searchData) {
+      flatItems = flattenCollections(
+        collectionListDocument || [],
+        $openedComponent,
+      );
+    } else {
+      flatItems = [];
+    }
   }
 
   $: {
@@ -338,46 +342,17 @@
     };
 
     for (const collection of collections) {
-      const isExpanded = openedItems.has(collection.id);
-
-      result.push({
-        id: collection.id,
-        name: collection.name,
-        type: "COLLECTION",
-        depth: 0,
-        parentCollection: {
-          id: "",
-          name: "",
-          workspaceId: "",
-          activeSync: false,
-          collectionType: "",
-        },
-        parentFolder: { id: "", name: "" },
-        parentRequest: { id: "", name: "" },
-        data: collection,
-        expand: isExpanded, // ✅ Add expand property here
-        virtualId: collection.id,
-      });
-
-      if (isExpanded) {
-        recurse(
-          collection.items || [],
-          1,
-          {
-            id: collection.id,
-            name: collection.name,
-            workspaceId: collection.workspaceId,
-            activeSync: collection.activeSync,
-            collectionType: collection.collectionType,
-          },
-          { id: "", name: "" },
-          { id: "", name: "" },
-        );
+      if (
+        (!(collection?.activeSync && isSharedWorkspace) &&
+          collection?.collectionType !== CollectionTypeBaseEnum.MOCK) ||
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK
+      ) {
+        const isExpanded = openedItems.has(collection.id);
 
         result.push({
           id: collection.id,
           name: collection.name,
-          type: "COLLECTION-MANAGER",
+          type: "COLLECTION",
           depth: 0,
           parentCollection: {
             id: "",
@@ -390,8 +365,43 @@
           parentRequest: { id: "", name: "" },
           data: collection,
           expand: isExpanded, // ✅ Add expand property here
-          virtualId: collection.id + "manager",
+          virtualId: collection.id,
         });
+
+        if (isExpanded) {
+          recurse(
+            collection.items || [],
+            1,
+            {
+              id: collection.id,
+              name: collection.name,
+              workspaceId: collection.workspaceId,
+              activeSync: collection.activeSync,
+              collectionType: collection.collectionType,
+            },
+            { id: "", name: "" },
+            { id: "", name: "" },
+          );
+
+          result.push({
+            id: collection.id,
+            name: collection.name,
+            type: "COLLECTION-MANAGER",
+            depth: 0,
+            parentCollection: {
+              id: "",
+              name: "",
+              workspaceId: "",
+              activeSync: false,
+              collectionType: "",
+            },
+            parentFolder: { id: "", name: "" },
+            parentRequest: { id: "", name: "" },
+            data: collection,
+            expand: isExpanded, // ✅ Add expand property here
+            virtualId: collection.id + "manager",
+          });
+        }
       }
     }
 
@@ -427,18 +437,6 @@
       showAddItemMenu = false;
     }
   };
-  $: {
-    console.log(activeTabPath);
-    if (activeTabPath?.collectionId) {
-      addCollectionItem(activeTabPath.collectionId, "collection");
-    }
-    if (activeTabPath?.folderId) {
-      addCollectionItem(activeTabPath.folderId, "folder");
-    }
-    if (activeTabPath?.requestId) {
-      addCollectionItem(activeTabPath.requestId, "request");
-    }
-  }
 </script>
 
 <svelte:window
@@ -612,7 +610,7 @@
       class="overflow-auto position-relative d-flex flex-column me-0"
       style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
     >
-      {#if collectionFilter?.length > 0 && searchData.length === 0}
+      {#if flatItems?.length > 0 && searchData.length === 0}
         <div
           class="box-line"
           style="background-color: {isExpandCollectionLine
@@ -620,7 +618,7 @@
             : 'var(--bg-ds-surface-100)'}"
         ></div>
       {/if}
-      {#if collectionFilter?.length > 0}
+      {#if flatItems?.length > 0}
         <div style="height: 100%;">
           <VirtualScroll data={flatItems} key="virtualId" let:data>
             <div class="item-container">

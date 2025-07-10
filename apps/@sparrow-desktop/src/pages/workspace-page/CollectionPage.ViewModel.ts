@@ -58,7 +58,7 @@ import {
 } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { tabsSplitterDirection } from "@sparrow/workspaces/stores";
+import { addCollectionItem, tabsSplitterDirection } from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -706,7 +706,18 @@ export default class CollectionsViewModel {
    * @param id - tab id
    */
   public handleActiveTab = async (id: string) => {
-    await this.tabRepository.activeTab(id);
+    const selectedTab = await this.tabRepository.activeTab(id);
+    const selectedTabJSON = selectedTab?.toMutableJSON();
+
+    if (selectedTabJSON?.path?.collectionId) {
+      addCollectionItem(selectedTabJSON?.path?.collectionId, "collection");
+    }
+    if (selectedTabJSON?.path?.folderId) {
+      addCollectionItem(selectedTabJSON?.path?.folderId, "folder");
+    }
+    if (selectedTabJSON?.path?.requestId) {
+      addCollectionItem(selectedTabJSON?.path?.requestId, "request");
+    }
   };
 
   /**
