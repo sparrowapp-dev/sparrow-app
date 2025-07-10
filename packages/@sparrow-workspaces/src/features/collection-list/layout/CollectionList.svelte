@@ -278,6 +278,7 @@
     };
     data: any;
     expand: boolean;
+    virtualId: string;
   };
 
   function flattenCollections(
@@ -312,6 +313,7 @@
           parentRequest,
           data: item,
           expand: isExpanded, // ✅ Add expand property here
+          virtualId: item.id,
         };
 
         result.push(flatItem);
@@ -354,6 +356,7 @@
         parentRequest: { id: "", name: "" },
         data: collection,
         expand: isExpanded, // ✅ Add expand property here
+        virtualId: collection.id,
       });
 
       if (isExpanded) {
@@ -387,6 +390,7 @@
           parentRequest: { id: "", name: "" },
           data: collection,
           expand: isExpanded, // ✅ Add expand property here
+          virtualId: collection.id + "manager",
         });
       }
     }
@@ -618,7 +622,7 @@
       {/if}
       {#if collectionFilter?.length > 0}
         <div style="height: 100%;">
-          <VirtualScroll data={flatItems} key="id" let:data>
+          <VirtualScroll data={flatItems} key="virtualId" let:data>
             <div class="item-container">
               {#each Array(data.depth).fill(0) as _, i}
                 <!-- <div class="indent-line" style="left: {i * 20}px"></div> -->
@@ -664,10 +668,12 @@
                   {activeTabPath}
                   {searchData}
                   {activeTabType}
-                  folder={{
-                    id: data.parentFolder.id,
-                    name: data.parentFolder.name,
-                  }}
+                  folder={data?.parentFolder?.id
+                    ? {
+                        id: data.parentFolder.id,
+                        name: data.parentFolder.name,
+                      }
+                    : null}
                   collection={{
                     id: data.parentCollection.id,
                     name: data.parentCollection.name,
@@ -687,10 +693,12 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
-                    folder={{
-                      id: data.parentFolder.id,
-                      name: data.parentFolder.name,
-                    }}
+                    folder={data?.parentFolder?.id
+                      ? {
+                          id: data.parentFolder.id,
+                          name: data.parentFolder.name,
+                        }
+                      : null}
                     collection={{
                       id: data.parentCollection.id,
                       name: data.parentCollection.name,
@@ -709,10 +717,12 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
-                    folder={{
-                      id: data.parentFolder.id,
-                      name: data.parentFolder.name,
-                    }}
+                    folder={data?.parentFolder?.id
+                      ? {
+                          id: data.parentFolder.id,
+                          name: data.parentFolder.name,
+                        }
+                      : null}
                     collection={{
                       id: data.parentCollection.id,
                       name: data.parentCollection.name,
@@ -731,10 +741,12 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
-                    folder={{
-                      id: data.parentFolder.id,
-                      name: data.parentFolder.name,
-                    }}
+                    folder={data?.parentFolder?.id
+                      ? {
+                          id: data.parentFolder.id,
+                          name: data.parentFolder.name,
+                        }
+                      : null}
                     collection={{
                       id: data.parentCollection.id,
                       name: data.parentCollection.name,
@@ -756,10 +768,12 @@
                     {activeTabPath}
                     {searchData}
                     {activeTabType}
-                    folder={{
-                      id: data.parentFolder.id,
-                      name: data.parentFolder.name,
-                    }}
+                    folder={data?.parentFolder?.id
+                      ? {
+                          id: data.parentFolder.id,
+                          name: data.parentFolder.name,
+                        }
+                      : null}
                     collection={{
                       id: data.parentCollection.id,
                       name: data.parentCollection.name,
@@ -809,10 +823,12 @@
                     {activeTabPath}
                     {searchData}
                     {activeTabType}
-                    folder={{
-                      id: data.parentFolder.id,
-                      name: data.parentFolder.name,
-                    }}
+                    folder={data?.parentFolder?.id
+                      ? {
+                          id: data.parentFolder.id,
+                          name: data.parentFolder.name,
+                        }
+                      : null}
                     collection={{
                       id: data.parentCollection.id,
                       name: data.parentCollection.name,
@@ -827,22 +843,24 @@
                 <SavedRequest
                   {userRole}
                   api={data.data}
-                  request={{
-                    id: data.parentRequest.id,
-                    name: data.parentRequest.name,
-                  }}
                   {onItemRenamed}
                   {onItemDeleted}
                   {onItemOpened}
-                  folder={{
-                    id: data.parentFolder.id,
-                    name: data.parentFolder.name,
-                  }}
+                  folder={data?.parentFolder?.id
+                    ? {
+                        id: data.parentFolder.id,
+                        name: data.parentFolder.name,
+                      }
+                    : null}
                   collection={{
                     id: data.parentCollection.id,
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                  }}
+                  request={{
+                    id: data.parentRequest.id,
+                    name: data.parentRequest.name,
                   }}
                   {activeTabId}
                 />
