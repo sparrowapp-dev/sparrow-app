@@ -313,16 +313,25 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={(e) => {
-      e.stopPropagation();
+    on:click|preventDefault|stopPropagation={(e) => {
       // if (api?.items && api?.items?.length > 0) {
       // } else {
       //   expand = false;
       // }
       if (!isRenaming) {
         // expand = !expand;
-        if (expand) {
-          removeCollectionItem(api.id);
+        if (api?.items?.length) {
+          if (expand) {
+            removeCollectionItem(api.id);
+          } else {
+            onItemOpened("request", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder,
+              request: api,
+            });
+            addCollectionItem(api.id, "Request");
+          }
         } else {
           onItemOpened("request", {
             workspaceId: collection.workspaceId,
@@ -330,7 +339,6 @@
             folder,
             request: api,
           });
-          addCollectionItem(api.id, "Request");
         }
       }
     }}
