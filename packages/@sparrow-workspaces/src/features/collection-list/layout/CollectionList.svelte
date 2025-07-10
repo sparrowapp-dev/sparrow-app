@@ -228,8 +228,14 @@
     }
   }
 
+  let openedComponentMap;
+  openedComponent.subscribe((_openedComponentMap) => {
+    openedComponentMap = _openedComponentMap;
+    flatItems = flattenCollections(collectionListDocument, openedComponentMap);
+  });
+
   $: {
-    flatItems = flattenCollections(collectionListDocument, $openedComponent);
+    flatItems = flattenCollections(collectionListDocument, openedComponentMap);
   }
 
   $: {
@@ -237,8 +243,7 @@
   }
   const collectionListSubscriber = collectionList.subscribe(async (value) => {
     if (value) {
-      collectionListDocument = value;
-      collectionListDocument = collectionListDocument
+      collectionListDocument = value
         .map((value) => {
           return value.toMutableJSON();
         })
@@ -400,8 +405,12 @@
     console.log(activeTabPath);
     if (activeTabPath?.collectionId) {
       addCollectionItem(activeTabPath.collectionId, "collection");
-    } else if (activeTabPath?.folderId) {
+    }
+    if (activeTabPath?.folderId) {
       addCollectionItem(activeTabPath.folderId, "folder");
+    }
+    if (activeTabPath?.requestId) {
+      addCollectionItem(activeTabPath.requestId, "request");
     }
   }
 </script>
