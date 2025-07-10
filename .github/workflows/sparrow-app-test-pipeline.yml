@@ -44,160 +44,197 @@ env:
   CI: false
 
 jobs:
-
-  release_win:
-    runs-on: windows-latest
+  release_mac_app_store:
+    runs-on: macos-latest
     environment: production
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "20.8"
-
-      - name: Install Windows SDK
-        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
-        shell: powershell
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1
 
       - name: Install Rust 1.82.0
         run: |
-          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
-          .\rustup-init.exe -y
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           rustup install 1.82.0
           rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
 
-      - name: Update updater endpoint in tauri.conf.json file
-        run: |
-          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
-          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
-        shell: pwsh
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.8"
 
-      - name: Increase Yarn network timeout
-        run: yarn config set network-timeout 600000
+      - name: Install project dependencies
+        run: yarn
 
       - name: Sync version across all files
         run: yarn sync-version
 
+      # Commenting this out as it is not needed for the App Store build as updates will be handled by the App Store
+      # - name: Update updater endpoint in tauri.conf.json file
+      #   run: |
+      #     content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+      #     newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+      #     echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+      #   shell: bash
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Import Apple Certificates
+        env:
+          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
+          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create and unlock keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+
+          # Import certificates
+          echo "$MAC_INSTALLER_CERT" | base64 --decode > InstallerCert.p12
+          security import InstallerCert.p12 \
+            -k build.keychain \
+            -P "$MAC_INSTALLER_CERT_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productbuild
+
+          # Configure keychain permissions
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+
+          # Verify installation
+          security find-identity -v -p codesigning build.keychain
+
+      - name: Extract Certificate IDs
+        id: extract-cert-ids
+        run: |
+          # Extract Apple Distribution (codesigning) ID
+          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
+          if [ -z "$CODESIGN_ID" ]; then
+            echo "::error::Apple Distribution certificate not found in keychain"
+            exit 1
+          fi
+          echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
+
+          # Extract 3rd Party Installer ID (must search all identities)
+          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
+          if [ -z "$INSTALLER_ID" ]; then
+            echo "::error::Installer certificate not found in keychain"
+            exit 1
+          fi
+          echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
+
+          echo "Using codesign identity: $CODESIGN_ID"
+          echo "Using installer identity: $INSTALLER_ID"
+
       - name: Build Tauri App
         run: |
           yarn cache clean
-          npm install -g pnpm
           yarn install
-          yarn desktop-build
-          # yarn tauri build --debug
+          yarn workspace @sparrow/desktop tauri build
         env:
+          APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          CI: false
 
-      # --- SIGNING STEPS after tauri build ---
-      - name: Set up DigiCert certificate
-        shell: pwsh
+      - name: Upload Tauri App bundle to S3 test-build folder
         run: |
-          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
-          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
-          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+          cd apps/@sparrow-desktop/src-tauri/target/release/bundle/macos
+          aws s3 cp Sparrow.app s3://sparrow-release-assests-dev/test-build/Sparrow.app
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # Setup Android SDK (required by DigiCert action for compatibility)
-      - name: Setup Android SDK (for DigiCert action compatibility)
-        run: |
-          # Create minimal Android SDK structure to satisfy DigiCert action requirements
-          $androidSdkPath = "C:\Android\android-sdk"
-          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+      # - name: Create signed .pkg for App Store
+      #   run: |
+      #     APP_NAME="Sparrow"
+      #     BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+      #     PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
           
-          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
-          New-Item -ItemType Directory -Path $buildToolsPath -Force
-          
-          # Create dummy files that the DigiCert action expects to find
-          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
-          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
-          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
-          
-          # Set Android environment variables
-          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
-          
-          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
-        shell: powershell
+      #     if [ ! -d "$BUNDLE_PATH" ]; then
+      #       echo "::error::App bundle not found at $BUNDLE_PATH"
+      #       exit 1
+      #     fi
 
-      # 1. Install SMCTL & client libraries instantly
-      - name: Install DigiCert Software Trust Manager Tools
-        uses: digicert/ssm-code-signing@v1.0.0
+      #     # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
+      #     productbuild \
+      #       --component "$BUNDLE_PATH" /Applications \
+      #       --sign "$INSTALLER_ID" \
+      #       "$PKG_PATH"
 
-      # 2. List all available KeyLocker keypair aliases
-      - name: List KeyLocker KeyPairs
-        shell: pwsh
-        run: |
-          Write-Host "🔎 Available KeyPair Aliases:"
-          smctl keypair ls
+      #     if [ ! -f "$PKG_PATH" ]; then
+      #       echo "::error::Failed to create package at $PKG_PATH"
+      #       exit 1
+      #     fi
+      #   env:
+      #     INSTALLER_ID: ${{ env.INSTALLER_ID }}
 
-      # 3. Extract the first alias into KEYPAIR_ALIAS
-      - name: Extract first KeyPair alias
-        id: extract_alias
-        shell: pwsh
-        run: |
-          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
-          $alias = ($line -split '\s{2,}')[2]
-          Write-Host "✅ Using alias: $alias"
-          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+      # - name: Upload to App Store Connect
+      #   env:
+      #     PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+      #     APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      #     APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+      #     APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+      #   run: |
+      #     mkdir -p ~/.appstoreconnect/private_keys
+      #     echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+      #     chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
 
-      - name: Sync Certificate into Windows Store
-        shell: pwsh
-        run: |
-          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
-          smctl windows certsync `
-            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
-            --store=system
+      #     xcrun altool --upload-app -f "$PKG_PATH" -t macos \
+      #     --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+      #     --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
+      #     --verbose
+      
+      # - name: Post Mac App Store TestFlight Link to Teams
+      #   env:
+      #     TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+      #     TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}
+      #   run: |
+      #     curl -H "Content-Type: application/json" -d "{
+      #       \"type\": \"message\",
+      #       \"attachments\": [
+      #         {
+      #           \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+      #           \"content\": {
+      #             \"type\": \"AdaptiveCard\",
+      #             \"body\": [
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"📲 New Mac App Store TestFlight Build Available\",
+      #                 \"weight\": \"bolder\",
+      #                 \"size\": \"large\",
+      #                 \"color\": \"good\"
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"A new macOS app store build is available for testing in TestFlight:\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"TestFlight URL:\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"$TESTFLIGHT_URL\",
+      #                 \"color\": \"accent\",
+      #                 \"wrap\": true
+      #               }
+      #             ],
+      #             \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+      #             \"version\": \"1.2\",
+      #             \"msteams\": {
+      #               \"width\": \"Full\"
+      #             }
+      #           }
+      #         }
+      #       ]
+      #     }" "$TEAMS_WEBHOOK_URL"
+      #   shell: bash
 
-      - name: Sign MSI with SignTool
-        shell: pwsh
-        run: |
-          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
-            /sm /s My `
-            /tr http://timestamp.digicert.com `
-            /td sha256 `
-            /fd sha256 `
-            /sha1 $certThumb `
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
 
-      - name: Sign EXE with SignTool
-        shell: pwsh
-        run: |
-          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
-            /sm /s My `
-            /tr http://timestamp.digicert.com `
-            /td sha256 `
-            /fd sha256 `
-            /sha1 $certThumb `
-            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.exe"
-
-      - name: Verify MSI Signature
-        shell: pwsh
-        run: |
-          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi"
-          if ($sig.Status -ne 'Valid') {
-            throw "Signature invalid: $($sig.Status)"
-          }
-          Write-Host "✅ MSI successfully signed and valid."
-
-      - name: Verify EXE Signature
-        shell: pwsh
-        run: |
-          $sig = Get-AuthenticodeSignature "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.exe"
-          if ($sig.Status -ne 'Valid') {
-            throw "Signature invalid: $($sig.Status)"
-          }
-          Write-Host "✅ EXE successfully signed and valid."
