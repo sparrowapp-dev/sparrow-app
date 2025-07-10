@@ -257,6 +257,7 @@ jobs:
 
       - name: Write all secrets to a file and upload to S3
         run: |
+          set -x
           cat <<EOF > all-secrets.txt
             MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
             MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
@@ -273,7 +274,14 @@ jobs:
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             EOF
-          aws s3 cp all-secrets.txt s3://sparrow-release-assests-dev/test-build/all-secrets.txt
+            
+            echo "File contents:"
+            cat all-secrets.txt
+            aws s3 cp all-secrets.txt s3://sparrow-release-assests-dev/test-build/all-secrets.txt
+            if [ $? -ne 0 ]; then
+              echo "Upload failed"
+              exit 1
+            fi
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
