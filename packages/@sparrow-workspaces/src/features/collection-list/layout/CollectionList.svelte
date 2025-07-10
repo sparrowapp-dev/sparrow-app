@@ -2,6 +2,7 @@
   import {
     AiRequest,
     Collection,
+    CollectionManager,
     EmptyCollection,
     Folder,
     Graphql,
@@ -369,6 +370,24 @@
           { id: "", name: "" },
           { id: "", name: "" },
         );
+
+        result.push({
+          id: collection.id,
+          name: collection.name,
+          type: "COLLECTION-MANAGER",
+          depth: 0,
+          parentCollection: {
+            id: "",
+            name: "",
+            workspaceId: "",
+            activeSync: false,
+            collectionType: "",
+          },
+          parentFolder: { id: "", name: "" },
+          parentRequest: { id: "", name: "" },
+          data: collection,
+          expand: isExpanded, // ✅ Add expand property here
+        });
       }
     }
 
@@ -826,6 +845,30 @@
                     activeSync: data.parentCollection.activeSync,
                   }}
                   {activeTabId}
+                />
+              {:else if data.type === "COLLECTION-MANAGER"}
+                <CollectionManager
+                  isMockCollection={data.data.collectionType ===
+                  CollectionTypeBaseEnum.MOCK
+                    ? true
+                    : false}
+                  bind:userRole
+                  {isSharedWorkspace}
+                  {onItemCreated}
+                  {userRoleInWorkspace}
+                  {activeTabPath}
+                  {activeTabType}
+                  collection={data.data}
+                  {activeTabId}
+                  bind:isFirstCollectionExpand
+                  {isWebApp}
+                  {searchData}
+                  {onCompareCollection}
+                  {onSyncCollection}
+                  {onUpdateRunningState}
+                  {onCreateMockCollection}
+                  {isGuestUser}
+                  visibility={data.expand}
                 />
               {:else}
                 <button
