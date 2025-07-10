@@ -150,12 +150,7 @@
   let isCollectionSyncing = false;
   let authProfilesList = []; // ToDo: Give a type here
 
-  $: {
-    authProfilesList = collection?.authProfiles || [];
-    if (collection) {
-      console.log("**** Auth Profile ***** :>> ", collection.authProfiles);
-    }
-  }
+  $: authProfilesList = collection?.authProfiles || [];
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated

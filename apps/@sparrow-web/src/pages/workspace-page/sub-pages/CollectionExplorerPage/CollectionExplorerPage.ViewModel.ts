@@ -1883,6 +1883,10 @@ class CollectionExplorerPage {
       };
     }
 
+    if (!_collection?.authProfiles.length) {
+      _authProfilePayload.defaultKey = true;
+    }
+
     const authProfileObj =
     {
       collectionId: _collection.id,
@@ -1898,7 +1902,7 @@ class CollectionExplorerPage {
     await this.collectionRepository.addAuthProfile( // update fn. updateCollectionData here 
       _collection.id as string,
       {
-        ..._authProfilePayload,
+        ...authProfileObj.authProfiles[0],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       },
@@ -1922,12 +1926,11 @@ class CollectionExplorerPage {
 
         await this.collectionRepository.updateAuthProfile(
           _collection.id as string,
-          _authProfilePayload.authId,
+          res.authId,
           res,
         );
 
         notifications.success("Auth profile created successfully.");
-        console.log("res :>> ", res);
         return { ...res, isSuccessful: true };
       } catch (error) {
         console.error("Error while handling guest auth profile:", error);

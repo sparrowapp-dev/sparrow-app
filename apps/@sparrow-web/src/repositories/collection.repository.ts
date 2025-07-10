@@ -1190,10 +1190,6 @@ export class CollectionRepository {
       .exec();
     await collection.incrementalPatch({
       authProfiles: [...collection?.authProfiles, newAuthProfileItem],
-      // selectedAuthType:
-      //   newAuthProfileItems.defaultKey
-      //     ? newAuthProfileItems.name
-      //     : collection.selectedAuthType,
     });
   };
 

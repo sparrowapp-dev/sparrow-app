@@ -127,6 +127,8 @@ export interface CollectionBaseInterface {
   updatedBy: string;
   syncedAt?: string;
   mockRequestHistory?: MockRequestHistoryBaseInterface[];
+  authProfiles: CollectionAuthBaseInterface[];
+  defaultSelectedAuthProfile: string
 }
 
 export interface CollectionArgsBaseInterface {

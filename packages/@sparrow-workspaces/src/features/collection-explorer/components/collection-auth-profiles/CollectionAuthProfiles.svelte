@@ -92,7 +92,7 @@
   let selectedDefaultKey = "";
 
   // Initialize selectedDefaultKey with the currently default auth profile
-  $: if (filteredAndSortedData && !selectedDefaultKey) {
+  $: if (filteredAndSortedData) {
     const defaultAuth = filteredAndSortedData.find((item) => item.defaultKey);
     if (defaultAuth) {
       selectedDefaultKey = defaultAuth.authId;
