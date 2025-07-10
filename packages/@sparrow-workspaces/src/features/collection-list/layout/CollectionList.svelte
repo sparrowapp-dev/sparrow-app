@@ -276,6 +276,7 @@
       name: string;
     };
     data: any;
+    expand: boolean;
   };
 
   function flattenCollections(
@@ -298,6 +299,8 @@
       parentRequest: { id: string; name: string },
     ) => {
       for (const item of items) {
+        const isExpanded = openedItems.has(item.id);
+
         const flatItem: FlatItem = {
           id: item.id,
           name: item.name,
@@ -307,12 +310,11 @@
           parentFolder,
           parentRequest,
           data: item,
+          expand: isExpanded, // ✅ Add expand property here
         };
 
         result.push(flatItem);
 
-        // If current item is expanded, recurse into its children
-        const isExpanded = openedItems.has(item.id);
         if (isExpanded && item.items?.length) {
           if (item.type === "FOLDER") {
             recurse(
@@ -333,7 +335,8 @@
     };
 
     for (const collection of collections) {
-      // Always show the collection root
+      const isExpanded = openedItems.has(collection.id);
+
       result.push({
         id: collection.id,
         name: collection.name,
@@ -349,10 +352,10 @@
         parentFolder: { id: "", name: "" },
         parentRequest: { id: "", name: "" },
         data: collection,
+        expand: isExpanded, // ✅ Add expand property here
       });
 
-      // Recurse only if collection is expanded
-      if (openedItems.has(collection.id)) {
+      if (isExpanded) {
         recurse(
           collection.items || [],
           1,
@@ -629,6 +632,7 @@
                   {onUpdateRunningState}
                   {onCreateMockCollection}
                   {isGuestUser}
+                  visibility={data.expand}
                 />
               {:else if data.type === CollectionItemTypeBaseEnum.REQUEST}
                 <Request
@@ -653,6 +657,7 @@
                   }}
                   {activeTabId}
                   {isWebApp}
+                  expand={data.expand}
                 />
               {:else if data.type === CollectionItemTypeBaseEnum.WEBSOCKET}
                 <div style="cursor:pointer;">
@@ -771,6 +776,7 @@
                   {activeTabId}
                   {searchData}
                   {isWebApp}
+                  expand={data.expand}
                 />
               {:else if data.type === CollectionItemTypeBaseEnum.AI_REQUEST}
                 <div style={`cursor: pointer; `}>

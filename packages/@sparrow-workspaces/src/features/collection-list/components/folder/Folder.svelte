@@ -102,7 +102,7 @@
   export let isWebApp = false;
   export let isSharedWorkspace = false;
 
-  let expand: boolean = false;
+  export let expand: boolean = false;
   let deleteLoader: boolean = false;
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
@@ -197,7 +197,7 @@
   }
   $: {
     if (searchData) {
-      expand = true;
+      // expand = true;
     }
     // if (activeTabPath) {
     // if (activeTabPath?.folderId === explorer.id) {
@@ -259,11 +259,11 @@
     }
   };
 
-  $: {
-    if ($openedComponent.has(explorer.id)) {
-      expand = true;
-    }
-  }
+  // $: {
+  //   if ($openedComponent.has(explorer.id)) {
+  //     expand = true;
+  //   }
+  // }
 </script>
 
 <svelte:window
@@ -366,14 +366,14 @@
       menuItems={[
         {
           onClick: () => {
-            expand = true;
-            if (expand) {
-              onItemOpened("folder", {
-                workspaceId: collection.workspaceId,
-                collection,
-                folder: explorer,
-              });
-            }
+            // expand = true;
+            // if (expand) {
+            onItemOpened("folder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+            // }
           },
           displayText: "Open Folder",
           disabled: false,
@@ -381,7 +381,7 @@
         },
         {
           onClick: () => {
-            expand = false;
+            // expand = false;
             isRenaming = true;
           },
           displayText: "Rename Folder",
@@ -513,19 +513,19 @@
           style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
-          on:click|preventDefault={() => {
+          on:click|preventDefault|stopPropagation={(e) => {
             if (!isRenaming) {
               if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-                expand = !expand;
+                // expand = !expand;
                 if (expand) {
-                  addCollectionItem(explorer.id, "Folder");
+                  removeCollectionItem(explorer.id);
+                } else {
                   onItemOpened("folder", {
                     workspaceId: collection.workspaceId,
                     collection,
                     folder: explorer,
                   });
-                } else {
-                  removeCollectionItem(explorer.id);
+                  addCollectionItem(explorer.id, "Folder");
                 }
               }
             }
@@ -539,7 +539,12 @@
               type="teritiary-regular"
               onClick={(e) => {
                 e.stopPropagation();
-                expand = !expand;
+                // expand = !expand;
+                if (expand) {
+                  removeCollectionItem(explorer.id);
+                } else {
+                  addCollectionItem(explorer.id, "Folder");
+                }
               }}
             />
           </span>
@@ -616,7 +621,7 @@
                   startIcon={ArrowSwapRegular}
                   onClick={(e) => {
                     e.stopPropagation();
-                    expand = true;
+                    // expand = true;
                     if (isMockCollection) {
                       onItemCreated("requestMockFolder", {
                         workspaceId: collection.workspaceId,

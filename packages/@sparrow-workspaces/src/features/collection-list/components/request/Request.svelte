@@ -34,7 +34,7 @@
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
 
-  let expand = false;
+  export let expand = false;
   /**
    * Callback for Item Deleted
    * @param entityType - type of item to delete like request/folder
@@ -165,19 +165,19 @@
       }
     }
   }
-  $: {
-    if ($openedComponent.has(api.id)) {
-      expand = true;
-    }
-    if (searchData) {
-      expand = true;
-    }
-    // if (activeTabPath) {
-    //   if (activeTabPath.requestId === api.id) {
-    //     expand = true;
-    //   }
-    // }
-  }
+  // $: {
+  //   if ($openedComponent.has(api.id)) {
+  //     expand = true;
+  //   }
+  //   if (searchData) {
+  //     expand = true;
+  //   }
+  // if (activeTabPath) {
+  //   if (activeTabPath.requestId === api.id) {
+  //     expand = true;
+  //   }
+  // }
+  // }
   const dragStop = () => {
     isDragging = false;
   };
@@ -313,23 +313,24 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (api?.items && api?.items?.length > 0) {
-      } else {
-        expand = false;
-      }
+    on:click|preventDefault={(e) => {
+      e.stopPropagation();
+      // if (api?.items && api?.items?.length > 0) {
+      // } else {
+      //   expand = false;
+      // }
       if (!isRenaming) {
-        expand = !expand;
+        // expand = !expand;
         if (expand) {
-          addCollectionItem(api.id, "Request");
+          removeCollectionItem(api.id);
+        } else {
           onItemOpened("request", {
             workspaceId: collection.workspaceId,
             collection,
             folder,
             request: api,
           });
-        } else {
-          removeCollectionItem(api.id);
+          addCollectionItem(api.id, "Request");
         }
       }
     }}
@@ -362,7 +363,12 @@
           type="teritiary-regular"
           onClick={(e) => {
             e.stopPropagation();
-            expand = !expand;
+            // expand = !expand;
+            if (expand) {
+              removeCollectionItem(api.id);
+            } else {
+              addCollectionItem(api.id, "Request");
+            }
           }}
         />
       {:else}
@@ -452,38 +458,6 @@
     {/if}
   {/if}
 </div>
-
-{#if expand}
-  <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
-    <div
-      class="sub-files position-relative"
-      style="background-color: {api.id === activeTabId
-        ? 'var(--bg-ds-surface-600)'
-        : 'transparent'};"
-    >
-      <div
-        class="box-line"
-        style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
-      ></div>
-      <!-- {#if } -->
-      <!-- {#each api?.items || [] as exp}
-        <div>
-          <SavedRequest
-            {userRole}
-            api={exp}
-            request={api}
-            {onItemRenamed}
-            {onItemDeleted}
-            {onItemOpened}
-            {folder}
-            {collection}
-            {activeTabId}
-          />
-        </div>
-      {/each} -->
-    </div>
-  </div>
-{/if}
 
 <style lang="scss">
   .delete-ticker {

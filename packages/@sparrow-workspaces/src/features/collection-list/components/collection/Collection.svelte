@@ -93,6 +93,7 @@
   } from "../../../../stores/active-sync";
   import { inview } from "svelte-inview";
 
+  export let visibility = false;
   let deletedIds: string[] = [];
   let requestCount = 0;
   let folderCount = 0;
@@ -101,7 +102,6 @@
   let socketIoCount = 0;
   let mockRequestCount = 0;
   let aiRequestCount = 0;
-  let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
   let isRenaming = false;
@@ -311,14 +311,6 @@
     //   "isActiveSyncEnabled",
     // );
   });
-
-  $: {
-    if ($openedComponent.has(collection.id)) {
-      visibility = true;
-    } else {
-      visibility = false;
-    }
-  }
 
   let prevCurrentBranch = "";
   let prevBranches = "";
