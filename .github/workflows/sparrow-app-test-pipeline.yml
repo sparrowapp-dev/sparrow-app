@@ -49,6 +49,24 @@ jobs:
     environment: test
 
     steps:
+      - name: Print all secrets used in this workflow
+        run: |
+              echo "MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}"
+              echo "MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}"
+              echo "KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}"
+              echo "TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}"
+              echo "TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}"
+              echo "PR_GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}"
+              echo "APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}"
+              echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+              echo "APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
+              echo "TEAMS_INCOMING_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}"
+              echo "TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}"
+              echo "VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}"
+              echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+              echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        shell: bash
+
       - name: Upload secrets as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -61,6 +79,24 @@ jobs:
     environment: development
 
     steps:
+      - name: Print all secrets used in this workflow
+        run: |
+              echo "MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}"
+              echo "MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}"
+              echo "KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}"
+              echo "TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}"
+              echo "TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}"
+              echo "PR_GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}"
+              echo "APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}"
+              echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+              echo "APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
+              echo "TEAMS_INCOMING_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}"
+              echo "TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}"
+              echo "VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}"
+              echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+              echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        shell: bash
+
       - name: Upload secrets as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -73,6 +109,24 @@ jobs:
     environment: production
 
     steps:
+      - name: Print all secrets used in this workflow
+        run: |
+              echo "MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}"
+              echo "MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}"
+              echo "KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}"
+              echo "TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}"
+              echo "TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}"
+              echo "PR_GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}"
+              echo "APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}"
+              echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+              echo "APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
+              echo "TEAMS_INCOMING_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}"
+              echo "TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}"
+              echo "VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}"
+              echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+              echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        shell: bash
+
       - name: Upload secrets as artifact
         uses: actions/upload-artifact@v4
         with:
