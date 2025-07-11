@@ -336,7 +336,7 @@
               />
               <div slot="footer">
                 {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !filteredLocalEnvironment?.length && !searchData && !currentWorkspace?.isShared}
-                  <div class={`pb-2 ps-5 pe-1`}>
+                  <div class={`pb-2 ps-4 pe-1`}>
                     <p
                       class={`add-env-desc-text mt-2 mb-3 text-fs-12 mb-0 fw-normal text-center`}
                       style="color: var(--text-secondary-50)"
