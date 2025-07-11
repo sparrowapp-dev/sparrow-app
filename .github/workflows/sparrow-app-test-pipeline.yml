@@ -137,10 +137,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tauri-build
-          path: apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/Sparrow.app
-
-      - name: Upload Tauri Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tauri-build
-          path: apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/dmg/Sparrow_2.26.0_aarch64.dmg
+          path: apps/@sparrow-desktop/src-tauri/target/release/bundle/macos
