@@ -44,111 +44,97 @@ env:
   CI: false
 
 jobs:
-  get_secrets_test:
-    runs-on: macos-latest
-    environment: test
-
-    steps:
-      - name: Write all secrets to a file and upload to S3
-        run: |
-          set -x
-          cat <<EOF > all-secrets-test.txt
-            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
-            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
-            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
-            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
-            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
-            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
-            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
-            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
-            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            EOF
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        shell: bash
-
-      - name: Upload secrets as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: all-secrets-test.txt
-          path: all-secrets-test.txt
-          retention-days: 1 
-
-  get_secrets_development:
-    runs-on: macos-latest
-    environment: development
-
-    steps:
-      - name: Write all secrets to a file
-        run: |
-          set -x
-          cat <<EOF > all-secrets-dev.txt
-            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
-            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
-            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
-            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
-            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
-            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
-            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
-            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
-            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            EOF
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        shell: bash
-
-      - name: Upload secrets as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: all-secrets-dev.txt
-          path: all-secrets-dev.txt
-          retention-days: 1 
-
-  get_secrets_production:
+  release_mac_app_store:
     runs-on: macos-latest
     environment: production
 
     steps:
-      - name: Write all secrets to a file and upload to S3
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust 1.82.0
         run: |
-          set -x
-          cat <<EOF > all-secrets-prod.txt
-            MAC_INSTALLER_CERT=${{ secrets.MAC_INSTALLER_CERT }}
-            MAC_INSTALLER_CERT_PASSWORD=${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
-            KEYCHAIN_PASSWORD=${{ secrets.KEYCHAIN_PASSWORD }}
-            TAURI_PRIVATE_KEY=${{ secrets.TAURI_PRIVATE_KEY }}
-            TAURI_KEY_PASSWORD=${{ secrets.TAURI_KEY_PASSWORD }}
-            PR_GITHUB_TOKEN=${{ secrets.PR_GITHUB_TOKEN }}
-            APP_STORE_CONNECT_API_KEY=${{ secrets.APP_STORE_CONNECT_API_KEY }}
-            APP_STORE_CONNECT_API_KEY_ID=${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-            APP_STORE_CONNECT_API_ISSUER=${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
-            TEAMS_INCOMING_WEBHOOK_URL=${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-            TESTFLIGHT_URL=${{ secrets.TESTFLIGHT_URL }}
-            VITE_RELEASE_NOTES_PAT_TOKEN=${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
-            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            EOF
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        shell: bash
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
 
-      - name: Upload secrets as artifact
-        uses: actions/upload-artifact@v4
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
         with:
-          name: all-secrets-prod.txt
-          path: all-secrets-prod.txt
-          retention-days: 1
+          node-version: "20.8"
 
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Import Apple Certificates
+        env:
+          MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
+          MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create and unlock keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+
+          # Import certificates
+          echo "$MAC_INSTALLER_CERT" | base64 --decode > InstallerCert.p12
+          security import InstallerCert.p12 \
+            -k build.keychain \
+            -P "$MAC_INSTALLER_CERT_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productbuild
+
+          # Configure keychain permissions
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+
+          # Verify installation
+          security find-identity -v -p codesigning build.keychain
+
+      - name: Extract Certificate IDs
+        id: extract-cert-ids
+        run: |
+          # Extract Apple Distribution (codesigning) ID
+          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
+          if [ -z "$CODESIGN_ID" ]; then
+            echo "::error::Apple Distribution certificate not found in keychain"
+            exit 1
+          fi
+          echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
+
+          # Extract 3rd Party Installer ID (must search all identities)
+          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
+          if [ -z "$INSTALLER_ID" ]; then
+            echo "::error::Installer certificate not found in keychain"
+            exit 1
+          fi
+          echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
+
+          echo "Using codesign identity: $CODESIGN_ID"
+          echo "Using installer identity: $INSTALLER_ID"
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          yarn install
+          yarn workspace @sparrow/desktop tauri build
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          CI: false
+          
+      - name: Upload Tauri Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tauri-build
+          path: apps/@sparrow-desktop/src-tauri/target/
