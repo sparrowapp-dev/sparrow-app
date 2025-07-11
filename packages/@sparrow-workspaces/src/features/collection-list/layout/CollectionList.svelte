@@ -286,9 +286,10 @@
   };
 
   function flattenCollections(
-    collections: any[] = [],
+    _collections: any[] = [],
     openedItems: Map<string, string>,
   ): FlatItem[] {
+    let collections = createDeepCopy(_collections);
     const result: FlatItem[] = [];
 
     const recurse = (
@@ -623,7 +624,17 @@
           <VirtualScroll data={flatItems} key="virtualId" let:data>
             <div class="item-container">
               {#each Array(data.depth).fill(0) as _, i}
-                <!-- <div class="indent-line" style="left: {i * 20}px"></div> -->
+                <div
+                  class="indent-line"
+                  style="background-color: var(--bg-ds-neutral-700); left: {i ===
+                  0
+                    ? 27
+                    : i === 1
+                      ? 42
+                      : i === 2
+                        ? 55
+                        : 80}px"
+                ></div>
               {/each}
 
               {#if data.type === "COLLECTION"}
@@ -1099,7 +1110,6 @@
     top: 0;
     bottom: 0;
     width: 1px;
-    background-color: #ccc;
   }
 
   .item {
