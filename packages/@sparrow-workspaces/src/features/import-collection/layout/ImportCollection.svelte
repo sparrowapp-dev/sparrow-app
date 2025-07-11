@@ -31,6 +31,7 @@
   export let onImportOapiText; // Sends the (JSON / XML) text to backend and create a collection                                        (3)
   export let onImportOapiFile; // Sends the (JSON / XML) file to backend and create a collection                                        (3)
 
+  export let onImportPostmanCollection;
   export let isActiveSyncRequired;
   export let isActiveSyncPlanModalOpen;
 
@@ -43,6 +44,7 @@
   let isTextEmpty: boolean = true;
   let isSyntaxError: boolean = false;
   let importData: string = "";
+  let postmanCollectionJson: string = "";
   let importType: string = "text";
   let activeSync = false;
 
@@ -62,7 +64,8 @@
   let isValidClientURL = false,
     isValidClientJSON = false,
     isValidClientXML = false,
-    isValidClientDeployedURL = false;
+    isValidClientDeployedURL = false,
+    isValidPostmanCollectionURL = false;
 
   let isValidServerURL = false,
     isValidServerJSON = false,
@@ -73,6 +76,7 @@
   const handleInputField = async () => {
     isimportDataLoading = true;
     isValidClientURL = false;
+    isValidPostmanCollectionURL = false;
     isValidClientJSON = false;
     isValidClientXML = false;
     isValidServerURL = false;
@@ -82,7 +86,13 @@
     isValidServerDeployedURL = false;
 
     if (validateClientURL(importData)) {
-      if (
+      if (importData.includes("api.postman.com")) {
+        const postmanResponse = await onGetOapiTextFromURL(importData);
+        if (postmanResponse?.data?.status === ResponseStatusCode.OK) {
+            isValidPostmanCollectionURL = true;
+            postmanCollectionJson = postmanResponse.data.body;
+        }
+      } else if (
         importData.includes("://127.0.0.1") ||
         importData.includes("://localhost")
       ) {
@@ -226,6 +236,26 @@
     }
   };
 
+  const handlePostmanUrl = async () => {
+    try {
+      progressBar.isLoading = true;
+      progressBar.isProgress = false;
+      progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
+      const response = await onImportPostmanCollection(
+        currentWorkspaceId,
+        postmanCollectionJson,
+      );
+      if (response.isSuccessful) {
+        progressBar.title = ProgressTitle.FETCHING_DATA;
+        progressBar.isProgress = true;
+        onCloseModal();
+      } else {
+        progressBar.isLoading = false;
+        isSyntaxError = true;
+      }
+    } catch (e) {}
+  };
+
   const validateJSON = (data) => {
     return validateImportBody(data);
   };
@@ -338,13 +368,15 @@
       uploadCollection.file.invalid = true;
       uploadCollection.file.showFileSizeError = false;
       uploadCollection.file.showFileTypeError = false;
+    } else if (isValidPostmanCollectionURL && postmanCollectionJson.length) {
+      handlePostmanUrl();
     }
     isLoading = false;
   };
 
   const handleImportJsonObject = async (
     contentType,
-    importJSON,
+    postmanCollectionJson,
     activeSyncEnabled = false,
   ) => {
     if (!contentType) {
@@ -357,7 +389,7 @@
     progressBar.title = ProgressTitle.IDENTIFYING_SYNTAX;
     const response = await onImportOapiText(
       currentWorkspaceId,
-      importJSON,
+      postmanCollectionJson,
       contentType,
       activeSyncEnabled,
       importData,
@@ -534,8 +566,8 @@
 {#if importType === "text"}
   <div>
     <p class="sparrow-fs-12 mb-1" style="color:var(--text-secondary-1000)">
-      Paste OAS Text or Swagger/Localhost Link <span class="required-mark"
-        >*</span
+      Paste OAS Text, Postman Collection or Swagger/Localhost Link <span
+        class="required-mark">*</span
       >
     </p>
   </div>
@@ -558,6 +590,7 @@
       !isValidServerURL &&
       !isValidServerXML &&
       !isimportDataLoading &&
+      !isValidPostmanCollectionURL &&
       isInputDataTouched
         ? `border: 1px solid var(--dangerColor) !important;`
         : ``}
@@ -566,7 +599,7 @@
       <div class="position-absolute" style="right: 10px; top:10px;">
         <Spinner size={`16px`} />
       </div>
-    {:else if (isValidClientURL && isValidServerURL && isInputDataTouched) || (isValidClientXML && isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && isValidServerJSON && isInputDataTouched)}
+    {:else if (isValidPostmanCollectionURL && isInputDataTouched) || (isValidClientURL && isValidServerURL && isInputDataTouched) || (isValidClientXML && isValidServerXML && isInputDataTouched) || (isValidClientDeployedURL && isValidServerDeployedURL && isInputDataTouched) || (isValidClientJSON && isValidServerJSON && isInputDataTouched)}
       <div class="position-absolute" style="right: 10px; top:8px;">
         <TickMark />
       </div>
@@ -576,10 +609,9 @@
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
       Please paste your OpenAPI specification text or Swagger/localhost link.
     </p>
-  {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && isInputDataTouched)}
+  {:else if (!isimportDataLoading && isValidClientDeployedURL && !isValidServerDeployedURL && !isValidPostmanCollectionURL && isInputDataTouched) || (!isimportDataLoading && isValidClientURL && !isValidServerURL && !isValidPostmanCollectionURL && isInputDataTouched) || (!isTextEmpty && !isValidPostmanCollectionURL && !isimportDataLoading && isValidClientXML && !isValidServerXML && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && isValidClientJSON && !isValidServerJSON && !isValidPostmanCollectionURL && isInputDataTouched) || (!isTextEmpty && !isimportDataLoading && !isValidClientJSON && !isValidClientURL && !isValidClientXML && !isValidServerJSON && !isValidServerURL && !isValidServerXML && !isValidClientDeployedURL && !isValidServerDeployedURL && !isValidPostmanCollectionURL && isInputDataTouched)}
     <p class="empty-data-error sparrow-fs-12 fw-normal w-100 text-start">
-      We have identified that the text you have pasted is not written in OpenAPI
-      Specification (OAS). Please visit https://swagger.io/specification/ for
+      We have identified that the text you have pasted is not a Postman Collection or written in OpenAPI Specification (OAS). Please visit https://swagger.io/specification/ for
       more information on OAS.
     </p>
   {/if}

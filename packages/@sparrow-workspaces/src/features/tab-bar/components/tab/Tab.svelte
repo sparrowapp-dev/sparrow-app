@@ -30,6 +30,7 @@
     BotRegular,
     HistoryRegular,
     HistoryIcon2,
+    DatabaseStackRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -39,6 +40,7 @@
   import { Badge, Spinner, Options, Dropdown, Tag } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   // ----
 
   // ------ Props ------
@@ -221,7 +223,11 @@
     <button
       tabindex="-1"
       class="position-relative p-0 border-0 ellipsis"
-      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ? '60%' : '100%'};
+      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ||
+      (tab?.type === TabTypeEnum.FOLDER &&
+        tab?.label === CollectionTypeBaseEnum.MOCK)
+        ? '60%'
+        : '100%'};
         text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if loader}
@@ -252,11 +258,15 @@
         >
       {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
-          <img
-            src={Collection}
-            alt="book"
-            style="width: 19px;heigh:19px;margin-right:5px;"
-          />
+          {#if tab?.label === CollectionTypeBaseEnum.MOCK}
+            <DatabaseStackRegular height="14px" width="10px" />
+          {:else}
+            <img
+              src={Collection}
+              alt="book"
+              style="width: 19px; height:19px; margin-right:5px;"
+            />
+          {/if}
         </span>
       {:else if tab.type === TabTypeEnum.HUB}
         <span>
@@ -344,8 +354,8 @@
         {tab.name}
       </span>
     </button>
-    {#if tab?.type === TabTypeEnum.MOCK_REQUEST}
-      <Tag type={"green"} text={"Mock"} />
+    {#if tab?.label && tab.type != TabTypeEnum.COLLECTION}
+      <Tag type={"green"} text={tab.label} />
     {/if}
     <div style="align-items:center; justify-content:center;">
       {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.AI_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}

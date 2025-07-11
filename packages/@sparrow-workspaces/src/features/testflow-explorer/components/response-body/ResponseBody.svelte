@@ -17,6 +17,38 @@
       }
     }
   }
+  let iframeRef: HTMLIFrameElement;
+
+  function handleIframeLoad(): void {
+    try {
+      const iframeDoc: Document | null =
+        iframeRef.contentDocument || iframeRef.contentWindow?.document || null;
+      if (!iframeDoc) {
+        console.warn("Cannot access iframe document");
+        return;
+      }
+      iframeDoc.addEventListener(
+        "click",
+        (e: MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        true,
+      );
+      iframeDoc.addEventListener(
+        "mousedown",
+        (e: MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        true,
+      );
+    } catch (error: unknown) {
+      console.error(
+        "Cannot access iframe content due to cross-origin restrictions",
+      );
+    }
+  }
 </script>
 
 <div
@@ -41,7 +73,11 @@
         -- Reponse content-type set to HTML preview,
         -- 
       -->
-      <iframe srcdoc={response.body} style="width: 100%; height: calc(100%);"
+      <iframe
+        bind:this={iframeRef}
+        srcdoc={response.body}
+        style="width: 100%; height: calc(100%);"
+        on:load={handleIframeLoad}
       ></iframe>
     {:else}
       <!-- 
@@ -61,7 +97,7 @@
 
 <style>
   iframe {
-    pointer-events: none;
+    /* pointer-events: none; */
   }
 
   .response-body {

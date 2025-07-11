@@ -14,9 +14,9 @@
   export let tab;
   export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
-  const _viewModel = new RestExplorerSavedViewModel(tab);
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  let _viewModel;
+  let environments;
+  let activeWorkspace;
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
@@ -31,15 +31,10 @@
     }
   });
 
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList,
-    1000,
-  );
-  const debouncedAPIUpdater = new Debounce().debounce(
-    _viewModel?.refreshTabData,
-    1000,
-  );
+  let renameWithCollectionList;
+  let debouncedAPIUpdater;
   let prevTabName = "";
+  let prevTabId = "";
   /**
    * Find the role of user in active workspace
    */
@@ -55,12 +50,48 @@
   };
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new RestExplorerSavedViewModel(tab);
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value;
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+                environmentId = activeWorkspaceRxDoc.get("environmentId");
+              }
+            },
+          );
+
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList as any,
+            1000,
+          );
+          debouncedAPIUpdater = new Debounce().debounce(
+            _viewModel?.refreshTabData as any,
+            1000,
+          );
+
+          const guestUser = await _viewModel.getGuestUser();
+          if (guestUser?.isBannerActive) {
+            isLoginBannerActive = guestUser?.isBannerActive;
+          }
+
+          findUserRole();
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
       }
-      prevTabName = tab.name;
-      findUserRole();
       debouncedAPIUpdater(tab);
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
     }
   }
 
@@ -69,16 +100,7 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
 
-  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        environmentId = activeWorkspaceRxDoc.get("environmentId");
-      }
-    },
-  );
+  let activeWorkspaceSubscriber;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -130,15 +152,9 @@
       refreshEnvironment();
     }
   }
-  onMount(async () => {
-    const guestUser = await _viewModel.getGuestUser();
-    if (guestUser?.isBannerActive) {
-      isLoginBannerActive = guestUser?.isBannerActive;
-    }
-  });
 
   onDestroy(() => {
-    activeWorkspaceSubscriber.unsubscribe();
+    activeWorkspaceSubscriber?.unsubscribe();
   });
 
   let restExplorerData: restExplorerData | undefined;

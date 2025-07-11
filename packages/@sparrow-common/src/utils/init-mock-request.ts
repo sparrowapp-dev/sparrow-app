@@ -42,6 +42,7 @@ export class InitMockRequestTab {
       source: "USER",
       isDeleted: false,
       activeSync: false,
+      label: "",
       property: {
         mockRequest: {
           method: HttpRequestMockMethodBaseEnum.GET,
@@ -262,5 +263,8 @@ export class InitMockRequestTab {
     if (this._tab.property.mockRequest?.state) {
       this._tab.property.mockRequest.state.isChatbotActive = _isActive;
     }
+  }
+  public updateLabel(_label: string) {
+    this._tab.label = _label;
   }
 }

@@ -6,9 +6,22 @@
   export let iconColor: string;
   export let iconSize: string;
   export let onClick: () => void;
+
+  let isProcessing = false;
+  const handleClick = async () => {
+    if (isProcessing) return;
+    isProcessing = true;
+    try {
+      await onClick();
+    } catch (error) {
+      console.error("Error in onClick handler:", error);
+    } finally {
+      isProcessing = false;
+    }
+  };
 </script>
 
-<div class="card" on:click={onClick}>
+<div class="card" on:click={handleClick}>
   <div class="card-content">
     {#if icon}
       <svelte:component

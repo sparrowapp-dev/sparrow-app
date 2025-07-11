@@ -147,8 +147,8 @@
         label={TFDefaultEnum.FULL_NAME}
         iconColor="var(--text-primary-300)"
         iconSize={"18px"}
-        onClick={() => {
-          onCreateTestflow();
+        onClick={async() => {
+          await onCreateTestflow();
           MixpanelEvent(Events.Default_Screen_TestFlows);
         }}
       />

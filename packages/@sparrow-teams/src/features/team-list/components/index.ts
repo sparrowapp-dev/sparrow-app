@@ -1,0 +1,1 @@
+export {default as TeamRow} from "./team-row/TeamRow.svelte";

@@ -32,7 +32,7 @@
 </script>
 
 <div class="d-flex flex-column align-items-center">
-  <List classProps={"pb-2 p-1 w-100"}>
+  <div class="w-100">
     {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <p
         class="text-fs-12 text-center w-100 {isCollectionEmpty ? 'ps-3' : ''}"
@@ -87,7 +87,7 @@
         />
       {/if}
     </div>
-  </List>
+  </div>
 </div>
 
 <style>

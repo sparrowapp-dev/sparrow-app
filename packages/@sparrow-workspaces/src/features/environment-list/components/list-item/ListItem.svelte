@@ -218,11 +218,7 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-<div
-  style="margin-bottom:2px;"
-  class="environment-tab"
-  bind:this={environmentTabWrapper}
->
+<div style="" class="environment-tab" bind:this={environmentTabWrapper}>
   <button
     tabindex="0"
     style="height:32px;gap:4px; padding-left:7px;  border-color: {showMenu

@@ -17,6 +17,7 @@
   import { ArrowUpFilled } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
   import { WithButtonV4 } from "@sparrow/workspaces/hoc";
+  import VirtualScroll from "svelte-virtual-scroll-list";
 
   export let webSocket;
   export let onSearchMessage;
@@ -55,24 +56,34 @@
   /**
    *  list container wrapper
    */
-  let listContainer: HTMLElement;
+
+  let virtualScrollEl: HTMLDivElement;
 
   /**
    * @description - scrolls the list container to top or bottom
    * @param position - decides the direction to scroll
    */
   const scroll = (position: "top" | "bottom") => {
-    if (position === "bottom") {
-      listContainer.scrollTo({
-        top: listContainer.scrollHeight,
-        behavior: "auto",
-      });
-    } else if (position === "top") {
-      listContainer.scrollTo({
-        top: 0,
-        behavior: "auto",
-      });
-    }
+    requestAnimationFrame(() => {
+      if (virtualScrollEl) {
+        const listContainer = virtualScrollEl.querySelector(
+          ".virtual-scroll-root",
+        ) as HTMLElement;
+        if (listContainer) {
+          if (position === "bottom") {
+            listContainer.scrollTo({
+              top: listContainer.scrollHeight,
+              behavior: "auto",
+            });
+          } else if (position === "top") {
+            listContainer.scrollTo({
+              top: 0,
+              behavior: "auto",
+            });
+          }
+        }
+      }
+    });
   };
 
   let isFilterDropdownActive = false;
@@ -240,18 +251,18 @@
     </div>
   </div>
   <div class="pt-1"></div>
-  <div style="flex:1; overflow:auto;" bind:this={listContainer}>
-    <div>
-      {#each filteredWebsocketMessage as message}
+  <div style="flex:1; overflow:auto;">
+    <div bind:this={virtualScrollEl} class="h-100">
+      <VirtualScroll data={filteredWebsocketMessage} key="uuid" let:data>
         <div
           class="response-message d-flex align-items-center gap-2"
           style="cursor: pointer;"
           on:click={() => {
-            onUpdateMessageBody(message.uuid);
+            onUpdateMessageBody(data.uuid);
 
             try {
-              if (message.data) {
-                JSON.parse(message.data);
+              if (data.data) {
+                JSON.parse(data.data);
                 onUpdateContentType(RequestDataTypeEnum.JSON);
               }
             } catch (e) {
@@ -263,26 +274,26 @@
             class="py-2 d-flex align-items-center"
             style="padding-left:6px ;padding-right: 6px;"
           >
-            {#if message?.transmitter === "sender"}
+            {#if data?.transmitter === "sender"}
               <ArrowUpRightRegular
                 size={"16px"}
                 color="var(--icon-ds-success-400)"
               />
               <!-- senderIcon -->
-            {:else if message?.transmitter === "disconnector"}
+            {:else if data?.transmitter === "disconnector"}
               <!-- DisconnectIcon -->
               <ErrorCircleFilled
                 size={"16px"}
                 color="var(--icon-ds-danger-400)"
               />
-            {:else if message?.transmitter === "connecter"}
+            {:else if data?.transmitter === "connecter"}
               <!-- ConnectIcon -->
 
               <CheckmarkCircleFilled
                 size={"16px"}
                 color="var(--icon-ds-success-400)"
               />
-            {:else if message?.transmitter === "receiver"}
+            {:else if data?.transmitter === "receiver"}
               <ArrowDownLeftFilled
                 color="var(--icon-ds-primary-400)"
                 size={"16px"}
@@ -294,14 +305,14 @@
             class="text-fs-12 py-2 timestamp"
             style="white-space: nowrap; line-height: 1;"
           >
-            {message?.timestamp}
+            {data?.timestamp}
           </span>
           <p class="ellipsis text-fs-12 mb-0" style="line-height: 1;">
-            {@html highlightSearchText(message?.data, searchData)}
+            {@html highlightSearchText(data?.data, searchData)}
           </p>
           <!-- </div> -->
         </div>
-      {/each}
+      </VirtualScroll>
 
       {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All Messages")}
         <p class="text-fs-16 text-center text-secondary-200">

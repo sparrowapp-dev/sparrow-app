@@ -20,7 +20,7 @@
   import { pagesMotion } from "../../constants";
   import { version } from "../../../src-tauri/tauri.conf.json";
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { user } from "../../store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
@@ -39,6 +39,7 @@
     UpgradePlanBanner,
     UpgradePlanPopUp,
   } from "@sparrow/common/components";
+  import { shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -59,7 +60,7 @@
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
   let userId = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -70,8 +71,14 @@
   const sparrowAdminUrl = constants.ADMIN_URL;
 
   onMount(async () => {
-    _viewModel.refreshTeams(userId);
-    _viewModel.refreshWorkspaces(userId);
+    if (userId && shouldRunThrottled(userId)) {
+      await Promise.all([
+        _viewModel.refreshTeams(userId),
+        _viewModel.refreshWorkspaces(userId),
+      ]);
+    } else {
+      console.error(`Throttled for ${userId}`);
+    }
 
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
@@ -110,6 +117,10 @@
       return version;
     }
   };
+
+  onDestroy(() => {
+    userSubscriber();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
