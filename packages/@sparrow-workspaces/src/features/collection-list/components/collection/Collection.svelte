@@ -811,6 +811,9 @@
           startIcon={!visibility ? ChevronRightRegular : ChevronDownRegular}
           onClick={(e) => {
             e.stopPropagation();
+            if (isFirstCollectionExpand) {
+              isFirstCollectionExpand = false;
+            }
             if (!isRenaming) {
               visibility = !visibility;
               if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
