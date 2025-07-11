@@ -692,10 +692,14 @@
     }
   });
 
+  let tourGuideCollectionId;
   const collectionListSubscriber = collectionList.subscribe((collections) => {
     let count = 0;
-    collections.forEach((collection) => {
+    collections.forEach((collection, index) => {
       const collectionData = collection.toMutableJSON();
+      if (index === 0) {
+        tourGuideCollectionId = collectionData.id;
+      }
       count += collectionData.items.length || 0;
     });
     totalCollectionCount.set(count);
@@ -1183,6 +1187,7 @@
       defaultCurrentStep.set(1);
       isDefaultTourGuideOpen.set(true);
     }}
+    {tourGuideCollectionId}
   />
 </Modal>
 <WorkspaceTourGuide />

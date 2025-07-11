@@ -211,6 +211,7 @@ export class TabRepository {
     if (selectedTab) {
       await selectedTab.incrementalUpdate({ $set: { isActive: true } });
     }
+    return selectedTab;
   };
 
   /**

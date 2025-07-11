@@ -2,10 +2,12 @@
   import { Button } from "@sparrow/library/ui";
   import SparrowLogo from "../icons/SparrowIconLogo.svelte";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { addCollectionItem } from "../../../stores";
 
   export let onClickExplore;
   export let onClickTour;
   export let loader = false;
+  export let tourGuideCollectionId;
   const handletake_tour = () => {
     captureEvent("take_tour", {
       component: "WelcomePopup",
@@ -53,6 +55,7 @@
       {loader}
       onClick={() => {
         onClickTour();
+        addCollectionItem(tourGuideCollectionId, "collection");
         handle_dismiss_tour();
       }}
     />

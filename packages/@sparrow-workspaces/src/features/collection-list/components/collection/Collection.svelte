@@ -93,6 +93,7 @@
   } from "../../../../stores/active-sync";
   import { inview } from "svelte-inview";
 
+  export let visibility = false;
   let deletedIds: string[] = [];
   let requestCount = 0;
   let folderCount = 0;
@@ -101,7 +102,6 @@
   let socketIoCount = 0;
   let mockRequestCount = 0;
   let aiRequestCount = 0;
-  let visibility = false;
   let isActiveSyncEnabled = true;
   let isBranchSynced: boolean = false;
   let isRenaming = false;
@@ -218,15 +218,23 @@
     // selectedMethodUnsubscibe();
   });
 
+  let prevActiveTabPath = "";
   $: {
     if (searchData) {
-      visibility = true;
+      // addCollectionItem(collection.id, "collection");
     }
-    if (activeTabPath) {
-      if (activeTabPath.collectionId === collection.id) {
-        visibility = true;
-      }
-    }
+    // if (activeTabPath) {
+    //   if ((prevActiveTabPath || "") !== (activeTabPath?.collectionId || "")) {
+    //     if (activeTabPath.collectionId === collection.id) {
+    //       setTimeout(() => {
+    //         if (!visibility) {
+    //           addCollectionItem(collection.id, "collection");
+    //         }
+    //       }, 3000);
+    //     }
+    //   }
+    //   prevActiveTabPath = activeTabPath.collectionId;
+    // }
   }
 
   $: {
@@ -303,12 +311,6 @@
     //   "isActiveSyncEnabled",
     // );
   });
-
-  $: {
-    if ($openedComponent.has(collection.id) || isFirstCollectionExpand) {
-      visibility = true;
-    }
-  }
 
   let prevCurrentBranch = "";
   let prevBranches = "";
@@ -789,16 +791,15 @@
             isFirstCollectionExpand = false;
           }
           if (!isRenaming) {
-            visibility = !visibility;
             if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
               if (visibility) {
+                removeCollectionItem(collection.id);
+              } else {
                 addCollectionItem(collection.id, "collection");
                 onItemOpened("collection", {
                   workspaceId: collection.workspaceId,
                   collection,
                 });
-              } else {
-                removeCollectionItem(collection.id);
               }
             }
           }
@@ -812,12 +813,11 @@
           onClick={(e) => {
             e.stopPropagation();
             if (!isRenaming) {
-              visibility = !visibility;
               if (!collection.id.includes(UntrackedItems.UNTRACKED)) {
                 if (visibility) {
-                  addCollectionItem(collection.id, "collection");
-                } else {
                   removeCollectionItem(collection.id);
+                } else {
+                  addCollectionItem(collection.id, "collection");
                 }
               }
             }
@@ -1039,14 +1039,6 @@
           class=" ps-0 position-relative"
           style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
         >
-          {#if collection?.items?.length > 0}
-            <div
-              class="box-line"
-              style="background-color: {verticalCollectionLine
-                ? 'var(--bg-ds-neutral-500)'
-                : 'var(--bg-ds-surface-100)'}"
-            ></div>
-          {/if}
           {#if isMockCollection}
             <div
               class="box-line"
@@ -1142,25 +1134,6 @@
                 </div>
               </div>
             {/if}
-            {#each collection?.items as explorer}
-              <Folder
-                {isMockCollection}
-                {userRole}
-                {isSharedWorkspace}
-                {onItemCreated}
-                {onItemDeleted}
-                {onItemRenamed}
-                {onItemOpened}
-                {collection}
-                {userRoleInWorkspace}
-                {activeTabPath}
-                {explorer}
-                {activeTabType}
-                {activeTabId}
-                {searchData}
-                {isWebApp}
-              />
-            {/each}
           </div>
           {#if !collection?.items?.length}
             <p
@@ -1174,284 +1147,9 @@
                 : "This collection is empty."}
             </p>
           {/if}
-
-          <div class="d-flex gap-2 ms-2" style="padding-left: 26px;">
-            {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-              <Tooltip
-                title={collection?.activeSync
-                  ? "Adding folders is disabled for active sync collections."
-                  : "Add Folder"}
-                placement={collection?.activeSync
-                  ? "top-left"
-                  : "bottom-center"}
-                distance={12}
-                zIndex={1000}
-              >
-                <div
-                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                  style="height: 24px; width: 24px; "
-                  role="button"
-                  tabindex="0"
-                  on:keydown={() => {}}
-                  on:click={() => {
-                    if (!collection?.activeSync) {
-                      onItemCreated("folder", {
-                        workspaceId: collection.workspaceId,
-                        collection,
-                      });
-                    }
-                  }}
-                >
-                  <FolderAddRegular
-                    size="16px"
-                    color="var(--bg-ds-neutral-300)"
-                  />
-                </div>
-              </Tooltip>
-
-              <Tooltip
-                title={isMockCollection
-                  ? "Add Mock REST API"
-                  : collection?.activeSync
-                    ? "Adding requests is disabled for active sync collections."
-                    : "Add REST API"}
-                placement={isMockCollection
-                  ? "top-center"
-                  : collection?.activeSync
-                    ? "top-left"
-                    : "bottom-center"}
-                distance={12}
-                zIndex={1000}
-              >
-                <div
-                  class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                  style="height: 24px; width: 24px;"
-                  role="button"
-                  on:click={() => {
-                    if (isMockCollection) {
-                      onItemCreated("mockRequestCollection", {
-                        workspaceId: collection.workspaceId,
-                        collection,
-                      });
-                    } else if (!collection?.activeSync) {
-                      onItemCreated("requestCollection", {
-                        workspaceId: collection.workspaceId,
-                        collection,
-                      });
-                    }
-                  }}
-                >
-                  <ArrowSwapRegular
-                    size="16px"
-                    color="var(--bg-ds-neutral-300)"
-                  />
-                </div>
-              </Tooltip>
-
-              {#if !isMockCollection}
-                <Tooltip
-                  title={collection?.activeSync
-                    ? "Adding requests is disabled for active sync collections."
-                    : `Add ${SocketIORequestDefaultAliasBaseEnum.NAME}`}
-                  placement={collection?.activeSync
-                    ? "top-left"
-                    : "bottom-center"}
-                  distance={12}
-                  zIndex={1000}
-                >
-                  <div
-                    class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                    style="height: 24px; width: 24px;"
-                    role="button"
-                    on:click={() => {
-                      if (!collection?.activeSync) {
-                        onItemCreated("socketioCollection", {
-                          workspaceId: collection.workspaceId,
-                          collection,
-                        });
-                        MixpanelEvent(Events.Collection_SocketIO, {
-                          description: "Created Socket.IO inside collection.",
-                        });
-                      }
-                    }}
-                  >
-                    <SocketIoIcon
-                      height={"13px"}
-                      width={"13px"}
-                      color={"var(--request-arc)"}
-                    />
-                  </div>
-                </Tooltip>
-                <Tooltip
-                  title={collection?.activeSync
-                    ? "Adding requests is disabled for active sync collections."
-                    : "Add WebSocket"}
-                  placement={collection?.activeSync
-                    ? "top-left"
-                    : "bottom-center"}
-                  distance={12}
-                  zIndex={1000}
-                >
-                  <div
-                    class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                    style="height: 24px; width: 24px;"
-                    role="button"
-                    on:click={() => {
-                      if (!collection?.activeSync) {
-                        onItemCreated("websocketCollection", {
-                          workspaceId: collection.workspaceId,
-                          collection,
-                        });
-                        MixpanelEvent(Events.Collection_WebSocket);
-                      }
-                    }}
-                  >
-                    <SocketIcon
-                      height="12px"
-                      width="16px"
-                      color="var(--request-arc)"
-                    />
-                  </div>
-                </Tooltip>
-
-                <Tooltip
-                  title={collection?.activeSync
-                    ? "Adding requests is disabled for active sync collections."
-                    : `Add ${GraphqlRequestDefaultAliasBaseEnum.NAME}`}
-                  placement={collection?.activeSync
-                    ? "top-left"
-                    : "bottom-center"}
-                  distance={12}
-                  zIndex={1000}
-                >
-                  <div
-                    class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                    style="height: 24px; width: 24px;"
-                    role="button"
-                    on:click={() => {
-                      if (!collection?.activeSync) {
-                        onItemCreated("graphqlCollection", {
-                          workspaceId: collection.workspaceId,
-                          collection,
-                        });
-                        MixpanelEvent(Events.Collection_GraphQL, {
-                          description: "Created GraphQL inside collection.",
-                        });
-                      }
-                    }}
-                  >
-                    <GraphIcon
-                      height={"13px"}
-                      width={"13px"}
-                      color={"var(--request-arc)"}
-                    />
-                  </div>
-                </Tooltip>
-
-                <Tooltip
-                  title={collection?.activeSync
-                    ? "Adding requests is disabled for active sync collections."
-                    : `Add AI Request`}
-                  placement={collection?.activeSync
-                    ? "top-left"
-                    : "bottom-center"}
-                  distance={12}
-                  zIndex={1000}
-                >
-                  <div
-                    class="shortcutIcon d-flex justify-content-center align-items-center rounded-1"
-                    style="height: 24px; width: 24px;"
-                    role="button"
-                    on:click={() => {
-                      if (!collection?.activeSync) {
-                        onItemCreated("aiRequestCollection", {
-                          workspaceId: collection.workspaceId,
-                          collection,
-                        });
-                        // MixpanelEvent(Events.Collection_GraphQL, {
-                        //   description: "Created GraphQL inside collection.",
-                        // });
-                      }
-                    }}
-                  >
-                    <BotRegular
-                      height={"13px"}
-                      width={"13px"}
-                      color={"var(--request-arc)"}
-                    />
-                  </div>
-                </Tooltip>
-              {/if}
-            {/if}
-          </div>
-          <!-- {#if showFolderAPIButtons}
-            <div class="mt-2 mb-2 d-flex">
-              <Tooltip
-                placement="bottom-center"
-                title={!hasWorkpaceLevelPermission(
-                  userRoleInWorkspace,
-                  workspaceLevelPermissions.SAVE_REQUEST,
-                )
-                  ? PERMISSION_NOT_FOUND_TEXT
-                  : CollectionMessage[0]}
-                classProp="mt-2 mb-2"
-              >
-                <button
-                  class="bg-transparent border-0"
-                  on:click={() =>
-                    onItemCreated("folder", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                    })}
-                >
-                  <img
-                    class="list-icons mb-2 mt-2"
-                    src={folderIcon}
-                    alt="+ Folder"
-                  />
-                </button>
-              </Tooltip>
-              <Tooltip
-                placement="bottom-center"
-                title={!hasWorkpaceLevelPermission(
-                  userRoleInWorkspace,
-                  workspaceLevelPermissions.SAVE_REQUEST,
-                )
-                  ? PERMISSION_NOT_FOUND_TEXT
-                  : CollectionMessage[1]}
-                classProp="mt-2 mb-2"
-              >
-                <button
-                  class="bg-transparent border-0"
-                  on:click={() =>
-                    onItemCreated("requestCollection", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                    })}
-                >
-                  <img
-                    class="list-icons mb-2 mt-2 ms-3"
-                    src={requestIcon}
-                    alt="+ API Request"
-                  />
-                </button>
-              </Tooltip>
-            </div>
-          {/if} -->
         </div>
       </div>
     {/if}
-
-    <!-- {:else}
-      <div
-        style="padding-left: 0; padding-right:0; cursor:pointer; display: {visibility
-          ? 'block'
-          : 'none'};"
-      >
-        <span class="sparrow-fs-12 text-muted">This branch is unavailable</span>
-      </div>
-    {/if}
-  {/if} -->
   {/if}
 </div>
 
