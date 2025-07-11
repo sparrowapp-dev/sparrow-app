@@ -147,7 +147,7 @@
       <div
         on:click={() => {
           updateBeautifiedState(true);
-          notifications.success("Code formatted successfully.");
+          // notifications.success("Code formatted successfully.");
         }}
         role="button"
         class="icon-container d-flex align-items-center justify-content-center border-radius-2"
