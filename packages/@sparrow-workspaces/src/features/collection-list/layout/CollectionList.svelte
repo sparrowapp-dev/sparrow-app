@@ -220,7 +220,8 @@
     500,
   );
 
-  let flatItems: any[] = [];
+  let standardFlatItems: any[] = [];
+  let mockFlatItems: any[] = [];
 
   // Only update collectionFilter when searchData or collectionListDocument changes
   $: if (searchData && collectionListDocument) {
@@ -232,20 +233,68 @@
   // Only update flatItems when collectionFilter or collectionListDocument or openedComponentMap changes
   $: {
     if (searchData && collectionFilter.length > 0) {
-      flatItems = flattenCollections(collectionFilter || [], $openedComponent);
+      let standardCollection = [];
+      let mockCollection = [];
+      if (collectionFilter?.length) {
+        standardCollection = collectionFilter.filter((_collection) => {
+          if (
+            _collection.collectionType === "STANDARD" ||
+            !_collection?.collectionType
+          ) {
+            return true;
+          }
+          return false;
+        });
+        mockCollection = collectionFilter.filter((_collection) => {
+          if (_collection.collectionType === "MOCK") {
+            return true;
+          }
+          return false;
+        });
+      }
+      standardFlatItems = flattenCollections(
+        standardCollection || [],
+        $openedComponent,
+      );
+      mockFlatItems = flattenCollections(
+        mockCollection || [],
+        $openedComponent,
+      );
     } else if (!searchData) {
-      flatItems = flattenCollections(
-        collectionListDocument || [],
+      let standardCollection = [];
+      let mockCollection = [];
+      if (collectionListDocument?.length) {
+        standardCollection = collectionListDocument.filter((_collection) => {
+          if (
+            _collection.collectionType === "STANDARD" ||
+            !_collection?.collectionType
+          ) {
+            return true;
+          }
+          return false;
+        });
+        mockCollection = collectionListDocument.filter((_collection) => {
+          if (_collection.collectionType === "MOCK") {
+            return true;
+          }
+          return false;
+        });
+      }
+
+      standardFlatItems = flattenCollections(
+        standardCollection || [],
+        $openedComponent,
+      );
+      mockFlatItems = flattenCollections(
+        mockCollection || [],
         $openedComponent,
       );
     } else {
-      flatItems = [];
+      standardFlatItems = [];
+      mockFlatItems = [];
     }
   }
 
-  $: {
-    console.log(flatItems);
-  }
   const collectionListSubscriber = collectionList.subscribe(async (value) => {
     if (value) {
       collectionListDocument = value
@@ -265,13 +314,7 @@
     name: string;
     type: string;
     depth: number;
-    parentCollection: {
-      id: string;
-      name: string;
-      workspaceId: string;
-      activeSync: boolean;
-      collectionType: string;
-    };
+    parentCollection: any;
     parentFolder: {
       id: string;
       name: string;
@@ -295,13 +338,7 @@
     const recurse = (
       items: any[],
       depth: number,
-      parentCollection: {
-        id: string;
-        name: string;
-        workspaceId: string;
-        activeSync: boolean;
-        collectionType: string;
-      },
+      parentCollection: any,
       parentFolder: { id: string; name: string },
       parentRequest: { id: string; name: string },
     ) => {
@@ -355,13 +392,7 @@
           name: collection.name,
           type: "COLLECTION",
           depth: 0,
-          parentCollection: {
-            id: "",
-            name: "",
-            workspaceId: "",
-            activeSync: false,
-            collectionType: "",
-          },
+          parentCollection: {},
           parentFolder: { id: "", name: "" },
           parentRequest: { id: "", name: "" },
           data: collection,
@@ -373,13 +404,7 @@
           recurse(
             collection.items || [],
             1,
-            {
-              id: collection.id,
-              name: collection.name,
-              workspaceId: collection.workspaceId,
-              activeSync: collection.activeSync,
-              collectionType: collection.collectionType,
-            },
+            collection,
             { id: "", name: "" },
             { id: "", name: "" },
           );
@@ -389,13 +414,7 @@
             name: collection.name,
             type: "COLLECTION-MANAGER",
             depth: 0,
-            parentCollection: {
-              id: "",
-              name: "",
-              workspaceId: "",
-              activeSync: false,
-              collectionType: "",
-            },
+            parentCollection: {},
             parentFolder: { id: "", name: "" },
             parentRequest: { id: "", name: "" },
             data: collection,
@@ -611,7 +630,7 @@
       class="overflow-auto position-relative d-flex flex-column me-0"
       style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
     >
-      {#if flatItems?.length > 0 && searchData.length === 0}
+      {#if (standardFlatItems?.length > 0 || mockFlatItems?.length > 0) && searchData.length === 0}
         <div
           class="box-line"
           style="background-color: {isExpandCollectionLine
@@ -619,9 +638,48 @@
             : 'var(--bg-ds-surface-100)'}"
         ></div>
       {/if}
-      {#if flatItems?.length > 0}
+      {#if standardFlatItems?.length > 0 || mockFlatItems?.length > 0}
         <div style="height: 100%;">
-          <VirtualScroll data={flatItems} key="virtualId" let:data>
+          <VirtualScroll
+            data={[...standardFlatItems, ...mockFlatItems]}
+            key="virtualId"
+            let:data
+          >
+            <div slot="header" class="ps-4">
+              {#if !standardFlatItems?.length && !searchData}
+                <EmptyCollection
+                  bind:userRole
+                  {onItemCreated}
+                  {collectionList}
+                  {userRoleInWorkspace}
+                  {currentWorkspace}
+                  handleCreateApiRequest={() => onItemCreated("request", {})}
+                  onImportCollectionPopup={showImportCollectionPopup}
+                  isAddCollectionDisabled={isGuestUser}
+                  onImportCurlPopup={showImportCurlPopup}
+                  {isGuestUser}
+                />
+                <hr style="margin: 0.5rem;" />
+              {/if}
+            </div>
+            <div slot="footer" class="ps-4">
+              {#if !mockFlatItems?.length && !isGuestUser && !searchData}
+                <hr style="margin: 0.5rem;" />
+                <EmptyCollection
+                  bind:userRole
+                  isMockCollection={true}
+                  {onItemCreated}
+                  {collectionList}
+                  {userRoleInWorkspace}
+                  {currentWorkspace}
+                  handleCreateApiRequest={() => onItemCreated("request", {})}
+                  onImportCollectionPopup={showImportCollectionPopup}
+                  isAddCollectionDisabled={isGuestUser}
+                  onImportCurlPopup={showImportCurlPopup}
+                  {isGuestUser}
+                />
+              {/if}
+            </div>
             <div class="item-container">
               {#each Array(data.depth).fill(0) as _, i}
                 <div
