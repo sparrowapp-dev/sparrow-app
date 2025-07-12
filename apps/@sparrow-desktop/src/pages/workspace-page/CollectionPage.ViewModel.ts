@@ -154,6 +154,7 @@ import { TeamRepository } from "@app/repositories/team.repository";
 import { TeamService } from "@app/services/team.service";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
+import type { TransformedRequest } from "@sparrow/common/types/workspace/collection-base";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -192,8 +193,8 @@ export default class CollectionsViewModel {
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
-   public fetchCollections = async (
-    workspaceId: string
+  public fetchCollections = async (
+    workspaceId: string,
   ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
     const isGuestUser = await this.getGuestUserState();
     if (!workspaceId || isGuestUser) {
@@ -202,7 +203,7 @@ export default class CollectionsViewModel {
 
     const getCollectionItemIds = (
       collectionItem: any,
-      collectedIds: string[]
+      collectedIds: string[],
     ): void => {
       const stack = [collectionItem];
       while (stack.length > 0) {
@@ -224,7 +225,8 @@ export default class CollectionsViewModel {
     };
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
 
     let res;
     if (
@@ -234,7 +236,7 @@ export default class CollectionsViewModel {
     ) {
       res = await this.collectionService.fetchPublicCollection(
         workspaceId,
-        constants.API_URL
+        constants.API_URL,
       );
     } else {
       res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
@@ -264,8 +266,14 @@ export default class CollectionsViewModel {
       await new Promise((res) => setTimeout(res)); // yield to UI
     }
 
-    await this.collectionRepository.bulkInsertData(workspaceId, processedCollections);
-    await this.collectionRepository.deleteOrphanCollections(workspaceId, collectionIds);
+    await this.collectionRepository.bulkInsertData(
+      workspaceId,
+      processedCollections,
+    );
+    await this.collectionRepository.deleteOrphanCollections(
+      workspaceId,
+      collectionIds,
+    );
 
     const collectionItemIds: string[] = [];
     for (const collection of collections) {
@@ -275,7 +283,7 @@ export default class CollectionsViewModel {
     const collectionItemTabsToBeDeleted =
       await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
         workspaceId,
-        collectionItemIds
+        collectionItemIds,
       );
 
     return {
@@ -1503,16 +1511,13 @@ export default class CollectionsViewModel {
 
   /**
    * Handle Import Api using Curl
-   * @param importCurl: string - Curl string
+   * @param parsedCurlData: TransformedRequest - Curl JSON
    */
   private handleImportCurl = async (
     workspaceId: string,
-    importCurl: string,
+    parsedCurlData: TransformedRequest | undefined,
   ) => {
-    const response =
-      await this.collectionService.importCollectionFromCurl(importCurl);
-
-    if (response.isSuccessful) {
+    if (parsedCurlData) {
       const requestTabAdapter = new RequestTabAdapter();
       const tabId = UntrackedItems.UNTRACKED + uuidv4();
       const adaptedRequest = requestTabAdapter.adapt(
@@ -1520,7 +1525,7 @@ export default class CollectionsViewModel {
         "",
         "",
         {
-          ...response.data.data,
+          ...parsedCurlData,
           id: tabId,
         },
       );
@@ -1530,37 +1535,11 @@ export default class CollectionsViewModel {
 
       notifications.success("cURL imported successfully.");
     } else {
-      if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to import cURL. Please try again.");
-      }
+      notifications.error("Failed to import cURL. Please try again.");
     }
     MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
       source: "curl import popup",
     });
-    return response;
-  };
-
-  /**
-   * Validates Curl
-   * @param importCurl: string - Curl string
-   */
-  public handleValidateCurl = async (importCurl: string) => {
-    const response =
-      await this.collectionService.importCollectionFromCurl(importCurl);
-    if (response.isSuccessful) {
-      const method = await response?.data?.data?.request?.method;
-      const isSuccessful = response.isSuccessful;
-      return {
-        isSuccessful: isSuccessful,
-        method: method,
-      };
-    } else {
-      return {
-        isSuccessful: false,
-      };
-    }
   };
 
   /**
@@ -6042,20 +6021,12 @@ export default class CollectionsViewModel {
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
    */
-  public handleImportItem = async (
-    entityType: string,
-    args: CollectionArgsDto,
-  ) => {
-    let response;
+  public handleImportItem = (entityType: string, args: CollectionArgsDto) => {
     switch (entityType) {
       case "curl":
-        response = await this.handleImportCurl(
-          args.workspaceId,
-          args.importCurl as string,
-        );
+        this.handleImportCurl(args.workspaceId, args.parsedCurlData);
         break;
     }
-    return response;
   };
 
   public handleOpenItem = async (entitytype: string, args: any) => {

@@ -1392,7 +1392,6 @@
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
-    onValidateCurl={_viewModel.handleValidateCurl}
   />
 </Modal>
 <!-- {/if} -->

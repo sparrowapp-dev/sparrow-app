@@ -141,7 +141,71 @@ export interface CollectionArgsBaseInterface {
   mockRequest?: CollectionItemBaseInterface;
   aiRequest?: CollectionItemBaseInterface;
   newName?: string;
-  importCurl?: string;
+  parsedCurlData?: TransformedRequest;
   deletedIds?: string[];
   requestIds?: string[];
+}
+export interface TransformedRequest {
+  id?: string;
+  tag?: string;
+  operationId?: string;
+  source?: string;
+  isDeleted?: boolean;
+  name?: string;
+  description?: string;
+  type?: string;
+  request?: SparrowRequest;
+  createdAt?: Date;
+  updatedAt?: Date;
+  createdBy?: string;
+  updatedBy?: string;
+  items?: TransformedRequest[];
+}
+
+interface SparrowRequest {
+  selectedRequestBodyType?: string;
+  selectedRequestAuthType?: string;
+  method: string;
+  url: string;
+  body: SparrowRequestBody;
+  headers?: KeyValue[];
+  queryParams?: KeyValue[];
+  auth: Auth;
+}
+
+interface SparrowRequestBody {
+  raw?: string;
+  urlencoded?: KeyValue[];
+  formdata?: FormData;
+}
+
+interface FormData {
+  text: KeyValue[];
+  file: FormDataFileEntry[];
+}
+
+interface KeyValue {
+  key?: string;
+  value: string | unknown;
+  checked?: boolean;
+}
+
+interface FormDataFileEntry {
+  key: string;
+  value: string | unknown;
+  checked: boolean;
+  base: string;
+}
+
+interface Auth {
+  bearerToken?: string;
+  basicAuth?: {
+    username: string;
+    password: string;
+  };
+  apiKey?: {
+    authKey: string;
+    authValue: string | unknown;
+    addTo: string;
+  };
 }
