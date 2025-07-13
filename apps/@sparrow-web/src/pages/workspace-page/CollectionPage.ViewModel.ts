@@ -1542,7 +1542,7 @@ export default class CollectionsViewModel {
         "",
         {
           ...parsedCurlData,
-          tabId,
+          id: tabId,
         },
       );
       adaptedRequest.isSaved = false;
