@@ -133,8 +133,32 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
           CI: false
 
+      - name: Create signed .pkg for App Store
+        run: |
+          APP_NAME="Sparrow"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
+
+          if [ ! -d "$BUNDLE_PATH" ]; then
+            echo "::error::App bundle not found at $BUNDLE_PATH"
+            exit 1
+          fi
+
+          # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
+          productbuild \
+            --component "$BUNDLE_PATH" /Applications \
+            --sign "$INSTALLER_ID" \
+            "$PKG_PATH"
+
+          if [ ! -f "$PKG_PATH" ]; then
+            echo "::error::Failed to create package at $PKG_PATH"
+            exit 1
+          fi
+        env:
+          INSTALLER_ID: ${{ env.INSTALLER_ID }}
+
       - name: Upload Tauri Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tauri-build
-          path: apps/@sparrow-desktop/src-tauri/target/release/bundle/macos
+          name: tauri-pkg
+          path: apps/@sparrow-desktop/src-tauri/target/release/bundle/*.pkg
