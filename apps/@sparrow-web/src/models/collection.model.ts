@@ -263,7 +263,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 7,
+  version: 8,
   properties: {
     collectionId: {
       type: "string",
@@ -355,7 +355,13 @@ export const collectionSchemaLiteral = {
         },
       },
     },
+    selectedAuthType: {
+      type: "string",
+    },
     authProfiles,
+    defaultSelectedAuthProfile: {
+      type: "string",
+    },
     mockRequestHistory: {
       type: "array",
       default: [],
@@ -386,12 +392,6 @@ export const collectionSchemaLiteral = {
           responseBody: { type: "string" },
         },
       },
-    },
-    selectedAuthType: {
-      type: "string",
-    },
-    defaultSelectedAuthProfile: {
-      type: "string",
     },
     primaryBranch: { type: "string" },
     currentBranch: { type: "string" },

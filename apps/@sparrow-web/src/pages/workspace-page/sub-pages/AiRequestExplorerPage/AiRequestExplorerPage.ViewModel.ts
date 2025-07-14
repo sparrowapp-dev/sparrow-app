@@ -94,6 +94,7 @@ import {
   CollectionItemTypeBaseEnum,
   CollectionRequestAddToBaseEnum,
   type CollectionAuthBaseInterface,
+  type CollectionAuthProifleBaseInterface,
   type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
 import type {
@@ -2221,7 +2222,7 @@ class AiRequestExplorerViewModel {
           m.path.collectionId as string,
         );
 
-        const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+        const authProfilesList: CollectionAuthProifleBaseInterface[] = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
         const selectedProfileId =
           m.property.request?.state?.selectedRequestAuthProfileId;
 

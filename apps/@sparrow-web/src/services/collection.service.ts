@@ -46,7 +46,7 @@ import type {
 } from "@sparrow/common/types/workspace/graphql-request-dto";
 import {
   CollectionItemTypeBaseEnum,
-  type CollectionAuthBaseInterface,
+  type CollectionAuthProifleBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
 import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 import type {
@@ -956,13 +956,13 @@ export class CollectionService {
 
   public addAuthProfile = async (
     baseUrl: string,
-    updatedPayload: CollectionAuthBaseInterface & {
+    updatedPayload: CollectionAuthProifleBaseInterface & {
       collectionId: string;
       workspaceId: string;
     },
   ) => {
     const response = await makeRequest(
-      "POST", // ToDo: Change to POST from backend
+      "POST", 
       `${baseUrl}/api/collection/auth-profiles`,
       {
         body: updatedPayload,
@@ -976,7 +976,7 @@ export class CollectionService {
   public updateAuthProfile = async (
     _baseUrl: string,
     authProfileId: string,
-    _updateedAuthProfilePayload: CollectionAuthBaseInterface & {
+    _updateedAuthProfilePayload: CollectionAuthProifleBaseInterface & {
       collectionId: string;
       workspaceId: string;
     },

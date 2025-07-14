@@ -232,11 +232,59 @@ const requestItems = {
   },
 };
 
+export const authProfileItemProperties = {
+  authId: { type: "number" },
+  name: { type: "string" },
+  description: { type: "string" },
+  authType: {
+    type: "string",
+    enum: ["Basic Auth", "Bearer Token", "API Key"],
+  },
+  auth: {
+    type: "object",
+    properties: {
+      basicAuth: {
+        type: "object",
+        properties: {
+          username: { type: "string" },
+          password: { type: "string" },
+        },
+      },
+      bearerToken: { type: "string" },
+      apiKey: {
+        type: "object",
+        properties: {
+          authKey: { type: "string" },
+          authValue: { type: "string" },
+          addTo: {
+            type: "string",
+            enum: ["Header", "Query Parameter"],
+          },
+        },
+      },
+    },
+  },
+  defaultKey: { type: "boolean" },
+  createdAt: { type: "string", format: "date-time" },
+  updatedAt: { type: "string", format: "date-time" },
+  createdBy: { type: "string" },
+  updatedBy: { type: "string" },
+};
+
+export const authProfiles = {
+  type: "array",
+  default: [],
+  items: {
+    type: "object",
+    properties: authProfileItemProperties,
+  },
+};
+
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 30,
+  version: 31,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -470,6 +518,9 @@ export const tabSchemaLiteral = {
                 },
                 isDocGenerating: {
                   type: "boolean",
+                },
+                selectedRequestAuthProfileId: {
+                  type: "string",
                 },
               },
             },
@@ -845,6 +896,7 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            authProfiles,
             state: {
               type: "object",
               properties: {

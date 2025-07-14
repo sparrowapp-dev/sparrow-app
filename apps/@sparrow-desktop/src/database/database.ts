@@ -419,6 +419,12 @@ export class RxDB {
           30: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          31: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.request) {
+              oldDoc.property.request.state.selectedRequestAuthProfileId = "";
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -471,6 +477,9 @@ export class RxDB {
             return oldDoc;
           },
           16: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          17: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },

@@ -6,6 +6,7 @@ import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
+import type { CollectionAuthProifleBaseInterface as AuthProfileDto } from "@sparrow/common/types/workspace/collection-base";
 export class CollectionRepository {
   constructor() {}
 
@@ -1181,7 +1182,7 @@ export class CollectionRepository {
    */
   public addAuthProfile = async (
     collectionId: string,
-    newAuthProfileItem: any, // ToDo: Add a proper type here
+    newAuthProfileItem: AuthProfileDto,
   ) => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
@@ -1198,7 +1199,7 @@ export class CollectionRepository {
   public updateAuthProfile = async (
     collectionId: string,
     uuid: string,
-    newAuthProfileItem: any, // ToDo: Add a proper type here
+    newAuthProfileItem: AuthProfileDto,
   ) => {
     const collection = await RxDB.getInstance()
       .rxdb.collection.findOne({
