@@ -19,6 +19,15 @@
   let isMethodWrong = false;
 
   const handleFormatCurl = (curlCommand: string): string => {
+    // 0. Extract $'…' raw-string literal (if present)
+    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
+    let rawLiteral = "";
+    const rawMatch = curlCommand.match(rawLiteralRegex);
+    if (rawMatch) {
+      rawLiteral = rawMatch[0];
+      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
+    }
+
     // 1. Extract heredoc (if present)
     const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
     const heredocMatch = curlCommand.match(heredocRegex);
@@ -71,6 +80,11 @@
     if (heredoc) {
       const [firstLine, ...restLines] = heredoc.split("\n");
       formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
+    }
+
+    // 7. Re-attach rawLiteral if it wasn’t already consumed
+    if (rawLiteral && !formatted.includes(rawLiteral)) {
+      formatted += ` \\\n  ${rawLiteral}`;
     }
 
     return formatted.trim();
@@ -463,19 +477,19 @@
 
   //importCurl contains the user pasted curl in string format
   const handleInputField = async () => {
-    try{
-    isCurlDataLoading = true;
-    isCurlValid = false;
-    isMethodWrong = false;
-    parsedCurlData = parseCurl(importCurl);
-    if (parsedCurlData) {
-      if (parsedCurlData.request!.method === "INVALID") {
-        isMethodWrong = true;
-      } else {
-        isCurlValid = true;
+    try {
+      isCurlDataLoading = true;
+      isCurlValid = false;
+      isMethodWrong = false;
+      parsedCurlData = parseCurl(importCurl);
+      if (parsedCurlData) {
+        if (parsedCurlData.request!.method === "INVALID") {
+          isMethodWrong = true;
+        } else {
+          isCurlValid = true;
+        }
       }
-    }
-    isCurlDataLoading = false;
+      isCurlDataLoading = false;
     } catch (error) {
       console.log("Error parsing cURL:", error);
       isCurlDataLoading = false;
