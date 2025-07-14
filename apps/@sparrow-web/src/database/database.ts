@@ -126,7 +126,7 @@ export type DatabaseType = RxDatabase<DatabaseCollections>;
 export class RxDB {
   private static instance: RxDB | null = null;
   public rxdb: DatabaseType | null = null;
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): RxDB {
     if (!RxDB.instance?.rxdb) {
@@ -316,7 +316,10 @@ export class RxDB {
           },
           15: function (oldDoc: TabDocument) {
             if (oldDoc?.property?.request) {
-              oldDoc.property.request.state.selectedRequestAuthProfileId = ""
+              oldDoc.property.request.state.selectedRequestAuthProfileId = "";
+            }
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.selectedRequestAuthProfileId = "";
             }
             return oldDoc;
           },

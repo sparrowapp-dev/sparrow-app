@@ -193,12 +193,21 @@ class RestExplorerViewModel {
 
         // console.log(
         //   "selectedRequestAuthProfileId:>> ",
-        //   m.property.request?.state?.selectedRequestAuthProfileId,
+        //   m.property.request?.state.requestAuthNavigation ===
+        //     HttpRequestAuthTypeBaseEnum.AUTH_PROFILES &&
+        //     !m.property.request?.state?.selectedRequestAuthProfileId,
         // );
-        // if (!m.property.request?.state?.selectedRequestAuthProfileId) {
+        // if (
+        //   m.property.request?.state.requestAuthNavigation ===
+        //     HttpRequestAuthTypeBaseEnum.AUTH_PROFILES &&
+        //   !m.property.request?.state?.selectedRequestAuthProfileId
+        // ) {
         //   console.log("Setting default auth profile id!");
-        //   const defaultAuthProfileId = collectionDoc?.defaultSelectedAuthProfile;
-        //   this.updateRequestState({ selectedRequestAuthProfileId: defaultAuthProfileId });
+        //   const defaultAuthProfileId =
+        //     collectionDoc?.defaultSelectedAuthProfile;
+        //   this.updateRequestState({
+        //     selectedRequestAuthProfileId: defaultAuthProfileId,
+        //   });
         // }
 
         if (

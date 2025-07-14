@@ -8,9 +8,12 @@
   } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
-  import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    CollectionAuthTypeBaseEnum,
+    type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { Alert, Button } from "@sparrow/library/ui";
+  import { Alert, Button, notifications } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   // import { apiKeyInstructions } from "@sparrow/common/types/workspace/ai-request-dto";
@@ -43,6 +46,31 @@
       destination: aiAuthNavigation,
     });
   };
+
+  // Setting default auth profile if the selected one is deleted from the collection
+  $: {
+    if (
+      requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES &&
+      collection?.authProfiles
+    ) {
+      const authProfile = collection?.authProfiles.find(
+        (profile: AuthProfileDto) => profile.authId === requestStateAuthProfile,
+      );
+
+      if (!authProfile) {
+        onUpdateRequestState({
+          selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile,
+        });
+
+        // If previous selected profiles didn't found
+        if (requestStateAuthProfile) {
+          notifications.warning(
+            "Selected auth profile not found. Resetting to default.",
+          );
+        }
+      }
+    }
+  }
 </script>
 
 <div class="d-flex flex-column w-100 h-100">

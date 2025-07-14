@@ -423,6 +423,9 @@ export class RxDB {
             if (oldDoc?.property?.request) {
               oldDoc.property.request.state.selectedRequestAuthProfileId = "";
             }
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.selectedRequestAuthProfileId = "";
+            }
             return oldDoc;
           },
         },

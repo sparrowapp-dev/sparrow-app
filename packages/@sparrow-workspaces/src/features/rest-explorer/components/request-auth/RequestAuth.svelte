@@ -8,7 +8,10 @@
   } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
-  import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    CollectionAuthTypeBaseEnum,
+    type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { Button, notifications } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
@@ -44,21 +47,17 @@
       collection?.authProfiles
     ) {
       const authProfile = collection?.authProfiles.find(
-        (profile) => profile.authId === requestStateAuthProfile,
+        (profile: AuthProfileDto) => profile.authId === requestStateAuthProfile,
       );
-      // const defaultAuthProfile = collection?.authProfiles.find(
-      //   (profile) => profile.defaultKey,
-      // );
 
       if (!authProfile) {
         onUpdateRequestState({
-          // selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile || defaultAuthProfile,
           selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile,
         });
 
         // If previous selected profiles didn't found
         if (requestStateAuthProfile) {
-          notifications.warning(
+          notifications.info(
             "Selected auth profile not found. Resetting to default.",
           );
         }

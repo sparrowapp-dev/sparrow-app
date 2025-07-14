@@ -200,13 +200,13 @@ class AiRequestExplorerViewModel {
         );
         const m = this._tab.getValue() as Tab;
 
-        if (!m.property.aiRequest?.state?.selectedRequestAuthProfileId) {
-          const defaultAuthProfileId =
-            collectionDoc?.defaultSelectedAuthProfile;
-          this.updateRequestState({
-            selectedRequestAuthProfileId: defaultAuthProfileId,
-          });
-        }
+        // if (!m.property.aiRequest?.state?.selectedRequestAuthProfileId) {
+        //   const defaultAuthProfileId =
+        //     collectionDoc?.defaultSelectedAuthProfile;
+        //   this.updateRequestState({
+        //     selectedRequestAuthProfileId: defaultAuthProfileId,
+        //   });
+        // }
 
         if (
           m.property.aiRequest?.state.aiAuthNavigation ===
@@ -472,8 +472,10 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey =
-      componentData.property.aiRequest.auth.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -512,8 +514,10 @@ class AiRequestExplorerViewModel {
   public getConversationsList = () => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -560,8 +564,10 @@ class AiRequestExplorerViewModel {
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -727,8 +733,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -787,8 +795,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -832,8 +842,10 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
@@ -844,15 +856,22 @@ class AiRequestExplorerViewModel {
     }
 
     try {
-      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, providerModel, filesToUpload);
+      const response = await this.aiRequestService.uploadRAGfiles(
+        provider,
+        providerAuthKey,
+        providerModel,
+        filesToUpload,
+      );
       if (response.isSuccessful) {
         return response.data.data;
       } else {
-        const errorMsg = response?.message || response?.data?.message || 'Failed to upload files. Please try again.';
+        const errorMsg =
+          response?.message ||
+          response?.data?.message ||
+          "Failed to upload files. Please try again.";
         notifications.error(errorMsg);
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Something went wrong while uploading files. :>> ", error);
     }
   };
@@ -2222,9 +2241,10 @@ class AiRequestExplorerViewModel {
           m.path.collectionId as string,
         );
 
-        const authProfilesList: CollectionAuthProifleBaseInterface[] = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+        const authProfilesList: CollectionAuthProifleBaseInterface[] =
+          collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
         const selectedProfileId =
-          m.property.request?.state?.selectedRequestAuthProfileId;
+          m.property.aiRequest?.state?.selectedRequestAuthProfileId;
 
         const selectedProfile = selectedProfileId
           ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
@@ -2507,14 +2527,21 @@ class AiRequestExplorerViewModel {
                 errorMessage =
                   "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
-                errorMessage = "Some issue occurred from server while processing your request, please try again.";
-              } else if (response.message.includes("exceeds the maximum limit") || 
-                  response.message.includes("Total file size exceeds the limit")
-            ) {
-                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
-                await this.updateRequestState({ isChatbotPromptBoxActive: false });
-              } 
-              else { errorMessage = response.message; } // Use the actual error message from the response
+                errorMessage =
+                  "Some issue occurred from server while processing your request, please try again.";
+              } else if (
+                response.message.includes("exceeds the maximum limit") ||
+                response.message.includes("Total file size exceeds the limit")
+              ) {
+                errorMessage =
+                  response.message +
+                  " Please start a new conversation to continue exploring!";
+                await this.updateRequestState({
+                  isChatbotPromptBoxActive: false,
+                });
+              } else {
+                errorMessage = response.message;
+              } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations ||

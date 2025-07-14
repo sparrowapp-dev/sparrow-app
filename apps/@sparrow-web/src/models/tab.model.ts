@@ -1498,6 +1498,9 @@ export const tabSchemaLiteral = {
                 isChatbotPromptBoxActive: {
                   type: "boolean",
                 },
+                selectedRequestAuthProfileId: {
+                  type: "string"
+                }
               },
             },
             auth: {

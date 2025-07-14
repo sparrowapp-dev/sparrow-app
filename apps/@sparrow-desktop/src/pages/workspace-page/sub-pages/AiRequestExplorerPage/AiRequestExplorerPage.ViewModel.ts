@@ -195,13 +195,13 @@ class AiRequestExplorerViewModel {
         );
         const m = this._tab.getValue() as Tab;
 
-        if (!m.property.aiRequest?.state?.selectedRequestAuthProfileId) {
-          const defaultAuthProfileId =
-            collectionDoc?.defaultSelectedAuthProfile;
-          this.updateRequestState({
-            selectedRequestAuthProfileId: defaultAuthProfileId,
-          });
-        }
+        // if (!m.property.aiRequest?.state?.selectedRequestAuthProfileId) {
+        //   const defaultAuthProfileId =
+        //     collectionDoc?.defaultSelectedAuthProfile;
+        //   this.updateRequestState({
+        //     selectedRequestAuthProfileId: defaultAuthProfileId,
+        //   });
+        // }
 
         if (
           m.property.aiRequest?.state.aiAuthNavigation ===
