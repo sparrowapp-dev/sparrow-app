@@ -133,7 +133,7 @@ class CollectionExplorerPage {
       progressiveTab.id,
       collection,
     );
-    console.log("collec :>> ", collection);
+
     if (!collection) result = false;
     // description
     else if (collectionTab.description !== progressiveTab.description) {

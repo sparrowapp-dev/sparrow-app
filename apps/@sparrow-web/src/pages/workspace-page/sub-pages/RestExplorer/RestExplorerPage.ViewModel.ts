@@ -88,6 +88,7 @@ import {
   CollectionItemTypeBaseEnum,
   CollectionRequestAddToBaseEnum,
   type CollectionAuthBaseInterface,
+  type CollectionAuthProifleBaseInterface as AuthProfileDto,
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { RequestSavedTabAdapter } from "src/adapter/request-saved-tab";
@@ -185,18 +186,24 @@ class RestExplorerViewModel {
         t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
 
-        const collectionDoc = await this.fetchCollection(t.path.collectionId as string);
+        const collectionDoc = await this.fetchCollection(
+          t.path.collectionId as string,
+        );
         const m = this._tab.getValue() as Tab;
 
-        console.log("selectedRequestAuthProfileId:>> ", m.property.request?.state?.selectedRequestAuthProfileId);
-        if (!m.property.request?.state?.selectedRequestAuthProfileId) {
-          console.log("Setting default auth profile id!");
-          const defaultAuthProfileId = collectionDoc?.defaultSelectedAuthProfile;
-          this.updateRequestState({ selectedRequestAuthProfileId: defaultAuthProfileId });
-        }
+        // console.log(
+        //   "selectedRequestAuthProfileId:>> ",
+        //   m.property.request?.state?.selectedRequestAuthProfileId,
+        // );
+        // if (!m.property.request?.state?.selectedRequestAuthProfileId) {
+        //   console.log("Setting default auth profile id!");
+        //   const defaultAuthProfileId = collectionDoc?.defaultSelectedAuthProfile;
+        //   this.updateRequestState({ selectedRequestAuthProfileId: defaultAuthProfileId });
+        // }
 
         if (
-          m.property.request?.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
+          m.property.request?.state.requestAuthNavigation ===
+          HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
         ) {
           this.authHeader = new ReduceAuthHeader(
             this._collectionAuth.getValue()
@@ -208,31 +215,38 @@ class RestExplorerViewModel {
               .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
             this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
           ).getValue();
-        }
-        else if (m.property.request?.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES) {
-          const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
-          const selectedProfileId = m.property.request?.state?.selectedRequestAuthProfileId;
+        } else if (
+          m.property.request?.state.requestAuthNavigation ===
+          HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
+        ) {
+          const authProfilesList: AuthProfileDto[] =
+            collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+          const selectedProfileId =
+            m.property.request?.state?.selectedRequestAuthProfileId;
 
           const selectedProfile = selectedProfileId
-            ? authProfilesList.find(pf => pf.authId === selectedProfileId)
-            : authProfilesList.find(pf => pf.defaultKey);
+            ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+            : authProfilesList.find((pf) => pf.defaultKey);
 
           this.collectionAuthProfile = {
             auth: selectedProfile?.auth,
             authId: selectedProfileId as string,
-            authType: selectedProfile?.authType
-          }
+            authType: selectedProfile?.authType,
+          };
 
           this.authHeader = new ReduceAuthHeader(
-            this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-            this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+            this._collectionAuthProfile.getValue()
+              .authType as CollectionAuthTypeBaseEnum,
+            this._collectionAuthProfile.getValue()
+              .auth as CollectionAuthBaseInterface,
           ).getValue();
           this.authParameter = new ReduceAuthParameter(
-            this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-            this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+            this._collectionAuthProfile.getValue()
+              .authType as CollectionAuthTypeBaseEnum,
+            this._collectionAuthProfile.getValue()
+              .auth as CollectionAuthBaseInterface,
           ).getValue();
-        }
-        else {
+        } else {
           this.authHeader = new ReduceAuthHeader(
             this._tab.getValue().property.request?.state.requestAuthNavigation,
             this._tab.getValue().property.request?.auth,
@@ -653,7 +667,10 @@ class RestExplorerViewModel {
           responseBodyLanguage: data.response.bodyLanguage,
           responseBodyFormatter: data?.response?.bodyFormatter,
         });
-        savedRequestTab.updateName(progressiveTab.name + ` (${data.response.status.replace(/^\d+\s*/, "")})`);
+        savedRequestTab.updateName(
+          progressiveTab.name +
+            ` (${data.response.status.replace(/^\d+\s*/, "")})`,
+        );
         responseCode = data.response.status;
       }
       return restApiDataMap;
@@ -907,53 +924,65 @@ class RestExplorerViewModel {
         HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
       ) {
         this.authHeader = new ReduceAuthHeader(
-          this._collectionAuth.getValue().collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
           this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
         ).getValue();
         this.authParameter = new ReduceAuthParameter(
-          this._collectionAuth.getValue().collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
           this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
         ).getValue();
-      }
-      else if (
+      } else if (
         _state.requestAuthNavigation ===
         HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
       ) {
         this.authHeader = new ReduceAuthHeader(
-          this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-          this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface,
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
         ).getValue();
         this.authParameter = new ReduceAuthParameter(
-          this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-          this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface,
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
         ).getValue();
       } else if (_state.selectedRequestAuthProfileId) {
         const m = this._tab.getValue() as Tab;
-        const collectionDoc = await this.fetchCollection(m.path.collectionId as string);
+        const collectionDoc = await this.fetchCollection(
+          m.path.collectionId as string,
+        );
 
-        const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
-        const selectedProfileId = m.property.request?.state?.selectedRequestAuthProfileId;
+        const authProfilesList: AuthProfileDto[] =
+          collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+        const selectedProfileId =
+          m.property.request?.state?.selectedRequestAuthProfileId;
 
         const selectedProfile = selectedProfileId
-          ? authProfilesList.find(pf => pf.authId === selectedProfileId)
-          : authProfilesList.find(pf => pf.defaultKey);
+          ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+          : authProfilesList.find((pf) => pf.defaultKey);
 
         this.collectionAuthProfile = {
           auth: selectedProfile?.auth,
           authId: selectedProfileId as string,
-          authType: selectedProfile?.authType
-        }
+          authType: selectedProfile?.authType,
+        };
 
         this.authHeader = new ReduceAuthHeader(
-          this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-          this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface,
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
         ).getValue();
         this.authParameter = new ReduceAuthParameter(
-          this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-          this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface,
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
         ).getValue();
-      }
-      else {
+      } else {
         this.authHeader = new ReduceAuthHeader(
           progressiveTab.property.request.state.requestAuthNavigation,
           progressiveTab.property.request.auth,
@@ -1108,12 +1137,14 @@ class RestExplorerViewModel {
     const decodeData = this._decodeRequest.init(
       this._tab.getValue().property.request,
       environmentVariables.filtered,
-      this._tab.getValue().property.request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
-        ? {
-          auth: this._collectionAuthProfile.getValue().auth,
-          collectionAuthNavigation: this._collectionAuthProfile.getValue().authType
-        } as HttpRequestCollectionLevelAuthTabInterface :
-        this._collectionAuth.getValue()
+      this._tab.getValue().property.request.state.requestAuthNavigation ===
+        HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
+        ? ({
+            auth: this._collectionAuthProfile.getValue().auth,
+            collectionAuthNavigation:
+              this._collectionAuthProfile.getValue().authType,
+          } as HttpRequestCollectionLevelAuthTabInterface)
+        : this._collectionAuth.getValue(),
     );
     const selectedAgent = localStorage.getItem(
       "selectedAgent",
@@ -1598,7 +1629,7 @@ class RestExplorerViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) { }
+  set collection(e) {}
 
   /**
    *
@@ -1723,7 +1754,9 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
+            const collectionDoc = await this.fetchCollection(
+              expectedPath.collectionId as string,
+            );
             if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -1740,31 +1773,37 @@ class RestExplorerViewModel {
                 this._collectionAuth.getValue()
                   .auth as CollectionAuthBaseInterface,
               ).getValue();
-            }
-            else if (
+            } else if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
             ) {
-              const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
-              const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
+              const authProfilesList: AuthProfileDto[] =
+                collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+              const selectedProfileId =
+                componentData.property.request?.state
+                  ?.selectedRequestAuthProfileId;
 
               const selectedProfile = selectedProfileId
-                ? authProfilesList.find(pf => pf.authId === selectedProfileId)
-                : authProfilesList.find(pf => pf.defaultKey);
+                ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+                : authProfilesList.find((pf) => pf.defaultKey);
 
               this.collectionAuthProfile = {
                 auth: selectedProfile?.auth,
                 authId: selectedProfileId,
-                authType: selectedProfile?.authType
-              }
+                authType: selectedProfile?.authType,
+              };
 
               this.authHeader = new ReduceAuthHeader(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
               this.authParameter = new ReduceAuthParameter(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
             }
           } else {
@@ -1838,7 +1877,9 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
+            const collectionDoc = await this.fetchCollection(
+              expectedPath.collectionId as string,
+            );
             if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -1855,31 +1896,37 @@ class RestExplorerViewModel {
                 this._collectionAuth.getValue()
                   .auth as CollectionAuthBaseInterface,
               ).getValue();
-            }
-            else if (
+            } else if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
             ) {
-              const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
-              const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
+              const authProfilesList: AuthProfileDto[] =
+                collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+              const selectedProfileId =
+                componentData.property.request?.state
+                  ?.selectedRequestAuthProfileId;
 
               const selectedProfile = selectedProfileId
-                ? authProfilesList.find(pf => pf.authId === selectedProfileId)
-                : authProfilesList.find(pf => pf.defaultKey);
+                ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+                : authProfilesList.find((pf) => pf.defaultKey);
 
               this.collectionAuthProfile = {
                 auth: selectedProfile?.auth,
                 authId: selectedProfileId as string,
-                authType: selectedProfile?.authType
-              }
+                authType: selectedProfile?.authType,
+              };
 
               this.authHeader = new ReduceAuthHeader(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
               this.authParameter = new ReduceAuthParameter(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
             }
           } else {
@@ -1956,7 +2003,9 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
+            const collectionDoc = await this.fetchCollection(
+              expectedPath.collectionId as string,
+            );
             if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -1973,31 +2022,37 @@ class RestExplorerViewModel {
                 this._collectionAuth.getValue()
                   .auth as CollectionAuthBaseInterface,
               ).getValue();
-            }
-            else if (
+            } else if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
             ) {
-              const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
-              const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
+              const authProfilesList: AuthProfileDto[] =
+                collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+              const selectedProfileId =
+                componentData.property.request?.state
+                  ?.selectedRequestAuthProfileId;
 
               const selectedProfile = selectedProfileId
-                ? authProfilesList.find(pf => pf.authId === selectedProfileId)
-                : authProfilesList.find(pf => pf.defaultKey);
+                ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+                : authProfilesList.find((pf) => pf.defaultKey);
 
               this.collectionAuthProfile = {
                 auth: selectedProfile?.auth,
                 authId: selectedProfileId as string,
-                authType: selectedProfile?.authType
-              }
+                authType: selectedProfile?.authType,
+              };
 
               this.authHeader = new ReduceAuthHeader(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
               this.authParameter = new ReduceAuthParameter(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
             }
           } else {
@@ -2068,7 +2123,9 @@ class RestExplorerViewModel {
             this.tab = progressiveTab;
             this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
 
-            const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
+            const collectionDoc = await this.fetchCollection(
+              expectedPath.collectionId as string,
+            );
             if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.INHERIT_AUTH
@@ -2085,31 +2142,37 @@ class RestExplorerViewModel {
                 this._collectionAuth.getValue()
                   .auth as CollectionAuthBaseInterface,
               ).getValue();
-            }
-            else if (
+            } else if (
               progressiveTab.property.request?.state.requestAuthNavigation ===
               HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
             ) {
-              const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
-              const selectedProfileId = componentData.property.request?.state?.selectedRequestAuthProfileId;
+              const authProfilesList: AuthProfileDto[] =
+                collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+              const selectedProfileId =
+                componentData.property.request?.state
+                  ?.selectedRequestAuthProfileId;
 
               const selectedProfile = selectedProfileId
-                ? authProfilesList.find(pf => pf.authId === selectedProfileId)
-                : authProfilesList.find(pf => pf.defaultKey);
+                ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+                : authProfilesList.find((pf) => pf.defaultKey);
 
               this.collectionAuthProfile = {
                 auth: selectedProfile?.auth,
                 authId: selectedProfileId as string,
-                authType: selectedProfile?.authType
-              }
+                authType: selectedProfile?.authType,
+              };
 
               this.authHeader = new ReduceAuthHeader(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
               this.authParameter = new ReduceAuthParameter(
-                this._collectionAuthProfile.getValue().authType as CollectionAuthTypeBaseEnum,
-                this._collectionAuthProfile.getValue().auth as CollectionAuthBaseInterface
+                this._collectionAuthProfile.getValue()
+                  .authType as CollectionAuthTypeBaseEnum,
+                this._collectionAuthProfile.getValue()
+                  .auth as CollectionAuthBaseInterface,
               ).getValue();
             }
           } else {

@@ -114,6 +114,7 @@
   import {
     CollectionTypeBaseEnum,
     type CollectionAuthProifleBaseInterface as AuthProfileDto,
+    type CollectionAuthProifleBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
@@ -151,8 +152,7 @@
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
   let isCollectionSyncing = false;
-  let authProfilesList = []; // ToDo: Give a type here
-
+  let authProfilesList: CollectionAuthProifleBaseInterface[] = [];
   $: authProfilesList = collection?.authProfiles || [];
 
   /**
@@ -363,7 +363,6 @@
   export let currentWorkspace;
 
   // Auth Profile wrapper functions/handlers
-  // ToDo: Add types for the parameters
   const handleOnCreateAuthProfile = async (authProfileData: AuthProfileDto) => {
     const response = await onCreateAuthProfile(collection, authProfileData);
     return response;

@@ -954,7 +954,6 @@ export class CollectionService {
     return response;
   };
 
-  
   public addAuthProfile = async (
     baseUrl: string,
     updatedPayload: CollectionAuthBaseInterface & {
@@ -963,8 +962,8 @@ export class CollectionService {
     },
   ) => {
     const response = await makeRequest(
-      "PUT", // ToDo: Change to POST from backend
-      `${baseUrl}/api/collection/add-auth-profiles`,
+      "POST", // ToDo: Change to POST from backend
+      `${baseUrl}/api/collection/auth-profiles`,
       {
         body: updatedPayload,
         headers: getAuthHeaders(),
@@ -984,8 +983,7 @@ export class CollectionService {
   ) => {
     const response = await makeRequest(
       "PUT",
-      // `${_baseUrl}/api/collection/update-auth-profiles/${authProfileId}`,
-      `${_baseUrl}/api/collection/update-auth-profiles`,
+      `${_baseUrl}/api/collection/auth-profiles`,
       {
         body: _updateedAuthProfilePayload,
         headers: getAuthHeaders(),
@@ -1005,8 +1003,7 @@ export class CollectionService {
   ) => {
     const response = await makeRequest(
       "DELETE",
-      // `${_baseUrl}/api/collection/delete-auth-profiles/${authProfileId}`,
-      `${_baseUrl}/api/collection/delete-auth-profiles`,
+      `${_baseUrl}/api/collection/auth-profiles`,
       {
         body: _authProfileDeletionPayload,
         headers: getAuthHeaders(),
