@@ -1,6 +1,8 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
   import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
+  import { cubicIn, cubicOut } from "svelte/easing";
 
   export let isTabMenu = false;
   export let xAxis = 0;
@@ -42,8 +44,8 @@
 <nav
   bind:this={dropdownEl}
   style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:{zIndex};"
-  in:scale={{ start: 0.8, duration: 400 }}
-  out:scale={{ start: 0.8, duration: 400 }}
+  in:fade={{ duration: 200, easing: cubicOut }}
+  out:fade={{ duration: 200, easing: cubicIn }}
 >
   <div
     style={`width: ${width}; background-color: var(--bg-ds-surface-600);`}

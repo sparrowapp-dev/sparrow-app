@@ -44,7 +44,7 @@
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
@@ -63,6 +63,7 @@
   import { WelcomePopUpWeb } from "@sparrow/common/components";
   import type { GithubRepoDocType } from "src/models/github-repo.model";
   import { DownloadApp } from "@sparrow/common/features";
+  import { shouldRunThrottled } from "@sparrow/common/store";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -70,15 +71,21 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let userId = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
   });
 
   onMount(async () => {
-    _viewModel.refreshTeams(userId);
-    _viewModel.refreshWorkspaces(userId);
+    if (userId && shouldRunThrottled(userId)) {
+      await Promise.all([
+        _viewModel.refreshTeams(userId),
+        _viewModel.refreshWorkspaces(userId),
+      ]);
+    } else {
+      console.error(`Throttled for ${userId}`);
+    }
 
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
@@ -106,7 +113,7 @@
   }
 
   let isWelcomePopupOpen = false;
-  isUserFirstSignUp.subscribe((value) => {
+  const isUserFirstSignUpSubscriber = isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
     }
@@ -139,13 +146,19 @@
   };
 
   let openTeamData: TeamDocType;
-  openTeam.subscribe((_team) => {
+  const openTeamSubscriber = openTeam.subscribe((_team) => {
     if (_team) {
       const teamJSON = _team?.toMutableJSON();
       setTimeout(() => {
         openTeamData = teamJSON;
       }, 0);
     }
+  });
+
+  onDestroy(() => {
+    openTeamSubscriber.unsubscribe();
+    userSubscriber();
+    isUserFirstSignUpSubscriber();
   });
 
   let isPopupOpen = false;

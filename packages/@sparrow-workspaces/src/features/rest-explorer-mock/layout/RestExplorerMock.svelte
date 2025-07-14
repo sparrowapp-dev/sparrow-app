@@ -522,258 +522,257 @@
   let selectedStatusCode = "";
 </script>
 
-{#if $tab.tabId}
-  <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 p-3">
-      <!-- Request Name Header -->
-      <!-- 
+<div class="d-flex rest-explorer-layout h-100">
+  <div class="w-100 d-flex flex-column h-100 p-3">
+    <!-- Request Name Header -->
+    <!-- 
         --
         -- Rest name header is set to display none 
         --
       -->
-      <div class="d-flex justify-content-between w-100 p-3 d-none">
-        <RequestName name={$tab.name} {onUpdateRequestName} />
+    <div class="d-flex justify-content-between w-100 p-3 d-none">
+      <RequestName name={$tab.name} {onUpdateRequestName} />
 
-        <div class="d-flex justify-content-between">
-          <Button
-            title="Save Request"
-            type={"secondary"}
-            loader={false}
-            buttonClassProp="ms-2"
-            buttonStartIcon={floppyDisk}
-            onClick={async () => {
-              const x = await onSaveRequest();
-              if (
-                x.status === "error" &&
-                x.message ===
-                  "request is not a part of any workspace or collection"
-              ) {
-                isExposeSaveAsRequest = true;
-              } else if (x.status === "success") {
-                notifications.success("Mock Request saved successfully.");
-              }
-            }}
-          /> <span class="position-relative" style="width:35px;"> </span>
-          <Button
-            title="Share"
-            type={"secondary"}
-            buttonClassProp="ms-2"
-            onClick={() => {}}
-          />
-        </div>
+      <div class="d-flex justify-content-between">
+        <Button
+          title="Save Request"
+          type={"secondary"}
+          loader={false}
+          buttonClassProp="ms-2"
+          buttonStartIcon={floppyDisk}
+          onClick={async () => {
+            const x = await onSaveRequest();
+            if (
+              x.status === "error" &&
+              x.message ===
+                "request is not a part of any workspace or collection"
+            ) {
+              isExposeSaveAsRequest = true;
+            } else if (x.status === "success") {
+              notifications.success("Mock Request saved successfully.");
+            }
+          }}
+        /> <span class="position-relative" style="width:35px;"> </span>
+        <Button
+          title="Share"
+          type={"secondary"}
+          buttonClassProp="ms-2"
+          onClick={() => {}}
+        />
       </div>
+    </div>
 
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSaveLoad={$loading}
-        isSave={$tab.isSaved}
-        bind:userRole
-        requestUrl={$tab.property.mockRequest?.url}
-        httpMethod={$tab.property.mockRequest?.method}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-        {isGuestUser}
-        mockCollectionUrl={collection?.mockCollectionUrl || ""}
-      />
+    <!-- HTTP URL Section -->
+    <HttpUrlSection
+      class=""
+      isSaveLoad={$loading}
+      isSave={$tab.isSaved}
+      bind:userRole
+      requestUrl={$tab.property?.mockRequest?.url}
+      httpMethod={$tab.property?.mockRequest?.method}
+      isSendRequestInProgress={storeData?.isSendRequestInProgress}
+      onSendButtonClicked={onSendRequest}
+      onCancelButtonClicked={onCancelRequest}
+      {onUpdateEnvironment}
+      {environmentVariables}
+      {onUpdateRequestUrl}
+      {onUpdateRequestMethod}
+      {toggleSaveRequest}
+      {onSaveRequest}
+      {isGuestUser}
+      mockCollectionUrl={collection?.mockCollectionUrl || ""}
+    />
 
-      <div
-        bind:this={splitpaneContainer}
-        style="flex:1; overflow:auto; margin-top: 12px;"
-      >
-        <Splitpanes class="explorer-chatbot-splitter">
-          <Pane class="position-relative bg-transparent">
-            <!--Disabling the Quick Help feature, will be taken up in next release-->
-            {#if isPopoverContainer}
-              <Popover
-                onClose={closeCollectionHelpText}
-                heading={`Welcome to Sparrow`}
+    <div
+      bind:this={splitpaneContainer}
+      style="flex:1; overflow:auto; margin-top: 12px;"
+    >
+      <Splitpanes class="explorer-chatbot-splitter">
+        <Pane class="position-relative bg-transparent">
+          <!--Disabling the Quick Help feature, will be taken up in next release-->
+          {#if isPopoverContainer}
+            <Popover
+              onClose={closeCollectionHelpText}
+              heading={`Welcome to Sparrow`}
+            >
+              <p class="mb-0 text-fs-12">
+                Your one-stop solution for API testing and management. Start
+                organizing your API requests into collections, utilize
+                environment variables, and streamline your development process.
+                Get started now by creating your first collection or exploring
+                our features
+                <span
+                  on:click={() => {
+                    isGuidePopup = true;
+                  }}
+                  class="link p-0 border-0"
+                  style="font-size: 12px;"
+                  >See how it works.
+                </span>
+              </p>
+            </Popover>
+            <div class="pt-2"></div>
+          {/if}
+
+          {#if !isLoading}
+            <Splitpanes
+              class="rest-splitter w-100 h-100"
+              id={"rest-splitter"}
+              horizontal={$tabsSplitterDirection === "horizontal"
+                ? true
+                : false}
+              dblClickSplitter={false}
+              on:resize={(e) => {
+                onUpdateRequestState({
+                  requestLeftSplitterWidthPercentage: e.detail[0].size,
+                });
+                onUpdateRequestState({
+                  requestRightSplitterWidthPercentage: e.detail[1].size,
+                });
+              }}
+            >
+              <Pane
+                minSize={30}
+                size={$tab.property?.mockRequest?.state
+                  ?.requestLeftSplitterWidthPercentage}
+                class="position-relative bg-transparent"
               >
-                <p class="mb-0 text-fs-12">
-                  Your one-stop solution for API testing and management. Start
-                  organizing your API requests into collections, utilize
-                  environment variables, and streamline your development
-                  process. Get started now by creating your first collection or
-                  exploring our features
-                  <span
-                    on:click={() => {
-                      isGuidePopup = true;
-                    }}
-                    class="link p-0 border-0"
-                    style="font-size: 12px;"
-                    >See how it works.
-                  </span>
-                </p>
-              </Popover>
-              <div class="pt-2"></div>
-            {/if}
-
-            {#if !isLoading}
-              <Splitpanes
-                class="rest-splitter w-100 h-100"
-                id={"rest-splitter"}
-                horizontal={$tabsSplitterDirection === "horizontal"
-                  ? true
-                  : false}
-                dblClickSplitter={false}
-                on:resize={(e) => {
-                  onUpdateRequestState({
-                    requestLeftSplitterWidthPercentage: e.detail[0].size,
-                  });
-                  onUpdateRequestState({
-                    requestRightSplitterWidthPercentage: e.detail[1].size,
-                  });
-                }}
-              >
-                <Pane
-                  minSize={30}
-                  size={$tab.property.mockRequest?.state
-                    ?.requestLeftSplitterWidthPercentage}
-                  class="position-relative bg-transparent"
+                <!-- Request Pane -->
+                <div
+                  class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
+                  'horizontal'
+                    ? 'pb-1'
+                    : 'pe-2'}"
                 >
-                  <!-- Request Pane -->
-                  <div
-                    class="h-100 d-flex flex-column position-relative {$tabsSplitterDirection ===
-                    'horizontal'
-                      ? 'pb-1'
-                      : 'pe-2'}"
-                  >
-                    <RequestNavigator
-                      requestStateSection={$tab.property.mockRequest?.state
-                        ?.requestNavigation}
-                      {onUpdateRequestState}
-                      authParameterLength={$requestAuthParameter.value ? 1 : 0}
-                      authHeaderLength={$requestAuthHeader.value ? 1 : 0}
-                      paramsLength={$tab.property?.mockRequest?.queryParams
-                        ?.length || 0}
-                      headersLength={$tab.property?.mockRequest?.headers
-                        ?.length || 0}
-                      autoGeneratedHeadersLength={$tab.property?.mockRequest
-                        ?.autoGeneratedHeaders?.length || 0}
-                    />
-                    <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $tab.property.mockRequest?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
-                        <RequestParameters
-                          isBulkEditActive={$tab?.property?.mockRequest.state
-                            ?.isParameterBulkEditActive}
-                          {onUpdateRequestState}
-                          params={$tab.property.mockRequest.queryParams}
-                          {onUpdateRequestParams}
-                          authParameter={$requestAuthParameter}
-                          {onUpdateEnvironment}
-                          {environmentVariables}
-                          bind:isMergeViewEnabled={isMergeViewEnableForParams}
-                          bind:isMergeViewLoading
-                          bind:newModifiedContent
-                        />
-                      {:else if $tab.property.mockRequest?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
-                        <RequestBody
-                          body={$tab.property.mockRequest.body}
-                          method={$tab.property.mockRequest.method}
-                          requestState={$tab.property.mockRequest.state}
-                          {onUpdateRequestBody}
-                          {onUpdateRequestState}
-                          {onUpdateEnvironment}
-                          {environmentVariables}
-                          {isWebApp}
-                          bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
-                          bind:isMergeViewLoading
-                          bind:newModifiedContent
-                          {mergeViewRequestDatasetType}
-                        />
-                      {:else if $tab.property.mockRequest?.state?.requestNavigation === RequestSectionEnum.HEADERS}
-                        <RequestHeaders
-                          isBulkEditActive={$tab?.property?.mockRequest.state
-                            ?.isHeaderBulkEditActive}
-                          {onUpdateRequestState}
-                          {environmentVariables}
-                          {onUpdateEnvironment}
-                          headers={$tab.property.mockRequest.headers}
-                          autoGeneratedHeaders={$tab.property.mockRequest
-                            .autoGeneratedHeaders}
-                          authHeader={$requestAuthHeader}
-                          onHeadersChange={onUpdateHeaders}
-                          onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
-                          {isWebApp}
-                          bind:isMergeViewEnabled={isMergeViewEnableForHeaders}
-                          bind:isMergeViewLoading
-                          bind:newModifiedContent
-                        />
-                      {:else if $tab.property.mockRequest?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
-                        <RequestAuth
-                          requestStateAuth={$tab.property.mockRequest.state
-                            .requestAuthNavigation}
-                          {onUpdateRequestState}
-                          auth={$tab.property.mockRequest.auth}
-                          collectionAuth={$collectionAuth}
-                          {onUpdateRequestAuth}
-                          {onUpdateEnvironment}
-                          {environmentVariables}
-                          {collection}
-                          {onOpenCollection}
-                        />
-                      {:else if $tab.property.mockRequest?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
-                        <RequestDoc
-                          isDocGenerating={$tab.property.mockRequest?.state
-                            ?.isDocGenerating}
-                          isDocAlreadyGenerated={$tab.property.mockRequest
-                            ?.state?.isDocAlreadyGenerated}
-                          {onGenerateDocumentation}
-                          {onUpdateRequestDescription}
-                          requestDoc={$tab.description}
-                          {isGuestUser}
-                        />
-                      {/if}
-                    </div>
-                  </div>
-                </Pane>
-                <Pane
-                  minSize={30}
-                  size={$tab.property.mockRequest?.state
-                    ?.requestRightSplitterWidthPercentage}
-                  class="bg-transparent position-relative"
-                >
-                  <!-- Response Pane -->
-                  <div class="d-flex h-100" style="gap: 8px;">
-                    <div style="width: 300px">
-                      <MultipleMockResponse
-                        bind:isResponseRatioModalOpen
-                        bind:isResponseStateModalOpen
-                        bind:responseToToggle
-                        requestName={$tab.name}
-                        requestMethod={$tab.property.mockRequest?.method}
-                        mockResponses={$tab.property.mockRequest?.items || []}
-                        {userRole}
-                        {isWebApp}
-                        {onCreateMockResponse}
-                        {onHandleMockResponseState}
-                        {onRenameMockResponse}
-                        {onDeleteMockResponse}
-                        activeResponseIdx={activeMockResponseIdx}
-                        onSetActiveResponseIdx={handleSetActiveResponseIdx}
+                  <RequestNavigator
+                    requestStateSection={$tab.property?.mockRequest?.state
+                      ?.requestNavigation}
+                    {onUpdateRequestState}
+                    authParameterLength={$requestAuthParameter.value ? 1 : 0}
+                    authHeaderLength={$requestAuthHeader.value ? 1 : 0}
+                    paramsLength={$tab.property?.mockRequest?.queryParams
+                      ?.length || 0}
+                    headersLength={$tab.property?.mockRequest?.headers
+                      ?.length || 0}
+                    autoGeneratedHeadersLength={$tab.property?.mockRequest
+                      ?.autoGeneratedHeaders?.length || 0}
+                  />
+                  <div style="flex:1; overflow:auto;" class="p-0">
+                    {#if $tab.property?.mockRequest?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
+                      <RequestParameters
+                        isBulkEditActive={$tab?.property?.mockRequest.state
+                          ?.isParameterBulkEditActive}
+                        {onUpdateRequestState}
+                        params={$tab.property?.mockRequest.queryParams}
+                        {onUpdateRequestParams}
+                        authParameter={$requestAuthParameter}
+                        {onUpdateEnvironment}
+                        {environmentVariables}
+                        bind:isMergeViewEnabled={isMergeViewEnableForParams}
+                        bind:isMergeViewLoading
+                        bind:newModifiedContent
                       />
-                    </div>
-                    <div
-                      style="width:1px; background:var(--border-ds-surface-100); height:100%; margin-left: 8px;"
-                    ></div>
-                    <div
-                      class="d-flex flex-column h-100 {$tabsSplitterDirection ===
-                      'horizontal'
-                        ? 'pt-1'
-                        : 'ps-2'}"
-                      style="flex:1;"
-                    >
-                      {#if $tab.property.mockRequest?.items && $tab.property.mockRequest?.items?.length > 0}
-                        <div class="h-100 d-flex flex-column">
-                          <div style="flex:1; overflow:auto;">
-                            <!-- {#if storeData?.isSendRequestInProgress}
+                    {:else if $tab.property?.mockRequest?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
+                      <RequestBody
+                        body={$tab.property?.mockRequest.body}
+                        method={$tab.property?.mockRequest.method}
+                        requestState={$tab.property?.mockRequest.state}
+                        {onUpdateRequestBody}
+                        {onUpdateRequestState}
+                        {onUpdateEnvironment}
+                        {environmentVariables}
+                        {isWebApp}
+                        bind:isMergeViewEnabled={isMergeViewEnableForRequestBody}
+                        bind:isMergeViewLoading
+                        bind:newModifiedContent
+                        {mergeViewRequestDatasetType}
+                      />
+                    {:else if $tab.property?.mockRequest?.state?.requestNavigation === RequestSectionEnum.HEADERS}
+                      <RequestHeaders
+                        isBulkEditActive={$tab?.property?.mockRequest.state
+                          ?.isHeaderBulkEditActive}
+                        {onUpdateRequestState}
+                        {environmentVariables}
+                        {onUpdateEnvironment}
+                        headers={$tab.property?.mockRequest.headers}
+                        autoGeneratedHeaders={$tab.property?.mockRequest
+                          .autoGeneratedHeaders}
+                        authHeader={$requestAuthHeader}
+                        onHeadersChange={onUpdateHeaders}
+                        onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
+                        {isWebApp}
+                        bind:isMergeViewEnabled={isMergeViewEnableForHeaders}
+                        bind:isMergeViewLoading
+                        bind:newModifiedContent
+                      />
+                    {:else if $tab.property?.mockRequest?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
+                      <RequestAuth
+                        requestStateAuth={$tab.property?.mockRequest.state
+                          .requestAuthNavigation}
+                        {onUpdateRequestState}
+                        auth={$tab.property?.mockRequest.auth}
+                        collectionAuth={$collectionAuth}
+                        {onUpdateRequestAuth}
+                        {onUpdateEnvironment}
+                        {environmentVariables}
+                        {collection}
+                        {onOpenCollection}
+                      />
+                    {:else if $tab.property?.mockRequest?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                      <RequestDoc
+                        isDocGenerating={$tab.property?.mockRequest?.state
+                          ?.isDocGenerating}
+                        isDocAlreadyGenerated={$tab.property?.mockRequest?.state
+                          ?.isDocAlreadyGenerated}
+                        {onGenerateDocumentation}
+                        {onUpdateRequestDescription}
+                        requestDoc={$tab.description}
+                        {isGuestUser}
+                      />
+                    {/if}
+                  </div>
+                </div>
+              </Pane>
+              <Pane
+                minSize={30}
+                size={$tab.property?.mockRequest?.state
+                  ?.requestRightSplitterWidthPercentage}
+                class="bg-transparent position-relative"
+              >
+                <!-- Response Pane -->
+                <div class="d-flex h-100" style="gap: 8px;">
+                  <div style="width: 300px">
+                    <MultipleMockResponse
+                      bind:isResponseRatioModalOpen
+                      bind:isResponseStateModalOpen
+                      bind:responseToToggle
+                      requestName={$tab.name}
+                      requestMethod={$tab.property?.mockRequest?.method}
+                      mockResponses={$tab.property?.mockRequest?.items || []}
+                      {userRole}
+                      {isWebApp}
+                      {onCreateMockResponse}
+                      {onHandleMockResponseState}
+                      {onRenameMockResponse}
+                      {onDeleteMockResponse}
+                      activeResponseIdx={activeMockResponseIdx}
+                      onSetActiveResponseIdx={handleSetActiveResponseIdx}
+                    />
+                  </div>
+                  <div
+                    style="width:1px; background:var(--border-ds-surface-100); height:100%; margin-left: 8px;"
+                  ></div>
+                  <div
+                    class="d-flex flex-column h-100 {$tabsSplitterDirection ===
+                    'horizontal'
+                      ? 'pt-1'
+                      : 'ps-2'}"
+                    style="flex:1;"
+                  >
+                    {#if $tab.property?.mockRequest?.items && $tab.property?.mockRequest?.items?.length > 0}
+                      <div class="h-100 d-flex flex-column">
+                        <div style="flex:1; overflow:auto;">
+                          <!-- {#if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
                             style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
@@ -789,152 +788,152 @@
                             {environmentVariables}
                           />
                         {:else if storeData?.response.status} -->
-                            <div
-                              class="h-100 d-flex flex-column"
-                              style="gap:12px"
-                            >
-                              <!-- <div
+                          <div
+                            class="h-100 d-flex flex-column"
+                            style="gap:12px"
+                          >
+                            <!-- <div
                             class="d-flex justify-content-between"
                             style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
                           > -->
-                              <div class="d-flex justify-content-between">
-                                <ResponseNavigator
-                                  requestStateSection={selectedResponse?.state
-                                    ?.responseNavigation}
-                                  {onUpdateResponseState}
-                                  responseHeadersLength={selectedResponse
-                                    ?.mockRequestResponse?.responseHeaders
-                                    ?.length || 0}
-                                  selectedResponseId={selectedResponse?.id}
-                                />
-                                <Select
-                                  data={HttpStatusCodes}
-                                  onclick={(selectedItem) => {
-                                    selectedStatusCode = selectedItem;
-                                    onUpdateResponseStatus(
-                                      selectedItem,
-                                      selectedResponse?.id,
-                                    );
-                                  }}
-                                  titleId={selectedResponse?.mockRequestResponse
-                                    ?.responseStatus}
-                                  placeholderText={"Status Code"}
-                                  id={"httpStatusCode"}
-                                  zIndex={701}
-                                  disabled={false}
-                                  minBodyWidth={"180px"}
-                                  minHeaderWidth={"180px"}
-                                  maxHeaderWidth={"180px"}
-                                  bodyTheme={"violet"}
-                                  menuItem={"v2"}
-                                  headerFontSize={"12px"}
-                                  isDropIconFilled={true}
-                                  maxBodyHeight={"196px"}
-                                  variant={"secondary"}
-                                  borderType={"none"}
-                                  borderActiveType={"none"}
-                                  borderHighlight={"hover-active"}
-                                  headerHighlight={"hover-active"}
-                                  headerHeight={"26px"}
-                                  borderRounded={"4px"}
-                                  headerSearchable={true}
-                                />
-                              </div>
-                              <!-- </div> -->
-                              <div
-                                class="flex-grow-1 d-flex flex-column"
-                                style="overflow:auto; min-height:0;"
-                              >
-                                {#if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
-                                  {#if selectedResponse?.state?.responseBodyLanguage !== "Image"}
-                                    <ResponseBodyNavigator
-                                      response={selectedResponse
-                                        ?.mockRequestResponse
-                                        ?.responseHeaders || []}
-                                      apiState={selectedResponse?.state}
-                                      path={$tab.path}
-                                      responseId={selectedResponse.id}
-                                      {onUpdateResponseState}
-                                      {onUpdateRequestState}
-                                      {onClearResponse}
-                                      {onSaveResponse}
-                                      {isWebApp}
-                                      {isGuestUser}
-                                      {userRole}
-                                    />
-                                  {/if}
-                                  <div
-                                    style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
-                                  >
-                                    <ResponseBody
-                                      response={selectedResponse
-                                        ?.mockRequestResponse?.responseBody}
-                                      apiState={selectedResponse?.state}
-                                      {onUpdateResponseBody}
-                                      responseId={selectedResponse.id}
-                                    />
-                                  </div>
-                                {:else if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
-                                  <div style="overflow:auto;">
-                                    <ResponseHeaders
-                                      responseHeaders={selectedResponse
-                                        ?.mockRequestResponse?.responseHeaders}
-                                      {onUpdateResponseHeaders}
-                                      responseId={selectedResponse.id}
-                                    />
-                                  </div>
-                                {/if}
-                              </div>
+                            <div class="d-flex justify-content-between">
+                              <ResponseNavigator
+                                requestStateSection={selectedResponse?.state
+                                  ?.responseNavigation}
+                                {onUpdateResponseState}
+                                responseHeadersLength={selectedResponse
+                                  ?.mockRequestResponse?.responseHeaders
+                                  ?.length || 0}
+                                selectedResponseId={selectedResponse?.id}
+                              />
+                              <Select
+                                data={HttpStatusCodes}
+                                onclick={(selectedItem) => {
+                                  selectedStatusCode = selectedItem;
+                                  onUpdateResponseStatus(
+                                    selectedItem,
+                                    selectedResponse?.id,
+                                  );
+                                }}
+                                titleId={selectedResponse?.mockRequestResponse
+                                  ?.responseStatus}
+                                placeholderText={"Status Code"}
+                                id={"httpStatusCode"}
+                                zIndex={701}
+                                disabled={false}
+                                minBodyWidth={"180px"}
+                                minHeaderWidth={"180px"}
+                                maxHeaderWidth={"180px"}
+                                bodyTheme={"violet"}
+                                menuItem={"v2"}
+                                headerFontSize={"12px"}
+                                isDropIconFilled={true}
+                                maxBodyHeight={"196px"}
+                                variant={"secondary"}
+                                borderType={"none"}
+                                borderActiveType={"none"}
+                                borderHighlight={"hover-active"}
+                                headerHighlight={"hover-active"}
+                                headerHeight={"26px"}
+                                borderRounded={"4px"}
+                                headerSearchable={true}
+                              />
                             </div>
-                            <!-- {/if} -->
+                            <!-- </div> -->
+                            <div
+                              class="flex-grow-1 d-flex flex-column"
+                              style="overflow:auto; min-height:0;"
+                            >
+                              {#if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.RESPONSE}
+                                {#if selectedResponse?.state?.responseBodyLanguage !== "Image"}
+                                  <ResponseBodyNavigator
+                                    response={selectedResponse
+                                      ?.mockRequestResponse?.responseHeaders ||
+                                      []}
+                                    apiState={selectedResponse?.state}
+                                    path={$tab.path}
+                                    responseId={selectedResponse.id}
+                                    {onUpdateResponseState}
+                                    {onUpdateRequestState}
+                                    {onClearResponse}
+                                    {onSaveResponse}
+                                    {isWebApp}
+                                    {isGuestUser}
+                                    {userRole}
+                                  />
+                                {/if}
+                                <div
+                                  style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                                >
+                                  <ResponseBody
+                                    response={selectedResponse
+                                      ?.mockRequestResponse?.responseBody}
+                                    apiState={selectedResponse?.state}
+                                    {onUpdateResponseBody}
+                                    responseId={selectedResponse.id}
+                                  />
+                                </div>
+                              {:else if selectedResponse?.state?.responseNavigation === ResponseSectionEnum.HEADERS}
+                                <div style="overflow:auto;">
+                                  <ResponseHeaders
+                                    responseHeaders={selectedResponse
+                                      ?.mockRequestResponse?.responseHeaders}
+                                    {onUpdateResponseHeaders}
+                                    responseId={selectedResponse.id}
+                                  />
+                                </div>
+                              {/if}
+                            </div>
                           </div>
+                          <!-- {/if} -->
                         </div>
-                      {:else}
-                        <NoMockResponseDetailsSection {onCreateMockResponse} />
-                      {/if}
-                    </div>
+                      </div>
+                    {:else}
+                      <NoMockResponseDetailsSection {onCreateMockResponse} />
+                    {/if}
                   </div>
-                </Pane>
-              </Splitpanes>
-            {:else}
-              <!-- loading state -->
-              <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
-            {/if}
-          </Pane>
-          <!-- AI Chatbot Interface -->
-          {#if !isGuestUser && $tab?.property?.mockRequest?.state?.isChatbotActive}
-            <Pane
-              class="position-relative bg-transparent"
-              minSize={minSizePct}
-              size={defaultSizePct}
-              maxSize={maxSizePct}
-            >
-              <ChatBot
-                {tab}
-                {onUpdateAiPrompt}
-                {onUpdateAiConversation}
-                {onUpdateAiModel}
-                {onUpdateRequestState}
-                {onGenerateAiResponse}
-                {onStopGeneratingAIResponse}
-                {onToggleLike}
-                {handleApplyChangeOnAISuggestion}
-              />
-            </Pane>
+                </div>
+              </Pane>
+            </Splitpanes>
+          {:else}
+            <!-- loading state -->
+            <ResponseDefaultScreen isMainScreen={true} {isWebApp} />
           {/if}
-        </Splitpanes>
-      </div>
+        </Pane>
+        <!-- AI Chatbot Interface -->
+        {#if !isGuestUser && $tab?.property?.mockRequest?.state?.isChatbotActive}
+          <Pane
+            class="position-relative bg-transparent"
+            minSize={minSizePct}
+            size={defaultSizePct}
+            maxSize={maxSizePct}
+          >
+            <ChatBot
+              {tab}
+              {onUpdateAiPrompt}
+              {onUpdateAiConversation}
+              {onUpdateAiModel}
+              {onUpdateRequestState}
+              {onGenerateAiResponse}
+              {onStopGeneratingAIResponse}
+              {onToggleLike}
+              {handleApplyChangeOnAISuggestion}
+            />
+          </Pane>
+        {/if}
+      </Splitpanes>
     </div>
-    <!--
+  </div>
+  <!--
       --
        -- Rest extension panel is set to display none 
       --
     -->
-    <div class="d-none">
-      <RestExtensionPanel
-        state={$tab.property.mockRequest?.state}
-        requestMethod={$tab.property.mockRequest?.method}
-        requestUrl={$tab.property.mockRequest?.url}
+  <div class="d-none">
+    <!-- <RestExtensionPanel
+        state={$tab.property?.mockRequest?.state}
+        requestMethod={$tab.property?.mockRequest?.method}
+        requestUrl={$tab.property?.mockRequest?.url}
         requestName={$tab.name}
         requestDescription={$tab.description}
         requestPath={$tab.path}
@@ -948,38 +947,37 @@
         {onUpdateRequestState}
         {onUpdateRequestDescription}
         {readRequestOrFolderInCollection}
-      />
-    </div>
+      /> -->
   </div>
-  <Modal
-    title={"Save Request"}
-    type={"dark"}
-    width={"55%"}
-    zIndex={10000}
-    isOpen={isExposeSaveAsRequest}
-    handleModalState={(flag = false) => {
+</div>
+<Modal
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag = false) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsCollectionItem
+    onClick={(flag = false) => {
       isExposeSaveAsRequest = flag;
     }}
-  >
-    <SaveAsCollectionItem
-      onClick={(flag = false) => {
-        isExposeSaveAsRequest = flag;
-      }}
-      requestMethod={$tab.property.mockRequest?.method}
-      requestUrl={$tab.property.mockRequest?.url}
-      requestName={$tab.name}
-      requestDescription={$tab.description}
-      requestPath={$tab.path}
-      collections={$collections}
-      {readWorkspace}
-      onSave={onSaveAsRequest}
-      {onCreateFolder}
-      {onCreateCollection}
-      {onRenameCollection}
-      {onRenameFolder}
-    />
-  </Modal>
-{/if}
+    requestMethod={$tab.property?.mockRequest?.method}
+    requestUrl={$tab.property?.mockRequest?.url}
+    requestName={$tab.name}
+    requestDescription={$tab.description}
+    requestPath={$tab.path}
+    collections={$collections}
+    {readWorkspace}
+    onSave={onSaveAsRequest}
+    {onCreateFolder}
+    {onCreateCollection}
+    {onRenameCollection}
+    {onRenameFolder}
+  />
+</Modal>
 
 <Modal
   title={""}
@@ -1072,7 +1070,7 @@
 >
   <MockResponesRatio
     bind:isResponseRatioModalOpen
-    mockResponses={$tab.property.mockRequest?.items || []}
+    mockResponses={$tab.property?.mockRequest?.items || []}
     {onUpdateResponseRatios}
   />
 </Modal>

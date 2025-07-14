@@ -343,19 +343,6 @@ export class DashboardViewModel {
     }
   };
 
-  private refreshTeamsWorkspacesThrottle = async (_userId: string) => {
-    await this.refreshTeams(_userId);
-    await this.refreshWorkspaces(_userId);
-  };
-  private refreshTeamsWorkspacesThrottler = throttle(
-    this.refreshTeamsWorkspacesThrottle,
-    2000,
-  );
-
-  public refreshTeamsWorkspaces = async (_userId: string) => {
-    this.refreshTeamsWorkspacesThrottler(_userId);
-  };
-
   /**
    * clear local DB and clear guest user details from store
    */
