@@ -44,6 +44,7 @@
   let isFailedPublishedModalOpen = false;
   let currrentInvites: number;
   let upgradePlanModalInvite: boolean = false;
+  let invitedCount: number = 0;
   const workspaceUpdatesList: Observable<UpdatesDocType[]> =
     _viewModel.getWorkspaceUpdatesList(workspaceID);
 
@@ -58,7 +59,7 @@
   }
   let userId = "";
   let userRole = "";
-  user.subscribe((value) => {
+  const userSubscriber = user.subscribe((value) => {
     if (value) {
       userId = value._id;
     }
@@ -125,6 +126,7 @@
     data: addUsersInWorkspacePayload,
     invitedUserCount: number,
   ) => {
+    invitedCount = invitedUserCount;
     const response = await _viewModel.inviteUserToWorkspace(
       workspaceId,
       workspaceName,
@@ -165,6 +167,7 @@
   // }
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
+    userSubscriber();
   });
   onMount(async () => {
     await _viewModel.fetchWorkspaceUpdates(workspaceID);
@@ -176,6 +179,7 @@
   bind:userRole
   bind:isShareModalOpen
   bind:upgradePlanModalInvite
+  bind:invitedCount
   tab={_viewModel.tab}
   {isSharedWorkspace}
   {workspaceType}

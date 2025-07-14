@@ -41,6 +41,9 @@
   let fileExtension: string;
   let formatedBody: string;
   let fileNameWithExtension: string;
+  let textBtn: HTMLSpanElement;
+  let rawBtn: HTMLSpanElement;
+  let previewBtn: HTMLSpanElement;
   // travers array of object and get content-type value
   const contentType: string | undefined = response.headers.find(
     (header: { key: string; value: string }) => header.key === "content-type",
@@ -134,6 +137,35 @@
       destination: event_name,
     });
   };
+
+  $: isRawVisible = false;
+  $: sliderStyle = getSliderStyle(apiState.bodyFormatter);
+
+  function getSliderStyle(formatter: any) {
+    if (!textBtn || !previewBtn) return "";
+    const gap = 4; // or read from CSS
+    const prettyWidth = textBtn.offsetWidth;
+    const rawWidth = rawBtn?.offsetWidth || 0;
+    const previewWidth = previewBtn.offsetWidth;
+    let left = 0;
+    let width = prettyWidth;
+    if (formatter === ResponseFormatter.PRETTY) {
+      left = prettyWidth / 2;
+      width = prettyWidth;
+    } else if (formatter === ResponseFormatter.RAW && isRawVisible) {
+      left = prettyWidth + gap + rawWidth / 2;
+      width = rawWidth;
+    } else if (formatter === ResponseFormatterEnum.PREVIEW) {
+      if (isRawVisible) {
+        left = prettyWidth + gap + rawWidth + gap + previewWidth / 2;
+      } else {
+        left = prettyWidth + gap + previewWidth / 2 - 5;
+      }
+      width = previewWidth;
+    }
+
+    return `left: ${left}px; width: ${width}px; transform: translateX(-50%);`;
+  }
 </script>
 
 <div
@@ -144,8 +176,15 @@
     style="top:55.4px;  margin-top: -1px;"
   >
     <div class="d-flex gap-1 align-items-center justify-content-center">
-      <div class="d-flex align-items-center rounded mb-0 py-1">
+      <div
+        class="position-relative d-flex align-items-center rounded mb-0 py-1"
+        style="position: relative;"
+      >
+        <!-- ✅ Smooth background -->
+        <div class="background-slider" style={sliderStyle}></div>
+
         <span
+          bind:this={textBtn}
           role="button"
           on:click={() => {
             onUpdateResponseState(
@@ -154,18 +193,13 @@
             );
           }}
           class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
-          style={apiState.bodyFormatter === ResponseFormatter.PRETTY
-            ? "background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);"
-            : ""}
+          style="position: relative; z-index: 2;"
         >
           Text
         </span>
-        <!--
-          --
-          -- Raw is set to display none
-          --
-          -->
+
         <span
+          bind:this={rawBtn}
           role="button"
           on:click={() => {
             onUpdateResponseState(
@@ -173,12 +207,14 @@
               ResponseFormatter.RAW,
             );
           }}
-          class="d-none border-radius-2 px-3 text-fs-12 py-1 btn-formatter {apiState.bodyFormatter ===
-          ResponseFormatter.RAW
-            ? 'bg-tertiary-500 text-secondary-100'
-            : ''}">Raw</span
+          class="d-none rounded px-2 text-fs-12 py-1 btn-formatter"
+          style="position: relative; z-index: 2;"
         >
+          Raw
+        </span>
+
         <span
+          bind:this={previewBtn}
           role="button"
           on:click={() => {
             onUpdateResponseState(
@@ -186,14 +222,11 @@
               ResponseFormatterEnum.PREVIEW,
             );
           }}
-          class="rounded px-2 text-fs-12 py-1 btn-formatter {apiState.bodyFormatter ===
-          ResponseFormatterEnum.PREVIEW
-            ? 'bg-tertiary-500 text-secondary-100'
-            : ''}"
-          style={apiState.bodyFormatter === ResponseFormatterEnum.PREVIEW
-            ? "background-color: var(--bg-ds-surface-600); color: var(--text-ds-neutral-100);"
-            : ""}>Preview</span
+          class="rounded px-2 text-fs-12 py-1 btn-formatter"
+          style="position: relative; z-index: 2;"
         >
+          Preview
+        </span>
       </div>
 
       {#if apiState.bodyFormatter === ResponseFormatter.PRETTY}
@@ -329,5 +362,19 @@
   }
   .icon-container:active {
     background-color: var(--bg-secondary-600);
+  }
+  .background-slider {
+    position: absolute;
+    top: 4px;
+    height: calc(100% - 8px);
+    background: var(--bg-ds-surface-600);
+    border-radius: 6px;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  .btn-formatter {
+    position: relative;
+    z-index: 2;
   }
 </style>

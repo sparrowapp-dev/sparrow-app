@@ -81,7 +81,7 @@
       <div class="expression-textarea-editor">
         <Editor
           lang={"JavaScript"}
-          placeholder={"Select API data, functions, or variables from the panel."}
+          placeholder={"Select API or function from the panel."}
           bind:value={expression}
           on:change={handleCodeMirrorChange}
           isEditable={true}

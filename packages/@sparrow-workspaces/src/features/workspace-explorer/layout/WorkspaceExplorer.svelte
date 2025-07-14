@@ -97,6 +97,7 @@
   export let onMakeWorkspacePublic;
   export let onShareWorkspace;
   export let onClickHubUrl;
+  export let invitedCount = 0;
 
   const formateUpdateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -277,7 +278,8 @@
   description={planContent?.description}
   planType="Collaborators"
   planLimitValue={userLimits?.usersPerHub?.value}
-  currentPlanValue={currrentInvites +
+  currentPlanValue={invitedCount +
+    currrentInvites +
     (currentWorkspace?.users?.length || 0) -
     1}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN

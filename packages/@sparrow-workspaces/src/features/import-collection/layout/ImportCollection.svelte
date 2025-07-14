@@ -17,6 +17,7 @@
   export let onImportOapiText; // Sends the (JSON / XML) text to backend and create a collection                                        (3)
   export let onImportOapiFile; // Sends the (JSON / XML) file to backend and create a collection                                        (3)
 
+  export let onImportPostmanCollection;
   export let isActiveSyncRequired;
   export let isActiveSyncPlanModalOpen;
 

@@ -25,8 +25,9 @@ class InitFolderTab {
       source: "USER",
       isDeleted: false,
       activeSync: false,
+      label: "",
       property: {
-        folder: {}
+        folder: {},
       },
       path: {
         workspaceId: _workspaceId,
@@ -71,6 +72,9 @@ class InitFolderTab {
   }
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
+  }
+  public updateLabel(_label: string) {
+    this._tab.label = _label;
   }
 }
 

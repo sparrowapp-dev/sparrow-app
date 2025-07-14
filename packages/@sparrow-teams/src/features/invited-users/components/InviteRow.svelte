@@ -5,10 +5,10 @@
 
   export let user: string;
   export let role: string;
-  export let index: number;
   export let onWithDrawInvite;
   export let onResendInvite;
   export let openTeam;
+  export let id;
 
   const handleWithDrawInvite = () => {
     onWithDrawInvite(openTeam?.teamId, user);
@@ -45,7 +45,7 @@
   let isNearBottom = false;
 
   // Unique ID for this row based on index
-  const rowId = `invite-row-${index}`;
+  const rowId = `invite-row-${id}`;
 
   const openMenu = (e: MouseEvent) => {
     e.stopPropagation();
@@ -63,10 +63,8 @@
     isNearBottom = viewportHeight - buttonRect.bottom < 150 ? true : false;
 
     pos = {
-      x: buttonRect.left - 142 + (buttonRect.width / 2),
-      y:
-        buttonRect.top +
-        2*buttonRect.height + -buttonRect.height,
+      x: buttonRect.left - 142 + buttonRect.width / 2,
+      y: buttonRect.top + 2 * buttonRect.height + -buttonRect.height,
     };
 
     showMenu = true;
@@ -93,86 +91,80 @@
   <MenuView xAxis={pos.x} yAxis={pos.y} {noOfRows} {noOfColumns} {menuItems} />
 {/if}
 
-<tr
+<div
   id={rowId}
   tabindex="0"
-  class="position-relative invite-row-item cursor-pointer ellipsis"
-  style="width:100%"
+  class="position-relative invite-row-item cursor-pointer ellipsis d-flex"
 >
-  <td
-    class="tab-data text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-regular rounded-start py-2 overflow-hidden ellipsis"
-    style="color:var(--bg-ds-neutral-300);"
-  >
-    <div class="flex flex-row align-items-center gap-2" style="display: flex;">
-      <Avatar size="medium" />
-      {user}
+  <div class="user-info ellipsis ps-2" style="width: 70%;">
+    <div class="d-flex w-100 align-items-center gap-2 ellipsis">
+      <Avatar
+        size="medium"
+        bgColor={"var(--bg-tertiary-700)"}
+        type={"letter"}
+        letter={user[0].toUpperCase() || ""}
+      />
+      <p class="ellipsis mb-0" style="width: calc(100% - 200px);">
+        {user}
+      </p>
     </div>
-  </td>
+  </div>
 
-  <td> </td>
-  <td> </td>
-  <td> </td>
-
-  <td
-    class="tab-data text-ds-font-size-12 text-ds-line-height-150 text-ds-font-weight-semi-bold py-2 pr-4"
-    style="color:var(--bg-ds-neutral-100); "
-  >
+  <div class="role-info" style="width: 20%;">
     {role.charAt(0).toUpperCase() + role.slice(1)}
-  </td>
+  </div>
 
-  <td class="position-relative">
-    <div bind:this={menuWrapper} class="button-container">
+  <div class="position-relative d-flex justify-content-end" style="width: 10%;">
+    <div bind:this={menuWrapper} class="button-container pe-5">
       <Button
         type="teritiary-regular"
         startIcon={MoreVerticalRegular}
         onClick={openMenu}
       />
     </div>
-  </td>
-</tr>
+  </div>
+</div>
 
 <style>
-  tr:hover {
+  .invite-row-item {
+    width: 100%;
+    height: 50px;
+    align-items: center;
+    border-bottom: 1px solid var(--bg-ds-surface-600);
+    border-radius: 8px;
+    transition: background-color 0.2s;
+  }
+
+  .invite-row-item:hover {
     background-color: var(--bg-ds-surface-600);
     cursor: pointer;
-    border-bottom-color: transparent;
   }
 
-  tr {
-    border-bottom-style: solid;
-    border-bottom-color: var(--bg-ds-surface-600);
-    border-bottom-width: 1px;
-    border-radius: 8px;
-    position: relative;
-  }
-
-  tr:active {
+  .invite-row-item:active {
     background-color: var(--bg-ds-surface-700);
-    cursor: pointer;
   }
 
-  tr[tabindex="0"]:focus-visible {
+  .invite-row-item:focus-visible {
     outline: solid 2px var(--bg-ds-primary-300) !important;
     outline-offset: -2px;
     background-color: var(--bg-ds-surface-700);
-    border-radius: 8px;
   }
 
-  .invite-row-item td {
-    background-color: transparent;
+  .user-info {
+    color: var(--bg-ds-neutral-300);
+    display: flex;
+    align-items: center;
   }
 
-  .button-container {
-    position: relative;
+  .role-info {
+    color: var(--bg-ds-neutral-100);
+    font-weight: 600;
   }
 
-  tr:hover .button-container {
+  .invite-row-item:hover .button-container {
     visibility: visible;
   }
-
-  .tab-data {
-    vertical-align: middle;
-    padding-top: 10px;
+  .button-container {
     position: relative;
   }
 </style>
