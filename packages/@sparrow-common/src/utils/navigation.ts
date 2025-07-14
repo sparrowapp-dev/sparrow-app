@@ -17,7 +17,7 @@ export const moveNavigation = (direction: string) => {
         left: navigation.scrollWidth,
         behavior: "smooth",
       });
-    }, 600);
+    }, 500);
   }
 };
 /* eslint-disable @typescript-eslint/no-explicit-any */
