@@ -27,6 +27,12 @@
     <array>
         <string>com.apple.launchservices.open</string>
     </array>
+
+    <!-- For opening HTTP URLs in default browser (Apple Events) -->
+    <key>com.apple.security.temporary-exception.apple-events</key>
+    <array>
+        <string>com.apple.launchservices.open</string>
+    </array>
     
     <!-- App identifiers -->
     <key>com.apple.application-identifier</key>
