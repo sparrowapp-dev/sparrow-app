@@ -1270,8 +1270,10 @@
       }
       return response;
     }}
-    onImportPostmanCollection={async (currentWorkspaceId, postmanCollectionJson) => {
-      debugger
+    onImportPostmanCollection={async (
+      currentWorkspaceId,
+      postmanCollectionJson,
+    ) => {
       const response = await _viewModel.importPostmanCollection(
         currentWorkspaceId,
         postmanCollectionJson,
