@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
@@ -596,7 +596,10 @@ class RestExplorerViewModel {
           responseBodyLanguage: data.response.bodyLanguage,
           responseBodyFormatter: data.response.bodyFormatter,
         });
-        savedRequestTab.updateName(progressiveTab.name +` (${data.response.status.replace(/^\d+\s*/, "")})`);
+        savedRequestTab.updateName(
+          progressiveTab.name +
+            ` (${data.response.status.replace(/^\d+\s*/, "")})`,
+        );
         responseCode = data.response.status;
       }
       return restApiDataMap;
@@ -611,7 +614,7 @@ class RestExplorerViewModel {
         type: "REST",
         status_code: responseCode,
       });
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -1653,7 +1656,7 @@ class RestExplorerViewModel {
             initRequestTab.updateHeaders(req.request.headers);
 
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1745,7 +1748,7 @@ class RestExplorerViewModel {
             initRequestTab.updateHeaders(res.data.data.request.headers);
 
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1829,7 +1832,7 @@ class RestExplorerViewModel {
             initRequestTab.updateAuth(req.request.auth);
             initRequestTab.updateHeaders(req.request.headers);
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1917,7 +1920,7 @@ class RestExplorerViewModel {
             initRequestTab.updateAuth(res.data.data.request.auth);
             initRequestTab.updateHeaders(res.data.data.request.headers);
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",

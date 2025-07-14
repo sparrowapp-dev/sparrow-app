@@ -3,7 +3,7 @@ import {
   createDeepCopy,
   InitAiRequestTab,
   MarkdownFormatter,
-  moveNavigation,
+  scrollToTab,
   Sleep,
 } from "@sparrow/common/utils";
 
@@ -59,7 +59,8 @@ import * as Sentry from "@sentry/svelte";
 import {
   AiModelProviderEnum,
   OpenAIModelEnum,
-  type modelsConfigType, type PromptFileAttachment,
+  type modelsConfigType,
+  type PromptFileAttachment,
 } from "@sparrow/common/types/workspace/ai-request-base";
 import {
   configFormat,
@@ -501,7 +502,8 @@ class AiRequestExplorerViewModel {
     }
 
     // Get the index of the (n-maxReceivers)th Receiver from the end
-    const startReceiverIndex = receiverIndices[receiverIndices.length - maxReceivers];
+    const startReceiverIndex =
+      receiverIndices[receiverIndices.length - maxReceivers];
 
     // Find the first Sender before this Receiver (if any) to maintain conversation context
     let startIndex = startReceiverIndex;
@@ -581,7 +583,7 @@ class AiRequestExplorerViewModel {
     conversationTitle: string,
   ) => {
     let isGuestUser = await this.getGuestUser();
-    if  (isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
 
@@ -631,10 +633,10 @@ class AiRequestExplorerViewModel {
         error,
       );
     }
-  }
+  };
 
   /**
-   * 
+   *
    * @param filesToUpload takes the file obj to upload on azure and model's context
    * @returns Array of objects containing uploaded file urls and fileIds by models context set
    */
@@ -642,28 +644,37 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey =
+      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
-      return Promise.reject("API key missing. Please authenticate before uploading the files.");
+      return Promise.reject(
+        "API key missing. Please authenticate before uploading the files.",
+      );
     }
 
     try {
-      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, providerModel, filesToUpload);
+      const response = await this.aiRequestService.uploadRAGfiles(
+        provider,
+        providerAuthKey,
+        providerModel,
+        filesToUpload,
+      );
       if (response.isSuccessful) {
         return response.data.data;
       } else {
-        const errorMsg = response?.message || response?.data?.message || 'Failed to upload files. Please try again.';
+        const errorMsg =
+          response?.message ||
+          response?.data?.message ||
+          "Failed to upload files. Please try again.";
         notifications.error(errorMsg);
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Something went wrong while uploading files. :>> ", error);
     }
-  }
-
+  };
 
   /**
    *
@@ -1180,7 +1191,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(req.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1258,7 +1269,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1324,7 +1335,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAISystemPrompt(req.aiRequest.systemPrompt);
             initAiRequestTab.updateAuth(req.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1398,7 +1409,7 @@ class AiRequestExplorerViewModel {
             );
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -2070,7 +2081,10 @@ class AiRequestExplorerViewModel {
    * Generates the AI Response from server with websocket communication protocol
    * @param Prompt - Prompt from the user
    */
-  public generateAIResponseWS = async (prompt = "", fileAttachments: PromptFileAttachment[]) => {
+  public generateAIResponseWS = async (
+    prompt = "",
+    fileAttachments: PromptFileAttachment[],
+  ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const tabId = componentData.tabId;
@@ -2103,7 +2117,7 @@ class AiRequestExplorerViewModel {
       !isChatAutoClearActive,
       componentData?.property?.aiRequest?.ai?.conversations || [],
       isJsonFormatEnabed,
-      fileAttachments
+      fileAttachments,
     );
 
     const modelSpecificConfig: modelsConfigType = {};
@@ -2193,12 +2207,19 @@ class AiRequestExplorerViewModel {
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
-              } else if (response.message.includes("exceeds the maximum limit") || 
-                  response.message.includes("Total file size exceeds the limit") ) 
-              {
-                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
-                await this.updateRequestState({ isChatbotPromptBoxActive: false });
-              } else { errorMessage = response.message; } // Use the actual error message from the response
+              } else if (
+                response.message.includes("exceeds the maximum limit") ||
+                response.message.includes("Total file size exceeds the limit")
+              ) {
+                errorMessage =
+                  response.message +
+                  " Please start a new conversation to continue exploring!";
+                await this.updateRequestState({
+                  isChatbotPromptBoxActive: false,
+                });
+              } else {
+                errorMessage = response.message;
+              } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations ||

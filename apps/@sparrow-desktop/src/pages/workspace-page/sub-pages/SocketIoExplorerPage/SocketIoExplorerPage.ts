@@ -4,7 +4,7 @@ import {
   ReduceQueryParams,
   DecodeSocketio,
 } from "@sparrow/workspaces/features/socketio-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
@@ -995,7 +995,7 @@ class SocketIoExplorerPageViewModel {
             initWebSocketTab.updateHeaders(req.socketio.headers);
 
             this.tabRepository.createTab(initWebSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1066,7 +1066,7 @@ class SocketIoExplorerPageViewModel {
             initSocketTab.updateHeaders(res.data.data.socketio.headers);
 
             this.tabRepository.createTab(initSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1130,7 +1130,7 @@ class SocketIoExplorerPageViewModel {
             initSocketTab.updateQueryParams(req.socketio.queryParams);
             initSocketTab.updateHeaders(req.socketio.headers);
             this.tabRepository.createTab(initSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1198,7 +1198,7 @@ class SocketIoExplorerPageViewModel {
             initSocketTab.updateQueryParams(res.data.data.socketio.queryParams);
             initSocketTab.updateHeaders(res.data.data.socketio.headers);
             this.tabRepository.createTab(initSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",

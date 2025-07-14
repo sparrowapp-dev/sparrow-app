@@ -10,7 +10,7 @@ import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { type Tab } from "@sparrow/common/types/workspace/tab";
 
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   currentStep,
   isFirstTimeInTestFlow,
@@ -166,7 +166,7 @@ export class TestflowViewModel {
         workspaceId: currentWorkspace._id,
       });
       // scroll the top tab bar to right
-      moveNavigation("right");
+      scrollToTab("");
       notifications.success("New Testflow created successfully.");
       // MixpanelEvent(Events.CREATE_TESTFLOW);
       let isFirstTimeUsingTestFlow = false;
@@ -332,7 +332,7 @@ export class TestflowViewModel {
    * @returns
    */
   public refreshTestflow = async (
-    workspaceId: string
+    workspaceId: string,
   ): Promise<{
     testflowTabsToBeDeleted?: string[];
   }> => {
@@ -346,7 +346,8 @@ export class TestflowViewModel {
     }
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
 
     let response;
     if (
@@ -356,10 +357,13 @@ export class TestflowViewModel {
     ) {
       response = await this.testflowService.fetchAllPublicTestflow(
         workspaceId,
-        constants.API_URL
+        constants.API_URL,
       );
     } else {
-      response = await this.testflowService.fetchAllTestflow(workspaceId, baseUrl);
+      response = await this.testflowService.fetchAllTestflow(
+        workspaceId,
+        baseUrl,
+      );
     }
 
     if (!response?.isSuccessful || !response?.data?.data) {
@@ -384,17 +388,19 @@ export class TestflowViewModel {
     }
 
     await this.testflowRepository.refreshTestflow(testflowsWithWorkspaceId);
-    await this.testflowRepository.deleteOrphanTestflows(workspaceId, testflowIds);
+    await this.testflowRepository.deleteOrphanTestflows(
+      workspaceId,
+      testflowIds,
+    );
 
     const testflowTabsToBeDeleted =
       await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
         workspaceId,
-        testflowIds
+        testflowIds,
       );
 
     return { testflowTabsToBeDeleted };
   };
-
 
   /**
    * @description - saves testflow to the mongo server

@@ -7,7 +7,7 @@ import {
   createDeepCopy,
   Debounce,
   InitHubTab,
-  moveNavigation,
+  scrollToTab,
   throttle,
 } from "@sparrow/common/utils";
 import type {
@@ -608,7 +608,7 @@ export default class WorkspaceExplorerViewModel {
       hubTab.updateDescription(teamData.description);
       hubTab.updateHubProperty(teamData);
       await this.tabRepository.createTab(hubTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
   /**

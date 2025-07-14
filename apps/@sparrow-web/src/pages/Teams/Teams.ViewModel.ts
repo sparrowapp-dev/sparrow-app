@@ -9,7 +9,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { GithubRepoReposistory } from "../../repositories/github-repo.repository";
 import { GithubService } from "../../services/github.service";
-import { moveNavigation } from "@sparrow/common/utils";
+import { scrollToTab } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
@@ -155,7 +155,7 @@ export class TeamsViewModel {
         };
         data.push(item);
       }
-  
+
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(
         data.map((_team) => {
@@ -287,7 +287,7 @@ export class TeamsViewModel {
     if (response?.isSuccessful && response?.data?.data) {
       const teamAdapter = new TeamAdapter();
       const adaptedTeam = teamAdapter.adapt(response.data.data).getValue();
-    
+
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New hub ${team.name} is created.`);
@@ -295,8 +295,7 @@ export class TeamsViewModel {
         planBannerisOpen.set(true);
       }
     } else {
-        notifications.error("Failed to create hub. Please try again.");
-      
+      notifications.error("Failed to create hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -370,7 +369,7 @@ export class TeamsViewModel {
       );
       await this.teamRepository.removeTeam("sharedWorkspaceTeam");
     }
-    moveNavigation("right");
+    scrollToTab("");
     navigate("collections");
   };
 
