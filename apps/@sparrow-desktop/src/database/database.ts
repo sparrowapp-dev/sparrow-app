@@ -410,6 +410,15 @@ export class RxDB {
             }
             return oldDoc;
           },
+          29: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.isChatbotPromptBoxActive = true;
+            }
+            return oldDoc;
+          },
+          30: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {

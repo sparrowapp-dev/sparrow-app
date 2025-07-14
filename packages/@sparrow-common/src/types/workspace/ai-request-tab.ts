@@ -65,6 +65,10 @@ export interface IsChatbotActive {
     isChatbotActive: boolean;
 }
 
+export interface IsChatbotPromptBoxActiveWrapper {
+    isChatbotPromptBoxActive: boolean;
+}
+
 export interface IsChatAutoClearActive {
     isChatAutoClearActive: boolean;
 }
@@ -258,6 +262,7 @@ export interface State
     IsChatbotConversationLoading,
     IsConversationHistoryPanelOpen,
     IsConversationHistoryLoading,
+    IsChatbotPromptBoxActiveWrapper,
     AiAuthProfileNavigationWrapper { }
 
 export interface StatePartial
@@ -276,4 +281,5 @@ export interface StatePartial
     Partial<IsChatbotConversationLoading>,
     Partial<IsConversationHistoryPanelOpen>,
     Partial<IsConversationHistoryLoading>,
+    Partial<IsChatbotPromptBoxActiveWrapper>,
     Partial<AiAuthProfileNavigationWrapper> { }

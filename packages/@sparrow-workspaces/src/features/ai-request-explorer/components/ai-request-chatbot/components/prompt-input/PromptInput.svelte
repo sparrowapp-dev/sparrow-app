@@ -35,6 +35,7 @@
   export let currentProvider: AiModelProviderEnum;
   export let currentModel: AIModelVariant;
   export let filesToUpload: PromptFileAttachment[] = [];
+  export let disabled: boolean = false;
 
   // Props
 
@@ -235,7 +236,8 @@
 <div
   class="prompt-input-container d-flex flex-column gap-3 {isPromptBoxFocused
     ? 'focused'
-    : ''} {isTyping ? 'typing' : ''}"
+    : ''} {isTyping ? 'typing' : ''} {disabled ? 'disabled' : ''}"
+  class:pointer-events-none={disabled}
 >
   <div class="textarea-wrapper">
     <!-- File Chips Display -->
@@ -380,18 +382,30 @@
     background-color: var(--bg-ds-surface-400) !important;
     border-radius: 4px;
     padding: 8px;
+    transition:
+      opacity 0.2s ease,
+      filter 0.2s ease;
   }
 
-  .prompt-input-container:hover {
+  .prompt-input-container:hover:not(.disabled) {
     outline: 1px solid var(--border-ds-neutral-300);
   }
 
-  .prompt-input-container.focused {
+  .prompt-input-container.focused:not(.disabled) {
     outline: 2px solid var(--border-ds-primary-300);
   }
 
-  .prompt-input-container.typing {
+  .prompt-input-container.typing:not(.disabled) {
     outline: 1px solid var(--border-ds-primary-300);
+  }
+
+  .prompt-input-container.disabled {
+    opacity: 0.6;
+    filter: grayscale(0.3);
+  }
+
+  .pointer-events-none {
+    pointer-events: none;
   }
 
   .prompt-text-field-area {

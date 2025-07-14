@@ -295,7 +295,7 @@
             class="text-ds-font-weight-medium percentage-indicator"
             style="color: var(--text-ds-neutral-200); font-size: 12px;"
           >
-            {response?.mockRequestResponse?.responseWeightRatio}%
+            {response?.mockRequestResponse?.responseWeightRatio || 0}%
           </div>
         </button>
         {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}

@@ -25,11 +25,12 @@
 
   // Exports
   export let tab: TabDocument;
-  export let onSyncCollection;
+
+  export let onSyncCollection: (collectionId: string) => void;
   export let onMockCollectionModelOpen;
 
   // ViewModel initialization
-  const _viewModel = new CollectionExplorerPage(tab);
+  let _viewModel;
 
   let userId = "";
   let userRole = "";
@@ -38,38 +39,80 @@
   let collection: CollectionDocument;
 
   let prevTabName = "";
+  let isSharedWorkspace = false;
+
+  let prevTabId = "";
 
   /**
    * produces delay to update name of a collection.
    */
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList as any,
-    1000,
-  );
+  let renameWithCollectionList;
 
   /**
    * Reacts whenever the collection tab changes.
    */
   $: {
     if (tab) {
-      if (prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+
+          _viewModel = new CollectionExplorerPage(tab);
+
+          (await _viewModel.getCollectionList()).subscribe(
+            async (_collectionList) => {
+              const response = await _viewModel.getCollection(tab.id);
+              if (response) {
+                collection = response?.toMutableJSON();
+              }
+            },
+          );
+          activeWorkspaceSubscribe = _viewModel.activeWorkspace.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value.toMutableJSON();
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc._id;
+                isSharedWorkspace = activeWorkspaceRxDoc.isShared;
+                environmentId = activeWorkspaceRxDoc.environmentId as string;
+                const clientUserId = getClientUser().id;
+                if (clientUserId) {
+                  let isUserViewer = false;
+                  activeWorkspaceRxDoc.users?.forEach((_user) => {
+                    if (_user.id === clientUserId) {
+                      if (_user.role === WorkspaceRole.WORKSPACE_VIEWER) {
+                        isUserViewer = true;
+                      }
+                    }
+                  });
+                  if (isUserViewer) {
+                    isCollectionEditable = false;
+                  } else {
+                    isCollectionEditable = true;
+                  }
+                } else {
+                  isCollectionEditable = true;
+                }
+                findUserRole();
+              }
+            },
+          );
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList as any,
+            1000,
+          );
+          environments = _viewModel.environments;
+          findUserRole();
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
       }
-      prevTabName = tab.name;
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
     }
   }
-
-  // Initialization of collection and userRoleInWorkspace
-  onMount(async () => {
-    (await _viewModel.getCollectionList()).subscribe(
-      async (_collectionList) => {
-        const response = await _viewModel.getCollection(tab.id);
-        if (response) {
-          collection = response?.toMutableJSON();
-        }
-      },
-    );
-  });
 
   user.subscribe((value) => {
     if (value) {
@@ -91,42 +134,13 @@
   };
 
   let isCollectionEditable = false;
-  const environments = _viewModel.environments;
+  let environments;
   let environmentVariables: EnvironmentLocalGlobalJoinBaseInterface;
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
-  let isSharedWorkspace = false;
-  const activeWorkspaceSubscribe = _viewModel.activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value.toMutableJSON();
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        isSharedWorkspace = activeWorkspaceRxDoc.isShared;
-        currentWorkspaceId = activeWorkspaceRxDoc._id;
-        environmentId = activeWorkspaceRxDoc.environmentId as string;
-        const clientUserId = getClientUser().id;
-        if (clientUserId) {
-          let isUserViewer = false;
-          activeWorkspaceRxDoc.users?.forEach((_user) => {
-            if (_user.id === clientUserId) {
-              if (_user.role === WorkspaceRole.WORKSPACE_VIEWER) {
-                isUserViewer = true;
-              }
-            }
-          });
-          if (isUserViewer) {
-            isCollectionEditable = false;
-          } else {
-            isCollectionEditable = true;
-          }
-        } else {
-          isCollectionEditable = true;
-        }
-        findUserRole();
-      }
-    },
-  );
+
+  let activeWorkspaceSubscribe;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -179,12 +193,8 @@
     }
   }
 
-  onMount(() => {
-    findUserRole();
-  });
-
   onDestroy(() => {
-    activeWorkspaceSubscribe.unsubscribe();
+    activeWorkspaceSubscribe?.unsubscribe();
   });
 </script>
 
@@ -198,10 +208,9 @@
   bind:collection
   {environmentVariables}
   {onSyncCollection}
-  {isSharedWorkspace}
   onUpdateDescription={_viewModel.handleUpdateDescription}
-  onItemCreated={_viewModel.handleCreateItem}
   onCreateAPIRequest={_viewModel.handleCreateRequest}
+  onItemCreated={_viewModel.handleCreateItem}
   onCollectionSynced={_viewModel.handleSyncCollection}
   onSaveCollection={_viewModel.handleSaveCollection}
   onRename={_viewModel.handleRename}
@@ -212,6 +221,7 @@
   onUpdateCollectionAuth={_viewModel.updateCollectionAuth}
   onUpdateRunningState={_viewModel.handleMockCollectionState}
   {currentWorkspace}
+  {isSharedWorkspace}
   onCreateAuthProfile={_viewModel.handleCreateAuthProfile}
   onUpdateAuthProfile={_viewModel.handleUpdateAuthProfile}
   onDeleteAuthProfile={_viewModel.handleDeleteAuthProfile}

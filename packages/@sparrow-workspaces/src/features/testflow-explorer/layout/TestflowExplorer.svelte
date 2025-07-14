@@ -1011,98 +1011,120 @@
   /**
    * Initializes nodes and edges on component mount.
    */
+
+  let prevTabName = "";
+  let prevTabId = "";
+  $: {
+    if ($tab) {
+      if (prevTabId !== $tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          unselectNodes();
+          nodes.update((_nodes: Node[]) => {
+            const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
+            let res = [];
+            for (let i = 0; i < dbNodes.length; i++) {
+              res.push({
+                id: dbNodes[i].id,
+                type: dbNodes[i].type,
+                data: {
+                  blockName: dbNodes[i]?.data?.blockName,
+                  blocks: nodes,
+                  connector: edges,
+                  onClick: function (_id: string, _options = undefined) {
+                    createNewNode(_id, _options);
+                  },
+                  onCheckEdges: function (_id: string, _direction: string) {
+                    return checkIfEdgesExist(_id, _direction);
+                  },
+                  onContextMenu: function (id: string, _event: string) {
+                    if (_event === "delete") {
+                      handleDeleteModal(id);
+                    } else if (
+                      _event === "run-from-here" ||
+                      _event === "run-till-here"
+                    ) {
+                      partialRun(id, _event);
+                    } else if (
+                      _event === "add-block-before" ||
+                      _event === "add-block-after"
+                    ) {
+                      createNewNode(id, undefined, _event);
+                    }
+                  },
+                  onOpenAddCustomRequestModal: function (id: string) {
+                    handleOpenAddCustomRequestModal(id);
+                  },
+                  onOpenSaveNodeRequestModal: function (
+                    nodeId: string,
+                    name: string,
+                    requestId: string,
+                    collectionId: string,
+                    method: string,
+                    folderId: string,
+                  ) {
+                    handleNodeRequestDropdown(
+                      nodeId,
+                      name,
+                      requestId,
+                      collectionId,
+                      method,
+                      folderId,
+                    );
+                  },
+                  updateBlockName: function (_id: string, value: string) {
+                    handleUpdateBlockName(_id, value);
+                  },
+                  collectionId: dbNodes[i].data?.collectionId,
+                  requestId: dbNodes[i].data?.requestId,
+                  folderId: dbNodes[i].data?.folderId,
+                  requestData: dbNodes[i].data?.requestData,
+                  collections: filteredCollections,
+                  tabId: $tab.tabId,
+                },
+                position: {
+                  x: dbNodes[i].position.x,
+                  y: dbNodes[i].position.y,
+                },
+                deletable: dbNodes[i].id === "1" ? false : isNodeDeletable,
+                draggable: dbNodes[i].id === "1" ? false : isNodesDraggable, // Disable dragging for this node
+              });
+            }
+            return res;
+          });
+          edges.update((_edges: TFEdgeHandlerType[]) => {
+            const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
+            let res = [];
+            for (let i = 0; i < dbEdges.length; i++) {
+              res.push({
+                id: dbEdges[i].id,
+                source: dbEdges[i].source,
+                type: "edge",
+                target: dbEdges[i].target,
+                deletable: isEdgeDeletable,
+                data: {
+                  onDeleteEdge: deleteEdges,
+                  onCreateNode: createNewNode,
+                },
+              });
+            }
+            return res;
+          });
+
+          prevTabId = $tab?.tabId;
+        })();
+      } else if ($tab?.name && prevTabName !== $tab.name) {
+        // renameWithEnvironmentList(tab.name);
+        prevTabName = $tab.name;
+      }
+      // findUserRole();
+    }
+  }
+
   onMount(() => {
     // Load initial nodes from the tab property
-    nodes.update((_nodes: Node[]) => {
-      const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
-      let res = [];
-      for (let i = 0; i < dbNodes.length; i++) {
-        res.push({
-          id: dbNodes[i].id,
-          type: dbNodes[i].type,
-          data: {
-            blockName: dbNodes[i]?.data?.blockName,
-            blocks: nodes,
-            connector: edges,
-            onClick: function (_id: string, _options = undefined) {
-              createNewNode(_id, _options);
-            },
-            onCheckEdges: function (_id: string, _direction: string) {
-              return checkIfEdgesExist(_id, _direction);
-            },
-            onContextMenu: function (id: string, _event: string) {
-              if (_event === "delete") {
-                handleDeleteModal(id);
-              } else if (
-                _event === "run-from-here" ||
-                _event === "run-till-here"
-              ) {
-                partialRun(id, _event);
-              } else if (
-                _event === "add-block-before" ||
-                _event === "add-block-after"
-              ) {
-                createNewNode(id, undefined, _event);
-              }
-            },
-            onOpenAddCustomRequestModal: function (id: string) {
-              handleOpenAddCustomRequestModal(id);
-            },
-            onOpenSaveNodeRequestModal: function (
-              nodeId: string,
-              name: string,
-              requestId: string,
-              collectionId: string,
-              method: string,
-              folderId: string,
-            ) {
-              handleNodeRequestDropdown(
-                nodeId,
-                name,
-                requestId,
-                collectionId,
-                method,
-                folderId,
-              );
-            },
-            updateBlockName: function (_id: string, value: string) {
-              handleUpdateBlockName(_id, value);
-            },
-            collectionId: dbNodes[i].data?.collectionId,
-            requestId: dbNodes[i].data?.requestId,
-            folderId: dbNodes[i].data?.folderId,
-            requestData: dbNodes[i].data?.requestData,
-            collections: filteredCollections,
-            tabId: $tab.tabId,
-          },
-          position: {
-            x: dbNodes[i].position.x,
-            y: dbNodes[i].position.y,
-          },
-          deletable: dbNodes[i].id === "1" ? false : isNodeDeletable,
-          draggable: dbNodes[i].id === "1" ? false : isNodesDraggable, // Disable dragging for this node
-        });
-      }
-      return res;
-    });
-    edges.update((_edges: TFEdgeHandlerType[]) => {
-      const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
-      let res = [];
-      for (let i = 0; i < dbEdges.length; i++) {
-        res.push({
-          id: dbEdges[i].id,
-          source: dbEdges[i].source,
-          type: "edge",
-          target: dbEdges[i].target,
-          deletable: isEdgeDeletable,
-          data: {
-            onDeleteEdge: deleteEdges,
-            onCreateNode: createNewNode,
-          },
-        });
-      }
-      return res;
-    });
   });
 
   // Reactive statement to handle selected node updates

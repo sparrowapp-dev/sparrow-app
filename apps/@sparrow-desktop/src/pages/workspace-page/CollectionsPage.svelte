@@ -18,7 +18,7 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "@app/constants";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, tick } from "svelte";
   // ---- Components
   import {
     RestExplorerPage,
@@ -99,6 +99,7 @@
   import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
   import { ResponseMessage } from "@sparrow/common/enums";
+  import { shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -147,15 +148,9 @@
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-  environments.subscribe((value) => {
+  const environmentsSubscriber = environments.subscribe((value) => {
     if (value) {
       environmentsValues = value;
-    }
-  });
-
-  currentWorkspace.subscribe((value) => {
-    if (value) {
-      currentWOrkspaceValue = value;
     }
   });
 
@@ -220,11 +215,11 @@
     scrollList("bottom");
   }
 
-  isGuestUserActive.subscribe((value) => {
+  const isGuestUserActiveSubscriber = isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
   });
 
-  user.subscribe((value) => {
+  const userSubscriber = user.subscribe((value) => {
     userId = value?._id;
   });
 
@@ -594,7 +589,7 @@
         _viewModel2.refreshEnvironment(workspaceId),
         _viewModel3.refreshTestflow(workspaceId),
       ]);
-
+      await tick();
       const collectionTabsToBeDeleted =
         fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
       const environmentTabsToBeDeleted =
@@ -619,48 +614,58 @@
 
   let isInitialDataLoading = true;
 
-  const cw = currentWorkspace.subscribe(async (value) => {
-    if (value) {
-      if (prevWorkspaceId !== value._id) {
-        isInitialDataLoading = true;
-        activeTab = undefined;
-        handleRefreshApicalls(value?._id);
+  const userValidationStoreSubscriber = userValidationStore.subscribe(
+    (validation) => {
+      if (!validation.isValid) {
+        isAccessDeniedModalOpen = true;
+        isWelcomePopupOpen = false;
+      }
+    },
+  );
 
-        userValidationStore.subscribe((validation) => {
-          if (!validation.isValid) {
-            isAccessDeniedModalOpen = true;
-            isWelcomePopupOpen = false;
+  const currentWorkspaceSubscriber = currentWorkspace.subscribe(
+    async (value) => {
+      if (value) {
+        currentWOrkspaceValue = value;
+        if (prevWorkspaceId !== value._id) {
+          isInitialDataLoading = true;
+          activeTab = undefined;
+          if (value?._id && shouldRunThrottled(value?._id)) {
+            handleRefreshApicalls(value?._id);
+          } else {
+            console.error(`Throttled for ${value?._id}`);
+          }
+
+          teamDetails = {
+            teamId: value?._data?.team?.teamId || "",
+            teamName: value?._data?.team?.teamName || "",
+            teamOwnerEmail: value?._data?.users[0]?.email,
+          };
+          if (teamDetails.teamId) {
+            handleLimits();
+          }
+          tabList = _viewModel.getTabListWithWorkspaceId(value._id);
+          activeTab = _viewModel.getActiveTab(value._id);
+          totalTeamCount = value._data?.users?.length;
+
+          isInitialDataLoading = false;
+        }
+        prevWorkspaceId = value._id;
+        if (count == 0) {
+          let url = window.location.href;
+          const params = new URLSearchParams(url.split("?")[1]);
+          const isNew = params.get("first");
+          if (isNew === "true") _viewModel.createNewTabWithData();
+          count = count + 1;
+        }
+        value.users?.forEach((user) => {
+          if (user.id === userId) {
+            userRole = user.role as string;
           }
         });
-        teamDetails = {
-          teamId: value?._data?.team?.teamId || "",
-          teamName: value?._data?.team?.teamName || "",
-          teamOwnerEmail: value?._data?.users[0]?.email,
-        };
-        if (teamDetails.teamId) {
-          handleLimits();
-        }
-        tabList = _viewModel.getTabListWithWorkspaceId(value._id);
-        activeTab = _viewModel.getActiveTab(value._id);
-        totalTeamCount = value._data?.users?.length;
-
-        isInitialDataLoading = false;
       }
-      prevWorkspaceId = value._id;
-      if (count == 0) {
-        let url = window.location.href;
-        const params = new URLSearchParams(url.split("?")[1]);
-        const isNew = params.get("first");
-        if (isNew === "true") _viewModel.createNewTabWithData();
-        count = count + 1;
-      }
-      value.users?.forEach((user) => {
-        if (user.id === userId) {
-          userRole = user.role as string;
-        }
-      });
-    }
-  });
+    },
+  );
 
   const handleAccessDeniedClose = () => {
     isAccessDeniedModalOpen = false;
@@ -678,7 +683,7 @@
 
   let isWelcomePopupOpen = false;
   let isTourGuideOpen = false;
-  isUserFirstSignUp.subscribe((value) => {
+  const isUserFirstSignUpSubscriber = isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
       isExpandCollection.set(value);
@@ -686,14 +691,15 @@
       isFirstCollectionExpand = value;
     }
   });
-  onDestroy(() => {
-    cw.unsubscribe();
-  });
 
-  collectionList.subscribe((collections) => {
+  let tourGuideCollectionId;
+  const collectionListSubscriber = collectionList.subscribe((collections) => {
     let count = 0;
-    collections.forEach((collection) => {
+    collections.forEach((collection, index) => {
       const collectionData = collection.toMutableJSON();
+      if (index === 0) {
+        tourGuideCollectionId = collectionData.id;
+      }
       count += collectionData.items.length || 0;
     });
     totalCollectionCount.set(count);
@@ -816,6 +822,16 @@
       planContentNonActive = planContentDisable();
     }
   }
+
+  onDestroy(() => {
+    currentWorkspaceSubscriber.unsubscribe();
+    isGuestUserActiveSubscriber();
+    userSubscriber();
+    collectionListSubscriber.unsubscribe();
+    isUserFirstSignUpSubscriber();
+    userValidationStoreSubscriber();
+    environmentsSubscriber.unsubscribe();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -917,7 +933,7 @@
                 {#if true}
                   {#if $activeTab?.type === TabTypeEnum.REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -926,13 +942,13 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.AI_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <AiRequestExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <CollectionExplorerPage
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
@@ -942,19 +958,19 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.FOLDER}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <FolderExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <EnvironmentExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
@@ -964,13 +980,13 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WebSocketExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <TestFlowExplorerPage
                           tab={$activeTab}
                           {teamDetails}
@@ -980,25 +996,25 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <SocketIoExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <GraphqlExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerSavedPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerMockPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -1007,24 +1023,24 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceDefault
                           {currentWorkspace}
                           {handleCreateEnvironment}
-                          onCreateTestflow={() => {
-                            handleCreateTestflowCheck();
+                          onCreateTestflow={async () => {
+                            await handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
@@ -1171,6 +1187,7 @@
       defaultCurrentStep.set(1);
       isDefaultTourGuideOpen.set(true);
     }}
+    {tourGuideCollectionId}
   />
 </Modal>
 <WorkspaceTourGuide />
@@ -1245,6 +1262,21 @@
         currentWorkspaceId,
         file,
         type,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
+    onImportPostmanCollection={async (
+      currentWorkspaceId,
+      postmanCollectionJson,
+    ) => {
+      const response = await _viewModel.importPostmanCollection(
+        currentWorkspaceId,
+        postmanCollectionJson,
       );
       if (response.isSuccessful) {
         setTimeout(() => {
@@ -1703,7 +1735,7 @@
         <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
           Need more details?
         </p>
-        <Tooltip title={"Coming Soon"} placement={"top-center"}>
+        <Tooltip title={"Coming Soon"} placement={"top-center"} distance={4}>
           <Button
             size="small"
             customWidth={"220px"}

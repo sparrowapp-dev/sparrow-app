@@ -103,6 +103,7 @@ class InitAiRequestTab {
                         isChatbotConversationLoading: false,
                         isConversationHistoryPanelOpen: false,
                         isConversationHistoryLoading: false,
+                        isChatbotPromptBoxActive: false, 
                         selectedRequestAuthProfileId: ""
                     },
                 },

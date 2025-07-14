@@ -73,7 +73,10 @@
     </div>
   {/if}
 </div>
-<div class="d-flex align-items-center justify-content-between" style="margin-bottom: 10px">
+<div
+  class="d-flex align-items-center justify-content-between"
+  style="margin-bottom: 10px"
+>
   <div class="d-flex" style="font-size: 12px;">
     <WithSelect
       id={"hash124"}
@@ -143,7 +146,7 @@
       <div
         on:click={() => {
           updateBeautifiedState(true);
-          notifications.success("Code formatted successfully.");
+          // notifications.success("Code formatted successfully.");
         }}
         role="button"
         class="icon-container d-flex align-items-center justify-content-center border-radius-2"

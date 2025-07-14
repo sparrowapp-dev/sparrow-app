@@ -641,6 +641,7 @@ class AiRequestExplorerViewModel {
   public handleUploadFilesToCloud = async (filesToUpload: []) => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
+    const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
     const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
@@ -650,15 +651,16 @@ class AiRequestExplorerViewModel {
     }
 
     try {
-      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, filesToUpload);
+      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, providerModel, filesToUpload);
       if (response.isSuccessful) {
         return response.data.data;
       } else {
-        notifications.error(`Failed to upload files. Please try again.`);
+        const errorMsg = response?.message || response?.data?.message || 'Failed to upload files. Please try again.';
+        notifications.error(errorMsg);
       }
     }
     catch (error) {
-      console.error("Something went wrong while deleting the conversation. :>> ", error);
+      console.error("Something went wrong while uploading files. :>> ", error);
     }
   }
 
@@ -1941,7 +1943,7 @@ class AiRequestExplorerViewModel {
     await this.switchConversation("", "New Conversation", []);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    // notifications.success("Created new conversation.");
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
   };
 
   public switchConversation = async (
@@ -1958,7 +1960,7 @@ class AiRequestExplorerViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
-    // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
+    this.updateRequestState({ isChatbotPromptBoxActive: true });
   };
 
   /**
@@ -2191,9 +2193,12 @@ class AiRequestExplorerViewModel {
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
-              } else {
-                errorMessage = response.message; // Use the actual error message from the response
-              }
+              } else if (response.message.includes("exceeds the maximum limit") || 
+                  response.message.includes("Total file size exceeds the limit") ) 
+              {
+                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
+                await this.updateRequestState({ isChatbotPromptBoxActive: false });
+              } else { errorMessage = response.message; } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations ||

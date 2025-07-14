@@ -16,7 +16,7 @@
   export let tab: TabDocument;
 
   // ViewModel initialization
-  const _viewModel = new MockHistoryExplorerPage(tab);
+  let _viewModel;
 
   let userId = "";
 
@@ -24,17 +24,38 @@
   let collection: CollectionDocument;
 
   // Initialization of collection, folder and userRoleInWorkspace
-  onMount(async () => {
-    (await _viewModel.getCollectionList()).subscribe(async (collectionList) => {
-      collection = await _viewModel.getCollection(tab.path?.collectionId);
-    });
-  });
 
   user.subscribe((value) => {
     if (value) {
       userId = value._id;
     }
   });
+
+  let prevTabId = "";
+  let prevTabName = "";
+
+  $: {
+    if (tab) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new MockHistoryExplorerPage(tab);
+          (await _viewModel.getCollectionList()).subscribe(
+            async (collectionList) => {
+              collection = await _viewModel.getCollection(
+                tab.path?.collectionId,
+              );
+            },
+          );
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
+      }
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
+    }
+  }
 </script>
 
 <MockHistoryExplorer

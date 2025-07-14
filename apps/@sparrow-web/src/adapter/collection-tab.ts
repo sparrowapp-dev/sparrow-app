@@ -6,6 +6,7 @@ import type {
   CollectionAuthTypeBaseEnum,
   CollectionBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
+import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
 import {
   type Auth,
   CollectionNavigationTabEnum,
@@ -48,6 +49,9 @@ export class CollectionTabAdapter {
       });
     }
     adaptedCollection.updateIsSave(true);
+    if (collection?.collectionType == CollectionTypeBaseEnum.MOCK) {
+      adaptedCollection.updateLabel(collection.collectionType);
+    }
     return adaptedCollection.getValue();
   }
 

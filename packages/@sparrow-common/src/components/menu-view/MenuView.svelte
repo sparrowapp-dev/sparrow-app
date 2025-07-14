@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
+  import { cubicIn, cubicOut } from "svelte/easing";
   export let xAxis = 0;
   export let yAxis = 0;
   export let menuItems: Array<{
@@ -52,7 +54,11 @@
   }
 </script>
 
-<nav style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;">
+<nav
+  style="position: fixed; top:{mouseY}px; left:{mouseX}px; z-index:4;"
+  in:fade={{ duration: 120, easing: cubicOut }}
+  out:fade={{ duration: 120, easing: cubicIn }}
+>
   <div
     style={`width: ${noOfColumns}px; background-color: var(--bg-ds-surface-600)`}
     class="overflow-hidden navbar p-0 d-flex flex-column border-radius-4 align-items-start justify-content-start text-whiteColor"

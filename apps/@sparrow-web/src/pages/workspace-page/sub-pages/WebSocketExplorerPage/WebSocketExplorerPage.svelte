@@ -13,9 +13,9 @@
   import { webSocketDataStore } from "@sparrow/workspaces/features/socket-explorer/store";
   export let tab: TabDocument;
   let isLoginBannerActive = false;
-  const _viewModel = new WebSocketViewModel(tab);
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  let _viewModel;
+  let environments;
+  let activeWorkspace;
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
@@ -43,18 +43,47 @@
       }
     });
   };
+  let prevTabId = "";
 
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList,
-    1000,
-  );
+  let renameWithCollectionList;
   let prevTabName = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new WebSocketViewModel(tab);
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+
+          activeWorkspaceSubscribe = activeWorkspace.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value;
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+                environmentId = activeWorkspaceRxDoc.get("environmentId");
+              }
+            },
+          );
+
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList,
+            1000,
+          );
+
+          const guestUser = await _viewModel.getGuestUser();
+          if (guestUser?.isBannerActive) {
+            isLoginBannerActive = guestUser?.isBannerActive;
+          }
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
       }
-      prevTabName = tab.name;
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
       findUserRole();
     }
   }
@@ -64,16 +93,7 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        environmentId = activeWorkspaceRxDoc.get("environmentId");
-      }
-    },
-  );
+  let activeWorkspaceSubscribe;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -125,16 +145,14 @@
       refreshEnvironment();
     }
   }
-  onMount(async () => {
-    const guestUser = await _viewModel.getGuestUser();
-    if (guestUser?.isBannerActive) {
-      isLoginBannerActive = guestUser?.isBannerActive;
-    }
-  });
 
   let webSocketData;
-  webSocketDataStore.subscribe((webSocketMap) => {
-    webSocketData = webSocketMap.get(tab.tabId);
+  let webSocketMap;
+  $: {
+    webSocketData = webSocketMap?.get(tab.tabId);
+  }
+  webSocketDataStore.subscribe((_webSocketMap) => {
+    webSocketMap = _webSocketMap;
   });
 </script>
 
@@ -145,8 +163,8 @@
   webSocket={webSocketData}
   {environmentVariables}
   {isGuestUser}
-  {isLoginBannerActive}
   isWebApp={true}
+  {isLoginBannerActive}
   onUpdateRequestUrl={_viewModel.updateRequestUrl}
   onUpdateRequestParams={_viewModel.updateParams}
   onUpdateRequestName={_viewModel.updateRequestName}

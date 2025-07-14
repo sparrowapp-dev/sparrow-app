@@ -994,7 +994,7 @@ export class TeamExplorerPageViewModel {
       notifications.success(`Invite resent successfully.`);
       return response;
     } else if (response?.data?.message === ResponseMessage.INVITE_DECLINED) {
-      notifications.error(`The invite has been declined by Collaborate.`);
+      notifications.error(`The invite has been declined by Collaborator.`);
     } else {
       notifications.error("Failed to resend invite. Please try again.");
     }
@@ -1016,11 +1016,12 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  public acceptInvite = async (teamId: string) => {
+  public acceptInvite = async (teamId: string, userId: string) => {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.acceptInvite(teamId, baseUrl);
     if (response.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
+      await this.refreshWorkspaces(userId);
       notifications.success(
         `You are now a member ${response?.data?.data.name} Hub.`,
       );
