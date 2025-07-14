@@ -323,7 +323,7 @@ export const collectionSchemaLiteral = {
       },
     },
     auth: {
-      type: "array",
+      type: "object",
       properties: {
         bearerToken: {
           type: "string",
