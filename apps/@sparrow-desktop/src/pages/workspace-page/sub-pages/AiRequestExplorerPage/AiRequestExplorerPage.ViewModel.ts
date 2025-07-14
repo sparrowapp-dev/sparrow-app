@@ -467,8 +467,10 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey =
-      componentData.property.aiRequest.auth.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -507,8 +509,10 @@ class AiRequestExplorerViewModel {
   public getConversationsList = () => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -555,8 +559,10 @@ class AiRequestExplorerViewModel {
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -722,8 +728,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -782,8 +790,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -827,8 +837,10 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
@@ -2206,7 +2218,7 @@ class AiRequestExplorerViewModel {
         const authProfilesList: CollectionAuthProifleBaseInterface[] =
           collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
         const selectedProfileId =
-          m.property.request?.state?.selectedRequestAuthProfileId;
+          m.property.aiRequest?.state?.selectedRequestAuthProfileId;
 
         const selectedProfile = selectedProfileId
           ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
