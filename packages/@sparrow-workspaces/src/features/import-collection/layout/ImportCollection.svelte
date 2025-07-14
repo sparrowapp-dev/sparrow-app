@@ -106,6 +106,7 @@
       {onValidateOapiText}
       {onImportOapiText}
       {isActiveSyncRequired}
+      {onImportPostmanCollection}
       bind:isActiveSyncPlanModalOpen
     />
   </div>
