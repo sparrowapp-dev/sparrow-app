@@ -220,6 +220,7 @@ export class TabRepository {
   }
 
   await this.rxdb.bulkUpsert(updatedDocs);
+  return selectedTab;
 };
 
 
