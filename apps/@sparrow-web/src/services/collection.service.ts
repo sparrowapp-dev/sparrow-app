@@ -44,7 +44,10 @@ import type {
   GraphqlRequestDeletePayloadDtoInterface,
   GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
-import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionItemTypeBaseEnum,
+  type CollectionAuthBaseInterface,
+} from "@sparrow/common/types/workspace/collection-base";
 import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 import type {
   HttpRequestSavedCreateUpdatePayloadDtoInterface,
@@ -64,7 +67,7 @@ import type {
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 
 export class CollectionService {
-  constructor() { }
+  constructor() {}
 
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
@@ -549,7 +552,7 @@ export class CollectionService {
 
   public addAiRequestInCollection = async (
     _aiRequest:
-      AiRequestCreateUpdateInCollectionPayloadDtoInterface
+      | AiRequestCreateUpdateInCollectionPayloadDtoInterface
       | AiRequestCreateUpdateInFolderPayloadDtoInterface,
     baseUrl: string,
   ): Promise<
@@ -951,14 +954,13 @@ export class CollectionService {
     return response;
   };
 
-
-
-  ///////////////////////////////////////////////////////////////////
-  //                      Auth Profiles
-  ///////////////////////////////////////////////////////////////////
+  
   public addAuthProfile = async (
     baseUrl: string,
-    updatedPayload, // ToDo: Add proper type here
+    updatedPayload: CollectionAuthBaseInterface & {
+      collectionId: string;
+      workspaceId: string;
+    },
   ) => {
     const response = await makeRequest(
       "PUT", // ToDo: Change to POST from backend
@@ -975,7 +977,10 @@ export class CollectionService {
   public updateAuthProfile = async (
     _baseUrl: string,
     authProfileId: string,
-    _updateedAuthProfilePayload, // ToDo: Add proper type here
+    _updateedAuthProfilePayload: CollectionAuthBaseInterface & {
+      collectionId: string;
+      workspaceId: string;
+    },
   ) => {
     const response = await makeRequest(
       "PUT",
@@ -992,7 +997,11 @@ export class CollectionService {
   public deleteAuthProfile = async (
     _baseUrl: string,
     _authProfileId: string,
-    _authProfileDeletionPayload // ToDo: Add proper type here
+    _authProfileDeletionPayload: {
+      collectionId: string;
+      workspaceId: string;
+      authId: string;
+    },
   ) => {
     const response = await makeRequest(
       "DELETE",
@@ -1005,5 +1014,4 @@ export class CollectionService {
     );
     return response;
   };
-
 }

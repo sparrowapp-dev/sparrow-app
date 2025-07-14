@@ -111,7 +111,10 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
   import { onDestroy, onMount } from "svelte";
-  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    CollectionTypeBaseEnum,
+    type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
 
@@ -361,13 +364,13 @@
 
   // Auth Profile wrapper functions/handlers
   // ToDo: Add types for the parameters
-  const handleOnCreateAuthProfile = async (authProfileData) => {
+  const handleOnCreateAuthProfile = async (authProfileData: AuthProfileDto) => {
     const response = await onCreateAuthProfile(collection, authProfileData);
     return response;
   };
   const handleOnUpdateAuthProfile = async (
     authId: string,
-    updatedAuthProfileData,
+    updatedAuthProfileData: AuthProfileDto,
   ) => {
     const response = await onUpdateAuthProfile(
       collection,

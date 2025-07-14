@@ -49,6 +49,19 @@ export interface CollectionItemBaseInterface {
   items: CollectionItemBaseInterface[];
 }
 
+export interface CollectionAuthProifleBaseInterface {
+  name: string;
+  authId: string;
+  description: string;
+  authType: CollectionAuthTypeBaseEnum;
+  auth: CollectionAuthBaseInterface;
+  defaultKey: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+}
+
 interface Branch {
   id: string;
   name: string;
@@ -128,7 +141,7 @@ export interface CollectionBaseInterface {
   syncedAt?: string;
   mockRequestHistory?: MockRequestHistoryBaseInterface[];
   authProfiles: CollectionAuthBaseInterface[];
-  defaultSelectedAuthProfile: string
+  defaultSelectedAuthProfile: string;
 }
 
 export interface CollectionArgsBaseInterface {

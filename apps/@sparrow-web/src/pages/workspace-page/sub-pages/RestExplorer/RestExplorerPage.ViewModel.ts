@@ -1723,7 +1723,6 @@ class RestExplorerViewModel {
               progressiveTab,
             );
 
-            // ToDo: do fixes for guest user auth profile
             const collectionDoc = await this.fetchCollection(expectedPath.collectionId as string);
             if (
               progressiveTab.property.request?.state.requestAuthNavigation ===

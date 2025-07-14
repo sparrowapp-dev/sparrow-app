@@ -43,6 +43,7 @@ import {
   type CollectionArgsBaseInterface,
   type CollectionBaseInterface as CollectionDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
+  type CollectionAuthProifleBaseInterface as AuthProfileDto,
 } from "@sparrow/common/types/workspace/collection-base";
 import {
   TabPersistenceTypeEnum,
@@ -132,6 +133,7 @@ class CollectionExplorerPage {
       progressiveTab.id,
       collection,
     );
+    console.log("collec :>> ", collection);
     if (!collection) result = false;
     // description
     else if (collectionTab.description !== progressiveTab.description) {
@@ -786,10 +788,11 @@ class CollectionExplorerPage {
       "Nov",
       "Dec",
     ];
-    const lastUpdated: string = `${monthNamesAbbreviated[new Date(collection?.updatedAt).getMonth()]
-      } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
-        collection?.updatedAt,
-      ).getFullYear()}`;
+    const lastUpdated: string = `${
+      monthNamesAbbreviated[new Date(collection?.updatedAt).getMonth()]
+    } ${new Date(collection?.updatedAt).getDate()}, ${new Date(
+      collection?.updatedAt,
+    ).getFullYear()}`;
     let totalRequests = 0;
     let totalFolders = 0;
     let totalWebSocket = 0;
@@ -1597,20 +1600,20 @@ class CollectionExplorerPage {
   ) => {
     const socketIoTab = new InitTab().socketIo(uuidv4(), _workspaceId);
     const socketIoOfCollectionPayload: SocketIORequestCreateUpdateInCollectionPayloadDtoInterface =
-    {
-      collectionId: _collection.id,
-      workspaceId: _workspaceId,
-      currentBranch: _collection.activeSync
-        ? _collection.currentBranch
-        : undefined,
-      source: _collection.activeSync ? "USER" : undefined,
-      items: {
-        name: socketIoTab.getValue().name,
-        type: CollectionItemTypeBaseEnum.SOCKETIO,
-        description: "",
-        socketio: {},
-      },
-    };
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: socketIoTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.SOCKETIO,
+          description: "",
+          socketio: {},
+        },
+      };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1682,20 +1685,20 @@ class CollectionExplorerPage {
   ) => {
     const graphqlTab = new InitTab().graphQl(uuidv4(), _workspaceId);
     const graphqlOfCollectionPayload: GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface =
-    {
-      collectionId: _collection.id,
-      workspaceId: _workspaceId,
-      currentBranch: _collection.activeSync
-        ? _collection.currentBranch
-        : undefined,
-      source: _collection.activeSync ? "USER" : undefined,
-      items: {
-        name: graphqlTab.getValue().name,
-        type: CollectionItemTypeBaseEnum.GRAPHQL,
-        description: "",
-        graphql: {},
-      },
-    };
+      {
+        collectionId: _collection.id,
+        workspaceId: _workspaceId,
+        currentBranch: _collection.activeSync
+          ? _collection.currentBranch
+          : undefined,
+        source: _collection.activeSync ? "USER" : undefined,
+        items: {
+          name: graphqlTab.getValue().name,
+          type: CollectionItemTypeBaseEnum.GRAPHQL,
+          description: "",
+          graphql: {},
+        },
+      };
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1867,12 +1870,17 @@ class CollectionExplorerPage {
     }
   };
 
-  // Auth Profile
+  /**
+   * Handle creating a new auth profile in a collection
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param authProfilePayload :AuthProfilePayload Object
+   * @returns :void
+   */
   public handleCreateAuthProfile = async (
     _collection: CollectionDto,
-    _authProfilePayload // ToDo: add type here
+    _authProfilePayload: AuthProfileDto,
   ) => {
-    _authProfilePayload.authId = UntrackedItems.UNTRACKED + uuidv4()
+    _authProfilePayload.authId = UntrackedItems.UNTRACKED + uuidv4();
     let userSource = {};
     if (_collection?.activeSync) {
       userSource = {
@@ -1887,26 +1895,22 @@ class CollectionExplorerPage {
       _authProfilePayload.defaultKey = true;
     }
 
-    const authProfileObj =
-    {
+    const authProfileObj = {
       collectionId: _collection.id,
       workspaceId: _collection.workspaceId,
       ...userSource,
       authProfiles: [
         {
           ..._authProfilePayload,
-        }
+        },
       ],
     };
 
-    await this.collectionRepository.addAuthProfile( // update fn. updateCollectionData here 
-      _collection.id as string,
-      {
-        ...authProfileObj.authProfiles[0],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-    );
+    await this.collectionRepository.addAuthProfile(_collection.id as string, {
+      ...authProfileObj.authProfiles[0],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
 
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
@@ -1915,10 +1919,11 @@ class CollectionExplorerPage {
 
     if (isGuestUser) {
       try {
-        const res = await this.collectionRepository.readAuthProfilesInCollection(
-          authProfileObj.collectionId as string,
-          _authProfilePayload.authId,
-        );
+        const res =
+          await this.collectionRepository.readAuthProfilesInCollection(
+            authProfileObj.collectionId as string,
+            _authProfilePayload.authId,
+          );
 
         if (res) res.authId = uuidv4();
 
@@ -1932,8 +1937,7 @@ class CollectionExplorerPage {
         return { ...res, isSuccessful: true };
       } catch (error) {
         console.error("Error while handling guest auth profile:", error);
-        // notifications.error("Failed to create auth profile. Please try again.");
-        return null; // or handle differently as per your flow
+        return error;
       }
     }
 
@@ -1944,7 +1948,7 @@ class CollectionExplorerPage {
     );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
-      await this.collectionRepository.updateAuthProfile( // update fn. updateCollectionData here 
+      await this.collectionRepository.updateAuthProfile(
         _collection.id as string,
         _authProfilePayload.authId,
         res,
@@ -1955,19 +1959,25 @@ class CollectionExplorerPage {
         _collection.id,
         _authProfilePayload.authId,
       );
-      console.error(response.message)
+      console.error(response.message);
       notifications.error("Failed to create authentication profile.");
     }
 
     return response;
-  }
+  };
 
+  /**
+   * Handle updating existing auth profile in a collection
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param authId :authId for which update has to be done
+   * @param authProfilePayload :AuthProfilePayload Object
+   * @returns :void
+   */
   public handleUpdateAuthProfile = async (
     _collection: CollectionDto,
     _authProfileId: string,
-    _updatedAuthProfilePayload // ToDo: add type
+    _updatedAuthProfilePayload: AuthProfileDto,
   ) => {
-
     let userSource = {};
     if (_collection?.activeSync) {
       userSource = {
@@ -1978,8 +1988,7 @@ class CollectionExplorerPage {
       };
     }
 
-    const updatedAuthProfileObj =
-    {
+    const updatedAuthProfileObj = {
       collectionId: _collection.id,
       workspaceId: _collection.workspaceId,
       ...userSource,
@@ -1993,12 +2002,13 @@ class CollectionExplorerPage {
 
     if (isGuestUser) {
       try {
-        const res = await this.collectionRepository.readAuthProfilesInCollection(
-          updatedAuthProfileObj.collectionId as string,
-          updatedAuthProfileObj.authId,
-        );
+        const res =
+          await this.collectionRepository.readAuthProfilesInCollection(
+            updatedAuthProfileObj.collectionId as string,
+            updatedAuthProfileObj.authId,
+          );
 
-        console.log("auth pro :>> ", _authProfileId)
+        console.log("auth pro :>> ", _authProfileId);
         console.log("in update res ;>> ", res, updatedAuthProfileObj);
         await this.collectionRepository.updateAuthProfile(
           _collection.id as string,
@@ -2018,10 +2028,9 @@ class CollectionExplorerPage {
       } catch (error) {
         console.error("Error while updating guest auth profile:", error);
         // notifications.error("Failed to update auth profile. Please try again.");
-        return null;
+        return error;
       }
     }
-
 
     const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
     const response = await this.collectionService.updateAuthProfile(
@@ -2038,18 +2047,26 @@ class CollectionExplorerPage {
       );
 
       // Don't show success notification if its a defaultkey is update request
-      if (!_updatedAuthProfilePayload.defaultKey) notifications.success("Auth profile updated successfully.");
+      if (!_updatedAuthProfilePayload.defaultKey)
+        notifications.success("Auth profile updated successfully.");
     } else {
-      console.error(response.message)
+      console.error(response.message);
       notifications.error("Failed to update authentication profile.");
     }
 
     return response;
-  }
+  };
 
+  /**
+   * Handle deleting auth profile in a collection
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param authId :authId of auth profile which needs to be deleted
+   * @param authProfilePayload :AuthProfilePayload Object
+   * @returns :void
+   */
   public handleDeleteAuthProfile = async (
     collection: CollectionDto,
-    authId: string
+    authId: string,
   ) => {
     let userSource = {};
     if (collection.activeSync) {
@@ -2094,18 +2111,14 @@ class CollectionExplorerPage {
     );
 
     if (response.isSuccessful) {
-      await this.collectionRepository.deleteAuthProfile(
-        collection.id,
-        authId,
-      );
+      await this.collectionRepository.deleteAuthProfile(collection.id, authId);
       notifications.success("Authentication profile deleted successfully.");
-    }
-    else {
+    } else {
       console.error(response.message);
       notifications.error("Failed to delete authentication profile.");
     }
     return response;
-  }
+  };
 }
 
 export default CollectionExplorerPage;

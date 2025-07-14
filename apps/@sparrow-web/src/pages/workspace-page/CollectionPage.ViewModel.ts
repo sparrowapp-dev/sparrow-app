@@ -45,7 +45,7 @@ import {
 } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation,scrollToTab } from "@sparrow/common/utils/navigation";
+import { moveNavigation, scrollToTab } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";

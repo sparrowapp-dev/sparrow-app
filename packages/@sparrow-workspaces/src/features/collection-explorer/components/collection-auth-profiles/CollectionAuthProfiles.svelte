@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, Modal } from "@sparrow/library/ui";
-  import { Table, Row, CreateAuthProfile } from "./sub-component";
+  import { Table, Row, AuthProfileForm } from "./sub-component";
   import { AddRegular, PersonKeyRegular } from "@sparrow/library/icons";
   import {
     DoubleLeftIcon,
@@ -8,6 +8,7 @@
     LeftIcon,
     RightIcon,
   } from "@sparrow/library/assets";
+  import type { CollectionAuthProifleBaseInterface as AuthProfileDto } from "@sparrow/common/types/workspace/collection-base";
 
   export let authProfilesList;
   export let onCreateAuthProfile;
@@ -16,7 +17,7 @@
   export let onUpdateRequestState;
 
   let isEditMode = false;
-  let authProfileFormData = null; // ToDo: Add proper type for auth profile data
+  let authProfileFormData: AuthProfileDto | null = null;
   let isCreateProfileModalOpen = false;
 
   let openInDesktop = false;
@@ -30,7 +31,7 @@
   let noOfProfilesListPerPage: number = 6;
 
   // For delete auth profile popup
-  let authProfileToDelete = null;
+  let authProfileToDelete: AuthProfileDto | null = null;
   let authProfileDeleteLoader = false;
   let isDeleteAuthProfilePopupOpen = false;
 
@@ -71,13 +72,13 @@
     );
 
   // Methods
-  const handleOnClickEditProfile = async (profileData) => {
+  const handleOnClickEditProfile = async (profileData: AuthProfileDto) => {
     authProfileFormData = profileData;
     isEditMode = true;
     isCreateProfileModalOpen = true;
   };
 
-  const handleOnClickDeleteProfile = async (authProfile: string) => {
+  const handleOnClickDeleteProfile = async (authProfile: AuthProfileDto) => {
     isDeleteAuthProfilePopupOpen = true;
     authProfileToDelete = authProfile;
   };
@@ -301,8 +302,7 @@
   isOpen={isCreateProfileModalOpen}
   handleModalState={handleModalClose}
 >
-  <!-- ToDo: Change compo. name to AuthProfileForm -->
-  <CreateAuthProfile
+  <AuthProfileForm
     handleModalState={handleModalClose}
     onCreateProfile={onCreateAuthProfile}
     onUpdateProfile={onUpdateAuthProfile}
@@ -361,7 +361,7 @@
       type={"danger"}
       loader={authProfileDeleteLoader}
       onClick={async () => {
-        await onDeleteAuthProfile(authProfileToDelete.authId);
+        await onDeleteAuthProfile(authProfileToDelete?.authId);
         authProfileDeleteLoader = false;
         isDeleteAuthProfilePopupOpen = false;
         authProfileToDelete = null;
