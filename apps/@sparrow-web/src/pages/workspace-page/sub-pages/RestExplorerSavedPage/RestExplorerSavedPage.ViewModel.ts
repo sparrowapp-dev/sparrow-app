@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   CompareArray,
   Debounce,
@@ -599,7 +599,7 @@ export class RestExplorerSavedViewModel {
     initRequestTab.updateIsSave(false);
     MixpanelEvent(Events.TRY_RESPONSE);
     this.tabRepository.createTab(initRequestTab.getValue());
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   /**
