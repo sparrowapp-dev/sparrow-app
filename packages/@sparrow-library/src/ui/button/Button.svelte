@@ -531,6 +531,11 @@
     border: 0px;
   }
   .smooth-button-transition {
-    transition: all 80ms ease-out;
+    transition: transform 80ms ease-out;
+    will-change: transform;
+  }
+
+  .smooth-button-transition:active {
+    transform: translateY(0.5px);
   }
 </style>
